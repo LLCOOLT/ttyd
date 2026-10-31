@@ -1,3 +1,5 @@
+// tik_05 (埋没した都市, Rogueport Sewers): the Thousand-Year Door room: the pedestal for the Crystal Stars (starstone, the
+// mahojin circle), the door opening scenes, and the shattering (tiz_broken) and crystal effects.
 #include "eff/eff_starstone.h"
 #include "eff/n64/eff_crystal_n64.h"
 #include "eff/n64/eff_pokopi_pcharge_n64.h"
@@ -30,31 +32,128 @@
 #include "libc_decls.h"
 #include "evt/evt_npc.h"
 #include "mario/mario_cam.h"
+#include "eff/n64/eff_stardust2_n64.h"
+#include "eff/n64/eff_stardust_n64.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_env.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "tik.h"
 #include <math.h>
+#include "cam_kaiten.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "evt/evt_pouch.h"
 
-double sin(double);
-double cos(double);
-double atan2(double y, double x);
-static inline f32 fid(f32 x) { return x; }
-double sin(double x);
-double cos(double x);
-typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
-void effStardustN64SetDrawCam(EffectEntry* eff, s32 camera);
-void effStardust2N64SetDrawCam(EffectEntry* eff, s32 camera);
-typedef struct BrokenPiece { s32 state; s32 delay; s32 dir; Vec vel; Vec pos; f32 rot; f32 rotSpeed; f32 gx; f32 gy; } BrokenPiece;
-typedef struct BrokenWork { s32 copied; smartEntry* tex; smartEntry* pieces; } BrokenWork;
+static inline f32 fid(f32 x) {
+    return x;
+}
+
+typedef struct BrokenPiece {
+    s32 state;
+    s32 delay;
+    s32 dir;
+    Vec vel;
+    Vec pos;
+    f32 rot;
+    f32 rotSpeed;
+    f32 gx;
+    f32 gy;
+} BrokenPiece;
+typedef struct BrokenWork {
+    s32 copied;
+    smartEntry* tex;
+    smartEntry* pieces;
+} BrokenWork;
 static u8* _ap;
 static KaitenParam* ckp0;
 static KaitenParam* ckp1;
 static KaitenParam* ckpw;
 BrokenWork broken_work;
 s32 select;
-static inline f32 tb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
-static inline f32 tb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
+static inline f32 tb_sin(f32 x) {
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * y;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
+    }
+    return a;
+}
+static inline f32 tb_cos(f32 x) {
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = -a;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+    }
+    return a;
+}
 void tiz_broken_draw(CameraId cameraId, void* param);
-void N_mapDispOn(void);
-void N_mapDispOff(void);
-void effStarStoneDraw(CameraId camera, void* param);
 s32 EXIGetType(s32 chan, u32 dev, u32* type);
 
 static USER_FUNC(alpha_init_func);
@@ -63,130 +162,12 @@ static USER_FUNC(cam_kaiten_get_para);
 static USER_FUNC(cam_kaiten_init);
 static USER_FUNC(cam_kaiten_set_direct);
 static USER_FUNC(cam_kaiten_set_para);
-USER_FUNC(cam_mahojin_kaiten_main);
-USER_FUNC(crystal_bgmode);
 USER_FUNC(disp_lighteffect_func);
 USER_FUNC(disp_treasure_map_func);
-USER_FUNC(eff_starstone_sound_off);
-USER_FUNC(effect_position);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_ctrl_onoff);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_delete);
-USER_FUNC(evt_eff_softdelete);
-USER_FUNC(evt_env_blur_on);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hitobj_attr_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_delete);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_position);
-USER_FUNC(evt_item_move_3d_position);
-USER_FUNC(evt_item_set_scale);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_map_get_fog);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_fog);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dir_npc);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_set_reardir);
-USER_FUNC(evt_mobj_jumpstand_blue);
-USER_FUNC(evt_mobj_kururing_floor);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_npc_delete);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_camid);
-USER_FUNC(evt_npc_set_color);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_wait_anim);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_force_reset_outofscreen);
-USER_FUNC(evt_party_jump_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_get_starstone);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon_f);
-USER_FUNC(evt_snd_envoff_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_pit);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_snd_sfxon__);
-USER_FUNC(evt_sub_animgroup_async);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
 static USER_FUNC(evtflash);
-USER_FUNC(img_alpha);
-USER_FUNC(is_dol_viewer);
-USER_FUNC(kemuri_set_color);
-USER_FUNC(kemuri_set_position);
-USER_FUNC(mahojin_effect_alpha);
-USER_FUNC(map_bgmode);
-USER_FUNC(map_bgmode_end);
-USER_FUNC(pcharge_set_position);
-USER_FUNC(stardust_setting);
-USER_FUNC(starstone_circle_link_func);
-USER_FUNC(starstone_get_position);
-USER_FUNC(starstone_set_alpha);
-USER_FUNC(starstone_set_position);
 static USER_FUNC(starstone_set_ry);
-USER_FUNC(starstone_setting);
-USER_FUNC(tiz_broken);
-USER_FUNC(tiz_stone);
-USER_FUNC(map_disp_onoff);
 void tiz_broken_draw(CameraId cameraId, void* param);
 static void alpha_tev(MapTevCallbackInfo* info);
-USER_FUNC(starstone_set_scale);
 
 static BeroEntry bero_entry_data[4];
 static NpcSetupInfo npcEnt[2];
@@ -225,7 +206,6 @@ extern EvtWord lastdungeon_anim_init[];
 extern EvtWord lastdungeon_init[];
 extern EvtWord lastdungeon[];
 extern EvtWord mahojin_event7[];
-extern EvtWord tik_05_init_evt[];
 
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
@@ -247,8 +227,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -263,8 +243,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)look_large_door, // enterEvent
@@ -280,8 +260,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero", // hitName
         1, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -298,21 +278,21 @@ static BeroEntry bero_entry_data[] = {
 };
 
 static EVT_BEGIN(kurihakase_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(378, 379)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG7_50_A_WAITING_PROF_FRANKLY, STORY_STG7_51_THOUSAND_YEAR_DOOR)
         CALL(evt_npc_set_position, STRING("me"), -30, 23, -190)
         CALL(evt_npc_set_ry, STRING("me"), 90)
-        CASE_BETWEEN(380, 387)
+        CASE_BETWEEN(STORY_STG7_52_THE_PEDESTAL, STORY_STG8_03_THE_PALACE_GARDEN)
         CALL(evt_npc_set_position, STRING("me"), -30, 23, -170)
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(kurihakase_talk)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(378, 379)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG7_50_A_WAITING_PROF_FRANKLY, STORY_STG7_51_THOUSAND_YEAR_DOOR)
         CALL(evt_msg_print, 0, STRING("mac_7_008"), 0, STRING("me"))
-        CASE_BETWEEN(380, 387)
+        CASE_BETWEEN(STORY_STG7_52_THE_PEDESTAL, STORY_STG8_03_THE_PALACE_GARDEN)
         CALL(evt_msg_print, 0, STRING("mac_7_014"), 0, STRING("me"))
     END_SWITCH
     RETURN
@@ -321,7 +301,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kurihakase_init, // initEvent
         NULL, // regularEvent
@@ -334,7 +314,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-USER_FUNC(starstone_set_position) {
+static USER_FUNC(starstone_set_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
@@ -348,7 +328,7 @@ USER_FUNC(starstone_set_position) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(starstone_get_position) {
+static USER_FUNC(starstone_get_position) {
     EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
     f32 x = ((EffStarStoneWork*)eff->userdata)->position.x;
@@ -371,7 +351,7 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(starstone_set_alpha) {
+static USER_FUNC(starstone_set_alpha) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 alpha = evtGetValue(event, args[1]);
@@ -380,7 +360,7 @@ USER_FUNC(starstone_set_alpha) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(starstone_set_scale) {
+static USER_FUNC(starstone_set_scale) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 scale = evtGetFloat(event, args[1]);
@@ -389,7 +369,7 @@ USER_FUNC(starstone_set_scale) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(starstone_circle_link_func) {
+static USER_FUNC(starstone_circle_link_func) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 idx = evtGetValue(event, args[1]) - 1;
@@ -414,7 +394,7 @@ USER_FUNC(starstone_circle_link_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(eff_starstone_sound_off) {
+static USER_FUNC(eff_starstone_sound_off) {
     ((EffStarStoneWork*)effNameToPtr((const char*)evtGetValue(event, event->args[0]))->userdata)->flags &= ~4;
     return EVT_RETURN_DONE;
 }
@@ -438,8 +418,8 @@ static void alpha_tev(MapTevCallbackInfo* info) {
 
 EVT_BEGIN(mahojin_alpha)
     CALL(evt_map_set_tevcallback, 1, PTR(alpha_tev))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("hosi_2"), 16777216)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("hosi_2"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("hosi_2"), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("hosi_2"), MAPOBJ_FLAG_DISPLAY_LIST)
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
     LOOP(0)
@@ -458,8 +438,8 @@ EVT_BEGIN(mahojin_alpha)
     END_LOOP
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("hosi_2"), 251658240)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("hosi_2"), 256)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("hosi_2"), MAPOBJ_FLAG_TEV_CALLBACK_MASK)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("hosi_2"), MAPOBJ_FLAG_DISPLAY_LIST)
     END_INLINE_EVENT
     RETURN
 EVT_END()
@@ -510,20 +490,20 @@ EVT_BEGIN(large_door_stg0)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
-    SET_VALUE(GSW(0), 16)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_13_FIRST_FLIGHT)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgm_scope, 0, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(look_large_door)
-    SWITCH(GSW(0))
-        CASE_EQUAL(15)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG0_12_02_PAPER_MAGE_1)
         SPAWN_EVENT(PTR(large_door_stg0))
         SET_VALUE(LW(0), 1)
         RETURN
-        CASE_EQUAL(378)
-        SET_VALUE(GSW(0), 379)
+        CASE_EQUAL(STORY_STG7_50_A_WAITING_PROF_FRANKLY)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_51_THOUSAND_YEAR_DOOR)
         SET_VALUE(LW(0), 0)
         RETURN
     END_SWITCH
@@ -542,7 +522,7 @@ EVT_BEGIN(kaidan_event)
                     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
                     IF_INT_LESS(LW(0), 0)
                         CALL(evt_mario_set_dir, 90, 0, 0)
-                        ELSE
+                    ELSE
                         CALL(evt_mario_set_dir, 270, 0, 0)
                     END_IF
                     WAIT_MS(800)
@@ -555,7 +535,7 @@ EVT_BEGIN(kaidan_event)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_party_run, 0)
-    SET_VALUE(GSW(0), 17)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_14_FRONT_OF_THE_PEDESTAL)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -730,7 +710,7 @@ static USER_FUNC(cam_kaiten_init) {
 }
 
 static USER_FUNC(cam_kaiten_set_direct) {
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
     f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
     f32 c = cos(6.2831855f * ckpw->angle / 360.0f);
 
@@ -839,7 +819,7 @@ USER_FUNC(disp_treasure_map_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(mahojin_effect_alpha) {
+static USER_FUNC(mahojin_effect_alpha) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 alpha = evtGetValue(event, args[1]);
@@ -848,7 +828,7 @@ USER_FUNC(mahojin_effect_alpha) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(effect_position) {
+static USER_FUNC(effect_position) {
     ItemEntry* item = itemNameToPtr("item00");
     f32 angle = -(6.2831855f * camGetPtr(CAMERA_3D)->viewYaw / 360.0f);
     f32 x;
@@ -885,14 +865,14 @@ USER_FUNC(effect_position) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(img_alpha) {
+static USER_FUNC(img_alpha) {
     Mtx trans;
     Mtx scale;
     Mtx rot;
     s32 alpha = evtGetValue(event, event->args[0]);
     ImageEntry* img = imgNameToPtr("img", gp->inBattle != 0);
 
-    animPoseSetMaterialFlagOn(img->poseId, 0x40);
+    animPoseSetMaterialFlagOn(img->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
     animPoseSetMaterialEvtColor(img->poseId, (GXColor){0xFF, 0xFF, 0xFF, alpha});
     PSMTXTrans(trans, 0.0f, 1.5f, 0.0f);
     PSMTXScale(scale, 0.9f, 0.9f, 0.9f);
@@ -902,7 +882,7 @@ USER_FUNC(img_alpha) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(tiz_stone) {
+static USER_FUNC(tiz_stone) {
     f32 t = evtGetValue(event, event->args[0]);
     EffectEntry* eff;
 
@@ -1014,10 +994,12 @@ void tiz_broken_draw(CameraId cameraId, void* param) {
     }
 }
 
+// Built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
+// removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-USER_FUNC(tiz_broken) {
-#ifdef VERSION_G8ME01
+static USER_FUNC(tiz_broken) {
+#if VERSION >= VERSION_US
     f32 sq; // FAKE: tb_sqrtf expanded by hand (see below)
     f64 guess;
 #endif
@@ -1060,7 +1042,7 @@ USER_FUNC(tiz_broken) {
                     }
                 }
                 if (dx || dy) {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                     // FAKE: sqrtf(dx * dx + dy * dy) expanded by hand with the
                     // value and Newton guess in function-scope locals (sq, guess);
                     // same instructions, but the temps of the inline colour differently in US.
@@ -1096,7 +1078,7 @@ USER_FUNC(tiz_broken) {
                 p->vel.x = -nx * param_tbl[1];
                 p->vel.y = -ny * param_tbl[1];
                 p->vel.z = 10.0f;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                 p->vel.x *= 60.0f / gp->framerate;
                 p->vel.y *= 60.0f / gp->framerate;
                 p->vel.z *= 60.0f / gp->framerate;
@@ -1105,7 +1087,7 @@ USER_FUNC(tiz_broken) {
                 power = param_tbl[3];
                 p->gx = power * tb_sin(angle);
                 p->gy = power * -tb_cos(angle);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                 p->gx *= 60.0f / gp->framerate;
                 p->gy *= 60.0f / gp->framerate;
 #endif
@@ -1186,7 +1168,7 @@ static USER_FUNC(evtflash) {
     switch (event->userdata[2]) {
         case 0: {
             GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-            fadeEntry(10, in, color);
+            fadeEntry(FADE_OUT_BLACK, in, color);
             event->userdata[2]++;
         }
         case 1:
@@ -1208,7 +1190,7 @@ static USER_FUNC(evtflash) {
             return EVT_RETURN_BLOCK;
         case 3: {
             GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-            fadeEntry(9, out, color);
+            fadeEntry(FADE_IN_BLACK, out, color);
             event->userdata[2]++;
         }
         case 4:
@@ -1220,7 +1202,7 @@ static USER_FUNC(evtflash) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(map_disp_onoff) {
+static USER_FUNC(map_disp_onoff) {
     if (evtGetValue(event, event->args[0])) {
         N_mapDispOn();
     } else {
@@ -1229,14 +1211,14 @@ USER_FUNC(map_disp_onoff) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(crystal_bgmode) {
+static USER_FUNC(crystal_bgmode) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
     ((EffCrystalN64Work*)eff->userdata)->camera = 5;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(map_bgmode) {
+static USER_FUNC(map_bgmode) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
@@ -1250,7 +1232,7 @@ USER_FUNC(map_bgmode) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(map_bgmode_end) {
+static USER_FUNC(map_bgmode_end) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
@@ -1264,7 +1246,7 @@ USER_FUNC(map_bgmode_end) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(cam_mahojin_kaiten_main) {
+static USER_FUNC(cam_mahojin_kaiten_main) {
     s32 frames;
     s32 msec;
     EvtWord* args = event->args;
@@ -1286,20 +1268,23 @@ USER_FUNC(cam_mahojin_kaiten_main) {
         event->lwData[15] = 1;
         event->savedTime = gp->renderTime;
     }
-    {s32 lo = frames * 20 / 100; s32 hi = frames * 80 / 100;
-    total = 0.0f;
-    speed = total;
-    for (i = 0; i < frames; i++) {
-        if (i <= lo) {
-            speed += 1.0f;
-        } else if (i >= hi) {
-            speed -= 1.0f;
+    {
+        s32 lo = frames * 20 / 100;
+        s32 hi = frames * 80 / 100;
+        total = 0.0f;
+        speed = total;
+        for (i = 0; i < frames; i++) {
+            if (i <= lo) {
+                speed += 1.0f;
+            } else if (i >= hi) {
+                speed -= 1.0f;
+            }
+            total += speed;
+            if (i == event->lwData[14]) {
+                cur = total;
+            }
         }
-        total += speed;
-        if (i == event->lwData[14]) {
-            cur = total;
-        }
-    }}
+    }
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
     if (elapsed > msec) {
         elapsed = msec;
@@ -1313,20 +1298,20 @@ USER_FUNC(cam_mahojin_kaiten_main) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(starstone_setting) {
+static USER_FUNC(starstone_setting) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
     EffectEntry* eff = effNameToPtr(name);
     EffectEntry* mahojin = effNameToPtr("mahojin");
 
-    ((EffStarStoneWork*)eff->userdata)->flags |= 0x20;
+    ((EffStarStoneWork*)eff->userdata)->flags |= STARSTONE_FLAG_NO_DRAW;
     ((EffMahojinWork*)mahojin->userdata)[idx + 2].arg = eff;
     ((EffMahojinWork*)mahojin->userdata)[idx + 2].func = effStarStoneDraw;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kemuri_set_position) {
+static USER_FUNC(kemuri_set_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
@@ -1340,7 +1325,7 @@ USER_FUNC(kemuri_set_position) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kemuri_set_color) {
+static USER_FUNC(kemuri_set_color) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 r = evtGetValue(event, args[1]);
@@ -1355,7 +1340,7 @@ USER_FUNC(kemuri_set_color) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(pcharge_set_position) {
+static USER_FUNC(pcharge_set_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
@@ -1369,7 +1354,7 @@ USER_FUNC(pcharge_set_position) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(stardust_setting) {
+static USER_FUNC(stardust_setting) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
     const char* name2 = (const char*)evtGetValue(event, args[1]);
@@ -1381,8 +1366,8 @@ USER_FUNC(stardust_setting) {
     return EVT_RETURN_DONE;
 }
 
-#ifndef VERSION_G8ME01
-USER_FUNC(is_dol_viewer) {
+#if VERSION <= VERSION_JP
+static USER_FUNC(is_dol_viewer) {
     u32 type;
 
     EXIGetType(0, 2, &type);
@@ -1405,7 +1390,7 @@ USER_FUNC(is_dol_viewer) {
 }
 #endif
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(evt_mapwrite)
     WAIT_MS(800)
     IF_INT_EQUAL(GW(15), 0)
@@ -1417,13 +1402,13 @@ EVT_BEGIN(evt_mapwrite)
         BEGIN_INLINE_EVENT
             CALL(evt_mario_set_dir, 90, 200, 0)
         END_INLINE_EVENT
-        ELSE
+    ELSE
         CALL(evt_mario_set_pose, STRING("M_I_N"))
         CALL(evt_cam3d_evt_set, 0, 102, 300, 0, 110, -250, 2000, 11)
     END_IF
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 15)
-    CALL(evt_item_entry, STRING("item00"), 96, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_item_set_scale, STRING("item00"), FLOAT(0.0f))
     SET_VALUE(GW(11), 0)
     BEGIN_INLINE_EVENT
@@ -1509,17 +1494,17 @@ EVT_BEGIN(evt_mapwrite)
         END_INLINE_EVENT
         BEGIN_INLINE_EVENT
             WAIT_MS(2000)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
             WAIT_MS(3250)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
             WAIT_MS(3500)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
             WAIT_MS(2700)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         END_INLINE_EVENT
     END_IF
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 4000)
@@ -1534,7 +1519,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
     IF_INT_EQUAL(GW(15), 0)
         CALL(evt_item_move_3d_position, STRING("item00"), LW(0), 115, LW(2), 14000, 11)
-        ELSE
+    ELSE
         CALL(evt_item_move_3d_position, STRING("item00"), LW(0), 115, LW(2), 9333, 11)
     END_IF
     CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
@@ -1546,12 +1531,12 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_eff, 0, STRING("laser"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(500)
     WAIT_MS(500)
-    CALL(evt_fade_entry, 21, 150, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_OUT_WHITE_3D, 150, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    CALL(evt_fade_entry, 20, 150, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_IN_WHITE_3D, 150, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(200)
-    CALL(evt_fade_entry, 21, 3200, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_OUT_WHITE_3D, 3200, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(map_disp_onoff, 0)
     WAIT_FRAMES(1)
@@ -1658,7 +1643,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(tiz_stone, 0)
     WAIT_MS(500)
     CALL(evt_npc_entry, STRING("tiz_obj"), LW(8))
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     CALL(evt_npc_pera_onoff, STRING("tiz_obj"), 0)
     CALL(evt_npc_set_ry, STRING("tiz_obj"), 0)
 #endif
@@ -1666,7 +1651,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_npc_set_position, STRING("tiz_obj"), LW(5), LW(6), LW(7))
     CALL(evt_npc_set_scale, STRING("tiz_obj"), FLOAT(1.5f), FLOAT(1.5f), FLOAT(1.5f))
     CALL(evt_npc_set_camid, STRING("tiz_obj"), 7)
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     CALL(evt_npc_set_anim, STRING("tiz_obj"), STRING("A_1"))
 #else
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 1000)
@@ -1717,7 +1702,7 @@ EVT_BEGIN(evt_mapwrite)
     END_SWITCH
     CALL(map_disp_onoff, 1)
     WAIT_FRAMES(1)
-    CALL(evt_fade_entry, 20, 1000, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_IN_WHITE_3D, 1000, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 120, 0, 0, 0, 0, 0, 0, 0)
@@ -1797,13 +1782,13 @@ EVT_BEGIN(evt_mapwrite)
         BEGIN_INLINE_EVENT
             CALL(evt_mario_set_dir, 90, 200, 0)
         END_INLINE_EVENT
-        ELSE
+    ELSE
         CALL(evt_mario_set_pose, STRING("M_I_N"))
         CALL(evt_cam3d_evt_set, 0, 102, 300, 0, 110, -250, 2000, 11)
     END_IF
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 15)
-    CALL(evt_item_entry, STRING("item00"), 96, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_item_set_scale, STRING("item00"), FLOAT(0.0f))
     SET_VALUE(GW(11), 0)
     BEGIN_INLINE_EVENT
@@ -1889,17 +1874,17 @@ EVT_BEGIN(evt_mapwrite)
         END_INLINE_EVENT
         BEGIN_INLINE_EVENT
             WAIT_MS(2000)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
             WAIT_MS(3250)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
             WAIT_MS(3500)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
             WAIT_MS(2700)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         END_INLINE_EVENT
     END_IF
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 4000)
@@ -1914,7 +1899,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
     IF_INT_EQUAL(GW(15), 0)
         CALL(evt_item_move_3d_position, STRING("item00"), LW(0), 115, LW(2), 14000, 11)
-        ELSE
+    ELSE
         CALL(evt_item_move_3d_position, STRING("item00"), LW(0), 115, LW(2), 9333, 11)
     END_IF
     CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
@@ -1926,12 +1911,12 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_eff, 0, STRING("laser"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(500)
     WAIT_MS(500)
-    CALL(evt_fade_entry, 21, 150, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_OUT_WHITE_3D, 150, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    CALL(evt_fade_entry, 20, 150, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_IN_WHITE_3D, 150, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(200)
-    CALL(evt_fade_entry, 21, 3200, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_OUT_WHITE_3D, 3200, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(map_disp_onoff, 0)
     WAIT_FRAMES(1)
@@ -2089,7 +2074,7 @@ EVT_BEGIN(evt_mapwrite)
     END_SWITCH
     CALL(map_disp_onoff, 1)
     WAIT_FRAMES(1)
-    CALL(evt_fade_entry, 20, 1000, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_IN_WHITE_3D, 1000, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 120, 0, 0, 0, 0, 0, 0, 0)
@@ -2162,9 +2147,9 @@ EVT_END()
 EVT_BEGIN(fake_fade)
     CALL(evt_cam3d_evt_set, 0, 225, 469, 0, 100, -270, 2000, 11)
     WAIT_MS(1200)
-    CALL(evt_fade_entry, 2, 500, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_OUT_IRIS, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    CALL(evt_fade_set_mapchange_type, 1, 10, 0, 1, 500)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 0, FADE_IN_IRIS, 500)
     RETURN
 EVT_END()
 
@@ -2240,7 +2225,7 @@ EVT_BEGIN(mahojin_event)
     CALL(evt_mario_mov_pos2, 0, -250, FLOAT(120.0f))
     CALL(evt_mario_set_dir, 90, 0, 0)
     WAIT_MS(500)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_7"))
@@ -2323,12 +2308,12 @@ EVT_BEGIN(mahojin_event)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(1000)
     CALL(evt_pouch_get_starstone, 0)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 2, 500, 0, 0, 0)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_IRIS, 500, 0, 0, 0)
     CALL(evt_fade_end_wait)
-    CALL(evt_fade_set_mapchange_type, 1, 10, 0, 1, 500)
-    SET_VALUE(GSW(0), 18)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 0, FADE_IN_IRIS, 500)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_15_THE_PEDESTAL)
     CALL(evt_bero_mapchange, STRING("gor_02"), 0)
     RETURN
 EVT_END()
@@ -2341,7 +2326,7 @@ EVT_BEGIN(mahojin_event1)
     CALL_CHILD(PTR(evt_mahojin_move))
     CALL(evt_msg_print_party, STRING("mac_1_001"))
     CALL_CHILD(PTR(evt_starstone_up))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 1, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
     SET_VALUE(GF(11), 0)
@@ -2359,10 +2344,10 @@ EVT_BEGIN(mahojin_event1)
     CALL(evt_mario_set_pose, STRING("M_I_2"))
     WAIT_MS(1200)
     CALL(evt_msg_print_party, STRING("mac_1_003"))
-    SET_VALUE(GSW(0), 64)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_30_ZESS_T)
     CALL_CHILD(PTR(fake_fade))
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_bero_mapchange, STRING("gor_02"), 0)
     RETURN
 EVT_END()
@@ -2375,7 +2360,7 @@ EVT_BEGIN(mahojin_event2)
     CALL_CHILD(PTR(evt_mahojin_move))
     CALL(evt_msg_print_party, STRING("mac_2_001"))
     CALL_CHILD(PTR(evt_starstone_up))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 2, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
     SET_VALUE(GF(11), 0)
@@ -2391,10 +2376,10 @@ EVT_BEGIN(mahojin_event2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_THINK1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_I_Z"))
-    SET_VALUE(GSW(0), 120)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_40_THOUSAND_YEAR_DOOR)
     CALL_CHILD(PTR(fake_fade))
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_bero_mapchange, STRING("gor_02"), 0)
     RETURN
 EVT_END()
@@ -2406,7 +2391,7 @@ EVT_BEGIN(mahojin_event3)
     CALL(evt_party_stop, 0)
     CALL_CHILD(PTR(evt_mahojin_move))
     CALL_CHILD(PTR(evt_starstone_up))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 3, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
     SET_VALUE(GF(11), 0)
@@ -2422,10 +2407,10 @@ EVT_BEGIN(mahojin_event3)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_4"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
-    SET_VALUE(GSW(0), 174)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_50_THOUSAND_YEAR_DOOR)
     CALL_CHILD(PTR(fake_fade))
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_bero_mapchange, STRING("gor_02"), 0)
     RETURN
 EVT_END()
@@ -2437,7 +2422,7 @@ EVT_BEGIN(mahojin_event4)
     CALL(evt_party_stop, 0)
     CALL_CHILD(PTR(evt_mahojin_move))
     CALL_CHILD(PTR(evt_starstone_up))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 4, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
     SET_VALUE(GF(11), 0)
@@ -2453,10 +2438,10 @@ EVT_BEGIN(mahojin_event4)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_4"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
-    SET_VALUE(GSW(0), 221)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_30_THOUSAND_YEAR_DOOR)
     CALL_CHILD(PTR(fake_fade))
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_bero_mapchange, STRING("gor_02"), 0)
     RETURN
 EVT_END()
@@ -2468,7 +2453,7 @@ EVT_BEGIN(mahojin_event5)
     CALL(evt_party_stop, 0)
     CALL_CHILD(PTR(evt_mahojin_move))
     CALL_CHILD(PTR(evt_starstone_up))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 5, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
     SET_VALUE(GF(11), 0)
@@ -2484,10 +2469,10 @@ EVT_BEGIN(mahojin_event5)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_4"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
-    SET_VALUE(GSW(0), 271)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_60_RETURN_TO_KEELHAUL)
     CALL_CHILD(PTR(fake_fade))
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_bero_mapchange, STRING("gor_02"), 0)
     RETURN
 EVT_END()
@@ -2499,7 +2484,7 @@ EVT_BEGIN(mahojin_event6)
     CALL(evt_party_stop, 0)
     CALL_CHILD(PTR(evt_mahojin_move))
     CALL_CHILD(PTR(evt_starstone_up))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 6, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
     SET_VALUE(GF(11), 0)
@@ -2515,10 +2500,10 @@ EVT_BEGIN(mahojin_event6)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_THINK1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
-    SET_VALUE(GSW(0), 347)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_70_THOUSAND_YEAR_DOOR)
     CALL_CHILD(PTR(fake_fade))
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_bero_mapchange, STRING("gor_02"), 0)
     RETURN
 EVT_END()
@@ -2564,20 +2549,20 @@ EVT_END()
 
 EVT_BEGIN(lastdungeon)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_cam_ctrl_onoff, 4, 0)
+    CALL(evt_cam_ctrl_onoff, CAMERA_3D, 0)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(2), -50)
         CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(120.0f))
         CALL(evt_mario_dispflag_onoff, 1, 1)
-        CALL(evt_party_dispflg_onoff, 0, 1, 1)
+        CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     END_INLINE_EVENT
     CALL(evt_snd_sfxon, STRING("SFX_EVT_MAP_KAKAGERU3_3"), 0)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 5000)
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0009765625f), FLOAT(0.0f), 5000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 200)
         WAIT_MS(200)
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 200)
     END_INLINE_EVENT
     CALL(evt_sub_intpl_msec_init, 0, 120, 0, 5000)
     LOOP(0)
@@ -2595,7 +2580,7 @@ EVT_BEGIN(lastdungeon)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(mahojin_event7)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -2611,7 +2596,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_MAP_KAKAGERU3_1"), 0)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 8, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
@@ -2792,17 +2777,17 @@ EVT_BEGIN(mahojin_event7)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(3250)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(3500)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(2700)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
     END_INLINE_EVENT
     WAIT_MS(14000)
     CALL(evt_mario_dispflag_onoff, 0, 4)
@@ -2910,8 +2895,8 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_cam3d_evt_set, 0, 65, 40, 0, 65, -250, 0, 11)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     WAIT_MS(1000)
-    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
-    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
     CALL(evt_msg_print_party, STRING("mac_7_010"))
     CALL(evt_cam3d_evt_set, -55, 62, -375, -55, 56, -575, 500, 11)
     WAIT_MS(500)
@@ -2975,7 +2960,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_mario_set_reardir)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0146484375f), 333)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0146484375f), 333)
     END_INLINE_EVENT
     CALL(evt_map_playanim, STRING("anm_hibi"), 0, 0)
     WAIT_MS(1500)
@@ -3043,10 +3028,10 @@ EVT_BEGIN(mahojin_event7)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 8000)
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0009765625f), FLOAT(0.0f), 8000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 200)
         WAIT_MS(200)
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 200)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(8000)
@@ -3114,19 +3099,19 @@ EVT_BEGIN(mahojin_event7)
     END_INLINE_EVENT
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 300, 0, -1000)
-    SET_VALUE(GSW(0), 380)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_52_THE_PEDESTAL)
     CALL(evt_party_run, 0)
     CALL(evt_mario_dispflag_onoff, 0, 4)
     CALL(evt_mario_adjust_dir)
     CALL(evt_mario_key_onoff, 1)
     SPAWN_EVENT(PTR(lastdungeon_init))
-    CALL(evt_run_case_evt, 10, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
+    CALL(evt_run_case_evt, CASE_COND_PUSH, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
     SET_VALUE(GF(10), 0)
     SPAWN_EVENT(PTR(mahojin_alpha))
     CALL(evt_exit_case_evt)
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
-        CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_TIK2"), 3000)
+        CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_TIK2"), 3000)
     END_INLINE_EVENT
     RETURN
 EVT_END()
@@ -3145,7 +3130,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_MAP_KAKAGERU3_1"), 0)
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 8, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
     SPAWN_EVENT(PTR(mahojin_se_event))
@@ -3326,17 +3311,17 @@ EVT_BEGIN(mahojin_event7)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(3250)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(3500)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(2700)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("door"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_yuka1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
     END_INLINE_EVENT
     WAIT_MS(14000)
     CALL(evt_mario_dispflag_onoff, 0, 4)
@@ -3444,8 +3429,8 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_cam3d_evt_set, 0, 65, 40, 0, 65, -250, 0, 11)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     WAIT_MS(1000)
-    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
-    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0146484375f), 130)
     CALL(evt_msg_print_party, STRING("mac_7_010"))
     CALL(evt_cam3d_evt_set, -55, 62, -375, -55, 56, -575, 500, 11)
     WAIT_MS(500)
@@ -3509,7 +3494,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_mario_set_reardir)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0146484375f), 333)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0146484375f), 333)
     END_INLINE_EVENT
     CALL(evt_map_playanim, STRING("anm_hibi"), 0, 0)
     WAIT_MS(1500)
@@ -3577,10 +3562,10 @@ EVT_BEGIN(mahojin_event7)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 8000)
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0009765625f), FLOAT(0.0f), 8000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 200)
         WAIT_MS(200)
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 200)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(8000)
@@ -3648,84 +3633,84 @@ EVT_BEGIN(mahojin_event7)
     END_INLINE_EVENT
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 300, 0, -1000)
-    SET_VALUE(GSW(0), 380)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_52_THE_PEDESTAL)
     CALL(evt_party_run, 0)
     CALL(evt_mario_dispflag_onoff, 0, 4)
     CALL(evt_mario_adjust_dir)
     CALL(evt_mario_key_onoff, 1)
     SPAWN_EVENT(PTR(lastdungeon_init))
-    CALL(evt_run_case_evt, 10, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
+    CALL(evt_run_case_evt, CASE_COND_PUSH, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
     SET_VALUE(GF(10), 0)
     SPAWN_EVENT(PTR(mahojin_alpha))
     CALL(evt_exit_case_evt)
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
-        CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_TIK2"), 3000)
+        CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_TIK2"), 3000)
     END_INLINE_EVENT
     RETURN
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(tik_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_TIK2"), 3000)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_TIK2"), 3000)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_mapobj_trans, 1, STRING("hosi_1"), 0, -5, 0)
     CALL(alpha_init_func)
     SET_VALUE(GF(10), 0)
     SPAWN_EVENT(PTR(mahojin_alpha))
-    CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_up), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_down), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_doa_l"), 2)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(15, 17)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_up), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_down), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_doa_l"), MAPOBJ_FLAG_BBOX_CULL)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG0_12_02_PAPER_MAGE_1, STORY_STG0_14_FRONT_OF_THE_PEDESTAL)
         SPAWN_EVENT(PTR(kaidan_event))
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event), 0)
-        CASE_EQUAL(63)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event1), 0)
-        CASE_EQUAL(119)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event2), 0)
-        CASE_EQUAL(173)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event3), 0)
-        CASE_EQUAL(220)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event4), 0)
-        CASE_EQUAL(270)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event5), 0)
-        CASE_EQUAL(346)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event6), 0)
-        CASE_BETWEEN(378, 379)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event7), 0)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event), 0)
+        CASE_EQUAL(STORY_STG1_21_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event1), 0)
+        CASE_EQUAL(STORY_STG2_27_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event2), 0)
+        CASE_EQUAL(STORY_STG3_35_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event3), 0)
+        CASE_EQUAL(STORY_STG4_17_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event4), 0)
+        CASE_EQUAL(STORY_STG5_59_01_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event5), 0)
+        CASE_EQUAL(STORY_STG6_57_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event6), 0)
+        CASE_BETWEEN(STORY_STG7_50_A_WAITING_PROF_FRANKLY, STORY_STG7_51_THOUSAND_YEAR_DOOR)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event7), 0)
     END_SWITCH
-    SWITCH(GSW(0))
-        CASE_EQUAL(15)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG0_12_02_PAPER_MAGE_1)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(bero_case_switch_off)
         CALL_CHILD(PTR(large_door_stg0_init))
-        CASE_LESS(380)
+        CASE_LESS(STORY_STG7_52_THE_PEDESTAL)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(bero_case_switch_off)
-        CASE_EQUAL(380)
+        CASE_EQUAL(STORY_STG7_52_THE_PEDESTAL)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(bero_case_switch_off)
         SPAWN_EVENT(PTR(lastdungeon_anim_init))
         SPAWN_EVENT(PTR(lastdungeon_init))
-        CALL(evt_run_case_evt, 10, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
-        CASE_GREATER(380)
+        CALL(evt_run_case_evt, CASE_COND_PUSH, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
+        CASE_GREATER(STORY_STG7_52_THE_PEDESTAL)
         SPAWN_EVENT(PTR(lastdungeon_anim_init))
     END_SWITCH
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou1"), STRING("hikou1_a"))
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou2"), STRING("hikou2_a"))
-    CALL(evt_mobj_powerupblk, STRING("pblk00"), -580, 380, -225, 0, GSWF(5532), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk00"), -580, 380, -225, 0, GSWF(GSWF_TIK05_SHINE_SPRITE), 0)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump00"), 250, 550, 80, -125, 0, 0)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump01"), 250, -550, 80, -125, 0, 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -350, 60, 175, 0, 0)
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 0, 0, 400, STRING("jimen"), 125, GSWF(5592))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hasira"), 2)
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 0, 0, 400, STRING("jimen"), 125, GSWF(GSWF_TIK05_STAR_PIECE_PANEL))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hasira"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_sub_animgroup_async, STRING("MOBJ_EFF_las_mon"))
     CALL(evt_sub_animgroup_async, STRING("EFF_treasure_map"))
     CALL(evt_sub_animgroup_async, STRING("MOBJ_EFF_mahojin"))
@@ -3746,60 +3731,60 @@ EVT_BEGIN(tik_05_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_TIK2"), 3000)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_TIK2"), 3000)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_mapobj_trans, 1, STRING("hosi_1"), 0, -5, 0)
     CALL(alpha_init_func)
     SET_VALUE(GF(10), 0)
     SPAWN_EVENT(PTR(mahojin_alpha))
-    CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_up), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_down), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_doa_l"), 2)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(15, 17)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_up), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_alpha_down), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_doa_l"), MAPOBJ_FLAG_BBOX_CULL)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG0_12_02_PAPER_MAGE_1, STORY_STG0_14_FRONT_OF_THE_PEDESTAL)
         SPAWN_EVENT(PTR(kaidan_event))
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event), 0)
-        CASE_EQUAL(63)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event1), 0)
-        CASE_EQUAL(119)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event2), 0)
-        CASE_EQUAL(173)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event3), 0)
-        CASE_EQUAL(220)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event4), 0)
-        CASE_EQUAL(270)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event5), 0)
-        CASE_EQUAL(346)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event6), 0)
-        CASE_BETWEEN(378, 379)
-        CALL(evt_run_case_evt, 0, 1, STRING("a_dai"), 0, PTR(mahojin_event7), 0)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event), 0)
+        CASE_EQUAL(STORY_STG1_21_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event1), 0)
+        CASE_EQUAL(STORY_STG2_27_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event2), 0)
+        CASE_EQUAL(STORY_STG3_35_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event3), 0)
+        CASE_EQUAL(STORY_STG4_17_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event4), 0)
+        CASE_EQUAL(STORY_STG5_59_01_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event5), 0)
+        CASE_EQUAL(STORY_STG6_57_A_MAIL_FROM_PEACH)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event6), 0)
+        CASE_BETWEEN(STORY_STG7_50_A_WAITING_PROF_FRANKLY, STORY_STG7_51_THOUSAND_YEAR_DOOR)
+        CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_dai"), 0, PTR(mahojin_event7), 0)
     END_SWITCH
-    SWITCH(GSW(0))
-        CASE_EQUAL(15)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG0_12_02_PAPER_MAGE_1)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL_CHILD(PTR(large_door_stg0_init))
-        CASE_LESS(380)
+        CASE_LESS(STORY_STG7_52_THE_PEDESTAL)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CASE_EQUAL(380)
+        CASE_EQUAL(STORY_STG7_52_THE_PEDESTAL)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         SPAWN_EVENT(PTR(lastdungeon_anim_init))
         SPAWN_EVENT(PTR(lastdungeon_init))
-        CALL(evt_run_case_evt, 10, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
-        CASE_GREATER(380)
+        CALL(evt_run_case_evt, CASE_COND_PUSH, 1, STRING("n_bero"), 0, PTR(lastdungeon), 0)
+        CASE_GREATER(STORY_STG7_52_THE_PEDESTAL)
         SPAWN_EVENT(PTR(lastdungeon_anim_init))
     END_SWITCH
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou1"), STRING("hikou1_a"))
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou2"), STRING("hikou2_a"))
-    CALL(evt_mobj_powerupblk, STRING("pblk00"), -580, 380, -225, 0, GSWF(5532), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk00"), -580, 380, -225, 0, GSWF(GSWF_TIK05_SHINE_SPRITE), 0)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump00"), 250, 550, 80, -125, 0, 0)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump01"), 250, -550, 80, -125, 0, 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -350, 60, 175, 0, 0)
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 0, 0, 400, STRING("jimen"), 125, GSWF(5592))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hasira"), 2)
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 0, 0, 400, STRING("jimen"), 125, GSWF(GSWF_TIK05_STAR_PIECE_PANEL))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hasira"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_sub_animgroup_async, STRING("MOBJ_EFF_las_mon"))
     CALL(evt_sub_animgroup_async, STRING("EFF_treasure_map"))
     CALL(evt_sub_animgroup_async, STRING("MOBJ_EFF_mahojin"))
@@ -3816,4 +3801,3 @@ EVT_BEGIN(tik_05_init_evt)
     RETURN
 EVT_END()
 #endif
-

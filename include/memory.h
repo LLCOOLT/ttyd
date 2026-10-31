@@ -1,45 +1,52 @@
+// memory.c: the heaps (HEAP_TYPE, __memAlloc), the map heap (_mapAlloc) and the smart heap for loaded files.
 #pragma once
 
 #include <dolphin/gx.h>
 #include "manager/filemgr.h"
+#include "version.h"
 
 typedef enum HEAP_TYPE {
-	HEAP_DEFAULT = 0,
-	HEAP_MALLOC = 1, //for memInit/Clear to do its allocation
-	HEAP_EXT = 2, //TODO: proper name for EXT
-	HEAP_EFFECT = 3,
-	HEAP_BATTLE = 4,
-	HEAP_UNK5 = 5
+    HEAP_DEFAULT = 0,
+    HEAP_MALLOC = 1, // for memInit/Clear to do its allocation
+    HEAP_EXT = 2,
+    HEAP_EFFECT = 3,
+    HEAP_BATTLE = 4,
+    HEAP_UNK5 = 5
 } HEAP_TYPE;
 
 typedef struct smartEntry {
-	void* address; //0x0
-	u32 size; //0x4
-	FileEntry* file; //0x8, file whose data lives in this block (smartGarbage checks its state)
-	u16 reserved_C; //0xC
-	u8 type; //0xE, total guess, no way to know
-	u8 pad_F; //0xF
-	u32 spaceAfter; //0x10, free bytes after this block (heap size - 32 at init; prev->spaceAfter += size on free)
-	struct smartEntry* next; //0x14
-	struct smartEntry* prev; //0x18
+    void* address;           // 0x0
+    u32 size;                // 0x4
+    FileEntry* file;         // 0x8, file whose data lives in this block (smartGarbage checks its state)
+    u16 inUse;               // 0xC, 1 while allocated (smartAlloc), 0 once freed (smartFree); not read
+    u8 type;                 // 0xE, auto-free group: smartAutoFree(n) frees this type (3 also frees 4); smartFree turns 4 into 3
+    u8 pad_F;                // 0xF
+    u32 spaceAfter;          // 0x10, free bytes after this block (heap size - 32 at init; prev->spaceAfter += size on free)
+    struct smartEntry* next; // 0x14
+    struct smartEntry* prev; // 0x18
 } smartEntry;
 
 typedef struct SmartWork {
-	void* ptr; //0x0
-	smartEntry work[0x800]; //0x4-0xE004
-	u32 bytesLeft; //0xE004
-	smartEntry* allocHead; //0xE008, list of allocated blocks (smartAutoFree walks it)
-	smartEntry* allocTail; //0xE00C
-	smartEntry* head; //0xE010
-	smartEntry* tail; //0xE014
-	s32 waitsync; //0xE018
+    void* ptr;              // 0x0
+    smartEntry work[0x800]; // 0x4-0xE004
+    u32 bytesLeft;          // 0xE004
+    smartEntry* allocHead;  // 0xE008, list of allocated blocks (smartAutoFree walks it)
+    smartEntry* allocTail;  // 0xE00C
+    smartEntry* head;       // 0xE010
+    smartEntry* tail;       // 0xE014
+    s32 waitsync;           // 0xE018
 } SmartWork;
 
 void memInit(void);
 void memClear(HEAP_TYPE heap);
 void* __memAlloc(HEAP_TYPE heap, u32 size);
 void __memFree(HEAP_TYPE heap, void* ptr);
-#if defined(VERSION_G8ME01) && !defined(MEMORY_C_DEFS)
+// The map heap functions take the heap base as their first argument in US and PAL, which added a second
+// map heap for battles (R_battlemapalloc_base_ptr); JP has one map heap and no argument. Game code calls
+// them with the JP argument list, and outside memory.c these macros pass the usual base (mapalloc_base_ptr)
+// in US and PAL: a deliberate per-version API shim instead of a version test at each of the ~300 call sites.
+// Calls on another heap (battle.c) write (_mapAlloc)(base, size).
+#if VERSION >= VERSION_US
 extern void* mapalloc_base_ptr;
 void* _mapAlloc(void* base, u32 size);
 void* _mapAllocTail(void* base, u32 size);
@@ -54,7 +61,7 @@ void _mapFree(void* alloc);
 #endif
 void smartInit(void);
 void smartReInit(void);
-void smartAutoFree(s32 a1);
+void smartAutoFree(s32 group);
 void smartFree(smartEntry* entry);
 smartEntry* smartAlloc(u32 size, u8 type);
 GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr);
@@ -62,6 +69,10 @@ GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr);
 void L_smartReInit(void);
 extern BOOL g_bFirstSmartAlloc;
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 extern void* R_battlemapalloc_base_ptr;
+
+void N_battleMapAlloc(void);
+void N_battleMapFree(void);
+
 #endif

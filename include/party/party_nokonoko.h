@@ -1,3 +1,4 @@
+// party_nokonoko.c: Koops's (nokonoko) field partner functions (init, move, use, finish) and the shell hold cancel.
 #pragma once
 
 #include "dolphin/types.h"
@@ -11,3 +12,6 @@ void nokonoko_move(PartyEntry* party);
 void nokonoko_use(PartyEntry* party);
 void nokonoko_use_post(PartyEntry* party);
 void nokotaro_hold_cancel(PartyEntry* party);
+
+BOOL nokonoko_holdItem(void);
+void nokonoko_use_cancel(void);

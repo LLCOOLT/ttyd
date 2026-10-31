@@ -1,3 +1,4 @@
+// aji.rel (敵のアジト, X-Naut Fortress): the REL prolog/epilog and the area's map list (aji_00 to aji_19).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,15 +8,8 @@
 #include "mario/mario_party.h"
 #include "data/mapdata.h"
 #include "aji.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-void partySetFamicomMode(PartyEntry* party, s32 mode);
-
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
+#include "evt/evt_story.h"
+#include "rel_module.h"
 
 void _unresolved(void) {
 }
@@ -23,10 +17,10 @@ void _unresolved(void) {
 void _epilog(void) {
     voidfunctionptr* dtor;
 
-    if (swGet(0x1079)) {
+    if (swGet(GSWF_AJI09_PIXEL_MARIO_ACTIVE)) {
         marioSetFamicomMode(0);
         partySetFamicomMode(partyGetPtr(marioGetPartyId()), 0);
-        swClear(0x1079);
+        swClear(GSWF_AJI09_PIXEL_MARIO_ACTIVE);
     }
     for (dtor = _dtors; *dtor != NULL; dtor++) {
         (*dtor)();
@@ -61,4 +55,3 @@ void _prolog(void) {
     relSetEvtAddr("aji_19", aji_19_init_evt);
     relSetBtlAddr("aji", btlsetup_aji_tbl, btl_aji_setup_no_tbl);
 }
-

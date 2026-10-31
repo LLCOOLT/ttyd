@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: water shield (wprotect) around a point that spawns water-damage splashes.
+#include "eff/n64/eff_opuku_wprotect_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -7,25 +9,14 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 #include "eff/n64/eff_water_damage_n64.h"
-
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
+#include "eff/eff_n64.h"
+#include "libc_decls.h"
 
 typedef struct PointData {
     s8 x, y, z;
     s16 s, t;
     u8 r, g, b;
 } PointData;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-u32 effTblRandN64(u32 rand, s32 index);
-void tri2();
-double sin(double);
-double cos(double);
 
 typedef struct EffOpukuWprotectN64Work {
     s32 type;     // 0x0
@@ -61,7 +52,7 @@ EffectEntry* effOpukuWprotectN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuWprotectN64Work));
     effect->userdata = work;
     effect->callback = effOpukuWprotectMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -105,12 +96,12 @@ void effOpukuWprotectMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
         if (type == 1) {
-            effect->flags &= ~4;
+            effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
             work->lifetime = 4;
         } else {
-            effect->flags &= ~4;
+            effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
             work->lifetime = 16;
         }
     }

@@ -2,7 +2,7 @@
 
 ## Matching
 
-One row per commit window, at most 3 per day. Figures come from an objdiff-cli report on each window's final tree. Rows from 2026-10-10 to 2026-10-22 are the Japanese release (G8MJ01); the last row is the US release (G8ME01).
+One row per commit window, at most 3 per day. Figures come from an objdiff-cli report on each window's final tree. Rows from 2026-10-10 to 2026-10-22 are the Japanese release (G8MJ01); the rows after it are the US (G8ME01) and European (G8MP01) releases and the June 2004 US demo (G8ME01_DEMO).
 
 | Window | Code matched | Fully linked | Data matched | Functions | Files matched | Linked this window |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -38,6 +38,10 @@ One row per commit window, at most 3 per day. Figures come from an objdiff-cli r
 | 2026-10-22 08:00-16:00 | 96.18% | 85.85% | 99.97% | not recorded | 1203 / 1234 | 24 |
 | 2026-10-22 16:00-24:00 | **100.00%** | **100.00%** | **100.00%** | **9768 / 9768** | **1234 / 1234** | 31 |
 | 2026-10-23, US (G8ME01) ³ | **100.00%** | **100.00%** | **100.00%** | **9748 / 9748** | **1226 / 1226** | - |
+| 2026-10-26, Europe (G8MP01) ⁴ | **100.00%** | **100.00%** | **100.00%** | **10271 / 10271** | **1378 / 1378** | - |
+| 2026-10-26, demo (G8ME01_DEMO) ⁵ | 99.10% | 93.75% | 90.51% | 7469 / 7478 | 739 / 757 | - |
+| 2026-10-28, demo (G8ME01_DEMO) ⁵ | 99.66% | 99.30% | 90.54% | 7475 / 7478 | 744 / 746 | - |
+| 2026-10-29, demo (G8ME01_DEMO) ⁵ | **100.00%** | **100.00%** | 90.54% | **7478 / 7478** | **746 / 746** | 2 |
 
 ¹ For these windows the report counted original assembly carried in as a stand-in as "matched", so 100% meant the build was complete and byte-identical, not that it was all C. The C share is in brackets. The data figure was objdiff's name-paired measure; the linked bytes were already identical.
 
@@ -45,9 +49,13 @@ One row per commit window, at most 3 per day. Figures come from an objdiff-cli r
 
 ³ The US release was decompiled starting from the finished Japanese decomp and reached 100% in one step. The Japanese figures stayed at 100%; on 2026-10-23 one data word was briefly mis-typed and then fixed.
 
+⁴ The European release is built from the US code line plus its own changes (see [VERSIONS.md](VERSIONS.md)), including the developer test REL `tst.rel` that only this release ships; it reached 100% in one step.
+
+⁵ Until every demo unit matched, the ones that did not were built from the original code, so the demo build was byte-identical throughout. Its data figure is objdiff's name-paired measure; the linked data bytes are identical. The unit total differs between the two rows because the list of demo units changed in between.
+
 ## Code-quality cleanup (since 2026-10-23)
 
-The cleanup keeps both builds byte-identical; every change is gated on JP (32 files OK) and US (30 files OK). These figures are measured on the cleanup branch (2026-10-25):
+The cleanup keeps every build byte-identical; each change is checked on JP (32 files OK) and US (30 files OK), and since 2026-10-26 also on Europe (33 files OK) and the demo (7 files OK). These figures are measured on the cleanup branch (2026-10-25):
 
 | What | Start | Now |
 | --- | --- | --- |
@@ -69,6 +77,23 @@ The cleanup keeps both builds byte-identical; every change is gated on JP (32 fi
 | Script arrays declared with a hard-coded size | 7,990 | 2,245 (sized where a forward declaration needs it) |
 | `#pragma` lines other than `once` | 1,692 | 708 |
 | `TODO` comments | 168 | 79 |
-| Behaviour-identical fakes ([FAKES.md](FAKES.md) rows / `FAKE` comments) | 214 / 427 | 120 / 225 |
+| Behaviour-identical fakes ([FAKES.md](FAKES.md) rows / `FAKE` comments) | 214 / 427 | 140 / 238 |
 
 Placements that stay are needed or kept on purpose: SDK startup sections, padding fillers, and small main-executable data that the original source most likely placed by hand too. Behaviour-identical fakes stay as well, and each is listed in [FAKES.md](FAKES.md).
+
+### Review census (2026-10-28)
+
+A second, stricter census measured what a reviewer would still flag in the game code (`src/`, `rels/`, `include/`: 1,594 files) after the cleanup above. These are the starting figures for the next pass; the "Now" column is measured on the cleanup branch (2026-10-29) with the same census scripts and is refreshed as work lands.
+
+| What | Start (2026-10-28) | Now |
+|---|---|---|
+| Battle scripts passing the acting unit as a bare `-2` | 48,595 in 412 files | 0 |
+| The "no output" script slot written as a bare `-250000000` | 9,058 in 391 files | 49 in 12 files |
+| Story flags and words written as bare numbers (`GSWF(n)` / `GSW(n)`) | 2,864 / 2,611 | 2,866 / 2,621 |
+| `USER_FUNC(x);` declarations in `.c` files | 22,803 (17,567 repeat a header) | 1,117 (214 repeat a header) |
+| Non-static prototypes in `.c` files | 3,471 (138 with types that differ from the header) | 1,354 (739 repeat a header, 287 of them with types that differ) |
+| `FAKE` comments / [FAKES.md](FAKES.md) rows | 233 / 138 | 238 / 140 |
+| Struct and union types defined in more than one file | 65 names | 15 names |
+| Files without a description comment | 1,553 of 1,594 | 1,609 of 1,649 |
+| Lines of version conditionals | 4,166 in 537 files | 4,103 in 539 files |
+| C files a strict clang parse rejects (per version) | 240 of 1,167 | 57 of 1,167 (JP) |

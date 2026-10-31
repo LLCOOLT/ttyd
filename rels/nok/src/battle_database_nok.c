@@ -1,3 +1,6 @@
+// battle_database_nok (ノコ村, Petalburg): the battle database; the epilogue's stage-play battle (btlgrp_nok_hei_ep) on
+// the Petal Meadows stage.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -5,8 +8,7 @@
 #include "battle/battle_stage.h"
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
-
-extern BattleUnitKind unit_act_mario;
+#include "nok.h"
 
 BattleStageObjectData nok_btlobject_data[10];
 BattleStageData nok_btlstage_data[1];
@@ -31,10 +33,10 @@ BattleStageObjectData nok_btlobject_data[] = {
 
 BattleStageData nok_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_04_0", // mSpecificStageDataDir
-        10, // mNumObjects
-        nok_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_04_0", // specificStageDataDir
+        10, // numObjects
+        nok_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -44,10 +46,10 @@ BattleStageData nok_btlstage_data[] = {
 
 BattleUnitSetup btlparty_nok_hei_ep[] = {
     {
-        &unit_act_mario, // mUnitKindParams
+        &unit_act_mario, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -79,7 +81,7 @@ NpcSetupBattleInfo btlsetup_nok_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_nok_btlno_hei_test1_off, // select
-        0x100000, // battleFlags
+        NPC_BATTLE_NO_PLAYER_ENTRY, // battleFlags
         6, // randomMode
         {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -91,4 +93,3 @@ NpcTerritoryInfo btl_nok_setup_no_tbl[] = {
     {"BTLNO_HEI_TEST1", 0},
     {0},
 };
-

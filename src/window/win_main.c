@@ -1,3 +1,4 @@
+// Pause menu: opening and closing the menu, item use from the menu, and the shared text and texture helpers.
 #include "win/win_main.h"
 #include "eff/eff_recovery.h"
 #include "data/item_data.h"
@@ -16,57 +17,43 @@
 #include <string.h>
 #include <stdarg.h>
 #include "evt/evt_yuugijou.h"
-#ifdef VERSION_G8ME01
+#include "libc_decls.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_env.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "koopa.h"
+#include "party/party_motion.h"
+#include "win/win_log.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "win/win_root.h"
+#if VERSION >= VERSION_US
 char* strstr(const char* str, const char* sub);
 #endif
 #include "driver/msgdrv.h"
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
 #include "win/win_party.h"
-#include "libc_decls.h"
+// FAKE: win_main.c calls pouchSetHP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
+typedef void (*PouchSetHPS32Fn)(s32);
+// FAKE: win_main.c calls pouchSetFP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
+typedef void (*PouchSetFPS32Fn)(s32);
+// FAKE: win_main.c calls pouchSetAP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
+typedef void (*PouchSetAPS32Fn)(s32);
 
-extern ItemData itemDataTable[];
-
-#define HALF_F float_0p5_8041dc98
+// FAKE: the 0.5f that winTexSet and friends load is a named .sdata2 constant defined after winLectureCheck
+// (winConstHalf below); with a plain 0.5f literal the .sdata2 constants come out in a different
+// order (winTexSet, winIconSet, winMain and others then differ).
+#define HALF_F winConstHalf
 USER_FUNC(cam_r);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_env_blur_on);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_item_delete);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_normal_pose);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_check);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_color);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_nokotaro_get_status);
-USER_FUNC(evt_party_set_breed_pose);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_seq_set_seq);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(lecture_key_mask_off);
 USER_FUNC(lecture_step_wait);
 USER_FUNC(all_party_slit_off);
@@ -97,25 +84,12 @@ static WindowWork* wp;
 #include "statuswindow.h"
 #include "data/party_data.h"
 #include "manager/evtmgr_cmd.h"
-s32 winRootMain(WindowWork* wp);
-void winRootDisp(CameraId camId, WindowWork* wp);
-const char* winGetMapTplName(void);
-s32 kpaGetStageViewType(void);
-void kpaPauseSE2(void);
-double sin(double);
-int vsprintf(char* buf, const char* fmt, va_list args);
-void FontDrawScaleVec(Vec scale);
 void FontDrawStringVecPitch(Vec* pos, const char* msg, f32 pitch);
-void FontDrawMessageMtx(Mtx mtx, const char* msg);
-void FontDrawEdge(void);
-void FontDrawEdgeOff(void);
 void winLectureKeyMask(void);
+// FAKE: the prototype this file was compiled with (u16 icon id; icondrv.h has s16/s32), so callers zero-extend the id
 void iconGetTexObj(GXTexObj* obj, u16 iconId);
 void winDisp(CameraId camId, void* param);
 void winDispKoopa(CameraId camId, void* param);
-
-void statusWinForceOff(void);
-void allPartyForceSlitOff(void);
 
 WindowWork* winGetPtr(void) {
     return wp;
@@ -160,17 +134,21 @@ void winOpenDisable(void) {
     }
 }
 
-#ifdef VERSION_G8ME01
-typedef struct { const char* s[6]; } WinLangTbl;
+#if VERSION >= VERSION_US
+typedef struct {
+    const char* s[6];
+} WinLangTbl;
 #else
-typedef struct { const char* s[2]; } WinLangTbl;
+typedef struct {
+    const char* s[2];
+} WinLangTbl;
 #endif
 static const WinLangTbl winLangTbl;
 
 void winMain(void) {
     MarioWork* mario;
     s32 i;
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     WindowPartyDt* list[7];
 #endif
 
@@ -235,16 +213,16 @@ void winMain(void) {
                         if (keyGetButton(0) & PAD_TRIGGER_Z) {
                             break;
                         }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
                         if (strcmp(gp->currentAreaName, "yuu") == 0) {
                             break;
                         }
 #endif
-                        if ((wp->buttonTrg & PAD_BUTTON_LEFT) && (swByteGet(0) >= 7 || partyChkJoin(1))) {
+                        if ((wp->buttonTrg & PAD_BUTTON_LEFT) && (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(1))) {
                             wp->menuSel = 1;
                         } else if (wp->buttonTrg & PAD_BUTTON_UP) {
                             wp->menuSel = 2;
-                        } else if ((wp->buttonTrg & PAD_BUTTON_RIGHT) && (swByteGet(0) >= 20 || pouchGetHaveBadgeCnt())) {
+                        } else if ((wp->buttonTrg & PAD_BUTTON_RIGHT) && (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_17_BADGE_TUTORIAL || pouchGetHaveBadgeCnt())) {
                             wp->menuSel = 3;
                         } else if (wp->buttonTrg & PAD_BUTTON_DOWN) {
                             wp->menuSel = 4;
@@ -255,19 +233,19 @@ void winMain(void) {
                     if (keyGetButton(0) & PAD_TRIGGER_L) {
                         break;
                     }
-#ifdef VERSION_G8ME01
-                    if ((gp->flags & 0x1000) && evtGetValue(NULL, GSW(0)) < 7) {
+#if VERSION >= VERSION_US
+                    if ((gp->flags & GLOBAL_FLAG_KIOSK) && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG0_07_GOOMBELLA_JOINS) {
                         break;
                     }
 #endif
                 }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
                 else {
                     wp->menuSel = 0;
                 }
 #endif
-                camGetPtr((CameraId)8)->flags |= 0x200;
-                if (gp->flags & 0x1000) {
+                camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_DISABLE;
+                if (gp->flags & GLOBAL_FLAG_KIOSK) {
                     wp->menuSel = 1;
                 }
                 if (!(wp->flags & 0x1000)) {
@@ -276,7 +254,7 @@ void winMain(void) {
                     npcStopForEvent();
                 }
                 fbatChangeMode(7);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
                 marioCtrlOff2();
 #else
                 if (mario->characterId == 2) {
@@ -290,11 +268,11 @@ void winMain(void) {
                 }
 #endif
                 partyCtrlOff();
-                psndSetFlag(0x80);
+                psndSetFlag(PSND_FLAG_MUTE_SFX);
                 if (mario->characterId == 2) {
                     kpaPauseSE2();
                 }
-                if (mario->flags & 0x80000000) {
+                if (mario->flags & MARIO_FLAG_IS_8_BIT) {
                     wp->flags |= 0x2000;
                 } else {
                     wp->flags &= ~0x2000;
@@ -302,13 +280,13 @@ void winMain(void) {
                 for (i = 0; i < 4; i++) {
                     padRumbleHardOff(i);
                 }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                 fileAsyncf(4, 0, WIN_DIR "%s/mail.tpl", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
 #else
                 fileAsyncf(4, 0, WIN_DIR "jp/mail.tpl", getMarioStDvdRoot());
 #endif
                 {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                     fileAsyncf(4, 0, WIN_DIR "%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
 #else
                     const char* name = winGetMapTplName();
@@ -327,7 +305,7 @@ void winMain(void) {
                 WinLangTbl lang = winLangTbl;
                 BOOL ok;
 
-                if (fileAsyncf(4, 0, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]) == 0U) {
+                if (fileAsyncf(4, 0, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]) == NULL) {
                     ok = FALSE;
                 } else {
                     wp->res = fileAllocf(4, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
@@ -363,8 +341,8 @@ void winMain(void) {
                 break;
 
             case 3:
-                camGetPtr((CameraId)8)->flags &= ~0x200;
-#ifdef VERSION_G8ME01_DEMO
+                camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
+#if VERSION == VERSION_DEMO
                 marioCtrlOn2();
 #else
                 if (mario->characterId == 2) {
@@ -379,7 +357,7 @@ void winMain(void) {
 #endif
                 partyCtrlOn();
                 fbatChangeMode(1);
-                psndClearFlag(0x80);
+                psndClearFlag(PSND_FLAG_MUTE_SFX);
                 statusWinForceUpdate();
                 if (!(wp->flags & 0x1000)) {
                     marioStSystemLevel(0);
@@ -417,7 +395,7 @@ void winMain(void) {
                 break;
 
             case 200: {
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
                 s32 partyId;
                 s32 n;
 
@@ -436,7 +414,7 @@ void winMain(void) {
                     }
                 }
 #else
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                 WindowPartyDt* list[11]; /* FAKE */ // US frame is 96 bytes; only 7 entries used
 #else
                 WindowPartyDt* list[7];
@@ -463,7 +441,7 @@ void winMain(void) {
                 wp->currentEvent = evtEntryType(evt_item_use, 0, 0, 0);
                 wp->currentEvent->lwData[10] = wp->item.useItem;
                 wp->currentEvent->lwData[11] = wp->item.useTarget == 0 ? 0 : list[wp->item.useTarget - 1]->partyId;
-                psndClearFlag(0x80);
+                psndClearFlag(PSND_FLAG_MUTE_SFX);
                 wp->menuState++;
                 pouchRemoveItemIndex(wp->item.useItem, wp->item.useIdx);
                 break;
@@ -521,18 +499,17 @@ void winDisp(CameraId camId, void* param) {
 
 void winDispKoopa(CameraId camId, void* param) {
     winTexInit(*wp->res->data);
-    winTexSet(0xB7, (Vec){ 0.0f, 50.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    winTexSet(0xB7, (Vec){0.0f, 50.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-#ifdef VERSION_G8ME01
-static const WinLangTbl winLangTbl = { { "jp", "us", "ge", "fr", "sp", "it" } };
+#if VERSION >= VERSION_US
+static const WinLangTbl winLangTbl = {{"jp", "us", "ge", "fr", "sp", "it"}};
 #else
-static const WinLangTbl winLangTbl = { { "jp", "us" } };
+static const WinLangTbl winLangTbl = {{"jp", "us"}};
 #endif
 
-
 EVT_BEGIN(kime_pose)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
@@ -560,7 +537,7 @@ EVT_BEGIN(kime_pose)
 EVT_END()
 
 EVT_BEGIN(kime_pose2)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
@@ -587,7 +564,7 @@ EVT_BEGIN(kime_pose2)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 EVT_BEGIN(win_main_child_evt)
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -599,7 +576,7 @@ EVT_END()
 #endif
 
 EVT_BEGIN(kime_pose_famicom)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
@@ -643,7 +620,7 @@ EVT_BEGIN(kime_pose_famicom)
 EVT_END()
 
 // The item shown over the user's head: the demo uses entry type 16.
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 #define ITEM_USE_KIND 16
 #else
 #define ITEM_USE_KIND 17
@@ -652,7 +629,7 @@ EVT_END()
 EVT_BEGIN(evt_item_use)
     SET_TYPE(0)
     CALL(evt_mario_normalize)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     WAIT_FRAMES(1)
     CALL(evt_mario_adjust_dir)
 #else
@@ -694,7 +671,7 @@ EVT_BEGIN(evt_item_use)
         CALL(famicom_check, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL_CHILD(PTR(kime_pose))
-            ELSE
+        ELSE
             CALL_CHILD(PTR(kime_pose_famicom))
         END_IF
         WAIT_MS(1000)
@@ -706,13 +683,13 @@ EVT_BEGIN(evt_item_use)
         CALL(famicom_check, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL_CHILD(PTR(kime_pose2))
-            ELSE
+        ELSE
             CALL_CHILD(PTR(kime_pose_famicom))
         END_IF
         CALL(itemUseFunc)
         WAIT_MS(1500)
         CALL(itemUseFunc2)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
         CALL(evt_party_set_breed_pose, 0, 1)
 #else
         CALL_CHILD(PTR(win_main_child_evt))
@@ -750,8 +727,8 @@ EVT_BEGIN(evt_diary_read)
         RETURN
     END_IF
     CALL(evt_msg_continue)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-#ifndef VERSION_G8ME01_DEMO
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+#if VERSION != VERSION_DEMO
     CALL(evt_mario_dispflag_onoff, 1, 2)
 #endif
     CALL(evt_mario_adjust_dir)
@@ -766,7 +743,7 @@ EVT_BEGIN(evt_diary_read)
         CALL(evt_npc_set_anim, STRING("ゆうれい"), STRING("O_1"))
         CALL(evt_npc_set_autotalkpose, STRING("ゆうれい"), STRING("O_2"), STRING("T_2"))
     END_IF
-    CALL(evt_npc_flag_onoff, 1, STRING("ゆうれい"), 262176)
+    CALL(evt_npc_flag_onoff, 1, STRING("ゆうれい"), NPC_FLAG_NO_SHADOW | NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
         LOOP(0)
             CALL(evt_sub_intpl_msec_init, 11, 180, 64, 1000)
@@ -787,12 +764,12 @@ EVT_BEGIN(evt_diary_read)
             END_IF
         END_LOOP
     END_INLINE_EVENT
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG5_GHOST1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
     ADD(LW(2), 20)
     CALL(evt_npc_set_position, STRING("ゆうれい"), LW(0), LW(1), LW(2))
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_GHOST_APPEAR1"), LW(0), LW(1), LW(2), 0)
 #else
     CALL(evt_snd_sfxon_3d, 132773, LW(0), LW(1), LW(2), 0)
@@ -801,11 +778,11 @@ EVT_BEGIN(evt_diary_read)
     CALL(evt_mario_set_pose, STRING("M_I_O"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_05"), 0, STRING("ゆうれい"))
     WAIT_MS(300)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     BEGIN_INLINE_EVENT
         CALL(evt_env_blur_on, 0, 0)
     END_INLINE_EVENT
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_GHOST_SHAKE1"), LW(0), LW(1), LW(2), LW(3))
 #else
@@ -816,7 +793,7 @@ EVT_BEGIN(evt_diary_read)
     END_INLINE_EVENT
     WAIT_MS(4000)
     CALL(evt_fade_set_mapchange_type, 1, -1, 600, -1, -1)
-    CALL(evt_seq_set_seq, 5, 0, 0)
+    CALL(evt_seq_set_seq, SEQ_GAME_OVER, 0, 0)
     RETURN
 EVT_END()
 
@@ -829,7 +806,7 @@ EVT_BEGIN(evt_lecture_msg)
     CALL(lecture_step_wait, 2)
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("lecture_badge_02"), 0, 0)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(500)
     CALL(lecture_step_wait, 3)
     WAIT_MS(500)
@@ -837,7 +814,7 @@ EVT_BEGIN(evt_lecture_msg)
     WAIT_MS(500)
 #endif
     CALL(lecture_step_wait, 5)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(500)
 #endif
     CALL(evt_msg_continue)
@@ -856,20 +833,20 @@ EVT_BEGIN(evt_lecture_msg)
     CALL(evt_msg_print, 0, STRING("lecture_badge_07"), 0, 0)
     CALL(lecture_step_wait, 10)
     CALL(evt_msg_continue)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     LOOP(0)
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 20)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_17_BADGE_TUTORIAL)
             BREAK_LOOP
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
 #endif
     WAIT_MS(500)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(lecture_key_mask_off)
 #endif
     RETURN
-#if defined(VERSION_G8ME01) || defined(VERSION_G8ME01_DEMO)
+#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
     OPCODE_END_SCRIPT,
     0 // US and demo: a trailing zero word in the object (the JP gap_05 data word)
 };
@@ -877,12 +854,11 @@ EVT_BEGIN(evt_lecture_msg)
 EVT_END()
 #endif
 
-
 USER_FUNC(itemUseFunc) {
     PartyEntry* party;
     MarioWork* mario;
     ItemData* item;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     EffectEntry* eff;
 #endif
 
@@ -896,13 +872,13 @@ USER_FUNC(itemUseFunc) {
         case 0:
             statusWinForceOpen();
             if (event->lwData[11] == 0) {
-                ((void (*)(s32))pouchSetHP)(pouchGetHP() + item->hp_restored);
-                ((void (*)(s32))pouchSetFP)(pouchGetFP() + item->fp_restored);
-                ((void (*)(s32))pouchSetAP)(pouchGetAP() + item->sp_restored);
+                ((PouchSetHPS32Fn)pouchSetHP)(pouchGetHP() + item->hp_restored);
+                ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + item->fp_restored);
+                ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + item->sp_restored);
             } else {
-                ((void (*)(s32, s32))pouchSetPartyHP)(event->lwData[11], pouchGetPartyHP(event->lwData[11]) + item->hp_restored);
-                ((void (*)(s32))pouchSetFP)(pouchGetFP() + item->fp_restored);
-                ((void (*)(s32))pouchSetAP)(pouchGetAP() + item->sp_restored);
+                pouchSetPartyHP(event->lwData[11], pouchGetPartyHP(event->lwData[11]) + item->hp_restored);
+                ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + item->fp_restored);
+                ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + item->sp_restored);
             }
             cnt++;
             break;
@@ -938,7 +914,7 @@ USER_FUNC(itemUseFunc) {
                 cnt = 300;
                 break;
             }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             effRecoveryEntry(0, item->hp_restored, party->position.x, party->position.y + party->height, party->position.z);
 #else
             eff = effRecoveryEntry(0, item->hp_restored, party->position.x, party->position.y + party->height, party->position.z);
@@ -996,7 +972,7 @@ USER_FUNC(party_color) {
     return EVT_RETURN_DONE;
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 USER_FUNC(all_party_slit_off) {
     allPartyForceSlitOff();
     return EVT_RETURN_DONE;
@@ -1008,7 +984,7 @@ USER_FUNC(cam_r) {
     Vec v;
     f32 s;
 
-    cam = camGetPtr(4);
+    cam = camGetPtr(CAMERA_3D);
     cam->rollAngle += 3.0f;
     s = (f32)sin((f32)(u32)gp->retraceCount / 10.0f);
     PSVECSubtract(&cam->cameraAt, &cam->cameraPos, &v);
@@ -1023,9 +999,11 @@ BOOL winGhostDiaryChk(void) {
     if (wp->menuState == 301) {
         return TRUE;
     }
-    return seqGetSeq() == 5;
+    return seqGetSeq() == SEQ_GAME_OVER;
 }
 
+// FAKE: stand-in for a function the linker stripped; it only keeps the original's path format string
+// in its place in .rodata.
 const char* winMainStrippedTpl(void) {
     return WIN_DIR "%s/win.tpl";
 }
@@ -1034,7 +1012,7 @@ void winFontInit(void) {
     FontDrawStart();
 }
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x1000];
     const char* msg = fmt;
@@ -1088,7 +1066,7 @@ void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
 }
 #endif
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x1000];
     const char* msg = fmt;
@@ -1107,7 +1085,10 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     } else {
         ref = FontGetMessageWidth("９９９");
     }
-    { s32 w = ref - FontGetMessageWidth(msg); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
+    {
+        s32 w = ref - FontGetMessageWidth(msg);
+        PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z);
+    }
     PSMTXScale(scl, scale.x, scale.y, scale.z);
     PSMTXConcat(trans, scl, trans);
     FontDrawColor(color);
@@ -1121,8 +1102,13 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     va_list args;
 
     va_start(args, fmt);
-    do { vsprintf(buf, fmt, args); } while (0);
-    { s32 w = FontGetMessageWidth("９９９") - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
+    do {
+        vsprintf(buf, fmt, args);
+    } while (0);
+    {
+        s32 w = FontGetMessageWidth("９９９") - FontGetMessageWidth(buf);
+        PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z);
+    }
     PSMTXScale(scl, scale.x, scale.y, scale.z);
     PSMTXConcat(trans, scl, trans);
     FontDrawColor(color);
@@ -1130,7 +1116,7 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
 }
 #endif
 
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 // PAL: right-aligned like winFontSetR, squeezed horizontally to fit width
 void winFontSetRWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...) {
     char buf[0x1000];
@@ -1166,7 +1152,7 @@ void winFontSetRWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* 
 }
 #endif
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 void winFontSetEdge(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x1000];
     const char* msg = fmt;
@@ -1237,7 +1223,7 @@ void winFontSetLabel(Vec pos, Vec scale, GXColor color, const char* msg) {
     }
 }
 
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
 void winFontSetPitch(f32 pitch, Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     va_list args;
@@ -1253,7 +1239,7 @@ void winFontSetPitch(f32 pitch, Vec pos, Vec scale, GXColor color, const char* f
 void winTexInit(TEXPalette* texture) {
     winTexTpl = texture;
     GXSetCullMode(GX_CULL_NONE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -1298,7 +1284,7 @@ void winTexSet(u32 textureId, Vec translate, Vec scale, GXColor color) {
     sy = scale.y * GXGetTexObjHeight(&obj);
     PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
     PSMTXConcat(trans, scl, m);
-    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    PSMTXConcat(camGetPtr(CAMERA_2D)->view, m, m);
     GXLoadPosMtxImm(m, 0);
     GXSetCurrentMtx(0);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -1312,7 +1298,7 @@ void winTexSet(u32 textureId, Vec translate, Vec scale, GXColor color) {
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color) {
     Mtx trans;
     Mtx scl;
@@ -1332,7 +1318,7 @@ void winTexSetNearest(u32 textureId, Vec translate, Vec scale, GXColor color) {
     sy = scale.y * GXGetTexObjHeight(&obj);
     PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
     PSMTXConcat(trans, scl, m);
-    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    PSMTXConcat(camGetPtr(CAMERA_2D)->view, m, m);
     GXLoadPosMtxImm(m, 0);
     GXSetCurrentMtx(0);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -1376,7 +1362,7 @@ void winTexSetRot(u32 textureId, Vec translate, Vec scale, GXColor color, f32 ro
     PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
     PSMTXConcat(trans, r, m);
     PSMTXConcat(m, scl, m);
-    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    PSMTXConcat(camGetPtr(CAMERA_2D)->view, m, m);
     GXLoadPosMtxImm(m, 0);
     GXSetCurrentMtx(0);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -1432,7 +1418,7 @@ void winTexSet_x2(u32 textureId1, u32 textureId2, Vec translate, Vec scale, GXCo
     sy = scale.y * GXGetTexObjHeight(&obj);
     PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
     PSMTXConcat(trans, scl, m);
-    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    PSMTXConcat(camGetPtr(CAMERA_2D)->view, m, m);
     GXLoadPosMtxImm(m, 0);
     GXSetCurrentMtx(0);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -1447,13 +1433,15 @@ void winTexSet_x2(u32 textureId1, u32 textureId2, Vec translate, Vec scale, GXCo
 }
 
 void winIconInit(void) {
-    winTexInit(NULL);}
+    winTexInit(NULL);
+}
 
 void winIconGrayInit(void) {
-    winTexInit(NULL);    GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_ALPHA);
+    winTexInit(NULL);
+    GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_ALPHA);
     GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_GREEN, GX_CH_GREEN, GX_CH_GREEN, GX_CH_ALPHA);
     GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
-    GXSetTevColor(GX_TEVREG1, (GXColor){ 0x55, 0x55, 0x55, 0xFF });
+    GXSetTevColor(GX_TEVREG1, (GXColor){0x55, 0x55, 0x55, 0xFF});
     GXSetNumTevStages(4);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -1490,7 +1478,7 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
     GXTexObj obj;
     f32 sy;
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     if (iconId == 0x11C) {
         iconId = 0x11B;
     }
@@ -1518,7 +1506,7 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
     sy = scale.y * GXGetTexObjHeight(&obj);
     PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
     PSMTXConcat(trans, scl, m);
-    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    PSMTXConcat(camGetPtr(CAMERA_2D)->view, m, m);
     GXLoadPosMtxImm(m, 0);
     GXSetCurrentMtx(0);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -1538,7 +1526,7 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
 USER_FUNC(lecture_step_wait) {
     s32 n = evtGetValue(event, event->args[0]);
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     // The demo has no key mask flag.
     if (wp->lectureStep < n) {
         return EVT_RETURN_BLOCK;
@@ -1556,7 +1544,7 @@ USER_FUNC(lecture_step_wait) {
 #endif
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 USER_FUNC(lecture_key_mask_off) {
     wp->flags &= ~0x800;
     return EVT_RETURN_DONE;
@@ -1565,7 +1553,7 @@ USER_FUNC(lecture_key_mask_off) {
 
 void winLectureKeyMask(void) {
     if (wp->flags & 0x1000) {
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         if (wp->flags & 0x800) {
             wp->buttonTrg = 0;
             wp->buttonRep = 0;
@@ -1590,8 +1578,8 @@ void winLectureKeyMask(void) {
             case 4:
                 wp->buttonTrg = 0;
                 wp->buttonRep = 0;
-                wp->dirTrg &= 0x8000;
-                wp->dirRep &= 0x8000;
+                wp->dirTrg &= DEMO_STICK_RIGHT;
+                wp->dirRep &= DEMO_STICK_RIGHT;
                 if (wp->dirTrg || wp->dirRep) {
                     wp->lectureStep++;
                 }
@@ -1623,7 +1611,7 @@ void winLectureKeyMask(void) {
 
 void winLectureOn(void) {
     wp->flags |= 0x1000;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     wp->flags |= 0x800;
 #endif
     wp->lectureStep = 0;
@@ -1639,9 +1627,11 @@ BOOL winLectureCheck(void) {
     return FALSE;
 }
 
+// FAKE: see HALF_F at the top; volatile keeps each use a load from this word.
+const volatile f32 winConstHalf __attribute__((aligned(8))) = 0.5f;
 
-const volatile f32 float_0p5_8041dc98 __attribute__((aligned(8))) = 0.5f;
-
+// FAKE: stand-in for a function the linker stripped; it only keeps the original's int-to-float
+// conversion constant in its place in .sdata2.
 void winMainStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }

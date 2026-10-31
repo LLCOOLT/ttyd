@@ -1,3 +1,4 @@
+// eff_sandars.c: Sandars explosion effect entry (effSandarsEntry) and its work data (EffSandarsWork).
 #pragma once
 
 #include "driver/effdrv.h"

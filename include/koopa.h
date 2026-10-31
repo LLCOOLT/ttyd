@@ -1,8 +1,10 @@
+// koopa.c: Bowser (koopa) as the player in the side-scrolling interludes: level, camera, attack and invincibility functions.
 #pragma once
 
 #include "dolphin/types.h"
 
 s32 kpaGetLevel(void);
+s32 kpaCamFollow(void);
 
 struct EffectEntry* getKoopaFireEfp(void);
 void kpaAttackStart(void);
@@ -26,11 +28,11 @@ struct HitEntry;
  * kpaPreInit allocates it once (0x154) and marioReset keeps the pointer.
  * Same layout on JP and US. */
 typedef enum KpaWorkFlags {
-    KPA_WORK_FLAG_NO_HIP_ATTACK = (1 << 4),  // 0x10, kpaHipAttackOk returns FALSE
-    KPA_WORK_FLAG_100 = (1 << 8),            // 0x100, koopa_motion sets/clears
-    KPA_WORK_FLAG_MUTEKI = (1 << 16),        // 0x10000, kpaMutekiOn/Off/Check
-    KPA_WORK_FLAG_WEARY = (1 << 24),         // 0x1000000, evt_koopa_weary
-    KPA_WORK_FLAG_DEAD = (1 << 28),          // 0x10000000, evt_koopa_chk_dead
+    KPA_WORK_FLAG_NO_HIP_ATTACK = (1 << 4), // 0x10, kpaHipAttackOk returns FALSE
+    KPA_WORK_FLAG_100 = (1 << 8),           // 0x100, koopa_motion sets/clears
+    KPA_WORK_FLAG_MUTEKI = (1 << 16),       // 0x10000, kpaMutekiOn/Off/Check
+    KPA_WORK_FLAG_WEARY = (1 << 24),        // 0x1000000, evt_koopa_weary
+    KPA_WORK_FLAG_DEAD = (1 << 28),         // 0x10000000, evt_koopa_chk_dead
 } KpaWorkFlags;
 
 typedef struct KpaWork {
@@ -62,5 +64,15 @@ typedef struct KpaWork {
     s32 pad_148;                  // 0x148, never accessed
     s32 fireSfxId;                // 0x14C, kpaFireSEOn/Off, -1 when off
     s32 swimSplashTimer;          // 0x150, kpa_swim_splash
-} KpaWork;                  // size 0x154
+} KpaWork;                        // size 0x154
 f32 kpaSetFallPara(void);
+
+s32 kpaNoHitEnemyCheck(void);
+void kpaSetLevel(s32 lv);
+void kpaPreInit(void);
+f32 kpaSetJumpPara(void);
+void kpa_jumpNpc(void);
+s32 kpaFireAttackCheck(void);
+void kpaFireDelete(void);
+void kpaPauseSE2(void);
+s32 kpaHipAttackCheck(void);

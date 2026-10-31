@@ -1,3 +1,4 @@
+// Item-reveal effect (naniga: "what is it") with "what" sounds and a smoke burst for the item shown.
 #include "data/item_data.h"
 #include "driver/animdrv.h"
 #include "driver/camdrv.h"
@@ -15,11 +16,8 @@
 #include "icon_ids.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_cmd.h"
-
-extern ItemData itemDataTable[];
-void effKemuTestDrawCam(EffectEntry* effect, s32 camera);
-EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z);
-extern s32 rand(void);
+#include "eff/eff_itemget.h"
+#include "libc_decls.h"
 
 typedef struct EffNanigaWork {
     s32 type;      // 0x0
@@ -46,11 +44,11 @@ void effNanigaDisp2(CameraId cameraId, EffectEntry* effect);
 void effNanigaDisp3(CameraId cameraId, EffectEntry* effect);
 
 static EVT_BEGIN(sound_evt)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT3"), 4264967296, 4264967297, 4264967298, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT3"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(833)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT4"), 4264967296, 4264967297, 4264967298, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT4"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(833)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT5"), 4264967296, 4264967297, 4264967298, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT5"), LW(0), LW(1), LW(2), 0)
     RETURN
 EVT_END()
 
@@ -68,7 +66,7 @@ EffectEntry* effNanigaEntry(s32 type, f32 x, f32 y, f32 z, s32* list, s32 item) 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffNanigaWork));
     effect->userdata = work;
     effect->callback = effNanigaMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = 20.0f + y;
@@ -103,7 +101,7 @@ EffectEntry* effNanigaEntry(s32 type, f32 x, f32 y, f32 z, s32* list, s32 item) 
     animGroupBaseAsync("EFF_naniga", inBattle, NULL);
     work->pose = -1;
     work->alpha = 255;
-    pos = (Vec){ 0.0f, 0.0f, 0.0f };
+    pos = (Vec){0.0f, 0.0f, 0.0f};
     pos.x = work->position.x;
     pos.y = work->position.y;
     pos.z = work->position.z;
@@ -124,14 +122,14 @@ void effNanigaMain(EffectEntry* effect) {
     EventEntry* evt;
     s32 state;
 
-    v = (Vec){ 0.0f, 0.0f, 0.0f };
+    v = (Vec){0.0f, 0.0f, 0.0f};
     v.x = work->position.x;
     v.y = work->position.y;
     v.z = work->position.z;
     pos = v;
     inBattle = gp->inBattle ? TRUE : FALSE;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         if (work->pose != -1) {
             animPoseRelease(work->pose);
         }
@@ -139,112 +137,112 @@ void effNanigaMain(EffectEntry* effect) {
         return;
     }
     switch (work->state) {
-    case 0:
-        work->state++;
-        work->timer = 30;
-    case 1:
-        if (work->timer == 30) {
-            for (i = 0; i < 4; i++) {
-                effKemuTestDrawCam(effKemuTestEntry(2, work->screen.x, work->screen.y, work->screen.z,
-                                                    0.5f + (f32)irand(200) / 100.0f),
-                                   8);
+        case 0:
+            work->state++;
+            work->timer = 30;
+        case 1:
+            if (work->timer == 30) {
+                for (i = 0; i < 4; i++) {
+                    effKemuTestDrawCam(effKemuTestEntry(2, work->screen.x, work->screen.y, work->screen.z,
+                                                        0.5f + (f32)irand(200) / 100.0f),
+                                       8);
+                }
+                psndSFXOn_3D("SFX_ITEM_WHAT1", &pos);
             }
-            psndSFXOn_3D("SFX_ITEM_WHAT1", &pos);
-        }
-        if (--work->timer < 0) {
-            work->timer = 60;
-            work->state++;
-        }
-        break;
-    case 2:
-        work->timer--;
-        if (work->timer < 0) {
-            work->timer = 0;
-            work->state++;
-            work->sfxId = psndSFXOn_3D("SFX_ITEM_WHAT2", &pos);
-        }
-        break;
-    case 3:
-        work->offset = ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(work->minOffset, work->maxOffset, 5, work->timer, 300);
-        work->timer++;
-        if (work->timer > 300) {
-            psndSFXOff(work->sfxId);
-            switch (work->mode) {
-            case 0:
+            if (--work->timer < 0) {
+                work->timer = 60;
+                work->state++;
+            }
+            break;
+        case 2:
+            work->timer--;
+            if (work->timer < 0) {
+                work->timer = 0;
+                work->state++;
+                work->sfxId = psndSFXOn_3D("SFX_ITEM_WHAT2", &pos);
+            }
+            break;
+        case 3:
+            work->offset = intplGetValue(5, work->minOffset, work->maxOffset, work->timer, 300);
+            work->timer++;
+            if (work->timer > 300) {
+                psndSFXOff(work->sfxId);
+                switch (work->mode) {
+                    case 0:
+                        work->timer = 60;
+                        work->state = 10;
+                        break;
+                    case 1:
+                        work->timer = 0;
+                        work->state = 4;
+                        break;
+                    case 2:
+                        work->timer = 0;
+                        work->state = 5;
+                        break;
+                }
+            }
+            break;
+        case 4:
+            if (work->timer < 10) {
+                work->timer++;
+            } else if (work->timer < 20) {
+                work->offset -= 4.0f;
+                work->timer++;
+            } else {
+                work->offset = work->maxOffset - 40.0f;
                 work->timer = 60;
                 work->state = 10;
-                break;
-            case 1:
-                work->timer = 0;
-                work->state = 4;
-                break;
-            case 2:
-                work->timer = 0;
-                work->state = 5;
-                break;
             }
-        }
-        break;
-    case 4:
-        if (work->timer < 10) {
-            work->timer++;
-        } else if (work->timer < 20) {
-            work->offset -= 4.0f;
-            work->timer++;
-        } else {
-            work->offset = work->maxOffset - 40.0f;
-            work->timer = 60;
-            work->state = 10;
-        }
-        break;
-    case 5:
-        if (work->timer < 10) {
-            work->timer++;
-        } else if (work->timer < 20) {
-            work->offset += 4.0f;
-            work->timer++;
-        } else {
-            work->offset = 40.0f + work->maxOffset;
-            work->timer = 60;
-            work->state = 10;
-        }
-        break;
-    case 10:
-        if (work->timer != 0) {
-            work->timer--;
-        } else if (animGroupBaseAsync("EFF_naniga", inBattle, NULL)) {
-            work->pose = animPoseEntry("EFF_naniga", inBattle);
-            animPoseSetAnim(work->pose, "A_1", TRUE);
-            work->state++;
-            evt = evtEntryType(sound_evt, 0, 0, 0);
-            evt->lwData[0] = (s32)(1024.0f * pos.x) - 230000000;
-            evt->lwData[1] = (s32)(1024.0f * pos.y) - 230000000;
-            evt->lwData[2] = (s32)(1024.0f * pos.z) - 230000000;
-        }
-        break;
-    case 11:
-        if (animPoseGetLoopTimes(work->pose) > 0.8f) {
-            effItemGetEntry(10, work->position.x, work->position.y, work->position.z);
-            work->state++;
-        }
-        break;
-    case 12:
-        work->alpha -= 4;
-        if (work->alpha < 0) {
-            animPoseRelease(work->pose);
-            work->pose = -1;
-            work->timer = 30;
-            work->state++;
-        }
-        break;
-    case 13:
-        if (work->timer != 0) {
-            work->timer--;
-        } else {
-            effDelete(effect);
-            return;
-        }
-        break;
+            break;
+        case 5:
+            if (work->timer < 10) {
+                work->timer++;
+            } else if (work->timer < 20) {
+                work->offset += 4.0f;
+                work->timer++;
+            } else {
+                work->offset = 40.0f + work->maxOffset;
+                work->timer = 60;
+                work->state = 10;
+            }
+            break;
+        case 10:
+            if (work->timer != 0) {
+                work->timer--;
+            } else if (animGroupBaseAsync("EFF_naniga", inBattle, NULL)) {
+                work->pose = animPoseEntry("EFF_naniga", inBattle);
+                animPoseSetAnim(work->pose, "A_1", TRUE);
+                work->state++;
+                evt = evtEntryType(sound_evt, 0, 0, 0);
+                evt->lwData[0] = (s32)(1024.0f * pos.x) - 230000000;
+                evt->lwData[1] = (s32)(1024.0f * pos.y) - 230000000;
+                evt->lwData[2] = (s32)(1024.0f * pos.z) - 230000000;
+            }
+            break;
+        case 11:
+            if (animPoseGetLoopTimes(work->pose) > 0.8f) {
+                effItemGetEntry(10, work->position.x, work->position.y, work->position.z);
+                work->state++;
+            }
+            break;
+        case 12:
+            work->alpha -= 4;
+            if (work->alpha < 0) {
+                animPoseRelease(work->pose);
+                work->pose = -1;
+                work->timer = 30;
+                work->state++;
+            }
+            break;
+        case 13:
+            if (work->timer != 0) {
+                work->timer--;
+            } else {
+                effDelete(effect);
+                return;
+            }
+            break;
     }
     while (work->offset < 0.0f) {
         work->offset += 40.0f * (f32)work->count;
@@ -254,22 +252,22 @@ void effNanigaMain(EffectEntry* effect) {
     }
     state = work->state;
     switch (state) {
-    case 0:
-    case 1:
-        break;
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 10:
-        dispEntry(CAMERA_2D, dispCalcZ(&pos), 1, (DispCallback)effNanigaDisp, effect);
-        break;
-    default:
-        if (state == 11 && animPoseGetLoopTimes(work->pose) < 0.8f) {
+        case 0:
+        case 1:
             break;
-        }
-        dispEntry(CAMERA_3D, dispCalcZ(&pos), 1, (DispCallback)effNanigaDisp3, effect);
-        break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 10:
+            dispEntry(CAMERA_2D, dispCalcZ(&pos), 1, (DispCallback)effNanigaDisp, effect);
+            break;
+        default:
+            if (state == 11 && animPoseGetLoopTimes(work->pose) < 0.8f) {
+                break;
+            }
+            dispEntry(CAMERA_3D, dispCalcZ(&pos), 1, (DispCallback)effNanigaDisp3, effect);
+            break;
     }
     if (work->pose != -1) {
         dispEntry(CAMERA_3D, dispCalcZ(&pos), 2, (DispCallback)effNanigaDisp2, effect);
@@ -361,8 +359,8 @@ void effNanigaDisp2(CameraId cameraId, EffectEntry* effect) {
     PSMTXScale(mS, work->scale, work->scale, work->scale);
     PSMTXConcat(mT, mR, mT);
     PSMTXConcat(mT, mS, mC);
-    animPoseSetMaterialFlagOn(work->pose, 0x40);
-    animPoseSetMaterialEvtColor(work->pose, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha });
+    animPoseSetMaterialFlagOn(work->pose, ANIM_MATERIAL_FLAG_EVT_COLOR);
+    animPoseSetMaterialEvtColor(work->pose, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
     animPoseMain(work->pose);
     animPoseDrawMtx(work->pose, mC, 1, 0.0f, 10.0f);
     animPoseDrawMtx(work->pose, mC, 2, 0.0f, 10.0f);
@@ -382,8 +380,8 @@ void effNanigaDisp3(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mT, mR, mT);
     PSMTXConcat(mT, mS, mC);
     if (work->state < 4) {
-        iconDispGxCol(mC, 0, ICON_184, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        iconDispGxCol(mC, 0, ICON_184, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     } else {
-        iconDispGxCol(mC, 0, item->icon_id, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        iconDispGxCol(mC, 0, item->icon_id, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     }
 }

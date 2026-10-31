@@ -1,3 +1,6 @@
+// Paper Mario 64 effect: a single flat sprite that stretches over `time` frames (progress 0-7);
+// the failure counterpart of eff_rothammer_success_n64.c.
+#include "eff/n64/eff_rothammer_fail_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/effdrv.h"
@@ -5,22 +8,21 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 
-double sin(double);
-double cos(double);
-
 typedef struct EffRotHammerFailN64Work {
-    s16 type;      // 0x0
-    Vec position;  // 0x4
-    Vec velocity;  // 0x10
-    f32 scaleY;    // 0x1C
-    f32 scaleX;    // 0x20
-    s32 lifetime;  // 0x24
-    s32 frame;     // 0x28
-    s32 total;     // 0x2C
-    f32 progress;  // 0x30
+    s16 type;     // 0x0
+    Vec position; // 0x4
+    Vec velocity; // 0x10
+    f32 scaleY;   // 0x1C
+    f32 scaleX;   // 0x20
+    s32 lifetime; // 0x24
+    s32 frame;    // 0x28
+    s32 total;    // 0x2C
+    f32 progress; // 0x30
 } EffRotHammerFailN64Work;
 
 static effN64Vtx size24x24_tex32x32_vtx[] = {
@@ -33,12 +35,11 @@ static effN64Vtx size24x24_tex32x32_vtx[] = {
 void effRotHammerFailMain(EffectEntry* effect);
 void effRotHammerFailDisp(CameraId cameraId, EffectEntry* effect);
 
-EffectEntry* effRotHammerFailN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z) {
+EffectEntry* effRotHammerFailN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffRotHammerFailN64Work* child;
     f32 zero;
     EffRotHammerFailN64Work* work;
-
 
     effect = effEntry();
     effect->type = "RotHammerFailN64";
@@ -47,7 +48,9 @@ EffectEntry* effRotHammerFailN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z) {
     zero = 0.0f;
     effect->callback = effRotHammerFailMain;
     work->lifetime = time;
-    child = work++; child = work; work--;
+    child = work++;
+    child = work;
+    work--;
     work->frame = 0;
     work->total = time;
     work->progress = zero;

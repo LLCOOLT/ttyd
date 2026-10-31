@@ -1,3 +1,4 @@
+// Shared pieces for the star-power special moves (sac_*): the opening camera, cheering and hand-beat helpers.
 #pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_ac_help.h"
@@ -8,33 +9,10 @@
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
-
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_homing_unit);
-USER_FUNC(evt_btl_camera_set_zoom);
-USER_FUNC(evt_btl_camera_set_moveSpeedLv);
-USER_FUNC(evt_btl_camera_set_zoomSpeedLv);
-USER_FUNC(btlevtcmd_CheckStatus);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_FaceDirectionAdd);
-USER_FUNC(btlevtcmd_MovePosition);
-USER_FUNC(btlevtcmd_snd_se);
-USER_FUNC(btlevtcmd_GetHomePos);
-USER_FUNC(btlevtcmd_SetMoveSpeed);
-USER_FUNC(btlevtcmd_GetStatusMg);
-USER_FUNC(evt_audience_sound_cheer);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_delete);
-
-s32 BattleAudienceSoundCheck(s32 id);
-void BattleAudienceSoundStop(s32 id);
-void BattleAudienceSoundCheer(s32 a, s32 b);
-void BattleAudienceSoundSetVol(s32 id, u8 vol, s32 c);
-void BattleAudienceSoundHandBeat(void);
-void BattleAudienceSoundClap(s32 a, s32 b);
-void BattleAudienceSoundCheerKind(s32 kind, s32 a, s32 b);
-void BattleAudienceSoundWhistleKind(s32 kind);
+#include "battle/battle_sub.h"
+#include "evt/evt_audience.h"
+#include "evt/evt_eff.h"
+#include "version.h"
 
 static s32 count;
 s32 count2;
@@ -44,8 +22,8 @@ u8 volPer;
 
 EVT_BEGIN(sac_start_camera_evt)
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
-    CALL(btlevtcmd_CheckStatus, -2, 10, LW(0))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_btl_camera_set_zoom, 0, 100)
     ELSE
@@ -57,16 +35,16 @@ EVT_BEGIN(sac_start_camera_evt)
 EVT_END()
 
 EVT_BEGIN(sac_mario_item_on_evt)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 15)
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 5, -1, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_MARIO_HAPPY1"), EVTDAT_POINTER_MAX, 0, EVTDAT_POINTER_MAX)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 5, -1, 0)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_HAPPY1"), EVTDAT_POINTER_MAX, 0, EVTDAT_POINTER_MAX)
     CALL(evt_audience_sound_cheer, 180, 60)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_P_2"))
-    CALL(btlevtcmd_GetPartsPos, -2, 1, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHeight, -2, LW(5))
-    CALL(btlevtcmd_GetStatusMg, -2, LW(6))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_P_2"))
+    CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(5))
+    CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
     MULTIPLY_FLOAT(LW(5), LW(6))
     ADD(LW(1), LW(5))
     ADD(LW(1), 35)
@@ -78,7 +56,8 @@ EVT_BEGIN(sac_mario_item_on_evt)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01_DEMO
+// The demo places this script after sac_start_stardust in its data (see the second copy below).
+#if VERSION != VERSION_DEMO
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
     CALL(evt_eff_delete, STRING("sac_treasure"))
@@ -88,7 +67,7 @@ EVT_END()
 
 EVT_BEGIN(sac_start_stardust)
     LOOP(6)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 50)
         CALL(evt_eff, STRING(""), STRING("stardust"), 5, LW(0), LW(1), LW(2), 30, 30, 10, 30, 0, 0, 0, 0)
         WAIT_FRAMES(10)
@@ -96,7 +75,8 @@ EVT_BEGIN(sac_start_stardust)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01_DEMO
+// Same script, at its place in the demo's data.
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
     CALL(evt_eff_delete, STRING("sac_treasure"))
@@ -105,24 +85,24 @@ EVT_END()
 #endif
 
 EVT_BEGIN(sac_mario_back_home)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 5, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 5, -1, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(enemy_slide_go_evt)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), 480)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(5.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 1)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(enemy_slide_return_evt)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(7.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, 0, 1)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 1)
     RETURN
 EVT_END()
 
@@ -162,7 +142,7 @@ USER_FUNC(sac_handbeat) {
     BattleAudienceSoundSetVol(4, volPer, 1);
     if (!handBeatEnable) {
         sound = BattleAudienceSoundGetPtr(4);
-        sound->mFadeoutTime = *(s32*)(sound->header + 0xC) = 180;
+        sound->fadeoutTime = *(s32*)(sound->header + 0xC) = 180;
         return EVT_RETURN_DONE;
     }
     if (count < 0) {
@@ -210,7 +190,7 @@ USER_FUNC(sac_cheer) {
     }
     if (!cheerEnable) {
         sound = BattleAudienceSoundGetPtr(4);
-        sound->mFadeoutTime = *(s32*)(sound->header + 0xC) = 180;
+        sound->fadeoutTime = *(s32*)(sound->header + 0xC) = 180;
         return EVT_RETURN_DONE;
     }
     if (count < 0) {
@@ -240,9 +220,9 @@ USER_FUNC(sac_enemy_slide_go) {
     EventEntry* evt;
     s32 i;
 
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         unit = BattleGetUnitPtr(wp, i);
-        if (unit && unit->mAlliance == 1) {
+        if (unit && unit->alliance == 1) {
             evt = evtEntry(enemy_slide_go_evt, 0, 0x20);
             evt->unitId = i;
         }
@@ -256,12 +236,12 @@ USER_FUNC(sac_enemy_slide_return) {
     EventEntry* evt;
     s32 i;
 
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         unit = BattleGetUnitPtr(wp, i);
-        if (unit && unit->mAlliance == 1) {
+        if (unit && unit->alliance == 1) {
             evt = evtEntry(enemy_slide_return_evt, 0, 0x20);
             evt->unitId = i;
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
             unit->slideReturnEventId = evt->eventId;
 #endif
         }

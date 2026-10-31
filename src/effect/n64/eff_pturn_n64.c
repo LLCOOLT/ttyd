@@ -1,20 +1,14 @@
+// Paper Mario 64 effect: a bobbing counter sprite whose digit steps toward the count given as `lifetime` (one step
+// every 8 frames); each step down drops a type-10 copy that falls away and fades. Type 1 shows no digit.
+#include "eff/n64/eff_pturn_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double cos(double);
-typedef struct effN64Vtx {
-    s16 x, y, z;
-    s16 s, t;
-    u8 r, g, b, a;
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
+#include "libc_decls.h"
 
 typedef struct PturnElem {
     s32 type;   // 0x0
@@ -32,7 +26,6 @@ typedef struct PturnElem {
     f32 rot;    // 0x40
     s32 delay;  // 0x44
 } PturnElem;
-
 
 f32 scale_dat[9] = {5.0f, 4.5f, 4.0f, 3.0f, 2.0f, 1.0f, 0.7f, 1.2f, 1.0f};
 
@@ -79,7 +72,7 @@ EffectEntry* effPturnN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(PturnElem) * 2);
     effect->userdata = work;
     effect->callback = effPturnMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->scale2 = 1.0f;
     if (type == 1) {
@@ -93,15 +86,15 @@ EffectEntry* effPturnN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     work->pos.y = y;
     work->pos.z = z;
     switch (type) {
-    case 0:
-        work->age = 100;
-        break;
-    case 1:
-        work->age = 100;
-        break;
-    case 10:
-        work->age = 21;
-        break;
+        case 0:
+            work->age = 100;
+            break;
+        case 1:
+            work->age = 100;
+            break;
+        case 10:
+            work->age = 21;
+            break;
     }
     work->frame = 0;
     work->delay = 0;
@@ -139,8 +132,8 @@ void effPturnMain(EffectEntry* effect) {
     tmp.y = work->pos.y;
     tmp.z = work->pos.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->age = 21;
     }
     if (work->age < 100) {
@@ -217,7 +210,7 @@ void effPturnMain(EffectEntry* effect) {
         }
         work->age++;
     }
-    dispEntry(4, dispCalcZ(&position), 2, (DispCallback)effPturnDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effPturnDisp, effect);
 }
 
 void effPturnDisp(CameraId cameraId, EffectEntry* effect) {

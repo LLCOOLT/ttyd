@@ -1,3 +1,6 @@
+// las_14 (ラストダンジョン, Palace of Shadow): a riddle room off las_10: the cloud puzzle solved with Flurrie (cloud
+// map capture).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -18,62 +21,45 @@
 #include "stdio.h"
 #include "evt/evt_bero.h"
 #include "las.h"
+#include "evt/evt_cloud_map.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "driver/mapdrv.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_img_alloc_capture);
-typedef struct CloudWork { s32 used; s32 state; char animName[0x20]; char imgName[0x20]; char offscreenName[0x20]; char groupNames[8][0x20]; char hitName[0x20]; s32 limit; s32 counter; EventEntry* evt; void* endEvt; s32 timer; s32 x; s32 y; s32 w; s32 h; f32 lastFrame; } CloudWork;
-void mapGrpSetOffScreen(const char* name, const char* offscreen);
-void mapGrpClearOffScreen(const char* name);
-static CloudWork* cloud;
+static CloudMapWork* cloud;
 static u8 cloud_once_flag;
-static void _mapsetofs_all(CloudWork* wp);
-static void _mapclsofs_all(CloudWork* wp);
-static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
-static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7);
 
-USER_FUNC(evt_bero_get_info);
 static USER_FUNC(evt_cloud_main);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_item);
 USER_FUNC(evt_las_cloud_ent);
 USER_FUNC(evt_las_cloud_init);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_flag_onoff);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_hit_onoff);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-static void _mapclsofs_all(CloudWork* wp);
-static void _mapsetofs_all(CloudWork* wp);
-static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h);
-static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7);
 
 static BeroEntry bero_entry_data[2];
 static const char* capturemap[3];
 static Vec v_list[8];
-extern EvtWord touch_evt[];
-extern EvtWord las_14_init_evt[];
 
-static void _img_alloc_capture(EvtWord a0, EvtWord a1, EvtWord a2, EvtWord a3, EvtWord a4, EvtWord a5, EvtWord a6, EvtWord a7) {
+static void _img_alloc_capture(EvtWord imgName, EvtWord shadowId, EvtWord offscreenName, EvtWord allocMode, EvtWord x, EvtWord y, EvtWord w, EvtWord h) {
     EventEntry event;
     EvtWord args[10];
 
     event.args = args;
-    args[0] = a0;
-    args[1] = a1;
-    args[2] = a2;
-    args[3] = a3;
-    args[4] = a4;
-    args[5] = a5;
-    args[6] = a6;
-    args[7] = a7;
+    args[0] = imgName;
+    args[1] = shadowId;
+    args[2] = offscreenName;
+    args[3] = allocMode;
+    args[4] = x;
+    args[5] = y;
+    args[6] = w;
+    args[7] = h;
     evt_img_alloc_capture(&event, TRUE);
 }
 
@@ -142,7 +128,7 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
     return TRUE;
 }
 
-static void _mapsetofs_all(CloudWork* wp) {
+static void _mapsetofs_all(CloudMapWork* wp) {
     s32 i;
 
     for (i = 0; i < 8; i++) {
@@ -153,7 +139,7 @@ static void _mapsetofs_all(CloudWork* wp) {
     }
 }
 
-static void _mapclsofs_all(CloudWork* wp) {
+static void _mapclsofs_all(CloudMapWork* wp) {
     s32 i;
 
     for (i = 0; i < 8; i++) {
@@ -181,8 +167,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_1", // hitName
         1, // type
         1, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -201,7 +187,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), 41, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x29, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
@@ -231,15 +217,15 @@ static EVT_BEGIN(evt_cloud_main_evt)
 EVT_END()
 
 static EVT_BEGIN(cloud_evt)
-    CALL(evt_mobj_flag_onoff, 0, STRING("box"), 16384)
+    CALL(evt_mobj_flag_onoff, 0, STRING("box"), MOBJ_FLAG_INVISIBLE)
     CALL(evt_mobj_hit_onoff, STRING("box"), 1)
     CALL(evt_hitobj_onoff, STRING("A_kura"), 1, 0)
-    SET_VALUE(GSWF(4344), 1)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+    SET_VALUE(GSWF(GSWF_LAS14_FLURRIE_GUST_SOLVED), 1)
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
     WAIT_MS(2000)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     RETURN
 EVT_END()
 
@@ -255,31 +241,31 @@ static EVT_BEGIN(hint_plate)
 EVT_END()
 
 EVT_BEGIN(las_14_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST2"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_hitobj_onoff, STRING("A_taka"), 1, 0)
-    IF_INT_EQUAL(GSWF(4344), 0)
+    IF_INT_EQUAL(GSWF(GSWF_LAS14_FLURRIE_GUST_SOLVED), 0)
         CALL(evt_las_cloud_init)
         CALL(evt_las_cloud_ent, PTR(&capturemap), STRING("A_kura"), PTR(cloud_evt))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_kura"), 0, PTR(touch_evt), 0)
-        ELSE
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kura"), 0, PTR(touch_evt), 0)
+    ELSE
         CALL(evt_hitobj_onoff, STRING("A_kura"), 1, 0)
     END_IF
-    CALL(evt_mobj_itembox, STRING("box"), 0, 0, 0, 0, 0, PTR(box_evt), GSWF(4365))
-    IF_INT_EQUAL(GSWF(4344), 0)
-        CALL(evt_mobj_flag_onoff, 1, STRING("box"), 16384)
+    CALL(evt_mobj_itembox, STRING("box"), 0, 0, 0, 0, 0, PTR(box_evt), GSWF(GSWF_LAS14_KEY_CHEST_OPENED))
+    IF_INT_EQUAL(GSWF(GSWF_LAS14_FLURRIE_GUST_SOLVED), 0)
+        CALL(evt_mobj_flag_onoff, 1, STRING("box"), MOBJ_FLAG_INVISIBLE)
         CALL(evt_mobj_hit_onoff, STRING("box"), 0)
     END_IF
-    CALL(evt_run_case_evt, 9, 1, STRING("A_pure"), 0, PTR(hint_plate), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_pure"), 0, PTR(hint_plate), 0)
     RETURN
 EVT_END()
 
 static USER_FUNC(evt_cloud_main) {
-    CloudWork* wp = (CloudWork*)event->lwData[0];
+    CloudMapWork* wp = (CloudMapWork*)event->lwData[0];
     s32 group = gp->inBattle != 0;
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
@@ -430,7 +416,7 @@ static USER_FUNC(evt_cloud_main) {
 USER_FUNC(evt_las_cloud_init) {
     s32 i;
 
-    cloud = _mapAlloc(sizeof(CloudWork) * 16);
+    cloud = _mapAlloc(sizeof(CloudMapWork) * 16);
     for (i = 0; i < 16; i++) {
         cloud[i].used = 0;
         sprintf(cloud[i].imgName, "i_name_%1d", i);
@@ -445,7 +431,7 @@ USER_FUNC(evt_las_cloud_ent) {
     char** groups;
     char* hitName;
     void* endEvt;
-    CloudWork* wp;
+    CloudMapWork* wp;
     s32 i;
     s32 j;
 
@@ -480,4 +466,3 @@ USER_FUNC(evt_las_cloud_ent) {
     wp->evt->lwData[0] = (EvtWord)wp;
     return EVT_RETURN_DONE;
 }
-

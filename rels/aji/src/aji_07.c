@@ -1,3 +1,5 @@
+// aji_07 (敵のアジト, X-Naut Fortress): the teleporter room (tensou) linking the fortress with the Moon
+// (moo_04) and the sewers (tik_00).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -5,50 +7,23 @@
 #include "mario/mario.h"
 #include "party.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "aji.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_color);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cam_off);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_dispdir);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dispdir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_dispdir);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_dispdir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(scale_func);
 
 static BeroEntry bero_entry_data[2];
@@ -56,7 +31,6 @@ extern EvtWord tensou_ride[];
 extern EvtWord tensou_switch[];
 extern EvtWord evt_tensou2[];
 extern EvtWord tensou_init[];
-extern EvtWord aji_07_init_evt[];
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -79,8 +53,8 @@ static BeroEntry bero_entry_data[] = {
         "s_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -180,14 +154,14 @@ EVT_BEGIN(tensou_ride)
     END_LOOP
     WAIT_MS(2000)
     CALL(evt_snd_sfxoff, LW(9))
-    SWITCH(GSW(0))
-        CASE_LESS(376)
-        SET_VALUE(GSWF(4175), 1)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG7_25_THE_LAST_MAIL)
+        SET_VALUE(GSWF(GSWF_TIK00_TELEPORTER_ARRIVAL), 1)
         CALL(evt_bero_mapchange, STRING("tik_00"), 0)
-        CASE_EQUAL(376)
+        CASE_EQUAL(STORY_STG7_25_THE_LAST_MAIL)
         CALL(evt_bero_mapchange, STRING("moo_04"), 0)
         CASE_DEFAULT
-        SET_VALUE(GSWF(4175), 1)
+        SET_VALUE(GSWF(GSWF_TIK00_TELEPORTER_ARRIVAL), 1)
         CALL(evt_bero_mapchange, STRING("tik_00"), 0)
     END_SWITCH
     CALL(evt_exit_case_evt)
@@ -195,24 +169,24 @@ EVT_BEGIN(tensou_ride)
 EVT_END()
 
 EVT_BEGIN(tensou_switch)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("sui__1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("sui__2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("sui__1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sui__2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, STRING("sui__1"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_SWITCH_WARP1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_map_playanim, STRING("anm_saisho"), 0, 0)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hikari"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hikari"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_checkanim, STRING("anm_saisho"), LW(0), LW(1))
     WAIT_MS(LW(1))
     CALL(evt_map_playanim, STRING("anm_wa-p"), 1, 0)
-    CALL(evt_run_case_evt, 0, 1, STRING("A_tensou"), 0, PTR(tensou_ride), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_tensou"), 0, PTR(tensou_ride), 0)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_tensou2)
     CALL(evt_map_playanim, STRING("anm_wa-p"), 1, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("wa_pu"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("wa_pu"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hit_get_position, STRING("A_tensou"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WARP_LIGHT1"), LW(0), LW(1), LW(2), LW(9))
     BEGIN_INLINE_EVENT
@@ -270,7 +244,7 @@ EVT_BEGIN(evt_tensou2)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("wa_pu"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("wa_pu"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_color, 1, STRING("wa_pu"), 255, 255, 255, 255)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
@@ -282,13 +256,13 @@ EVT_BEGIN(evt_tensou2)
 EVT_END()
 
 EVT_BEGIN(tensou_init)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("sui__1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sui__2"), 1)
-    CALL(evt_run_case_evt, 9, 1, STRING("A__sui"), 0, PTR(tensou_switch), 0)
-    IF_INT_EQUAL(GSWF(1326), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("sui__1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui__2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A__sui"), 0, PTR(tensou_switch), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TIK00_TELEPORT_TO_AJI), 0)
         RETURN
     END_IF
-    SET_VALUE(GSWF(1326), 0)
+    SET_VALUE(GSWF(GSWF_TIK00_TELEPORT_TO_AJI), 0)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_party_stop, 1)
@@ -303,13 +277,13 @@ EVT_BEGIN(tensou_init)
 EVT_END()
 
 static EVT_BEGIN(evt_haguruma)
-    SET_VALUE(GSWF(4194), 1)
+    SET_VALUE(GSWF(GSWF_AJI07_COG_TAKEN), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(aji_07_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI4"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -318,8 +292,8 @@ EVT_BEGIN(aji_07_init_evt)
     CALL(evt_map_playanim, STRING("anm_PC"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_terop"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_tiktik"), 1, 0)
-    IF_INT_EQUAL(GSWF(4194), 0)
-        CALL(evt_item_entry, STRING("haguruma"), 85, -65, 100, -120, 16, -1, PTR(evt_haguruma))
+    IF_INT_EQUAL(GSWF(GSWF_AJI07_COG_TAKEN), 0)
+        CALL(evt_item_entry, STRING("haguruma"), ITEM_COG, -65, 100, -120, 16, -1, PTR(evt_haguruma))
     END_IF
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("tenjo"))
@@ -337,7 +311,7 @@ EVT_BEGIN(aji_07_init_evt)
             CALL(evt_party_cont_onoff, 0, 1)
             CALL(evt_party_cont_onoff, 1, 1)
             CALL(evt_mario_wait_landon)
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
             LOOP(30)
                 CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
                 CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
@@ -358,4 +332,3 @@ EVT_BEGIN(aji_07_init_evt)
     SPAWN_EVENT(PTR(evt_emergency))
     RETURN
 EVT_END()
-

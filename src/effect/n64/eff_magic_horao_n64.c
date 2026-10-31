@@ -1,3 +1,5 @@
+// Paper Mario 64 magic effect (horao); types 0-5, some types spawn dust (hokori) puffs.
+#include "eff/n64/eff_magic_horao_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -5,36 +7,27 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-double sin(double);
-
-typedef struct effN64Vtx {
-    s16 x, y, z;
-    s16 s, t;
-    u8 r, g, b, a;
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
+#include "eff/n64/eff_hokori_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffMagicHoraoN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    f32 vy;        // 0x10
+    s32 type;        // 0x0
+    Vec position;    // 0x4
+    f32 vy;          // 0x10
     f32 startScale;  // 0x14
     f32 targetScale; // 0x18
     s32 startAlpha;  // 0x1C
     s32 targetAlpha; // 0x20
     f32 curScale;    // 0x24
     f32 lerpRate;    // 0x28, eases curScale and alpha toward their targets
-    s32 state;     // 0x2C
-    s32 timer;     // 0x30
-    f32 scale;     // 0x34
-    s32 angle;     // 0x38
-    s32 alpha;     // 0x3C
-    s32 lifetime;  // 0x40
-    s32 frame;     // 0x44
+    s32 state;       // 0x2C
+    s32 timer;       // 0x30
+    f32 scale;       // 0x34
+    s32 angle;       // 0x38
+    s32 alpha;       // 0x3C
+    s32 lifetime;    // 0x40
+    s32 frame;       // 0x44
 } EffMagicHoraoN64Work;
 
 static effN64Vtx size64x64_tex64x64_vtx[] = {
@@ -43,8 +36,6 @@ static effN64Vtx size64x64_tex64x64_vtx[] = {
     {3200, 6400, 0, 2048, 2048, 0, 0, 0, 0xFF},
     {-3200, 6400, 0, 0, 2048, 0, 0, 0, 0xFF},
 };
-
-EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z);
 
 void effMagicHoraoMain(EffectEntry* effect);
 void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect);
@@ -178,6 +169,8 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(camera->view, mtx, mtx);
     GXLoadPosMtxImm(mtx, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
+    // The first element sets ang and the second reads it: MWCC evaluates initialiser elements left to right (C leaves
+    // their order unspecified). Setting ang in a statement before the call changes the register allocation.
     GXSetTevColor(GX_TEVREG0, (GXColor){(ang = 6.2831855f * (f32)(frame * 30) / 360.0f, 225.0f + 25.0f * (f32)sin(ang)), 225.0f + 25.0f * (f32)sin(ang), 0xFF, alpha});
     GXSetNumChans(0);
     GXSetNumTexGens(1);

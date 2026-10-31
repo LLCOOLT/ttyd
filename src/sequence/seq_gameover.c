@@ -1,9 +1,9 @@
+// Game over sequence: the game over screen, then a return to the title.
 // NOTE: seq_gameOverExit/seq_gameOverInit and N_evt_snd_bgm_unpause live in the
 // event/evt_snd.c split (0x80077EC4..0x80077F88), which is really the tail of this TU.
-// mapdrv.h declares mapPreLoad(void), but this version takes the map name
-#define mapPreLoad mapPreLoad_unused
 #include "driver/camdrv.h"
 #include "driver/fadedrv.h"
+#include "driver/mapdrv.h"
 #include "driver/seqdrv.h"
 #include "evt/evt_cam.h"
 #include "evt/evt_cmd.h"
@@ -17,44 +17,20 @@
 #include "system.h"
 #include <string.h>
 #include "seq/seq_gameover.h"
-#undef mapPreLoad
+#include "cam_road.h"
+#include "cam_shift.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "seq/seq_mapchange.h"
+#include "statuswindow.h"
+#include "version.h"
+#include <dolphin/pad.h>
 
 typedef struct GameOverWork {
     EventEntry* evt; // 0x0
 } GameOverWork;
-
-
-BOOL mapPreLoad(const char* map);
-void _relUnLoad(void);
-void _unload(const char* map, const char* nextMap, const char* nextBero);
-void statusWinForceOff(void);
-void statusWinDispOff(void);
-void statusWinDispOn(void);
-void npcClearDeadInfo(void);
-void countDownEnd(void);
-void camRoadReset(void);
-void camShiftReset(void);
-
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_clear_party);
-USER_FUNC(N_evt_snd_bgm_unpause);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_cam_ctrl_onoff);
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_sub_get_language);
-#endif
 
 static GameOverWork work;
 static GameOverWork* wp = &work;
@@ -91,49 +67,49 @@ EVT_END()
 EVT_BEGIN(fall_gameover)
     SET_VALUE(LW(0), STRING("g"))
     SPAWN_EVENT(_fall_char)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(166)
 #else
     WAIT_FRAMES(10)
 #endif
     SET_VALUE(LW(0), STRING("a"))
     SPAWN_EVENT(_fall_char)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(333)
 #else
     WAIT_FRAMES(20)
 #endif
     SET_VALUE(LW(0), STRING("m"))
     SPAWN_EVENT(_fall_char)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(166)
 #else
     WAIT_FRAMES(10)
 #endif
     SET_VALUE(LW(0), STRING("e"))
     SPAWN_EVENT(_fall_char)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(166)
 #else
     WAIT_FRAMES(10)
 #endif
     SET_VALUE(LW(0), STRING("o"))
     SPAWN_EVENT(_fall_char)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(166)
 #else
     WAIT_FRAMES(10)
 #endif
     SET_VALUE(LW(0), STRING("v"))
     SPAWN_EVENT(_fall_char)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(166)
 #else
     WAIT_FRAMES(10)
 #endif
     SET_VALUE(LW(0), STRING("e2"))
     SPAWN_EVENT(_fall_char)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(500)
 #else
     WAIT_FRAMES(30)
@@ -147,9 +123,9 @@ EVT_BEGIN(fall_gameover)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(1000)
-#elif defined(VERSION_G8ME01_DEMO)
+#elif VERSION == VERSION_DEMO
     WAIT_FRAMES(120)
 #else
     WAIT_FRAMES(60)
@@ -157,7 +133,7 @@ EVT_BEGIN(fall_gameover)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(fall_gameover_es)
     SET_VALUE(LW(0), STRING("f"))
     SPAWN_EVENT(_fall_char)
@@ -217,24 +193,24 @@ EVT_BEGIN(evt_gameover)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
     CALL(evt_mario_clear_party, 1)
     WAIT_FRAMES(1)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(N_evt_snd_bgm_unpause)
 #endif
     CALL(evt_mario_dispflag_onoff, 1, 2)
     CALL(evt_mario_set_pose, STRING("M_D_2"))
     CALL(evt_mario_set_dir, 180, 0, 0)
     CALL(evt_mario_adjust_dir)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_sub_get_language, LW(0))
     IF_INT_EQUAL(LW(0), 4)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("g"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("a"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("o"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("v"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("r"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("g"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("a"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("e"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("o"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("v"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("e2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("r"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_trans, 1, STRING("f"), 0, 200, 0)
         CALL(evt_mapobj_trans, 1, STRING("i"), 0, 200, 0)
         CALL(evt_mapobj_trans, 1, STRING("n"), 0, 200, 0)
@@ -246,42 +222,42 @@ EVT_BEGIN(evt_gameover)
         CALL(evt_mapobj_trans, 1, STRING("e4"), 0, 200, 0)
         CALL(evt_mapobj_trans, 1, STRING("g1"), 0, 200, 0)
         CALL(evt_mapobj_trans, 1, STRING("o289"), 0, 200, 0)
-        ELSE
+    ELSE
 #endif
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("f"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("i"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("d"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e3"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("l"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("j"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("u"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e4"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("g1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("o289"), 1)
-    CALL(evt_mapobj_trans, 1, STRING("g"), 0, 200, 0)
-    CALL(evt_mapobj_trans, 1, STRING("a"), 0, 200, 0)
-    CALL(evt_mapobj_trans, 1, STRING("m"), 0, 200, 0)
-    CALL(evt_mapobj_trans, 1, STRING("e"), 0, 200, 0)
-    CALL(evt_mapobj_trans, 1, STRING("o"), 0, 200, 0)
-    CALL(evt_mapobj_trans, 1, STRING("v"), 0, 200, 0)
-    CALL(evt_mapobj_trans, 1, STRING("e2"), 0, 200, 0)
-    CALL(evt_mapobj_trans, 1, STRING("r"), 0, 200, 0)
-#ifdef VERSION_G8ME01
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("f"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("i"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("d"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("e3"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("l"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("j"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("u"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("e4"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("g1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("o289"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_trans, 1, STRING("g"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("a"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("m"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("e"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("o"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("v"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("e2"), 0, 200, 0)
+        CALL(evt_mapobj_trans, 1, STRING("r"), 0, 200, 0)
+#if VERSION >= VERSION_US
     END_IF
 #endif
     CALL(evt_cam_ctrl_onoff, 4, 1)
     CALL(evt_cam3d_evt_set, 0, 208, 653, 0, 91, -30, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("anm_hokori"), 1, 0)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_sub_get_language, LW(0))
     IF_INT_EQUAL(LW(0), 4)
         CALL_CHILD(fall_gameover_es)
-        ELSE
+    ELSE
 #endif
-    CALL_CHILD(fall_gameover)
-#ifdef VERSION_G8ME01
+        CALL_CHILD(fall_gameover)
+#if VERSION >= VERSION_US
     END_IF
 #endif
     RETURN
@@ -295,12 +271,8 @@ void seq_gameOverMain(SequenceWork* work) {
         case 0:
             if (work->mapName == NULL) {
                 GXColor color = {0, 0, 0, 255};
-                fadeEntry(2, 1000, color);
-#ifdef VERSION_G8ME01_DEMO
-                gp->areaFadeInType = 8;
-#else
-                gp->areaFadeInType = 10;
-#endif
+                fadeEntry(FADE_OUT_IRIS, 1000, color);
+                gp->areaFadeInType = FADE_OUT_BLACK;
                 gp->areaFadeInDuration = 300;
             }
             mapPreLoad("sys_00");
@@ -315,19 +287,19 @@ void seq_gameOverMain(SequenceWork* work) {
             strcpy(gp->currentAreaName + 0x10, gp->currentMapName);
             statusWinForceOff();
             statusWinDispOff();
-            camera = camGetPtr(4);
+            camera = camGetPtr(CAMERA_3D);
             camera->viewport[0] = 0.0f;
             camera->viewport[1] = 0.0f;
             camera->viewport[2] = gp->fbWidth;
             camera->viewport[3] = gp->efbHeight;
-            camera = camGetPtr(8);
+            camera = camGetPtr(CAMERA_2D);
             camera->viewport[0] = 0.0f;
             camera->viewport[1] = 0.0f;
             camera->viewport[2] = gp->fbWidth;
             camera->viewport[3] = gp->efbHeight;
-            camGetPtr(8)->flags &= ~0x100;
-            camGetPtr(8)->flags |= 0x400;
-            camGetPtr(8)->flags |= 0x200;
+            camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX;
+            camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_SNAP;
+            camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_DISABLE;
             fadeTecOff();
             fadeSoftFocusOff();
             npcClearDeadInfo();
@@ -340,7 +312,7 @@ void seq_gameOverMain(SequenceWork* work) {
                 break;
             }
             mapLoad("sys_00");
-            camera = camGetPtr(4);
+            camera = camGetPtr(CAMERA_3D);
             mario = marioGetPtr();
             {
                 camera->marioPos.x = 0.0f;
@@ -358,11 +330,7 @@ void seq_gameOverMain(SequenceWork* work) {
             break;
         case 3: {
             GXColor color = {0, 0, 0, 255};
-#ifdef VERSION_G8ME01_DEMO
-            fadeEntry(29, 200, color);
-#else
-            fadeEntry(31, 200, color);
-#endif
+            fadeEntry(FADE_CURTAIN_CENTER_Z2_3D, 200, color);
             work->state++;
             break;
         }
@@ -373,14 +341,14 @@ void seq_gameOverMain(SequenceWork* work) {
                 GXColor color = {0, 0, 0, 255};
                 fadeEntry(FADE_IN_BLACK, 1000, color);
             }
-#ifdef VERSION_G8ME01_DEMO
-            psndBGMOn(0x200, (char*)0x93);
+#if VERSION == VERSION_DEMO
+            psndBGMOn(PSND_FADE_OUT, (char*)0x93);
             marioReset();
             marioEntry();
 #else
             marioReset();
             marioEntry();
-            psndBGMOn(0x200, (char*)0x93);
+            psndBGMOn(PSND_FADE_OUT, (char*)0x93);
             if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
                 sound.streams[psbgm[0].streamId].flags |= 0x8000;
             }
@@ -390,20 +358,16 @@ void seq_gameOverMain(SequenceWork* work) {
             break;
         case 5:
             if (evtCheckID(wp->evt->eventId)) {
-                if (!(keyGetButtonTrg(0) & 0x1100)) {
+                if (!(keyGetButtonTrg(0) & (PAD_BUTTON_A | PAD_BUTTON_START))) {
                     break;
                 }
             }
             {
                 GXColor color = {0, 0, 0, 255};
-#ifdef VERSION_G8ME01_DEMO
-                fadeEntry(34, 0, color);
-#else
-                fadeEntry(36, 0, color);
-#endif
+                fadeEntry(FADE_CURTAIN_CENTER_A2, 0, color);
             }
-#ifndef VERSION_G8ME01_DEMO
-            psndBGMOff_f_d(0x200, 4000, FALSE);
+#if VERSION != VERSION_DEMO
+            psndBGMOff_f_d(PSND_FADE_OUT, 4000, FALSE);
 #endif
             work->state++;
             break;
@@ -411,7 +375,7 @@ void seq_gameOverMain(SequenceWork* work) {
             if (!fadeIsFinish()) {
                 break;
             }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             gp->resetType = 1;
 #else
             _relUnLoad();
@@ -420,11 +384,11 @@ void seq_gameOverMain(SequenceWork* work) {
             strcpy(gp->currentMapName, "");
             strcpy(gp->currentAreaName, "");
             statusWinDispOn();
-            camGetPtr(8)->flags &= ~0x200;
-            if (gp->flags & 0x1000) {
-                seqSetSeq(7, NULL, NULL);
+            camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
+            if (gp->flags & GLOBAL_FLAG_KIOSK) {
+                seqSetSeq(SEQ_E3, NULL, NULL);
             } else {
-                seqSetSeq(1, NULL, NULL);
+                seqSetSeq(SEQ_TITLE, NULL, NULL);
             }
 #endif
             break;

@@ -1,21 +1,22 @@
+// Underwater bubbles (mizutama, 水中の泡) released at an angle that slow down and drift upward; types 0-3 while
+// swimming and 4-7 after diving in, the size grows with the type (radius type + 1). Used by Bowser swimming.
 #include "eff/eff_mizutama.h"
 #include "driver/dispdrv.h"
 #include "memory.h"
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 
 typedef struct EffMizutamaWork {
-    s32 type;       // 0x0
-    Vec position;   // 0x4, element 0: origin, others: offset from origin
-    f32 velX;       // 0x10
-    f32 velY;       // 0x14
-    f32 scale;      // 0x18
-    s32 timer;      // 0x1C, only cleared at entry
-    s32 state;      // 0x20, only cleared at entry
-    s32 delay;      // 0x24
+    s32 type;     // 0x0
+    Vec position; // 0x4, element 0: origin, others: offset from origin
+    f32 velX;     // 0x10
+    f32 velY;     // 0x14
+    f32 scale;    // 0x18
+    s32 timer;    // 0x1C, only cleared at entry
+    s32 state;    // 0x20, only cleared at entry
+    s32 delay;    // 0x24
 } EffMizutamaWork;
 
 EffectEntry* effMizutamaEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
@@ -73,8 +74,7 @@ EffectEntry* effMizutamaEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
             work->velY = 2.0f * (f32)cos(rad);
             work->scale = (irand(20) + 80) / 100.0f;
             work->delay = i * 2;
-        }
-        else {
+        } else {
             // scattered along a line, splashing outwards
             z = radius;
             irand(360);
@@ -98,7 +98,7 @@ void effMizutamaMain(EffectEntry* effect) {
     s32 done, i;
 
     done = 0;
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         if (work->delay) {

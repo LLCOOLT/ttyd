@@ -1,3 +1,4 @@
+// evt_door.c: scripts and commands for house doors (door_entry, evt_door_open/close and the door sound scripts).
 #pragma once
 
 #include "evt/evt_cmd.h"
@@ -23,3 +24,11 @@ extern EvtWord evt_door_open_quick[];
 extern EvtWord evt_door_open_roll[];
 extern EvtWord evt_door_setup[];
 extern EvtWord house_close_se[];
+
+USER_FUNC(door_dark_flag);
+USER_FUNC(evt_door_param);
+USER_FUNC(evt_door_save_mapflag);
+USER_FUNC(evt_door_load_mapflag);
+USER_FUNC(evt_door_set_param);
+USER_FUNC(evt_door_end_wait);
+void door_position_sub(s32 type, const char* map, const char* hitIn, const char* hitOut, Vec* in, Vec* out, BOOL mario);

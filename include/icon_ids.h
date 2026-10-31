@@ -1,6 +1,6 @@
+#pragma once
+
 // ICON_xxx is named by the JP icon id; the value is the US id when building G8ME01.
-#ifndef ICON_IDS_H
-#define ICON_IDS_H
 
 #include "version.h"
 
@@ -540,5 +540,3 @@
 #define ICON_215 VERSION_PICK(0x215, 0x217)
 #define ICON_216 VERSION_PICK(0x216, 0x218)
 #define ICON_217 VERSION_PICK(0x217, 0x219)
-
-#endif

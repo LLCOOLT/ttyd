@@ -1,42 +1,25 @@
+// Palace of Shadow (las, the "last" dungeon): the coloured lamps on Sir Grodus's (shuryo) field model and his staff, animated in the las_28 and las_29 scenes.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "driver/npcdrv.h"
 #include "driver/animdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_sub.h"
+#include "las.h"
 #include "memory.h"
+#include "evt/evt_shuryolight.h"
 
-void animPoseDrawShape(s32 poseId, s32 shapeIdx);
-void animPoseSetDispCallBack(s32 poseId, void (*callback)(void* param, s32 group), void* param);
-typedef struct ShuryoLight { NpcEntry* npc; const char** anims; s32 status; s32 group; s32 shape; } ShuryoLight;
-typedef struct ShuryoWork { s32 powerEvt; s32 headEvt; s32 tueEvt; ShuryoLight lights[5]; } ShuryoWork;
 static ShuryoWork* slhp;
 
 static USER_FUNC(evt_shuryolight_set_anim);
 static USER_FUNC(evt_shuryolight_wait_anim_end);
-USER_FUNC(evt_sub_random);
-USER_FUNC(evt_shuryolight_delete);
-static USER_FUNC(evt_shuryolight_run_tue_evt);
-USER_FUNC(evt_shuryolight_run_head_evt);
-static USER_FUNC(evt_shuryolight_run_power_evt);
-USER_FUNC(evt_shuryolight_run_evt);
-static USER_FUNC(evt_shuryolight_get_status);
-static USER_FUNC(evt_shuryolight_get_anim_time);
-USER_FUNC(evt_shuryolight_init);
-static s32 shuryolightRunEvt(EvtWord* code, s32 id);
-static void shuryolightSetAnim(s32 index, s32 anim);
-static void shuryolight_callback(void* param, s32 group);
 
 static const char* green_light_anim[5];
 static const char* yellow_light_anim[5];
 static const char* red_light_anim[5];
 static const char* orange_light_anim[5];
-extern EvtWord shuryolight_pow_normal[];
-extern EvtWord shuryolight_pow_tenmetu[];
-extern EvtWord shuryolight_head_normal[];
-extern EvtWord shuryolight_head_tenmetu[];
-extern EvtWord shuryolight_head_off[];
-extern EvtWord shuryolight_tue_normal[];
 
 static const char* green_light_anim[] = {
     "L_1C",
@@ -187,40 +170,40 @@ USER_FUNC(evt_shuryolight_init) {
     npcEntry("light_head_3", "c_shuryo");
     npcEntry("light_tue_1", "c_shuryo");
     slhp = _mapAlloc(sizeof(ShuryoWork));
-    slhp->powerEvt = 0;
-    slhp->headEvt = 0;
-    slhp->tueEvt = 0;
+    slhp->powerEvtId = 0;
+    slhp->headEvtId = 0;
+    slhp->tueEvtId = 0;
     lights = slhp->lights;
     npc = npcNameToPtr("light_power");
-    npc->flags |= 0xA0;
+    npc->flags |= NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE;
     lights[0].npc = npc;
     lights[0].anims = (const char**)green_light_anim;
     lights[0].group = animPoseGetGroupIdx(base->poseId, "locator6");
     lights[0].shape = animPoseGetShapeIdx(npc->poseId, "pPlaneShape34");
     shuryolightSetAnim(0, 1);
     npc = npcNameToPtr("light_head_1");
-    npc->flags |= 0xA0;
+    npc->flags |= NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE;
     lights[1].npc = npc;
     lights[1].anims = (const char**)orange_light_anim;
     lights[1].group = animPoseGetGroupIdx(base->poseId, "locator9");
     lights[1].shape = animPoseGetShapeIdx(npc->poseId, "pPlaneShape37");
     shuryolightSetAnim(1, 3);
     npc = npcNameToPtr("light_head_2");
-    npc->flags |= 0xA0;
+    npc->flags |= NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE;
     lights[2].npc = npc;
     lights[2].anims = (const char**)red_light_anim;
     lights[2].group = animPoseGetGroupIdx(base->poseId, "locator8");
     lights[2].shape = animPoseGetShapeIdx(npc->poseId, "pPlaneShape36");
     shuryolightSetAnim(2, 3);
     npc = npcNameToPtr("light_head_3");
-    npc->flags |= 0xA0;
+    npc->flags |= NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE;
     lights[3].npc = npc;
     lights[3].anims = (const char**)yellow_light_anim;
     lights[3].group = animPoseGetGroupIdx(base->poseId, "locator7");
     lights[3].shape = animPoseGetShapeIdx(npc->poseId, "pPlaneShape35");
     shuryolightSetAnim(3, 3);
     npc = npcNameToPtr("light_tue_1");
-    npc->flags |= 0xA0;
+    npc->flags |= NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE;
     lights[4].npc = npc;
     lights[4].anims = (const char**)red_light_anim;
     lights[4].group = animPoseGetGroupIdx(base->poseId, "locator5");
@@ -269,48 +252,48 @@ USER_FUNC(evt_shuryolight_run_evt) {
     s32* tue = (s32*)evtGetValue(event, args[2]);
 
     if (power != NULL) {
-        slhp->powerEvt = shuryolightRunEvt(power, slhp->powerEvt);
+        slhp->powerEvtId = shuryolightRunEvt(power, slhp->powerEvtId);
     }
     if (head != NULL) {
-        slhp->headEvt = shuryolightRunEvt(head, slhp->headEvt);
+        slhp->headEvtId = shuryolightRunEvt(head, slhp->headEvtId);
     }
     if (tue != NULL) {
-        slhp->tueEvt = shuryolightRunEvt(tue, slhp->tueEvt);
+        slhp->tueEvtId = shuryolightRunEvt(tue, slhp->tueEvtId);
     }
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_run_power_evt) {
     EvtWord* code = (EvtWord*)evtGetValue(event, event->args[0]);
 
-    slhp->powerEvt = shuryolightRunEvt(code, slhp->powerEvt);
+    slhp->powerEvtId = shuryolightRunEvt(code, slhp->powerEvtId);
     return EVT_RETURN_DONE;
 }
 USER_FUNC(evt_shuryolight_run_head_evt) {
     EvtWord* code = (EvtWord*)evtGetValue(event, event->args[0]);
 
-    slhp->headEvt = shuryolightRunEvt(code, slhp->headEvt);
+    slhp->headEvtId = shuryolightRunEvt(code, slhp->headEvtId);
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(evt_shuryolight_run_tue_evt) {
     EvtWord* code = (EvtWord*)evtGetValue(event, event->args[0]);
 
-    slhp->tueEvt = shuryolightRunEvt(code, slhp->tueEvt);
+    slhp->tueEvtId = shuryolightRunEvt(code, slhp->tueEvtId);
     return EVT_RETURN_DONE;
 }
 USER_FUNC(evt_shuryolight_delete) {
     s32 i;
 
-    if (slhp->powerEvt != 0) {
-        evtDeleteID(slhp->powerEvt);
-        slhp->powerEvt = 0;
+    if (slhp->powerEvtId != 0) {
+        evtDeleteID(slhp->powerEvtId);
+        slhp->powerEvtId = 0;
     }
-    if (slhp->headEvt != 0) {
-        evtDeleteID(slhp->headEvt);
-        slhp->headEvt = 0;
+    if (slhp->headEvtId != 0) {
+        evtDeleteID(slhp->headEvtId);
+        slhp->headEvtId = 0;
     }
-    if (slhp->tueEvt != 0) {
-        evtDeleteID(slhp->tueEvt);
-        slhp->tueEvt = 0;
+    if (slhp->tueEvtId != 0) {
+        evtDeleteID(slhp->tueEvtId);
+        slhp->tueEvtId = 0;
     }
     for (i = 0; i < 5; i++) {
         npcDeleteGroup(slhp->lights[i].npc);

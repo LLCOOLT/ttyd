@@ -1,3 +1,4 @@
+// Debug draw call stubs for the tst REL's tessellation test, linked to _unresolved (no target in the retail DOL).
 #pragma once
 
 #include "dolphin/types.h"

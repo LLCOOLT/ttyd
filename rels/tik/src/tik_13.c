@@ -1,26 +1,22 @@
+// tik_13 (埋没した都市, Rogueport Sewers): a small dripping room off tik_02.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "tik.h"
+#include "evt/evt_story.h"
 
 static BeroEntry bero_entry_data[2];
-extern EvtWord tik_13_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -36,8 +32,8 @@ static BeroEntry bero_entry_data[] = {
 };
 
 EVT_BEGIN(tik_13_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK6"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK6"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -51,7 +47,6 @@ EVT_BEGIN(tik_13_init_evt)
             CALL(evt_snd_sfxon_3d, STRING("SFX_STG0_AMB_WATERDROP2"), LW(0), LW(1), LW(2), 0)
         END_LOOP
     END_INLINE_EVENT
-    CALL(evt_item_entry, STRING("item_00"), 125, -30, 52, -70, 16, GSWF(5596), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, -30, 52, -70, 16, GSWF(GSWF_TIK13_STAR_PIECE), 0)
     RETURN
 EVT_END()
-

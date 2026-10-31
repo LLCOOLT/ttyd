@@ -1,10 +1,10 @@
+// Battle unit for Flurrie (クラウダ) in her own stage play in the epilogue (nok.rel); it only plays its scripted part.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "unit/party/unit_party_clauda.h"
-
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_StartWaitEvent);
+#include "battle/battle_sub.h"
+#include "battle/battle_event_cmd.h"
 
 BattleUnitKind unit_act_clauda;
 static BattleUnitDefense defence;
@@ -96,8 +96,8 @@ static BattleUnitKindPart parts[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -114,7 +114,6 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

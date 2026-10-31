@@ -1,23 +1,21 @@
+// dou_13 (洞窟, Pirate's Grotto): side passage between dou_08 and dou_09.
+// Has Bill Blaster (killer_cannon) enemies.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_npc_check);
-USER_FUNC(evt_npc_set_link);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "dou.h"
 
 static BeroEntry bero_entry_data[3];
-extern EvtWord dou_13_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -32,8 +30,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -49,8 +47,8 @@ static BeroEntry bero_entry_data[] = {
 };
 
 EVT_BEGIN(dou_13_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU9"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU9"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -65,4 +63,3 @@ EVT_BEGIN(dou_13_init_evt)
     END_IF
     RETURN
 EVT_END()
-

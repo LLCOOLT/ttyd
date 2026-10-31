@@ -1,47 +1,33 @@
+// win.rel (ふしぎの森, Boggly Woods): registers win_00..win_06 and the battle database, and holds the door and tree
+// scripts the maps share.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_case.h"
+#include "evt/evt_map.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
 #include "win.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-
-USER_FUNC(evt_bero_mario_go);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
-
-extern EvtWord evt_win_door_open_pure[];
-extern EvtWord evt_win_door_open[];
-extern EvtWord evt_win_door_close_pure[];
-extern EvtWord evt_win_door_close[];
-extern EvtWord _tree_anime[];
-extern EvtWord win_tree_entry[];
-extern EvtWord win_puni_walk_se[];
+#include "rel_module.h"
+#include "driver/casedrv.h"
 
 EVT_BEGIN(evt_win_door_open_pure)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_mapobj_get_position, LW(8), LW(10), LW(11), LW(12))
             CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_WOOD3"), LW(10), LW(11), LW(12), 0)
-            ELSE
+        ELSE
             CALL(evt_mapobj_get_position, LW(8), LW(10), LW(11), LW(12))
             CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_WOOD2"), LW(10), LW(11), LW(12), 0)
         END_IF
     END_INLINE_EVENT
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_sub_intpl_msec_init, 11, 0, -70, LW(1))
-        ELSE
+    ELSE
         CALL(evt_sub_intpl_msec_init, 11, -70, 0, LW(1))
     END_IF
     LOOP(0)
@@ -76,7 +62,7 @@ EVT_BEGIN(evt_win_door_close_pure)
     END_INLINE_EVENT
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_sub_intpl_msec_init, 11, 70, 0, LW(1))
-        ELSE
+    ELSE
         CALL(evt_sub_intpl_msec_init, 11, 0, 70, LW(1))
     END_IF
     LOOP(0)
@@ -141,7 +127,7 @@ EVT_BEGIN(win_tree_entry)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
-        CALL(evt_run_case_evt, 13, 1, LW(1), 0, PTR(_tree_anime), 0)
+        CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, LW(1), 0, PTR(_tree_anime), 0)
     END_LOOP
     RETURN
 EVT_END()

@@ -1,7 +1,10 @@
+// eff_n64.c: shared Paper Mario 64 effect support: init, texture lookup, effect set table, vertex/triangle helpers.
 #pragma once
 
 #include <dolphin/types.h>
+#include "eff/eff_n64_vtx.h"
 #include "sdk/texPalette.h"
+#include "version.h"
 
 typedef struct eff_n64_work {
     TEXPalette* effTexture; // 0x0
@@ -11,18 +14,11 @@ typedef struct eff_n64_work {
 typedef struct eff_set {
     s16 id;     // 0x0
     char* name; // 0x4
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     const char* description; // 0x8
     const char** users;      // 0xC, who uses the effect
 #endif
 } eff_set;
-
-// N64-style vertex, stride 0xE
-typedef struct effN64Vtx {
-    s16 x, y, z; // 0x0
-    s16 s, t;    // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
 
 void effInit64(void);
 void effTexSetupN64(void);

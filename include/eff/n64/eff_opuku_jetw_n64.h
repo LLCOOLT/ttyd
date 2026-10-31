@@ -1,3 +1,4 @@
+// eff_opuku_jetw_n64.c: water-jet effect entry (effOpukuJetwN64Entry).
 #pragma once
 
 #include <dolphin/mtx.h>

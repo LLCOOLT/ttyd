@@ -1,3 +1,5 @@
+// moo_04 (月, the Moon): a scene map: a flight scene with an X-Naut (stg7_aji messages) and an epilogue scene (ep_45).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -5,59 +7,28 @@
 #include "party.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_bg.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "moo.h"
+#include "math.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-double fmod(double x, double y);
-
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bg_disp_onoff);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_delete);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_add_rotate);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_get_scale);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_rotate_offset);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_spline_get_value);
-USER_FUNC(evt_sub_spline_init);
 static USER_FUNC(mario_kirimomi);
 
 static f32 spline_dt[9];
-extern EvtWord kanbu_fly[];
 static NpcSetupInfo npcEnt[2];
-extern EvtWord moo_04_init_evt[];
 
 static f32 spline_dt[] = {
     -12.916925f, 123.84991f, 512.97614f, 17.94919f, 46.050007f, 5.011878f, 65.15421f, 48.400024f,
@@ -208,7 +179,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"幹部"*/"\x8A\xB2\x95\x94", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -219,7 +190,7 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 static EVT_BEGIN(epilogue_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -230,25 +201,25 @@ static EVT_BEGIN(epilogue_evt)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("ep_45"), 0, 0)
     WAIT_MS(2000)
-    CALL(evt_snd_bgmoff_f, 512, 3000)
-    CALL(evt_snd_envoff_f, 512, 3000)
-    CALL(evt_fade_set_mapchange_type, 1, 10, 900, 9, 900)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 3000)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 900, FADE_IN_BLACK, 900)
     CALL(evt_bero_mapchange, STRING("gor_00"), STRING("epilogue2"))
     RETURN
 EVT_END()
 
 EVT_BEGIN(moo_04_init_evt)
-    IF_INT_NOT_EQUAL(GSW(0), 402)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_MON1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG7_MOO4"))
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_MON1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_MOO4"))
     END_IF
     CALL(evt_npc_setup, PTR(npcEnt))
-    SWITCH(GSW(0))
-        CASE_LESS(358)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG7_06_TO_THE_MOON)
         CALL(evt_cam3d_evt_set, 0, 134, 533, 0, 38, -8, 0, 11)
         SPAWN_EVENT(PTR(mario_fly))
         WAIT_FRAMES(1)
-        CASE_LESS(373)
+        CASE_LESS(STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_cam3d_evt_set, 20, 200, 533, 20, 104, -8, 0, 11)
         CALL(evt_mario_cont_onoff, 0)
         CALL(evt_party_cont_onoff, 0, 0)
@@ -256,7 +227,7 @@ EVT_BEGIN(moo_04_init_evt)
         CALL(evt_party_set_pos, 0, 0, -1000, 0)
         WAIT_FRAMES(1)
         SPAWN_EVENT(PTR(kanbu_fly))
-        CASE_EQUAL(402)
+        CASE_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
         SPAWN_EVENT(PTR(epilogue_evt))
         CASE_DEFAULT
@@ -275,16 +246,16 @@ EVT_BEGIN(moo_04_init_evt)
             CALL(evt_eff64, 0, STRING("crystal_n64"), 6, 30, 90, -75, FLOAT(1.0f), 50, 0, 0, 0, 0, 0, 0)
             WAIT_MS(1000)
             CALL(evt_eff64, STRING("hikari"), STRING("radiation_n64"), 2, 30, 90, -75, FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
-            SET_VALUE(GSW(0), 377)
-            CALL(evt_fade_entry, 17, 2000, 255, 255, 255)
+            SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_26_THE_HIDEOUT_EXPLODES)
+            CALL(evt_fade_entry, FADE_OUT_WHITE, 2000, 255, 255, 255)
             CALL(evt_fade_end_wait)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S"), MAPOBJ_FLAG_HIDE)
             CALL(evt_bg_disp_onoff, 0)
             CALL(evt_eff_delete, STRING("hikari"))
-            CALL(evt_fade_entry, 16, 2000, 255, 255, 255)
+            CALL(evt_fade_entry, FADE_IN_WHITE, 2000, 255, 255, 255)
             CALL(evt_fade_end_wait)
-            CALL(evt_fade_set_mapchange_type, 1, 10, 1000, 9, 1000)
-            SET_VALUE(GSWF(4175), 1)
+            CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 1000, FADE_IN_BLACK, 1000)
+            SET_VALUE(GSWF(GSWF_TIK00_TELEPORTER_ARRIVAL), 1)
             CALL(evt_bero_mapchange, STRING("tik_00"), 0)
         END_INLINE_EVENT
     END_SWITCH
@@ -314,4 +285,3 @@ static USER_FUNC(mario_kirimomi) {
     }
     return EVT_RETURN_DONE;
 }
-

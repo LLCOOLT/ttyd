@@ -1,3 +1,5 @@
+// eki_00 (駅, Riverside Station): entrance room with a lift, bridge, paper-fold event and a Smorg (moamoa) cutscene
+// Close Call P item; doors to eki_01 and the platform (hom_00).
 #include "driver/imgdrv.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -27,174 +29,199 @@
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
 #include "driver/extdrv.h"
-#undef EXT_LIT
-#define EXT_LIT(sym, val) (val)
+#include "map/moamoa.h"
+#include "driver/envdrv.h"
+#include "driver/itemdrv.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "party/party_nokonoko.h"
+#include "eki.h"
+#include "evt/evt_story.h"
+#include "libc_decls.h"
+#include "driver/casedrv.h"
 
-typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 pad_6[2]; Vec target; f32 vy; s16 jumpTimer; u8 pad_1a[2]; f32 speed; f32 gravity; s16 next; u8 pad_26[2]; f32 lastX; f32 lastZ; Vec jitter; s16 pose; u8 pad_3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 pad_4d[3]; } Moamoa;
-typedef struct MoamoaWork { u16 flags; u8 pad_2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 targetHits[2]; s16 thirdTargetHits; s16 hammerFrames; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork; /* thirdTargetHits is targetHits[2], reached by i % 3 */
-typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
 static MoamoaWork* wp;
-int rand(void);
-static f32 randf(f32 min, f32 max);
 static f32 randf(f32 min, f32 max);
 static void moamoa_pose_init(void);
-static void moamoa_pose_init(void);
-static void moamoa_pose_main(void);
 static void moamoa_pose_main(void);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-extern const char* g_moamoa_chain_tbl[][2];
 static void ext_moamoa_main(void);
-static void ext_moamoa_main(void);
+// The swarm code inlines more than MWCC's default total inline budget (10000) allows. Any limit from about 10200
+// up gives the same code (removal and other values tested): rsh_05 writes 11500 and rsh_06 100000 for the same code.
 #pragma inline_max_total_size(100000)
-static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
-static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
-static inline f32 moa_sinx(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
-static inline f32 moa_cosx(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
-s32 nokonokoGetStatus(PartyEntry* party);
-f32 cloudGetBreathDist(void);
-double sin(double x);
-double cos(double x);
-static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa);
+static inline f32 moa_sin(f32 x) {
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * y;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
+    }
+    return a;
+}
+static inline f32 moa_cos(f32 x) {
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = -a;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+    }
+    return a;
+}
+static inline f32 moa_sinx(f32 x) {
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
+        } else {
+            x = 1.5707964f - (x - 1.5707964f);
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
+        }
+    } else if (x < 4.712389f) {
+        x = x - 3.1415927f;
+        x2 = x * x;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * x;
+        a = -a;
+    } else {
+        x = 1.5707964f - (x - 4.712389f);
+        x2 = x * x;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * x;
+        a = -a;
+    }
+    return a;
+}
+static inline f32 moa_cosx(f32 x) {
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+        } else {
+            x = 1.5707964f - (x - 1.5707964f);
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = -a;
+        }
+    } else if (x < 4.712389f) {
+        x = x - 3.1415927f;
+        x2 = x * x;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = -a;
+    } else {
+        x = 1.5707964f - (x - 4.712389f);
+        x2 = x * x;
+        a = a * x2 - b;
+        a = a * x2 + c;
+    }
+    return a;
+}
 static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa);
 static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
-static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void ext_disp(CameraId camera, void* param);
-static void ext_disp(CameraId camera, void* param);
-static void ext_shadow_disp(CameraId camera, void* param);
 static void ext_shadow_disp(CameraId camera, void* param);
 
-s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
-s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_evt_set(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam_letter_box_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_eff_fukidashi(EventEntry* event, BOOL isFirstCall);
-s32 evt_ext_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_key_get_buttontrg(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_set_tevcallback(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_rotate(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_trans(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_cont_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_dispflag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_key_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_normalize(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_dir(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_pose(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_print(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_print_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_battle_start(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_pera_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_reverse_ry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_anim(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_battle_info(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_ry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_scale(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_wait_battle_end(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_cont_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_run(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_set_dir(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_set_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_stop(EventEntry* event, BOOL isFirstCall);
-s32 evt_seq_wait(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_get_mapname(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_get_sincos(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_get_stopwatch(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_get_system_flag(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_intpl_msec_get_value(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_intpl_msec_init(EventEntry* event, BOOL isFirstCall);
 static void ext_moamoa_dispent(void);
-static void ext_moamoa_dispent(void);
-static void ext_moamoa_main(void);
-static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa);
-static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
-static void ext_shadow_disp(CameraId camera, void* param);
-static void ext_disp(CameraId camera, void* param);
 static void ext_moamoa_init(void);
-static void ext_moamoa_init(void);
-static f32 randf(f32 min, f32 max);
-static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
-static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-static void moamoa_pose_main(void);
-static void moamoa_pose_init(void);
 
-s32 evt_cam3d_evt_off(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
-s32 evt_del_case_evt(EventEntry* event, BOOL isFirstCall);
-s32 evt_exit_case_evt(EventEntry* event, BOOL isFirstCall);
-s32 evt_hitobj_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
-s32 evt_img_clear_virtual_point(EventEntry* event, BOOL isFirstCall);
-s32 evt_img_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_img_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_img_set_paper(EventEntry* event, BOOL isFirstCall);
-s32 evt_img_set_paper_anim(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_delete(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_delete_check(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_flag_on(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_set_bound_rate(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_set_gravity(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_set_jump_power(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_set_move_dir_speed(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_set_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_status_on(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_checkanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_playanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_clear_offscreen(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_set_offscreen(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_mov_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_mov_pos2(EventEntry* event, BOOL isFirstCall);
-s32 evt_mobj_delete(EventEntry* event, BOOL isFirstCall);
-s32 evt_mobj_set_scale(EventEntry* event, BOOL isFirstCall);
-s32 evt_mobj_switch_blue(EventEntry* event, BOOL isFirstCall);
-s32 evt_offscreen_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_paper_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_jump_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_move_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_move_pos2(EventEntry* event, BOOL isFirstCall);
-s32 evt_pouch_remove_item(EventEntry* event, BOOL isFirstCall);
-s32 evt_run_case_evt(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmoff_f(EventEntry* event, BOOL isFirstCall);
-s32 evt_win_item_select(EventEntry* event, BOOL isFirstCall);
-s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 
-static ExtTexInfo ext_moamoa_data[47];
+static MoamoaData ext_moamoa_data[47];
 static BeroEntry bero_data[3];
 extern EvtWord evt_bridge[];
 extern EvtWord evt_bridge2[];
@@ -205,9 +232,8 @@ extern EvtWord evt_elv_up[];
 static s32 item_tbl[2];
 extern EvtWord evt_elv[];
 extern EvtWord evt_elv_nomsg[];
-extern EvtWord eki_00_init_evt[];
 
-static ExtTexInfo ext_moamoa_data[] = {
+static MoamoaData ext_moamoa_data[] = {
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 2.0f},
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 4.0f},
@@ -257,15 +283,10 @@ static ExtTexInfo ext_moamoa_data[] = {
     {0},
 };
 
-int rand(void);
-
-double sin(double x);
-
-void envAddTev(s32 type, MapTevCallbackInfo* info);
-
+// Kept out of line (removal tested: inlined, the code differs).
 #pragma dont_inline on
 static void moamoa_pose_init(void) {
-    MoamoaData* data = (MoamoaData*)ext_moamoa_data;
+    MoamoaData* data = ext_moamoa_data;
     s32 i = 0;
     s32 start;
     char model[32];
@@ -337,7 +358,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
     MoamoaPoseDef* def = wp->defs;
     s32 i;
 
-    if (moa->flags & 0x800) {
+    if (moa->flags & MOAMOA_FLAG_KIND_MODEL) {
         model = group_tbl[moa->kind][0];
         if (moa->kind >= 2) {
             anim = group_tbl[moa->kind][1];
@@ -352,12 +373,12 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
         }
     }
     if (i < wp->numDefs && moa->pose != i) {
-        if (moa->flags & 4) {
+        if (moa->flags & MOAMOA_FLAG_DAMAGED) {
             if (strncmp(anim, (char*)"D", 1)) {
                 return;
             }
         }
-        if (moa->flags & 0x10) {
+        if (moa->flags & MOAMOA_FLAG_ESCAPING) {
             if (strncmp(anim, (char*)"R", 1)) {
                 return;
             }
@@ -399,7 +420,7 @@ static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
     extGetPosePtr();
     moa = wp->moa;
     for (i = 0; i < wp->count; i++, moa++) {
-        if (!(moa->flags & 0x20)) {
+        if (!(moa->flags & MOAMOA_FLAG_GONE)) {
             return EVT_RETURN_BLOCK;
         }
     }
@@ -420,13 +441,13 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
             moa->next = 14;
             moa->state = 14;
             moa->timer = i < 100 ? i % 100 : i % 60 + 100;
-            moa->flags |= 0x100;
+            moa->flags |= MOAMOA_FLAG_FUSING;
         }
     }
     extGetPosePtr();
     moa = wp->moa;
     for (i = 0; i < wp->count; i++, moa++) {
-        if (!(moa->flags & 0x200)) {
+        if (!(moa->flags & MOAMOA_FLAG_GATHERED)) {
             return EVT_RETURN_BLOCK;
         }
     }
@@ -434,7 +455,7 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     moa = wp->moa;
     for (i = 0; i < wp->count; i++, pose++, moa++) {
         pose->flags |= 4;
-        moa->flags |= 0x400;
+        moa->flags |= MOAMOA_FLAG_MERGED;
         moa->state = 61;
         moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"S_1");
     }
@@ -453,18 +474,18 @@ static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
         if (on) {
             if (!all) {
                 if (moa->kind == 1) {
-                    moa->flags |= 0x800;
+                    moa->flags |= MOAMOA_FLAG_KIND_MODEL;
                 }
             } else {
-                moa->flags |= 0x800;
+                moa->flags |= MOAMOA_FLAG_KIND_MODEL;
             }
         } else {
             if (!all) {
                 if (moa->kind != 1) {
-                    moa->flags &= ~0x800;
+                    moa->flags &= ~MOAMOA_FLAG_KIND_MODEL;
                 }
             } else {
-                moa->flags &= ~0x800;
+                moa->flags &= ~MOAMOA_FLAG_KIND_MODEL;
             }
         }
         moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"S_1");
@@ -479,7 +500,7 @@ static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
     extGetPosePtr();
     moa = wp->moa;
     for (i = 0; i < wp->count; i++, moa++) {
-        moa->flags &= ~0x400;
+        moa->flags &= ~MOAMOA_FLAG_MERGED;
         moa->state = 63;
     }
     return EVT_RETURN_DONE;
@@ -491,11 +512,11 @@ static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
 
     for (i = 0; i < wp->count; i++, pose++, moa++) {
         pose->flags |= 4;
-        moa->flags |= 0x400;
-        moa->flags |= 0x100;
-        moa->flags |= 0x200;
+        moa->flags |= MOAMOA_FLAG_MERGED;
+        moa->flags |= MOAMOA_FLAG_FUSING;
+        moa->flags |= MOAMOA_FLAG_GATHERED;
         moa->state = 61;
-        moa->flags |= 0x800;
+        moa->flags |= MOAMOA_FLAG_KIND_MODEL;
         moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"S_1");
     }
     return EVT_RETURN_DONE;
@@ -506,9 +527,9 @@ static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     wp->target[i] = wp->target[1 - i];
     wp->targetHits[i] = 100;
     if (i == 0) {
-        wp->flags |= 0x1000;
+        wp->flags |= MOAMOA_WORK_TARGET0_OFF;
     } else {
-        wp->flags |= 0x2000;
+        wp->flags |= MOAMOA_WORK_TARGET1_OFF;
     }
     return EVT_RETURN_DONE;
 }
@@ -517,6 +538,9 @@ static f32 randf(f32 min, f32 max) {
 
     return r * (max - min) + min;
 }
+// Copy propagation and lifetime analysis are off from here to ext_moamoa_dispent, in three blocks that are each
+// needed (removal tested). The copies of this swarm code in rsh_05/rsh_06, and the ext-pose
+// code in bom_01, gor_10 and hei_10, use the same settings, so they are probably the original per-function options.
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 __declspec(section ".rodata") static Vec ext_moamoa_t0 = {0.0f, 0.0f, 10.0f};
@@ -606,6 +630,7 @@ static void ext_shadow_disp(CameraId camera, void* param) {
         offscreenAddBoundingBox(offscreenNameToId((char*)"offscreen"), left, top, right, bottom);
     }
 }
+// Kept out of line (removal tested).
 #pragma dont_inline on
 static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     f32 hitX, hitY, hitZ, dist, nx, ny, nz;
@@ -635,7 +660,7 @@ static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround
     moa->state = 3;
     moa->next = next;
     pose->dir = 180.0f + angle;
-    moa->flags |= 2;
+    moa->flags |= MOAMOA_FLAG_JUMPING;
     pose->flags |= 0x10;
     pose->flags &= ~4;
 }
@@ -657,50 +682,51 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
     if ((*pose->mtx)[1][3] > mario->position.y + mario->wPlayerCollisionBox.y) {
         return 0;
     }
-    if (distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], mario->position.x, mario->position.z) < (mario->wPlayerCollisionBox.x + 20.0f) / 2
-        && mario->position.y > 10.0f + (*pose->mtx)[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
-        && wp->bounceCount < 2) {
-        if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
+    if (distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], mario->position.x, mario->position.z) < (mario->wPlayerCollisionBox.x + 20.0f) / 2 && mario->position.y > 10.0f + (*pose->mtx)[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000) && wp->bounceCount < 2) {
+        if (mario->currMotionId != MARIO_MOTION_ROLL && mario->currMotionId != MARIO_MOTION_YOSHI) {
             marioChgMot(5);
         }
         wp->bounceCount++;
         return 1;
     }
-    if (!(mario->flags & 0x30000)) {
+    if (!(mario->flags & (MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING))) {
         wp->bounceCount = 0;
     }
-    if (mario->currMotionId == 0x12 && wp->hammerFrames > 10) {
-        f32 r2; f32 t; cam = camGetPtr(CAMERA_3D);
-        t = cam->viewYaw; r2 = 6.2831855f * reviseAngle((f32)(mario->displayDirection - 90.0f) + t) / 360.0f;
-        angle = 35.0f * moa_sin(r2) + mario->position.x;
-        dist = mario->position.z - 35.0f * moa_cos(r2);
+    if (mario->currMotionId == MARIO_MOTION_HAMMER && wp->hammerFrames > 10) {
+        f32 hammerRad;
+        f32 t;
+        cam = camGetPtr(CAMERA_3D);
+        t = cam->viewYaw;
+        hammerRad = 6.2831855f * reviseAngle((f32)(mario->displayDirection - 90.0f) + t) / 360.0f;
+        angle = 35.0f * moa_sin(hammerRad) + mario->position.x;
+        dist = mario->position.z - 35.0f * moa_cos(hammerRad);
         if (distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], angle, dist) < 35.0f) {
             return 2;
         }
     }
-    if (mario->currMotionId == 0x13 && (s32)mario->currSubMotionId == 0x14) {
-        f32 (*m)[4] = *pose->mtx;
+    if (mario->currMotionId == MARIO_MOTION_HAMMER_2 && (s32)mario->currSubMotionId == 0x14) {
+        f32(*m)[4] = *pose->mtx;
         a = (Vec){m[0][3], m[1][3], m[2][3]};
         if (PSVECDistance(&mario->position, &a) < 65.0f) {
             return 2;
         }
     }
     if (wp->breathDir >= 0.0f) {
-        f32 (*m)[4] = *pose->mtx;
+        f32(*m)[4] = *pose->mtx;
         b = (Vec){m[0][3], m[1][3], m[2][3]};
         if (PSVECDistance(&wp->breathPos, &b) < 30.0f) {
             return 3;
         }
     }
     if (nokonokoGetStatus(partyGetPtr(0)) == 2) {
-        f32 (*m)[4] = *pose->mtx;
+        f32(*m)[4] = *pose->mtx;
         c = (Vec){m[0][3], m[1][3], m[2][3]};
         if (PSVECDistance(&partyGetPtr(0)->position, &c) < 30.0f) {
             return 2;
         }
     }
-    if (partyGetPtr(0)->currentMemberId == 3 && partyGetPtr(0)->useMotionId == 0x46) {
-        f32 (*m)[4] = *pose->mtx;
+    if (partyGetPtr(0)->currentMemberId == PARTY_MEMBER_BOBBERY && partyGetPtr(0)->useMotionId == 0x46) {
+        f32(*m)[4] = *pose->mtx;
         d = (Vec){m[0][3], m[1][3], m[2][3]};
         if (PSVECDistance(&partyGetPtr(0)->position, &d) < 50.0f) {
             return 4;
@@ -713,7 +739,7 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
         (*pose->mtx)[0][3] = moa->lastX;
         (*pose->mtx)[2][3] = moa->lastZ;
         {
-            f32 (*m)[4] = *pose->mtx;
+            f32(*m)[4] = *pose->mtx;
             f = (Vec){m[0][3], m[1][3], m[2][3]};
         }
         dist = PSVECDistance(&e, &f);
@@ -736,595 +762,551 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 __declspec(section ".rodata") static Vec moamoa_zero_vec = {0.0f, 0.0f, 0.0f};
-static void ext_moamoa_main(void)
-{
-  MarioWork *mario = marioGetPtr();
-  PartyEntry *party = partyGetPtr(0);
-  CameraEntry *cam = camGetPtr(CAMERA_3D);
-  s32 sndFlag;
-  s32 i;
-  s32 ret;
-  s32 idx;
-  ExtdrvPose *pose;
-  ExtdrvPose *other;
-  Moamoa *moa;
-  Moamoa *m;
-  f32 a2;
-  f32 rad;
-  f32 angle;
-  f32 x;
-  f32 y;
-  f32 dist;
-  f32 z;
-  f32 spd;
-  f32 grav;
-  f32 tx;
-  f32 tz;
-  f32 ty;
-  Vec sp;
-  Vec pv;
-  Mtx rot;
-  Mtx rot2;
-  s32 hit;
-  f32 a;
-  f32 d;
-  f32 t;
-  f32 r;
-  f32 s;
-  hit = 0;
-  if (mario->currMotionId == 0x12)
-  {
-    wp->hammerFrames++;
-  }
-  else
-  {
-    wp->hammerFrames = 0;
-  }
-  if (mario->currMotionId == 0)
-  {
-    wp->idleFrames++;
-    if (wp->idleFrames > 1000)
-    {
-      wp->idleFrames = 1000;
+static void ext_moamoa_main(void) {
+    MarioWork* mario = marioGetPtr();
+    PartyEntry* party = partyGetPtr(0);
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
+    s32 sndFlag;
+    s32 i;
+    s32 ret;
+    ExtdrvPose* pose;
+    Moamoa* moa;
+    f32 jumpSpeed;
+    f32 rad;
+    f32 angle;
+    f32 x;
+    f32 y;
+    f32 dist;
+    f32 z;
+    f32 spd;
+    f32 grav;
+    f32 tx;
+    f32 tz;
+    f32 ty;
+    Vec sp;
+    Vec pv;
+    Mtx rot;
+    Mtx rot2;
+    s32 hit;
+    f32 a;
+    f32 d;
+    f32 r;
+    f32 s;
+    hit = 0;
+    if (mario->currMotionId == MARIO_MOTION_HAMMER) {
+        wp->hammerFrames++;
+    } else {
+        wp->hammerFrames = 0;
     }
-  }
-  else
-  {
-    wp->idleFrames = 0;
-  }
-  if (party->flags & 0x100)
-  {
-    wp->flags |= 0x10;
-  }
-  else
-  {
-    wp->flags &= ~0x10;
-  }
-  wp->breathDir = -1.0f;
-  wp->breathDist = -1.0f;
-  if ((party->currentMemberId == 5) && (party->flags & 0x100))
-  {
-    wp->breathDir = cloudGetBreathDir();
-    wp->breathDist = cloudGetBreathDist();
-    wp->breathPos.x = (wp->breathDist * moa_sinx((6.2831855f * wp->breathDir) / 360.0f)) + party->position.x;
-    wp->breathPos.y = party->position.y;
-    wp->breathPos.z = party->position.z - (wp->breathDist * moa_cosx((6.2831855f * wp->breathDir) / 360.0f));
-  }
-  if (wp->hitCount > 250)
-  {
-    s32 j;
-    Moamoa *mm;
-    extGetPosePtr();
-    for (j = 0, mm = wp->moa; j < wp->count; j++, mm++)
-    {
-      if (mm->flags & 4)
-      {
-        continue;
-      }
-      if (mm->flags & 0x10)
-      {
-        break;
-      }
-      mm->state = 25;
-      mm->timer = 0;
-      mm->flags |= 0x10;
+    if (mario->currMotionId == MARIO_MOTION_STAY) {
+        wp->idleFrames++;
+        if (wp->idleFrames > 1000) {
+            wp->idleFrames = 1000;
+        }
+    } else {
+        wp->idleFrames = 0;
     }
-
-    if (wp->escapeEvt == ((void *) 0))
-    {
-      wp->escapeEvt = evtEntry(evt_moamoa_escape, 0, 0);
+    if (party->flags & PARTY_FLAG_IS_BEING_USED) {
+        wp->flags |= MOAMOA_WORK_PARTNER_IN_USE;
+    } else {
+        wp->flags &= ~MOAMOA_WORK_PARTNER_IN_USE;
     }
-  }
-  pose = extGetPosePtr();
-  sndFlag = 0;
-  moa = wp->moa;
-  for (i = 0; i < wp->count; i++, pose++, moa++)
-  {
-    wp->angle = angleABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
-    wp->dist = distABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
-    if ((((((wp->flags & 1) && (!(wp->flags & 4))) && (!marioKeyOffChk())) && (!marioCtrlOffChk())) && (!hit)) && (!(moa->flags & 0x154)))
-    {
-      ret = moamoa_hit_check(pose, moa);
-      if (ret == 1)
-      {
-        moa->flags |= 4;
-        moa->state = 36;
-        wp->hitCount++;
-        moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"D_1");
-        hit = 1;
-      }
-      else
-        if ((ret == 2) || (ret == 4))
-      {
-        moa->flags |= 0xc;
-        moa->state = 47;
-        wp->hitCount++;
-        moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"D_1");
-        if (ret != 4)
-        {
-          hit = 1;
-        }
-      }
-      else
-        if (ret == 3)
-      {
-        angle = (wp->breathDir + wp->angle) / 2.0f;
-        moa->flags |= 0x84;
-        moa->state = 48;
-        moa->target = moamoa_zero_vec;
-        spd = randf(0.1f, 0.2f);
-        rad = (6.2831855f * angle) / 360.0f;
-        moa->vy = spd * moa_sinx(rad);
-        moa->speed = randf(0.03f, 0.06f);
-        moa->gravity = spd * (-moa_cosx(rad));
-        moa->jumpTimer = 120;
-        wp->hitCount++;
-        moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"D_1");
-        hit = 1;
-      }
+    wp->breathDir = -1.0f;
+    wp->breathDist = -1.0f;
+    if ((party->currentMemberId == PARTY_MEMBER_FLURRIE) && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
+        wp->breathDir = cloudGetBreathDir();
+        wp->breathDist = cloudGetBreathDist();
+        wp->breathPos.x = (wp->breathDist * moa_sinx((6.2831855f * wp->breathDir) / 360.0f)) + party->position.x;
+        wp->breathPos.y = party->position.y;
+        wp->breathPos.z = party->position.z - (wp->breathDist * moa_cosx((6.2831855f * wp->breathDir) / 360.0f));
     }
-    if (((wp->flags & 1) && (!(moa->flags & 0x155))) && (wp->dist < 50.0f))
-    {
-      if (moa->flags & 2)
-      {
-        moa->next = 1;
-      }
-      else
-      {
-        moa->state = 1;
-      }
+    if (wp->hitCount > 250) {
+        s32 j;
+        Moamoa* mm;
+        extGetPosePtr();
+        for (j = 0, mm = wp->moa; j < wp->count; j++, mm++) {
+            if (mm->flags & MOAMOA_FLAG_DAMAGED) {
+                continue;
+            }
+            if (mm->flags & MOAMOA_FLAG_ESCAPING) {
+                break;
+            }
+            mm->state = 25;
+            mm->timer = 0;
+            mm->flags |= MOAMOA_FLAG_ESCAPING;
+        }
+
+        if (wp->escapeEvt == ((void*)0)) {
+            wp->escapeEvt = evtEntry(evt_moamoa_escape, 0, 0);
+        }
     }
-    if ((((wp->flags & 1) && (!(moa->flags & 0x444))) && (i == (gp->retraceCount % wp->count))) && (irand(1000) < 200))
-    {
-      Vec tmp = {0.0f, 0.0f, 0.0f};
-      tmp.x = (*pose->mtx)[0][3]; tmp.y = (*pose->mtx)[1][3]; tmp.z = (*pose->mtx)[2][3];
-      sp = tmp;
-      psndSFXOn_3D(SFX_NAME_WORD("SFX_STG6_MOAMOA_VOICE1"), &sp); // FAKE: integer cast hoists the literal as an @ temp
-    }
-    switch (moa->state)
-    {
-      case 0:
-        if ((i % 50) < 20)
-      {
-        f32 x;
-        f32 z;
-        f32 y;
-        f32 ax;
-        f32 az;
-        f32 ar;
-        rad = randf(0.0f, 6.2831855f);
-        dist = randf(0.0f, 50.0f);
-        ax = wp->target[i % 3].x + (dist * moa_sinx(rad));
-        az = wp->target[i % 3].z - (dist * moa_cosx(rad));
-        ar = (6.2831855f * angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], ax, az)) / 360.0f;
-        x = (15.0f * moa_sinx(ar)) + (*pose->mtx)[0][3];
-        y = (*pose->mtx)[1][3];
-        z = (*pose->mtx)[2][3] - (15.0f * moa_cosx(ar));
-        {
-          f32 k1;
-          f32 k2;
-          f32 r1 = rand() / 32767.0f;
-          f32 r2 = rand() / 32767.0f;
-          moamoa_jump(pose, moa, moa->state, 1, x, y, z, (r1 * (k1 = 3.0f - 1.5f)) + 1.5f, (r2 * (k2 = 2.0f - 0.8f)) + 0.8f);
+    pose = extGetPosePtr();
+    sndFlag = 0;
+    moa = wp->moa;
+    for (i = 0; i < wp->count; i++, pose++, moa++) {
+        wp->angle = angleABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
+        wp->dist = distABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
+        if ((((((wp->flags & MOAMOA_WORK_ACTIVE) && (!(wp->flags & MOAMOA_WORK_NO_HIT))) && (!marioKeyOffChk())) && (!marioCtrlOffChk())) && (!hit)) && (!(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING)))) {
+            ret = moamoa_hit_check(pose, moa);
+            if (ret == 1) {
+                moa->flags |= MOAMOA_FLAG_DAMAGED;
+                moa->state = 36;
+                wp->hitCount++;
+                moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"D_1");
+                hit = 1;
+            } else if ((ret == 2) || (ret == 4)) {
+                moa->flags |= MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_KNOCKED;
+                moa->state = 47;
+                wp->hitCount++;
+                moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"D_1");
+                if (ret != 4) {
+                    hit = 1;
+                }
+            } else if (ret == 3) {
+                angle = (wp->breathDir + wp->angle) / 2.0f;
+                moa->flags |= MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_BLOWN;
+                moa->state = 48;
+                moa->target = moamoa_zero_vec;
+                spd = randf(0.1f, 0.2f);
+                rad = (6.2831855f * angle) / 360.0f;
+                moa->vy = spd * moa_sinx(rad);
+                moa->speed = randf(0.03f, 0.06f);
+                moa->gravity = spd * (-moa_cosx(rad));
+                moa->jumpTimer = 120;
+                wp->hitCount++;
+                moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"D_1");
+                hit = 1;
+            }
         }
-        moa->flags |= 1;
-        break;
-      }
-      {
-        f32 z;
-      {
-        f32 d;
-        f32 a;
-        f32 r;
-        d = distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
-        a = angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
-        if (d < 100.0f)
-        {
-          a = randf(0.0f, 360.0f);
+        if (((wp->flags & MOAMOA_WORK_ACTIVE) && (!(moa->flags & (MOAMOA_FLAG_TO_TARGET | MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING)))) && (wp->dist < 50.0f)) {
+            if (moa->flags & MOAMOA_FLAG_JUMPING) {
+                moa->next = 1;
+            } else {
+                moa->state = 1;
+            }
         }
-        r = (6.2831855f * a) / 360.0f;
-        rad = (5.0f * moa_sinx(r)) + (*pose->mtx)[0][3];
-        y = (*pose->mtx)[1][3];
-        z = (*pose->mtx)[2][3] - (5.0f * moa_cosx(r));
-      }
-      {
-        f32 k1;
-        f32 k2;
-        f32 r1 = rand() / 32767.0f;
-        f32 r2 = rand() / 32767.0f;
-        moamoa_jump(pose, moa, moa->state, 1, rad, y, z, (r1 * (k1 = 0.5f - 0.3f)) + 0.3f, (r2 * (k2 = 0.8f - 0.5f)) + 0.5f);
-      }
-      }
-        moa->flags &= ~1;
-        break;
-
-      case 50:
-        if ((--moa->timer) < 0)
-      {
-        moa->timer = 0;
-        moa->state++;
-      }
-        break;
-
-      case 51:
-        moa->speed = randf(0.0f, 200.0f);
-        moa->gravity = randf(0.0f, (300.0f * moa->speed) / 200.0f);
-        moa->state++;
-        moa->timer = 0;
-
-      case 52:
-        s = (moa->timer < 200) ? (1.0f) : ((800 - moa->timer) / 600.0f);
-        if (s < 0.0f)
-      {
-        s = 0.0f;
-        moa->flags |= 0x200;
-      }
-        tx = wp->target[i % 3].x;
-        ty = wp->target[i % 3].y;
-        tz = wp->target[i % 3].z;
-        tx += s * (moa->gravity * ((f32) sin(((f32) (i + gp->retraceCount)) / 4.0f)));
-        r = i + gp->retraceCount;
-        ty += moa->speed * s;
-        tz += s * ((-moa->gravity) * ((f32) cos(r / 4.0f)));
-        (*pose->mtx)[0][3] += (tx - (*pose->mtx)[0][3]) / 15.0f;
-        (*pose->mtx)[1][3] += (ty - (*pose->mtx)[1][3]) / 15.0f;
-        (*pose->mtx)[2][3] += (tz - (*pose->mtx)[2][3]) / 15.0f;
-        moa->timer++;
-        break;
-
-      case 1:
-      {
-        f32 rad;
-        {
-          f32 k; f32 r1 = rand() / 32767.0f;
-          f32 a = wp->angle + ((r1 * (k = 45.0f - -45.0f)) + -45.0f);
-          rad = (6.2831855f * a) / 360.0f;
+        if ((((wp->flags & MOAMOA_WORK_ACTIVE) && (!(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_MERGED)))) && (i == (gp->retraceCount % wp->count))) && (irand(1000) < 200)) {
+            Vec tmp = {0.0f, 0.0f, 0.0f};
+            tmp.x = (*pose->mtx)[0][3];
+            tmp.y = (*pose->mtx)[1][3];
+            tmp.z = (*pose->mtx)[2][3];
+            sp = tmp;
+            psndSFXOn_3D(SFX_NAME_WORD("SFX_STG6_MOAMOA_VOICE1"), &sp); // FAKE: integer cast hoists the literal as an @ temp
         }
-        d = wp->dist;
-        x = (*pose->mtx)[0][3] + (15.0f * moa_sinx(rad));
-        dist = (*pose->mtx)[1][3];
-        z = (*pose->mtx)[2][3] - (15.0f * moa_cosx(rad));
-        { f32 hopSpeed; f32 k; f32 r1 = rand() / 32767.0f; hopSpeed = r1 * (k = 1.0f - 1.0f) + 1.0f;
-        // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
-        { f32 g2 = randf(0.4f, 0.4f); { f32 x2 = x; f32 y2 = dist; f32 z2 = z; f32 s2 = hopSpeed; f32 g3 = g2; moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g3); } } }
-      }
-        break;
+        switch (moa->state) {
+            case 0:
+                if ((i % 50) < 20) {
+                    f32 hopX;
+                    f32 hopZ;
+                    f32 hopY;
+                    f32 ax;
+                    f32 az;
+                    f32 ar;
+                    rad = randf(0.0f, 6.2831855f);
+                    dist = randf(0.0f, 50.0f);
+                    ax = wp->target[i % 3].x + (dist * moa_sinx(rad));
+                    az = wp->target[i % 3].z - (dist * moa_cosx(rad));
+                    ar = (6.2831855f * angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], ax, az)) / 360.0f;
+                    hopX = (15.0f * moa_sinx(ar)) + (*pose->mtx)[0][3];
+                    hopY = (*pose->mtx)[1][3];
+                    hopZ = (*pose->mtx)[2][3] - (15.0f * moa_cosx(ar));
+                    {
+                        f32 span1;
+                        f32 span2;
+                        f32 frac1 = rand() / 32767.0f;
+                        f32 frac2 = rand() / 32767.0f;
+                        moamoa_jump(pose, moa, moa->state, 1, hopX, hopY, hopZ, (frac1 * (span1 = 3.0f - 1.5f)) + 1.5f, (frac2 * (span2 = 2.0f - 0.8f)) + 0.8f);
+                    }
+                    moa->flags |= MOAMOA_FLAG_TO_TARGET;
+                    break;
+                }
+                {
+                    f32 hopZ;
+                    {
+                        f32 targetDist;
+                        f32 targetAngle;
+                        f32 targetRad;
+                        targetDist = distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
+                        targetAngle = angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
+                        if (targetDist < 100.0f) {
+                            targetAngle = randf(0.0f, 360.0f);
+                        }
+                        targetRad = (6.2831855f * targetAngle) / 360.0f;
+                        rad = (5.0f * moa_sinx(targetRad)) + (*pose->mtx)[0][3];
+                        y = (*pose->mtx)[1][3];
+                        hopZ = (*pose->mtx)[2][3] - (5.0f * moa_cosx(targetRad));
+                    }
+                    {
+                        f32 span1;
+                        f32 span2;
+                        f32 frac1 = rand() / 32767.0f;
+                        f32 frac2 = rand() / 32767.0f;
+                        moamoa_jump(pose, moa, moa->state, 1, rad, y, hopZ, (frac1 * (span1 = 0.5f - 0.3f)) + 0.3f, (frac2 * (span2 = 0.8f - 0.5f)) + 0.5f);
+                    }
+                }
+                moa->flags &= ~MOAMOA_FLAG_TO_TARGET;
+                break;
 
-      case 2:
-      {
-        f32 z;
-        f32 x;
-      {
-        f32 r = randf(-45.0f, 45.0f);
-        a = wp->angle;
-        a += r;
-      }
-        a += 180.0f;
-        d = wp->dist;
-        x = (*pose->mtx)[0][3] + (30.0f * moa_sinx((6.2831855f * a) / 360.0f));
-        y = (*pose->mtx)[1][3];
-        z = (*pose->mtx)[2][3];
-      {
-        f32 b;
-        f32 k;
-        f32 r1 = rand() / 32767.0f;
-        f32 r2;
-        a2 = 2.0f * ((r1 * (k = 1.0f - 1.0f)) + 1.0f);
-        r2 = rand() / 32767.0f;
-        b = 2.0f * ((r2 * (k = 0.4f - 0.4f)) + 0.4f);
-        // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
-        { f32 x2 = x; f32 y2 = y; f32 z2 = z; f32 s2 = a2; f32 g2 = b; moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g2); }
-      }
-        break;
-      }
+            case 50:
+                if ((--moa->timer) < 0) {
+                    moa->timer = 0;
+                    moa->state++;
+                }
+                break;
 
-      case 3:
-        (*pose->mtx)[1][3] += moa->vy;
-        moa->vy -= moa->gravity;
-      {
-        f32 rad = (6.2831855f * angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], moa->target.x, moa->target.z)) / 360.0f;
-        (*pose->mtx)[0][3] += moa->speed * moa_sinx(rad);
-        (*pose->mtx)[2][3] = (*pose->mtx)[2][3] + (moa->speed * (-moa_cosx(rad)));
-      }
-        if ((--moa->jumpTimer) < 0)
-      {
-        (*pose->mtx)[0][3] = moa->target.x;
-        (*pose->mtx)[1][3] = moa->target.y;
-        (*pose->mtx)[2][3] = moa->target.z;
-        moa->flags &= ~2;
-        pose->flags &= ~0x10;
-        moa->timer = 0;
-        moa->state++;
-      }
-        break;
+            case 51:
+                moa->speed = randf(0.0f, 200.0f);
+                moa->gravity = randf(0.0f, (300.0f * moa->speed) / 200.0f);
+                moa->state++;
+                moa->timer = 0;
 
-      case 4:
-        if ((++moa->timer) > 4)
-      {
-        moa->state = moa->next;
-      }
-        break;
+            case 52:
+                s = (moa->timer < 200) ? (1.0f) : ((800 - moa->timer) / 600.0f);
+                if (s < 0.0f) {
+                    s = 0.0f;
+                    moa->flags |= MOAMOA_FLAG_GATHERED;
+                }
+                tx = wp->target[i % 3].x;
+                ty = wp->target[i % 3].y;
+                tz = wp->target[i % 3].z;
+                tx += s * (moa->gravity * ((f32)sin(((f32)(i + gp->retraceCount)) / 4.0f)));
+                r = i + gp->retraceCount;
+                ty += moa->speed * s;
+                tz += s * ((-moa->gravity) * ((f32)cos(r / 4.0f)));
+                (*pose->mtx)[0][3] += (tx - (*pose->mtx)[0][3]) / 15.0f;
+                (*pose->mtx)[1][3] += (ty - (*pose->mtx)[1][3]) / 15.0f;
+                (*pose->mtx)[2][3] += (tz - (*pose->mtx)[2][3]) / 15.0f;
+                moa->timer++;
+                break;
 
-      case 36:
+            case 1: {
+                f32 hopRad;
+                {
+                    f32 k;
+                    f32 frac1 = rand() / 32767.0f;
+                    f32 hopAngle = wp->angle + ((frac1 * (k = 45.0f - -45.0f)) + -45.0f);
+                    hopRad = (6.2831855f * hopAngle) / 360.0f;
+                }
+                d = wp->dist;
+                x = (*pose->mtx)[0][3] + (15.0f * moa_sinx(hopRad));
+                dist = (*pose->mtx)[1][3];
+                z = (*pose->mtx)[2][3] - (15.0f * moa_cosx(hopRad));
+                {
+                    f32 hopSpeed;
+                    f32 k;
+                    f32 frac1 = rand() / 32767.0f;
+                    hopSpeed = frac1 * (k = 1.0f - 1.0f) + 1.0f;
+                    // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
+                    {
+                        f32 g2 = randf(0.4f, 0.4f);
+                        {
+                            f32 x2 = x;
+                            f32 y2 = dist;
+                            f32 z2 = z;
+                            f32 s2 = hopSpeed;
+                            f32 g3 = g2;
+                            moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g3);
+                        }
+                    }
+                }
+            } break;
 
-      case 37:
+            case 2: {
+                f32 hopZ;
+                f32 hopX;
+                {
+                    f32 turn = randf(-45.0f, 45.0f);
+                    a = wp->angle;
+                    a += turn;
+                }
+                a += 180.0f;
+                d = wp->dist;
+                hopX = (*pose->mtx)[0][3] + (30.0f * moa_sinx((6.2831855f * a) / 360.0f));
+                y = (*pose->mtx)[1][3];
+                hopZ = (*pose->mtx)[2][3];
+                {
+                    f32 b;
+                    f32 k;
+                    f32 frac1 = rand() / 32767.0f;
+                    f32 frac2;
+                    jumpSpeed = 2.0f * ((frac1 * (k = 1.0f - 1.0f)) + 1.0f);
+                    frac2 = rand() / 32767.0f;
+                    b = 2.0f * ((frac2 * (k = 0.4f - 0.4f)) + 0.4f);
+                    // FAKE: block-local copies of the float args (behaviour-identical) put the f1..f5 arg moves ahead of the ?: as in the target
+                    {
+                        f32 x2 = hopX;
+                        f32 y2 = y;
+                        f32 z2 = hopZ;
+                        f32 s2 = jumpSpeed;
+                        f32 g2 = b;
+                        moamoa_jump(pose, moa, (d < 100.0f) ? (moa->state) : (0), 1, x2, y2, z2, s2, g2);
+                    }
+                }
+                break;
+            }
 
-      case 38:
-      {
-        f32 tz;
-        if (!(moa->flags & 1))
-        {
-          tx = mario->position.x;
-          tz = mario->position.z;
+            case 3:
+                (*pose->mtx)[1][3] += moa->vy;
+                moa->vy -= moa->gravity;
+                {
+                    f32 moveRad = (6.2831855f * angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], moa->target.x, moa->target.z)) / 360.0f;
+                    (*pose->mtx)[0][3] += moa->speed * moa_sinx(moveRad);
+                    (*pose->mtx)[2][3] = (*pose->mtx)[2][3] + (moa->speed * (-moa_cosx(moveRad)));
+                }
+                if ((--moa->jumpTimer) < 0) {
+                    (*pose->mtx)[0][3] = moa->target.x;
+                    (*pose->mtx)[1][3] = moa->target.y;
+                    (*pose->mtx)[2][3] = moa->target.z;
+                    moa->flags &= ~MOAMOA_FLAG_JUMPING;
+                    pose->flags &= ~0x10;
+                    moa->timer = 0;
+                    moa->state++;
+                }
+                break;
+
+            case 4:
+                if ((++moa->timer) > 4) {
+                    moa->state = moa->next;
+                }
+                break;
+
+            case 36:
+
+            case 37:
+
+            case 38: {
+                f32 targetZ;
+                if (!(moa->flags & MOAMOA_FLAG_TO_TARGET)) {
+                    tx = mario->position.x;
+                    targetZ = mario->position.z;
+                } else {
+                    tx = wp->target[i % 3].x;
+                    targetZ = wp->target[i % 3].z;
+                }
+                {
+                    f32 hopZ;
+                    {
+                        f32 hopRad;
+                        f32 k;
+                        s = rand() / 32767.0f;
+                        {
+                            f32 fleeAngle = angleABf(tx, targetZ, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
+                            fleeAngle += ((s * (k = 45.0f - -45.0f)) + -45.0f);
+                            hopRad = (6.2831855f * fleeAngle) / 360.0f;
+                        }
+                        ty = (*pose->mtx)[0][3] + (15.0f * moa_sinx(hopRad));
+                        y = (*pose->mtx)[1][3];
+                        hopZ = (*pose->mtx)[2][3] - (15.0f * moa_cosx(hopRad));
+                    }
+                    {
+                        f32 k;
+                        f32 frac1 = rand() / 32767.0f;
+                        f32 frac2 = rand() / 32767.0f;
+                        k = 1.0f - 1.0f;
+                        moamoa_jump(pose, moa, moa->state + 1, 1, ty, y, hopZ, (frac1 * k) + 1.0f, (frac2 * k) + 1.0f);
+                    }
+                }
+            } break;
+
+            case 39:
+                if ((++moa->timer) < 30) {
+                    (*pose->mtx)[0][0] *= 0.9f;
+                    (*pose->mtx)[1][1] *= 0.9f;
+                    (*pose->mtx)[2][2] *= 0.9f;
+                } else {
+                    moa->state = 49;
+                }
+                break;
+
+            case 47: {
+                f32 hopRad;
+                s = rand() / 32767.0f;
+                dist = randf(300.0f, 500.0f);
+                {
+                    f32 k;
+                    hopRad = (6.2831855f * ((s * (k = 225.0f - 135.0f)) + 135.0f)) / 360.0f;
+                }
+                x = (dist * moa_sinx(hopRad)) + (*pose->mtx)[0][3];
+                y = (*pose->mtx)[2][3] - (dist * moa_cosx(hopRad));
+            }
+                {
+                    f32 k;
+                    f32 frac1 = rand() / 32767.0f;
+                    spd = (frac1 * (k = 6.0f - 5.0f)) + 5.0f;
+                }
+                {
+                    f32 k;
+                    f32 frac1 = rand() / 32767.0f;
+                    s = (frac1 * (k = 0.3f - 0.2f)) + 0.2f;
+                }
+                if (!sndFlag) {
+                    Vec pos = {0.0f, 0.0f, 0.0f};
+                    pos.x = (*pose->mtx)[0][3];
+                    pos.y = (*pose->mtx)[1][3];
+                    pos.z = (*pose->mtx)[2][3];
+                    psndSFXOn_3D((const char*)0x6c3, &pos);
+                    sndFlag = 1;
+                }
+                dist = -100.0f;
+                moamoa_jump(pose, moa, 49, 0, x, dist, y, spd, s);
+                break;
+
+            case 48:
+                if ((--moa->jumpTimer) > 0) {
+                    moa->target.x += moa->vy;
+                    moa->target.y += moa->speed;
+                    moa->target.z += moa->gravity;
+                    (*pose->mtx)[0][3] += moa->target.x;
+                    (*pose->mtx)[1][3] += moa->target.y;
+                    (*pose->mtx)[2][3] += moa->target.z;
+                } else {
+                    moa->state = 49;
+                }
+                break;
+
+            case 49:
+                if ((wp->flags & MOAMOA_WORK_TARGET0_OFF) && (wp->flags & MOAMOA_WORK_TARGET1_OFF)) {
+                    moa->state = 62;
+                    break;
+                }
+                if (wp->hitCount < 250) {
+                    PSMTXIdentity(*pose->mtx);
+                    (*pose->mtx)[0][3] = wp->target[i % 3].x;
+                    (*pose->mtx)[1][3] = wp->target[i % 3].y;
+                    (*pose->mtx)[2][3] = wp->target[i % 3].z;
+                    moa->flags = 0;
+                    moa->state = 0;
+                    moa->timer = 0;
+                } else {
+                    moa->state = 62;
+                }
+                break;
+
+            case 25:
+                if (moa->timer < 30) {
+                    PSMTXRotRad(rot, 'y', 0.20943952f);
+                    PSMTXConcat(*pose->mtx, rot, *pose->mtx);
+                    pose->flags &= ~2;
+                    moa->timer++;
+                } else {
+                    pose->flags |= 2;
+                    moa->timer = (100.0f - distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->target[i % 3].x, wp->target[i % 3].z)) / 2.0f;
+                    moa->state++;
+                }
+                break;
+
+            case 26:
+                if ((--moa->timer) < 0) {
+                    moa->state++;
+                }
+                break;
+
+            case 27: {
+                f32 hopRad;
+                if ((__fabs((*pose->mtx)[0][3]) < 300.0) && (__fabs((*pose->mtx)[2][3]) < 300.0)) {
+                    s = rand() / 32767.0f;
+                    {
+                        f32 k;
+                        f32 fleeAngle = angleABf(wp->target[i % 3].x, wp->target[i % 3].z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
+                        fleeAngle += ((s * (k = 45.0f - -45.0f)) + -45.0f);
+                        hopRad = (6.2831855f * fleeAngle) / 360.0f;
+                    }
+                    x = (15.0f * moa_sinx(hopRad)) + (*pose->mtx)[0][3];
+                    grav = (*pose->mtx)[2][3] - (15.0f * moa_cosx(hopRad));
+                    {
+                        f32 span1;
+                        f32 span2;
+                        f32 frac1 = rand() / 32767.0f;
+                        f32 frac2 = rand() / 32767.0f;
+                        moamoa_jump(pose, moa, moa->state, 1, x, 0.0f, grav, 3.0f * ((frac1 * (span1 = 1.0f - 1.0f)) + 1.0f), (frac2 * (span2 = 1.0f - 1.0f)) + 1.0f);
+                    }
+                } else {
+                    moa->state = 62;
+                }
+            } break;
+
+            case 62:
+                moa->flags |= MOAMOA_FLAG_GONE;
+                pose->flags &= ~1;
+                pose->flags |= 4;
+                break;
+
+            case 63: {
+                f32 k;
+                s = rand() / 32767.0f;
+                spd = randf(2.0f, 3.0f);
+                moa->timer = irand(i / 2);
+                rad = (6.2831855f * ((s * (k = 315.0f - 225.0f)) + 225.0f)) / 360.0f;
+            }
+                moa->target.x = spd * moa_sinx(rad);
+                moa->target.y = randf(1.0f, 2.0f);
+                moa->target.z = spd * (-moa_cosx(rad));
+                moa->state++;
+                break;
+
+            case 64:
+                if ((--moa->timer) < 0) {
+                    moa->state++;
+                }
+                break;
+
+            case 65:
+                moa->target.x *= 1.1f;
+                moa->target.y *= 1.02f;
+                moa->target.z *= 1.1f;
+                (*pose->mtx)[0][3] += moa->target.x;
+                (*pose->mtx)[1][3] += moa->target.y;
+                (*pose->mtx)[2][3] += moa->target.z;
+                PSMTXRotRad(rot2, 'y', 0.20943952f);
+                PSMTXConcat(*pose->mtx, rot2, *pose->mtx);
+                pose->flags &= ~2;
+                if ((*pose->mtx)[0][3] < (-1000.0f)) {
+                    moa->state = 62;
+                }
+                break;
         }
-        else
-        {
-          tx = wp->target[i % 3].x;
-          tz = wp->target[i % 3].z;
+
+        if (!(moa->flags & (MOAMOA_FLAG_KNOCKED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_BLOWN))) {
+            if ((*pose->mtx)[0][3] > 280.0f) {
+                (*pose->mtx)[0][3] = 280.0f;
+            }
+            if ((*pose->mtx)[0][3] < (-120.0f)) {
+                (*pose->mtx)[0][3] = -120.0f;
+            }
+            if ((*pose->mtx)[2][3] > 70.0f) {
+                (*pose->mtx)[2][3] = 70.0f;
+            }
+            if ((*pose->mtx)[2][3] < (-70.0f)) {
+                (*pose->mtx)[2][3] = -70.0f;
+            }
         }
-      {
-        f32 z;
-        {
-          f32 rad; f32 k;
-          s = rand() / 32767.0f;
-          { f32 a3 = angleABf(tx, tz, (*pose->mtx)[0][3], (*pose->mtx)[2][3]); a3 += ((s * (k = 45.0f - -45.0f)) + -45.0f); rad = (6.2831855f * a3) / 360.0f; }
-          ty = (*pose->mtx)[0][3] + (15.0f * moa_sinx(rad));
-          y = (*pose->mtx)[1][3];
-          z = (*pose->mtx)[2][3] - (15.0f * moa_cosx(rad));
-        }
-        {
-          f32 k;
-          f32 r1 = rand() / 32767.0f;
-          f32 r2 = rand() / 32767.0f;
-          k = 1.0f - 1.0f;
-          moamoa_jump(pose, moa, moa->state + 1, 1, ty, y, z, (r1 * k) + 1.0f, (r2 * k) + 1.0f);
-        }
-      }
-      }
-        break;
-
-      case 39:
-        if ((++moa->timer) < 30)
-      {
-        (*pose->mtx)[0][0] *= 0.9f;
-        (*pose->mtx)[1][1] *= 0.9f;
-        (*pose->mtx)[2][2] *= 0.9f;
-      }
-      else
-      {
-        moa->state = 49;
-      }
-        break;
-
-      case 47:
-      {
-        f32 rad;
-        s = rand() / 32767.0f;
-        dist = randf(300.0f, 500.0f);
-        { f32 k; rad = (6.2831855f * ((s * (k = 225.0f - 135.0f)) + 135.0f)) / 360.0f; }
-        x = (dist * moa_sinx(rad)) + (*pose->mtx)[0][3];
-        y = (*pose->mtx)[2][3] - (dist * moa_cosx(rad));
-      }
-      {
-        f32 k;
-        f32 r1 = rand() / 32767.0f;
-        spd = (r1 * (k = 6.0f - 5.0f)) + 5.0f;
-      }
-      {
-        f32 k;
-        f32 r1 = rand() / 32767.0f;
-        s = (r1 * (k = 0.3f - 0.2f)) + 0.2f;
-      }
-        if (!sndFlag)
-      {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = (*pose->mtx)[0][3]; pos.y = (*pose->mtx)[1][3]; pos.z = (*pose->mtx)[2][3];
-        psndSFXOn_3D((const char *) 0x6c3, &pos);
-        sndFlag = 1;
-      }
-        dist = -100.0f;
-        moamoa_jump(pose, moa, 49, 0, x, dist, y, spd, s);
-        break;
-
-      case 48:
-        if ((--moa->jumpTimer) > 0)
-      {
-        moa->target.x += moa->vy;
-        moa->target.y += moa->speed;
-        moa->target.z += moa->gravity;
-        (*pose->mtx)[0][3] += moa->target.x;
-        (*pose->mtx)[1][3] += moa->target.y;
-        (*pose->mtx)[2][3] += moa->target.z;
-      }
-      else
-      {
-        moa->state = 49;
-      }
-        break;
-
-      case 49:
-        if ((wp->flags & 0x1000) && (wp->flags & 0x2000))
-      {
-        moa->state = 62;
-        break;
-      }
-        if (wp->hitCount < 250)
-      {
-        PSMTXIdentity(*pose->mtx);
-        (*pose->mtx)[0][3] = wp->target[i % 3].x;
-        (*pose->mtx)[1][3] = wp->target[i % 3].y;
-        (*pose->mtx)[2][3] = wp->target[i % 3].z;
-        moa->flags = 0;
-        moa->state = 0;
-        moa->timer = 0;
-      }
-      else
-      {
-        moa->state = 62;
-      }
-        break;
-
-      case 25:
-        if (moa->timer < 30)
-      {
-        PSMTXRotRad(rot, 'y', 0.20943952f);
-        PSMTXConcat(*pose->mtx, rot, *pose->mtx);
-        pose->flags &= ~2;
-        moa->timer++;
-      }
-      else
-      {
-        pose->flags |= 2;
-        moa->timer = (100.0f - distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->target[i % 3].x, wp->target[i % 3].z)) / 2.0f;
-        moa->state++;
-      }
-        break;
-
-      case 26:
-        if ((--moa->timer) < 0)
-      {
-        moa->state++;
-      }
-        break;
-
-      case 27:
-      {
-        f32 rad;
-        if ((__fabs((*pose->mtx)[0][3]) < 300.0) && (__fabs((*pose->mtx)[2][3]) < 300.0))
-        {
-          s = rand() / 32767.0f;
-          { f32 k; f32 a3 = angleABf(wp->target[i % 3].x, wp->target[i % 3].z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]); a3 += ((s * (k = 45.0f - -45.0f)) + -45.0f); rad = (6.2831855f * a3) / 360.0f; }
-          x = (15.0f * moa_sinx(rad)) + (*pose->mtx)[0][3];
-          grav = (*pose->mtx)[2][3] - (15.0f * moa_cosx(rad));
-          {
-            f32 k;
-            f32 r1 = rand() / 32767.0f;
-            f32 r2 = rand() / 32767.0f;
-            moamoa_jump(pose, moa, moa->state, 1, x, 0.0f, grav, 3.0f * ((r1 * (k = 1.0f - 1.0f)) + 1.0f), (r2 * k) + 1.0f);
-          }
-        }
-        else
-        {
-          moa->state = 62;
-        }
-      }
-        break;
-
-      case 62:
-        moa->flags |= 0x20;
-        pose->flags &= ~1;
-        pose->flags |= 4;
-        break;
-
-      case 63:
-      {
-        f32 k;
-        s = rand() / 32767.0f;
-        spd = randf(2.0f, 3.0f);
-        moa->timer = irand(i / 2);
-        rad = (6.2831855f * ((s * (k = 315.0f - 225.0f)) + 225.0f)) / 360.0f;
-      }
-        moa->target.x = spd * moa_sinx(rad);
-        moa->target.y = randf(1.0f, 2.0f);
-        moa->target.z = spd * (-moa_cosx(rad));
-        moa->state++;
-        break;
-
-      case 64:
-        if ((--moa->timer) < 0)
-      {
-        moa->state++;
-      }
-        break;
-
-      case 65:
-        moa->target.x *= 1.1f;
-        moa->target.y *= 1.02f;
-        moa->target.z *= 1.1f;
-        (*pose->mtx)[0][3] += moa->target.x;
-        (*pose->mtx)[1][3] += moa->target.y;
-        (*pose->mtx)[2][3] += moa->target.z;
-        PSMTXRotRad(rot2, 'y', 0.20943952f);
-        PSMTXConcat(*pose->mtx, rot2, *pose->mtx);
-        pose->flags &= ~2;
-        if ((*pose->mtx)[0][3] < (-1000.0f))
-      {
-        moa->state = 62;
-      }
-        break;
-
+        moa->lastX = (*pose->mtx)[0][3];
+        moa->lastZ = (*pose->mtx)[2][3];
     }
 
-    if (!(moa->flags & 0x98))
-    {
-      if ((*pose->mtx)[0][3] > 280.0f)
-      {
-        (*pose->mtx)[0][3] = 280.0f;
-      }
-      if ((*pose->mtx)[0][3] < (-120.0f))
-      {
-        (*pose->mtx)[0][3] = -120.0f;
-      }
-      if ((*pose->mtx)[2][3] > 70.0f)
-      {
-        (*pose->mtx)[2][3] = 70.0f;
-      }
-      if ((*pose->mtx)[2][3] < (-70.0f))
-      {
-        (*pose->mtx)[2][3] = -70.0f;
-      }
+    moamoa_pose_main();
+    if (wp->flags & MOAMOA_WORK_PARTNER_IN_USE) {
+        mario->floorMove.x = 0.0f;
+        mario->floorMove.y = 0.0f;
+        mario->floorMove.z = 0.0f;
+    } else {
+        pv = (Vec){mario->floorMove.x, mario->floorMove.y, mario->floorMove.z};
+        if (PSVECMag(&pv) > 2.0f) {
+            PSVECNormalize(&pv, &pv);
+            mario->floorMove.x = 2.0f * pv.x;
+            mario->floorMove.y = 2.0f * pv.y;
+            mario->floorMove.z = 2.0f * pv.z;
+        }
     }
-    moa->lastX = (*pose->mtx)[0][3];
-    moa->lastZ = (*pose->mtx)[2][3];
-  }
-
-  moamoa_pose_main();
-  if (wp->flags & 0x10)
-  {
-    mario->floorMove.x = 0.0f;
-    mario->floorMove.y = 0.0f;
-    mario->floorMove.z = 0.0f;
-  }
-  else
-  {
-    pv = (Vec){mario->floorMove.x, mario->floorMove.y, mario->floorMove.z};
-    if (PSVECMag(&pv) > 2.0f)
-    {
-      PSVECNormalize(&pv, &pv);
-      mario->floorMove.x = 2.0f * pv.x;
-      mario->floorMove.y = 2.0f * pv.y;
-      mario->floorMove.z = 2.0f * pv.z;
-    }
-  }
 }
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 static void ext_moamoa_dispent(void) {
-    if (wp->flags & 1) {
+    if (wp->flags & MOAMOA_WORK_ACTIVE) {
         dispEntry(CAMERA_3D, (0.0f), 1, ext_disp, NULL);
         dispEntry(CAMERA_3D, (0.0f), 2, ext_shadow_disp, NULL);
     }
-    if (wp->flags & 2) {
+    if (wp->flags & MOAMOA_WORK_DRAW_OFFSCREEN) {
         dispEntry(CAMERA_OFFSCREEN2, -5000.0f, 1, ext_disp, NULL);
         dispEntry(CAMERA_OFFSCREEN2, -5000.0f, 2, ext_shadow_disp, NULL);
     }
@@ -1363,8 +1345,8 @@ static BeroEntry bero_data[] = {
         ((char*)"e_bero"), // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -1381,8 +1363,8 @@ static BeroEntry bero_data[] = {
         ((char*)"s_bero"), // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -1401,22 +1383,22 @@ static BeroEntry bero_data[] = {
 EVT_BEGIN(evt_bridge)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(500)
-    SET_VALUE(GSWF(3576), 1)
+    SET_VALUE(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 1)
     CALL(evt_bero_mapchange, STRING(((char*)"hom_00")), STRING(((char*)"n_bero_2")))
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_bridge2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"s_eki_07")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"s_eki_00")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_00")), 1, 0)
     CALL(evt_map_playanim, STRING(((char*)"anm_ori")), 2, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"kaidann")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"ori")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_kaidan")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_ori")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_kabe")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kabe")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(((char*)"anm_ere_1")), 2, 0)
     CALL(evt_mario_set_pos, -210, 60, 0)
     CALL(evt_party_set_pos, 0, -230, 60, 0)
@@ -1429,8 +1411,8 @@ EVT_BEGIN(evt_bridge2)
     CALL(evt_party_cont_onoff, 0, 1)
     CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_lever")), 0, 0, -80)
     SET_VALUE(GF(0), 1)
-    SET_VALUE(GSW(0), 325)
-    SET_VALUE(GSWF(3576), 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_42_DRAWBRIDGE_DOWN)
+    SET_VALUE(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 0)
     RETURN
 EVT_END()
 
@@ -1458,16 +1440,16 @@ static EVT_BEGIN(evt_origami)
     WAIT_MS(500)
     CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ORIGAMI_APPEAR1")), -220, 60, 0, 0)
     CALL(evt_map_playanim, STRING(((char*)"anm_ori")), 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"kaidann")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"ori")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_kaidan")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_ori")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"kaidann_A")), 1, 1)
     CALL(evt_map_checkanim, STRING(((char*)"anm_ori")), LW(0), LW(1))
     WAIT_MS(1600)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_kabe")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kabe")), MAPOBJ_FLAG_HIDE)
     WAIT_MS(1000)
-    CALL(evt_mobj_switch_blue, 0, STRING(((char*)"bridge_sw")), -220, 60, 0, PTR(evt_bridge), GSWF(3725))
+    CALL(evt_mobj_switch_blue, 0, STRING(((char*)"bridge_sw")), -220, 60, 0, PTR(evt_bridge), GSWF(GSWF_EKI00_BRIDGE_SWITCH_PRESSED))
     CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_OBJ_SWITCH_APPEAR1")), -220, 60, 0, 0)
     CALL(evt_mobj_set_scale, STRING(((char*)"bridge_sw")), FLOAT(0.099609375f), FLOAT(0.099609375f), FLOAT(0.099609375f))
     CALL(evt_sub_intpl_msec_init, 8, 100, 1000, 1000)
@@ -1479,7 +1461,7 @@ static EVT_BEGIN(evt_origami)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    SET_VALUE(GSW(0), 324)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     CALL(evt_mario_key_onoff, 1)
@@ -1527,15 +1509,15 @@ static EVT_BEGIN(evt_meet_moamoa)
         CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_6")), 0, STRING(((char*)"party")))
     END_SWITCH
     BEGIN_INLINE_EVENT
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING(((char*)"BGM_FF_ENV_SURPRISED1")))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING(((char*)"BGM_FF_ENV_SURPRISED1")))
         WAIT_MS(2000)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, 32, 151, 528, 32, 56, -12, 500, 11)
     WAIT_MS(2000)
-    CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_EVT_DANGER4")))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(((char*)"BGM_EVT_DANGER4")))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_dispflag_onoff, 1, 2)
         WAIT_MS(1000)
@@ -1560,7 +1542,7 @@ static EVT_BEGIN(evt_meet_moamoa)
     END_SWITCH
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 322)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_39_SMORG_1ST_ENCOUNTER)
     CALL(evt_mario_dispflag_onoff, 0, 2)
     CALL(evt_party_run, 0)
     RETURN
@@ -1569,7 +1551,7 @@ EVT_END()
 static EVT_BEGIN(evt_moamoa_escape)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 0, 151, 528, 0, 56, -12, 500, 11)
-    CALL(evt_snd_bgmoff_f, 512, 180)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 180)
     BEGIN_INLINE_EVENT
         CALL(evt_moamoa_end_wait)
         CALL(evt_moamoa_exit)
@@ -1577,13 +1559,11 @@ static EVT_BEGIN(evt_moamoa_escape)
     WAIT_MS(3000)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    CALL(evt_run_case_evt, 9, 1, STRING(((char*)"a_lever")), 0, PTR(evt_origami), GW(10))
-    SET_VALUE(GSW(0), 323)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_lever")), 0, PTR(evt_origami), GW(10))
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
-
-s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 
 s32 img_set_color(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
@@ -1593,7 +1573,7 @@ s32 img_set_color(EventEntry* event, BOOL isFirstCall) {
     u8 b = evtGetValue(event, args[3]);
     u8 a = evtGetValue(event, args[4]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
-    animPoseSetMaterialFlagOn(img->poseId, 0x40);
+    animPoseSetMaterialFlagOn(img->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
     animPoseSetMaterialEvtColor(img->poseId, (GXColor){r, g, b, a});
     return EVT_RETURN_DONE;
 }
@@ -1601,7 +1581,7 @@ s32 img_set_color(EventEntry* event, BOOL isFirstCall) {
 EVT_BEGIN(evt_elv_rumble)
     IF_INT_EQUAL(GF(0), 0)
         CALL(evt_map_checkanim, STRING(((char*)"anm_ere_1")), LW(0), LW(1))
-        ELSE
+    ELSE
         CALL(evt_map_checkanim, STRING(((char*)"anm_ere_2")), LW(0), LW(1))
     END_IF
     SUBTRACT(LW(1), 500)
@@ -1653,7 +1633,7 @@ EVT_BEGIN(evt_elv_down)
     CALL(evt_mario_set_dir, 270, 200, 0)
     CALL(evt_mapobj_set_offscreen, 1, STRING(((char*)"s_eki_00")), STRING(((char*)"offscreen")))
     CALL(evt_mapobj_clear_offscreen, 1, STRING(((char*)"s_eki_07")))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"s_eki_00")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
     CALL(evt_img_onoff, STRING(((char*)"capture_img")), 1)
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
@@ -1690,7 +1670,7 @@ EVT_BEGIN(evt_elv_down)
     CALL(evt_mapobj_clear_offscreen, 1, STRING(((char*)"s_eki_00")))
     CALL(evt_mapobj_set_offscreen, 1, STRING(((char*)"s_eki_07")), STRING(((char*)"offscreen")))
     CALL(evt_img_onoff, STRING(((char*)"capture_img")), 1)
-    IF_INT_LESS(GSW(0), 323)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 0, 1)
         CALL(evt_moamoa_flag_onoff, 1, 2)
     END_IF
@@ -1712,23 +1692,23 @@ EVT_BEGIN(evt_elv_down)
         END_IF
     END_LOOP
     CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
-    IF_INT_LESS(GSW(0), 323)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 1, 1)
         CALL(evt_moamoa_flag_onoff, 0, 2)
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"s_eki_07")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"s_eki_00")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_00")), 1, 0)
-    SWITCH(GSW(0))
-        CASE_LESS(323)
-        CASE_EQUAL(323)
-        CALL(evt_run_case_evt, 9, 1, STRING(((char*)"a_lever")), 0, PTR(evt_origami), GW(10))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_40_SWATTING_SMORGS)
+        CASE_EQUAL(STORY_STG6_40_SWATTING_SMORGS)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_lever")), 0, PTR(evt_origami), GW(10))
         CASE_DEFAULT
         CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_lever")), 0, 0, -80)
     END_SWITCH
-    IF_INT_EQUAL(GSW(0), 324)
-        CALL(evt_mobj_switch_blue, 0, STRING(((char*)"bridge_sw")), -220, 60, 0, PTR(evt_bridge), GSWF(3725))
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
+        CALL(evt_mobj_switch_blue, 0, STRING(((char*)"bridge_sw")), -220, 60, 0, PTR(evt_bridge), GSWF(GSWF_EKI00_BRIDGE_SWITCH_PRESSED))
     END_IF
     CALL(evt_item_delete_check, STRING(((char*)"item")), LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1736,19 +1716,19 @@ EVT_BEGIN(evt_elv_down)
         SUBTRACT(LW(1), 2000)
         CALL(evt_item_set_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
     END_IF
-    IF_INT_LESS(GSW(0), 324)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"kaidann")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"ori")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"n_kaidan")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"n_ori")), 1)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING(((char*)"kaidann_A")), 1, 0)
-        ELSE
+    ELSE
         CALL(evt_map_playanim, STRING(((char*)"anm_ori")), 2, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"kaidann")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"ori")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_kaidan")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_ori")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"n_kabe")), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kabe")), MAPOBJ_FLAG_HIDE)
     END_IF
     BEGIN_INLINE_EVENT
         CALL(evt_party_stop, 0)
@@ -1769,11 +1749,11 @@ EVT_BEGIN(evt_elv_down)
     END_INLINE_EVENT
     CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_2")), 0, 0)
     WAIT_MS(500)
-    IF_INT_LESS(GSW(0), 322)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_39_SMORG_1ST_ENCOUNTER)
         CALL_CHILD(PTR(evt_meet_moamoa))
     END_IF
-    IF_INT_EQUAL(GSW(0), 322)
-        CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_EVT_DANGER4")))
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_39_SMORG_1ST_ENCOUNTER)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(((char*)"BGM_EVT_DANGER4")))
     END_IF
     CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_2")), LW(0), LW(1))
     WAIT_MS(LW(1))
@@ -1781,7 +1761,7 @@ EVT_BEGIN(evt_elv_down)
 EVT_END()
 
 EVT_BEGIN(evt_elv_up)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
@@ -1808,9 +1788,9 @@ EVT_BEGIN(evt_elv_up)
     WAIT_MS(500)
     CALL(evt_mapobj_clear_offscreen, 1, STRING(((char*)"s_eki_00")))
     CALL(evt_mapobj_set_offscreen, 1, STRING(((char*)"s_eki_07")), STRING(((char*)"offscreen")))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"s_eki_07")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
     CALL(evt_img_onoff, STRING(((char*)"capture_img")), 1)
-    IF_INT_LESS(GSW(0), 323)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 0, 1)
         CALL(evt_moamoa_flag_onoff, 1, 2)
     END_IF
@@ -1832,7 +1812,7 @@ EVT_BEGIN(evt_elv_up)
         END_IF
     END_LOOP
     CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
-    IF_INT_LESS(GSW(0), 323)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 0, 2)
     END_IF
     BEGIN_INLINE_EVENT
@@ -1870,9 +1850,9 @@ EVT_BEGIN(evt_elv_up)
         END_IF
     END_LOOP
     CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
-    IF_INT_LESS(GSW(0), 324)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
     END_IF
-    IF_INT_EQUAL(GSW(0), 324)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
         CALL(evt_mobj_delete, STRING(((char*)"bridge_sw")))
     END_IF
     CALL(evt_item_delete_check, STRING(((char*)"item")), LW(0))
@@ -1881,11 +1861,11 @@ EVT_BEGIN(evt_elv_up)
         ADD(LW(1), 2000)
         CALL(evt_item_set_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"s_eki_07")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"s_eki_00")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_00")), 1, 1)
-    IF_INT_EQUAL(GSW(0), 323)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_del_case_evt, 0, GW(10))
     END_IF
     BEGIN_INLINE_EVENT
@@ -1914,21 +1894,21 @@ static s32 item_tbl[] = {
 
 EVT_BEGIN(evt_elv)
     CALL(evt_mario_key_onoff, 0)
-    IF_INT_LESS(GSW(0), 321)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_38_RIDE_THE_ELEVATOR)
         CALL(evt_win_item_select, 0, PTR(item_tbl), LW(1), 0)
         IF_INT_EQUAL(LW(1), -1)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
-        CALL(evt_pouch_remove_item, 26, LW(0))
-        SET_VALUE(GSW(0), 321)
+        CALL(evt_pouch_remove_item, ITEM_ELEVATOR_KEY_0x1A, LW(0))
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_38_RIDE_THE_ELEVATOR)
         CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_ELEVATOR_KEY1")), 0)
         CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_07")), 0, 0)
     END_IF
     IF_INT_EQUAL(GF(0), 0)
         CALL_CHILD(PTR(evt_elv_down))
         SET_VALUE(GF(0), 1)
-        ELSE
+    ELSE
         CALL_CHILD(PTR(evt_elv_up))
         SET_VALUE(GF(0), 0)
     END_IF
@@ -1946,13 +1926,13 @@ EVT_END()
 
 static EVT_BEGIN(evt_head)
     CALL(evt_item_delete, STRING(((char*)"item")))
-    CALL(evt_item_entry, STRING(((char*)"item")), 300, -260, 160, -60, 4, GSWF(3745), 0)
+    CALL(evt_item_entry, STRING(((char*)"item")), ITEM_CLOSE_CALL_P, -260, 160, -60, 4, GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
     CALL(evt_item_set_move_dir_speed, STRING(((char*)"item")), FLOAT(135.0f), FLOAT(90.0f))
     CALL(evt_item_set_gravity, STRING(((char*)"item")), FLOAT(1.0f))
     CALL(evt_item_set_bound_rate, STRING(((char*)"item")), FLOAT(0.5996094f))
     CALL(evt_item_set_jump_power, STRING(((char*)"item")), FLOAT(500.0f))
-    CALL(evt_item_status_on, STRING(((char*)"item")), 16)
-    CALL(evt_item_flag_on, STRING(((char*)"item")), 2048)
+    CALL(evt_item_status_on, STRING(((char*)"item")), ITEM_STATUS_CUSTOM_LAUNCH)
+    CALL(evt_item_flag_on, STRING(((char*)"item")), ITEM_FLAG_NO_CEILING)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
@@ -1967,34 +1947,33 @@ EVT_END()
 EVT_BEGIN(eki_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    IF_INT_EQUAL(GSWF(3576), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 0)
         CALL_CHILD(PTR(evt_bero_info_run))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(bero_case_entry))
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"s_eki_07")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 0)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 320)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_37_ELEVATOR_KEY)
         CALL_CHILD(PTR(evt_elv_init))
-        CALL(evt_run_case_evt, 9, 1, STRING(((char*)"a_suitti")), 0, PTR(evt_elv), 0)
-        ELSE
-        CALL(evt_run_case_evt, 9, 1, STRING(((char*)"a_suitti")), 0, PTR(evt_elv_nomsg), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_suitti")), 0, PTR(evt_elv), 0)
+    ELSE
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_suitti")), 0, PTR(evt_elv_nomsg), 0)
     END_IF
-    IF_INT_LESS(GSW(0), 323)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL_CHILD(PTR(evt_moamoa_init))
     END_IF
-    CALL(evt_item_entry, STRING(((char*)"item")), 300, -260, 130, -60, 17, GSWF(3745), 0)
-    IF_INT_EQUAL(GSWF(3745), 0)
-        CALL(evt_run_case_evt, 16, 1, STRING(((char*)"a_dai_sita")), 0, PTR(evt_head), 0)
+    CALL(evt_item_entry, STRING(((char*)"item")), ITEM_CLOSE_CALL_P, -260, 130, -60, 17, GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
+        CALL(evt_run_case_evt, CASE_COND_HEAD, 1, STRING(((char*)"a_dai_sita")), 0, PTR(evt_head), 0)
     END_IF
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_EKI2")))
-    IF_INT_EQUAL(GSWF(3576), 1)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(((char*)"ENV_STG6_EKI2")))
+    IF_INT_EQUAL(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 1)
         SPAWN_EVENT(PTR(evt_bridge2))
     END_IF
-    CALL(evt_run_case_evt, 9, 1, STRING(((char*)"a_kan")), 0, PTR(evt_kanban), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_kan")), 0, PTR(evt_kanban), 0)
     RETURN
 EVT_END()
 
 // target pad words (G5: section sizes must match or later DOL addresses shift)
-

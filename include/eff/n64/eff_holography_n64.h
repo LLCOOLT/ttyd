@@ -1,3 +1,4 @@
+// eff_holography_n64.c: Paper Mario 64 Holography effect entry (effHolographyN64Entry).
 #pragma once
 
 #include <dolphin/types.h>

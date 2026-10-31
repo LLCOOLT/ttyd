@@ -5,11 +5,7 @@
 #include "battle/battle_sub.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
-
-f32 sinfd(f32 deg);
-BOOL BattleSamplingEnemy(BattleWorkWeaponTargets* d, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags,
-                         s8 direction);
-void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* d, u32 flags, s32* unitOut, s32* partOut);
+#include "battle/battle_detect.h"
 
 typedef struct UfoWork {
     s32 targetUnitId; // 0x0, unit the UFO hovers over (-1 none)
@@ -18,7 +14,7 @@ typedef struct UfoWork {
     s32 swayFrame;    // 0xC, hover bob counter (_ufo_sway)
     s32 timer;        // 0x10, frames to wait after the drop
     s32 dropState;    // 0x14, dropped item: 0 none, 1 start, 2 falling, 3/4 blinking, 5 gone
-    s32 pad_18;       // 0x18, never accessed
+    s32 reserved_18;  // 0x18, never accessed
     s32 dropTimer;    // 0x1C, blink frames left
     Vec dropPos;      // 0x20
     Vec dropTarget;   // 0x2C
@@ -82,7 +78,7 @@ USER_FUNC(_ufo_main) {
     }
     targetId = work->targetUnitId;
     partId = work->targetPartId;
-    if (work->state < 6 && (wp->flags & 4)) {
+    if (work->state < 6 && (wp->flags & BATTLE_FLAG_ACT_DECIDED)) {
         return EVT_RETURN_BLOCK;
     }
     if (work->state < 6 && targetId != -1) {
@@ -107,7 +103,7 @@ USER_FUNC(_ufo_main) {
                 break;
             case 2:
                 BattleSamplingEnemy(&targets, NULL, id, BtlUnit_GetEnemyBelong(unit), 0x1103100, 0,
-                                    wp->alliances[unit->mAlliance].attackDirection);
+                                    wp->alliances[unit->alliance].attackDirection);
                 BattleChoiceSamplingEnemy(&targets, 0x80000000, &targetId, &partId);
                 if (targetId == -1) {
                     work->state = 6;
@@ -155,10 +151,10 @@ USER_FUNC(_ufo_main) {
                 hy4 += oy4;
                 hz4 += oz4;
                 BtlUnit_SetPartsPos(part, hx4, hy4, hz4);
-                part->attributes |= 0x10000000;
+                part->attributes |= PART_ATTR_WORLD_POSITION;
                 work->dropState = 1;
                 work->timer = 60;
-                BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= kNotTargetable;
+                BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= PART_ATTR_NOT_TARGETABLE;
                 work->state = 5;
                 _ufo_sway(unit, TRUE);
                 break;
@@ -190,7 +186,7 @@ USER_FUNC(_ufo_main) {
                     work->state = 11;
                 }
                 if (x7 >= 240.0f) {
-                    BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= kNotTargetable;
+                    BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= PART_ATTR_NOT_TARGETABLE;
                 }
                 _ufo_sway(unit, TRUE);
                 break;
@@ -201,7 +197,7 @@ USER_FUNC(_ufo_main) {
                 break;
             case 10:
                 work->state = 6;
-                BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= kNotTargetable;
+                BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= PART_ATTR_NOT_TARGETABLE;
                 break;
             case 11:
             default:
@@ -288,7 +284,7 @@ void _ufo_drop_main(EventEntry* event) {
         case 1:
             BtlUnit_GetPartsPos(part, &work->dropPos.x, &work->dropPos.y, &work->dropPos.z);
             targetPart = BtlUnit_GetPartsPtr(target, targetPartId);
-            if (targetPart->attributes & 0x10000000) {
+            if (targetPart->attributes & PART_ATTR_WORLD_POSITION) {
                 BtlUnit_GetPartsPos(targetPart, &work->dropTarget.x, &work->dropTarget.y, &work->dropTarget.z);
             } else {
                 BtlUnit_GetPos(target, &ux, &uy, &uz);
@@ -325,14 +321,14 @@ void _ufo_drop_main(EventEntry* event) {
     if (work->dropTimer > 0) {
         work->dropTimer--;
         if (work->dropTimer <= 0) {
-            part->attributes |= 0x1000000;
+            part->attributes |= PART_ATTR_HIDDEN;
             work->dropState = 5;
             return;
         }
         if (work->dropTimer & 2) {
-            part->attributes |= 0x1000000;
+            part->attributes |= PART_ATTR_HIDDEN;
         } else {
-            part->attributes &= ~0x1000000;
+            part->attributes &= ~PART_ATTR_HIDDEN;
         }
     }
     if (target == NULL) {
@@ -342,7 +338,7 @@ void _ufo_drop_main(EventEntry* event) {
     targetPart = BtlUnit_GetPartsPtr(target, targetPartId);
     x = work->dropPos.x;
     y = work->dropPos.y;
-    if (targetPart->attributes & 0x10000000) {
+    if (targetPart->attributes & PART_ATTR_WORLD_POSITION) {
         BtlUnit_GetPartsPos(targetPart, &tx, &ty, &tz);
     } else {
         BtlUnit_GetPos(target, &px, &py, &pz);
@@ -353,16 +349,16 @@ void _ufo_drop_main(EventEntry* event) {
     }
     left = x - part->shadowSize / 2;
     right = x + part->shadowSize / 2;
-    bottom = y - part->reserved_1A4 / 2;
-    top = y + part->reserved_1A4 / 2;
+    bottom = y - part->hitHeight / 2;
+    top = y + part->hitHeight / 2;
     tLeft = tx - targetPart->shadowSize / 2;
     tRight = tx + targetPart->shadowSize / 2;
-    tBottom = ty - targetPart->reserved_1A4 / 2;
-    tTop = ty + targetPart->reserved_1A4 / 2;
+    tBottom = ty - targetPart->hitHeight / 2;
+    tTop = ty + targetPart->hitHeight / 2;
     if (right >= tLeft && left <= tRight && top >= tBottom && bottom <= tTop) {
         hit = TRUE;
     }
     if (hit) {
-        part->attributes |= 0x1000000;
+        part->attributes |= PART_ATTR_HIDDEN;
     }
 }

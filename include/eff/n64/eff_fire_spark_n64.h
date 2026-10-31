@@ -1,3 +1,4 @@
+// eff_fire_spark_n64.c: Paper Mario 64 FireSpark effect entry (effFireSparkN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

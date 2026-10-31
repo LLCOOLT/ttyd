@@ -1,3 +1,5 @@
+// Battle database of the Moon (moo.rel): stage data, enemy groups and the encounter tables of its maps.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -10,7 +12,6 @@
 #include "driver/npcdrv.h"
 
 static USER_FUNC(_space_rotate);
-extern BattleUnitKind unit_barriern_z;
 
 BattleStageObjectData moo_btlobject_data[5];
 BattleStageData moo_btlstage_data[1];
@@ -92,10 +93,10 @@ BattleStageObjectData moo_btlobject_data[] = {
 
 BattleStageData moo_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_07_4", // mSpecificStageDataDir
-        5, // mNumObjects
-        moo_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_07_4", // specificStageDataDir
+        5, // numObjects
+        moo_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgBEvt
@@ -106,30 +107,30 @@ BattleStageData moo_btlstage_data[] = {
 
 BattleUnitSetup btlparty_moo_moo_00_01_off_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_default_param_list, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -150,20 +151,20 @@ BattleGroupSetup btlgrp_moo_moo_00_01_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_01_01_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -184,20 +185,20 @@ BattleGroupSetup btlgrp_moo_moo_01_01_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_01_02_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -218,30 +219,30 @@ BattleGroupSetup btlgrp_moo_moo_01_02_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_01_02_off_2[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -262,30 +263,30 @@ BattleGroupSetup btlgrp_moo_moo_01_02_off_2 = {
 
 BattleUnitSetup btlparty_moo_moo_01_03_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -306,20 +307,20 @@ BattleGroupSetup btlgrp_moo_moo_01_03_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_01_04_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -340,30 +341,30 @@ BattleGroupSetup btlgrp_moo_moo_01_04_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_01_04_off_2[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -384,40 +385,40 @@ BattleGroupSetup btlgrp_moo_moo_01_04_off_2 = {
 
 BattleUnitSetup btlparty_moo_moo_01_04_off_3[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -438,40 +439,40 @@ BattleGroupSetup btlgrp_moo_moo_01_04_off_3 = {
 
 BattleUnitSetup btlparty_moo_moo_01_05_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -492,20 +493,20 @@ BattleGroupSetup btlgrp_moo_moo_01_05_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_02_01_off_1[] = {
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
     },
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -526,20 +527,20 @@ BattleGroupSetup btlgrp_moo_moo_02_01_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_02_02_off_1[] = {
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -560,20 +561,20 @@ BattleGroupSetup btlgrp_moo_moo_02_02_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_02_03_off_1[] = {
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
     },
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -594,30 +595,30 @@ BattleGroupSetup btlgrp_moo_moo_02_03_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_02_04_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -638,20 +639,20 @@ BattleGroupSetup btlgrp_moo_moo_02_04_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_02_05_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -672,20 +673,20 @@ BattleGroupSetup btlgrp_moo_moo_02_05_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_05_01_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -706,30 +707,30 @@ BattleGroupSetup btlgrp_moo_moo_05_01_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_05_01_off_2[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -750,40 +751,40 @@ BattleGroupSetup btlgrp_moo_moo_05_01_off_2 = {
 
 BattleUnitSetup btlparty_moo_moo_05_01_off_3[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -804,20 +805,20 @@ BattleGroupSetup btlgrp_moo_moo_05_01_off_3 = {
 
 BattleUnitSetup btlparty_moo_moo_05_02_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -838,20 +839,20 @@ BattleGroupSetup btlgrp_moo_moo_05_02_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_05_03_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -872,30 +873,30 @@ BattleGroupSetup btlgrp_moo_moo_05_03_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_05_03_off_2[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -916,30 +917,30 @@ BattleGroupSetup btlgrp_moo_moo_05_03_off_2 = {
 
 BattleUnitSetup btlparty_moo_moo_05_04_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -960,20 +961,20 @@ BattleGroupSetup btlgrp_moo_moo_05_04_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_05_05_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -994,30 +995,30 @@ BattleGroupSetup btlgrp_moo_moo_05_05_off_1 = {
 
 BattleUnitSetup btlparty_moo_moo_05_05_off_2[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1038,40 +1039,40 @@ BattleGroupSetup btlgrp_moo_moo_05_05_off_2 = {
 
 BattleUnitSetup btlparty_moo_moo_05_05_off_3[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1384,7 +1385,7 @@ static USER_FUNC(_space_rotate) {
     s32 total = evtGetValue(event, args[2]);
     BattleStageObject* obj = BattleSearchObjectPtr(name);
 
-    obj->mRotation.z = 360.0f * step / total;
+    obj->rotation.z = 360.0f * step / total;
     step++;
     if (step >= total) {
         step = 0;

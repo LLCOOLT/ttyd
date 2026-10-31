@@ -1,3 +1,5 @@
+// hatty (unit kind 206): a test enemy on the yellow Goomba model with two attacks and an event that
+// spawns kohatty helpers; its main loop user function is a stub.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -10,8 +12,6 @@
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 #include "manager/evtmgr_cmd.h"
-
-USER_FUNC(hatty_main);
 
 BattleUnitKind unit_hatty;
 static BattleUnitDefense defence;
@@ -100,10 +100,9 @@ BattleUnitKind unit_hatty = {
 USER_FUNC(hatty_main) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
-    BattleUnit* unit;
 
     id = BattleTransID(event, id);
-    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    BattleGetUnitPtr(_battleWorkPointer, id);
 
     return EVT_RETURN_BLOCK;
 }
@@ -137,23 +136,23 @@ static BattleWeapon weapon_hatty_attack = {
     0, 0, // baseFpCost..baseSpCost
     0, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1001260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
     0, // counterResistFlags
-    0x80002000, // targetWeightFlags
+    TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     100, 2, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -161,7 +160,7 @@ static BattleWeapon weapon_hatty_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -173,23 +172,23 @@ static BattleWeapon weapon_hatty_attack2 = {
     0, 0, // baseFpCost..baseSpCost
     0, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1001260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
     0, // counterResistFlags
-    0x80002000, // targetWeightFlags
+    TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 100, 3, // sleepChance..poisonTime
     2, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -197,22 +196,22 @@ static BattleWeapon weapon_hatty_attack2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(main_event)
-    CALL(hatty_main, -2)
+    CALL(hatty_main, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     SPAWN_EVENT(PTR(main_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -226,10 +225,10 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static BattleUnitSetup entry_kohatty = {
-    &unit_kohatty, // mUnitKindParams
+    &unit_kohatty, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {-1000.0f, -1000.0f, -1000.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -237,7 +236,7 @@ static BattleUnitSetup entry_kohatty = {
 };
 
 static EVT_BEGIN(kohatty_spawn_event)
-    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_kohatty), 0)
     CALL(btlevtcmd_SetPos, LW(3), LW(7), 10, LW(2))
     CALL(btlevtcmd_SetFallAccel, LW(3), 0)
@@ -248,10 +247,10 @@ static EVT_BEGIN(kohatty_spawn_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     CALL(evt_sub_random, 99, LW(10))
@@ -260,10 +259,10 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
         LOOP(0)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(14))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
             SET_VALUE(LW(4), LW(0))
-            CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
@@ -285,32 +284,32 @@ static EVT_BEGIN(attack_event)
     END_IF
     IF_INT_LESS(LW(10), 50)
         SET_VALUE(LW(6), PTR(&weapon_hatty_attack))
-        ELSE
+    ELSE
         SET_VALUE(LW(6), PTR(&weapon_hatty_attack2))
     END_IF
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(6))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(6))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(6), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 8)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(6))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(6))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 40)
     ADD(LW(1), 5)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, -16, 0, 0, -1)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -16, 0, 0, -1)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_mode, 0, 3)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 50)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(6), 256, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -333,34 +332,34 @@ static EVT_BEGIN(attack_event)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(5.0f))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 50)
     SUBTRACT(LW(1), 10)
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, 0, 1, 0, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 1, 0, -1)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
     WAIT_MS(500)
     GOTO(98)
     LABEL(91)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(5.0f))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 10)
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, 0, 1, 0, -1)
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 1, 0, -1)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(6))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(6), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
     GOTO(98)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(7.0f))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 0, -10, 0, 0, -1)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -10, 0, 0, -1)
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()

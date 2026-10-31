@@ -1,3 +1,6 @@
+// Charge glow (Charge): about 30 additive sparkle sprites around a point; types 0-2 pick the colour pair.
+#include "eff/eff_charge.h"
+// functions are emitted in source order, as in the original
 #pragma defer_codegen off
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,9 +10,7 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffChargeWork {
     s32 state;    // 0x0
@@ -51,7 +52,7 @@ void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
     effGetTexObj(30, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     {
-        GXSetTevColor(GX_TEVREG1, (GXColor){ work->r1, work->g1, work->b1, 0 });
+        GXSetTevColor(GX_TEVREG1, (GXColor){work->r1, work->g1, work->b1, 0});
     }
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -79,7 +80,7 @@ void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
         f32 ps = work->scale;
         if (ps) {
             {
-                GXSetTevColor(GX_TEVREG0, (GXColor){ s0, s1, s2, work->alpha });
+                GXSetTevColor(GX_TEVREG0, (GXColor){s0, s1, s2, work->alpha});
             }
             PSMTXTrans(pmtx, work->position.x, work->position.y, work->position.z);
             PSMTXScale(smtx, ps, ps, ps);
@@ -98,8 +99,7 @@ void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
                 GXTexCoord2f32(1.0f, 1.0f);
                 GXPosition3f32(-8.0f, -24.0f, 0.0f);
                 GXTexCoord2f32(0.0f, 1.0f);
-            }
-            else {
+            } else {
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 GXPosition3f32(-12.0f, -12.0f, 0.0f);
                 GXTexCoord2f32(0.0f, 0.0f);
@@ -120,7 +120,7 @@ void effChargeMain(EffectEntry* effect) {
     EffChargeWork* work = effect->userdata;
     s32 i;
     Vec position;
-    Vec tmp = { 0.0f, 0.0f, 0.0f };
+    Vec tmp = {0.0f, 0.0f, 0.0f};
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -138,8 +138,7 @@ void effChargeMain(EffectEntry* effect) {
     frame = work->frame;
     if (frame <= 20) {
         work->alpha = frame * 12;
-    }
-    else {
+    } else {
         work->alpha = 255;
     }
     if (frame & 1) {

@@ -1,3 +1,5 @@
+// Spell effect (majinai: charm/spell): plays the MOBJ_EFF_majinai animation while the map darkens and Mario glows,
+// with a stardust burst, then restores the map (states 0-3: load, darken, wait, restore). The type is stored, never read.
 #include "eff/eff_majinai.h"
 #include "eff/eff_stardust.h"
 #include "battle/battle.h"
@@ -9,11 +11,12 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include <dolphin/mtx.h>
+#include "version.h"
 
 EffectEntry* effMajinaiEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffMajinaiWork* work;
-    static const GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
+    static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 
     effect = effEntry();
     effect->type = "Majinai";
@@ -21,7 +24,7 @@ EffectEntry* effMajinaiEntry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffMajinaiWork) * effect->count);
     effect->userdata = work;
     effect->callback = effMajinaiMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -44,12 +47,12 @@ void effMajinaiMain(EffectEntry* effect) {
     s32 color;
     MarioWork* mario;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
     inBattle = gp->inBattle ? TRUE : FALSE;
 
     // soft delete
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         if (work->poseId != -1) {
             animPoseRelease(work->poseId);
         }
@@ -73,28 +76,27 @@ void effMajinaiMain(EffectEntry* effect) {
             if (color < 64) {
                 color = 64;
             }
-            map->entries[0].color = (GXColor){ color, color, color, 0xFF };
+            map->entries[0].color = (GXColor){color, color, color, 0xFF};
             map->entries[0].flags |= 8;
             if (!gp->inBattle) {
                 mario = marioGetPtr();
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
                 for (i = 0; i < 3; i++) {
                     if (mario->paperAnimGroupId[i] != -1) {
-                        animPoseSetMaterialFlagOn(mario->paperAnimGroupId[i], 0x800);
+                        animPoseSetMaterialFlagOn(mario->paperAnimGroupId[i], ANIM_MATERIAL_FLAG_NO_BLEND);
                     }
                 }
 #else
                 for (i = 0; i < 5; i++) {
-                    animPoseSetMaterialFlagOn(mario->paperAnimGroupId[i], 0x800);
+                    animPoseSetMaterialFlagOn(mario->paperAnimGroupId[i], ANIM_MATERIAL_FLAG_NO_BLEND);
                 }
 #endif
-            }
-            else {
+            } else {
                 unit = BattleGetMarioPtr(_battleWorkPointer);
-                animPoseSetMaterialFlagOn(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->poseId, 0x800);
+                animPoseSetMaterialFlagOn(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->poseId, ANIM_MATERIAL_FLAG_NO_BLEND);
             }
             if (animPoseGetLoopTimes(work->poseId) >= 0.93f) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
                 effStardustEntry(0, 16, 60, work->position.x, 55.0f + work->position.y, work->position.z, 45.0f, 45.0f);
 #else
                 effStardustEntry(0, 16, 60, work->position.x, 55.0f * work->scale + work->position.y,
@@ -115,25 +117,24 @@ void effMajinaiMain(EffectEntry* effect) {
             if (color > 255) {
                 color = 255;
             }
-            map->entries[0].color = (GXColor){ color, color, color, 0xFF };
+            map->entries[0].color = (GXColor){color, color, color, 0xFF};
             map->entries[0].flags |= 8;
             if (!gp->inBattle) {
                 mario = marioGetPtr();
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
                 for (i = 0; i < 3; i++) {
                     if (mario->paperAnimGroupId[i] != -1) {
-                        animPoseSetMaterialFlagOff(mario->paperAnimGroupId[i], 0x800);
+                        animPoseSetMaterialFlagOff(mario->paperAnimGroupId[i], ANIM_MATERIAL_FLAG_NO_BLEND);
                     }
                 }
 #else
                 for (i = 0; i < 5; i++) {
-                    animPoseSetMaterialFlagOff(mario->paperAnimGroupId[i], 0x800);
+                    animPoseSetMaterialFlagOff(mario->paperAnimGroupId[i], ANIM_MATERIAL_FLAG_NO_BLEND);
                 }
 #endif
-            }
-            else {
+            } else {
                 unit = BattleGetMarioPtr(_battleWorkPointer);
-                animPoseSetMaterialFlagOff(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->poseId, 0x800);
+                animPoseSetMaterialFlagOff(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->poseId, ANIM_MATERIAL_FLAG_NO_BLEND);
             }
             work->alpha -= 5;
             if (work->alpha < 0) {
@@ -161,8 +162,8 @@ void effMajinaiDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
         PSMTXConcat(mtx, rot, mtx);
         PSMTXConcat(mtx, scale, mtx);
-        animPoseSetMaterialFlagOn(work->poseId, 0x840);
-        animPoseSetMaterialEvtColor(work->poseId, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha });
+        animPoseSetMaterialFlagOn(work->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR | ANIM_MATERIAL_FLAG_NO_BLEND);
+        animPoseSetMaterialEvtColor(work->poseId, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
         animPoseMain(work->poseId);
         animPoseDrawMtx(work->poseId, mtx, 1, 0.0f, 10.0f);
         animPoseDrawMtx(work->poseId, mtx, 2, 0.0f, 10.0f);

@@ -1,71 +1,30 @@
+// gra_06 (ウスグラの道, Twilight Trail): the end of the trail before Creepy Steeple (jin_00), with the save and heart
+// blocks.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
 #include "gra.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_event_from_road);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_kagemario_init);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_jump_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_telop_entry);
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_mario_dispflag_onoff);
-#endif
-
-extern EvtWord ne_close[];
-extern EvtWord ne_open[];
-extern EvtWord gra_06_ido[];
-extern EvtWord gra_06_ido_in_sub[];
-extern EvtWord gra_06_ido_in[];
 static BeroEntry bero_entry_data[4];
-extern EvtWord gra_06_saku_open[];
-extern EvtWord first_gra06jin[];
-extern EvtWord teresa_oidasare_evt[];
-extern EvtWord gra_06_init_evt[];
 
 EVT_BEGIN(ne_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -84,7 +43,7 @@ EVT_BEGIN(ne_open)
 EVT_END()
 
 EVT_BEGIN(gra_06_ido)
-    SET_VALUE(GSWF(2079), 1)
+    SET_VALUE(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 1)
     CALL(evt_bero_mapchange, STRING("jin_09"), 0)
     SET_VALUE(LW(0), 1)
     RETURN
@@ -125,8 +84,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -142,8 +101,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "sw_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -159,8 +118,8 @@ static BeroEntry bero_entry_data[] = {
         "ana", // hitName
         3840, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)gra_06_ido_in, // enterEvent
@@ -215,12 +174,12 @@ EVT_BEGIN(gra_06_saku_open)
         CALL(evt_mario_get_party, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(evt_mario_key_onoff, 0)
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
             CALL(evt_party_stop, 0)
             WAIT_MS(200)
 #endif
             CALL(evt_msg_print_party, STRING("stg4_gra_20"))
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
             CALL(evt_party_run, 0)
 #endif
             CALL(evt_mario_key_onoff, 1)
@@ -262,14 +221,14 @@ EVT_BEGIN(gra_06_saku_open)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(100)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusari"), 1)
-    SET_VALUE(GSWF(2078), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusari"), MAPOBJ_FLAG_HIDE)
+    SET_VALUE(GSWF(GSWF_GRA06_STEEPLE_GATE_OPENED), 1)
     CALL(evt_hitobj_onoff, STRING("a_saku01"), 1, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(first_gra06jin)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, -84, 562, 619, -431, 402, 73, 0, 11)
     CALL(evt_mario_set_pos, -320, 0, 365)
@@ -283,7 +242,7 @@ EVT_BEGIN(first_gra06jin)
     CALL(evt_cam3d_evt_set, 305, 562, 372, -42, 402, -174, 5000, 0)
     WAIT_MS(6000)
     CALL(evt_cam3d_evt_set, 1050, 219, 1169, 88, 250, 153, 2000, 0)
-    CALL(evt_snd_bgmoff_f, 512, 3000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, -110, 350, FLOAT(100.0f))
     END_INLINE_EVENT
@@ -292,8 +251,8 @@ EVT_BEGIN(first_gra06jin)
     CALL(evt_cam3d_evt_set, 120, 92, 530, -83, 40, 315, 0, 0)
     CALL(evt_mario_mov_pos2, -67, 312, FLOAT(100.0f))
     WAIT_FRAMES(1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
     CALL(evt_party_stop, 0)
     CALL(evt_party_set_dir, 0, 90, 200)
     WAIT_MS(300)
@@ -301,7 +260,7 @@ EVT_BEGIN(first_gra06jin)
     CALL(evt_party_run, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 193)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_08_STEEPLE_DEMO_EXT)
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -320,7 +279,7 @@ EVT_BEGIN(teresa_oidasare_evt)
     CALL(evt_cam3d_event_from_road, 65, 60, -115, 0, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
     CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 0, 11)
     CALL(evt_seq_wait, 2)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_mario_dispflag_onoff, 1, 2)
 #endif
@@ -393,63 +352,62 @@ EVT_BEGIN(teresa_oidasare_evt)
         CALL(evt_party_set_pose, 0, STRING("PWD_S_1"))
     END_SWITCH
     CALL(evt_cam3d_evt_off, 0, 11)
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
     CALL(evt_mario_cont_onoff, 1)
 #endif
     CALL(evt_party_cont_onoff, 0, 1)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mario_dispflag_onoff, 0, 2)
 #endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
-    SET_VALUE(GSWF(2227), 0)
+    SET_VALUE(GSWF(GSWF_JIN00_BOOS_CARRIED_MARIO_OUT), 0)
     SET_VALUE(LW(0), STRING("n_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
 EVT_END()
 
 EVT_BEGIN(gra_06_init_evt)
-    CALL(evt_item_entry, STRING("item00"), 125, -130, 0, 150, 16, GSWF(5633), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -130, 0, 150, 16, GSWF(GSWF_GRA06_STAR_PIECE), 0)
     CALL(evt_kagemario_init)
-    IF_INT_EQUAL(GSWF(2227), 1)
+    IF_INT_EQUAL(GSWF(GSWF_JIN00_BOOS_CARRIED_MARIO_OUT), 1)
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
         SPAWN_EVENT(PTR(bero_case_entry))
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         SPAWN_EVENT(PTR(teresa_oidasare_evt))
-        ELSE
+    ELSE
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
-        IF_INT_LESS(GSW(0), 193)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_08_STEEPLE_DEMO_EXT)
             CALL_CHILD(PTR(bero_case_entry))
-            ELSE
+        ELSE
             CALL_CHILD(PTR(evt_bero_info_run))
         END_IF
     END_IF
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -125, 60, 235, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 10, -270, 60, 270, 0, 0)
-    CALL(evt_mobj_brick, STRING("mobj_hidden1"), 67, 90, -13, 121, 11, 0, GSWF(2090))
+    CALL(evt_mobj_brick, STRING("mobj_hidden1"), 67, 90, -13, ITEM_COIN, 11, 0, GSWF(GSWF_GRA06_HIDDEN_COIN_BLOCK_HIT))
     CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
-    IF_INT_EQUAL(GSWF(2078), 0)
+    IF_INT_EQUAL(GSWF(GSWF_GRA06_STEEPLE_GATE_OPENED), 0)
         CALL(evt_hitobj_onoff, STRING("A_Mon"), 1, 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("a_saku01"), 0, PTR(gra_06_saku_open), 0)
-        ELSE
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_saku01"), 0, PTR(gra_06_saku_open), 0)
+    ELSE
         CALL(evt_hit_bind_mapobj, STRING("A_mon_L"), STRING("mon_L"))
         CALL(evt_hit_bind_mapobj, STRING("A_mon_R"), STRING("mon_R"))
         CALL(evt_mapobj_rotate, 0, STRING("mon_L"), 0, 90, 0)
         CALL(evt_mapobj_rotate, 0, STRING("mon_R"), 0, -90, 0)
         CALL(evt_hit_bind_update, STRING("A_mon_L"))
         CALL(evt_hit_bind_update, STRING("A_mon_R"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusari"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusari"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_saku01"), 1, 0)
     END_IF
-    IF_INT_LESS(GSW(0), 193)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_08_STEEPLE_DEMO_EXT)
         SPAWN_EVENT(PTR(first_gra06jin))
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
     END_IF
     RETURN
 EVT_END()
-

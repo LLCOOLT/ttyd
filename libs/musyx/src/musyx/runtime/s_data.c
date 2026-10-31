@@ -374,7 +374,7 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
   GSROOT* root;
   void* prj;
   for (root = gsRoot; root != NULL; root = root->next) {
-    /* fake: r steps one GSTACK per i; reproduces the register use of seqPlaySong(.., 0, ..) inlined */
+    /* FAKE: r steps one GSTACK per i; reproduces the register use of seqPlaySong(.., 0, ..) inlined */
     GSROOT* r;
     for (i = 0, r = root; i < root->sp; r = (GSROOT*)((u8*)r + sizeof(GSTACK)), ++i) {
       if (r->stack[0].gAddr->id != sgid) {

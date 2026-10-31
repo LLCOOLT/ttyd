@@ -1,14 +1,13 @@
+// Machine-gun effect: a shot drawn moving from a point at a given angle, speed and scale.
 #include "eff/eff_machinegun.h"
 #include "driver/dispdrv.h"
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "version.h"
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
-
 
 typedef struct EffMachinegunWork {
     s32 type;     // 0x0
@@ -44,7 +43,7 @@ void effMachinegunMain(EffectEntry* effect) {
     EffMachinegunWork* work = effect->userdata;
     Vec position;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
     work->position.x += work->speed * (f32)cos(6.2831855f * work->angle / 360.0f);
     work->position.y += work->speed * (f32)sin(6.2831855f * work->angle / 360.0f);
     work->speed *= 0.9f;
@@ -70,7 +69,7 @@ void effMachinegunDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0x7C, 0x74, 0x6C, work->alpha });
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0x7C, 0x74, 0x6C, work->alpha});
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
     GXSetNumTevStages(1);

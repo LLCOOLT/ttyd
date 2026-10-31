@@ -1,3 +1,4 @@
+// Treasure map: plays the EFF_treasure_map model animation at a point and fades out when removed.
 #include "eff/eff_treasure_map.h"
 #include "driver/animdrv.h"
 #include "driver/dispdrv.h"
@@ -15,7 +16,7 @@ EffectEntry* effTreasureMapEntry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffTreasureMapWork));
     effect->userdata = work;
     effect->callback = effTreasureMapMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -34,7 +35,7 @@ void effTreasureMapMain(EffectEntry* effect) {
     Vec position;
     BOOL inBattle;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
     inBattle = gp->inBattle != 0;
 
     if (work->poseId == -1) {
@@ -46,8 +47,8 @@ void effTreasureMapMain(EffectEntry* effect) {
     }
 
     // soft delete: start fading out
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {
@@ -87,17 +88,16 @@ void effTreasureMapDisp(CameraId cameraId, EffectEntry* effect) {
                 PSMTXRotRad(rot, 'y', MTXDegToRad(work->rotY));
                 PSMTXConcat(trans, scale, mtx);
                 PSMTXConcat(mtx, rot, mtx);
-                animPoseSetMaterialFlagOn(work->poseId, 0x40);
-                animPoseSetMaterialEvtColor(work->poseId, (GXColor){ 0x2E, 0x1B, 0x08, work->alpha });
-            }
-            else {
+                animPoseSetMaterialFlagOn(work->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
+                animPoseSetMaterialEvtColor(work->poseId, (GXColor){0x2E, 0x1B, 0x08, work->alpha});
+            } else {
                 PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
                 PSMTXScale(scale, s, s, s);
                 PSMTXRotRad(rot, 'y', MTXDegToRad(work->rotY));
                 PSMTXConcat(trans, scale, mtx);
                 PSMTXConcat(mtx, rot, mtx);
-                animPoseSetMaterialFlagOn(work->poseId, 0x40);
-                animPoseSetMaterialEvtColor(work->poseId, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha });
+                animPoseSetMaterialFlagOn(work->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
+                animPoseSetMaterialEvtColor(work->poseId, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
             }
             animPoseMain(work->poseId);
             animPoseDrawMtx(work->poseId, mtx, 1, 0.0f, 10.0f);

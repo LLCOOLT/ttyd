@@ -1,3 +1,5 @@
+// Rogueport Sewers (tik, chika: underground): battle database: the enemy groups (BattleSetup) and stages of the sewers,
+// the Blooper fight and Professor Frankly's lecture battle.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -9,11 +11,10 @@
 #include "tik.h"
 #include "battle/battle_stage.h"
 #include "driver/npcdrv.h"
-
-f32 sinfd(f32 degrees);
+#include "battle/battle_sub.h"
+#include "evt/evt_story.h"
 
 static USER_FUNC(_wave_offset);
-extern BattleUnitKind unit_boss_gesso;
 
 BattleStageObjectData tik_btlobject_data[20];
 BattleStageData tik_btlstage_data[4];
@@ -177,10 +178,10 @@ BattleStageObjectData tik_btlobject_data[] = {
 
 BattleStageData tik_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_2", // mSpecificStageDataDir
-        8, // mNumObjects
-        tik_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_2", // specificStageDataDir
+        8, // numObjects
+        tik_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -190,30 +191,30 @@ BattleStageData tik_btlstage_data[] = {
         1, // disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_2", // mSpecificStageDataDir
-        5, // mNumObjects
-        &tik_btlobject_data[8], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_2", // specificStageDataDir
+        5, // numObjects
+        &tik_btlobject_data[8], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_3", // mSpecificStageDataDir
-        2, // mNumObjects
-        &tik_btlobject_data[13], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_3", // specificStageDataDir
+        2, // numObjects
+        &tik_btlobject_data[13], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_1", // mSpecificStageDataDir
-        5, // mNumObjects
-        &tik_btlobject_data[15], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_1", // specificStageDataDir
+        5, // numObjects
+        &tik_btlobject_data[15], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -223,10 +224,10 @@ BattleStageData tik_btlstage_data[] = {
 
 BattleUnitSetup btlparty_tik_tik_gesso[] = {
     {
-        &unit_boss_gesso, // mUnitKindParams
+        &unit_boss_gesso, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {122.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -246,40 +247,40 @@ BattleGroupSetup btlgrp_tik_tik_gesso = {
 
 BattleUnitSetup btlparty_tik_tik_01_01_off_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kurikuri, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_lecture_frankli_kuriboo, // mUnitKindParams
+        &unit_lecture_frankli_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -299,20 +300,20 @@ BattleGroupSetup btlgrp_tik_tik_01_01_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_01_02_off_1[] = {
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -333,10 +334,10 @@ BattleGroupSetup btlgrp_tik_tik_01_02_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_04_01_off_1[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -357,10 +358,10 @@ BattleGroupSetup btlgrp_tik_tik_04_01_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_04_01_on_1[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -381,20 +382,20 @@ BattleGroupSetup btlgrp_tik_tik_04_01_on_1 = {
 
 BattleUnitSetup btlparty_tik_tik_04_01_on_2[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -415,20 +416,20 @@ BattleGroupSetup btlgrp_tik_tik_04_01_on_2 = {
 
 BattleUnitSetup btlparty_tik_tik_04_02_off_1[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -449,20 +450,20 @@ BattleGroupSetup btlgrp_tik_tik_04_02_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_04_02_on_1[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -483,30 +484,30 @@ BattleGroupSetup btlgrp_tik_tik_04_02_on_1 = {
 
 BattleUnitSetup btlparty_tik_tik_04_02_on_2[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -527,20 +528,20 @@ BattleGroupSetup btlgrp_tik_tik_04_02_on_2 = {
 
 BattleUnitSetup btlparty_tik_tik_04_03_off_1[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_patapata, // mUnitKindParams
+        &unit_patapata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -561,20 +562,20 @@ BattleGroupSetup btlgrp_tik_tik_04_03_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_04_03_off_2[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -595,20 +596,20 @@ BattleGroupSetup btlgrp_tik_tik_04_03_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_04_03_off_3[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -629,20 +630,20 @@ BattleGroupSetup btlgrp_tik_tik_04_03_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_04_04_off_1[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -663,20 +664,20 @@ BattleGroupSetup btlgrp_tik_tik_04_04_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_04_04_off_2[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -697,20 +698,20 @@ BattleGroupSetup btlgrp_tik_tik_04_04_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_04_04_off_3[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -731,30 +732,30 @@ BattleGroupSetup btlgrp_tik_tik_04_04_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_07_01_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -775,20 +776,20 @@ BattleGroupSetup btlgrp_tik_tik_07_01_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_07_01_off_2[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -809,20 +810,20 @@ BattleGroupSetup btlgrp_tik_tik_07_01_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_07_02_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -843,30 +844,30 @@ BattleGroupSetup btlgrp_tik_tik_07_02_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_07_02_off_2[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -887,20 +888,20 @@ BattleGroupSetup btlgrp_tik_tik_07_02_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_07_03_off_1[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -921,20 +922,20 @@ BattleGroupSetup btlgrp_tik_tik_07_03_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_07_03_off_2[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -955,20 +956,20 @@ BattleGroupSetup btlgrp_tik_tik_07_03_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_07_03_off_3[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -989,20 +990,20 @@ BattleGroupSetup btlgrp_tik_tik_07_03_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_07_04_off_1[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hammer_bros, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1023,20 +1024,20 @@ BattleGroupSetup btlgrp_tik_tik_07_04_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_07_04_off_2[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hammer_bros, // itemDropTable
     },
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1057,20 +1058,20 @@ BattleGroupSetup btlgrp_tik_tik_07_04_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_07_04_off_3[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hammer_bros, // itemDropTable
     },
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1091,10 +1092,10 @@ BattleGroupSetup btlgrp_tik_tik_07_04_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_15_01_off_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1115,10 +1116,10 @@ BattleGroupSetup btlgrp_tik_tik_15_01_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_15_02_off_1[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1139,10 +1140,10 @@ BattleGroupSetup btlgrp_tik_tik_15_02_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_15_03_off_1[] = {
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1163,20 +1164,20 @@ BattleGroupSetup btlgrp_tik_tik_15_03_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_15_04_off_1[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hammer_bros, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1197,20 +1198,20 @@ BattleGroupSetup btlgrp_tik_tik_15_04_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_15_04_off_2[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hammer_bros, // itemDropTable
     },
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1231,20 +1232,20 @@ BattleGroupSetup btlgrp_tik_tik_15_04_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_15_04_off_3[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hammer_bros, // itemDropTable
     },
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1265,20 +1266,20 @@ BattleGroupSetup btlgrp_tik_tik_15_04_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_15_05_off_1[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1299,20 +1300,20 @@ BattleGroupSetup btlgrp_tik_tik_15_05_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_15_05_off_2[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1333,20 +1334,20 @@ BattleGroupSetup btlgrp_tik_tik_15_05_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_15_05_off_3[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1367,20 +1368,20 @@ BattleGroupSetup btlgrp_tik_tik_15_05_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_18_01_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1401,30 +1402,30 @@ BattleGroupSetup btlgrp_tik_tik_18_01_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_18_01_off_2[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1445,40 +1446,40 @@ BattleGroupSetup btlgrp_tik_tik_18_01_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_18_02_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1499,20 +1500,20 @@ BattleGroupSetup btlgrp_tik_tik_18_02_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_18_02_off_2[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1533,20 +1534,20 @@ BattleGroupSetup btlgrp_tik_tik_18_02_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_18_03_off_1[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1567,20 +1568,20 @@ BattleGroupSetup btlgrp_tik_tik_18_03_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_18_03_off_2[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1601,20 +1602,20 @@ BattleGroupSetup btlgrp_tik_tik_18_03_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_18_03_off_3[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1635,20 +1636,20 @@ BattleGroupSetup btlgrp_tik_tik_18_03_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_18_04_off_1[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1669,20 +1670,20 @@ BattleGroupSetup btlgrp_tik_tik_18_04_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_18_04_off_2[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1703,20 +1704,20 @@ BattleGroupSetup btlgrp_tik_tik_18_04_off_2 = {
 
 BattleUnitSetup btlparty_tik_tik_18_04_off_3[] = {
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko, // itemDropTable
     },
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1737,50 +1738,50 @@ BattleGroupSetup btlgrp_tik_tik_18_04_off_3 = {
 
 BattleUnitSetup btlparty_tik_tik_20_01_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1801,40 +1802,40 @@ BattleGroupSetup btlgrp_tik_tik_20_01_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_20_02_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1855,30 +1856,30 @@ BattleGroupSetup btlgrp_tik_tik_20_02_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_20_03_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1899,40 +1900,40 @@ BattleGroupSetup btlgrp_tik_tik_20_03_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_20_04_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1953,50 +1954,50 @@ BattleGroupSetup btlgrp_tik_tik_20_04_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_20_05_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2017,50 +2018,50 @@ BattleGroupSetup btlgrp_tik_tik_20_05_off_1 = {
 
 BattleUnitSetup btlparty_tik_tik_20_06_off_1[] = {
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2294,7 +2295,7 @@ NpcSetupBattleInfo btlsetup_tik_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tik_btlno_tik_gesso_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_CHUBOSS_BATTLE1", // bgmName
@@ -2306,7 +2307,7 @@ NpcSetupBattleInfo btlsetup_tik_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tik_btlno_tik_01_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -2324,7 +2325,7 @@ NpcSetupBattleInfo btlsetup_tik_tbl[] = {
     {
         /*"tik04ヒンニャー1"*/"\x74\x69\x6B\x30\x34\x83\x71\x83\x93\x83\x6A\x83\x83\x81\x5B\x31", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(1246), // swFlag
+        GSWF(GSWF_GOR02_FIRST_EPIGRAPHY_DONE), // swFlag
         btlgrpsel_tik_btlno_tik_04_01_on, // altSelect
         btlgrpsel_tik_btlno_tik_04_01_off, // select
         0, 0, // battleFlags, randomMode
@@ -2334,7 +2335,7 @@ NpcSetupBattleInfo btlsetup_tik_tbl[] = {
     {
         /*"tik04ヒンニャー2"*/"\x74\x69\x6B\x30\x34\x83\x71\x83\x93\x83\x6A\x83\x83\x81\x5B\x32", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(1246), // swFlag
+        GSWF(GSWF_GOR02_FIRST_EPIGRAPHY_DONE), // swFlag
         btlgrpsel_tik_btlno_tik_04_02_on, // altSelect
         btlgrpsel_tik_btlno_tik_04_02_off, // select
         0, 0, // battleFlags, randomMode
@@ -2632,4 +2633,3 @@ EVT_BEGIN(bgset_tik_wave_event)
     GOTO(0)
     RETURN
 EVT_END()
-

@@ -1,3 +1,4 @@
+// eff_energy.c: energy-orb effect: effEnergyEntry, effEnergyMain and effEnergyDisp.
 #pragma once
 
 #include "driver/camdrv.h"

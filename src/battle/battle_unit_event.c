@@ -1,3 +1,4 @@
+// Battle unit events: running the hit, phase, wait and init event scripts attached to a unit.
 #include "battle/battle_unit_event.h"
 
 BOOL BattleCheckEndUnitInitEvent(BattleWork* wp) {
@@ -6,15 +7,14 @@ BOOL BattleCheckEndUnitInitEvent(BattleWork* wp) {
     s32 i, eventId;
 
     valid = TRUE;
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         unit = BattleGetUnitPtr(wp, i);
         if (unit) {
             eventId = unit->initEventId;
             if (eventId) {
                 if (evtCheckID(eventId)) {
                     valid = FALSE;
-                }
-                else {
+                } else {
                     unit->initEventId = 0;
                 }
             }
@@ -92,8 +92,7 @@ s32 BattleRunPhaseEvent(BattleUnit* unit, BOOL isUnison) {
         if (code) {
             evt = evtEntry(code, 0xA, 0x20);
         }
-    }
-    else {
+    } else {
         code = unit->phaseEventCode;
         if (code) {
             evt = evtEntry(code, 0xA, 0x20);
@@ -146,5 +145,5 @@ s32 BattleRunWaitEvent(BattleUnit* unit) {
         evt->unitId = unit->unitId;
         unit->waitEventId = evt->eventId;
     }
-    return 0; //unused
+    return 0; // unused
 }

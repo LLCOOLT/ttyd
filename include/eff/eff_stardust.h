@@ -1,3 +1,4 @@
+// eff_stardust.c: stardust effect entry (effStardustEntry).
 #pragma once
 
 #include "driver/effdrv.h"

@@ -1,3 +1,5 @@
+// The Great Tree (mri, mori: forest): battle database: the enemy groups (BattleSetup) and stages of the tree's rooms
+// and of the Magnus von Grapple boss fight.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -6,8 +8,10 @@
 #include "battle/battle_stage.h"
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_map.h"
+#include "version.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(evt_mapobj_flag_onoff);
 extern BattleUnitKind unit_barriern;
 
 BattleStageObjectData mri_btlobject_data[43];
@@ -119,10 +123,10 @@ BattleStageObjectData mri_btlobject_data[] = {
 
 BattleStageData mri_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_02_1", // mSpecificStageDataDir
-        11, // mNumObjects
-        mri_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_02_1", // specificStageDataDir
+        11, // numObjects
+        mri_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         stg_02_1_init_evt, // initEvt
@@ -132,10 +136,10 @@ BattleStageData mri_btlstage_data[] = {
         1, // disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_02_1", // mSpecificStageDataDir
-        11, // mNumObjects
-        &mri_btlobject_data[11], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_02_1", // specificStageDataDir
+        11, // numObjects
+        &mri_btlobject_data[11], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         stg_02_1_init_evt, // initEvt
@@ -145,10 +149,10 @@ BattleStageData mri_btlstage_data[] = {
         1, // disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_02_1", // mSpecificStageDataDir
-        11, // mNumObjects
-        &mri_btlobject_data[22], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_02_1", // specificStageDataDir
+        11, // numObjects
+        &mri_btlobject_data[22], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         stg_02_1_init_evt, // initEvt
@@ -158,10 +162,10 @@ BattleStageData mri_btlstage_data[] = {
         1, // disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_02_1", // mSpecificStageDataDir
-        10, // mNumObjects
-        &mri_btlobject_data[33], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_02_1", // specificStageDataDir
+        10, // numObjects
+        &mri_btlobject_data[33], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         stg_02_1_init_evt, // initEvt
@@ -174,20 +178,20 @@ BattleStageData mri_btlstage_data[] = {
 
 BattleUnitSetup btlparty_mri_mri_01_01[] = {
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_gundan_zako, // itemDropTable
     },
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -207,10 +211,10 @@ BattleGroupSetup btlgrp_mri_mri_01_01 = {
 
 BattleUnitSetup btlparty_mri_mri_04_01[] = {
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -230,20 +234,20 @@ BattleGroupSetup btlgrp_mri_mri_04_01 = {
 
 BattleUnitSetup btlparty_mri_mri_05_01[] = {
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_gundan_zako, // itemDropTable
     },
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -264,30 +268,30 @@ BattleGroupSetup btlgrp_mri_mri_05_01 = {
 
 BattleUnitSetup btlparty_mri_mri_06_2F_02[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -308,40 +312,40 @@ BattleGroupSetup btlgrp_mri_mri_06_2F_02 = {
 
 BattleUnitSetup btlparty_mri_mri_06_2F_03[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -362,20 +366,20 @@ BattleGroupSetup btlgrp_mri_mri_06_2F_03 = {
 
 BattleUnitSetup btlparty_mri_mri_12_01[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -396,40 +400,40 @@ BattleGroupSetup btlgrp_mri_mri_12_01 = {
 
 BattleUnitSetup btlparty_mri_mri_12_02[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -450,20 +454,20 @@ BattleGroupSetup btlgrp_mri_mri_12_02 = {
 
 BattleUnitSetup btlparty_mri_mri_15_01[] = {
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_gundan_zako, // itemDropTable
     },
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -483,20 +487,20 @@ BattleGroupSetup btlgrp_mri_mri_15_01 = {
 
 BattleUnitSetup btlparty_mri_mri_17_01[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -517,30 +521,30 @@ BattleGroupSetup btlgrp_mri_mri_17_01 = {
 
 BattleUnitSetup btlparty_mri_mri_18_02[] = {
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_gundan_zako, // itemDropTable
     },
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_gundan_zako, // itemDropTable
     },
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -561,11 +565,11 @@ BattleGroupSetup btlgrp_mri_mri_18_02 = {
 
 BattleUnitSetup btlparty_mri_mri_18_03[] = {
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
-#ifdef VERSION_G8ME01_DEMO
+        BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION == VERSION_DEMO
         {50.0f, 40.0f, -10.0f}, // position
 #else
         {0.0f, 40.0f, -20.0f}, // position
@@ -575,11 +579,11 @@ BattleUnitSetup btlparty_mri_mri_18_03[] = {
         battle_item_barriern, // itemDropTable
     },
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
-#ifdef VERSION_G8ME01_DEMO
+        BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION == VERSION_DEMO
         {90.0f, 40.0f, 0.0f}, // position
 #else
         {75.0f, 40.0f, 0.0f}, // position
@@ -589,11 +593,11 @@ BattleUnitSetup btlparty_mri_mri_18_03[] = {
         battle_item_barriern, // itemDropTable
     },
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
-#ifdef VERSION_G8ME01_DEMO
+        BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION == VERSION_DEMO
         {130.0f, 40.0f, 10.0f}, // position
 #else
         {150.0f, 40.0f, 20.0f}, // position
@@ -617,20 +621,20 @@ BattleGroupSetup btlgrp_mri_mri_18_03 = {
 
 BattleUnitSetup btlparty_mri_mri_19_01[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -651,20 +655,20 @@ BattleGroupSetup btlgrp_mri_mri_19_01 = {
 
 BattleUnitSetup btlparty_mri_mri_19_02[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -685,40 +689,40 @@ BattleGroupSetup btlgrp_mri_mri_19_02 = {
 
 BattleUnitSetup btlparty_mri_mri_19_04[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -739,20 +743,20 @@ BattleGroupSetup btlgrp_mri_mri_19_04 = {
 
 BattleUnitSetup btlparty_mri_mri_20_02[] = {
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_gundan_zako, // itemDropTable
     },
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -773,11 +777,11 @@ BattleGroupSetup btlgrp_mri_mri_20_02 = {
 
 BattleUnitSetup btlparty_mri_mri_20_03[] = {
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
-#ifdef VERSION_G8ME01_DEMO
+        BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION == VERSION_DEMO
         {50.0f, 40.0f, -10.0f}, // position
 #else
         {10.0f, 40.0f, -20.0f}, // position
@@ -787,20 +791,20 @@ BattleUnitSetup btlparty_mri_mri_20_03[] = {
         battle_item_barriern, // itemDropTable
     },
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern, // itemDropTable
     },
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -821,10 +825,10 @@ BattleGroupSetup btlgrp_mri_mri_20_03 = {
 
 BattleUnitSetup btlparty_mri_mri_mb[] = {
     {
-        &unit_boss_magnum_battender, // mUnitKindParams
+        &unit_boss_magnum_battender, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -994,7 +998,7 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_01_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -1005,7 +1009,7 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_04_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {10, 10}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -1066,7 +1070,7 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_15_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{4, 4}, {10, 10}, {0}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -1158,7 +1162,7 @@ NpcSetupBattleInfo btlsetup_mri_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_mri_btlno_mri_mb_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         2, // randomMode
         {{0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {10, 10}, {0}, {0}, {0}, {0}, {0}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG3_3RDLEADER1", // bgmName
@@ -1192,7 +1196,6 @@ NpcTerritoryInfo btl_mri_setup_no_tbl[] = {
 };
 
 EVT_BEGIN(stg_02_1_init_evt)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ueki"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ueki"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
-

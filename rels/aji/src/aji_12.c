@@ -1,3 +1,4 @@
+// aji_12 (敵のアジト, X-Naut Fortress): an electrified floor-panel room (hikaru_yuka) with 44 panels.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -11,29 +12,18 @@
 #include "evt/evt_bero.h"
 #include "aji.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "libc_decls.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-void mapGrpFlagOn(const char* name, u32 flags);
-void mapGrpFlagOff(const char* name, u32 flags);
-void hitGrpAttrOn(const char* name, u32 flags);
-void hitGrpAttrOff(const char* name, u32 flags);
-int sscanf(const char* s, const char* format, ...);
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
 static USER_FUNC(hikaru_off);
 static USER_FUNC(mario_chk);
 static USER_FUNC(thunder_main);
@@ -41,7 +31,6 @@ static USER_FUNC(thunder_main);
 static BeroEntry bero_entry_data[2];
 const char* hit_list[50];
 static HitDamageReturn dmgReturnPt[2];
-extern EvtWord aji_12_init_evt[];
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -64,8 +53,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -137,10 +126,10 @@ const char* hit_list[] = {
 static EVT_BEGIN(evt_box)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("dummy"), 30, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("dummy"), ITEM_CARD_KEY_0x1E, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("dummy"))
-    SET_VALUE(GSWF(4183), 1)
+    SET_VALUE(GSWF(GSWF_AJI12_CARD_KEY_TAKEN), 1)
     WAIT_FRAMES(2)
     CALL(hikaru_off)
     BEGIN_INLINE_EVENT
@@ -148,13 +137,13 @@ static EVT_BEGIN(evt_box)
         CALL(evt_mario_set_dir, 90, 300, 0)
     END_INLINE_EVENT
     LOOP(5)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yukayu1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yukayu2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("ato"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yukayu1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yukayu2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ato"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(150)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yukayu1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yukayu2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("ato"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yukayu1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yukayu2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ato"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(150)
     END_LOOP
     CALL(evt_mario_key_onoff, 1)
@@ -167,7 +156,7 @@ static HitDamageReturn dmgReturnPt[] = {
 };
 
 static EVT_BEGIN(hikaru_yuka_init)
-    CALL(evt_mobj_itembox, STRING("box"), -350, 10, -10, 2, 0, PTR(evt_box), GSWF(4179))
+    CALL(evt_mobj_itembox, STRING("box"), -350, 10, -10, 2, 0, PTR(evt_box), GSWF(GSWF_AJI12_CARD_KEY_CHEST_OPENED))
     CALL(evt_hit_damage_return_set, PTR(dmgReturnPt))
     BEGIN_INLINE_EVENT
         CALL(thunder_main)
@@ -175,30 +164,30 @@ static EVT_BEGIN(hikaru_yuka_init)
     BEGIN_INLINE_EVENT
         CALL(mario_chk)
     END_INLINE_EVENT
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yukayu1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yukayu2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yukayu1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yukayu2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("denyuka"), 1, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(aji_12_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("no1"), 1)
-    IF_INT_EQUAL(GSWF(4183), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("no1"), MAPOBJ_FLAG_HIDE)
+    IF_INT_EQUAL(GSWF(GSWF_AJI12_CARD_KEY_TAKEN), 0)
         CALL_CHILD(PTR(hikaru_yuka_init))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("ato"), 1)
-        ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ato"), MAPOBJ_FLAG_HIDE)
+    ELSE
         CALL(hikaru_off)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yukayu1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yukayu2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("ato"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yukayu1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yukayu2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ato"), MAPOBJ_FLAG_HIDE)
     END_IF
-    CALL(evt_mobj_badgeblk, STRING("mobj00"), 170, 60, 120, 144, 0, GSWF(4214), 0)
+    CALL(evt_mobj_badgeblk, STRING("mobj00"), 170, 60, 120, ITEM_HP_DRAIN_ITEM, 0, GSWF(GSWF_AJI12_HP_DRAIN_BLOCK_HIT), 0)
     SPAWN_EVENT(PTR(evt_emergency))
     RETURN
 EVT_END()
@@ -210,7 +199,7 @@ static USER_FUNC(thunder_main) {
         event->userdata[0] = 0;
     }
     if (event->userdata[0] == 0) {
-        if (mario->currMotionId == 0x20) {
+        if (mario->currMotionId == MARIO_MOTION_DAMAGE_TOGE) {
             EffectEntry* eff;
 
             event->userdata[0] = 1;
@@ -223,7 +212,7 @@ static USER_FUNC(thunder_main) {
             ((EffAkariChargeN64Work*)eff->userdata)->elem[0].g2 = 0;
             ((EffAkariChargeN64Work*)eff->userdata)->elem[0].b2 = 0;
         }
-    } else if (mario->currMotionId != 0x20) {
+    } else if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE) {
         event->userdata[0] = 0;
     }
     return EVT_RETURN_BLOCK;
@@ -242,7 +231,7 @@ static USER_FUNC(mario_chk) {
         event->userdata[0] = 0;
         event->userdata[1] = 0;
     }
-    if (evtGetValue(NULL, GSWF(4183))) {
+    if (evtGetValue(NULL, GSWF(GSWF_AJI12_CARD_KEY_TAKEN))) {
         return EVT_RETURN_DONE;
     }
     for (i = 1; i <= 44; i++) {
@@ -255,7 +244,7 @@ static USER_FUNC(mario_chk) {
         hitGrpAttrOn((const char*)hit_list[i], 0x800);
     }
     party = partyGetPtr(0);
-    if (party != NULL && party->currentMemberId == 4 && (party->flags & 0x100)) {
+    if (party != NULL && party->currentMemberId == PARTY_MEMBER_YOSHI && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
         hit = mario->hitobjStandOn;
         if (hit == NULL) {
             hit = mario->hitobjJumpFrom;
@@ -301,7 +290,7 @@ static USER_FUNC(mario_chk) {
     mapGrpFlagOn(name, 1);
     sprintf(name, "A_hikaru_%02d", n);
     hitGrpAttrOff(name, 0x800);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     j++;
     if (j >= 50) {
         j = 49;
@@ -340,4 +329,3 @@ static USER_FUNC(hikaru_off) {
     hitGrpAttrOff("A_no1", 0x800);
     return EVT_RETURN_DONE;
 }
-

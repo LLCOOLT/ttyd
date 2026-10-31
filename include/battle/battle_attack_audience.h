@@ -1,3 +1,4 @@
+// Declares the audience attack events and lookup functions.
 #pragma once
 
 #include "evt/evt_cmd.h"
@@ -7,3 +8,7 @@ USER_FUNC(_get_attack_aud_no);
 
 extern EvtWord btlataudevtPresentItem_Damage[];
 extern EvtWord btlataudevtPresentItem_Get[];
+
+USER_FUNC(_check_aud_item_type);
+EvtWord* btlataudGetMoveEventPtr(void);
+EvtWord* btlataudGetAttackEventPtr(s32 unitId);

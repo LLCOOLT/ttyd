@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: a star that streaks across the screen toward a target point, leaving a trail of 8 copies.
+#include "eff/n64/eff_sstar_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -13,19 +15,8 @@
 #include <string.h>
 #include "libc_decls.h"
 #include <math.h>
-
-double sin(double);
-double cos(double);
-
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
+#include "version.h"
 
 typedef struct EffSstarN64Work {
     s32 type;          // 0x0
@@ -193,7 +184,7 @@ void effSstarMain(EffectEntry* effect) {
             w->rotZ = angleABf(0.0f, 0.0f, -w->velocity.y, w->screenSpeedX);
         }
     }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     if (mario->position.y - w->position.y > 300.0f) {
         w->life = -1;
     }
@@ -212,7 +203,7 @@ void effSstarMain(EffectEntry* effect) {
     if (w->life < 0) {
         effDelete(effect);
     } else {
-        dispEntry(4, dispCalcZ(&pos), 2, (DispCallback)effSstarDisp, effect);
+        dispEntry(CAMERA_3D, dispCalcZ(&pos), 2, (DispCallback)effSstarDisp, effect);
     }
 }
 

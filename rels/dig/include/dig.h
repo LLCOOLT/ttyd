@@ -1,8 +1,14 @@
+// Test map for THP movie playback (dig, JP and PAL only): the dig_00 init event and the movie start/stop functions.
 #pragma once
 
 #include "dolphin/types.h"
 #include "evt/evt_word.h"
+#include "version.h"
 
-#if !defined(VERSION_G8ME01) || defined(VERSION_G8MP01)  // JP and PAL have this REL
+#if VERSION != VERSION_US // JP and PAL have this REL
 extern EvtWord dig_00_init_evt[];
+
+void dig_thpStop(void);
+void dig_thpInit(void);
+
 #endif

@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: `count` colored sparkle stars scatter from a point with the given velocity (stardust).
+#include "eff/n64/eff_stardust2_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,9 +8,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
-
-double sin(double);
-double cos(double);
+#include "version.h"
 
 typedef struct EffStardust2N64Work {
     s16 flag;     // 0x0
@@ -128,42 +128,43 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
         p->frame = 0;
         p->scale = 1.0f;
         switch (type) {
-        case 0:
-        case 1:
-            p->velocity.z = 0.0f;
-            p->velocity.x = sn * tx;
-            p->velocity.y = cs * ty;
-            p->position.z = 0.0f;
-            break;
-        case 2:
-        case 5:
-            p->velocity.x = sn * tx;
-            p->position.y = fy;
-            p->position.z = cs * tx;
-            p->velocity.y = 0.03f * (f32)(-(rand() % 10));
-            p->velocity.z = 0.04f * (f32)(rand() % 10) + 0.01f;
-            break;
-        case 3:
-            p->position.x = 0.005f * (sn * vx * (f32)(rand() % 100));
-            p->position.y = 0.005f * (cs * vy * (f32)(rand() % 100));
-            p->position.z = 0.0f;
-            p->velocity.y = 0.0f;
-            p->velocity.x = 0.0f;
-            p->velocity.z = 0.0f;
-            p->life += i + i;
-            break;
-        default:
-            p->velocity.x = sn * tx;
-            p->position.y = fy;
-            p->position.z = cs * tx;
-            p->velocity.y = 0.03f * (f32)(-(rand() % 10));
-            p->velocity.z = 0.04f * (f32)(rand() % 10) + 0.01f;
-            break;
+            case 0:
+            case 1:
+                p->velocity.z = 0.0f;
+                p->velocity.x = sn * tx;
+                p->velocity.y = cs * ty;
+                p->position.z = 0.0f;
+                break;
+            case 2:
+            case 5:
+                p->velocity.x = sn * tx;
+                p->position.y = fy;
+                p->position.z = cs * tx;
+                p->velocity.y = 0.03f * (f32)(-(rand() % 10));
+                p->velocity.z = 0.04f * (f32)(rand() % 10) + 0.01f;
+                break;
+            case 3:
+                p->position.x = 0.005f * (sn * vx * (f32)(rand() % 100));
+                p->position.y = 0.005f * (cs * vy * (f32)(rand() % 100));
+                p->position.z = 0.0f;
+                p->velocity.y = 0.0f;
+                p->velocity.x = 0.0f;
+                p->velocity.z = 0.0f;
+                p->life += i + i;
+                break;
+            default:
+                p->velocity.x = sn * tx;
+                p->position.y = fy;
+                p->position.z = cs * tx;
+                p->velocity.y = 0.03f * (f32)(-(rand() % 10));
+                p->velocity.z = 0.04f * (f32)(rand() % 10) + 0.01f;
+                break;
         }
     }
     return effect;
 }
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 void effStardust2Main(EffectEntry* effect) {
     EffStardust2N64Work* w = effect->userdata;
@@ -194,102 +195,102 @@ void effStardust2Main(EffectEntry* effect) {
     w++;
     for (i = 0; i < effect->count - 1; i++, w++) {
         switch (type) {
-        case 0:
-        case 1:
-            w->color = (frame + i) & 7;
-            w->velocity.z += -0.02f;
-#ifdef VERSION_G8ME01_DEMO
-            if (frame - 1 < 14) {
-                s = 0.01f * (f32)speed_data[frame - 1];
-                w->position.x = w->velocity.x * s;
-                w->position.y = w->velocity.y * s + w->velocity.z;
-                w->scale = 0.01f * (f32)scale_data[frame - 1];
+            case 0:
+            case 1:
+                w->color = (frame + i) & 7;
+                w->velocity.z += -0.02f;
+#if VERSION == VERSION_DEMO
+                if (frame - 1 < 14) {
+                    s = 0.01f * (f32)speed_data[frame - 1];
+                    w->position.x = w->velocity.x * s;
+                    w->position.y = w->velocity.y * s + w->velocity.z;
+                    w->scale = 0.01f * (f32)scale_data[frame - 1];
 #else
-            idx = frame - 1;
-            if (idx < 14) {
-                s = 0.01f * (f32)speed_data[idx];
-                w->position.x = w->velocity.x * s;
-                w->position.y = w->velocity.y * s + w->velocity.z;
-                w->scale = 0.01f * (f32)scale_data[idx];
+                idx = frame - 1;
+                if (idx < 14) {
+                    s = 0.01f * (f32)speed_data[idx];
+                    w->position.x = w->velocity.x * s;
+                    w->position.y = w->velocity.y * s + w->velocity.z;
+                    w->scale = 0.01f * (f32)scale_data[idx];
 #endif
-            } else {
-                f32 one = 1.0f;
-                f32 base = 360.0f / (f32)(effect->count - 1) * (f32)i + 60.0f;
-                if (i & 1) {
-                    base -= 120.0f;
+                } else {
+                    f32 one = 1.0f;
+                    f32 base = 360.0f / (f32)(effect->count - 1) * (f32)i + 60.0f;
+                    if (i & 1) {
+                        base -= 120.0f;
+                    }
+                    w->type = 10;
+                    ang = 6.2831855f * base / 360.0f;
+                    w->velocity.x = one * (f32)sin(ang);
+                    w->velocity.y = one * (f32)cos(ang);
+                    w->velocity.z = -0.05f;
                 }
-                w->type = 10;
-                ang = 6.2831855f * base / 360.0f;
-                w->velocity.x = one * (f32)sin(ang);
-                w->velocity.y = one * (f32)cos(ang);
-                w->velocity.z = -0.05f;
-            }
-            break;
-        case 10:
-        case 30:
-            w->color = (frame + i) & 7;
-            w->velocity.x *= 0.96f;
-            w->velocity.y *= 0.96f;
-            w->velocity.y += w->velocity.z;
-            w->position.x += w->velocity.x;
-            w->position.y += w->velocity.y;
-            w->scale += 0.1f * (0.1f - w->scale);
-            break;
-        case 3:
-            w->color = (frame + i + i) & 7;
-#ifdef VERSION_G8ME01_DEMO
-            if (frame - 1 < 14) {
-                w->scale = 0.01f * (f32)scale_data[frame - 1];
-#else
-            idx = frame - 1;
-            if (idx < 14) {
-                w->scale = 0.01f * (f32)scale_data[idx];
-#endif
-            } else {
-                w->type = 30;
-            }
-            break;
-        case 2:
-        case 4:
-        case 5:
-        default:
-            w->color = (frame + i + i) & 7;
-            if (w->life < 0) {
-                done++;
-            }
-            w->life--;
-            if (w->life > 30 || w->life < 0) {
-                w->color = -1;
                 break;
-            }
-            w->frame++;
-            frame = w->frame;
-#ifdef VERSION_G8ME01_DEMO
-            if (frame - 1 < 14) {
-                w->scale = 0.01f * (f32)scale_data[frame - 1];
+            case 10:
+            case 30:
+                w->color = (frame + i) & 7;
+                w->velocity.x *= 0.96f;
+                w->velocity.y *= 0.96f;
+                w->velocity.y += w->velocity.z;
+                w->position.x += w->velocity.x;
+                w->position.y += w->velocity.y;
+                w->scale += 0.1f * (0.1f - w->scale);
+                break;
+            case 3:
+                w->color = (frame + i + i) & 7;
+#if VERSION == VERSION_DEMO
+                if (frame - 1 < 14) {
+                    w->scale = 0.01f * (f32)scale_data[frame - 1];
 #else
-            idx = frame - 1;
-            if (idx < 14) {
-                w->scale = 0.01f * (f32)scale_data[idx];
+                idx = frame - 1;
+                if (idx < 14) {
+                    w->scale = 0.01f * (f32)scale_data[idx];
 #endif
-                if (type == 5) {
+                } else {
+                    w->type = 30;
+                }
+                break;
+            case 2:
+            case 4:
+            case 5:
+            default:
+                w->color = (frame + i + i) & 7;
+                if (w->life < 0) {
+                    done++;
+                }
+                w->life--;
+                if (w->life > 30 || w->life < 0) {
+                    w->color = -1;
+                    break;
+                }
+                w->frame++;
+                frame = w->frame;
+#if VERSION == VERSION_DEMO
+                if (frame - 1 < 14) {
+                    w->scale = 0.01f * (f32)scale_data[frame - 1];
+#else
+                idx = frame - 1;
+                if (idx < 14) {
+                    w->scale = 0.01f * (f32)scale_data[idx];
+#endif
+                    if (type == 5) {
+                        w->velocity.y += w->velocity.z;
+                        w->position.y += w->velocity.y;
+                    }
+                } else {
+                    w->scale += 0.1f * (0.1f - w->scale);
                     w->velocity.y += w->velocity.z;
                     w->position.y += w->velocity.y;
                 }
-            } else {
-                w->scale += 0.1f * (0.1f - w->scale);
-                w->velocity.y += w->velocity.z;
-                w->position.y += w->velocity.y;
-            }
-            if (type == 4) {
-                ang = 6.2831855f * (f32)(frame * 12) / 360.0f;
-                w->position.x = w->velocity.x * (f32)sin(ang);
-                w->position.z = w->velocity.x * (f32)cos(ang);
-            } else {
-                w->position.x = w->velocity.x;
-            }
-            w->velocity.y *= 0.96f;
-            break;
+                if (type == 4) {
+                    ang = 6.2831855f * (f32)(frame * 12) / 360.0f;
+                    w->position.x = w->velocity.x * (f32)sin(ang);
+                    w->position.z = w->velocity.x * (f32)cos(ang);
+                } else {
+                    w->position.x = w->velocity.x;
+                }
+                w->velocity.y *= 0.96f;
+                break;
         }
     }
     if ((u32)type > 1 && type != 3 && type < 10 && done >= effect->count - 1) {
@@ -340,30 +341,30 @@ void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     GXSetCullMode(GX_CULL_NONE);
     switch (type) {
-    case 0:
-    case 1:
-    case 2:
-    case 10:
-        fr = 1.0f;
-        fg = 0.5f;
-        fb = 0.1f;
-        break;
-    case 3:
-    case 30:
-        fr = 1.0f;
-        fg = 0.8f;
-        fb = 0.7f;
-        break;
-    case 5:
-        fr = 1.4f;
-        fb = 0.7f;
-        fg = fr;
-        break;
-    default:
-        fg = 0.7f;
-        fr = 1.4f;
-        fb = fg;
-        break;
+        case 0:
+        case 1:
+        case 2:
+        case 10:
+            fr = 1.0f;
+            fg = 0.5f;
+            fb = 0.1f;
+            break;
+        case 3:
+        case 30:
+            fr = 1.0f;
+            fg = 0.8f;
+            fb = 0.7f;
+            break;
+        case 5:
+            fr = 1.4f;
+            fb = 0.7f;
+            fg = fr;
+            break;
+        default:
+            fg = 0.7f;
+            fr = 1.4f;
+            fb = fg;
+            break;
     }
     for (i = 0; i < effect->count - 1; i++, w++) {
         camera = w->color;
@@ -394,30 +395,30 @@ void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
         }
         GXSetTevColor(GX_TEVREG0, (GXColor){r, g, b, 255});
         switch (camera & 7) {
-        case 0:
-            vtx = size8x8_tex22x22_vtx + 12;
-            break;
-        case 1:
-            vtx = size8x8_tex22x22_vtx + 16;
-            break;
-        case 2:
-            vtx = size8x8_tex22x22_vtx + 20;
-            break;
-        case 3:
-            vtx = size8x8_tex22x22_vtx + 24;
-            break;
-        case 4:
-            vtx = size8x8_tex22x22_vtx + 28;
-            break;
-        case 5:
-            vtx = size8x8_tex22x22_vtx;
-            break;
-        case 6:
-            vtx = size8x8_tex22x22_vtx + 4;
-            break;
-        case 7:
-            vtx = size8x8_tex22x22_vtx + 8;
-            break;
+            case 0:
+                vtx = size8x8_tex22x22_vtx + 12;
+                break;
+            case 1:
+                vtx = size8x8_tex22x22_vtx + 16;
+                break;
+            case 2:
+                vtx = size8x8_tex22x22_vtx + 20;
+                break;
+            case 3:
+                vtx = size8x8_tex22x22_vtx + 24;
+                break;
+            case 4:
+                vtx = size8x8_tex22x22_vtx + 28;
+                break;
+            case 5:
+                vtx = size8x8_tex22x22_vtx;
+                break;
+            case 6:
+                vtx = size8x8_tex22x22_vtx + 4;
+                break;
+            case 7:
+                vtx = size8x8_tex22x22_vtx + 8;
+                break;
         }
         effSetVtxDescN64(vtx);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);

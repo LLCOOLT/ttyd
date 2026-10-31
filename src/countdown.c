@@ -1,3 +1,4 @@
+// Countdown timer: the on-screen time limit that timed events start, save, restart and end.
 #include "countdown.h"
 
 #include "driver/camdrv.h"
@@ -11,7 +12,8 @@
 #include <dolphin/os.h>
 #include <string.h>
 #include "pmario_sound.h"
-
+#include "version.h"
+#include "evt/evt_story.h"
 
 //.sdata2
 static const GXColor sWhite = {255, 255, 255, 255};
@@ -20,7 +22,7 @@ static const GXColor sShadow = {255, 255, 255, 153};
 //.sbss
 static CountdownWork* wp;
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 #define CD_ICON_OFS 7
 #else
 #define CD_ICON_OFS 0
@@ -37,7 +39,7 @@ void countDownSaveReStart(void) {
     if ((work->flags & 1) != 0) {
         u32 ticks = OS_TIMER_CLOCK / 1000;
         s64 ms = work->elapsed / ticks;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         s32 rem = work->limit - ms;
         if (rem < 0) {
             rem = 0;
@@ -49,12 +51,12 @@ void countDownSaveReStart(void) {
             work->elapsed = (s64)ticks * (u32)(work->limit - work->restart);
         }
         wp->prevTime = gp->renderTime;
-        if (evtGetValue(NULL, GSW(0)) < 0x160) {
+        if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG7_00_START) {
             wp->sfxId = psndSFXOn("SFX_STG2_BOMB_TIMER1");
         } else {
             wp->sfxId = psndSFXOn("SFX_STG7_ALART_WARNING1");
         }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         wp->flags &= ~2;
 #endif
     }
@@ -73,7 +75,7 @@ void countDownStart(u32 limit, u32 restart) {
     wp->y = -180.0f;
     wp->flags = 0;
     wp->flags |= 1;
-    if (evtGetValue(NULL, GSW(0)) < 0x160) {
+    if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG7_00_START) {
         wp->sfxId = psndSFXOn("SFX_STG2_BOMB_TIMER1");
     } else {
         wp->sfxId = psndSFXOn("SFX_STG7_ALART_WARNING1");
@@ -87,32 +89,32 @@ void countDownSetRestartTime(u32 restart) {
 void countDownMain(void) {
     if ((wp->flags & 1) != 0) {
         switch (wp->state) {
-        case 0:
-            if (++wp->counter < 30) {
-                wp->offX = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(300.0f, 0.0f, 11, wp->counter, 30);
-            } else {
-                wp->counter = 0;
-                wp->state++;
-            }
-            break;
-        case 1:
-#ifndef VERSION_G8ME01_DEMO
-            if ((wp->flags & 2) != 0) {
-                psndSFXOff(wp->sfxId);
-                wp->sfxId = -1;
-            }
+            case 0:
+                if (++wp->counter < 30) {
+                    wp->offX = intplGetValue(11, 300.0f, 0.0f, wp->counter, 30);
+                } else {
+                    wp->counter = 0;
+                    wp->state++;
+                }
+                break;
+            case 1:
+#if VERSION != VERSION_DEMO
+                if ((wp->flags & 2) != 0) {
+                    psndSFXOff(wp->sfxId);
+                    wp->sfxId = -1;
+                }
 #endif
-            break;
-        case 2:
-            if (++wp->counter < 30) {
-                wp->offX = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 300.0f, 11, wp->counter, 30);
-            } else {
-                wp->counter = 0;
-                wp->state++;
-                wp->flags &= ~1;
-                psndSFXOff(wp->sfxId);
-            }
-            break;
+                break;
+            case 2:
+                if (++wp->counter < 30) {
+                    wp->offX = intplGetValue(11, 0.0f, 300.0f, wp->counter, 30);
+                } else {
+                    wp->counter = 0;
+                    wp->state++;
+                    wp->flags &= ~1;
+                    psndSFXOff(wp->sfxId);
+                }
+                break;
         }
         if ((wp->flags & 8) == 0 && marioStGetSystemLevel() == 0U) {
             wp->elapsed += (s32)((u32)gp->renderTime - (u32)wp->prevTime);
@@ -129,11 +131,6 @@ void countDownMain(void) {
 }
 
 // The demo draws the countdown icons with icon flag 0x4, retail with 0x10.
-#ifdef VERSION_G8ME01_DEMO
-#define CD_ICON_FLAGS 0x4
-#else
-#define CD_ICON_FLAGS 0x10
-#endif
 
 static void countDownDisp(CameraId cameraId, void* param) {
     GXColor white = sWhite;
@@ -163,7 +160,7 @@ static void countDownDisp(CameraId cameraId, void* param) {
         PSMTXConcat(base, scale, mtx);
         {
             GXColor shadow = sShadow;
-            iconDispGxCol(mtx, CD_ICON_FLAGS, 0x1f6 + CD_ICON_OFS, shadow);
+            iconDispGxCol(mtx, ICON_DISP_2D, 0x1f6 + CD_ICON_OFS, shadow);
         }
         digits[0] = sec / 100;
         sec %= 100;
@@ -172,11 +169,11 @@ static void countDownDisp(CameraId cameraId, void* param) {
         for (i = 0; i < 3; i++) {
             PSMTXTrans(mtx, i * 30 - 50, 8.0f, 0.0f);
             PSMTXConcat(base, mtx, mtx);
-            iconDispGxCol(mtx, CD_ICON_FLAGS, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
+            iconDispGxCol(mtx, ICON_DISP_2D, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
         }
         PSMTXTrans(mtx, 28.0f, 10.0f, 0.0f);
         PSMTXConcat(base, mtx, mtx);
-        iconDispGxCol(mtx, CD_ICON_FLAGS, 0x201 + CD_ICON_OFS, white3);
+        iconDispGxCol(mtx, ICON_DISP_2D, 0x201 + CD_ICON_OFS, white3);
         digits[0] = msec / 100;
         digits[1] = (msec % 100) / 10;
         for (i = 0; i < 2; i++) {
@@ -184,7 +181,7 @@ static void countDownDisp(CameraId cameraId, void* param) {
             PSMTXScale(scale, 0.5f, 0.5f, 0.5f);
             PSMTXConcat(mtx, scale, mtx);
             PSMTXConcat(base, mtx, mtx);
-            iconDispGxCol(mtx, CD_ICON_FLAGS, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
+            iconDispGxCol(mtx, ICON_DISP_2D, (u16)(digits[i] + 0x1f7 + CD_ICON_OFS), white2);
         }
     }
 }

@@ -1,3 +1,5 @@
+// Scripts and commands for house doors: opening, walking in and out, inside/outside map groups
+// and NPC visibility.
 #include "data_tables.h"
 #include "evt/evt_door.h"
 #include "evt/evt_cmd.h"
@@ -15,76 +17,46 @@
 #include "memory.h"
 #include "pmario_sound.h"
 #include <dolphin/mtx.h>
-
-double atan(double);
-double cos(double);
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "version.h"
+#include "driver/casedrv.h"
+#include "libc_decls.h"
 
 typedef struct HouseData {
-    s32 type;               // 0x0
-    const char* hit[4];     // 0x4, hit object names
-    s32 anim[4];            // 0x14
-    s32 outside;            // 0x24
-    s32 door;               // 0x28
-    s32 inside[2];          // 0x2C
-    s32 initInside[2];      // 0x34
-    const char** npcs;      // 0x3C
-    const char** noclip;    // 0x40
-    const char** mobjs;     // 0x44
-    const char** items;     // 0x48
+    s32 type;            // 0x0
+    const char* hit[4];  // 0x4, hit object names
+    s32 anim[4];         // 0x14
+    s32 outside;         // 0x24
+    s32 door;            // 0x28
+    s32 inside[2];       // 0x2C
+    s32 initInside[2];   // 0x34
+    const char** npcs;   // 0x3C
+    const char** noclip; // 0x40
+    const char** mobjs;  // 0x44
+    const char** items;  // 0x48
 } HouseData;
 
 typedef struct HouseWork {
-    HouseData* data;        // 0x0
-    Vec in;                 // 0x4
-    Vec out;                // 0x10
+    HouseData* data; // 0x0
+    Vec in;          // 0x4
+    Vec out;         // 0x10
 } HouseWork;
 
 s32 DoorFLAG;
 s32 door_mapflag;
 
-void door_position_sub(s32 type, const char* map, const char* hitIn, const char* hitOut, Vec* in, Vec* out, BOOL mario);
 void door_dark_flag_sub(BOOL on, const char** npcs, const char** mobjs, const char** items);
 
-
-USER_FUNC(N_evt_mario_party_door_halve_hitbox);
 USER_FUNC(animation);
-USER_FUNC(door_dark_flag);
-USER_FUNC(door_entry);
 USER_FUNC(door_group);
-USER_FUNC(evt_cam3d_event_from_road);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_set_xyz);
-USER_FUNC(evt_cam3d_evt_xyz_off);
-USER_FUNC(evt_cam3d_get_shift);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_door_load_mapflag);
-USER_FUNC(evt_door_param);
-USER_FUNC(evt_door_save_mapflag);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_map_blend_off);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_blend);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_party_door_move);
-USER_FUNC(evt_party_move_beside_mario);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_env_lpf);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(get_noclip_map);
 USER_FUNC(in_pos);
 USER_FUNC(init_inside_group);
@@ -95,39 +67,19 @@ USER_FUNC(npc_hide_onoff);
 USER_FUNC(npc_light);
 USER_FUNC(out_pos);
 USER_FUNC(outside_group);
-USER_FUNC(snd_door_in);
-USER_FUNC(snd_door_out);
-USER_FUNC(evt_door_end_wait);
-USER_FUNC(evt_door_set_param);
-USER_FUNC(evt_door_data_copy);
 
-extern EvtWord door_open_se[];
-extern EvtWord door_close_se[];
 extern EvtWord door_down_se[];
 extern EvtWord house_open_se[];
 extern EvtWord evt_dark[];
 extern EvtWord evt_dark2[];
 extern EvtWord evt_light2[];
-extern EvtWord door_up_se[];
-extern EvtWord house_close_se[];
 extern EvtWord in_houseanim[];
 extern EvtWord out_houseanim[];
 extern EvtWord in_dooranim[];
 extern EvtWord out_dooranim[];
 extern EvtWord house_in[];
 extern EvtWord house_out[];
-extern EvtWord evt_door_setup[];
-extern EvtWord door_dark[];
 extern EvtWord door_dark2[];
-extern EvtWord door_light[];
-extern EvtWord door_light2[];
-extern EvtWord evt_door_open[];
-extern EvtWord evt_door_open_bom_01[];
-extern EvtWord evt_door_open_roll[];
-extern EvtWord evt_door_close[];
-extern EvtWord evt_door_close_roll[];
-extern EvtWord evt_door_open_quick[];
-extern EvtWord evt_door_entry[];
 
 EVT_BEGIN(door_open_se)
     CALL(evt_door_param, LW(0), 8, LW(1))
@@ -228,15 +180,15 @@ EVT_BEGIN(house_open_se)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 USER_FUNC(snd_door_in) {
-	psndSetFlag(0x100);
-	return EVT_RETURN_DONE;
+    psndSetFlag(PSND_FLAG_MUTE_DOOR_SFX);
+    return EVT_RETURN_DONE;
 }
 
 USER_FUNC(snd_door_out) {
-	psndClearFlag(0x100);
-	return EVT_RETURN_DONE;
+    psndClearFlag(PSND_FLAG_MUTE_DOOR_SFX);
+    return EVT_RETURN_DONE;
 }
 #endif
 
@@ -285,7 +237,7 @@ USER_FUNC(door_entry) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // the demo defines house_close_se right after house_open_se
 EVT_BEGIN(house_close_se)
     CALL_CHILD(PTR(house_open_se))
@@ -353,7 +305,7 @@ EVT_BEGIN(door_up_se)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 EVT_BEGIN(house_close_se)
     CALL_CHILD(PTR(house_open_se))
     RETURN
@@ -373,7 +325,7 @@ EVT_BEGIN(in_houseanim)
                     WAIT_MS(166)
                     CALL(evt_snd_sfxon_3d, STRING("SFX_HOUSE_DOWN1"), LW(2), LW(3), LW(4), 0)
                 END_LOOP
-                ELSE
+            ELSE
                 CALL(door_group, LW(10), LW(0))
                 CALL(evt_mapobj_get_position, LW(0), LW(2), LW(3), LW(4))
                 CALL(evt_snd_sfxon_3d, STRING("SFX_HOUSE_OPEN1"), LW(2), LW(3), LW(4), 0)
@@ -489,15 +441,15 @@ EVT_BEGIN(out_dooranim)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(house_in)
     PEEK_INT(LW(0), PTR(&DoorFLAG))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
     POKE_INT(1, PTR(&DoorFLAG))
-    CALL(evt_snd_bgmoff, 18432)
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam_letter_box_disable, 1)
@@ -513,19 +465,19 @@ EVT_BEGIN(house_in)
         IF_INT_EQUAL(LW(1), -1)
             BREAK_LOOP
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
         ADD(LW(0), 1)
     END_LOOP
     CALL(outside_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 2048)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND)
     CALL(door_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(inside_group, LW(10), LW(0), LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, LW(1), 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(out_pos, LW(10), LW(0), LW(2))
     CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(135.0f))
@@ -562,8 +514,8 @@ EVT_BEGIN(house_in)
         RETURN
     END_IF
     POKE_INT(1, PTR(&DoorFLAG))
-    CALL(evt_snd_bgmoff, 18432)
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam_letter_box_disable, 1)
@@ -579,19 +531,19 @@ EVT_BEGIN(house_in)
         IF_INT_EQUAL(LW(1), -1)
             BREAK_LOOP
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
         ADD(LW(0), 1)
     END_LOOP
     CALL(outside_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 2048)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND)
     CALL(door_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(inside_group, LW(10), LW(0), LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, LW(1), 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(N_evt_mario_party_door_halve_hitbox)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(out_pos, LW(10), LW(0), LW(2))
@@ -625,15 +577,15 @@ EVT_BEGIN(house_in)
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(house_out)
     PEEK_INT(LW(0), PTR(&DoorFLAG))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
     POKE_INT(1, PTR(&DoorFLAG))
-    CALL(evt_snd_bgmon, 160, 0)
-    CALL(evt_snd_envon, 160, 0)
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_env_lpf, 0, 0)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam_letter_box_disable, 1)
@@ -659,7 +611,7 @@ EVT_BEGIN(house_out)
         IF_INT_EQUAL(LW(1), -1)
             BREAK_LOOP
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_BBOX_CULL)
         ADD(LW(0), 1)
     END_LOOP
     CALL(evt_cam3d_evt_xyz_off, 100, 11)
@@ -674,15 +626,15 @@ EVT_BEGIN(house_out)
     END_LOOP
     POKE_INT(0, PTR(&DoorFLAG))
     CALL(inside_group, LW(10), LW(0), LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, LW(1), 1, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(outside_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 2048)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND)
     CALL(door_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(npc_light, LW(10))
     RETURN
 EVT_END()
@@ -693,8 +645,8 @@ EVT_BEGIN(house_out)
         RETURN
     END_IF
     POKE_INT(1, PTR(&DoorFLAG))
-    CALL(evt_snd_bgmon, 160, 0)
-    CALL(evt_snd_envon, 160, 0)
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_env_lpf, 0, 0)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam_letter_box_disable, 1)
@@ -721,7 +673,7 @@ EVT_BEGIN(house_out)
         IF_INT_EQUAL(LW(1), -1)
             BREAK_LOOP
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_BBOX_CULL)
         ADD(LW(0), 1)
     END_LOOP
     CALL(evt_cam3d_evt_xyz_off, 100, 11)
@@ -736,15 +688,15 @@ EVT_BEGIN(house_out)
     END_LOOP
     POKE_INT(0, PTR(&DoorFLAG))
     CALL(inside_group, LW(10), LW(0), LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, LW(1), 1, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(outside_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 2048)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND)
     CALL(door_group, LW(10), LW(0))
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 4096)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_NO_BLEND2)
     CALL(npc_light, LW(10))
     CALL(snd_door_out)
     RETURN
@@ -756,7 +708,7 @@ EVT_BEGIN(evt_door_setup)
     POKE_INT(0, PTR(&DoorFLAG))
     CALL(init_inside_group, LW(10), LW(0), LW(1))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_HIDE)
     END_IF
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hitobj_onoff, LW(1), 1, 0)
@@ -819,7 +771,7 @@ EVT_BEGIN(door_light2)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_door_open)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -832,7 +784,7 @@ EVT_BEGIN(evt_door_open)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     BEGIN_INLINE_EVENT
         CALL(evt_door_param, LW(0), 4, LW(1), LW(2), LW(3))
@@ -842,18 +794,18 @@ EVT_BEGIN(evt_door_open)
     END_INLINE_EVENT
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
@@ -1001,7 +953,7 @@ EVT_BEGIN(evt_door_open)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     BEGIN_INLINE_EVENT
         CALL(evt_door_param, LW(0), 4, LW(1), LW(2), LW(3))
@@ -1011,18 +963,18 @@ EVT_BEGIN(evt_door_open)
     END_INLINE_EVENT
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
@@ -1160,7 +1112,7 @@ EVT_BEGIN(evt_door_open)
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_door_open_bom_01)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -1169,22 +1121,22 @@ EVT_BEGIN(evt_door_open_bom_01)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
@@ -1287,29 +1239,29 @@ EVT_BEGIN(evt_door_open_bom_01)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
     END_IF
     CALL(door_dark_flag, LW(0), 1)
     SPAWN_EVENT(PTR(door_open_se))
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
     CALL(N_evt_mario_party_door_halve_hitbox)
 #endif
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
@@ -1401,7 +1353,7 @@ EVT_BEGIN(evt_door_open_bom_01)
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_door_open_roll)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
@@ -1411,22 +1363,22 @@ EVT_BEGIN(evt_door_open_roll)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
@@ -1483,22 +1435,22 @@ EVT_BEGIN(evt_door_open_roll)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
@@ -1547,7 +1499,7 @@ EVT_BEGIN(evt_door_open_roll)
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_door_close)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -1670,22 +1622,22 @@ EVT_BEGIN(evt_door_close)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         IF_BITS_CLEAR(LW(15), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 0)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -1711,7 +1663,7 @@ EVT_BEGIN(evt_door_close)
     BEGIN_INLINE_EVENT
         IF_BITS_CLEAR(LW(15), 16)
             CALL(evt_door_param, LW(0), 5, LW(1), LW(2), LW(3))
-            ELSE
+        ELSE
             CALL(evt_door_param, LW(0), 11, LW(1), LW(2), LW(3))
         END_IF
         CALL(evt_mario_get_pos, 0, LW(4), LW(5), LW(6))
@@ -1785,7 +1737,7 @@ EVT_BEGIN(evt_door_close)
     WAIT_MS(500)
     IF_BITS_CLEAR(LW(15), 16)
         CALL(evt_door_param, LW(0), 5, LW(1), LW(2), LW(3))
-        ELSE
+    ELSE
         CALL(evt_door_param, LW(0), 11, LW(1), LW(2), LW(3))
     END_IF
     IF_BITS_CLEAR(LW(15), 8)
@@ -1821,22 +1773,22 @@ EVT_BEGIN(evt_door_close)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         IF_BITS_CLEAR(LW(15), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 0)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -1851,7 +1803,7 @@ EVT_BEGIN(evt_door_close)
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_door_close_roll)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
@@ -1904,22 +1856,22 @@ EVT_BEGIN(evt_door_close_roll)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         IF_BITS_CLEAR(LW(15), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 0)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -1982,22 +1934,22 @@ EVT_BEGIN(evt_door_close_roll)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         IF_BITS_CLEAR(LW(15), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 0)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -2009,7 +1961,7 @@ EVT_BEGIN(evt_door_close_roll)
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_door_open_quick)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -2018,7 +1970,7 @@ EVT_BEGIN(evt_door_open_quick)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(10), LW(0))
@@ -2033,18 +1985,18 @@ EVT_BEGIN(evt_door_open_quick)
     END_INLINE_EVENT
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
@@ -2078,7 +2030,7 @@ EVT_BEGIN(evt_door_open_quick)
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_BBOX_CULL)
     END_IF
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(10), LW(0))
@@ -2093,18 +2045,18 @@ EVT_BEGIN(evt_door_open_quick)
     END_INLINE_EVENT
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
     END_IF
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 4096)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_NO_BLEND2)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
@@ -2134,7 +2086,7 @@ EVT_END()
 EVT_BEGIN(evt_door_entry)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
     END_IF
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 0)
@@ -2142,11 +2094,11 @@ EVT_BEGIN(evt_door_entry)
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(2), 0)
         SET_VALUE(LW(15), 0)
-        CALL(evt_run_case_evt, 9, 1, LW(2), 0, PTR(evt_door_close), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(2), 0, PTR(evt_door_close), 0)
     END_IF
     IF_INT_NOT_EQUAL(LW(3), 0)
         SET_VALUE(LW(15), 0)
-        CALL(evt_run_case_evt, 9, 1, LW(3), 0, PTR(evt_door_open), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(3), 0, PTR(evt_door_open), 0)
     END_IF
     CALL(evt_door_param, LW(0), 9, LW(1))
     IF_BITS_SET(LW(1), 1)
@@ -2222,65 +2174,63 @@ USER_FUNC(animation) {
 }
 
 // the item flag the dark/light helpers toggle on field items: 0x80 in the demo, 0x40 in retail
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 #define DOOR_ITEM_DARK_FLAG 0x80
 #else
 #define DOOR_ITEM_DARK_FLAG 0x40
 #endif
 
-#define NPC_LIGHT_BODY(FN, ICONFN)                                              \
-    HouseWork* w = (HouseWork*)evtGetValue(event, *event->args);                \
-    MarioWork* mario = marioGetPtr();                                           \
-    PartyEntry* party = partyGetPtr(0);                                         \
-    PartyEntry* follower = partyGetPtr(1);                                      \
-    const char** list;                                                          \
-    if (mario) {                                                                \
-        FN(marioGetPtr()->paperAnimGroupId[0], 0x1800);                         \
-        FN(marioGetPtr()->paperAnimGroupId[1], 0x1800);                         \
-        FN(marioGetPtr()->paperAnimGroupId[2], 0x1800);                         \
-    }                                                                           \
-    if (party) {                                                                \
-        FN(party->paperAnimGroup, 0x1800);                                      \
-    }                                                                           \
-    if (follower) {                                                             \
-        FN(follower->paperAnimGroup, 0x1800);                                   \
-    }                                                                           \
-    list = w->data->npcs;                                                       \
-    if (list) {                                                                 \
-        for (; *list; list++) {                                                 \
-            NpcEntry* npc = npcNameToPtr_NoAssert(*list);                       \
-            if (npc) {                                                          \
-                FN(npc->poseId, 0x1800);                                        \
-            }                                                                   \
-        }                                                                       \
-    }                                                                           \
-    list = w->data->mobjs;                                                      \
-    if (list) {                                                                 \
-        for (; *list; list++) {                                                 \
-            MapObjectEntry* mobj = mobjNameToPtrNoAssert(*list);                \
-            if (mobj) {                                                         \
-                FN(mobj->poseId, 0x1800);                                       \
-            }                                                                   \
-        }                                                                       \
-    }                                                                           \
-    list = w->data->items;                                                      \
-    if (list) {                                                                 \
-        for (; *list; list++) {                                                 \
-            ItemEntry* item = itemNameToPtr((char*)*list);                      \
-            if (item) {                                                         \
-                ICONFN(item->name, DOOR_ITEM_DARK_FLAG);                                       \
-            }                                                                   \
-        }                                                                       \
-    }                                                                           \
+#define NPC_LIGHT_BODY(FN, ICONFN)                               \
+    HouseWork* w = (HouseWork*)evtGetValue(event, *event->args); \
+    MarioWork* mario = marioGetPtr();                            \
+    PartyEntry* party = partyGetPtr(0);                          \
+    PartyEntry* follower = partyGetPtr(1);                       \
+    const char** list;                                           \
+    if (mario) {                                                 \
+        FN(marioGetPtr()->paperAnimGroupId[0], 0x1800);          \
+        FN(marioGetPtr()->paperAnimGroupId[1], 0x1800);          \
+        FN(marioGetPtr()->paperAnimGroupId[2], 0x1800);          \
+    }                                                            \
+    if (party) {                                                 \
+        FN(party->paperAnimGroup, 0x1800);                       \
+    }                                                            \
+    if (follower) {                                              \
+        FN(follower->paperAnimGroup, 0x1800);                    \
+    }                                                            \
+    list = w->data->npcs;                                        \
+    if (list) {                                                  \
+        for (; *list; list++) {                                  \
+            NpcEntry* npc = npcNameToPtr_NoAssert(*list);        \
+            if (npc) {                                           \
+                FN(npc->poseId, 0x1800);                         \
+            }                                                    \
+        }                                                        \
+    }                                                            \
+    list = w->data->mobjs;                                       \
+    if (list) {                                                  \
+        for (; *list; list++) {                                  \
+            MapObjectEntry* mobj = mobjNameToPtrNoAssert(*list); \
+            if (mobj) {                                          \
+                FN(mobj->poseId, 0x1800);                        \
+            }                                                    \
+        }                                                        \
+    }                                                            \
+    list = w->data->items;                                       \
+    if (list) {                                                  \
+        for (; *list; list++) {                                  \
+            ItemEntry* item = itemNameToPtr((char*)*list);       \
+            if (item) {                                          \
+                ICONFN(item->name, DOOR_ITEM_DARK_FLAG);         \
+            }                                                    \
+        }                                                        \
+    }                                                            \
     return EVT_RETURN_DONE;
 
-USER_FUNC(npc_dark) {
-    NPC_LIGHT_BODY(animPoseSetMaterialFlagOn, iconFlagOn)
-}
+USER_FUNC(npc_dark){
+    NPC_LIGHT_BODY(animPoseSetMaterialFlagOn, iconFlagOn)}
 
-USER_FUNC(npc_light) {
-    NPC_LIGHT_BODY(animPoseSetMaterialFlagOff, iconFlagOff)
-}
+USER_FUNC(npc_light){
+    NPC_LIGHT_BODY(animPoseSetMaterialFlagOff, iconFlagOff)}
 
 USER_FUNC(get_noclip_map) {
     EvtWord* args = event->args;
@@ -2296,12 +2246,12 @@ USER_FUNC(get_noclip_map) {
     return EVT_RETURN_DONE;
 }
 
-#define DOOR_POS_GET(HIT)                       \
-    if (!mario) {                               \
-        hitObjGetPos(HIT, &pos);                \
-    } else {                                    \
-        pos = marioGetPtr()->position;          \
-    }                                           \
+#define DOOR_POS_GET(HIT)              \
+    if (!mario) {                      \
+        hitObjGetPos(HIT, &pos);       \
+    } else {                           \
+        pos = marioGetPtr()->position; \
+    }                                  \
     hitObjGetNormal(HIT, &nrm);
 
 void door_position_sub(s32 type, const char* map, const char* hitIn, const char* hitOut, Vec* in, Vec* out, BOOL mario) {
@@ -2392,41 +2342,41 @@ void door_position_sub(s32 type, const char* map, const char* hitIn, const char*
     }
 }
 
-#define DARK_SUB_BODY(FN, ICONFN)                                   \
-    if (mario) {                                                    \
-        FN(mario->paperAnimGroupId[0], 0x1800);                     \
-        FN(mario->paperAnimGroupId[1], 0x1800);                     \
-        FN(mario->paperAnimGroupId[2], 0x1800);                     \
-    }                                                               \
-    if (party) {                                                    \
-        FN(party->paperAnimGroup, 0x1800);                          \
-    }                                                               \
-    if (follower) {                                                 \
-        FN(follower->paperAnimGroup, 0x1800);                       \
-    }                                                               \
-    if (npcs) {                                                     \
-        for (list = npcs; *list; list++) {                          \
-            NpcEntry* npc = npcNameToPtr_NoAssert(*list);           \
-            if (npc) {                                              \
-                FN(npc->poseId, 0x1800);                            \
-            }                                                       \
-        }                                                           \
-    }                                                               \
-    if (mobjs) {                                                    \
-        for (list = mobjs; *list; list++) {                         \
-            MapObjectEntry* mobj = mobjNameToPtrNoAssert(*list);    \
-            if (mobj) {                                             \
-                FN(mobj->poseId, 0x1800);                           \
-            }                                                       \
-        }                                                           \
-    }                                                               \
-    if (items) {                                                    \
-        for (list = items; *list; list++) {                         \
-            ItemEntry* item = itemNameToPtr((char*)*list);          \
-            if (item) {                                             \
-                ICONFN(item->name, DOOR_ITEM_DARK_FLAG);                           \
-            }                                                       \
-        }                                                           \
+#define DARK_SUB_BODY(FN, ICONFN)                                \
+    if (mario) {                                                 \
+        FN(mario->paperAnimGroupId[0], 0x1800);                  \
+        FN(mario->paperAnimGroupId[1], 0x1800);                  \
+        FN(mario->paperAnimGroupId[2], 0x1800);                  \
+    }                                                            \
+    if (party) {                                                 \
+        FN(party->paperAnimGroup, 0x1800);                       \
+    }                                                            \
+    if (follower) {                                              \
+        FN(follower->paperAnimGroup, 0x1800);                    \
+    }                                                            \
+    if (npcs) {                                                  \
+        for (list = npcs; *list; list++) {                       \
+            NpcEntry* npc = npcNameToPtr_NoAssert(*list);        \
+            if (npc) {                                           \
+                FN(npc->poseId, 0x1800);                         \
+            }                                                    \
+        }                                                        \
+    }                                                            \
+    if (mobjs) {                                                 \
+        for (list = mobjs; *list; list++) {                      \
+            MapObjectEntry* mobj = mobjNameToPtrNoAssert(*list); \
+            if (mobj) {                                          \
+                FN(mobj->poseId, 0x1800);                        \
+            }                                                    \
+        }                                                        \
+    }                                                            \
+    if (items) {                                                 \
+        for (list = items; *list; list++) {                      \
+            ItemEntry* item = itemNameToPtr((char*)*list);       \
+            if (item) {                                          \
+                ICONFN(item->name, DOOR_ITEM_DARK_FLAG);         \
+            }                                                    \
+        }                                                        \
     }
 
 void door_dark_flag_sub(BOOL on, const char** npcs, const char** mobjs, const char** items) {
@@ -2450,10 +2400,10 @@ USER_FUNC(door_dark_flag) {
     return EVT_RETURN_DONE;
 }
 
-#define DOOR_PARAM_POS(V, M)                                                        \
-    door_position_sub(d->type, d->mapobj, d->hitIn, d->hitOut, &in, &out, M);       \
-    evtSetValue(event, args[2], V.x);                                               \
-    evtSetValue(event, args[3], V.y);                                               \
+#define DOOR_PARAM_POS(V, M)                                                  \
+    door_position_sub(d->type, d->mapobj, d->hitIn, d->hitOut, &in, &out, M); \
+    evtSetValue(event, args[2], V.x);                                         \
+    evtSetValue(event, args[3], V.y);                                         \
     evtSetValue(event, args[4], V.z);
 
 USER_FUNC(evt_door_param) {
@@ -2544,25 +2494,25 @@ USER_FUNC(npc_hide_onoff) {
         NpcEntry* npc = npcNameToPtr_NoAssert(list[i]);
         if (npc) {
             if (on) {
-                npc->flags |= 0x800;
+                npc->flags |= NPC_FLAG_NO_DISPLAY;
             } else {
-                npc->flags &= ~0x800;
+                npc->flags &= ~NPC_FLAG_NO_DISPLAY;
             }
         }
     }
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // the demo defines these with the door helpers at the end of the file
 USER_FUNC(snd_door_in) {
-	psndSetFlag(0x100);
-	return EVT_RETURN_DONE;
+    psndSetFlag(PSND_FLAG_MUTE_DOOR_SFX);
+    return EVT_RETURN_DONE;
 }
 
 USER_FUNC(snd_door_out) {
-	psndClearFlag(0x100);
-	return EVT_RETURN_DONE;
+    psndClearFlag(PSND_FLAG_MUTE_DOOR_SFX);
+    return EVT_RETURN_DONE;
 }
 #endif
 

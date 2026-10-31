@@ -1,3 +1,4 @@
+// eff_fire_dust_n64.c: Paper Mario 64 FireDust effect entry (effFireDustN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

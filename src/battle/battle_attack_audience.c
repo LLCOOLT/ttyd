@@ -1,11 +1,14 @@
+// Audience attacks: audience members throwing items, and item announcements.
 #include "driver/itemdrv.h"
-#ifdef VERSION_G8ME01
+#include "evt/evt_msg.h"
+#include "version.h"
+#if VERSION >= VERSION_US
 #include "mario/mariost.h"
 #include <string.h>
-void evtMsgFmtStr(char* dst, const char* src);
 #endif
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
+#include "battle/battle_damage.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_unit.h"
 #include "data/item_data.h"
@@ -21,21 +24,10 @@ void evtMsgFmtStr(char* dst, const char* src);
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_attack_audience.h"
 #include "libc_decls.h"
+#include "battle/battle_sub.h"
 
+// this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-
-extern ItemData itemDataTable[];
-extern void* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
-extern void itemDelete(const char* name);
-extern void psndSFX_pit(s32 id, s32 pitch);
-
-USER_FUNC(_damage);
-USER_FUNC(_delete_present_item);
-USER_FUNC(_get_item_announce);
-USER_FUNC(_get_present_target_id);
-USER_FUNC(_get_present_item);
-USER_FUNC(_attack_aud);
-USER_FUNC(_get_attack_aud_no);
 
 s32 _get_attack_aud_no(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
@@ -125,7 +117,7 @@ s32 _get_present_item(EventEntry* event, BOOL isFirstCall) {
     s32 id = BattleAudience_GetPresentTargetUnitId();
     BattleUnit* unit = BattleGetUnitPtr(wp, id);
 
-    if (unit->mAlliance == 0) {
+    if (unit->alliance == 0) {
         pouchGetItem(item);
     } else if (unit->heldItem == 0) {
         unit->heldItem = item;
@@ -149,11 +141,10 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     s32 no;
     f32 x;
     f32 y;
-    GXColor col;
 
     no = BattleAudience_GetPresentItemNo();
     itemName = msgSearch(itemDataTable[no].name);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     if ((u32)gp->language == 0) {
         msg = msgSearch("btl_msg_get_item");
         sprintf(buf, msg, itemName);
@@ -186,12 +177,12 @@ s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
         f32 z;
 
         BtlUnit_GetPos(unit, &x, &y, &z);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
         y = y + (f32)(BtlUnit_GetHeight(unit) + 10);
-        event->userdatap[1] = itemEntry(NULL, item, 0x10, -1, 0, x, y, z);
+        event->userdatap[1] = itemEntry(x, y, z, NULL, item, 0x10, -1, 0);
 #else
-        y = y + (unit->mSizeMultiplier * (f32)BtlUnit_GetHeight(unit) + 8.0f);
-        event->userdatap[1] = itemEntry(NULL, item, 0x11, -1, 0, x, y, z);
+        y = y + (unit->sizeMultiplier * (f32)BtlUnit_GetHeight(unit) + 8.0f);
+        event->userdatap[1] = itemEntry(x, y, z, NULL, item, 0x11, -1, 0);
 #endif
         event->userdata[2] = 90;
     } else {
@@ -203,7 +194,7 @@ s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
             return 2;
         }
     }
-    dispEntry(8, 900.0f, 1, (void*)_get_item_announce_disp, NULL);
+    dispEntry(CAMERA_2D, 900.0f, 1, (void*)_get_item_announce_disp, NULL);
     return 0;
 }
 
@@ -219,7 +210,7 @@ s32 _damage(EventEntry* event, BOOL isFirstCall) {
     evtGetValue(event, args[0]);
     aud = BattleAudienceBaseGetPtr();
     BattleActionCommandResetDefenceResult();
-    BattleCheckDamage(BattleGetSystemPtr(wp), unit, (struct BattleWorkUnitPart*)part, &aud->presentWeapon, 0x100);
+    BattleCheckDamage(BattleGetSystemPtr(wp), unit, part, &aud->presentWeapon, DAMAGE_FLAG_LAST_HIT);
     return 2;
 }
 
@@ -233,20 +224,13 @@ EvtWord* btlataudGetMoveEventPtr(void) {
     }
 }
 
-
-
-
-
-
-
-
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
 __declspec(section ".data") static s32 btlataudevtDummyPad[1] = {0};
 #endif
 EVT_BEGIN(btlataudevtDummy)
     CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
     CALL(_attack_aud, LW(3), 0)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 EvtWord* btlataudGetAttackEventPtr(s32 unitId) {
@@ -268,8 +252,8 @@ EVT_END()
 
 EVT_BEGIN(btlataudevtPresentItem_Get)
     CALL(_get_present_target_id, LW(3))
-    CALL(btlevtcmd_StopWaitEvent, -2)
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), LW(3))
         CALL(btlevtcmd_StopWaitEvent, LW(3))
     END_IF
@@ -277,12 +261,11 @@ EVT_BEGIN(btlataudevtPresentItem_Get)
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 52)
     CALL(_get_item_announce)
-    CALL(_delete_present_item, -250000000)
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    CALL(_delete_present_item, EVT_NULLPTR)
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), LW(3))
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_IF
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-

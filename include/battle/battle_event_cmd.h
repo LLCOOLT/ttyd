@@ -1,7 +1,9 @@
+// Declares the battle event commands (btlevtcmd_*) available to battle scripts.
 #pragma once
 
 #include "evt/evt_cmd.h"
 #include <dolphin/types.h>
+#include "version.h"
 
 USER_FUNC(btlevtcmd_WaitEventEnd);
 USER_FUNC(btlevtcmd_check_battleflag);
@@ -15,6 +17,11 @@ USER_FUNC(btlevtcmd_GetPosFloat);
 USER_FUNC(btlevtcmd_GetRandomValue);
 USER_FUNC(btlevtcmd_DrawLots);
 USER_FUNC(btlevtcmd_SpawnUnit);
+// btlevtcmd_KillUnit flags (second argument)
+enum BtlKillUnitFlags {
+    KILL_UNIT_KEEP = 0x1,     // KO the unit but do not delete it
+    KILL_UNIT_INACTIVE = 0x2, // only mark the unit UNIT_ATTR_INACTIVE (no KO status)
+};
 USER_FUNC(btlevtcmd_KillUnit);
 USER_FUNC(btlevtcmd_ReplaceParts);
 USER_FUNC(btlevtcmd_ChangeParty);
@@ -57,8 +64,8 @@ USER_FUNC(btlevtcmd_SetPartsRotateOffset);
 USER_FUNC(btlevtcmd_AddPartsRotateOffset);
 USER_FUNC(btlevtcmd_SetRotateOffsetFromCenterOffset);
 USER_FUNC(btlevtcmd_SetCutBaseOffset);
-USER_FUNC(btlevtcmd_SetBintaHitOffset); //Love Slap
-USER_FUNC(btlevtcmd_SetKissHitOffset); //Lip Lock
+USER_FUNC(btlevtcmd_SetBintaHitOffset); // Love Slap
+USER_FUNC(btlevtcmd_SetKissHitOffset);  // Lip Lock
 USER_FUNC(btlevtcmd_SetCutWidth);
 USER_FUNC(btlevtcmd_SetCutHeight);
 USER_FUNC(btlevtcmd_SetPossessionItemOffset);
@@ -112,6 +119,15 @@ USER_FUNC(btlevtcmd_GetPartyId);
 USER_FUNC(btlevtcmd_GetBodyId);
 USER_FUNC(btlevtcmd_GetUnitId);
 USER_FUNC(btlevtcmd_GetPartyTechLv);
+// btlevtcmd_CalculateFaceDirection flags (fifth argument); the result is the unit's (or part's) face direction
+// unless a flag overrides it
+enum BtlFaceDirFlags {
+    FACE_DIR_TOWARD_X = 0x1,     // face the x coordinate passed as the target unit argument
+    FACE_DIR_ATTACK_DIR = 0x4,   // the unit's alliance attack direction
+    FACE_DIR_MOVE_DIR = 0x8,     // the unit's (or part's) move direction
+    FACE_DIR_TOWARD_UNIT = 0x10, // face the target unit/part
+    FACE_DIR_REVERSE = 0x100,    // negate the result
+};
 USER_FUNC(btlevtcmd_CalculateFaceDirection);
 USER_FUNC(btlevtcmd_GetFaceDirection);
 USER_FUNC(btlevtcmd_ChangeFaceDirection);
@@ -132,35 +148,6 @@ USER_FUNC(btlevtcmd_OffToken);
 USER_FUNC(btlevtcmd_CheckToken);
 USER_FUNC(btlevtcmd_SetRegistStatus);
 USER_FUNC(btlevtcmd_CheckCommandUnit);
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 USER_FUNC(btlevtcmd_ACRStart);
 USER_FUNC(btlevtcmd_ACRGetResult);
@@ -233,6 +220,10 @@ USER_FUNC(btlevtcmd_GetMoveFrame);
 USER_FUNC(btlevtcmd_GetResultAC);
 USER_FUNC(btlevtcmd_GetResultACDefence);
 USER_FUNC(btlevtcmd_GetResultCountAC);
+// btlevtcmd_GetResultPrizeLv(unit, lv, out): the action-command prize level for
+// lv plus the difficulty. BTL_UNIT_NONE and BTL_UNIT_SYSTEM both mean "no unit"
+// (no target whose damage code can cancel the prize), so the scripts that pass
+// BTL_UNIT_SYSTEM here do not refer to the system unit.
 USER_FUNC(btlevtcmd_GetResultPrizeLv);
 USER_FUNC(btlevtcmd_GetSelectEnemy);
 USER_FUNC(btlevtcmd_GetSelectNextEnemy);
@@ -270,7 +261,7 @@ USER_FUNC(btlevtcmd_SacBgsetMove);
 USER_FUNC(btlevtcmd_SamplingEnemy);
 USER_FUNC(btlevtcmd_SetDiveSound);
 USER_FUNC(btlevtcmd_SetEventCeilFall);
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 USER_FUNC(btlevtcmd_SetEventHit);
 #endif
 USER_FUNC(btlevtcmd_SetFallAccel);
@@ -310,3 +301,31 @@ USER_FUNC(btlevtcmd_ftomsec);
 USER_FUNC(btlevtcmd_snd_se);
 USER_FUNC(btlevtcmd_snd_se_offset);
 USER_FUNC(btlevtcmd_snd_voice);
+
+USER_FUNC(btlevtcmd_EllipseMovePosition);
+USER_FUNC(btlevtcmd_GetConsumeItem);
+USER_FUNC(btlevtcmd_CommandFlyItem);
+USER_FUNC(btlevtcmd_ConsumeItem);
+USER_FUNC(btlevtcmd_SetEventEntry);
+USER_FUNC(btlevtcmd_SetEventPhase);
+USER_FUNC(btlevtcmd_SetEventUnisonPhase);
+USER_FUNC(btlevtcmd_GuardMoveEnd);
+USER_FUNC(btlevtcmd_WaitAttackEndCheck);
+USER_FUNC(btlevtcmd_GetConfuseActEvent);
+USER_FUNC(btlevtcmd_AnimeWaitPlayLoopTiming);
+USER_FUNC(btlevtcmd_SetTalkBodyId);
+USER_FUNC(btlevtcmd_AnimeCmpPoseType);
+USER_FUNC(btlevtcmd_CheckDefinePosetype);
+USER_FUNC(btlevtcmd_CheckGuardMotionEnable);
+USER_FUNC(btlevtcmd_GetACPossibility);
+USER_FUNC(btlevtcmd_CheckUnitFlag);
+USER_FUNC(btlevtcmd_AfterReactionEntry);
+USER_FUNC(btlevtcmd_CommandGetWeaponItemId);
+USER_FUNC(btlevtcmd_GetItemRecoverParam);
+USER_FUNC(btlevtcmd_SetGuard);
+USER_FUNC(btlevtcmd_InterruptStop);
+USER_FUNC(btlevtcmd_SortPhaseMoveTable);
+USER_FUNC(btlevtcmd_SetJumpSound);
+USER_FUNC(btlevtcmd_BtlStageObjFlagOnOff);
+USER_FUNC(btlevtcmd_BtlStageObjSetRotate);
+USER_FUNC(btlevtcmd_BtlStageObjGetRotate);

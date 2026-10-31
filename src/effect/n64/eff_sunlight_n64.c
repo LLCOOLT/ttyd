@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: sunlight: soft white light beams that fade in and out over `lifetime` frames.
 #include "version.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -7,8 +8,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "eff/n64/eff_sunlight_n64.h"
-
-double sin(double);
+#include "libc_decls.h"
 
 typedef struct EffSunlightN64Work {
     s32 type;      // 0x0
@@ -35,7 +35,7 @@ EffectEntry* effSunlightN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f3
     work = __memAlloc(HEAP_EFFECT, sizeof(EffSunlightN64Work));
     effect->userdata = work;
     effect->callback = effSunlightMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -77,8 +77,8 @@ void effSunlightMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -196,28 +196,28 @@ void effSunlightDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(scale, trans, scale);
         GXLoadTexMtxImm(scale, GX_TEXMTX1, GX_MTX2x4);
         switch (i) {
-        case 0:
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
-            tri2(0, 1, 2, 0, 0, 2, 3, 0);
-            tri2(4, 5, 6, 0, 4, 6, 7, 0);
-            break;
-        case 1:
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(8, 9, 10, 8, 8, 10, 11, 8);
-            break;
-        case 2:
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(12, 13, 14, 12, 12, 14, 15, 12);
-            break;
-        case 3:
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
-            tri2(16, 17, 18, 16, 16, 18, 19, 16);
-            tri2(20, 21, 22, 16, 20, 22, 23, 16);
-            break;
-        case 4:
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(24, 25, 26, 24, 24, 26, 27, 24);
-            break;
+            case 0:
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(4, 5, 6, 0, 4, 6, 7, 0);
+                break;
+            case 1:
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+                tri2(8, 9, 10, 8, 8, 10, 11, 8);
+                break;
+            case 2:
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+                tri2(12, 13, 14, 12, 12, 14, 15, 12);
+                break;
+            case 3:
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
+                tri2(16, 17, 18, 16, 16, 18, 19, 16);
+                tri2(20, 21, 22, 16, 20, 22, 23, 16);
+                break;
+            case 4:
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+                tri2(24, 25, 26, 24, 24, 26, 27, 24);
+                break;
         }
     }
     GXSetProjectionv(proj);

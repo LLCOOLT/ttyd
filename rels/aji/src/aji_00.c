@@ -1,49 +1,27 @@
+// aji_00 (敵のアジト, X-Naut Fortress): the corridor between aji_19 and the elevator hall, where two X-Naut
+// underlings (teshita) are met.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "aji.h"
 #include "evt/evt_npc.h"
-
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_npc_battle_start);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_battle_info);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_wait_battle_end);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_telop_entry);
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[3];
-extern EvtWord aji_00_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -82,8 +60,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -100,8 +78,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -118,8 +96,8 @@ static BeroEntry bero_entry_data[] = {
 };
 
 static EVT_BEGIN(first_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER2"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_set_position, STRING("手下１"), 225, 0, -25)
     CALL(evt_npc_set_position, STRING("手下２"), 265, 0, 25)
@@ -148,7 +126,7 @@ static EVT_BEGIN(first_evt)
         CALL(evt_npc_move_position, STRING("手下２"), -160, 0, 0, FLOAT(200.0f), 0)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("手下１"), -200, 0, 0, FLOAT(200.0f), 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_npc_set_battle_info, STRING("手下１"), 6)
     CALL(evt_npc_battle_start, STRING("手下１"))
     CALL(evt_npc_wait_battle_end)
@@ -182,10 +160,10 @@ static EVT_BEGIN(first_evt)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(800)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    SET_VALUE(GSW(0), 361)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_08_ELITE_X_NAUTS)
     CALL(evt_cam3d_evt_off, 500, 11)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_telop_entry, 16)
@@ -202,7 +180,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -211,7 +189,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -222,17 +200,17 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 EVT_BEGIN(aji_00_init_evt)
-    IF_INT_LESS(GSW(0), 361)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN1"))
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_08_ELITE_X_NAUTS)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     END_IF
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    IF_INT_LESS(GSW(0), 361)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_08_ELITE_X_NAUTS)
         SPAWN_EVENT(PTR(first_evt))
     END_IF
     CALL(evt_mobj_recovery_blk, STRING("r_blk"), 20, -100, 60, -200, 0, 0)
@@ -242,12 +220,11 @@ EVT_BEGIN(aji_00_init_evt)
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_02"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_03"), 1, 0)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(376, 402)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG7_25_THE_LAST_MAIL, STORY_STG8_END_AFTER_THE_BATTLE)
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 9, 1, STRING("w_bero"), 0, PTR(evt_door_msg), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero"), 0, PTR(evt_door_msg), 0)
     END_SWITCH
     RETURN
 EVT_END()
-

@@ -1,3 +1,4 @@
+// eff_majinai.c: majinai (spell) effect entry (effMajinaiEntry), its work struct and main/draw callbacks.
 #pragma once
 
 #include "driver/camdrv.h"

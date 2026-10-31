@@ -1,3 +1,4 @@
+// Smorg (moamoa): boss battle unit, the main body, used on the Excess Express.
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -21,13 +22,57 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "driver/extdrv.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_npc.h"
+#include "rsh.h"
 
-typedef struct MoamoaGroup { char anim[16]; char pose[8]; f32 speed; s32 start; s32 num; } MoamoaGroup;
-typedef struct Moamoa { u16 flags; u8 pad_2[2]; Vec pos; s16 group; u8 pad_12[6]; OSTime time; s16 chain; s16 order; f32 t; s32 poseId; s32 type; EvtWord* owner; Vec vel; Vec pos2; u8 pad_4c[4]; } Moamoa;
-typedef struct MoamoaWork { s32 flags; s32 count; Moamoa* elems; s32 numGroups; MoamoaGroup groups[32]; s16 chainNum[128]; s16 chainIdx[128][2]; s32 poseId[5]; s32 unitId; Vec center; f32 angle; f32 radius; f32 targetScale; f32 scale; } MoamoaWork;
-typedef struct MoamoaExtData { const char* anim; const char* pose; f32 speed; } MoamoaExtData;
-static MoamoaWork* wp;
-#ifdef VERSION_G8MP01
+typedef struct MoamoaGroup {
+    char anim[16];
+    char pose[8];
+    f32 speed;
+    s32 start;
+    s32 num;
+} MoamoaGroup;
+typedef struct BtlMoamoa {
+    u16 flags;
+    u8 pad_2[2];
+    Vec pos;
+    s16 group;
+    u8 pad_12[6];
+    OSTime time;
+    s16 chain;
+    s16 order;
+    f32 t;
+    s32 poseId;
+    s32 type;
+    EvtWord* owner;
+    Vec vel;
+    Vec pos2;
+    u8 pad_4c[4];
+} BtlMoamoa;
+typedef struct BtlMoamoaWork {
+    s32 flags;
+    s32 count;
+    BtlMoamoa* elems;
+    s32 numGroups;
+    MoamoaGroup groups[32];
+    s16 chainNum[128];
+    s16 chainIdx[128][2];
+    s32 poseId[5];
+    s32 unitId;
+    Vec center;
+    f32 angle;
+    f32 radius;
+    f32 targetScale;
+    f32 scale;
+} BtlMoamoaWork;
+typedef struct MoamoaExtData {
+    const char* anim;
+    const char* pose;
+    f32 speed;
+} MoamoaExtData;
+static BtlMoamoaWork* wp;
+#if VERSION == VERSION_EU
 // PAL: a seeded generator for the swarm's start positions (moamoa_srand / moamoa_randf)
 static u32 moamoa_rand_prev;
 static u32 moamoa_rand_cur;
@@ -35,57 +80,17 @@ static u32 moamoa_rand_cur;
 int rand(void);
 void moamoa_mainUnitIdClear(void);
 static f32 randf(f32 min, f32 max);
-extern const char* g_moamoa_chain_tbl[][2];
 USER_FUNC(moamoa1_on);
-void moamoa_pose(Moamoa* elem);
+void moamoa_pose(BtlMoamoa* elem);
 void moamoa_draw(CameraId cameraId, void* param);
 
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_CheckActStatus);
-USER_FUNC(btlevtcmd_CheckPhase);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_GetHp);
-USER_FUNC(btlevtcmd_GetMaxHp);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_GetUnitId);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventPhase);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetHitCursorOffset);
-USER_FUNC(btlevtcmd_SetHitOffset);
-USER_FUNC(btlevtcmd_SetHomePos);
-USER_FUNC(btlevtcmd_SetPos);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_SpawnUnit);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_moveto);
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(moamoa_on);
 USER_FUNC(moamoa_set_bodyScale);
-void moamoa_draw(CameraId cameraId, void* param);
 static void ext_moamoa_main(void);
 static void ext_moamoa_init(void);
-void moamoa_pose(Moamoa* elem);
 USER_FUNC(moamoa2_on);
 USER_FUNC(moamoa1_on);
 USER_FUNC(moamoa_bomb);
 USER_FUNC(moamoa_guruguru);
-void moamoa_mainUnitIdClear(void);
-static f32 randf(f32 min, f32 max);
-USER_FUNC(evt_moamoa_mainUnitIdClear);
-USER_FUNC(boss_moamoa_check_zenei_kouei);
-extern BattleUnitKind unit_boss_moamoa_mouth;
-extern BattleUnitKind unit_boss_moamoa_tentacle_a;
-extern BattleUnitKind unit_boss_moamoa_tentacle_b;
-extern BattleUnitKind unit_boss_moamoa_tentacle_c;
 
 BattleUnitKind unit_boss_moamoa;
 BattleUnitDefense moamoa_defence;
@@ -145,7 +150,7 @@ static f32 randf(f32 min, f32 max) {
     return r * (max - min) + min;
 }
 
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 void moamoa_srand(u32 seed) {
     moamoa_rand_prev = seed;
     moamoa_rand_cur = seed + 0x37E35F7D;
@@ -269,10 +274,10 @@ static BattleUnitKindPart parts[] = {
 };
 
 BattleUnitSetup entry_boss_moamoa_tentacle_a = {
-    &unit_boss_moamoa_tentacle_a, // mUnitKindParams
+    &unit_boss_moamoa_tentacle_a, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {0.0f, -1000.0f, 0.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -280,10 +285,10 @@ BattleUnitSetup entry_boss_moamoa_tentacle_a = {
 };
 
 BattleUnitSetup entry_boss_moamoa_tentacle_b = {
-    &unit_boss_moamoa_tentacle_b, // mUnitKindParams
+    &unit_boss_moamoa_tentacle_b, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {0.0f, -1000.0f, 0.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -291,10 +296,10 @@ BattleUnitSetup entry_boss_moamoa_tentacle_b = {
 };
 
 BattleUnitSetup entry_boss_moamoa_tentacle_c = {
-    &unit_boss_moamoa_tentacle_c, // mUnitKindParams
+    &unit_boss_moamoa_tentacle_c, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {0.0f, -1000.0f, 0.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -302,10 +307,10 @@ BattleUnitSetup entry_boss_moamoa_tentacle_c = {
 };
 
 BattleUnitSetup entry_boss_moamoa_mouth = {
-    &unit_boss_moamoa_mouth, // mUnitKindParams
+    &unit_boss_moamoa_mouth, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {0.0f, -1000.0f, 0.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -318,28 +323,28 @@ BattleWeapon weapon_moamoa_tsunami_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -347,7 +352,7 @@ BattleWeapon weapon_moamoa_tsunami_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -355,7 +360,7 @@ EVT_BEGIN(moamoa_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_NOT_EQUAL(LW(0), 2)
         SET_VALUE(LW(1), 30)
-        ELSE
+    ELSE
         SET_VALUE(LW(1), 1)
     END_IF
     CALL(evt_btl_camera_set_moveto, 0, 83, 144, 512, 83, 109, 0, LW(1), 11)
@@ -369,7 +374,7 @@ static EVT_BEGIN(mario_party_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_NOT_EQUAL(LW(0), 2)
         SET_VALUE(LW(1), 30)
-        ELSE
+    ELSE
         SET_VALUE(LW(1), 1)
     END_IF
     CALL(evt_btl_camera_set_moveto, 0, -120, 58, 257, -120, 40, 0, LW(1), 11)
@@ -380,40 +385,40 @@ static EVT_BEGIN(mario_party_zoom)
 EVT_END()
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 2)
-    CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
-    CALL(btlevtcmd_GetUnitId, -2, LW(4))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(4))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_c), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 3)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_b), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 4)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_a), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 5)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     SET_VALUE(LW(5), 6)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), -1)
     CALL_CHILD(PTR(evt_moamoa))
     SPAWN_EVENT(PTR(MOAMOA_SET_BODYSCALE))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -433,48 +438,48 @@ const char* MOAMOA_TAIJOU[] = {
 
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 1)
         SET_VALUE(LW(0), 5)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(1))
         IF_INT_NOT_EQUAL(LW(1), -1)
-            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("R_1A"))
             WAIT_FRAMES(1)
             CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
             CALL(btlevtcmd_KillUnit, LW(1), 1)
-            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), -1)
         END_IF
         SET_VALUE(LW(0), 4)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(1))
         IF_INT_NOT_EQUAL(LW(1), -1)
-            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("R_1B"))
             WAIT_FRAMES(1)
             CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
             CALL(btlevtcmd_KillUnit, LW(1), 1)
-            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), -1)
         END_IF
         SET_VALUE(LW(0), 3)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(1))
         IF_INT_NOT_EQUAL(LW(1), -1)
-            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("R_1C"))
             WAIT_FRAMES(1)
             CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
             CALL(btlevtcmd_KillUnit, LW(1), 1)
-            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), -1)
         END_IF
     ELSE
         SET_VALUE(LW(0), 6)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(1))
         IF_INT_NOT_EQUAL(LW(1), -1)
-            CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN2"), -250000000, 0, -250000000)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_DOWN2"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("L_2_6"))
             WAIT_FRAMES(1)
             CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
             CALL(btlevtcmd_KillUnit, LW(1), 1)
-            CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), -1)
         END_IF
     END_IF
     SET_INT_READ_ADDR(PTR(&MOAMOA_TAIJOU))
@@ -483,25 +488,25 @@ static EVT_BEGIN(dead_event)
         IF_INT_EQUAL(LW(2), 0)
             BREAK_LOOP
         END_IF
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     END_LOOP
     WAIT_MS(1000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_LUMP1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_LUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LOOP(0)
         READ_INT(LW(2))
         IF_INT_EQUAL(LW(2), 0)
             BREAK_LOOP
         END_IF
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     END_LOOP
     CALL(moamoa_guruguru)
     WAIT_MS(500)
     SET_VALUE(LW(10), -2)
-    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     ADD(LW(2), 10)
     CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
@@ -518,7 +523,7 @@ static EVT_BEGIN(dead_event)
         LOOP(LW(0))
         END_LOOP
     END_IF
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_EXPLOSION1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_EXPLOSION1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(moamoa_bomb)
     CALL(evt_moamoa_mainUnitIdClear)
     CALL(btlevtcmd_GetBackItem, LW(10))
@@ -542,38 +547,38 @@ const char* moamoa2_change_tbl[] = {
 };
 
 EVT_BEGIN(moamoa_tentacl_on)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_RESTORE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("V_2"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_RESTORE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("V_2"))
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
-    CALL(btlevtcmd_GetUnitId, -2, LW(4))
+    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(4))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_c), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 3)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     SET_VALUE(LW(6), LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_b), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 4)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     SET_VALUE(LW(7), LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_tentacle_a), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 5)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     CALL(moamoa1_on)
-    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&moamoa_defence))
-    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 536870912)
-    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(moamoa1_pose_table))
+    CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&moamoa_defence))
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 536870912)
+    CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(moamoa1_pose_table))
     CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 16777216)
     CALL(btlevtcmd_OnPartsAttribute, LW(7), 1, 16777216)
     CALL(btlevtcmd_OnPartsAttribute, LW(6), 1, 16777216)
@@ -590,22 +595,22 @@ EVT_BEGIN(moamoa_tentacl_on)
 EVT_END()
 
 EVT_BEGIN(moamoa_mouth_on)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_RESTORE2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_RESTORE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(40)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("V_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("V_2"))
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
-    CALL(btlevtcmd_GetUnitId, -2, LW(4))
+    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(4))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_boss_moamoa_mouth), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 6)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(5), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     CALL(moamoa2_on)
-    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&moamoa2_defence))
-    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(moamoa1_pose_table))
+    CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&moamoa2_defence))
+    CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(moamoa1_pose_table))
     SET_INT_READ_ADDR(PTR(&moamoa2_change_tbl))
     CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 16777216)
     WAIT_FRAMES(3)
@@ -633,50 +638,50 @@ EVT_BEGIN(moamoa_mouth_on)
 EVT_END()
 
 static EVT_BEGIN(phase_event)
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(0)
     END_IF
-    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(0)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 6, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(0))
     IF_INT_EQUAL(LW(0), -1)
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         IF_INT_EQUAL(LW(0), -1)
-            CALL(btlevtcmd_GetUnitWork, -2, 4, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
             IF_INT_EQUAL(LW(0), -1)
-                CALL(btlevtcmd_GetUnitWork, -2, 3, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
                 IF_INT_EQUAL(LW(0), -1)
-                    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(1))
+                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(1))
                     IF_INT_NOT_EQUAL(LW(1), 0)
                         SUBTRACT(LW(1), 1)
-                        CALL(btlevtcmd_SetUnitWork, -2, 1, LW(1))
+                        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(1))
                         IF_INT_EQUAL(LW(1), 0)
-                            CALL(btlevtcmd_SetUnitWork, -2, 1, 2)
-                            CALL(btlevtcmd_GetUnitWork, -2, 2, LW(0))
+                            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
+                            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
                             SWITCH(LW(0))
                                 CASE_EQUAL(0)
-                                CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+                                CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
                                 MULTIPLY(LW(0), 50)
                                 DIVIDE(LW(0), 100)
-                                CALL(btlevtcmd_GetHp, -2, LW(1))
+                                CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
                                 IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-                                    CALL(btlevtcmd_SetUnitWork, -2, 2, 1)
-                                    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1_2"))
+                                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
+                                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1_2"))
                                     WAIT_MS(1000)
-                                    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1_1"))
+                                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1_1"))
                                 END_IF
                             END_SWITCH
-                            CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+                            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
                             IF_INT_NOT_EQUAL(LW(1), 1)
                                 CALL_CHILD(PTR(moamoa_tentacl_on))
-                                ELSE
+                            ELSE
                                 CALL_CHILD(PTR(moamoa_mouth_on))
                             END_IF
-                            CALL(btlevtcmd_SetHitOffset, -2, 1, 0, 0, 0)
-                            CALL(btlevtcmd_SetHitCursorOffset, -2, 1, 0, 0, 0)
+                            CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
+                            CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
                         END_IF
                     END_IF
                 END_IF
@@ -688,18 +693,18 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
@@ -797,7 +802,7 @@ static ExtTexInfo ext_moamoa_data[] = {
 
 USER_FUNC(moamoa_guruguru) {
     s32 i;
-    Moamoa* elem;
+    BtlMoamoa* elem;
     ExtdrvPose* pose;
     f32 cnt;
     f32 ang;
@@ -846,11 +851,11 @@ USER_FUNC(moamoa_guruguru) {
 
 USER_FUNC(moamoa_bomb) {
     ExtdrvPose* p2;
-    Moamoa* e2;
+    BtlMoamoa* e2;
     s32 k;
     s32 i;
     ExtdrvPose* pose;
-    Moamoa* elem;
+    BtlMoamoa* elem;
     s32 n;
 
     BattleGetUnitPtr(_battleWorkPointer, wp->unitId);
@@ -919,7 +924,7 @@ USER_FUNC(moamoa1_on) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, wp->unitId);
     s32 i;
     BattleUnitPart* part;
-    Moamoa* elem;
+    BtlMoamoa* elem;
     AnimationPose* ap;
     s32 j;
     Vec* p;
@@ -968,7 +973,7 @@ USER_FUNC(moamoa1_on) {
 
 USER_FUNC(moamoa2_on) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, wp->unitId);
-    Moamoa* elem;
+    BtlMoamoa* elem;
     AnimationPose* ap;
     Vec* p;
     s32 i;
@@ -1004,37 +1009,40 @@ USER_FUNC(moamoa2_on) {
 
 USER_FUNC(moamoa_on) {
     s32 i;
-    Moamoa* elem;
+    BtlMoamoa* elem;
     MoamoaExtData* d;
     s32 j;
     AnimationPose* ap;
     Vec* p;
     s32 start;
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     u32 seeds[4] = {0x3056, 0xF36, 0xF2A93, 0x17F57};
 #endif
     Vec v;
     char anim[32];
     char pose[32];
 
-    wp = BTL_ALLOC(sizeof(MoamoaWork));
-    memset(wp, 0, sizeof(MoamoaWork));
+    wp = BTL_ALLOC(sizeof(BtlMoamoaWork));
+    memset(wp, 0, sizeof(BtlMoamoaWork));
     wp->count = 750;
-    wp->elems = BTL_ALLOC(wp->count * sizeof(Moamoa));
-    memset(wp->elems, 0, wp->count * sizeof(Moamoa));
+    wp->elems = BTL_ALLOC(wp->count * sizeof(BtlMoamoa));
+    memset(wp->elems, 0, wp->count * sizeof(BtlMoamoa));
     elem = wp->elems;
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     moamoa_srand(seeds[rand() & 3]);
-#define MOAMOA_START_RANDF moamoa_randf
-#else
-#define MOAMOA_START_RANDF randf
 #endif
     for (i = 0; i < wp->count; i++, elem++) {
         elem->flags = 0;
         v = (Vec){0.0f, 0.0f, 0.0f};
-        v.x = MOAMOA_START_RANDF(-10.0f, 10.0f);
-        v.y = MOAMOA_START_RANDF(-10.0f, 10.0f);
-        v.z = MOAMOA_START_RANDF(-10.0f, 10.0f);
+#if VERSION == VERSION_EU
+        v.x = moamoa_randf(-10.0f, 10.0f);
+        v.y = moamoa_randf(-10.0f, 10.0f);
+        v.z = moamoa_randf(-10.0f, 10.0f);
+#else
+        v.x = randf(-10.0f, 10.0f);
+        v.y = randf(-10.0f, 10.0f);
+        v.z = randf(-10.0f, 10.0f);
+#endif
         elem->pos = v;
     }
     wp->unitId = BattleTransID(event, -2);
@@ -1047,8 +1055,8 @@ USER_FUNC(moamoa_on) {
         *p = (Vec){0.0f, -1000.0f, 0.0f};
     }
     for (i = 0; i < g_moamoa_chain_num; i++) {
-        wp->chainIdx[i][0] = animPoseGetGroupIdx(wp->poseId[0], g_moamoa_chain_tbl[i][0]);
-        wp->chainIdx[i][1] = animPoseGetGroupIdx(wp->poseId[0], g_moamoa_chain_tbl[i][1]);
+        wp->chainIdx[i][0] = animPoseGetGroupIdx(wp->poseId[0], g_moamoa_chain_tbl[i].from);
+        wp->chainIdx[i][1] = animPoseGetGroupIdx(wp->poseId[0], g_moamoa_chain_tbl[i].to);
     }
     elem = wp->elems;
     for (i = 0; i < wp->count; i++, elem++) {
@@ -1145,20 +1153,20 @@ static EVT_BEGIN(evt_moamoa)
     CALL(evt_npc_set_position, STRING("papa"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("mama"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("konari"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("kinopio"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("cook"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("powan"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("sarary"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("rose"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("papa"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("mama"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("konari"), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING("kinopio"), NPC_FLAG_NO_DISPLAY)
+    CALL(evt_npc_flag_onoff, 1, STRING("cook"), NPC_FLAG_NO_DISPLAY)
+    CALL(evt_npc_flag_onoff, 1, STRING("powan"), NPC_FLAG_NO_DISPLAY)
+    CALL(evt_npc_flag_onoff, 1, STRING("sarary"), NPC_FLAG_NO_DISPLAY)
+    CALL(evt_npc_flag_onoff, 1, STRING("rose"), NPC_FLAG_NO_DISPLAY)
+    CALL(evt_npc_flag_onoff, 1, STRING("papa"), NPC_FLAG_NO_DISPLAY)
+    CALL(evt_npc_flag_onoff, 1, STRING("mama"), NPC_FLAG_NO_DISPLAY)
+    CALL(evt_npc_flag_onoff, 1, STRING("konari"), NPC_FLAG_NO_DISPLAY)
     CALL(moamoa_on)
     CALL(evt_ext_entry, 750, PTR(ext_moamoa_data), PTR(ext_moamoa_init), PTR(ext_moamoa_main), 0)
     RETURN
 EVT_END()
 
-void moamoa_pose(Moamoa* elem) {
+void moamoa_pose(BtlMoamoa* elem) {
     static const char* group_tbl[][2] = {
         {"c_n_moa_a", "S_1"},
         {"c_n_moa_b", "S_1"},
@@ -1194,7 +1202,7 @@ void moamoa_pose(Moamoa* elem) {
 static void ext_moamoa_init(void) {
     s32 i;
     ExtdrvPose* pose;
-    Moamoa* elem;
+    BtlMoamoa* elem;
 
     pose = extGetPosePtr();
     elem = wp->elems;
@@ -1213,9 +1221,9 @@ EVT_BEGIN(MOAMOA_SET_BODYSCALE)
 EVT_END()
 
 static void ext_moamoa_main(void) {
-    Moamoa* elem;
-    Moamoa* e4;
-    Moamoa* e2;
+    BtlMoamoa* elem;
+    BtlMoamoa* e4;
+    BtlMoamoa* e2;
     s32 k4;
     s32 k3;
     s32 k;
@@ -1367,4 +1375,3 @@ USER_FUNC(moamoa_set_bodyScale) {
     wp->targetScale = 0.333f * (n - 3) + 1.0f;
     return 0;
 }
-

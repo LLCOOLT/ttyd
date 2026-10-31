@@ -1,28 +1,26 @@
+// gon_00 (ゴンババ, Hooktail Castle): entrance area reached from Petal Meadows (hei_00).
+// Has a save block, a recovery block and a blue jump pad; doors lead on to gon_01.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mobj_jumpstand_blue);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_get_system_flag);
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "gon.h"
+#include "version.h"
+#include "mario/mariost.h"
+#include "evt/evt_story.h"
 
 static BeroEntry bero_entry_data[4];
 static BeroEntry e3_bero[2];
-extern EvtWord gon_00_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -37,8 +35,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -53,8 +51,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_3", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -73,8 +71,8 @@ static BeroEntry e3_bero[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -90,22 +88,22 @@ static BeroEntry e3_bero[] = {
 };
 
 EVT_BEGIN(gon_00_init_evt)
-#ifndef VERSION_G8ME01_DEMO
-    SET_VALUE(GSWF(255), 1)
+#if VERSION != VERSION_DEMO
+    SET_VALUE(GSWF(GSWF_LOG_MAP_GON_ROUTE_SHOWN), 1)
 #endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     WAIT_FRAMES(1)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 160, 60, -90, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 6, -150, 260, 0, 0, 0)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump"), 230, 0, 0, -90, 0, 0)
     CALL(evt_map_playanim, STRING("hokori"), 1, 0)
     CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_SET(LW(0), 4096)
+    IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_bero_overwrite, STRING("w_bero"), PTR(e3_bero))
@@ -114,4 +112,3 @@ EVT_BEGIN(gon_00_init_evt)
     END_IF
     RETURN
 EVT_END()
-

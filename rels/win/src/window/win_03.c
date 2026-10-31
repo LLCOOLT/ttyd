@@ -1,3 +1,5 @@
+// win_03 (ウィンディん家周辺, Boggly Woods): the path between win_02 and Flurrie's house (win_04), with two Piranha Plants.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -11,49 +13,23 @@
 #include "evt/evt_case.h"
 #include "evt/evt_sub.h"
 #include "party/party_motion.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_env.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "win.h"
 #include "data_tables.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(camera_action);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_env_blur_on);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_mario_bgmode_on);
-USER_FUNC(evt_mario_cam_y_off);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_npc_check);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_start_for_event);
-USER_FUNC(evt_npc_stop_for_event);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfxon_3d);
-
-extern EvtWord clouda_house_in[];
-extern EvtWord clouda_house_out[];
-extern EvtWord cloud_out[];
-extern EvtWord cloud_in[];
 static BeroEntry bero_entry_data[5];
-extern EvtWord lookat_house[];
-extern EvtWord cloud_lostitem[];
-extern EvtWord tree_evt_01[];
 static TreeAccess tree_access_data[5];
-extern EvtWord dummy_event[];
-extern EvtWord win_03_init_evt[];
 
 EVT_BEGIN(clouda_house_in)
     CALL(evt_mario_key_onoff, 0)
@@ -88,8 +64,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -105,8 +81,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -121,8 +97,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -137,8 +113,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero", // hitName
         4099, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)cloud_out, // enterEvent
@@ -166,7 +142,7 @@ EVT_BEGIN(lookat_house)
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_normalize)
     CALL(evt_msg_print, 0, STRING("stg2_win_e04_02"), 0, STRING("extparty"))
-    SET_VALUE(GSW(0), 80)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_04_PLANE_PANEL)
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_npc_start_for_event)
     CALL(evt_mario_key_onoff, 1)
@@ -237,7 +213,7 @@ static EVT_BEGIN(cloud_toujou)
     CALL(camera_action)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg2_win_e04_00_01"), 0, 0)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     CALL(evt_bero_mapchange, STRING("win_04"), STRING(""))
     RETURN
 EVT_END()
@@ -283,18 +259,18 @@ EVT_BEGIN(cloud_lostitem)
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SURPRISED3"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SURPRISED3"))
         WAIT_MS(3000)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg2_win_e04_00_05"), 0, 0)
     WAIT_WHILE(GF(0))
     WAIT_MS(2000)
-    SET_VALUE(GSW(0), 78)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_04_SHES_LOST_HER_PRECIOUS)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     CALL(evt_bero_mapchange, STRING("win_01"), STRING("n_bero"))
     RETURN
 EVT_END()
@@ -302,7 +278,7 @@ EVT_END()
 EVT_BEGIN(tree_evt_01)
     CALL(evt_item_delete_check, STRING("item_tree01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_tree01"), 125, -333, 72, -24, 0, GSWF(5609), 0)
+        CALL(evt_item_entry, STRING("item_tree01"), ITEM_STAR_PIECE, -333, 72, -24, 0, GSWF(GSWF_WIN03_STAR_PIECE_TREE), 0)
     END_IF
     RETURN
 EVT_END()
@@ -324,29 +300,28 @@ EVT_BEGIN(win_03_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
-    CALL(evt_run_case_evt, 5, 1, STRING("n_bero"), 0, PTR(dummy_event), 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN1"))
-    CALL(evt_snd_bgmon, 160, 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON_A, 1, STRING("n_bero"), 0, PTR(dummy_event), 0)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN1"))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     SET_VALUE(LW(0), PTR(tree_access_data))
     CALL_CHILD(evt_sub_tree_access_entry)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 7, 425, 60, 75, 0, 0)
-    CALL(evt_item_entry, STRING("i"), 135, 475, 0, -60, 16, GSWF(2679), 0)
-    CALL(evt_item_entry, STRING("item_00"), 125, -150, 0, -30, 16, GSWF(5610), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_siro_asu"), 1)
+    CALL(evt_item_entry, STRING("i"), ITEM_VOLT_SHROOM, 475, 0, -60, 16, GSWF(GSWF_WIN03_VOLT_SHROOM_TAKEN), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, -150, 0, -30, 16, GSWF(GSWF_WIN03_STAR_PIECE), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_siro_asu"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_siro_asu"), 1, 0)
-    IF_INT_EQUAL(GSW(0), 79)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_05_TO_FLURRIES_PLACE)
         SPAWN_EVENT(lookat_house)
     END_IF
-    IF_INT_EQUAL(GSW(0), 76)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_02_SEALED_ENTRANCE_2)
         CALL(evt_npc_check_delete, STRING(/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31"))
         SPAWN_EVENT(cloud_toujou)
     END_IF
-    IF_INT_EQUAL(GSW(0), 77)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_03_FLURRIE_INTRO)
         CALL(evt_npc_check_delete, STRING(/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31"))
         SPAWN_EVENT(cloud_lostitem)
     END_IF
     RETURN
 EVT_END_PAD4()
-

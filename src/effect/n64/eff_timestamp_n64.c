@@ -1,21 +1,13 @@
+// Paper Mario 64 effect: timestamp: ten digit sprites that fade in with staggered delays around a point.
+#include "eff/n64/eff_timestamp_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffTimestampN64Work {
     s32 type;           // 0x0
@@ -38,7 +30,6 @@ typedef struct EffTimestampN64Work {
     s32 digitAlpha[10]; // 0x124
     s32 delay[10];      // 0x14C
 } EffTimestampN64Work;
-
 
 static u8 scale_data[4] = {120, 80, 40, 60};
 static u8 colr[17] = {255, 255, 255, 198, 138, 130, 130, 130, 130, 130, 175, 215, 250, 255, 255, 255, 255};
@@ -65,7 +56,7 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffTimestampN64Work));
     effect->userdata = work;
     effect->callback = effTimestampMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -85,14 +76,14 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     work->scale2 = 1.0f;
     p = pos_data;
     for (i = 0; i < 10; i++) {
-        work->posX[i] = pos_data[i*3];
-        work->posY[i] = pos_data[i*3+1];
+        work->posX[i] = pos_data[i * 3];
+        work->posY[i] = pos_data[i * 3 + 1];
         work->posZ[i] = 0.0f;
         work->rotX[i] = 0.0f;
         work->rotY[i] = 0.0f;
         work->rotZ[i] = 0.0f;
         work->digitAlpha[i] = 0;
-        work->delay[i] = pos_data[i*3+2];
+        work->delay[i] = pos_data[i * 3 + 2];
         p += 3;
     }
     return effect;
@@ -110,8 +101,8 @@ void effTimestampMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 64;
     }
     if (work->lifetime < 1000) {

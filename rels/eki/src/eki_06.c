@@ -1,3 +1,4 @@
+// eki_06 (駅, Riverside Station): far room with three floor switches, a paper-fold origami, a box and a power-up block; door to eki_05.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,35 +10,20 @@
 #include "pmario_sound.h"
 #include "string.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "eki.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static s32 lock;
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mobj_delete);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_mobj_set_anim);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_npc_get_ReactionOfLivingBody);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(sw_entry);
 s32 sw_main(MapObjectEntry* mobj);
 void sw_reset(void);
@@ -46,8 +32,6 @@ void sw_cntup(MapObjectEntry* mobj);
 
 static BeroEntry bero_data[3];
 extern EvtWord evt_box_open[];
-extern EvtWord evt_sw_complete[];
-extern EvtWord eki_06_init_evt[];
 
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -66,8 +50,8 @@ static BeroEntry bero_data[] = {
         "e_bero_1", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -83,8 +67,8 @@ static BeroEntry bero_data[] = {
     {
         "e_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -100,7 +84,7 @@ static BeroEntry bero_data[] = {
 };
 
 EVT_BEGIN(evt_box_open)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 317)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_34_3_BLUE_BLOCKS)
         RETURN
     END_IF
     LABEL(0)
@@ -128,7 +112,7 @@ EVT_BEGIN(evt_box_open)
     CALL(evt_hitobj_onoff, STRING("a_hako"), 1, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 317)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_34_3_BLUE_BLOCKS)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -169,8 +153,8 @@ EVT_BEGIN(evt_sw_complete)
     CALL(evt_mobj_delete, STRING("MOBJ_eki_06_su3"))
     CALL(evt_cam3d_evt_set, -80, 202, 448, -80, 107, -92, 500, 11)
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("origami"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_origami"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("origami"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_origami"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_ori"), 1, 1)
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_get_position, STRING("origami"), LW(0), LW(1), LW(2))
@@ -196,17 +180,17 @@ EVT_BEGIN(evt_sw_complete)
         END_LOOP
     END_INLINE_EVENT
     WAIT_FRAMES(100)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oku_1"), MAPOBJ_FLAG_HIDE)
     WAIT_FRAMES(32)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oku_2"), MAPOBJ_FLAG_HIDE)
     WAIT_FRAMES(34)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_3"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oku_3"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_checkanim, STRING("anm_kaidan167"), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_FF_ENV_SUCCESS1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_FF_ENV_SUCCESS1"))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 318)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_35_ORIGAMI_STAIRS)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -238,7 +222,7 @@ void sw_reset(void) {
     MapObjectEntry* mobj;
 
     mobj = mobjNameToPtr("MOBJ_eki_06_su1");
-    mobj->flags &= ~2;
+    mobj->flags &= ~MOBJ_FLAG_NO_SHADOW;
     switch (sw_cnt(mobj)) {
         case 2:
             animPoseSetAnim(mobj->poseId, "ANIM_5", 1);
@@ -247,7 +231,7 @@ void sw_reset(void) {
     }
 
     mobj = mobjNameToPtr("MOBJ_eki_06_su2");
-    mobj->flags &= ~2;
+    mobj->flags &= ~MOBJ_FLAG_NO_SHADOW;
     switch (sw_cnt(mobj)) {
         case 11:
             animPoseSetAnim(mobj->poseId, "ANIM_7", 1);
@@ -256,7 +240,7 @@ void sw_reset(void) {
     }
 
     mobj = mobjNameToPtr("MOBJ_eki_06_su3");
-    mobj->flags &= ~2;
+    mobj->flags &= ~MOBJ_FLAG_NO_SHADOW;
     switch (sw_cnt(mobj)) {
         case 4:
             animPoseSetAnim(mobj->poseId, "ANIM_7", 1);
@@ -270,14 +254,14 @@ s32 sw_main(MapObjectEntry* mobj) {
         case 2:
             break;
         case 0:
-            if (!(mobj->flags & 8)) {
+            if (!(mobj->flags & MOBJ_FLAG_HIT)) {
                 break;
             }
             if (lock != 0) {
                 break;
             }
             lock = 1;
-            if (mobj->hitFlag == 0x200000) {
+            if (mobj->hitFlag == MOBJ_HIT_STAND_ON) {
                 marioChgMot(5);
             }
             psndSFXOn_3D("SFX_STG6_OBJ_SWITCH_ON1", &mobj->position);
@@ -318,9 +302,9 @@ s32 sw_main(MapObjectEntry* mobj) {
                 mobj->state++;
                 break;
             }
-            mobjNameToPtr("MOBJ_eki_06_su1")->flags |= 2;
-            mobjNameToPtr("MOBJ_eki_06_su2")->flags |= 2;
-            mobjNameToPtr("MOBJ_eki_06_su3")->flags |= 2;
+            mobjNameToPtr("MOBJ_eki_06_su1")->flags |= MOBJ_FLAG_NO_SHADOW;
+            mobjNameToPtr("MOBJ_eki_06_su2")->flags |= MOBJ_FLAG_NO_SHADOW;
+            mobjNameToPtr("MOBJ_eki_06_su3")->flags |= MOBJ_FLAG_NO_SHADOW;
             if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
                 if (sw_cnt(mobj) == 1) {
                     animPoseSetAnim(mobj->poseId, "ANIM_3", 1);
@@ -342,7 +326,7 @@ s32 sw_main(MapObjectEntry* mobj) {
                     animPoseSetAnim(mobj->poseId, "ANIM_1", 1);
                 }
             }
-            mobj->flags &= ~8;
+            mobj->flags &= ~MOBJ_FLAG_HIT;
             mobj->state = 0;
             lock = 0;
             break;
@@ -366,14 +350,14 @@ USER_FUNC(sw_entry) {
     }
     mobjEntry(name, name);
     mobj = mobjNameToPtr(name);
-    mobj->flags |= 6;
+    mobj->flags |= MOBJ_FLAG_CALC_MTX | MOBJ_FLAG_NO_SHADOW;
     pos = (Vec){0.0f, 0.0f, 0.0f};
     pos.x = x;
     pos.y = y;
     pos.z = z;
     mobj->position = pos;
     mobj->mainFunc = sw_main;
-    mobj->flags |= 0xA10000;
+    mobj->flags |= MOBJ_HIT_PARTY_ACTION | MOBJ_HIT_STAND_ON | MOBJ_HIT_HAMMER;
     mobj->state = 0;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "ANIM_1", 1);
@@ -385,35 +369,35 @@ EVT_BEGIN(eki_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI2"))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2"))
     CALL(evt_npc_change_fbat_mode, 1)
     SPAWN_EVENT(PTR(evt_box_open))
-    SWITCH(GSW(0))
-        CASE_LESS(317)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_34_3_BLUE_BLOCKS)
         CALL(evt_hitobj_onoff, STRING("a_ori"), 1, 0)
-        CASE_EQUAL(317)
+        CASE_EQUAL(STORY_STG6_34_3_BLUE_BLOCKS)
         SET_VALUE(GW(0), 0)
         SET_VALUE(GW(1), 0)
         SET_VALUE(GW(2), 0)
         CALL(sw_entry, STRING("MOBJ_eki_06_su3"), -240, 0, 40)
         CALL(sw_entry, STRING("MOBJ_eki_06_su2"), -140, 0, 40)
         CALL(sw_entry, STRING("MOBJ_eki_06_su1"), -40, 0, 40)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("origami"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("origami"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_ori"), 1, 0)
         CASE_DEFAULT
         CALL(evt_map_playanim, STRING("anm_kaidan167"), 2, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_origami"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_3"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_origami"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oku_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oku_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oku_3"), MAPOBJ_FLAG_HIDE)
     END_SWITCH
-    IF_INT_LESS(GSW(0), 317)
-        ELSE
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_34_3_BLUE_BLOCKS)
+    ELSE
         CALL(evt_map_playanim, STRING("anm_hako"), 2, 0)
         CALL(evt_hitobj_onoff, STRING("a_hako"), 1, 0)
     END_IF
     CALL(evt_mapobj_trans, 1, STRING("HAKO"), 0, FLOAT(0.099609375f), 0)
-    CALL(evt_mobj_powerupblk, STRING("pblk01"), 95, 295, -80, 0, GSWF(5562), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk01"), 95, 295, -80, 0, GSWF(GSWF_EKI06_SHINE_SPRITE), 0)
     RETURN
 EVT_END()

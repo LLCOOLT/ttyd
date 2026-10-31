@@ -1,3 +1,4 @@
+// eff_kumokumo_chip_n64.c: cloud-fragment (kumokumo chip) effect entry (effKumokumoChipN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

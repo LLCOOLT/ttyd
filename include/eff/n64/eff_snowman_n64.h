@@ -1,3 +1,4 @@
+// eff_snowman_n64.c: snowman effect entry (effSnowmanN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

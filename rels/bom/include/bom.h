@@ -1,5 +1,7 @@
 #pragma once
 
+// Declarations shared by the bom.rel units (サイハテ村, Fahr Outpost).
+
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"

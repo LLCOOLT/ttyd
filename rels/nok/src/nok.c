@@ -1,29 +1,15 @@
+// nok (ノコ村, Petalburg): registers nok_00 and nok_01 and the battle database.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_sub.h"
 #include "nok.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-
-USER_FUNC(evt_nokonoko_urouro_check_func);
-USER_FUNC(evt_npc_add_dirdist);
-USER_FUNC(evt_npc_get_loiter_dir);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_sub_get_dir);
-USER_FUNC(evt_sub_random);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
-
-extern EvtWord nokonoko_urouro_regl[];
+#include "rel_module.h"
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -96,4 +82,3 @@ EVT_BEGIN(nokonoko_urouro_regl)
     END_LOOP
     RETURN
 EVT_END()
-

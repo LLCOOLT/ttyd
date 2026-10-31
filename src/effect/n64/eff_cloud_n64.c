@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: cloud puff sprite scaled by the given scale; types 0-3 pick the colours.
 #include "eff/n64/eff_cloud_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -12,9 +13,6 @@
 #include "libc_decls.h"
 #include <math.h>
 
-double sin(double);
-double cos(double);
-
 void effCloudMain(EffectEntry* effect);
 void effCloudDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -28,7 +26,7 @@ EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     work = __memAlloc(HEAP_EFFECT, sizeof(EffCloudN64Work));
     effect->userdata = work;
     effect->callback = effCloudMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -41,42 +39,42 @@ EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     work->position.z = z;
     work->scale = scale;
     switch (type) {
-    case 0:
-        work->r = 255;
-        work->g = 255;
-        work->b = 255;
-        work->r2 = 225;
-        work->g2 = 225;
-        work->b2 = 225;
-        work->fade = 255;
-        break;
-    case 1:
-        work->r = 255;
-        work->g = 245;
-        work->b = 230;
-        work->r2 = 45;
-        work->g2 = 35;
-        work->b2 = 15;
-        work->fade = 255;
-        break;
-    case 2:
-        work->r = 255;
-        work->g = 0;
-        work->b = 0;
-        work->r2 = 155;
-        work->g2 = 125;
-        work->b2 = 125;
-        work->fade = 255;
-        break;
-    case 3:
-        work->r = 255;
-        work->g = 255;
-        work->b = 255;
-        work->r2 = 255;
-        work->g2 = 65;
-        work->b2 = 20;
-        work->fade = 255;
-        break;
+        case 0:
+            work->r = 255;
+            work->g = 255;
+            work->b = 255;
+            work->r2 = 225;
+            work->g2 = 225;
+            work->b2 = 225;
+            work->fade = 255;
+            break;
+        case 1:
+            work->r = 255;
+            work->g = 245;
+            work->b = 230;
+            work->r2 = 45;
+            work->g2 = 35;
+            work->b2 = 15;
+            work->fade = 255;
+            break;
+        case 2:
+            work->r = 255;
+            work->g = 0;
+            work->b = 0;
+            work->r2 = 155;
+            work->g2 = 125;
+            work->b2 = 125;
+            work->fade = 255;
+            break;
+        case 3:
+            work->r = 255;
+            work->g = 255;
+            work->b = 255;
+            work->r2 = 255;
+            work->g2 = 65;
+            work->b2 = 20;
+            work->fade = 255;
+            break;
     }
     work->pos.x = x;
     work->pos.y = y;
@@ -139,8 +137,8 @@ void effCloudMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -190,7 +188,7 @@ void effCloudMain(EffectEntry* effect) {
         }
         work->len[idx] = prev + d;
     }
-    dispEntry(4, dispCalcZ(&position), 2, (DispCallback)effCloudDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effCloudDisp, effect);
 }
 
 void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
@@ -220,8 +218,6 @@ void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
     s32 c;
     s32 idx;
     f32 zero, ang, a1, a2, diff, x, y, z, w, sn, cs;
-
-
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;

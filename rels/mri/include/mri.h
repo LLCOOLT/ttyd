@@ -1,8 +1,11 @@
+// The Great Tree (mri, mori: forest): declarations shared by the area's maps: their init events, the battle tables, and
+// the common door, planter and Puni events.
 #pragma once
 
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"
+#include "evt/evt_cmd.h"
 
 extern EvtWord all_juyoitem_lecture_rel[];
 extern NpcTerritoryInfo btl_mri_setup_no_tbl[];
@@ -59,7 +62,6 @@ extern BattleUnitKind unit_monochrome_pakkun;
 extern BattleUnitKind unit_piders;
 
 extern s32 JailAwayTable_New[];
-extern s32 evt_cloud_main_evt[];
 extern EvtWord mri_puni_init_dvd[];
 extern EvtWord mri_puni_main[];
 extern EvtWord mri_puni_position_init[];
@@ -69,3 +71,13 @@ extern u8 puniMapdata_MRI_06[];
 extern u8 puniMapdata_MRI_09[];
 extern u8 puniMapdata_MRI_09_01[];
 extern u8 puniMapdata_MRI_16[];
+
+USER_FUNC(evt_mri_get16bitdata);
+USER_FUNC(mri_npc_buruburu);
+USER_FUNC(evt_mri_toge_make_retsu);
+USER_FUNC(evt_mri_toge_retsu_stop);
+USER_FUNC(evt_mri_toge_enter_init);
+USER_FUNC(evt_mri_puni_win_init);
+USER_FUNC(evt_mri_puni_win_attack);
+USER_FUNC(evt_mri_puni_win_end);
+void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end);

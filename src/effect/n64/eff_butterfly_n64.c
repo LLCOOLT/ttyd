@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: butterfly that flutters around a home point.
 #include "eff/n64/eff_butterfly_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -8,23 +9,22 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 #include <math.h>
 
 typedef struct EffButterflyN64Work {
-    s32 type;       // 0x0
-    s32 lifetime;   // 0x4
-    s32 frame;      // 0x8
-    Vec position;   // 0xC
-    Vec home;       // 0x18
-    s32 alpha;      // 0x24
-    f32 rotY;       // 0x28
-    s32 bobIdx;     // 0x2C
-    s32 timer;      // 0x30
-    f32 radiusXZ;   // 0x34
-    f32 radiusY;    // 0x38
-    Vec velocity;   // 0x3C
+    s32 type;     // 0x0
+    s32 lifetime; // 0x4
+    s32 frame;    // 0x8
+    Vec position; // 0xC
+    Vec home;     // 0x18
+    s32 alpha;    // 0x24
+    f32 rotY;     // 0x28
+    s32 bobIdx;   // 0x2C
+    s32 timer;    // 0x30
+    f32 radiusXZ; // 0x34
+    f32 radiusY;  // 0x38
+    Vec velocity; // 0x3C
 } EffButterflyN64Work;
 
 static s8 y_data[30] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -17, -15, -13, -11, -9, -7, -5, -3, -1, 0, 0};
@@ -224,7 +224,7 @@ EffectEntry* effButterflyN64Entry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffButterflyN64Work));
     effect->userdata = work;
     effect->callback = effButterflyMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->lifetime = 1000;
     work->alpha = 255;
@@ -255,8 +255,8 @@ void effButterflyMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 900;
     }
     if (work->lifetime < 1000) {

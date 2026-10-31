@@ -1,3 +1,6 @@
+// Paper Mario 64 effect: fire ring, one 90-vertex mesh with two scrolling flame textures that grows, spawns fire
+// dust and fades out over its last 10 frames.
+#include "eff/n64/eff_fire_ring_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -5,24 +8,23 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-double sin(double x);
-double cos(double x);
+#include "eff/n64/eff_fire_dust_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffFireRingN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
+    s32 type;           // 0x0
+    Vec position;       // 0x4
     f32 reserved_10[3]; // 0x10, never read or written
-    f32 scale;     // 0x1c
-    f32 scaleVel;  // 0x20
-    s32 alpha;     // 0x24
-    s32 lifetime;  // 0x28
-    s32 frame;     // 0x2c
-    f32 uv[4];     // 0x30
-    f32 uvVel[4];  // 0x40
-    u8 r, g, b;    // 0x50
+    f32 scale;          // 0x1c
+    f32 scaleVel;       // 0x20
+    s32 alpha;          // 0x24
+    s32 lifetime;       // 0x28
+    s32 frame;          // 0x2c
+    f32 uv[4];          // 0x30
+    f32 uvVel[4];       // 0x40
+    u8 r, g, b;         // 0x50
 } EffFireRingN64Work;
 
-EffectEntry* effFireDustN64Entry(s32 type, s32 lifetime, s32 unk, f32 x, f32 y, f32 z, f32 a, f32 b);
 void effFireRingMain(EffectEntry* effect);
 void effFireRingDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -158,14 +160,22 @@ void effFireRingMain(EffectEntry* effect) {
         work->uv[1] += work->uvVel[1];
         work->uv[2] += work->uvVel[2];
         work->uv[3] += work->uvVel[3];
-        if (work->uv[0] > 128.0f) work->uv[0] -= 128.0f;
-        if (work->uv[1] > 128.0f) work->uv[1] -= 128.0f;
-        if (work->uv[2] > 128.0f) work->uv[2] -= 128.0f;
-        if (work->uv[3] > 128.0f) work->uv[3] -= 128.0f;
-        if (work->uv[0] < 0.0f) work->uv[0] += 128.0f;
-        if (work->uv[1] < 0.0f) work->uv[1] += 128.0f;
-        if (work->uv[2] < 0.0f) work->uv[2] += 128.0f;
-        if (work->uv[3] < 0.0f) work->uv[3] += 128.0f;
+        if (work->uv[0] > 128.0f)
+            work->uv[0] -= 128.0f;
+        if (work->uv[1] > 128.0f)
+            work->uv[1] -= 128.0f;
+        if (work->uv[2] > 128.0f)
+            work->uv[2] -= 128.0f;
+        if (work->uv[3] > 128.0f)
+            work->uv[3] -= 128.0f;
+        if (work->uv[0] < 0.0f)
+            work->uv[0] += 128.0f;
+        if (work->uv[1] < 0.0f)
+            work->uv[1] += 128.0f;
+        if (work->uv[2] < 0.0f)
+            work->uv[2] += 128.0f;
+        if (work->uv[3] < 0.0f)
+            work->uv[3] += 128.0f;
         dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effFireRingDisp, effect);
     }
 }

@@ -1,8 +1,10 @@
+// Declarations for the Hooktail Castle (gon) module: map init scripts, battle setup tables, the Paper Curse lecture scripts and the area's battle units.
 #pragma once
 
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"
+#include "evt/evt_cmd.h"
 
 extern NpcTerritoryInfo btl_gon_setup_no_tbl[];
 extern NpcSetupBattleInfo btlsetup_gon_tbl[];
@@ -30,4 +32,7 @@ extern BattleUnitKind unit_patakuri;
 extern BattleUnitKind unit_patapata;
 extern BattleUnitKind unit_togekuri;
 
-extern s32 evt_cloud_main_evt[];
+// User functions defined in the area's files (global symbols in the original REL).
+// gon_11.c
+USER_FUNC(evt_iri_16_cloud_init);
+USER_FUNC(evt_iri_16_cloud_ent);

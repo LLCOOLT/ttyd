@@ -1,8 +1,9 @@
+// Object stream macros (KPA_OBJ_*) for Bowser's side-scrolling stages, read by kpa_read_mobj/kpa_read_item.
 #pragma once
 
 #include "evt/evt_cmd.h"
 
-/* Koopa Koot-style stage object streams read by kpa_read_mobj / kpa_read_item (kpa.c).
+/* The object streams of Bowser's side-scrolling stages, read by kpa_read_mobj / kpa_read_item (kpa.c).
    Positions are evt floats; each macro expands to the tag word followed by its operands. */
 #define KPA_OBJ_END -1
 #define KPA_OBJ_OJAMA_BLK(x, z) 0, FLOAT(x), FLOAT(z)

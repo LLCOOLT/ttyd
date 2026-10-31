@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: Peach dust whose particle layout comes from three 16x16 masks, one per type.
+#include "eff/n64/eff_peach_dust_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,9 +8,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-double cos(double);
-double sin(double);
+#include "version.h"
+#include "libc_decls.h"
 
 typedef struct EffPeachDustParticle {
     s32 pad0;     // 0x0
@@ -38,7 +39,60 @@ static u8 scale_data[] = {
     0x67, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67,
 };
 
-char data[768] = ".......+..............@.#...........$%&.*=..........-...;>.........,'....)!.......~~......{.......~~......]@@^....~/........(_......#:<.....+.......[}|.....+.......1.......23......45.....677......8......7.......90......7.......a22b...c...........deee............f++++..........ff....+........ff......+........+......+.......+.......ff......+........+...f++.........+..ff...........+f..+............+.ff............+..+............+..f+.f+++f.....+....+f..+......+.......+.......+.......+.......+........+++++++f.....gh............+g.ggg..........g...hh..........g....g..........hh..hh.hh.......g..hg+ghgg......hghg.g...g.......hggg.....+.....g+.h......g....g..........g....g..........g.....g.........g.....g.........hgg...g...........g...g.........hg.....gggggggggh...";
+// Three 16x16 masks, one per type, that place the dust particles: any byte other than '.' gets a particle.
+// The first row of each mask is the top of the shape. Which other character is used has no meaning to the code.
+u8 data[768] =
+    // type 0
+    ".......+........"
+    "......@.#......."
+    "....$%&.*=......"
+    "....-...;>......"
+    "...,'....)!....."
+    "..~~......{....."
+    "..~~......]@@^.."
+    "..~/........(_.."
+    "....#:<.....+..."
+    "....[}|.....+..."
+    "....1.......23.."
+    "....45.....677.."
+    "....8......7...."
+    "...90......7...."
+    "...a22b...c....."
+    "......deee......"
+    // type 1
+    "......f++++....."
+    ".....ff....+...."
+    "....ff......+..."
+    ".....+......+..."
+    "....+.......ff.."
+    "....+........+.."
+    ".f++.........+.."
+    "ff...........+f."
+    ".+............+."
+    "ff............+."
+    ".+............+."
+    ".f+.f+++f.....+."
+    "...+f..+......+."
+    "......+.......+."
+    "......+.......+."
+    ".......+++++++f."
+    // type 2
+    "....gh.........."
+    "..+g.ggg........"
+    "..g...hh........"
+    "..g....g........"
+    "..hh..hh.hh....."
+    "..g..hg+ghgg...."
+    "..hghg.g...g...."
+    "...hggg.....+..."
+    "..g+.h......g..."
+    ".g..........g..."
+    ".g..........g..."
+    "..g.........g..."
+    "..g.........hgg."
+    "..g...........g."
+    "..g.........hg.."
+    "...gggggggggh...";
 
 static u8 color_rotation_data[] = {
     0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
@@ -88,7 +142,7 @@ void effPeachDustMain(EffectEntry* effect);
 void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32 scale) {
-    char* base;
+    u8* base;
     EffectEntry* effect;
     EffPeachDustParticle* p;
     s32 count;
@@ -182,7 +236,7 @@ void effPeachDustMain(EffectEntry* effect) {
         } else {
             p->frame++;
             f = p->frame;
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             if (f - 1 < 25) {
                 p->scale = 0.4f * (0.01f * scale_data[f - 1]);
 #else
@@ -259,9 +313,13 @@ void effPeachDustDisp(CameraId cameraId, EffectEntry* effect) {
         if (off >= 36) {
             off = 0;
         }
-        { f32 k = 1.4f; f32 h = 0.7f; r = color_rotation_data[off++] * k;
-        g = color_rotation_data[off++] * h;
-        b = color_rotation_data[off++] * h; }
+        {
+            f32 k = 1.4f;
+            f32 h = 0.7f;
+            r = color_rotation_data[off++] * k;
+            g = color_rotation_data[off++] * h;
+            b = color_rotation_data[off++] * h;
+        }
         if (r > 255) {
             r = 255;
         }

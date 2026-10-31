@@ -1,3 +1,5 @@
+// Palace of Shadow battle unit: the Sir Grodus (boss) (`boss_batten_leader`): parts, stats, poses and AI scripts.
+
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -23,97 +25,39 @@
 #include "evt/evt_eff.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "eff/n64/eff_glass_n64.h"
+#include "eff/n64/eff_pokopi_thunder_n64.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "las.h"
+#include "driver/mapdrv.h"
+#include "unit/unit_barriern.h"
+#include "libc_decls.h"
+#include "driver/camdrv.h"
 
-EffectEntry* effPokopiThunderN64Entry(s32 type, s32 time, f32 x1, f32 y1, f32 z1, f32 x2, f32 y2, f32 z2, f32 scale);
-int rand(void);
 Vec nowv;
 f32 maer;
-s32 irand(s32 scalar);
-EffectEntry* effGlassN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
 static s32 xlw[16];
 s32 xlw2[16];
 char xmemo[20];
 EventEntry* xevt;
-void animPoseSetDispCallBack(s32 poseId, void (*callback)(BattleUnitPart*, s32), void* userdata);
 void _light_point_callback(BattleUnitPart* part, s32 group);
-void animPoseDrawShape(s32 poseId, s32 shapeIdx);
-typedef struct BattenSpline { s32 n; Vec* table; f32 a[5]; f32 b[15]; s32 count; } BattenSpline;
-void spline_maketable(s32 n, Vec* table, f32* a, f32* b);
-void spline_getvalue(f32 t, Vec* out, s32 n, Vec* table, f32* a, f32* b);
-u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table);
-u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n);
 
 static USER_FUNC(_set_draw_callback);
 USER_FUNC(btl_hitoffsetx);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
 USER_FUNC(btlevtcmd_AnimeGetPose);
-USER_FUNC(btlevtcmd_AnimeSetPoseTable);
-USER_FUNC(btlevtcmd_AnimeWaitPlayComplete);
-USER_FUNC(btlevtcmd_CheckActStatus);
-USER_FUNC(btlevtcmd_CheckDamageCode);
-USER_FUNC(btlevtcmd_CheckPhase);
-USER_FUNC(btlevtcmd_DrawLots);
-USER_FUNC(btlevtcmd_GetBodyId);
-USER_FUNC(btlevtcmd_GetDamage);
-USER_FUNC(btlevtcmd_GetDamagePartsId);
-USER_FUNC(btlevtcmd_GetHitPos);
-USER_FUNC(btlevtcmd_GetHp);
-USER_FUNC(btlevtcmd_GetMaxHp);
-USER_FUNC(btlevtcmd_GetTotalDamage);
-USER_FUNC(btlevtcmd_GetUnitId);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_OffPartsAttribute);
-USER_FUNC(btlevtcmd_OnPartsAttribute);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventEntry);
-USER_FUNC(btlevtcmd_SetEventPhase);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetHpGaugeOffset);
-USER_FUNC(btlevtcmd_SetPartsBlur);
-USER_FUNC(btlevtcmd_SetStayPose);
-USER_FUNC(btlevtcmd_SetStayPoseType);
-USER_FUNC(btlevtcmd_SetTalkPose);
-USER_FUNC(btlevtcmd_SetTalkPoseType);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StatusWindowOnOff);
-USER_FUNC(btlevtcmd_StopWaitEvent);
-USER_FUNC(btlevtcmd_WaitAttackEnd);
-USER_FUNC(btlevtcmd_get_turn);
 USER_FUNC(datastrcopy);
 static USER_FUNC(enzan_lw_load);
 USER_FUNC(enzan_lw_load2);
 static USER_FUNC(enzan_lw_save);
 USER_FUNC(enzan_lw_save2);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_moveto);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_random);
 USER_FUNC(pose_check_evt_run);
 USER_FUNC(pose_check_evt_stop);
 USER_FUNC(_hp_gauge_flag_on);
 USER_FUNC(battenSatelliteToOutside);
 USER_FUNC(battenSatelliteToInside);
-u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n);
-u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table);
-void _light_point_callback(BattleUnitPart* part, s32 group);
-USER_FUNC(battleGetBattenSatelliteInitPos);
-USER_FUNC(check_satellite);
-static USER_FUNC(eff_staff);
-USER_FUNC(evt_eff_firechange00);
-USER_FUNC(evt_eff_barriersizechange);
-USER_FUNC(evt_eff_colorchange00);
-USER_FUNC(evt_eff_pokopi_thunder);
-extern s32 bts_x_flag_add[];
-extern s32 bts_x_flag_set[];
-extern s32 bts_x_flag_wait[];
-extern BattleUnitKind unit_boss_batten_satellite;
 
-extern EvtWord batten_leader_zoom[];
 BattleWeapon weapon_batten_leader_thunder;
 BattleWeapon weapon_batten_leader_fire;
 BattleWeapon weapon_batten_leader_ice;
@@ -130,14 +74,28 @@ static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_furafura[18];
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[7];
-extern EvtWord hakai_snd_event[];
 BattleUnitSetup entry_batten_satellite;
 /* light blink sequence read by the light event: {mapobj name, frames} steps, then a NULL name */
-typedef struct LightStep { const char* name; s32 time; } LightStep;
-typedef struct LightSeq1 { LightStep steps[1]; const char* end; } LightSeq1;
-typedef struct LightSeq2 { LightStep steps[2]; const char* end; } LightSeq2;
-typedef struct LightSeq3 { LightStep steps[3]; const char* end; } LightSeq3;
-typedef struct LightSeq4 { LightStep steps[4]; const char* end; } LightSeq4;
+typedef struct LightStep {
+    const char* name;
+    s32 time;
+} LightStep;
+typedef struct LightSeq1 {
+    LightStep steps[1];
+    const char* end;
+} LightSeq1;
+typedef struct LightSeq2 {
+    LightStep steps[2];
+    const char* end;
+} LightSeq2;
+typedef struct LightSeq3 {
+    LightStep steps[3];
+    const char* end;
+} LightSeq3;
+typedef struct LightSeq4 {
+    LightStep steps[4];
+    const char* end;
+} LightSeq4;
 LightSeq3 btl_shuryolight_pow_normal;
 LightSeq1 btl_shuryolight_pow_tenmetu2;
 LightSeq2 btl_shuryolight_pow_tenmetu;
@@ -161,10 +119,6 @@ LightSeq1 btl_shuryolight_head_2_on;
 LightSeq1 btl_shuryolight_head_3_on;
 LightSeq4 btl_shuryolight_rod_normal;
 LightSeq1 btl_shuryolight_rod_off;
-extern EvtWord light_anim_rtn[];
-extern EvtWord light_rod_anim_rtn[];
-extern EvtWord light_pose_change[];
-extern EvtWord maiframeanimcheck[];
 static EvtWord init_event[149];
 static EvtWord entry_event[94];
 static EvtWord damage_event[47];
@@ -207,7 +161,7 @@ EVT_BEGIN(batten_leader_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_NOT_EQUAL(LW(0), 2)
         SET_VALUE(LW(1), 30)
-        ELSE
+    ELSE
         SET_VALUE(LW(1), 1)
     END_IF
     CALL(evt_btl_camera_set_moveto, 0, 83, 84, 349, 83, 60, 0, LW(1), 11)
@@ -221,7 +175,7 @@ static EVT_BEGIN(mario_party_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_NOT_EQUAL(LW(0), 2)
         SET_VALUE(LW(1), 30)
-        ELSE
+    ELSE
         SET_VALUE(LW(1), 1)
     END_IF
     CALL(evt_btl_camera_set_moveto, 0, -120, 58, 257, -120, 40, 0, LW(1), 11)
@@ -237,30 +191,30 @@ BattleWeapon weapon_batten_leader_thunder = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     4, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -268,7 +222,7 @@ BattleWeapon weapon_batten_leader_thunder = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -278,33 +232,33 @@ BattleWeapon weapon_batten_leader_fire = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     1, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x80002000, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     75, // burnChance
 #else
     20, // burnChance
@@ -315,7 +269,7 @@ BattleWeapon weapon_batten_leader_fire = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -325,30 +279,30 @@ BattleWeapon weapon_batten_leader_ice = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     2, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x80002000, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
@@ -359,7 +313,7 @@ BattleWeapon weapon_batten_leader_ice = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -370,23 +324,23 @@ BattleWeapon weapon_batten_leader_shikaeshi = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1004020, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    8, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -395,7 +349,7 @@ BattleWeapon weapon_batten_leader_shikaeshi = {
     3, // paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -406,23 +360,23 @@ BattleWeapon weapon_batten_leader_yokeyoke = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1004020, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    8, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, // poisonStrength..electricTime
     100, // dodgyChance
@@ -432,7 +386,7 @@ BattleWeapon weapon_batten_leader_yokeyoke = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -442,28 +396,28 @@ BattleWeapon weapon_batten_leader_stop = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    7, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
     30, // stopChance
     2, // stopTime
@@ -474,7 +428,7 @@ BattleWeapon weapon_batten_leader_stop = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -615,11 +569,11 @@ static BattleUnitKindPart parts[] = {
 };
 
 EVT_BEGIN(hakai_snd_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_BARRIER_BREAK1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_BARRIER_BREAK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     RETURN
 EVT_END()
 
-USER_FUNC(evt_eff_pokopi_thunder) {
+static USER_FUNC(evt_eff_pokopi_thunder) {
     f32 top;
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -633,7 +587,7 @@ USER_FUNC(evt_eff_pokopi_thunder) {
     effPokopiThunderN64Entry(1, 30, x, top, z, x, y, z, 1.0f);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(evt_eff_colorchange00) {
+static USER_FUNC(evt_eff_colorchange00) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
     ((EffCloudN64Work*)eff->userdata)->r = 255;
@@ -647,14 +601,14 @@ USER_FUNC(evt_eff_colorchange00) {
 
     return EVT_RETURN_DONE;
 }
-USER_FUNC(evt_eff_barriersizechange) {
+static USER_FUNC(evt_eff_barriersizechange) {
     EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
     ((EffSyuryouWork*)eff->userdata)->scale = evtGetFloat(event, args[1]);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(evt_eff_firechange00) {
+static USER_FUNC(evt_eff_firechange00) {
     Mtx m;
     Vec target;
     Vec pos;
@@ -755,17 +709,17 @@ static USER_FUNC(eff_staff) {
     f32 x;
     f32 y;
     f32 z;
-    f32* wk;
+    EffSyuryouWork* barrier;
 
-    wk = effSyuryouEntry(0, 90, 0.0f, -1000.0f, 0.0f)->userdata;
+    barrier = effSyuryouEntry(0, 90, 0.0f, -1000.0f, 0.0f)->userdata;
     BtlUnit_GetPos(unit, &x, &y, &z);
-    wk[1] = x + 6.0f * (unit->mSizeMultiplier * unit->faceDirection);
-    wk[2] = y + 68.0f * unit->mSizeMultiplier;
-    wk[3] = 5.0f + z;
-    wk[4] = unit->mSizeMultiplier;
+    barrier->position.x = x + 6.0f * (unit->sizeMultiplier * unit->faceDirection);
+    barrier->position.y = y + 68.0f * unit->sizeMultiplier;
+    barrier->position.z = 5.0f + z;
+    barrier->scale = unit->sizeMultiplier;
     return EVT_RETURN_DONE;
 }
-USER_FUNC(check_satellite) {
+static USER_FUNC(check_satellite) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     BattleUnitPart* part;
@@ -798,7 +752,7 @@ USER_FUNC(check_satellite) {
     if (!all) {
         part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
         part2 = BtlUnit_GetPartsPtr(unit, 2);
-        if (part->attributes & 0x40000000) {
+        if (part->attributes & PART_ATTR_IMMUNE_TO_MOST_STATUS) {
             evt = evtEntryType(hakai_snd_event, event->priority, 0, event->type);
             evt->unitId = event->unitId;
             evt->ownerNPC = event->ownerNPC;
@@ -822,8 +776,8 @@ USER_FUNC(check_satellite) {
                 effGlassN64Entry(2, 60, x + dx, y + dy, z, 1.0f);
             }
         }
-        part->attributes &= ~0x40000000;
-        part2->attributes &= ~0x20000000;
+        part->attributes &= ~PART_ATTR_IMMUNE_TO_MOST_STATUS;
+        part2->attributes &= ~PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS;
         part->defenseAttr = &defence_attr;
         for (i = 0; i < 5; i++) {
             part->defense->defenses[i] = defencecopy[i];
@@ -832,7 +786,7 @@ USER_FUNC(check_satellite) {
     } else {
         part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
         part2 = BtlUnit_GetPartsPtr(unit, 2);
-        if (!(part->attributes & 0x40000000)) {
+        if (!(part->attributes & PART_ATTR_IMMUNE_TO_MOST_STATUS)) {
             f32 px;
             f32 py;
             f32 pz;
@@ -842,20 +796,20 @@ USER_FUNC(check_satellite) {
             unit->work[8] = (EvtWord)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
         }
         if (unit->work[8] != 0) {
-            f32* ud = ((EffectEntry*)unit->work[8])->userdata;
+            EffSyuryouWork* barrier = ((EffectEntry*)unit->work[8])->userdata;
             f32 ex;
             f32 ey;
             f32 ez;
 
             BtlUnit_GetPos(unit, &ex, &ey, &ez);
-            ud[1] = ex;
-            ud[2] = ey - 12.5f * unit->mSizeMultiplier;
-            ud[3] = 10.0f + ez;
+            barrier->position.x = ex;
+            barrier->position.y = ey - 12.5f * unit->sizeMultiplier;
+            barrier->position.z = 10.0f + ez;
 
-            ud[4] = 2.5f * unit->mSizeMultiplier;
+            barrier->scale = 2.5f * unit->sizeMultiplier;
         }
-        part->attributes |= 0x40000000;
-        part2->attributes |= 0x20000000;
+        part->attributes |= PART_ATTR_IMMUNE_TO_MOST_STATUS;
+        part2->attributes |= PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS;
         part->defenseAttr = &defence_attr_muteki;
         for (i = 0; i < 5; i++) {
             part->defense->defenses[i] = defencecopy[i];
@@ -864,7 +818,7 @@ USER_FUNC(check_satellite) {
     }
     return EVT_RETURN_DONE;
 }
-USER_FUNC(battleGetBattenSatelliteInitPos) {
+static USER_FUNC(battleGetBattenSatelliteInitPos) {
     EvtWord* args = event->args;
     BattleUnit* unit;
     s32 num;
@@ -918,10 +872,10 @@ USER_FUNC(battleGetBattenSatelliteInitPos) {
 }
 
 BattleUnitSetup entry_batten_satellite = {
-    &unit_boss_batten_satellite, // mUnitKindParams
+    &unit_boss_batten_satellite, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {1000.0f, 0.0f, 1000.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -983,15 +937,15 @@ EVT_BEGIN(light_anim_rtn)
                 SET_INT_READ_ADDR(LW(6))
                 READ_INT(LW(1))
             END_IF
-            CALL(btlevtcmd_AnimeChangePose, -2, 4, LW(1))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, LW(1))
             READ_INT(LW(1))
             IF_INT_GREATER(LW(1), 0)
                 WAIT_MS(LW(1))
-                ELSE
+            ELSE
                 SWITCH(LW(1))
                     CASE_EQUAL(0)
                     WAIT_FRAMES(1)
-                    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 4)
+                    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 4)
                     CASE_EQUAL(-1)
                     BREAK_LOOP
                     CASE_EQUAL(-2)
@@ -1007,9 +961,9 @@ EVT_BEGIN(light_anim_rtn)
                     END_LOOP
                     READ_INT4(LW(1), LW(2), LW(3), LW(4))
                     LOOP(LW(0))
-                        CALL(btlevtcmd_AnimeChangePose, -2, 4, LW(1))
+                        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, LW(1))
                         WAIT_MS(LW(2))
-                        CALL(btlevtcmd_AnimeChangePose, -2, 4, LW(3))
+                        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, LW(3))
                         WAIT_MS(LW(4))
                     END_LOOP
                     CASE_EQUAL(-3)
@@ -1034,15 +988,15 @@ EVT_BEGIN(light_anim_rtn)
                 SET_INT_READ_ADDR(LW(7))
                 READ_INT(LW(1))
             END_IF
-            CALL(btlevtcmd_AnimeChangePose, -2, 5, LW(1))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, LW(1))
             READ_INT(LW(1))
             IF_INT_GREATER(LW(1), 0)
                 WAIT_MS(LW(1))
-                ELSE
+            ELSE
                 SWITCH(LW(1))
                     CASE_EQUAL(0)
                     WAIT_FRAMES(1)
-                    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 5)
+                    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 5)
                     CASE_EQUAL(-1)
                     BREAK_LOOP
                     CASE_EQUAL(-2)
@@ -1058,9 +1012,9 @@ EVT_BEGIN(light_anim_rtn)
                     END_LOOP
                     READ_INT4(LW(1), LW(2), LW(3), LW(4))
                     LOOP(LW(0))
-                        CALL(btlevtcmd_AnimeChangePose, -2, 5, LW(1))
+                        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, LW(1))
                         WAIT_MS(LW(2))
-                        CALL(btlevtcmd_AnimeChangePose, -2, 5, LW(3))
+                        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, LW(3))
                         WAIT_MS(LW(4))
                     END_LOOP
                     CASE_EQUAL(-3)
@@ -1085,15 +1039,15 @@ EVT_BEGIN(light_anim_rtn)
                 SET_INT_READ_ADDR(LW(8))
                 READ_INT(LW(1))
             END_IF
-            CALL(btlevtcmd_AnimeChangePose, -2, 6, LW(1))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 6, LW(1))
             READ_INT(LW(1))
             IF_INT_GREATER(LW(1), 0)
                 WAIT_MS(LW(1))
-                ELSE
+            ELSE
                 SWITCH(LW(1))
                     CASE_EQUAL(0)
                     WAIT_FRAMES(1)
-                    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 6)
+                    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 6)
                     CASE_EQUAL(-1)
                     BREAK_LOOP
                     CASE_EQUAL(-2)
@@ -1109,9 +1063,9 @@ EVT_BEGIN(light_anim_rtn)
                     END_LOOP
                     READ_INT4(LW(1), LW(2), LW(3), LW(4))
                     LOOP(LW(0))
-                        CALL(btlevtcmd_AnimeChangePose, -2, 6, LW(1))
+                        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 6, LW(1))
                         WAIT_MS(LW(2))
-                        CALL(btlevtcmd_AnimeChangePose, -2, 6, LW(3))
+                        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 6, LW(3))
                         WAIT_MS(LW(4))
                     END_LOOP
                     CASE_EQUAL(-3)
@@ -1135,15 +1089,15 @@ EVT_BEGIN(light_anim_rtn)
             SET_INT_READ_ADDR(LW(5))
             READ_INT(LW(1))
         END_IF
-        CALL(btlevtcmd_AnimeChangePose, -2, 3, LW(1))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, LW(1))
         READ_INT(LW(1))
         IF_INT_GREATER(LW(1), 0)
             WAIT_MS(LW(1))
-            ELSE
+        ELSE
             SWITCH(LW(1))
                 CASE_EQUAL(0)
                 WAIT_FRAMES(1)
-                CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 3)
+                CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 3)
                 CASE_EQUAL(-1)
                 BREAK_LOOP
                 CASE_EQUAL(-2)
@@ -1159,9 +1113,9 @@ EVT_BEGIN(light_anim_rtn)
                 END_LOOP
                 READ_INT4(LW(1), LW(2), LW(3), LW(4))
                 LOOP(LW(0))
-                    CALL(btlevtcmd_AnimeChangePose, -2, 3, LW(1))
+                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, LW(1))
                     WAIT_MS(LW(2))
-                    CALL(btlevtcmd_AnimeChangePose, -2, 3, LW(3))
+                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, LW(3))
                     WAIT_MS(LW(4))
                 END_LOOP
                 CASE_EQUAL(-3)
@@ -1188,15 +1142,15 @@ EVT_BEGIN(light_rod_anim_rtn)
             SET_INT_READ_ADDR(LW(9))
             READ_INT(LW(1))
         END_IF
-        CALL(btlevtcmd_AnimeChangePose, -2, 7, LW(1))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 7, LW(1))
         READ_INT(LW(1))
         IF_INT_GREATER(LW(1), 0)
             WAIT_MS(LW(1))
-            ELSE
+        ELSE
             SWITCH(LW(1))
                 CASE_EQUAL(0)
                 WAIT_FRAMES(1)
-                CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 7)
+                CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 7)
                 CASE_EQUAL(-1)
                 BREAK_LOOP
                 CASE_EQUAL(-2)
@@ -1212,9 +1166,9 @@ EVT_BEGIN(light_rod_anim_rtn)
                 END_LOOP
                 READ_INT4(LW(1), LW(2), LW(3), LW(4))
                 LOOP(LW(0))
-                    CALL(btlevtcmd_AnimeChangePose, -2, 7, LW(1))
+                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 7, LW(1))
                     WAIT_MS(LW(2))
-                    CALL(btlevtcmd_AnimeChangePose, -2, 7, LW(3))
+                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 7, LW(3))
                     WAIT_MS(LW(4))
                 END_LOOP
                 CASE_EQUAL(-3)
@@ -1235,7 +1189,7 @@ EVT_END()
 
 EVT_BEGIN(light_pose_change)
     CALL(enzan_lw_save2)
-    CALL(btlevtcmd_AnimeGetPose, -2, 1, LW(0))
+    CALL(btlevtcmd_AnimeGetPose, BTL_UNIT_SELF, 1, LW(0))
     IF_STR_EQUAL(LW(0), STRING("A_1B"))
         CALL(enzan_lw_save)
         SET_VALUE(LW(5), PTR(&btl_shuryolight_pow_normal))
@@ -1342,13 +1296,13 @@ EVT_BEGIN(light_pose_change)
     SET_VALUE(LW(8), PTR(&btl_shuryolight_head_3_normal))
     SET_VALUE(LW(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_GetUnitWork, -2, 6, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 6, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     END_IF
     CALL(enzan_lw_load)
     CALL(enzan_lw_load2)
@@ -1357,7 +1311,7 @@ EVT_END()
 
 EVT_BEGIN(maiframeanimcheck)
     LOOP(0)
-        CALL(btlevtcmd_AnimeGetPose, -2, 1, LW(1))
+        CALL(btlevtcmd_AnimeGetPose, BTL_UNIT_SELF, 1, LW(1))
         IF_STR_NOT_EQUAL(LW(0), LW(1))
             CALL(datastrcopy, LW(1))
             CALL_CHILD(PTR(light_pose_change))
@@ -1368,19 +1322,19 @@ EVT_BEGIN(maiframeanimcheck)
 EVT_END()
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetEventEntry, -2, PTR(entry_event))
-    CALL(btl_hitoffsetx, -2, 2, -3)
-    CALL(btlevtcmd_SetHpGaugeOffset, -2, -2, -6)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("L_1B"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("L_4B"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("L_3B"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 6, STRING("L_2B"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 7, STRING("L_3B"))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(entry_event))
+    CALL(btl_hitoffsetx, BTL_UNIT_SELF, 2, -3)
+    CALL(btlevtcmd_SetHpGaugeOffset, BTL_UNIT_SELF, -2, -6)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("L_1B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("L_4B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, STRING("L_3B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 6, STRING("L_2B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 7, STRING("L_3B"))
     CALL(_set_draw_callback)
     CALL(enzan_lw_save)
     SET_VALUE(LW(5), PTR(&btl_shuryolight_pow_normal))
@@ -1388,24 +1342,24 @@ static EVT_BEGIN(init_event)
     SET_VALUE(LW(7), PTR(&btl_shuryolight_head_2_normal))
     SET_VALUE(LW(8), PTR(&btl_shuryolight_head_3_normal))
     SET_VALUE(LW(0), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 6, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
     SPAWN_EVENT_GET_ID(PTR(light_anim_rtn), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 4, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     CALL(enzan_lw_load)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
     SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     CALL(enzan_lw_load)
     CALL(pose_check_evt_run)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 2, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, -1)
     SET_VALUE(LW(0), 9)
     LOOP(4)
-        CALL(btlevtcmd_SetUnitWork, -2, LW(0), -1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), -1)
         ADD(LW(0), 1)
     END_LOOP
     RETURN
@@ -1416,24 +1370,24 @@ static EVT_BEGIN(entry_event)
     SET_VALUE(LW(0), 2)
     CALL_CHILD(batten_leader_zoom)
     WAIT_MS(1000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("E_1"))
     WAIT_MS(1000)
-    CALL(evt_msg_print, 2, STRING("stg8_las_65"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_65"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(1000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), -250000000, 0, -250000000)
-    CALL(eff_staff, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(eff_staff, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(6), 4)
     CALL_CHILD(sub_call_satellite)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
     CALL(check_satellite)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -1444,7 +1398,7 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
-    CALL(btlevtcmd_GetUnitWork, -2, 3, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SWITCH(LW(0))
             CASE_EQUAL(4)
@@ -1456,7 +1410,7 @@ static EVT_BEGIN(damage_event)
             CALL(evt_btl_camera_set_mode, 0, 0)
             WAIT_MS(300)
         END_SWITCH
-        CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
     END_IF
     RETURN
 EVT_END()
@@ -1475,17 +1429,17 @@ EVT_BEGIN(damage_sub_event)
     CALL(btlevtcmd_GetDamagePartsId, LW(10), LW(11))
     IF_INT_EQUAL(LW(11), 1)
         CALL(btlevtcmd_AnimeChangePoseType, LW(10), 1, 39)
-        ELSE
+    ELSE
         CALL(enzan_lw_save)
         SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_off))
         SET_VALUE(LW(0), 9)
-        CALL(btlevtcmd_GetUnitWork, -2, 7, LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
         IF_INT_NOT_EQUAL(LW(0), LW(1))
-            CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
-            CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
             DELETE_EVENT(LW(0))
             SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-            CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         END_IF
         CALL(enzan_lw_load)
         CALL(btlevtcmd_AnimeChangePose, LW(10), 1, STRING("D_2"))
@@ -1495,17 +1449,17 @@ EVT_BEGIN(damage_sub_event)
     IF_INT_NOT_EQUAL(LW(0), 0)
         IF_INT_NOT_EQUAL(LW(11), 1)
             CALL(btlevtcmd_GetTotalDamage, LW(10), LW(0))
-            CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
             IF_INT_LESS(LW(1), 0)
                 SET_VALUE(LW(1), 100)
-                ELSE
+            ELSE
                 MULTIPLY(LW(0), 10)
                 ADD(LW(1), LW(0))
                 IF_INT_GREATER(LW(1), 100)
                     SET_VALUE(LW(1), 100)
                 END_IF
             END_IF
-            CALL(btlevtcmd_SetUnitWork, -2, 2, LW(1))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(1))
         END_IF
     END_IF
     WAIT_MS(500)
@@ -1513,12 +1467,12 @@ EVT_BEGIN(damage_sub_event)
 EVT_END()
 
 static EVT_BEGIN(phase_event)
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(player_before_phase_event))
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(monster_before_phase_event))
         GOTO(99)
@@ -1528,61 +1482,61 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 EVT_BEGIN(monster_before_phase_event)
-    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(0)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         MULTIPLY(LW(0), 75)
         DIVIDE(LW(0), 100)
-        CALL(btlevtcmd_GetHp, -2, LW(1))
+        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
-            CALL(btlevtcmd_StopWaitEvent, -2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+            CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
             CALL_CHILD(PTR(batten_leader_zoom))
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("E_1"))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("E_1"))
             WAIT_MS(1000)
-            CALL(evt_msg_print, 2, STRING("stg8_las_66"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("stg8_las_66"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
         END_IF
         CASE_EQUAL(1)
-        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         MULTIPLY(LW(0), 50)
         DIVIDE(LW(0), 100)
-        CALL(btlevtcmd_GetHp, -2, LW(1))
+        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, -2, 1, 2)
-            CALL(btlevtcmd_StopWaitEvent, -2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
+            CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
             CALL_CHILD(PTR(batten_leader_zoom))
-            CALL(evt_msg_print, 2, STRING("stg8_las_67"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("stg8_las_67"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
         END_IF
         CASE_EQUAL(2)
-        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         MULTIPLY(LW(0), 25)
         DIVIDE(LW(0), 100)
-        CALL(btlevtcmd_GetHp, -2, LW(1))
+        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, -2, 1, 3)
-            CALL(btlevtcmd_StopWaitEvent, -2)
-            CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_furafura))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 3)
+            CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
+            CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_furafura))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
             CALL_CHILD(PTR(batten_leader_zoom))
-            CALL(btlevtcmd_SetTalkPoseType, -2, 65)
-            CALL(btlevtcmd_SetStayPoseType, -2, 43)
-            CALL(evt_msg_print, 2, STRING("stg8_las_68"), 0, -2)
+            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+            CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
+            CALL(evt_msg_print, 2, STRING("stg8_las_68"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
@@ -1596,7 +1550,7 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
     SET_VALUE(LW(0), 9)
     LOOP(4)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(0), LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(1))
         CALL(btlevtcmd_GetUnitId, LW(1), LW(1))
         IF_INT_NOT_EQUAL(LW(1), -1)
             CALL(btlevtcmd_CheckDamageCode, LW(1), 512, LW(2))
@@ -1622,27 +1576,27 @@ static EVT_BEGIN(dead_event)
     SET_VALUE(LW(7), PTR(&btl_shuryolight_head_2_off))
     SET_VALUE(LW(8), PTR(&btl_shuryolight_head_3_off))
     SET_VALUE(LW(0), 7)
-    CALL(btlevtcmd_GetUnitWork, -2, 6, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 6, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_3"))
     WAIT_MS(750)
-    CALL(btlevtcmd_SetTalkPose, -2, STRING("T_5"))
-    CALL(btlevtcmd_SetStayPose, -2, STRING("D_4"))
-    CALL(evt_msg_print, 2, STRING("stg8_las_69"), 0, -2)
+    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("T_5"))
+    CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("D_4"))
+    CALL(evt_msg_print, 2, STRING("stg8_las_69"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("D_4"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_4"))
     WAIT_MS(500)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_GetUnitWork, -2, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     DELETE_EVENT(LW(0))
-    CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     DELETE_EVENT(LW(0))
     SET_VALUE(LW(10), -2)
     CALL_CHILD(PTR(subsetevt_dead_core_nospin_norotate))
@@ -1812,7 +1766,7 @@ static Vec splineTableOut4_4[] = {
 static EVT_BEGIN(satellite_blur_on)
     SET_VALUE(LW(2), 9)
     LOOP(4)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(2), LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(2), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
             CALL(btlevtcmd_SetPartsBlur, LW(3), LW(4), 255, 255, 255, 255, 255, 255, 255, 100, 0)
@@ -1826,7 +1780,7 @@ EVT_END()
 static EVT_BEGIN(satellite_blur_off)
     SET_VALUE(LW(2), 9)
     LOOP(4)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(2), LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(2), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
             CALL(btlevtcmd_OffPartsAttribute, LW(3), LW(4), 67108864)
@@ -1837,15 +1791,15 @@ static EVT_BEGIN(satellite_blur_off)
 EVT_END()
 
 EVT_BEGIN(sub_call_satellite)
-    CALL(btlevtcmd_GetUnitId, -2, LW(4))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(4))
     SET_VALUE(LW(1), 9)
     SET_VALUE(LW(5), 0)
     LOOP(4)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(1), LW(2))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(2))
         IF_INT_EQUAL(LW(2), -1)
             CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_batten_satellite), 0)
             CALL(btlevtcmd_AddPos, LW(3), 0, 45, -5)
-            CALL(btlevtcmd_SetUnitWork, -2, LW(1), LW(3))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(1), LW(3))
             CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
             ADD(LW(0), 1)
             ADD(LW(5), 1)
@@ -1858,22 +1812,22 @@ EVT_BEGIN(sub_call_satellite)
     WAIT_FRAMES(5)
     CALL_CHILD(satellite_blur_on)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_SPLIT2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_SPLIT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(battenSatelliteToOutside, -2, LW(0))
+    CALL(battenSatelliteToOutside, BTL_UNIT_SELF, LW(0))
     WAIT_MS(1000)
     CALL_CHILD(satellite_blur_off)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     RETURN
 EVT_END()
 
 EVT_BEGIN(player_before_phase_event)
-    CALL(btlevtcmd_StopWaitEvent, -2)
+    CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
     CALL(btlevtcmd_get_turn, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
@@ -1882,7 +1836,7 @@ EVT_BEGIN(player_before_phase_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 9)
     LOOP(4)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(1), LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             ADD(LW(0), 1)
         END_IF
@@ -1893,14 +1847,14 @@ EVT_BEGIN(player_before_phase_event)
     END_IF
     CALL_CHILD(satellite_blur_on)
     IF_INT_NOT_EQUAL(LW(1), 0)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_SPLIT1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_SPLIT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(1))
-    CALL(battenSatelliteToInside, -2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
+    CALL(battenSatelliteToInside, BTL_UNIT_SELF, LW(1))
     CALL_CHILD(satellite_blur_off)
     SET_VALUE(LW(1), 9)
     LOOP(3)
-        CALL(btlevtcmd_GetUnitWork, -2, LW(1), LW(2))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(2))
         IF_INT_EQUAL(LW(2), -1)
             SET_VALUE(LW(4), LW(1))
             SET_VALUE(LW(3), 999999999)
@@ -1918,18 +1872,18 @@ EVT_BEGIN(player_before_phase_event)
                     BREAK_LOOP
                 END_IF
                 ADD(LW(3), 0)
-                CALL(btlevtcmd_GetUnitWork, -2, LW(3), LW(2))
-                CALL(btlevtcmd_SetUnitWork, -2, LW(4), LW(2))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(3), LW(2))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(4), LW(2))
                 SET_VALUE(LW(4), LW(3))
             END_LOOP
-            CALL(btlevtcmd_SetUnitWork, -2, LW(4), -1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(4), -1)
         END_IF
         ADD(LW(1), 1)
     END_LOOP
     SET_VALUE(LW(6), 2)
     CALL_CHILD(sub_call_satellite)
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1940,7 +1894,7 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(PTR(batten_leader_thunder_attack_event))
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(2))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(2))
     IF_INT_LESS(LW(2), 2)
         CALL(btlevtcmd_DrawLots, LW(0), 6, 60, 40, 30, 20, 20, 20)
         SWITCH(LW(0))
@@ -1963,7 +1917,7 @@ static EVT_BEGIN(attack_event)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_stop))
             CALL_CHILD(PTR(batten_leader_stop_attack_event))
         END_SWITCH
-        ELSE
+    ELSE
         CALL(btlevtcmd_DrawLots, LW(0), 6, 60, 40, 30, 20, 20, 20)
         SWITCH(LW(0))
             CASE_EQUAL(0)
@@ -1987,39 +1941,39 @@ static EVT_BEGIN(attack_event)
         END_SWITCH
     END_IF
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(batten_leader_thunder_attack_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), -250000000, 0, -250000000)
-    CALL(eff_staff, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(eff_staff, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
-            CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             ADD_FLOAT(LW(0), FLOAT(-52.0f))
             ADD_FLOAT(LW(1), FLOAT(60.0f))
             ADD_FLOAT(LW(2), FLOAT(20.0f))
@@ -2028,45 +1982,45 @@ EVT_BEGIN(batten_leader_thunder_attack_event)
             RETURN
         END_IF
     END_IF
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     WAIT_MS(500)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_THUNDER1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_THUNDER1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_eff_pokopi_thunder, -80, 0, 25)
     CALL(evt_eff_pokopi_thunder, -160, 0, -25)
     WAIT_MS(100)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_THUNDER1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_THUNDER1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_eff_pokopi_thunder, -100, 0, 35)
     CALL(evt_eff_pokopi_thunder, -140, 0, -35)
     WAIT_MS(100)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_THUNDER1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_THUNDER1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_eff_pokopi_thunder, -120, 0, 25)
     CALL(evt_eff_pokopi_thunder, -120, 0, -25)
     WAIT_MS(100)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_THUNDER1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_THUNDER1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(evt_eff_pokopi_thunder, -140, 0, 35)
         CALL(evt_eff_pokopi_thunder, -100, 0, -35)
         WAIT_MS(100)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_THUNDER1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_THUNDER1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(evt_eff_pokopi_thunder, -160, 0, 25)
         CALL(evt_eff_pokopi_thunder, -80, 0, -25)
     END_INLINE_EVENT
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(0)
-        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         SWITCH(LW(5))
             CASE_OR_EQUAL(4)
             GOTO(90)
@@ -2095,46 +2049,46 @@ EVT_BEGIN(batten_leader_thunder_attack_event)
             SET_VALUE(LW(10), 1)
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         END_IF
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         LABEL(98)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_INT_EQUAL(LW(3), -1)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(batten_leader_fire_attack_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), -250000000, 0, -250000000)
-    CALL(eff_staff, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(eff_staff, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
-            CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             ADD_FLOAT(LW(0), FLOAT(-52.0f))
             ADD_FLOAT(LW(1), FLOAT(60.0f))
             ADD_FLOAT(LW(2), FLOAT(20.0f))
@@ -2143,22 +2097,22 @@ EVT_BEGIN(batten_leader_fire_attack_event)
             RETURN
         END_IF
     END_IF
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_FIRE1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_FIRE1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_FLOAT_VALUE(LW(5), LW(0))
     ADD_FLOAT(LW(0), -40)
     ADD_FLOAT(LW(5), -400)
@@ -2173,12 +2127,12 @@ EVT_BEGIN(batten_leader_fire_attack_event)
         CALL(bts_x_flag_add, 1)
     END_SIBLING_EVENT
     WAIT_MS(600)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(0)
-        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         SWITCH(LW(5))
             CASE_OR_EQUAL(4)
             SET_VALUE(LW(6), 90)
@@ -2209,11 +2163,11 @@ EVT_BEGIN(batten_leader_fire_attack_event)
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
             ADD(LW(7), 1)
             BEGIN_SIBLING_EVENT
-                CALL(evt_cam_shake, 4, FLOAT(0.005859375f), FLOAT(0.0f), 500)
+                CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.005859375f), FLOAT(0.0f), 500)
                 CALL(bts_x_flag_add, 1)
             END_SIBLING_EVENT
         END_IF
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         LABEL(97)
         WAIT_MS(150)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -2221,40 +2175,40 @@ EVT_BEGIN(batten_leader_fire_attack_event)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(bts_x_flag_wait, LW(7))
     RETURN
 EVT_END()
 
 EVT_BEGIN(batten_leader_ice_attack_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), -250000000, 0, -250000000)
-    CALL(eff_staff, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(eff_staff, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
-            CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             ADD_FLOAT(LW(0), FLOAT(-52.0f))
             ADD_FLOAT(LW(1), FLOAT(60.0f))
             ADD_FLOAT(LW(2), FLOAT(20.0f))
@@ -2263,22 +2217,22 @@ EVT_BEGIN(batten_leader_ice_attack_event)
             RETURN
         END_IF
     END_IF
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_ICE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_ICE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD_FLOAT(LW(0), FLOAT(-52.0f))
     ADD_FLOAT(LW(1), FLOAT(60.0f))
     ADD_FLOAT(LW(2), FLOAT(10.0f))
@@ -2286,7 +2240,7 @@ EVT_BEGIN(batten_leader_ice_attack_event)
     ADD_FLOAT(LW(7), FLOAT(10.0f))
     CALL(evt_eff64, STRING("ICE_EFF_00"), STRING("opuku_wgun_n64"), 0, LW(0), LW(1), LW(2), LW(5), LW(6), LW(7), FLOAT(1.0f), 9, 0, 0, 0)
     WAIT_MS(150)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2309,47 +2263,47 @@ EVT_BEGIN(batten_leader_ice_attack_event)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
     WAIT_MS(300)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
     LABEL(98)
-    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(batten_leader_shikaeshi_attack_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), -250000000, 0, -250000000)
-    CALL(eff_staff, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(eff_staff, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1C"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1C"))
     WAIT_MS(140)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
-            CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             ADD_FLOAT(LW(0), FLOAT(-25.0f))
             ADD_FLOAT(LW(1), FLOAT(80.0f))
             ADD_FLOAT(LW(2), FLOAT(20.0f))
@@ -2358,45 +2312,45 @@ EVT_BEGIN(batten_leader_shikaeshi_attack_event)
             RETURN
         END_IF
     END_IF
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 400)
-    CALL(btlevtcmd_SetUnitWork, -2, 3, 4)
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 4)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
     RETURN
 EVT_END()
 
 EVT_BEGIN(batten_leader_yokeyoke_attack_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), -250000000, 0, -250000000)
-    CALL(eff_staff, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(eff_staff, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1C"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1C"))
     WAIT_MS(140)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
-            CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             ADD_FLOAT(LW(0), FLOAT(-25.0f))
             ADD_FLOAT(LW(1), FLOAT(80.0f))
             ADD_FLOAT(LW(2), FLOAT(20.0f))
@@ -2405,45 +2359,45 @@ EVT_BEGIN(batten_leader_yokeyoke_attack_event)
             RETURN
         END_IF
     END_IF
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 400)
-    CALL(btlevtcmd_SetUnitWork, -2, 3, 5)
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 5)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
     RETURN
 EVT_END()
 
 EVT_BEGIN(batten_leader_stop_attack_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), -250000000, 0, -250000000)
-    CALL(eff_staff, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1B"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(eff_staff, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, -2, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
-            CALL(btlevtcmd_GetPosFloat, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             ADD_FLOAT(LW(0), FLOAT(-52.0f))
             ADD_FLOAT(LW(1), FLOAT(60.0f))
             ADD_FLOAT(LW(2), FLOAT(20.0f))
@@ -2452,30 +2406,30 @@ EVT_BEGIN(batten_leader_stop_attack_event)
             RETURN
         END_IF
     END_IF
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SRYO_STOP1"), -250000000, 0, -250000000)
-    CALL(evt_cam_get_at, 4, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STOP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(evt_cam_get_at, CAMERA_3D, LW(0), LW(1), LW(2))
     ADD_FLOAT(LW(0), FLOAT(-25.0f))
     SET_FLOAT_VALUE(LW(2), FLOAT(100.0f))
     CALL(evt_eff64, STRING("TIMESTOP_EFF_00"), STRING("timestamp_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 150, 0, 0, 0, 0, 0, 0)
     WAIT_MS(2500)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(0)
-        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         SWITCH(LW(5))
             CASE_OR_EQUAL(4)
             SET_VALUE(LW(6), 90)
@@ -2505,20 +2459,20 @@ EVT_BEGIN(batten_leader_stop_attack_event)
             SET_VALUE(LW(10), 1)
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         END_IF
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         LABEL(97)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_INT_EQUAL(LW(3), -1)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
     CALL(check_satellite)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LOOP(0)
         WAIT_FRAMES(1)
         CALL(check_satellite)
@@ -2627,11 +2581,11 @@ static USER_FUNC(_set_draw_callback) {
     p5 = BtlUnit_GetPartsPtr(unit, 5);
     p6 = BtlUnit_GetPartsPtr(unit, 6);
     p7 = BtlUnit_GetPartsPtr(unit, 7);
-    p3->attributes |= 0x1000000;
-    p4->attributes |= 0x1000000;
-    p5->attributes |= 0x1000000;
-    p6->attributes |= 0x1000000;
-    p7->attributes |= 0x1000000;
+    p3->attributes |= PART_ATTR_HIDDEN;
+    p4->attributes |= PART_ATTR_HIDDEN;
+    p5->attributes |= PART_ATTR_HIDDEN;
+    p6->attributes |= PART_ATTR_HIDDEN;
+    p7->attributes |= PART_ATTR_HIDDEN;
     return EVT_RETURN_DONE;
 }
 void _light_point_callback(BattleUnitPart* part, s32 group) {
@@ -2641,7 +2595,7 @@ void _light_point_callback(BattleUnitPart* part, s32 group) {
     s32 shape;
 
     poseId = part->poseId;
-    unit = part->mOwner;
+    unit = part->owner;
 
     if (strcmp("locator6", animPoseGetGroupName(poseId, group)) == 0) {
         idx = 0;
@@ -2657,41 +2611,31 @@ void _light_point_callback(BattleUnitPart* part, s32 group) {
         idx = -1;
     }
     switch (idx) {
-        case 0:
-            {
-                s32 pose = BtlUnit_GetPartsPtr(unit, 3)->poseId;
-                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape34");
-                animPoseDrawShape(pose, sh);
-            }
-            break;
-        case 1:
-            {
-                s32 pose = BtlUnit_GetPartsPtr(unit, 4)->poseId;
-                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape37");
-                animPoseDrawShape(pose, sh);
-            }
-            break;
-        case 2:
-            {
-                s32 pose = BtlUnit_GetPartsPtr(unit, 5)->poseId;
-                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape36");
-                animPoseDrawShape(pose, sh);
-            }
-            break;
-        case 3:
-            {
-                s32 pose = BtlUnit_GetPartsPtr(unit, 6)->poseId;
-                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape35");
-                animPoseDrawShape(pose, sh);
-            }
-            break;
-        case 4:
-            {
-                s32 pose = BtlUnit_GetPartsPtr(unit, 7)->poseId;
-                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape36");
-                animPoseDrawShape(pose, sh);
-            }
-            break;
+        case 0: {
+            s32 pose = BtlUnit_GetPartsPtr(unit, 3)->poseId;
+            s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape34");
+            animPoseDrawShape(pose, sh);
+        } break;
+        case 1: {
+            s32 pose = BtlUnit_GetPartsPtr(unit, 4)->poseId;
+            s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape37");
+            animPoseDrawShape(pose, sh);
+        } break;
+        case 2: {
+            s32 pose = BtlUnit_GetPartsPtr(unit, 5)->poseId;
+            s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape36");
+            animPoseDrawShape(pose, sh);
+        } break;
+        case 3: {
+            s32 pose = BtlUnit_GetPartsPtr(unit, 6)->poseId;
+            s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape35");
+            animPoseDrawShape(pose, sh);
+        } break;
+        case 4: {
+            s32 pose = BtlUnit_GetPartsPtr(unit, 7)->poseId;
+            s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape36");
+            animPoseDrawShape(pose, sh);
+        } break;
     }
 }
 USER_FUNC(_hp_gauge_flag_on) {
@@ -2707,23 +2651,23 @@ USER_FUNC(_hp_gauge_flag_on) {
     }
     return EVT_RETURN_DONE;
 }
-u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
-    BattenSpline* sp;
+static u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
+    SatelliteSpline* sp;
 
-    sp = BTL_ALLOC(sizeof(BattenSpline));
+    sp = BTL_ALLOC(sizeof(SatelliteSpline));
     if (unit->work[9 + n] == -1) {
         return FALSE;
     }
     unit->work[13 + n] = (EvtWord)sp;
-    sp->n = 5;
-    sp->table = table;
-    sp->count = 0;
-    spline_maketable(5, sp->table, sp->a, sp->b);
+    sp->numPoints = 5;
+    sp->points = table;
+    sp->frame = 0;
+    spline_maketable(5, sp->points, sp->knots, sp->curvature);
     BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + n]), 1)->work[1] = (EvtWord)table;
     return TRUE;
 }
-u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
-    BattenSpline* sp;
+static u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
+    SatelliteSpline* sp;
     BattleUnit* sat;
     Vec upos;
     Vec pos;
@@ -2731,18 +2675,18 @@ u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
     if (unit->work[9 + n] == -1) {
         return FALSE;
     }
-    sp = (BattenSpline*)unit->work[13 + n];
+    sp = (SatelliteSpline*)unit->work[13 + n];
     if (sp == NULL) {
         return FALSE;
     }
-    if (sp->count >= 60) {
+    if (sp->frame >= 60) {
         if (sp != NULL) {
             BTL_FREE(sp);
             unit->work[13 + n] = 0;
         }
         return FALSE;
     }
-    spline_getvalue(intplGetValue(4, sp->count, 60, 0.0f, 1.0f), &pos, sp->n, sp->table, sp->a, sp->b);
+    spline_getvalue(&pos, intplGetValue(4, 0.0f, 1.0f, sp->frame, 60), sp->numPoints, sp->points, sp->knots, sp->curvature);
     sat = BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + n]);
     if (sat == NULL) {
         return FALSE;
@@ -2750,7 +2694,7 @@ u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
     BtlUnit_GetPos(unit, &upos.x, &upos.y, &upos.z);
     BtlUnit_SetPos(sat, upos.x + pos.x * unit->faceDirection, 5.0f + (upos.y + pos.y), upos.z + pos.z);
     BtlUnit_SetHomePos(sat, upos.x + pos.x * unit->faceDirection, 5.0f + (upos.y + pos.y), upos.z + pos.z);
-    sp->count++;
+    sp->frame++;
     return TRUE;
 }
 USER_FUNC(battenSatelliteToInside) {
@@ -2821,86 +2765,86 @@ USER_FUNC(battenSatelliteToOutside) {
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     if (isFirstCall) {
         switch (num) {
-        case 1:
-            i = 0;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut1_1) == TRUE) {
-                    break;
+            case 1:
+                i = 0;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut1_1) == TRUE) {
+                        break;
+                    }
+                    i++;
+                }
+                break;
+            case 2:
+                i = 0;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut2_1) == TRUE) {
+                        break;
+                    }
+                    i++;
                 }
                 i++;
-            }
-            break;
-        case 2:
-            i = 0;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut2_1) == TRUE) {
-                    break;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut2_2) == TRUE) {
+                        break;
+                    }
+                    i++;
+                }
+                break;
+            case 3:
+                i = 0;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut3_1) == TRUE) {
+                        break;
+                    }
+                    i++;
                 }
                 i++;
-            }
-            i++;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut2_2) == TRUE) {
-                    break;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut3_2) == TRUE) {
+                        break;
+                    }
+                    i++;
                 }
                 i++;
-            }
-            break;
-        case 3:
-            i = 0;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut3_1) == TRUE) {
-                    break;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut3_3) == TRUE) {
+                        break;
+                    }
+                    i++;
+                }
+                break;
+            case 4:
+                i = 0;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut4_1) == TRUE) {
+                        break;
+                    }
+                    i++;
                 }
                 i++;
-            }
-            i++;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut3_2) == TRUE) {
-                    break;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut4_2) == TRUE) {
+                        break;
+                    }
+                    i++;
                 }
                 i++;
-            }
-            i++;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut3_3) == TRUE) {
-                    break;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut4_3) == TRUE) {
+                        break;
+                    }
+                    i++;
                 }
                 i++;
-            }
-            break;
-        case 4:
-            i = 0;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut4_1) == TRUE) {
-                    break;
+                while (TRUE) {
+                    if (battenSatelliteTo_Init(unit, i, splineTableOut4_4) == TRUE) {
+                        break;
+                    }
+                    i++;
                 }
-                i++;
-            }
-            i++;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut4_2) == TRUE) {
-                    break;
-                }
-                i++;
-            }
-            i++;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut4_3) == TRUE) {
-                    break;
-                }
-                i++;
-            }
-            i++;
-            while (TRUE) {
-                if (battenSatelliteTo_Init(unit, i, splineTableOut4_4) == TRUE) {
-                    break;
-                }
-                i++;
-            }
-            break;
-        default:
-            return EVT_RETURN_DONE;
+                break;
+            default:
+                return EVT_RETURN_DONE;
         }
     }
     moving = FALSE;

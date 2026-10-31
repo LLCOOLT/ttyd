@@ -1,3 +1,4 @@
+// Stardust: wrapper over the Paper Mario 64 stardust2 effect (effStardust2N64Entry).
 #include "eff/eff_stardust.h"
 #include "eff/n64/eff_stardust2_n64.h"
 

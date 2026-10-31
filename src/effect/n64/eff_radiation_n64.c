@@ -1,3 +1,6 @@
+// Paper Mario 64 effect: pale-yellow rays from a point: types 0-1 eight rays that rise and fade, other
+// types 16 spinning rays with scrolling textures; type + 10 draws in another display layer with plain alpha blending
+// and no depth test.
 #include "eff/eff_n64.h"
 #include "eff/n64/eff_radiation_n64.h"
 #include "driver/camdrv.h"
@@ -43,8 +46,6 @@ s32 r_data[] = {
 
 /* 0x2C bytes in the original: not a whole number of 14-byte effN64Vtx records, so kept as halfwords */
 
-
-
 EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffRadiationN64Work* work;
@@ -72,7 +73,7 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffRadiationN64Work));
     effect->userdata = work;
     effect->callback = effRadiationMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     work->life = 100;
@@ -86,53 +87,53 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     work->camera = camera;
     p = work;
     switch (type) {
-    case 0:
-    case 1:
-        p++;
-        for (i = 1; i < effect->count; i++) {
-            p->initY = (f32)((i - 1) * 30 / (count - 1) - 10);
-            p->initLife = 50 - (i - 1) * 20 / (count - 1);
-            p->initYVel = 2.5f + 25.0f / (f32)p->initLife;
-            p->initRotX = (f32)(s32)effTblRandN64(180, i * 3);
-            p->initRotY = (f32)(s32)effTblRandN64(180, i * 3 + 1);
-            p->initRotZ = (f32)(s32)effTblRandN64(180, i * 3 + 2);
-            p->y = p->initY;
-            p->life = p->initLife;
-            p->yVel = p->initYVel;
-            p->rotX = p->initRotX;
-            p->rotY = p->initRotY;
-            p->rotZ = p->initRotZ;
-            p->alpha = 0;
-            p->frame = 0;
+        case 0:
+        case 1:
             p++;
-        }
-        break;
-    default:
-        p++;
-        for (j = 1, lf = 0x20; j < effect->count; lf += 2, j++, p++) {
-            p->y = 0.0f;
-            k = (j - 1) * 5;
-            p->life = lf;
-            p->rotX = (f32)r_data[k++];
-            p->rotY = (f32)r_data[k++];
-            p->rotZ = (f32)r_data[k++];
-            p->alpha = 0;
-            p->frame = 0;
-            p->scroll2 = 0.0f;
-            p->scroll0 = 0.0f;
-            p->scrollVel0 = 0.0f;
-            p->scrollVel2 = -0.6f;
-            p->scroll1 = 10.0f;
-            p->scroll3 = 0.0f;
-            p->scrollVel1 = 0.0f;
-            p->scrollVel3 = 0.6f;
-            p->rotVelX = 0.0f;
-            p->rotVelY = 0.0f;
-            k++;
-            p->rotVelZ = 0.1f * (f32)r_data[k++];
-            p->delay = 0;
-        }
-        break;
+            for (i = 1; i < effect->count; i++) {
+                p->initY = (f32)((i - 1) * 30 / (count - 1) - 10);
+                p->initLife = 50 - (i - 1) * 20 / (count - 1);
+                p->initYVel = 2.5f + 25.0f / (f32)p->initLife;
+                p->initRotX = (f32)(s32)effTblRandN64(180, i * 3);
+                p->initRotY = (f32)(s32)effTblRandN64(180, i * 3 + 1);
+                p->initRotZ = (f32)(s32)effTblRandN64(180, i * 3 + 2);
+                p->y = p->initY;
+                p->life = p->initLife;
+                p->yVel = p->initYVel;
+                p->rotX = p->initRotX;
+                p->rotY = p->initRotY;
+                p->rotZ = p->initRotZ;
+                p->alpha = 0;
+                p->frame = 0;
+                p++;
+            }
+            break;
+        default:
+            p++;
+            for (j = 1, lf = 0x20; j < effect->count; lf += 2, j++, p++) {
+                p->y = 0.0f;
+                k = (j - 1) * 5;
+                p->life = lf;
+                p->rotX = (f32)r_data[k++];
+                p->rotY = (f32)r_data[k++];
+                p->rotZ = (f32)r_data[k++];
+                p->alpha = 0;
+                p->frame = 0;
+                p->scroll2 = 0.0f;
+                p->scroll0 = 0.0f;
+                p->scrollVel0 = 0.0f;
+                p->scrollVel2 = -0.6f;
+                p->scroll1 = 10.0f;
+                p->scroll3 = 0.0f;
+                p->scrollVel1 = 0.0f;
+                p->scrollVel3 = 0.6f;
+                p->rotVelX = 0.0f;
+                p->rotVelY = 0.0f;
+                k++;
+                p->rotVelZ = 0.1f * (f32)r_data[k++];
+                p->delay = 0;
+            }
+            break;
     }
     return effect;
 }
@@ -161,8 +162,8 @@ void effRadiationMain(EffectEntry* effect) {
         p->life--;
     }
     p->frame++;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         p->life = 10;
     }
     life = p->life;
@@ -172,109 +173,109 @@ void effRadiationMain(EffectEntry* effect) {
     }
     base1 = p->frame;
     switch (type) {
-    case 0:
-    case 1:
-        base = (base1 * 10 + 1) * 3;
-        base1 = base + 1;
-        base2 = base + 2;
-        p++;
-        for (i = 1; i < effect->count; i++, p++) {
-            p->life--;
-            p->frame++;
-            if (p->frame < 10) {
-                p->alpha = p->frame * 12;
+        case 0:
+        case 1:
+            base = (base1 * 10 + 1) * 3;
+            base1 = base + 1;
+            base2 = base + 2;
+            p++;
+            for (i = 1; i < effect->count; i++, p++) {
+                p->life--;
+                p->frame++;
+                if (p->frame < 10) {
+                    p->alpha = p->frame * 12;
+                }
+                if (p->life < 5) {
+                    p->alpha = p->life * 25;
+                }
+                p->y += p->yVel;
+                if (p->life <= 0) {
+                    p->initRotX = (f32)(s32)effTblRandN64(180, base);
+                    p->initRotY = (f32)(s32)effTblRandN64(180, base1);
+                    p->initRotZ = (f32)(s32)effTblRandN64(180, base2);
+                    p->y = p->initY;
+                    p->life = p->initLife;
+                    p->yVel = p->initYVel;
+                    p->rotX = p->initRotX;
+                    p->rotY = p->initRotY;
+                    p->rotZ = p->initRotZ;
+                    p->alpha = 0;
+                    p->frame = 0;
+                }
             }
-            if (p->life < 5) {
-                p->alpha = p->life * 25;
+            break;
+        default:
+            p++;
+            for (j = 1, lf = 0x20; j < effect->count; lf += 2, j++, p++) {
+                p->scroll0 += p->scrollVel0;
+                if (p->scroll0 > 256.0f) {
+                    p->scroll0 -= 256.0f;
+                }
+                if (p->scroll0 < 0.0f) {
+                    p->scroll0 += 256.0f;
+                }
+                p->scroll1 += p->scrollVel1;
+                if (p->scroll1 > 256.0f) {
+                    p->scroll1 -= 256.0f;
+                }
+                if (p->scroll1 < 0.0f) {
+                    p->scroll1 += 256.0f;
+                }
+                p->scroll2 += p->scrollVel2;
+                if (p->scroll2 > 256.0f) {
+                    p->scroll2 -= 256.0f;
+                }
+                if (p->scroll2 < 0.0f) {
+                    p->scroll2 += 256.0f;
+                }
+                p->scroll3 += p->scrollVel3;
+                if (p->scroll3 > 256.0f) {
+                    p->scroll3 -= 256.0f;
+                }
+                if (p->scroll3 < 0.0f) {
+                    p->scroll3 += 256.0f;
+                }
+                p->life--;
+                p->frame++;
+                if (p->frame < 5) {
+                    p->alpha = p->frame * 50;
+                }
+                if (p->life < 5) {
+                    p->alpha = p->life * 50;
+                }
+                if (life < 10) {
+                    p->alpha = p->alpha * life / 10;
+                }
+                if (p->life <= 0) {
+                    p->y = 0.0f;
+                    k = (j - 1) * 5;
+                    p->life = lf;
+                    p->rotX = (f32)r_data[k++];
+                    p->rotY = (f32)r_data[k++];
+                    p->rotZ = (f32)r_data[k++];
+                    p->alpha = 0;
+                    p->frame = 0;
+                    p->scroll2 = 0.0f;
+                    p->scroll0 = 0.0f;
+                    p->scrollVel0 = 0.0f;
+                    p->scrollVel2 = -0.6f;
+                    p->scroll1 = 10.0f;
+                    p->scroll3 = 0.0f;
+                    p->scrollVel1 = 0.0f;
+                    p->scrollVel3 = 0.6f;
+                    p->rotVelX = 0.0f;
+                    p->rotVelY = 0.0f;
+                    k++;
+                    p->rotVelZ = 0.1f * (f32)r_data[k++];
+                    p->delay = 0;
+                }
+                if (p->delay <= 0 || (--p->delay, p->delay <= 0)) {
+                    p->rotX += p->rotVelX;
+                    p->rotY += p->rotVelY;
+                    p->rotZ += p->rotVelZ;
+                }
             }
-            p->y += p->yVel;
-            if (p->life <= 0) {
-                p->initRotX = (f32)(s32)effTblRandN64(180, base);
-                p->initRotY = (f32)(s32)effTblRandN64(180, base1);
-                p->initRotZ = (f32)(s32)effTblRandN64(180, base2);
-                p->y = p->initY;
-                p->life = p->initLife;
-                p->yVel = p->initYVel;
-                p->rotX = p->initRotX;
-                p->rotY = p->initRotY;
-                p->rotZ = p->initRotZ;
-                p->alpha = 0;
-                p->frame = 0;
-            }
-        }
-        break;
-    default:
-        p++;
-        for (j = 1, lf = 0x20; j < effect->count; lf += 2, j++, p++) {
-            p->scroll0 += p->scrollVel0;
-            if (p->scroll0 > 256.0f) {
-                p->scroll0 -= 256.0f;
-            }
-            if (p->scroll0 < 0.0f) {
-                p->scroll0 += 256.0f;
-            }
-            p->scroll1 += p->scrollVel1;
-            if (p->scroll1 > 256.0f) {
-                p->scroll1 -= 256.0f;
-            }
-            if (p->scroll1 < 0.0f) {
-                p->scroll1 += 256.0f;
-            }
-            p->scroll2 += p->scrollVel2;
-            if (p->scroll2 > 256.0f) {
-                p->scroll2 -= 256.0f;
-            }
-            if (p->scroll2 < 0.0f) {
-                p->scroll2 += 256.0f;
-            }
-            p->scroll3 += p->scrollVel3;
-            if (p->scroll3 > 256.0f) {
-                p->scroll3 -= 256.0f;
-            }
-            if (p->scroll3 < 0.0f) {
-                p->scroll3 += 256.0f;
-            }
-            p->life--;
-            p->frame++;
-            if (p->frame < 5) {
-                p->alpha = p->frame * 50;
-            }
-            if (p->life < 5) {
-                p->alpha = p->life * 50;
-            }
-            if (life < 10) {
-                p->alpha = p->alpha * life / 10;
-            }
-            if (p->life <= 0) {
-                p->y = 0.0f;
-                k = (j - 1) * 5;
-                p->life = lf;
-                p->rotX = (f32)r_data[k++];
-                p->rotY = (f32)r_data[k++];
-                p->rotZ = (f32)r_data[k++];
-                p->alpha = 0;
-                p->frame = 0;
-                p->scroll2 = 0.0f;
-                p->scroll0 = 0.0f;
-                p->scrollVel0 = 0.0f;
-                p->scrollVel2 = -0.6f;
-                p->scroll1 = 10.0f;
-                p->scroll3 = 0.0f;
-                p->scrollVel1 = 0.0f;
-                p->scrollVel3 = 0.6f;
-                p->rotVelX = 0.0f;
-                p->rotVelY = 0.0f;
-                k++;
-                p->rotVelZ = 0.1f * (f32)r_data[k++];
-                p->delay = 0;
-            }
-            if (p->delay <= 0 || (--p->delay, p->delay <= 0)) {
-                p->rotX += p->rotVelX;
-                p->rotY += p->rotVelY;
-                p->rotZ += p->rotVelZ;
-            }
-        }
-        break;
+            break;
     }
     w2 = effect->userdata;
     if (w2->flag == 0) {
@@ -315,30 +316,30 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
     switch (type) {
-    case 0:
-    case 1:
-        GXSetNumTevStages(1);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_C0, GX_CC_ONE, GX_CC_TEXC, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
-        effGetTexObjN64(0x2C, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-        PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
-        GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-        break;
-    default:
-        GXSetNumTevStages(1);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
-        GXSetNumTexGens(0);
-        break;
+        case 0:
+        case 1:
+            GXSetNumTevStages(1);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_C0, GX_CC_ONE, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+            effGetTexObjN64(0x2C, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            GXSetNumTexGens(1);
+            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+            PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
+            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+            break;
+        default:
+            GXSetNumTevStages(1);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+            GXSetNumTexGens(0);
+            break;
     }
     GXSetCullMode(GX_CULL_NONE);
     PSMTXTrans(mtx, p->position.x, p->position.y, p->position.z);
@@ -357,18 +358,18 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
             sx = sz = 0.25f * (3.0f + a);
 
             switch (i & 3) {
-            case 0:
-                sy = 0.3f * a;
-                break;
-            case 1:
-                sy = 0.5f * a;
-                break;
-            case 2:
-                sy = 0.9f * a;
-                break;
-            default:
-                sy = a;
-                break;
+                case 0:
+                    sy = 0.3f * a;
+                    break;
+                case 1:
+                    sy = 0.5f * a;
+                    break;
+                case 2:
+                    sy = 0.9f * a;
+                    break;
+                default:
+                    sy = a;
+                    break;
             }
             PSMTXScale(scale, sx, sy, sz);
             PSMTXConcat(tmp, scale, tmp);
@@ -386,26 +387,25 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadPosMtxImm(tmp, GX_PNMTX0);
         GXSetCurrentMtx(0);
         switch (type) {
-        case 0:
-        case 1:
-            vtx = size150x20_tex32x32;
-            break;
-        default:
-            vtx = (effN64Vtx*)size300x40_tex32x32;
-            break;
+            case 0:
+            case 1:
+                vtx = size150x20_tex32x32;
+                break;
+            default:
+                vtx = (effN64Vtx*)size300x40_tex32x32;
+                break;
         }
         effSetVtxDescN64(vtx);
         switch (type) {
-        case 0:
-        case 1:
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(0, 1, 2, 0, 0, 2, 3, 0);
-            break;
-        default:
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
-            tri1(0, 1, 2, 0);
-            break;
+            case 0:
+            case 1:
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
+                break;
+            default:
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
+                tri1(0, 1, 2, 0);
+                break;
         }
-
     }
 }

@@ -1,30 +1,30 @@
+// Camera roads: moves the field camera along the camera curves stored in each map's camroad file.
 #include "system.h"
 #include "driver/arcdrv.h"
 #include "driver/mapdrv.h"
 #include "manager/dvdmgr.h"
 #include "memory.h"
 #include "mario/mariost.h"
-#include "cam_shift.h"
 #include "libc_decls.h"
+#include "cam_shift.h"
 #include "cam_road.h"
 #include "addr_word.h"
 #include <math.h>
+#include "version.h"
 typedef struct CamRoadHit {
-    f32 t;                 // 0x00
-    f32 f_04;              // 0x04
-    f32 y;                 // 0x08
-    Vec pos;               // 0x0c
-    Vec dir;               // 0x18
-    s32 f_24;              // 0x24
-    u32 flags;             // 0x28
+    f32 t;     // 0x00
+    f32 f_04;  // 0x04
+    f32 y;     // 0x08
+    Vec pos;   // 0x0c
+    Vec dir;   // 0x18
+    s32 f_24;  // 0x24
+    u32 flags; // 0x28
 } CamRoadHit;
-double sin(double);
-double cos(double);
 double acos(double);
-double atan2(double, double);
-static const Vec unk_vec0 = {0.0f, 1.0f, 0.0f};
-static const Vec unk_vec1 = {90.0f, 110.0f, 13.0f};
-static const Vec unk_vec2 = {-110.0f, -70.0f, -190.0f};
+// Unreferenced in every version (an up vector and two camera offsets); they hold their place in .rodata.
+static const Vec unusedUp = {0.0f, 1.0f, 0.0f};
+static const Vec unusedVec1 = {90.0f, 110.0f, 13.0f};
+static const Vec unusedVec2 = {-110.0f, -70.0f, -190.0f};
 static CamRoadWork work;
 static CamRoadWork* wp = &work;
 void OSReport(const char* msg, ...);
@@ -32,15 +32,15 @@ void calcCurrentCamState(CameraParams* out);
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* speed);
 void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
-static inline void crCheck(BOOL b) {}
-
+static inline void crCheck(BOOL b) {
+}
 
 // FAKE: stand-in for a debug function the linker stripped; its two strings are the last literals in the
-// target .rodata pool (codegen runs bottom-up, so it sits before the first function). The JP demo map
-// (MarioSt.MAP) names the original: the strings are @2397/@2398, numbered between calcCurrentCamState and
+// target .rodata pool (codegen runs bottom-up, so it sits before the first function). The map file of
+// the Japanese July 2004 demo (MarioSt.MAP) names the original: the strings are @2397/@2398, numbered between calcCurrentCamState and
 // camRoadSetup, where the map lists the stripped camRoadDraw (0x8b8 bytes, UNUSED in the demo as well), so
 // no build contains its code.
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 static void camRoadStrippedReport(const char* p, s32 a, s32 b) {
     OSReport("%scam = %d\n", p, a);
     OSReport("%scurve = %d\n", p, b);
@@ -100,7 +100,7 @@ s32 camRoadSetup(const char* name) {
     }
     return 1;
 }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo pools the two strings ahead of camRoadSetup's, so the stand-in follows camRoadSetup.
 static void camRoadStrippedReport(const char* p, s32 a, s32 b) {
     OSReport("%scam = %d\n", p, a);
@@ -186,6 +186,7 @@ static inline Vec crVecCross(Vec a, Vec b) {
 static inline f32 crVecDot(Vec a, Vec b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
+// crVecIsZero, crLen2 and angleLerp are unused, but deleting them (with crCheck) changes the code of the file.
 static inline BOOL crVecIsZero(Vec a) {
     if (a.x == 0.0f && a.y == 0.0f && a.z == 0.0f) {
         return TRUE;
@@ -235,15 +236,17 @@ s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist) {
         }
     }
     t = -nd / crVecDot(n, dir);
-    { Vec h2 = crVecAdd(P, crVecScale(dir, t)); hit = h2; }
+    {
+        Vec h2 = crVecAdd(P, crVecScale(dir, t));
+        hit = h2;
+    }
     if (hit.y < *dist) {
         return 0;
     }
     *dist = hit.y;
     return 1;
 }
-// CC_BEGIN
- static inline f32 crLen2(f32 x, f32 z) {
+static inline f32 crLen2(f32 x, f32 z) {
     f32 l = x * x + z * z;
     if (l != 0.0) {
         l = sqrtf(l);
@@ -381,17 +384,29 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                 if (yy < yA) {
                     if (cross > 0.0) {
                         if (sgn < 0.0f) {
-                            if (d > limA) { d = limA; fl |= 2; }
+                            if (d > limA) {
+                                d = limA;
+                                fl |= 2;
+                            }
                         } else {
-                            if (d > limB) { d = limB; fl |= 2; }
+                            if (d > limB) {
+                                d = limB;
+                                fl |= 2;
+                            }
                             d = -d;
                         }
                     } else {
                         if (sgn < 0.0f) {
-                            if (d > limB) { d = limB; fl |= 2; }
+                            if (d > limB) {
+                                d = limB;
+                                fl |= 2;
+                            }
                             d = -d;
                         } else {
-                            if (d > limA) { d = limA; fl |= 2; }
+                            if (d > limA) {
+                                d = limA;
+                                fl |= 2;
+                            }
                         }
                     }
                     ret = 1;
@@ -410,17 +425,29 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                 if (yy > yB) {
                     if (cross > 0.0) {
                         if (sgn < 0.0f) {
-                            if (d > limA) { d = limA; fl |= 2; }
+                            if (d > limA) {
+                                d = limA;
+                                fl |= 2;
+                            }
                         } else {
-                            if (d > limB) { d = limB; fl |= 2; }
+                            if (d > limB) {
+                                d = limB;
+                                fl |= 2;
+                            }
                             d = -d;
                         }
                     } else {
                         if (sgn < 0.0f) {
-                            if (d > limB) { d = limB; fl |= 2; }
+                            if (d > limB) {
+                                d = limB;
+                                fl |= 2;
+                            }
                             d = -d;
                         } else {
-                            if (d > limA) { d = limA; fl |= 2; }
+                            if (d > limA) {
+                                d = limA;
+                                fl |= 2;
+                            }
                         }
                     }
                     ret = 1;
@@ -439,29 +466,41 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                 if (cross > 0.0) {
                     if (sgn < 0.0f) {
                         if (d > limA) {
-                            dpx /= rp; dpz /= rp; fl |= 2;
+                            dpx /= rp;
+                            dpz /= rp;
+                            fl |= 2;
                             rp += d - limA;
-                            dpx *= rp; dpz *= rp;
+                            dpx *= rp;
+                            dpz *= rp;
                         }
                     } else {
                         if (d > limB) {
-                            dpx /= rp; dpz /= rp; fl |= 2;
+                            dpx /= rp;
+                            dpz /= rp;
+                            fl |= 2;
                             rp -= d - limB;
-                            dpx *= rp; dpz *= rp;
+                            dpx *= rp;
+                            dpz *= rp;
                         }
                     }
                 } else {
                     if (sgn < 0.0f) {
                         if (d > limB) {
-                            dpx /= rp; dpz /= rp; fl |= 2;
+                            dpx /= rp;
+                            dpz /= rp;
+                            fl |= 2;
                             rp += d - limB;
-                            dpx *= rp; dpz *= rp;
+                            dpx *= rp;
+                            dpz *= rp;
                         }
                     } else {
                         if (d > limA) {
-                            dpx /= rp; dpz /= rp; fl |= 2;
+                            dpx /= rp;
+                            dpz /= rp;
+                            fl |= 2;
                             rp -= d - limA;
-                            dpx *= rp; dpz *= rp;
+                            dpx *= rp;
+                            dpz *= rp;
                         }
                     }
                     side = -1.0f;
@@ -469,15 +508,21 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
             } else if (isGrp) {
                 if (cross > 0.0) {
                     if (!(sgn < 0.0f) && d > 0.0f) {
-                        dpx /= rp; dpz /= rp; fl = 3;
+                        dpx /= rp;
+                        dpz /= rp;
+                        fl = 3;
                         rp -= d;
-                        dpx *= rp; dpz *= rp;
+                        dpx *= rp;
+                        dpz *= rp;
                     }
                 } else {
                     if (sgn < 0.0f && d > 0.0f) {
-                        dpx /= rp; dpz /= rp; fl = 3;
+                        dpx /= rp;
+                        dpz /= rp;
+                        fl = 3;
                         rp += d;
-                        dpx *= rp; dpz *= rp;
+                        dpx *= rp;
+                        dpz *= rp;
                     }
                     side = -1.0f;
                 }
@@ -541,9 +586,15 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                 if (yy < yA) {
                     cr = dx2 * su1x + dz2 * dx;
                     if (cr < 0.0f) {
-                        if (dist > limA) { dist = limA; fl |= 2; }
+                        if (dist > limA) {
+                            dist = limA;
+                            fl |= 2;
+                        }
                     } else {
-                        if (dist > limB) { dist = limB; fl |= 2; }
+                        if (dist > limB) {
+                            dist = limB;
+                            fl |= 2;
+                        }
                         dist = -dist;
                     }
                     ret = 1;
@@ -562,9 +613,15 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                 if (yy > yB) {
                     cr = dx2 * su1x + dz2 * dx;
                     if (cr < 0.0f) {
-                        if (dist > limA) { dist = limA; fl |= 2; }
+                        if (dist > limA) {
+                            dist = limA;
+                            fl |= 2;
+                        }
                     } else {
-                        if (dist > limB) { dist = limB; fl |= 2; }
+                        if (dist > limB) {
+                            dist = limB;
+                            fl |= 2;
+                        }
                         dist = -dist;
                     }
                     ret = 1;
@@ -610,11 +667,14 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
     }
     return ret;
 }
-// CC_END
 // FAKE: cos through an inline so the first-block cs is an inline @ temp (numbered above the hoisted +-1 constants, f15 as in the target)
-static inline f32 camRoadCos(f32 x) { return (f32)cos(x); }
+static inline f32 camRoadCos(f32 x) {
+    return (f32)cos(x);
+}
 // FAKE: l2 through an inline so it is an inline @ temp (numbered with the sgn ?: temps) -> 2nd-web lim1/lim2 colour f27/f25 as in the target
-static inline f32 crMul(f32 a, f32 b) { return a * b; }
+static inline f32 crMul(f32 a, f32 b) {
+    return a * b;
+}
 // FAKE: the t/s solve through an inline (s via pointer) so t is the inline return @ temp, numbered above the CSE temps
 // (v2.x load, frsp dB.x) -> t is simplified before the r1/r2 products and colours f5 as in the target
 static inline f32 camRoadSolve(f32 ax, f32 az, Vec* dB, Vec* v2, f32* sp) {
@@ -731,7 +791,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             strip = &wp->map->f_f4[grp->stripOfs];
             for (k = 0; k < m; k++, strip++) {
                 cnt = strip->num;
-        cnt = cnt - 1;
+                cnt = cnt - 1;
                 idx = &wp->map->f_100[strip->idxOfs];
                 idxp = idx + 1;
                 for (l = 1; cnt > l; idxp++, l++) {
@@ -989,7 +1049,9 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     out->f_58 = g;
     out->shiftXRate = curve->f_7c;
 }
-static inline f32 crSq(f32 x) { return x * x; }
+static inline f32 crSq(f32 x) {
+    return x * x;
+}
 u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
     u32 flags = 0;
     s32 d;
@@ -1118,6 +1180,7 @@ static inline f32 angleLerp(f32 a0, f32 a1, f32 r) {
     }
     return r * (a1 - a0) + a0;
 }
+// FAKE: #pragma dont_inline on: keeps calcHokanCamRoad out of line as in the target; without it calcHokanCamRoad is inlined into camRoadMain (316 -> 436 instructions)
 #pragma dont_inline on
 void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t) {
     f32 r, a0, a1, a2;
@@ -1150,22 +1213,22 @@ void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadSta
     out->shiftXRate = r * (to->shiftXRate - from->shiftXRate) + from->shiftXRate;
 }
 #pragma dont_inline reset
-#define CAMROAD_HOKAN_START(src, flags)                                                                     \
-    {                                                                                                         \
-        wp->cmpFlags = flags;                                                                                 \
-        wp->f_c8 = 1;                                                                                         \
-        wp->time = gp->renderFieldTime;                                                                       \
-        wp->hokanT = 0.0f;                                                                                    \
-        wp->start = src;                                                                                      \
-        wp->prev = wp->next;                                                                                  \
-        if (wp->prev.f_08 || wp->start.f_08 ||                                                                \
-            (wp->state == 0x65 &&                                                                             \
-             ((wp->prev.cam && wp->prev.cam->f_20) || (wp->start.cam && wp->start.cam->f_20))) ||             \
-            (wp->prev.cam && wp->prev.cam->f_7c) || (wp->start.cam && wp->start.cam->f_7c)) {                 \
-            wp->hokanType = 1;                                                                                \
-        } else {                                                                                              \
-            wp->hokanType = 0;                                                                                \
-        }                                                                                                     \
+#define CAMROAD_HOKAN_START(src, flags)                                                           \
+    {                                                                                             \
+        wp->cmpFlags = flags;                                                                     \
+        wp->f_c8 = 1;                                                                             \
+        wp->time = gp->renderFieldTime;                                                           \
+        wp->hokanT = 0.0f;                                                                        \
+        wp->start = src;                                                                          \
+        wp->prev = wp->next;                                                                      \
+        if (wp->prev.f_08 || wp->start.f_08 ||                                                    \
+            (wp->state == 0x65 &&                                                                 \
+             ((wp->prev.cam && wp->prev.cam->f_20) || (wp->start.cam && wp->start.cam->f_20))) || \
+            (wp->prev.cam && wp->prev.cam->f_7c) || (wp->start.cam && wp->start.cam->f_7c)) {     \
+            wp->hokanType = 1;                                                                    \
+        } else {                                                                                  \
+            wp->hokanType = 0;                                                                    \
+        }                                                                                         \
     }
 void camRoadMain(CameraParams* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g) {
     u32 flags;
@@ -1278,13 +1341,9 @@ void camRoadCurveOff(const char* name) {
 
 // prototypes for asm stopgap forward references
 void camRoadCurveOff(const char* name);
-void camRoadCurveOn(const char* name);
-void camRoadReset(void);
-f32 camRoadGetCurrentShiftXRate(void);
 void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
 u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed);
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit);
 s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist);
 void calcCurrentCamState(CameraParams* out);
-s32 camRoadSetup(const char* name);

@@ -1,7 +1,9 @@
+// hitdrv.c: the hit driver (HitEntry, HitCheckQuery): map collision objects and the ray and sphere checks.
 #pragma once
 
 #include <dolphin/mtx.h>
 #include "driver/mapdrv.h"
+#include "version.h"
 
 typedef struct HitCheckQuery HitCheckQuery;
 typedef struct HitEntry HitEntry;
@@ -34,30 +36,30 @@ typedef struct HitDamageReturn {
 } HitDamageReturn;
 
 struct HitEntry {
-    u16 flags;                      // 0x0
-    u8 pad_02[0x4 - 0x2];             // 0x2, never accessed
-    s32 attributes;                 // 0x4
-    MapFileJoint* joint;            // 0x8
-    Mtx worldMtx;                   // 0xC
-    Mtx localMtx;                   // 0x3C
-    Mtx animMtx;                    // 0x6C, joint animation matrix (output of mapCalcAnimMatrix, concatenated into worldMtx)
-    Vec centerLocal;                // 0x9C
-    s16 vectorCount;                // 0xA8, number of HitVector triangles (set from hitCalcVtxPosition)
-    s16 mapIndex;                   // 0xAA
-    HitVector* vectors;             // 0xAC
-    HitDamageReturn* damage;        // 0xB0
-    u8 pad_B4[0xC0 - 0xB4];          // 0xB4, never accessed
-    Vec centerWorld;                // 0xC0
-    f32 radius;                     // 0xCC
-    union {                         // 0xD0, owner: map object, or the mobj for mobj hit objects
+    u16 flags;               // 0x0
+    u8 pad_02[0x4 - 0x2];    // 0x2, never accessed
+    s32 attributes;          // 0x4
+    MapFileJoint* joint;     // 0x8
+    Mtx worldMtx;            // 0xC
+    Mtx localMtx;            // 0x3C
+    Mtx animMtx;             // 0x6C, joint animation matrix (output of mapCalcAnimMatrix, concatenated into worldMtx)
+    Vec centerLocal;         // 0x9C
+    s16 vectorCount;         // 0xA8, number of HitVector triangles (set from hitCalcVtxPosition)
+    s16 mapIndex;            // 0xAA
+    HitVector* vectors;      // 0xAC
+    HitDamageReturn* damage; // 0xB0
+    u8 pad_B4[0xC0 - 0xB4];  // 0xB4, never accessed
+    Vec centerWorld;         // 0xC0
+    f32 radius;              // 0xCC
+    union {                  // 0xD0, owner: map object, or the mobj for mobj hit objects
         MapObject* mapObj;
         struct MapObjectEntry* mobj;
     };
-    struct HitEntry* parent;        // 0xD4
-    struct HitEntry* child;         // 0xD8
-    struct HitEntry* sibling;       // 0xDC
-#ifndef VERSION_G8ME01_DEMO
-    struct HitEntry* nextActive;    // 0xE0, next entry in the hitActiveListTop list (not in the demo)
+    struct HitEntry* parent;  // 0xD4
+    struct HitEntry* child;   // 0xD8
+    struct HitEntry* sibling; // 0xDC
+#if VERSION != VERSION_DEMO
+    struct HitEntry* nextActive; // 0xE0, next entry in the hitActiveListTop list (not in the demo)
 #endif
 };
 
@@ -82,3 +84,16 @@ Vec* hitGetDamageReturnPos(HitEntry* hit);
 void hitBindMapObj(const char* hitName, const char* mapobjName);
 
 void hitDelete(const char* name);
+
+void hitBindUpdate(const char* name);
+void hitObjFlagOff(const char* name, u16 mask);
+HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx);
+HitEntry* hitEntry(MapFileJoint* root, Mtx rootMtx, s32 mapIndex);
+void hitReInit(void);
+void hitGrpAttrOff(const char* name, u32 mask);
+void hitGrpAttrOn(const char* name, u32 mask);
+void hitGrpFlagOff(const char* name, u16 mask);
+void hitGrpFlagOn(const char* name, u16 mask);
+void hitObjAttrOff(const char* name, u32 mask);
+void hitObjAttrOn(const char* name, u32 mask);
+void hitObjFlagOn(const char* name, u16 mask);

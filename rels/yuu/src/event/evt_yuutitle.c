@@ -1,3 +1,5 @@
+// evt_yuutitle: Pianta Parlor minigame title card display (alloc, main, free, draw).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,18 +11,19 @@
 #include "driver/camdrv.h"
 #include "manager/fontmgr.h"
 
-typedef struct YuuTitleWork { EventEntry* event; u16 flags; f32 x; f32 y; f32 startX; f32 startY; f32 targetX; f32 targetY; s32 alpha; const char* msg; } YuuTitleWork;
+typedef struct YuuTitleWork {
+    EventEntry* event;
+    u16 flags;
+    f32 x;
+    f32 y;
+    f32 startX;
+    f32 startY;
+    f32 targetX;
+    f32 targetY;
+    s32 alpha;
+    const char* msg;
+} YuuTitleWork;
 static YuuTitleWork* _wp;
-void evt_yuutitle_disp_func(CameraId camera, void* param);
-void FontDrawScale(f32 scale);
-void FontDrawEdge(void);
-void FontDrawEdgeOff(void);
-void FontDrawString(f32 x, f32 y, const char* str);
-
-USER_FUNC(evt_yuutitle_main_func);
-USER_FUNC(evt_yuutitle_free);
-USER_FUNC(evt_yuutitle_alloc);
-void evt_yuutitle_disp_func(CameraId camera, void* param);
 
 static EvtWord main_evt[4];
 
@@ -100,4 +103,3 @@ static EVT_BEGIN(main_evt)
     CALL(evt_yuutitle_main_func)
     RETURN
 EVT_END()
-

@@ -1,3 +1,4 @@
+// eff_rothammer_success_n64.c: hammer success effect entry (effRotHammerSuccessN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

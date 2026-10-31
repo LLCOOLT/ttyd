@@ -1,8 +1,10 @@
+// Declarations for the Riverside Station (eki) area: battle setup tables, the per-room init events, the key-item lecture event and the area's battle units.
 #pragma once
 
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"
+#include "evt/evt_cmd.h"
 
 extern EvtWord all_juyoitem_lecture_rel[];
 extern NpcTerritoryInfo btl_eki_setup_no_tbl[];
@@ -20,3 +22,7 @@ extern BattleUnitKind unit_patatogemet;
 extern BattleUnitKind unit_sambo_mummy;
 
 extern EvtWord evt_sw_complete[];
+
+// User functions defined in the area's files (global symbols in the original REL).
+// eki_02.c
+USER_FUNC(hit_move);

@@ -1,30 +1,15 @@
+// Rogueport Sewers (tik, chika: underground): the REL prolog/epilog, the map list, and the shared wandering event for
+// the sewer residents (tik_villager_urouro).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_sub.h"
 #include "tik.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-
-USER_FUNC(evt_npc_add_dirdist);
-USER_FUNC(evt_npc_get_loiter_dir);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_sub_get_dir);
-USER_FUNC(evt_sub_random);
-USER_FUNC(evt_tik_villager_urouro_check_func);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
-
-extern EvtWord tik_villager_urouro[];
+#include "rel_module.h"
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -68,7 +53,7 @@ void _epilog(void) {
 void _unresolved(void) {
 }
 
-USER_FUNC(evt_tik_villager_urouro_check_func) {
+static USER_FUNC(evt_tik_villager_urouro_check_func) {
     EvtWord* args = event->args;
     s32 xVar = args[0];
     s32 zVar = args[1];
@@ -117,4 +102,3 @@ EVT_BEGIN(tik_villager_urouro)
         WAIT_MS(1000)
     END_LOOP
 EVT_END()
-

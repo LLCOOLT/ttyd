@@ -1,3 +1,4 @@
+// eff_pokopi_pipo_n64.c: arcing blob effect entry (effPokopiPipoN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

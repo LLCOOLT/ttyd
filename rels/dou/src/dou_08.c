@@ -1,33 +1,27 @@
+// dou_08 (洞窟, Pirate's Grotto): room between dou_07 and dou_13 with two ship-change platforms for the boat move.
+// Floating barrel and bottle.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "driver/hitdrv.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_dou_normal_puka);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_random);
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "dou.h"
+#include "driver/mapdrv.h"
 
 static BeroEntry bero_entry_data[3];
 static HitDamageReturn hitDmgRetPoints[10];
-extern EvtWord dou_08_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -42,8 +36,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "n_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -122,8 +116,8 @@ static HitDamageReturn hitDmgRetPoints[] = {
 };
 
 EVT_BEGIN(dou_08_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU8"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU8"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -140,10 +134,9 @@ EVT_BEGIN(dou_08_init_evt)
     SET_VALUE(LW(0), STRING("s08_taru"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main1), LW(10))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_hibi"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_hibi"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_01"), STRING("Ship_Change_01"))
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_02"), STRING("Ship_Change_02"))
     RETURN
 EVT_END()
-

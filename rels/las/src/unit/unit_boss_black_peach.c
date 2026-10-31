@@ -1,3 +1,5 @@
+// Palace of Shadow battle unit: the the Shadow Queen (final boss), her hands and the possessed-Peach first phase (`boss_black_peach`): parts, stats, poses and AI scripts.
+
 #include "eff/n64/eff_shock_n64.h"
 #include "eff/n64/eff_pokopi_thunder_n64.h"
 #include "version.h"
@@ -23,130 +25,68 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
-#ifdef VERSION_G8ME01
-USER_FUNC(btlevtcmd_WaitEventEnd);
-#endif
+#include "battle/battle_event_cmd.h"
+#include "eff/n64/eff_stardust2_n64.h"
+#include "evt/evt_batstage.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_env.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "pmario_sound.h"
+#include "unit/party/unit_party_vivian.h"
+#include "battle/battle_camera.h"
+#include "evt/evt_story.h"
 
-typedef struct HandElem { u16 flip; u8 pad_2[2]; s32 animIdx; OSTime time; s16 ofs; s16 phase; f32 speed; Vec pos; s32 poseId; } HandElem; /* poseId: never accessed */
-typedef struct HandAnim { char name[16]; char anim[8]; f32 rate; s32 start; s32 count; } HandAnim;
-typedef struct HandWork { HandElem* elems; s32 num; HandAnim anim[32]; u8 groupPos[0x49C - 0x488]; f32 y; u8 ySpeed[4]; s32 animNum; s32 timer; s32 state; } HandWork; /* groupPos/ySpeed: never accessed */
-typedef struct HandData { const char* name; const char* anim; f32 rate; } HandData;
-typedef struct QueenConnect { s32 poseId[3]; u8 locatorWork[0x40 - 0xC]; s32 idx[2]; } QueenConnect; /* locatorWork: never accessed */
+typedef struct HandElem {
+    u16 flip;
+    u8 pad_2[2];
+    s32 animIdx;
+    OSTime time;
+    s16 ofs;
+    s16 phase;
+    f32 speed;
+    Vec pos;
+    s32 poseId;
+} HandElem; /* poseId: never accessed */
+typedef struct HandAnim {
+    char name[16];
+    char anim[8];
+    f32 rate;
+    s32 start;
+    s32 count;
+} HandAnim;
+typedef struct HandWork {
+    HandElem* elems;
+    s32 num;
+    HandAnim anim[32];
+    u8 groupPos[0x49C - 0x488];
+    f32 y;
+    u8 ySpeed[4];
+    s32 animNum;
+    s32 timer;
+    s32 state;
+} HandWork; /* groupPos/ySpeed: never accessed */
+typedef struct HandData {
+    const char* name;
+    const char* anim;
+    f32 rate;
+} HandData;
+typedef struct QueenConnect {
+    s32 poseId[3];
+    u8 locatorWork[0x40 - 0xC];
+    s32 idx[2];
+} QueenConnect; /* locatorWork: never accessed */
 HandData hand_data[32];
 HandWork* hand_wp;
-s32 psndSFXOn_3D(const char* name, Vec* position);
-void BattleAudienceAddTargetNum(f32 a, f32 b);
 #include "battle/battle_break_slot.h"
 #include "driver/extdrv.h"
-u8* lightGetPaperCraft(void);
-EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b);
-EffectEntry* effPokopiThunderN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 scale);
-EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y, f32 z, f32 vx, f32 vy);
-void btl_camera_shake_w(s32 a, s32 b, s32 c, f32 d, f32 e);
-void BtlUnit_SetAnim(BattleUnitPart* part, const char* anim);
-double cos(double);
+#include "driver/lightdrv.h"
 
-USER_FUNC(battle_evt_majo_disp_off);
-USER_FUNC(battle_evt_majo_disp_on);
-USER_FUNC(btlevtcmd_AddPartsPos);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AttackDeclare);
-USER_FUNC(btlevtcmd_CheckActStatus);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_CheckPhase);
-USER_FUNC(btlevtcmd_CheckStatus);
-USER_FUNC(btlevtcmd_CheckToken);
-USER_FUNC(btlevtcmd_ChoiceSamplingEnemy);
-USER_FUNC(btlevtcmd_ClearAllStatus);
-USER_FUNC(btlevtcmd_DrawLots);
-USER_FUNC(btlevtcmd_GetDamageCode);
-USER_FUNC(btlevtcmd_GetEnemyBelong);
-USER_FUNC(btlevtcmd_GetHeight);
-USER_FUNC(btlevtcmd_GetHitPos);
-USER_FUNC(btlevtcmd_GetHomePos);
-USER_FUNC(btlevtcmd_GetHp);
-USER_FUNC(btlevtcmd_GetHpDamage);
-USER_FUNC(btlevtcmd_GetMaxHp);
-USER_FUNC(btlevtcmd_GetPartsPos);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_GetSelectNextEnemy);
-USER_FUNC(btlevtcmd_GetUnitId);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_InterruptStop);
-USER_FUNC(btlevtcmd_KillUnit);
-USER_FUNC(btlevtcmd_OffAttribute);
-USER_FUNC(btlevtcmd_OffPartsAttribute);
-USER_FUNC(btlevtcmd_OnAttribute);
-USER_FUNC(btlevtcmd_OnPartsAttribute);
-USER_FUNC(btlevtcmd_OnUnitFlag);
-USER_FUNC(btlevtcmd_PayWeaponCost);
-USER_FUNC(btlevtcmd_PreCheckDamage);
-USER_FUNC(btlevtcmd_RecoverHp);
-USER_FUNC(btlevtcmd_ResultACDefence);
-USER_FUNC(btlevtcmd_SamplingEnemy);
-USER_FUNC(btlevtcmd_SetAlpha);
-USER_FUNC(btlevtcmd_SetBaseRotate);
-USER_FUNC(btlevtcmd_SetBaseScale);
-USER_FUNC(btlevtcmd_SetBintaHitOffset);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventEntry);
-USER_FUNC(btlevtcmd_SetEventPhase);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetHitCursorOffset);
-USER_FUNC(btlevtcmd_SetHitOffset);
-USER_FUNC(btlevtcmd_SetHomePos);
-USER_FUNC(btlevtcmd_SetHp);
-USER_FUNC(btlevtcmd_SetKissHitOffset);
-USER_FUNC(btlevtcmd_SetMaxMoveCount);
-USER_FUNC(btlevtcmd_SetPartsBaseRotate);
-USER_FUNC(btlevtcmd_SetPartsBaseScale);
-USER_FUNC(btlevtcmd_SetPartsDefenceAttrTable);
-USER_FUNC(btlevtcmd_SetPartsDefenceTable);
-USER_FUNC(btlevtcmd_SetPartsHomePos);
-USER_FUNC(btlevtcmd_SetPartsPos);
-USER_FUNC(btlevtcmd_SetPartsRotate);
-USER_FUNC(btlevtcmd_SetPos);
-USER_FUNC(btlevtcmd_SetRegistStatus);
-USER_FUNC(btlevtcmd_SetScale);
-USER_FUNC(btlevtcmd_SetStayPose);
-USER_FUNC(btlevtcmd_SetTalkPose);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_SpawnUnit);
-USER_FUNC(btlevtcmd_StartAvoid);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StatusWindowOnOff);
-USER_FUNC(btlevtcmd_WaitAttackEnd);
-USER_FUNC(btlevtcmd_WaitGuardMove);
-USER_FUNC(btlevtcmd_WeaponAftereffect);
-USER_FUNC(btlevtcmd_reset_turn);
 USER_FUNC(eff_queen_set_alpha_evt);
-USER_FUNC(evt_batstage_return_aud_dark_base);
-USER_FUNC(evt_btl_camera_set_homing_unit);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_moveSpeedLv);
-USER_FUNC(evt_btl_camera_set_moveto);
-USER_FUNC(evt_btl_camera_set_prilimit);
-USER_FUNC(evt_btl_camera_set_zoom);
-USER_FUNC(evt_btl_camera_shake_h);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_softdelete);
-USER_FUNC(evt_env_blur_on);
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_battle_party);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfx_vol);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_random);
 USER_FUNC(make_pattern);
 USER_FUNC(peach_hand1000_dark_drag_1_evt);
 USER_FUNC(peach_talk_synchro_shadow_head_evt);
@@ -170,9 +110,6 @@ USER_FUNC(queen_thunder);
 USER_FUNC(shadow_queen_connect);
 USER_FUNC(slot_init);
 USER_FUNC(queen_break_slot_flag2_on);
-USER_FUNC(queen_hand_small_drag_4_evt);
-USER_FUNC(peach_shock_evt);
-USER_FUNC(change_pose);
 void hand_main(void);
 void hand_draw(CameraId cameraId, void* param);
 static void hand_init(void);
@@ -210,7 +147,6 @@ PoseTableEntry queen_hand_pose_table[4];
 BattleDataEntry queen_data_table[2];
 BattleUnitKindPart queen_parts[5];
 f32 hair_offset[36];
-extern EvtWord shadow_queen_1000[];
 BattleUnitKind unit_boss_shadow_hand_1;
 BattleUnitDefense queen_hand_1_defence;
 BattleUnitDefenseAttr queen_hand_1_defence_attr;
@@ -239,45 +175,18 @@ BattleUnitSetup entry_shadow_hand_small;
 extern EvtWord peach_init_event[];
 extern EvtWord peach_entry_event[];
 extern EvtWord peach_damage_event[];
-extern EvtWord peach_change_evt[];
 extern EvtWord peach_phase_event[];
 extern EvtWord peach_dead_event[];
-extern EvtWord peack_attack_black_thunder[];
-extern EvtWord peack_attack_black_energy[];
-extern EvtWord peack_attack_dark_drag[];
-extern EvtWord peack_attack_drain[];
 extern EvtWord peach_attack_event[];
 extern EvtWord peach_wait_event[];
 extern EvtWord queen_init_event[];
-extern EvtWord queen_first_attack_message_evt[];
-extern EvtWord queen_next_attack_message_evt[];
-extern EvtWord queen_last_attack_message_evt[];
-extern EvtWord queen_change_hand_small_evt[];
-extern EvtWord queen_change_hand_big_evt[];
-extern EvtWord queen_hand_big_life_check_evt[];
-extern EvtWord queen_hand_small_life_check_evt[];
-extern EvtWord queen_hp_drain_evt[];
-extern EvtWord queen_hp_drain_evt_miss[];
-extern EvtWord queen_first_damage_evt[];
-extern EvtWord queen_2_hp_msg_evt[];
-extern EvtWord queen_4_hp_msg_evt[];
-extern EvtWord queen_dead_hp_msg_evt[];
 extern EvtWord queen_phase_event[];
-extern EvtWord queen_attack_black_thunder[];
-extern EvtWord queen_attack_charge[];
-extern EvtWord queen_attack_black_wave[];
-extern EvtWord queen_attack_black_energy[];
-extern EvtWord queen_attack_bress1[];
-extern EvtWord queen_attack_bress2[];
-extern EvtWord queen_attack_bress3[];
 extern EvtWord queen_attack_event[];
 extern EvtWord queen_damage_event[];
 extern EvtWord queen_dead_event[];
 extern EvtWord queen_wait_event[];
 extern EvtWord queen_entry_event[];
 extern EvtWord queen_hand_1_init_event[];
-extern EvtWord queen_hand_1_press_attack[];
-extern EvtWord queen_hand_1_drain_attack[];
 extern EvtWord queen_hand_1_attack_event[];
 extern EvtWord queen_hand_1_damage_event[];
 extern EvtWord queen_hand_1_dead_event[];
@@ -288,8 +197,6 @@ extern EvtWord queen_hand_2_damage_event[];
 extern EvtWord queen_hand_2_dead_event[];
 extern EvtWord queen_hand_2_wait_event[];
 extern EvtWord queen_hand_small_init_event[];
-extern EvtWord queen_hand_small_drag_attack[];
-extern EvtWord queen_hand_small_1000hand_attack[];
 extern EvtWord queen_hand_small_attack_event[];
 extern EvtWord queen_hand_small_damage_event[];
 extern EvtWord queen_hand_small_dead_event[];
@@ -409,30 +316,30 @@ BattleWeapon weapon_peach_black_thunder_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     4, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -440,7 +347,7 @@ BattleWeapon weapon_peach_black_thunder_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -450,29 +357,29 @@ BattleWeapon weapon_peach_black_energy_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1004020, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x5087, // special
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED, // special
     0, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, // burnTime..sizeChangeStrength
@@ -486,7 +393,7 @@ BattleWeapon weapon_peach_black_energy_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -496,29 +403,29 @@ BattleWeapon weapon_peach_drain_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -526,7 +433,7 @@ BattleWeapon weapon_peach_drain_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -537,23 +444,23 @@ BattleWeapon weapon_peach_dark_drag_attack = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -561,7 +468,7 @@ BattleWeapon weapon_peach_dark_drag_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -572,24 +479,24 @@ BattleWeapon weapon_peach_dark_drag_last_attack = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, // element
     27, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x2004F, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -597,7 +504,7 @@ BattleWeapon weapon_peach_dark_drag_last_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -608,22 +515,22 @@ BattleWeapon weapon_peach_dark_charge_attack = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1004020, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x108, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -632,7 +539,7 @@ BattleWeapon weapon_peach_dark_charge_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -642,29 +549,29 @@ BattleWeapon weapon_peach_black_wave_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x2004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -672,7 +579,7 @@ BattleWeapon weapon_peach_black_wave_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -682,34 +589,34 @@ BattleWeapon weapon_peach_black_sigh_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x2004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
     0, 0, 0, 0, // atkChangeStrength..defChangeStrength
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     90, // allergicChance
 #else
     60, // allergicChance
@@ -718,7 +625,7 @@ BattleWeapon weapon_peach_black_sigh_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -728,32 +635,32 @@ BattleWeapon weapon_peach_black_temptation_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x2004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, // poisonStrength
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     75, // confuseChance
 #else
     50, // confuseChance
@@ -765,7 +672,7 @@ BattleWeapon weapon_peach_black_temptation_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -775,31 +682,31 @@ BattleWeapon weapon_peach_black_poison_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
-    0x2004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, // sleepChance..dizzyTime
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     75, // poisonChance
 #else
     50, // poisonChance
@@ -812,7 +719,7 @@ BattleWeapon weapon_peach_black_poison_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -822,29 +729,29 @@ BattleWeapon weapon_peach_black_press_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    7, // special
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -852,7 +759,7 @@ BattleWeapon weapon_peach_black_press_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -862,33 +769,33 @@ BattleWeapon weapon_peach_black_1000hand_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x21002000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#ifdef VERSION_G8ME01
-    0x47, // special
+#if VERSION >= VERSION_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
 #else
-    7, // special
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE, // special
 #endif
-    0x7FF, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -896,7 +803,7 @@ BattleWeapon weapon_peach_black_1000hand_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -1030,11 +937,11 @@ f32 hair_offset[] = {
 // inline helper for pose_init: defined here so its Vec template lands at this .rodata position
 inline void hand_light_init(void) {
     Mtx mtx;
-    u8* light = lightGetPaperCraft();
+    LightEntry* light = lightGetPaperCraft();
 
-    *(Vec*)(light + 0x24) = (Vec){-200.0f, 100.0f, 500.0f};
+    light->position = (Vec){-200.0f, 100.0f, 500.0f};
     PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
-    PSMTXMultVec(mtx, (Vec*)(light + 0x24), (Vec*)(light + 0x24));
+    PSMTXMultVec(mtx, &light->position, &light->position);
 }
 
 EVT_BEGIN(shadow_queen_1000)
@@ -1323,10 +1230,10 @@ BattleUnitKindPart queen_hand_small_parts[] = {
 };
 
 BattleUnitSetup entry_shadow_queen = {
-    &unit_boss_shadow_queen, // mUnitKindParams
+    &unit_boss_shadow_queen, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {75.0f, 0.0f, 0.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -1334,10 +1241,10 @@ BattleUnitSetup entry_shadow_queen = {
 };
 
 BattleUnitSetup entry_shadow_hand_1 = {
-    &unit_boss_shadow_hand_1, // mUnitKindParams
+    &unit_boss_shadow_hand_1, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {15.0f, 0.0f, -50.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -1345,10 +1252,10 @@ BattleUnitSetup entry_shadow_hand_1 = {
 };
 
 BattleUnitSetup entry_shadow_hand_2 = {
-    &unit_boss_shadow_hand_2, // mUnitKindParams
+    &unit_boss_shadow_hand_2, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {160.0f, 0.0f, 50.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -1356,10 +1263,10 @@ BattleUnitSetup entry_shadow_hand_2 = {
 };
 
 BattleUnitSetup entry_shadow_hand_small = {
-    &unit_boss_shadow_hand_small, // mUnitKindParams
+    &unit_boss_shadow_hand_small, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {95.0f, 0.0f, 0.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -1371,19 +1278,19 @@ EVT_BEGIN(peach_init_event)
     SET_VALUE(GW(9), -1)
     SET_VALUE(GW(10), -1)
     SET_VALUE(GW(14), 0)
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-        ELSE
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    ELSE
         CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_queen), 0)
-        CALL(btlevtcmd_SetPos, -2, 0, -1000, 0)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 1, 50397184)
-        CALL(btlevtcmd_OnAttribute, -2, 301989888)
-        CALL(btlevtcmd_SetMaxMoveCount, -2, 0)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
+        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 0, -1000, 0)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 50397184)
+        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 301989888)
+        CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     SET_VALUE(GW(13), LW(0))
     BEGIN_INLINE_EVENT
         CALL(shadow_queen_connect)
@@ -1391,16 +1298,16 @@ EVT_BEGIN(peach_init_event)
     BEGIN_INLINE_EVENT
         CALL(peach_talk_synchro_shadow_head_evt)
     END_INLINE_EVENT
-    CALL(btlevtcmd_SetPartsBaseScale, -2, 7, FLOAT(-1.0f), FLOAT(1.0f), FLOAT(1.0f))
-    CALL(btlevtcmd_SetPartsBaseRotate, -2, 6, 0, 315, 0)
-    CALL(btlevtcmd_SetPartsBaseRotate, -2, 7, 0, 315, 0)
-    CALL(btlevtcmd_SetPartsPos, -2, 6, 15, 0, -50)
-    CALL(btlevtcmd_SetPartsPos, -2, 7, 160, 0, 50)
+    CALL(btlevtcmd_SetPartsBaseScale, BTL_UNIT_SELF, 7, FLOAT(-1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    CALL(btlevtcmd_SetPartsBaseRotate, BTL_UNIT_SELF, 6, 0, 315, 0)
+    CALL(btlevtcmd_SetPartsBaseRotate, BTL_UNIT_SELF, 7, 0, 315, 0)
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 6, 15, 0, -50)
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 7, 160, 0, 50)
     SPAWN_EVENT(PTR(shadow_queen_1000))
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(LW(0), FLOAT(360.0f))
         LOOP(0)
-            CALL(btlevtcmd_SetPartsRotate, -2, 2, FLOAT(0.0f), LW(0), FLOAT(3.6992188f))
+            CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, FLOAT(0.0f), LW(0), FLOAT(3.6992188f))
             SUBTRACT_FLOAT(LW(0), FLOAT(0.71972656f))
             IF_FLOAT_LESS(LW(0), FLOAT(0.0f))
                 ADD_FLOAT(LW(0), FLOAT(360.0f))
@@ -1408,14 +1315,14 @@ EVT_BEGIN(peach_init_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
-    CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("KRT_S_1"))
-    CALL(btlevtcmd_SetEventWait, -2, PTR(peach_wait_event))
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(peach_phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(peach_attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(peach_damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetEventEntry, -2, PTR(peach_entry_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRT_S_1"))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(peach_wait_event))
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(peach_phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(peach_attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(peach_damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(peach_entry_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1425,12 +1332,12 @@ EVT_BEGIN(peach_entry_event)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 83, 69, 332, 83, 46, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_140_02"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_140_02"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_moveto, 0, -122, 69, 332, -122, 46, 0, 15, 11)
     WAIT_MS(550)
     CALL(evt_msg_print_battle_party, STRING("stg8_las_141"))
-    CALL(btlevtcmd_StartWaitEvent, -4)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_PARTNER)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -1443,67 +1350,67 @@ EVT_BEGIN(peach_damage_event)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(peach_change_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 83, 69, 332, 83, 46, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_141_01"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_141_01"), 0, BTL_UNIT_SELF)
     WAIT_MS(200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_L_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_L_2"))
     WAIT_MS(200)
-    CALL(btlevtcmd_SetTalkPose, -2, STRING("KRT_T_3"))
-    CALL(evt_msg_print, 2, STRING("stg8_las_141_02"), 0, -2)
+    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KRT_T_3"))
+    CALL(evt_msg_print, 2, STRING("stg8_las_141_02"), 0, BTL_UNIT_SELF)
     WAIT_MS(200)
     BEGIN_INLINE_EVENT
         CALL(evt_env_blur_on, 0, 500)
     END_INLINE_EVENT
     CALL(evt_btl_camera_set_moveto, 0, 83, 125, 565, 83, 86, 0, 30, 11)
     WAIT_MS(400)
-    CALL(btlevtcmd_ClearAllStatus, -2)
+    CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     WAIT_MS(400)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_q"), STRING("mist2"), 0, LW(0), 15, LW(2), 100, 0, -1, 0, 0, 0, 0, 0)
     ADD(LW(2), 30)
     CALL(evt_eff, STRING("m_q2"), STRING("queen"), 0, LW(0), 0, LW(2), FLOAT(1.0f), 330, 0, 0, 0, 0, 0, 0)
     CALL(eff_queen_set_alpha_evt, 90)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_QWEN_APPEAR2"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_OnUnitFlag, -2, 16777216)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), 0, LW(2))
-        CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_O_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("KRT_O_2"))
-        CALL(btlevtcmd_SetAlpha, -2, 2, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 5, 0)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 4, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 5, 16777216)
+        CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), 0, LW(2))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_O_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, STRING("KRT_O_2"))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, 0)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 4, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
         SET_VALUE(LW(0), 0)
         LOOP(63)
-            CALL(btlevtcmd_SetAlpha, -2, 2, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 3, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 4, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 5, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, LW(0))
             ADD(LW(0), 4)
             WAIT_MS(50)
         END_LOOP
-        CALL(btlevtcmd_SetAlpha, -2, 2, 255)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 255)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 255)
-        CALL(btlevtcmd_SetAlpha, -2, 5, 255)
-        CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-        CALL(btlevtcmd_OnPartsAttribute, -2, 5, 16777216)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, 255)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
@@ -1512,68 +1419,68 @@ EVT_BEGIN(peach_change_evt)
         CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
         SET_VALUE(GW(9), LW(0))
     END_INLINE_EVENT
-    CALL(evt_snd_bgmoff_f, 513, 2000)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 2000)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_FLOAT_VALUE(LW(1), LW(1))
     SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
     LOOP(100)
         ADD_FLOAT(LW(1), FLOAT(0.4091797f))
         ADD_FLOAT(LW(3), FLOAT(0.4091797f))
-        CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         SET_FLOAT_VALUE(LW(4), LW(1))
         SUBTRACT_FLOAT(LW(4), LW(3))
-        CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(4), LW(2))
+        CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(4), LW(2))
         WAIT_MS(20)
     END_LOOP
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_L_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_L_1"))
     WAIT_MS(800)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     WAIT_MS(500)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_T_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_T_1"))
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
-    CALL(evt_snd_bgmon, 513, STRING("BGM_BOSS_STG8_LAST_BOSS1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_BOSS_STG8_LAST_BOSS1"))
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_141_03"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_141_03"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_GetPartsPos, -2, 2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsHomePos, -2, 2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsHomePos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence))
     CALL(btlevtcmd_SetPartsDefenceTable, GW(8), 1, PTR(&queen_muteki_defence))
     CALL(btlevtcmd_SetPartsDefenceTable, GW(9), 1, PTR(&queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence_attr))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(8), 1, PTR(&queen_muteki_defence_attr))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(9), 1, PTR(&queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
+    CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&queen_muteki_regist))
     CALL(btlevtcmd_SetRegistStatus, GW(8), PTR(&queen_muteki_regist))
     CALL(btlevtcmd_SetRegistStatus, GW(9), PTR(&queen_muteki_regist))
     CALL(btlevtcmd_OffPartsAttribute, GW(8), 1, 65536)
     CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, 65536)
     CALL(btlevtcmd_OffAttribute, GW(8), 33554432)
     CALL(btlevtcmd_OffAttribute, GW(9), 33554432)
-    CALL(btlevtcmd_SetHitOffset, -2, 1, 34, -15, 30)
-    CALL(btlevtcmd_SetHitCursorOffset, -2, 1, 34, -15, 30)
-    CALL(btlevtcmd_SetBintaHitOffset, -2, 25, 0, 0)
-    CALL(btlevtcmd_SetKissHitOffset, -2, 50, 40, 0)
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(queen_phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(queen_attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(queen_damage_event))
-    CALL(btlevtcmd_SetEventWait, -2, PTR(queen_wait_event))
+    CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 34, -15, 30)
+    CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 34, -15, 30)
+    CALL(btlevtcmd_SetBintaHitOffset, BTL_UNIT_SELF, 25, 0, 0)
+    CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 50, 40, 0)
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(queen_phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(queen_attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(queen_damage_event))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(queen_wait_event))
     SET_VALUE(GW(11), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
     SET_VALUE(GW(10), -1)
     SET_VALUE(GW(12), 0)
-    CALL(btlevtcmd_GetHp, -2, LW(0))
+    CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_SetHp, -2, 90)
+        CALL(btlevtcmd_SetHp, BTL_UNIT_SELF, 90)
     END_IF
-    CALL(btlevtcmd_GetHp, -2, LW(0))
-    SET_VALUE(GSW(1124), LW(0))
+    CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
+    SET_VALUE(GSW(GSW_SHADOW_QUEEN_HP), LW(0))
     CALL(evt_btl_camera_set_mode, 0, 0)
     RETURN
 EVT_END()
@@ -1583,57 +1490,57 @@ EVT_BEGIN(peach_change_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 83, 69, 332, 83, 46, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_141_01"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_141_01"), 0, BTL_UNIT_SELF)
     WAIT_MS(200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_L_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_L_2"))
     WAIT_MS(200)
-    CALL(btlevtcmd_SetTalkPose, -2, STRING("KRT_T_3"))
-    CALL(evt_msg_print, 2, STRING("stg8_las_141_02"), 0, -2)
+    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KRT_T_3"))
+    CALL(evt_msg_print, 2, STRING("stg8_las_141_02"), 0, BTL_UNIT_SELF)
     WAIT_MS(200)
     BEGIN_INLINE_EVENT
         CALL(evt_env_blur_on, 0, 500)
     END_INLINE_EVENT
     CALL(evt_btl_camera_set_moveto, 0, 83, 125, 565, 83, 86, 0, 30, 11)
     WAIT_MS(400)
-    CALL(btlevtcmd_ClearAllStatus, -2)
+    CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     WAIT_MS(400)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_q"), STRING("mist2"), 0, LW(0), 15, LW(2), 100, 0, -1, 0, 0, 0, 0, 0)
     ADD(LW(2), 30)
     CALL(evt_eff, STRING("m_q2"), STRING("queen"), 0, LW(0), 0, LW(2), FLOAT(1.0f), 330, 0, 0, 0, 0, 0, 0)
     CALL(eff_queen_set_alpha_evt, 90)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_QWEN_APPEAR2"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_OnUnitFlag, -2, 16777216)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), 0, LW(2))
-        CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_O_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("KRT_O_2"))
-        CALL(btlevtcmd_SetAlpha, -2, 2, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 5, 0)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 4, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 5, 16777216)
+        CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), 0, LW(2))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_O_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, STRING("KRT_O_2"))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, 0)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 4, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
         SET_VALUE(LW(0), 0)
         LOOP(63)
-            CALL(btlevtcmd_SetAlpha, -2, 2, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 3, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 4, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 5, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, LW(0))
             ADD(LW(0), 4)
             WAIT_MS(50)
         END_LOOP
-        CALL(btlevtcmd_SetAlpha, -2, 2, 255)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 255)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 255)
-        CALL(btlevtcmd_SetAlpha, -2, 5, 255)
-        CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-        CALL(btlevtcmd_OnPartsAttribute, -2, 5, 16777216)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, 255)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
@@ -1642,88 +1549,88 @@ EVT_BEGIN(peach_change_evt)
         CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
         SET_VALUE(GW(9), LW(0))
     END_INLINE_EVENT
-    CALL(evt_snd_bgmoff_f, 513, 2000)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 2000)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_FLOAT_VALUE(LW(1), LW(1))
     SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
     LOOP(100)
         ADD_FLOAT(LW(1), FLOAT(0.4091797f))
         ADD_FLOAT(LW(3), FLOAT(0.4091797f))
-        CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         SET_FLOAT_VALUE(LW(4), LW(1))
         SUBTRACT_FLOAT(LW(4), LW(3))
-        CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(4), LW(2))
+        CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(4), LW(2))
         WAIT_MS(20)
     END_LOOP
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_L_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_L_1"))
     WAIT_MS(800)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     WAIT_MS(500)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_T_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_T_1"))
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
-    CALL(evt_snd_bgmon, 513, STRING("BGM_BOSS_STG8_LAST_BOSS1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_BOSS_STG8_LAST_BOSS1"))
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_141_03"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_141_03"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_GetPartsPos, -2, 2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsHomePos, -2, 2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
+    CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsHomePos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence))
     CALL(btlevtcmd_SetPartsDefenceTable, GW(8), 1, PTR(&queen_muteki_defence))
     CALL(btlevtcmd_SetPartsDefenceTable, GW(9), 1, PTR(&queen_muteki_defence))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence_attr))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(8), 1, PTR(&queen_muteki_defence_attr))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, GW(9), 1, PTR(&queen_muteki_defence_attr))
-    CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
+    CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&queen_muteki_regist))
     CALL(btlevtcmd_SetRegistStatus, GW(8), PTR(&queen_muteki_regist))
     CALL(btlevtcmd_SetRegistStatus, GW(9), PTR(&queen_muteki_regist))
     CALL(btlevtcmd_OffPartsAttribute, GW(8), 1, 65536)
     CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, 65536)
     CALL(btlevtcmd_OffAttribute, GW(8), 33554432)
     CALL(btlevtcmd_OffAttribute, GW(9), 33554432)
-    CALL(btlevtcmd_SetHitOffset, -2, 1, 34, -15, 30)
-    CALL(btlevtcmd_SetHitCursorOffset, -2, 1, 34, -15, 30)
-    CALL(btlevtcmd_SetBintaHitOffset, -2, 25, 0, 0)
-    CALL(btlevtcmd_SetKissHitOffset, -2, 50, 40, 0)
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(queen_phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(queen_attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(queen_damage_event))
-    CALL(btlevtcmd_SetEventWait, -2, PTR(queen_wait_event))
+    CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 34, -15, 30)
+    CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 34, -15, 30)
+    CALL(btlevtcmd_SetBintaHitOffset, BTL_UNIT_SELF, 25, 0, 0)
+    CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 50, 40, 0)
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(queen_phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(queen_attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(queen_damage_event))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(queen_wait_event))
     SET_VALUE(GW(11), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
     SET_VALUE(GW(10), -1)
     SET_VALUE(GW(12), 0)
-    CALL(btlevtcmd_GetHp, -2, LW(0))
+    CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_SetHp, -2, 112)
+        CALL(btlevtcmd_SetHp, BTL_UNIT_SELF, 112)
     END_IF
-    CALL(btlevtcmd_GetHp, -2, LW(0))
-    SET_VALUE(GSW(1124), LW(0))
+    CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
+    SET_VALUE(GSW(GSW_SHADOW_QUEEN_HP), LW(0))
     CALL(evt_btl_camera_set_mode, 0, 0)
     RETURN
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(peach_phase_event)
-    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 4)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 1)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetHp, -2, LW(0))
+    CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
     IF_INT_LESS(LW(0), 90)
         CALL_CHILD(PTR(peach_change_evt))
         CALL(btlevtcmd_reset_turn)
@@ -1733,19 +1640,19 @@ EVT_BEGIN(peach_phase_event)
 EVT_END()
 #else
 EVT_BEGIN(peach_phase_event)
-    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 4)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 1)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetHp, -2, LW(0))
+    CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
     IF_INT_LESS(LW(0), 112)
         CALL_CHILD(PTR(peach_change_evt))
         CALL(btlevtcmd_reset_turn)
@@ -1758,30 +1665,30 @@ EVT_END()
 EVT_BEGIN(peach_dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL_CHILD(PTR(peach_change_evt))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     CALL(btlevtcmd_reset_turn)
     RETURN
 EVT_END()
 
 EVT_BEGIN(peack_attack_black_thunder)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_thunder_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_thunder_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_1"))
     WAIT_MS(500)
     WAIT_MS(700)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(queen_thunder, LW(0), LW(1), LW(2))
     WAIT_MS(80)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1809,7 +1716,7 @@ EVT_BEGIN(peack_attack_black_thunder)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_thunder_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     LABEL(95)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -1818,79 +1725,79 @@ EVT_BEGIN(peack_attack_black_thunder)
 EVT_END()
 
 EVT_BEGIN(peack_attack_black_energy)
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 400)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     WAIT_MS(200)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_2"))
     WAIT_MS(750)
     BEGIN_INLINE_EVENT
         CALL(evt_env_blur_on, 0, 1000)
     END_INLINE_EVENT
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHeight, -2, LW(5))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(5))
     ADD(LW(1), LW(5))
     ADD(LW(1), -15)
     CALL(evt_eff, STRING(""), STRING("charge"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 60, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_DARK_POWER1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1000)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_energy_attack))
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(&weapon_peach_black_energy_attack), 256, LW(5))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_energy_attack))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, PTR(&weapon_peach_black_energy_attack), 256, LW(5))
     RETURN
 EVT_END()
 
 EVT_BEGIN(peack_attack_dark_drag)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_dark_drag_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_dark_drag_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     WAIT_MS(200)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_QWEN_APPEAR1"), LW(0), LW(1), LW(2), LW(10))
-        CALL(btlevtcmd_SetAlpha, -2, 2, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 6, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 7, 0)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 4, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 6, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 7, 16777216)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 6, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 7, 0)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 4, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 6, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 7, 16777216)
         SET_VALUE(LW(0), 0)
         LOOP(6)
-            CALL(btlevtcmd_SetAlpha, -2, 2, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 3, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 4, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 6, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 7, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 6, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 7, LW(0))
             ADD(LW(0), 16)
             WAIT_MS(5)
         END_LOOP
     END_INLINE_EVENT
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_2"))
     WAIT_MS(500)
     CALL(evt_btl_camera_set_homing_unit, 0, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -1909,7 +1816,7 @@ EVT_BEGIN(peack_attack_dark_drag)
     CALL(evt_eff, STRING("m_h_s2"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     WAIT_MS(1250)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1944,13 +1851,13 @@ EVT_BEGIN(peack_attack_dark_drag)
     CALL(btlevtcmd_GetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
@@ -1960,7 +1867,7 @@ EVT_BEGIN(peack_attack_dark_drag)
     CALL(battle_evt_majo_disp_on, LW(3), LW(4), LW(0), LW(1), LW(2), 0)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_last_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_last_attack), 256, LW(5))
     WAIT_MS(750)
     LABEL(95)
     LABEL(98)
@@ -1968,63 +1875,63 @@ EVT_BEGIN(peack_attack_dark_drag)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 100)
         LOOP(6)
-            CALL(btlevtcmd_SetAlpha, -2, 2, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 3, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 4, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 6, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 7, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 6, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 7, LW(0))
             ADD(LW(0), -16)
             WAIT_MS(5)
         END_LOOP
-        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 4, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 6, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 7, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 4, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 6, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 7, 16777216)
     END_INLINE_EVENT
     CALL(evt_btl_camera_set_mode, 0, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(peack_attack_drain)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_drain_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_drain_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_drain_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     WAIT_MS(200)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_QWEN_APPEAR1"), LW(0), LW(1), LW(2), LW(10))
-        CALL(btlevtcmd_SetAlpha, -2, 2, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 7, 0)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 4, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 6, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 7, 16777216)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 7, 0)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 4, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 6, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 7, 16777216)
         SET_VALUE(LW(0), 0)
         LOOP(6)
-            CALL(btlevtcmd_SetAlpha, -2, 2, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 3, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 4, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 7, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 7, LW(0))
             ADD(LW(0), 16)
             WAIT_MS(5)
         END_LOOP
     END_INLINE_EVENT
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_2"))
     WAIT_MS(500)
     CALL(evt_btl_camera_set_homing_unit, 0, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -2034,26 +1941,26 @@ EVT_BEGIN(peack_attack_drain)
     CALL(evt_btl_camera_set_homing_unit, 0, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 6, STRING("KRT_S_1"))
-    CALL(btlevtcmd_SetAlpha, -2, 6, 0)
-    CALL(btlevtcmd_OffPartsAttribute, -2, 6, 16777216)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 6, STRING("KRT_S_1"))
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 6, 0)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 6, 16777216)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_h_1"), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
     ADD(LW(0), 20)
     SET_VALUE(LW(1), 0)
     ADD(LW(2), -30)
-    CALL(btlevtcmd_SetPartsPos, -2, 6, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 6, LW(0), LW(1), LW(2))
     SET_VALUE(LW(0), 0)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 6, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 6, LW(0))
         ADD(LW(0), 16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 6, 255)
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 6, 255)
     WAIT_MS(500)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_DRAIN1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 6, STRING("KRT_A2_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 6, STRING("KRT_A2_1"))
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
         CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
@@ -2066,7 +1973,7 @@ EVT_BEGIN(peack_attack_drain)
         WAIT_MS(600)
     END_INLINE_EVENT
     WAIT_MS(2000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2093,11 +2000,11 @@ EVT_BEGIN(peack_attack_drain)
     LABEL(91)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_drain_attack))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_drain_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     CALL(btlevtcmd_GetHpDamage, LW(3), LW(0))
-    CALL(btlevtcmd_RecoverHp, -2, 1, LW(0))
-    CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
-    CALL(btlevtcmd_GetHeight, -2, LW(8))
+    CALL(btlevtcmd_RecoverHp, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
+    CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(8))
     ADD(LW(6), LW(8))
     ADD(LW(7), 30)
     CALL(evt_eff, STRING(""), STRING("recovery"), 0, LW(5), LW(6), LW(7), LW(0), 0, 0, 0, 0, 0, 0, 0)
@@ -2108,45 +2015,45 @@ EVT_BEGIN(peack_attack_drain)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 100)
         LOOP(6)
-            CALL(btlevtcmd_SetAlpha, -2, 2, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 3, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 4, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 7, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 7, LW(0))
             ADD(LW(0), -16)
             WAIT_MS(5)
         END_LOOP
-        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 4, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 7, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 4, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 7, 16777216)
     END_INLINE_EVENT
     SET_VALUE(LW(0), 255)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 6, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 6, LW(0))
         ADD(LW(0), -16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_OnPartsAttribute, -2, 6, 16777216)
-    CALL(btlevtcmd_SetPartsPos, -2, 6, 15, 0, -50)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 6, 16777216)
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 6, 15, 0, -50)
     LABEL(99)
     RETURN
 EVT_END()
 
 EVT_BEGIN(peach_attack_event)
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
         CALL_CHILD(PTR(peack_attack_black_thunder))
         CASE_EQUAL(1)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
         CALL_CHILD(PTR(peack_attack_black_energy))
         CASE_EQUAL(2)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
         CALL_CHILD(PTR(peack_attack_dark_drag))
         CASE_EQUAL(3)
         CALL(btlevtcmd_DrawLots, LW(0), 4, 100, 30, 30, 30)
-        CALL(btlevtcmd_CheckStatus, -2, 14, LW(1))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 14, LW(1))
         IF_INT_EQUAL(LW(1), 1)
             IF_INT_EQUAL(LW(0), 1)
                 SET_VALUE(LW(0), 0)
@@ -2163,29 +2070,29 @@ EVT_BEGIN(peach_attack_event)
             CALL_CHILD(PTR(peack_attack_dark_drag))
         END_SWITCH
     END_SWITCH
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(peach_wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_init_event)
-    CALL(btlevtcmd_GetMaxHp, -2, LW(0))
-    CALL(btlevtcmd_SetHp, -2, LW(0))
-    CALL(btlevtcmd_SetEventWait, -2, PTR(queen_wait_event))
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(queen_phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(queen_attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(queen_damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetEventEntry, -2, PTR(queen_entry_event))
-    CALL(btlevtcmd_OnUnitFlag, -2, 16777216)
+    CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SetHp, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(queen_wait_event))
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(queen_phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(queen_attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(queen_damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(queen_entry_event))
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     SET_VALUE(GW(11), 1)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 3)
-    CALL(btlevtcmd_SetUnitWork, -2, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 3)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
     SET_VALUE(GW(10), -1)
     SET_VALUE(GW(12), 300)
     SET_VALUE(GW(18), 0)
@@ -2194,12 +2101,12 @@ EVT_BEGIN(queen_init_event)
     SET_VALUE(GW(8), LW(0))
     CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
     SET_VALUE(GW(9), LW(0))
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     SET_VALUE(GW(13), LW(0))
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(LW(0), FLOAT(360.0f))
         LOOP(0)
-            CALL(btlevtcmd_SetPartsRotate, -2, 2, FLOAT(0.0f), LW(0), FLOAT(3.6992188f))
+            CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, FLOAT(0.0f), LW(0), FLOAT(3.6992188f))
             SUBTRACT_FLOAT(LW(0), FLOAT(0.71972656f))
             IF_FLOAT_LESS(LW(0), FLOAT(0.0f))
                 ADD_FLOAT(LW(0), FLOAT(360.0f))
@@ -2207,12 +2114,12 @@ EVT_BEGIN(queen_init_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)
-    CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
     BEGIN_INLINE_EVENT
         CALL(shadow_queen_connect)
     END_INLINE_EVENT
@@ -2224,18 +2131,18 @@ EVT_BEGIN(queen_init_event)
     CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, 65536)
     CALL(btlevtcmd_OffAttribute, GW(8), 33554432)
     CALL(btlevtcmd_OffAttribute, GW(9), 33554432)
-    CALL(btlevtcmd_SetHitOffset, -2, 1, 34, -15, 30)
-    CALL(btlevtcmd_SetHitCursorOffset, -2, 1, 34, -15, 30)
-    CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("KRT_S_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 34, -15, 30)
+    CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 34, -15, 30)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_q"), STRING("mist2"), 0, LW(0), 15, LW(2), 100, 0, -1, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_first_attack_message_evt)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF
@@ -2243,9 +2150,9 @@ EVT_BEGIN(queen_first_attack_message_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_142"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_142"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
     SET_VALUE(GW(12), 100)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2253,7 +2160,7 @@ EVT_BEGIN(queen_first_attack_message_evt)
 EVT_END()
 
 EVT_BEGIN(queen_next_attack_message_evt)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 1)
         RETURN
     END_IF
@@ -2261,9 +2168,9 @@ EVT_BEGIN(queen_next_attack_message_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_143"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_143"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
     SET_VALUE(GW(12), 200)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2271,7 +2178,7 @@ EVT_BEGIN(queen_next_attack_message_evt)
 EVT_END()
 
 EVT_BEGIN(queen_last_attack_message_evt)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 2)
         RETURN
     END_IF
@@ -2279,10 +2186,10 @@ EVT_BEGIN(queen_last_attack_message_evt)
     CALL(evt_btl_camera_set_moveto, 0, -113, 69, 332, -113, 46, 0, 15, 11)
     WAIT_MS(550)
     CALL(evt_msg_print_battle_party, STRING("stg8_las_145"))
-    CALL(btlevtcmd_StartWaitEvent, -4)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_PARTNER)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 3)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 3)
     SET_VALUE(GW(12), 300)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(1000)
@@ -2424,7 +2331,7 @@ EVT_BEGIN(queen_hp_drain_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_144"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_144"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_mode, 0, 0)
     BEGIN_INLINE_EVENT
@@ -2478,7 +2385,7 @@ EVT_BEGIN(queen_hp_drain_evt)
     IF_INT_GREATER(LW(10), 99)
         SET_VALUE(LW(10), 99)
     END_IF
-    CALL(btlevtcmd_GetMaxHp, -2, LW(10))
+    CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(10))
     CALL(btlevtcmd_RecoverHp, GW(13), 1, LW(10))
     CALL(btlevtcmd_GetPos, GW(13), LW(5), LW(6), LW(7))
     CALL(btlevtcmd_GetHeight, GW(13), LW(8))
@@ -2497,7 +2404,7 @@ EVT_BEGIN(queen_hp_drain_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_142_01"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_142_01"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2512,7 +2419,7 @@ EVT_BEGIN(queen_hp_drain_evt_miss)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_144"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_144"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(1000)
@@ -2525,17 +2432,17 @@ EVT_BEGIN(queen_first_damage_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_163"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_163"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, -113, 69, 332, -113, 46, 0, 30, 11)
     WAIT_MS(800)
     CALL(evt_msg_print_battle_party, STRING("stg8_las_164"))
-    CALL(btlevtcmd_StartWaitEvent, -4)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_PARTNER)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 1, 11)
     WAIT_MS(350)
-    CALL(evt_msg_print, 2, STRING("stg8_las_165"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_165"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2548,7 +2455,7 @@ EVT_BEGIN(queen_2_hp_msg_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_166"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_166"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2561,7 +2468,7 @@ EVT_BEGIN(queen_4_hp_msg_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(evt_msg_print, 2, STRING("stg8_las_167"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_167"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2574,29 +2481,29 @@ EVT_BEGIN(queen_dead_hp_msg_evt)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
     WAIT_MS(800)
-    CALL(btlevtcmd_SetTalkPose, -2, STRING("KRT_D_1"))
-    CALL(btlevtcmd_SetStayPose, -2, STRING("KRT_D_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KRT_S_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_D_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("KRT_S_1"))
+    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KRT_D_1"))
+    CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("KRT_D_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_D_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRT_S_1"))
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_D_1"))
     END_IF
     IF_INT_NOT_EQUAL(GW(9), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(9), 1, STRING("KRT_D_1"))
     END_IF
-    CALL(evt_msg_print, 2, STRING("stg8_las_168"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_168"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(1000)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_phase_event)
-    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
@@ -2634,7 +2541,7 @@ EVT_BEGIN(queen_phase_event)
                 SET_VALUE(GW(11), 3)
                 SET_VALUE(GW(14), 1)
                 CALL_CHILD(PTR(queen_hp_drain_evt))
-                ELSE
+            ELSE
                 CALL_CHILD(PTR(queen_hp_drain_evt_miss))
             END_IF
             CALL_CHILD(PTR(queen_last_attack_message_evt))
@@ -2649,11 +2556,11 @@ EVT_BEGIN(queen_phase_event)
             BREAK_SWITCH
         END_IF
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
+        CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
         IF_INT_EQUAL(LW(0), 1)
             CALL_CHILD(PTR(queen_hand_big_life_check_evt))
         END_IF
-        CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+        CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_sub_random, 100, LW(0))
             IF_INT_LESS_OR_EQUAL(LW(0), 50)
@@ -2662,11 +2569,11 @@ EVT_BEGIN(queen_phase_event)
             END_IF
         END_IF
         CASE_EQUAL(2)
-        CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
+        CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
         IF_INT_EQUAL(LW(0), 1)
             CALL_CHILD(PTR(queen_hand_small_life_check_evt))
         END_IF
-        CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+        CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_sub_random, 100, LW(0))
             IF_INT_LESS_OR_EQUAL(LW(0), 50)
@@ -2675,7 +2582,7 @@ EVT_BEGIN(queen_phase_event)
             END_IF
         END_IF
         CASE_EQUAL(3)
-        CALL(btlevtcmd_CheckPhase, LW(0), 67108868)
+        CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_ENEMY)
         IF_INT_EQUAL(LW(0), 1)
             SET_VALUE(GW(11), 2)
         END_IF
@@ -2685,32 +2592,32 @@ EVT_BEGIN(queen_phase_event)
 EVT_END()
 
 EVT_BEGIN(queen_attack_black_thunder)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_thunder_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_thunder_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_thunder_attack))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_1"))
     WAIT_MS(500)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), -33)
     ADD(LW(1), 82)
     CALL(evt_eff, STRING(""), STRING("toge_flush"), 4, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_2"))
     WAIT_MS(700)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(queen_thunder, LW(0), LW(1), LW(2))
     WAIT_MS(80)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2738,7 +2645,7 @@ EVT_BEGIN(queen_attack_black_thunder)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_thunder_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_thunder_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_thunder_attack), 256, LW(5))
     LABEL(95)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2747,20 +2654,20 @@ EVT_BEGIN(queen_attack_black_thunder)
 EVT_END()
 
 EVT_BEGIN(queen_attack_charge)
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_dark_charge_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_dark_charge_attack))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_2"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_2"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_1"))
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_A_3"))
     END_IF
@@ -2773,39 +2680,39 @@ EVT_BEGIN(queen_attack_charge)
     END_INLINE_EVENT
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHeight, -2, LW(5))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(5))
     ADD(LW(1), LW(5))
     ADD(LW(2), 30)
     CALL(evt_eff, STRING(""), STRING("charge"), 2, LW(0), LW(1), LW(2), FLOAT(3.0f), 60, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_DARK_POWER1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_S_1"))
     END_IF
     IF_INT_NOT_EQUAL(GW(9), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(9), 1, STRING("KRT_S_1"))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(&weapon_peach_dark_charge_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, PTR(&weapon_peach_dark_charge_attack), 256, LW(5))
     LABEL(99)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_attack_black_wave)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_wave_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_wave_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_wave_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_wave_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_wave_attack))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     IF_INT_NOT_EQUAL(GW(10), -1)
@@ -2816,8 +2723,8 @@ EVT_BEGIN(queen_attack_black_wave)
         SET_VALUE(GW(9), LW(0))
         WAIT_MS(1500)
     END_IF
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_L_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_T_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_L_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_T_3"))
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_A_3"))
     END_IF
@@ -2826,21 +2733,21 @@ EVT_BEGIN(queen_attack_black_wave)
     END_IF
     WAIT_MS(1000)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_3"))
     WAIT_MS(200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_1"))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), -33)
     ADD(LW(1), 82)
     CALL(evt_eff, STRING(""), STRING("toge_flush"), 4, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_q2"), STRING("queen2"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_DARK_WAVE1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1500)
         LOOP(3)
@@ -2859,8 +2766,8 @@ EVT_BEGIN(queen_attack_black_wave)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 120, 0)
     WAIT_MS(3500)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 120, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_2"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_2"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_A_4"))
@@ -2869,7 +2776,7 @@ EVT_BEGIN(queen_attack_black_wave)
         CALL(btlevtcmd_AnimeChangePose, GW(9), 1, STRING("KRT_A_4"))
     END_IF
     WAIT_MS(1500)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_S_1"))
     END_IF
@@ -2879,7 +2786,7 @@ EVT_BEGIN(queen_attack_black_wave)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_wave_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_wave_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_wave_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2909,7 +2816,7 @@ EVT_BEGIN(queen_attack_black_wave)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_wave_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_wave_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_wave_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -2926,19 +2833,19 @@ EVT_BEGIN(queen_attack_black_wave)
 EVT_END()
 
 EVT_BEGIN(queen_attack_black_energy)
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 400)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_2"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_2"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_1"))
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_A_3"))
     END_IF
@@ -2946,7 +2853,7 @@ EVT_BEGIN(queen_attack_black_energy)
         CALL(btlevtcmd_AnimeChangePose, GW(9), 1, STRING("KRT_A_3"))
     END_IF
     WAIT_MS(750)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
     IF_INT_NOT_EQUAL(GW(8), -1)
         CALL(btlevtcmd_AnimeChangePose, GW(8), 1, STRING("KRT_S_1"))
     END_IF
@@ -2958,56 +2865,56 @@ EVT_BEGIN(queen_attack_black_energy)
     END_INLINE_EVENT
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHeight, -2, LW(5))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(5))
     ADD(LW(1), LW(5))
     ADD(LW(1), -15)
     CALL(evt_eff, STRING(""), STRING("charge"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 60, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_DARK_POWER1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1000)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_energy_attack))
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, PTR(&weapon_peach_black_energy_attack), 256, LW(5))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_energy_attack))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, PTR(&weapon_peach_black_energy_attack), 256, LW(5))
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_attack_bress1)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_sigh_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_sigh_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_sigh_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_sigh_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_sigh_attack))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_1"))
     WAIT_MS(500)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), -33)
     ADD(LW(1), 82)
     CALL(evt_eff, STRING(""), STRING("toge_flush"), 4, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_1"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_1"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_2"))
     CALL(evt_eff, STRING(""), STRING("toiki"), 0, 73, 112, 0, 180, 0, 0, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_BREATH1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(2500)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_BREATH2"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_3"))
     WAIT_MS(80)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_sigh_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_sigh_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_sigh_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3037,7 +2944,7 @@ EVT_BEGIN(queen_attack_bress1)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_sigh_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_sigh_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_sigh_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -3051,43 +2958,43 @@ EVT_BEGIN(queen_attack_bress1)
 EVT_END()
 
 EVT_BEGIN(queen_attack_bress2)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_temptation_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_temptation_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_temptation_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_temptation_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_temptation_attack))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_1"))
     WAIT_MS(500)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), -33)
     ADD(LW(1), 82)
     CALL(evt_eff, STRING(""), STRING("toge_flush"), 4, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_1"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_1"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_2"))
     CALL(evt_eff, STRING(""), STRING("toiki"), 1, 73, 112, 0, 180, 0, 0, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_BREATH1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(2500)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_BREATH2"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_3"))
     WAIT_MS(80)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_temptation_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_temptation_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_temptation_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3117,7 +3024,7 @@ EVT_BEGIN(queen_attack_bress2)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_temptation_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_temptation_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_temptation_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -3131,44 +3038,44 @@ EVT_BEGIN(queen_attack_bress2)
 EVT_END()
 
 EVT_BEGIN(queen_attack_bress3)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_poison_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_poison_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_poison_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_poison_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_poison_attack))
     WAIT_MS(200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A_1"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A_1"))
     WAIT_MS(500)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), -33)
     ADD(LW(1), 82)
     CALL(evt_eff, STRING(""), STRING("toge_flush"), 4, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_EYE_SHINE1"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_1"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_1"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_HAND_UP1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_2"))
     CALL(evt_eff, STRING(""), STRING("toiki"), 2, 73, 112, 0, 180, 0, 0, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_BREATH1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(2500)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_BREATH2"), LW(0), LW(1), LW(2), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_A2_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_A2_3"))
     WAIT_MS(80)
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_S_1"))
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_poison_attack))
     SET_VALUE(LF(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_poison_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_poison_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3198,7 +3105,7 @@ EVT_BEGIN(queen_attack_bress3)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_poison_attack))
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_poison_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_poison_attack), 256, LW(5))
     LABEL(95)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -3211,16 +3118,16 @@ EVT_BEGIN(queen_attack_bress3)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(queen_attack_event)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(0)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
             CALL_CHILD(PTR(queen_attack_black_thunder))
             CASE_EQUAL(1)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
             CALL_CHILD(PTR(queen_attack_black_energy))
             CASE_EQUAL(3)
             CALL(btlevtcmd_DrawLots, LW(0), 4, 100, 20, 30, 30)
@@ -3237,20 +3144,20 @@ EVT_BEGIN(queen_attack_event)
         END_SWITCH
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
         CALL_CHILD(PTR(queen_attack_black_thunder))
         CASE_EQUAL(1)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
         CALL_CHILD(PTR(queen_attack_charge))
         CASE_EQUAL(2)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
         CALL_CHILD(PTR(queen_attack_black_wave))
         CASE_EQUAL(3)
         CALL(btlevtcmd_DrawLots, LW(0), 6, 100, 50, 60, 20, 30, 30)
-        CALL(btlevtcmd_CheckStatus, -2, 14, LW(1))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 14, LW(1))
         IF_INT_EQUAL(LW(1), 1)
             IF_INT_EQUAL(LW(0), 1)
                 SET_VALUE(LW(0), 0)
@@ -3262,7 +3169,7 @@ EVT_BEGIN(queen_attack_event)
             CASE_EQUAL(1)
             CALL_CHILD(PTR(queen_attack_black_energy))
             CASE_EQUAL(2)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
             CALL_CHILD(PTR(queen_attack_charge))
             CASE_EQUAL(3)
             CALL_CHILD(PTR(queen_attack_bress1))
@@ -3273,19 +3180,19 @@ EVT_BEGIN(queen_attack_event)
         END_SWITCH
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #else
 EVT_BEGIN(queen_attack_event)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(0)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
             CALL_CHILD(PTR(queen_attack_black_thunder))
             CASE_EQUAL(1)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
             CALL_CHILD(PTR(queen_attack_black_energy))
             CASE_EQUAL(3)
             CALL(btlevtcmd_DrawLots, LW(0), 4, 100, 20, 30, 30)
@@ -3302,20 +3209,20 @@ EVT_BEGIN(queen_attack_event)
         END_SWITCH
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
         CALL_CHILD(PTR(queen_attack_black_thunder))
         CASE_EQUAL(1)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
         CALL_CHILD(PTR(queen_attack_charge))
         CASE_EQUAL(2)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
         CALL_CHILD(PTR(queen_attack_black_wave))
         CASE_EQUAL(3)
         CALL(btlevtcmd_DrawLots, LW(0), 6, 100, 50, 30, 20, 30, 30)
-        CALL(btlevtcmd_CheckStatus, -2, 14, LW(1))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 14, LW(1))
         IF_INT_EQUAL(LW(1), 1)
             IF_INT_EQUAL(LW(0), 1)
                 SET_VALUE(LW(0), 0)
@@ -3327,7 +3234,7 @@ EVT_BEGIN(queen_attack_event)
             CASE_EQUAL(1)
             CALL_CHILD(PTR(queen_attack_black_energy))
             CASE_EQUAL(2)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
             CALL_CHILD(PTR(queen_attack_charge))
             CASE_EQUAL(3)
             CALL_CHILD(PTR(queen_attack_bress1))
@@ -3338,13 +3245,13 @@ EVT_BEGIN(queen_attack_event)
         END_SWITCH
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #endif
 
 EVT_BEGIN(queen_damage_event)
-    CALL(btlevtcmd_GetDamageCode, -2, LW(0))
+    CALL(btlevtcmd_GetDamageCode, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 22)
         ADD(GW(12), 1)
         IF_INT_EQUAL(GW(18), 0)
@@ -3352,9 +3259,9 @@ EVT_BEGIN(queen_damage_event)
         END_IF
         BEGIN_INLINE_EVENT
             LOOP(5)
-                CALL(btlevtcmd_AddPartsPos, -2, 2, 2, 0, 0)
+                CALL(btlevtcmd_AddPartsPos, BTL_UNIT_SELF, 2, 2, 0, 0)
                 WAIT_MS(70)
-                CALL(btlevtcmd_AddPartsPos, -2, 2, -2, 0, 0)
+                CALL(btlevtcmd_AddPartsPos, BTL_UNIT_SELF, 2, -2, 0, 0)
                 WAIT_MS(70)
             END_LOOP
         END_INLINE_EVENT
@@ -3363,8 +3270,8 @@ EVT_BEGIN(queen_damage_event)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -3374,38 +3281,38 @@ EVT_BEGIN(queen_dead_event)
     CALL(evt_eff_softdelete, STRING("m_q"))
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_SetTalkPose, -2, STRING("KRT_S_1"))
-        CALL(btlevtcmd_SetStayPose, -2, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KRT_O_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 4, STRING("KRT_S_1"))
-        CALL(btlevtcmd_AnimeChangePose, -2, 5, STRING("KRT_O_2"))
-        CALL(btlevtcmd_SetAlpha, -2, 2, 254)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 254)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 254)
-        CALL(btlevtcmd_SetAlpha, -2, 5, 254)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 4, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 5, 16777216)
+        CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KRT_S_1"))
+        CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRT_O_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRT_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, STRING("KRT_O_2"))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 254)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 254)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 254)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, 254)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 4, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
         SET_VALUE(LW(0), 254)
         LOOP(63)
-            CALL(btlevtcmd_SetAlpha, -2, 2, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 3, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 4, LW(0))
-            CALL(btlevtcmd_SetAlpha, -2, 5, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, LW(0))
             SUBTRACT(LW(0), 4)
             WAIT_MS(50)
         END_LOOP
-        CALL(btlevtcmd_SetAlpha, -2, 2, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 3, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 4, 0)
-        CALL(btlevtcmd_SetAlpha, -2, 5, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, 0)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, 0)
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_BPCH_DIE1"), LW(0), LW(1), LW(2), LW(10))
         CALL(evt_eff, STRING(""), STRING("mist"), 6, 80, 50, 20, 0, 1500, 0, 0, 0, 0, 0, 0)
         WAIT_MS(200)
@@ -3452,26 +3359,26 @@ EVT_BEGIN(queen_dead_event)
     IF_INT_NOT_EQUAL(GF(0), 1)
         GOTO(0)
     END_IF
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_FLOAT_VALUE(LW(1), LW(1))
     SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
     LOOP(50)
         SUBTRACT_FLOAT(LW(1), FLOAT(0.81933594f))
         SUBTRACT_FLOAT(LW(3), FLOAT(0.81933594f))
-        CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         SET_FLOAT_VALUE(LW(4), LW(1))
         SUBTRACT_FLOAT(LW(4), LW(3))
-        CALL(btlevtcmd_SetPartsPos, -2, 2, LW(0), LW(4), LW(2))
+        CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(4), LW(2))
         WAIT_MS(10)
     END_LOOP
-    CALL(btlevtcmd_KillUnit, -2, 1)
+    CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 1)
     CALL(evt_btl_camera_set_prilimit, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 3)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 3)
     RETURN
 EVT_END()
 
@@ -3482,11 +3389,11 @@ EVT_BEGIN(queen_entry_event)
     CALL(evt_btl_camera_set_moveto, 0, -113, 69, 332, -113, 46, 0, 15, 11)
     WAIT_MS(550)
     CALL(evt_msg_print_battle_party, STRING("stg8_las_161"))
-    CALL(btlevtcmd_StartWaitEvent, -4)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_PARTNER)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 1, 11)
     WAIT_MS(350)
-    CALL(evt_msg_print, 2, STRING("stg8_las_162"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_162"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -3495,80 +3402,80 @@ EVT_BEGIN(queen_entry_event)
 EVT_END()
 
 EVT_BEGIN(queen_hand_1_init_event)
-    CALL(btlevtcmd_SetBaseRotate, -2, 0, 315, 0)
+    CALL(btlevtcmd_SetBaseRotate, BTL_UNIT_SELF, 0, 315, 0)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_OffPartsAttribute, -2, 1, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
         SET_VALUE(LW(0), 0)
         LOOP(15)
-            CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
             ADD(LW(0), 16)
             WAIT_MS(5)
         END_LOOP
-        CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
     END_INLINE_EVENT
-    CALL(btlevtcmd_SetEventWait, -2, PTR(queen_hand_1_wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(queen_hand_1_attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(queen_hand_1_damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(queen_hand_1_wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(queen_hand_1_attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(queen_hand_1_damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_h_1"), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
-        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
-        CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
+        CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence))
+        CALL(btlevtcmd_SetPartsDefenceAttrTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence_attr))
+        CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&queen_muteki_regist))
     END_IF
-    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 65536)
-    CALL(btlevtcmd_OffAttribute, -2, 33554432)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 65536)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 33554432)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     SET_VALUE(GF(0), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_hand_1_press_attack)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_press_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_press_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_press_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_press_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_press_attack))
     CALL(evt_eff_softdelete, LW(10))
     SET_VALUE(LW(0), 255)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), -16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 0)
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 0)
     WAIT_MS(500)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(0), 20)
     SET_VALUE(LW(1), 0)
     ADD(LW(2), -30)
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -2)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     SET_VALUE(LW(0), 0)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), 16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, LW(10), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A1_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A1_1"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_HAND_UP1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1100)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 15, 0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_press_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_press_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3596,7 +3503,7 @@ EVT_BEGIN(queen_hand_1_press_attack)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_press_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_press_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_press_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_press_attack), 256, LW(5))
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     LABEL(98)
@@ -3604,65 +3511,65 @@ EVT_BEGIN(queen_hand_1_press_attack)
     CALL(evt_eff_softdelete, LW(10))
     SET_VALUE(LW(0), 255)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), -16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 0)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     SET_VALUE(LW(0), 0)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), 16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, LW(10), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_hand_1_drain_attack)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_drain_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_drain_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_drain_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_drain_attack))
     CALL(evt_eff_softdelete, LW(10))
     SET_VALUE(LW(0), 255)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), -16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 0)
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 0)
     WAIT_MS(500)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)
     ADD(LW(2), -30)
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -2)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     SET_VALUE(LW(0), 0)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), 16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, LW(10), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_A2_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A2_1"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWEN_DRAIN1"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
@@ -3677,7 +3584,7 @@ EVT_BEGIN(queen_hand_1_drain_attack)
         WAIT_MS(600)
     END_INLINE_EVENT
     WAIT_MS(2000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3705,7 +3612,7 @@ EVT_BEGIN(queen_hand_1_drain_attack)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_drain_attack))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_drain_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_drain_attack), 256, LW(5))
     CALL(btlevtcmd_GetHpDamage, LW(3), LW(0))
     CALL(btlevtcmd_RecoverHp, GW(13), 1, LW(0))
     CALL(btlevtcmd_GetPos, GW(13), LW(5), LW(6), LW(7))
@@ -3720,27 +3627,27 @@ EVT_BEGIN(queen_hand_1_drain_attack)
     CALL(evt_eff_softdelete, LW(10))
     SET_VALUE(LW(0), 255)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), -16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 0)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KRT_S_1"))
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
     SET_VALUE(LW(0), 0)
     LOOP(15)
-        CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
         ADD(LW(0), 16)
         WAIT_MS(5)
     END_LOOP
-    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, LW(10), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(queen_hand_1_attack_event)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -3756,7 +3663,7 @@ EVT_BEGIN(queen_hand_1_attack_event)
         CALL_CHILD(PTR(queen_hand_1_drain_attack))
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #else
@@ -3775,7 +3682,7 @@ EVT_BEGIN(queen_hand_1_attack_event)
         CALL_CHILD(PTR(queen_hand_1_drain_attack))
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #endif
@@ -3810,42 +3717,42 @@ EVT_BEGIN(queen_hand_1_dead_event)
 EVT_END()
 
 EVT_BEGIN(queen_hand_1_wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_hand_2_init_event)
-    CALL(btlevtcmd_SetBaseScale, -2, FLOAT(-1.0996094f), FLOAT(1.0996094f), FLOAT(1.0996094f))
-    CALL(btlevtcmd_SetBaseRotate, -2, 0, 315, 0)
+    CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, FLOAT(-1.0996094f), FLOAT(1.0996094f), FLOAT(1.0996094f))
+    CALL(btlevtcmd_SetBaseRotate, BTL_UNIT_SELF, 0, 315, 0)
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_OffPartsAttribute, -2, 1, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
         SET_VALUE(LW(0), 0)
         LOOP(15)
-            CALL(btlevtcmd_SetAlpha, -2, 1, LW(0))
+            CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(0))
             ADD(LW(0), 16)
             WAIT_MS(5)
         END_LOOP
-        CALL(btlevtcmd_SetAlpha, -2, 1, 255)
+        CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
     END_INLINE_EVENT
-    CALL(btlevtcmd_SetEventWait, -2, PTR(queen_hand_2_wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(queen_hand_2_attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(queen_hand_2_damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(queen_hand_2_wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(queen_hand_2_attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(queen_hand_2_damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("m_h_2"), STRING("mist2"), 0, LW(0), 15, LW(2), 50, 0, -1, 0, 0, 0, 0, 0)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
-        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
-        CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
+        CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence))
+        CALL(btlevtcmd_SetPartsDefenceAttrTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence_attr))
+        CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&queen_muteki_regist))
     END_IF
-    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 65536)
-    CALL(btlevtcmd_OffAttribute, -2, 33554432)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 65536)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 33554432)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     SET_VALUE(GF(0), 1)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(queen_hand_2_attack_event)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -3861,7 +3768,7 @@ EVT_BEGIN(queen_hand_2_attack_event)
         CALL_CHILD(PTR(queen_hand_1_drain_attack))
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #else
@@ -3880,7 +3787,7 @@ EVT_BEGIN(queen_hand_2_attack_event)
         CALL_CHILD(PTR(queen_hand_1_drain_attack))
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #endif
@@ -3915,42 +3822,42 @@ EVT_BEGIN(queen_hand_2_dead_event)
 EVT_END()
 
 EVT_BEGIN(queen_hand_2_wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_hand_small_init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(queen_hand_small_wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(queen_hand_small_attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(queen_hand_small_damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(queen_hand_small_wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(queen_hand_small_attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(queen_hand_small_damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(evt_eff, STRING("m_h_s1"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s2"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_QWEN_HAND_APPEAR1_2"), 0)
     CALL(queen_hand_small_entry_evt)
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_SetPartsDefenceTable, -2, 1, PTR(&queen_muteki_defence))
-        CALL(btlevtcmd_SetPartsDefenceAttrTable, -2, 1, PTR(&queen_muteki_defence_attr))
-        CALL(btlevtcmd_SetRegistStatus, -2, PTR(&queen_muteki_regist))
+        CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence))
+        CALL(btlevtcmd_SetPartsDefenceAttrTable, BTL_UNIT_SELF, 1, PTR(&queen_muteki_defence_attr))
+        CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&queen_muteki_regist))
     END_IF
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     SET_VALUE(GF(0), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(queen_hand_small_drag_attack)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_dark_drag_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_dark_drag_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_dark_drag_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_dark_drag_attack))
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
     CALL(evt_eff_softdelete, STRING("m_h_s3"))
@@ -3962,7 +3869,7 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWENH_HAND_APPEAR1"), LW(0), LW(1), LW(2), 0)
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     BEGIN_INLINE_EVENT_GET_ID(LW(15))
 #else
     BEGIN_INLINE_EVENT
@@ -3973,7 +3880,7 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_eff, STRING("m_h_s2_"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3_"), STRING("mist2"), 0, -100, 15, 0, 100, 0, -1, 0, 0, 0, 0, 0)
     WAIT_MS(1250)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -4008,13 +3915,13 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(btlevtcmd_GetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 0, LW(5))
     WAIT_MS(750)
     CALL(evt_eff_softdelete, STRING("m_h_s1_"))
     CALL(evt_eff_softdelete, STRING("m_h_s2_"))
@@ -4024,7 +3931,7 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(battle_evt_majo_disp_on, LW(3), LW(4), LW(0), LW(1), LW(2), 0)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_dark_drag_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_last_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_last_attack), 256, LW(5))
     WAIT_MS(750)
     LABEL(95)
     LABEL(98)
@@ -4033,7 +3940,7 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_eff, STRING("m_h_s2"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_QWEN_HAND_APPEAR1_2"), 0)
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     IF_INT_NOT_EQUAL(LW(15), 0)
         CALL(btlevtcmd_WaitEventEnd, LW(15))
     END_IF
@@ -4042,19 +3949,19 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(queen_hand_small_1000hand_attack)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_1000hand_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_1000hand_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(subsetevt_confuse_flustered)
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_1000hand_attack))
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 180, 0)
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
@@ -4064,7 +3971,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
         CALL(queen_hand_small_1000hand_1_evt)
     END_INLINE_EVENT
     WAIT_MS(400)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -4103,16 +4010,16 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
     LABEL(91)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_1000hand_attack))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 256, LW(5))
     WAIT_MS(500)
     WAIT_MS(1000)
     GOTO(98)
@@ -4131,17 +4038,17 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
 EVT_END()
 #else
 EVT_BEGIN(queen_hand_small_1000hand_attack)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_1000hand_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_peach_black_1000hand_attack), LW(3), LW(4))
-    CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(subsetevt_confuse_flustered))
         RETURN
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_peach_black_1000hand_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_peach_black_1000hand_attack))
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 180, 0)
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
@@ -4151,7 +4058,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
         CALL(queen_hand_small_1000hand_1_evt)
     END_INLINE_EVENT
     WAIT_MS(400)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_dark_drag_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -4190,16 +4097,16 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
     LABEL(91)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_peach_black_1000hand_attack))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 0, LW(5))
     WAIT_MS(500)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_peach_black_1000hand_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_peach_black_1000hand_attack), 256, LW(5))
     WAIT_MS(500)
     WAIT_MS(1000)
     GOTO(98)
@@ -4215,7 +4122,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
 EVT_END()
 #endif
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(queen_hand_small_attack_event)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -4229,7 +4136,7 @@ EVT_BEGIN(queen_hand_small_attack_event)
         CALL_CHILD(PTR(queen_hand_small_drag_attack))
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #else
@@ -4246,7 +4153,7 @@ EVT_BEGIN(queen_hand_small_attack_event)
         CALL_CHILD(PTR(queen_hand_small_drag_attack))
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #endif
@@ -4256,7 +4163,7 @@ EVT_BEGIN(queen_hand_small_damage_event)
         SET_VALUE(GW(18), 1)
     END_IF
     ADD(GW(12), 1)
-    CALL(btlevtcmd_GetDamageCode, -2, LW(0))
+    CALL(btlevtcmd_GetDamageCode, BTL_UNIT_SELF, LW(0))
     BEGIN_INLINE_EVENT
         LOOP(5)
             CALL(queen_hand_small_1000hand_set_offset_evt, 2, 0, 0)
@@ -4265,7 +4172,7 @@ EVT_BEGIN(queen_hand_small_damage_event)
             WAIT_MS(70)
         END_LOOP
     END_INLINE_EVENT
-END_IF
+END_IF // stray: no IF is open here; the original script has it too, and END_IF does nothing when run
 SET_VALUE(LW(10), -2)
 SET_VALUE(LW(11), 1)
 CALL_CHILD(PTR(btldefaultevt_Damage))
@@ -4288,7 +4195,7 @@ EVT_BEGIN(queen_hand_small_dead_event)
 EVT_END()
 
 EVT_BEGIN(queen_hand_small_wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
@@ -4565,7 +4472,7 @@ USER_FUNC(queen_hand_small_drag_3_evt) {
     return 0;
 }
 
-USER_FUNC(queen_hand_small_drag_4_evt) {
+static USER_FUNC(queen_hand_small_drag_4_evt) {
     s32 i;
     ExtdrvPose* pose;
     HandElem* elem;
@@ -4689,7 +4596,7 @@ USER_FUNC(slot_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(peach_shock_evt) {
+static USER_FUNC(peach_shock_evt) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
@@ -5059,11 +4966,11 @@ USER_FUNC(queen_thunder) {
     ((EffShockN64Work*)eff->userdata)->col1[0] = 255;
     ((EffShockN64Work*)eff->userdata)->col1[1] = 160;
     ((EffShockN64Work*)eff->userdata)->col1[2] = 192;
-    btl_camera_shake_w(0, 8, 0, 1.0f, 1.0f);
+    btl_camera_shake_w(0, 1.0f, 1.0f, 8, 0);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(change_pose) {
+static USER_FUNC(change_pose) {
     s32 anim = evtGetValue(event, *event->args);
     s32 i;
     HandElem* elem;
@@ -5305,4 +5212,3 @@ USER_FUNC(shadow_queen_connect) {
     BtlUnit_SetPartsPos(part, wpos[wk->idx[1]].x, wpos[wk->idx[1]].y, wpos[wk->idx[1]].z);
     return 0;
 }
-

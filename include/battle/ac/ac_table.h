@@ -1,14 +1,15 @@
+// Declares the action-command entry table and the main, result, display and delete functions of each command.
 #pragma once
 
 #include "battle/battle.h"
 #include <dolphin/types.h>
 
 typedef struct ActionCommandEntry {
-	s32 id;
-	s32 (*main)(BattleWork* work);
-	s32 (*result)(BattleWork* work);
-	void (*disp)(CameraId camId, void* param);
-	void (*delete)(BattleWork* work);
+    s32 id;
+    s32 (*main)(BattleWork* work);
+    s32 (*result)(BattleWork* work);
+    void (*disp)(CameraId camId, void* param);
+    void (*delete)(BattleWork* work);
 } ActionCommandEntry;
 
 #define AC_DECLARE(name)                                   \

@@ -1,30 +1,30 @@
+// hei_06 (平原, Petal Meadows): grassy field between hei_05 and hei_07.
+// Field enemies, a recovery block, a Fire Flower block, an Inn Coupon and coins.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_item.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "hei.h"
 #include "data_tables.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
+#include "version.h"
+#include "evt/evt_story.h"
 
 static BeroEntry bero_entry_data[3];
 static TreeAccess ki_data[5];
 extern EvtWord evt_kusa_8[];
 static KusaAccess kusa_data[10];
-extern EvtWord hei_06_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -39,8 +39,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -66,7 +66,7 @@ static TreeAccess ki_data[] = {
 EVT_BEGIN(evt_kusa_8)
     CALL(evt_item_delete_check, STRING("item_kusa_8"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_8"), 121, 200, 75, 60, 4, GSWF(1794), 0)
+        CALL(evt_item_entry, STRING("item_kusa_8"), ITEM_COIN, 200, 75, 60, 4, GSWF(GSWF_HEI06_BUSH_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -88,21 +88,20 @@ EVT_BEGIN(hei_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-    CALL(evt_snd_bgmon, 160, 0)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
     CALL(evt_npc_change_fbat_mode, 1)
     SET_VALUE(LW(0), PTR(ki_data))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     SET_VALUE(LW(0), PTR(kusa_data))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 5, 375, 160, -75, 0, 0)
-    CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), -25, 110, -75, 132, 0, GSWF(1795), 0)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, STRING("item_00"), 164, 50, 50, 105, 15, GSWF(1806), 0)
+    CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), -25, 110, -75, ITEM_FIRE_FLOWER, 0, GSWF(GSWF_HEI06_FIRE_FLOWER_BLOCK_HIT), 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, STRING("item_00"), ITEM_INN_COUPON, 50, 50, 105, 15, GSWF(GSWF_HEI06_INN_COUPON_TAKEN), 0)
 #else
-    CALL(evt_item_entry, STRING("item_00"), 164, 50, 50, 105, 16, GSWF(1806), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_INN_COUPON, 50, 50, 105, 16, GSWF(GSWF_HEI06_INN_COUPON_TAKEN), 0)
 #endif
     RETURN
 EVT_END()
-

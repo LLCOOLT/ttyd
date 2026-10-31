@@ -1,42 +1,37 @@
+// kpa_05 (クッパ編, Bowser's interludes): the third side-scrolling stage, over lava; continues in kpa_06.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
 #include "kpa.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
 #include "kpa_stage_data.h"
+#include "version.h"
+#include "evt/evt_story.h"
 
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_koopa_chk_dead);
-USER_FUNC(evt_koopa_get_level);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mario_cam_off);
-USER_FUNC(evt_mario_get_name_hitobj_ride);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_jumpstand);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_npc_setup);
 static USER_FUNC(kpa_get_level);
-USER_FUNC(kpa_status_init);
 
 static EvtWord kpa_act_stg3_mobj[118];
 EvtWord kpa_act_stg3_item[79];
 static EvtWord jumpstand_evt[60];
 static NpcSetupInfo npcEnt[1];
-extern EvtWord kpa_05_init_evt[];
 
 static EvtWord kpa_act_stg3_mobj[] = {
-    KPA_OBJ_FIREBAR_DODAI_0(-1062.5f, 100.0f, 3, -229998976),
-    KPA_OBJ_FIREBAR_DODAI_0(-687.5f, 100.0f, 2, -229997952),
-    KPA_OBJ_FIREBAR_DODAI_1(-512.5f, 225.0f, 3, -229998976), KPA_OBJ_OJAMA_BLK(-325.0f, 200.0f),
+    KPA_OBJ_FIREBAR_DODAI_0(-1062.5f, 100.0f, 3, FLOAT(1.0f)),
+    KPA_OBJ_FIREBAR_DODAI_0(-687.5f, 100.0f, 2, FLOAT(2.0f)),
+    KPA_OBJ_FIREBAR_DODAI_1(-512.5f, 225.0f, 3, FLOAT(1.0f)), KPA_OBJ_OJAMA_BLK(-325.0f, 200.0f),
     KPA_OBJ_BRICK_3(-225.0f, 25.0f), KPA_OBJ_BRICK_3(-175.0f, 25.0f), KPA_OBJ_BRICK_3(-125.0f, 25.0f),
     KPA_OBJ_BRICK_3(-75.0f, 25.0f), KPA_OBJ_BRICK_3(-25.0f, 25.0f), KPA_OBJ_BRICK_3(25.0f, 25.0f),
     KPA_OBJ_BRICK_3(75.0f, 25.0f), KPA_OBJ_BRICK_3(125.0f, 75.0f), KPA_OBJ_STONE_BLK(250.0f, 25.0f),
     KPA_OBJ_STONE_BLK(300.0f, 25.0f), KPA_OBJ_STONE_BLK(300.0f, 75.0f), KPA_OBJ_STONE_BLK(350.0f, 75.0f),
     KPA_OBJ_OJAMA_BLK(400.0f, 0.0f), KPA_OBJ_STONE_BLK(400.0f, 75.0f),
-    KPA_OBJ_FIREBAR_DODAI_1(387.5f, 125.0f, 6, -229999488), KPA_OBJ_STONE_BLK(450.0f, 75.0f),
+    KPA_OBJ_FIREBAR_DODAI_1(387.5f, 125.0f, 6, FLOAT(0.5f)), KPA_OBJ_STONE_BLK(450.0f, 75.0f),
     KPA_OBJ_STONE_BLK(500.0f, 25.0f), KPA_OBJ_STONE_BLK(500.0f, 75.0f), KPA_OBJ_STONE_BLK(550.0f, 25.0f),
     KPA_OBJ_BRICK_3(725.0f, 0.0f), KPA_OBJ_BRICK_3(775.0f, 0.0f), KPA_OBJ_OJAMA_BLK(700.0f, 175.0f),
     KPA_OBJ_BRICK_3(950.0f, 25.0f), KPA_OBJ_BRICK_3(1000.0f, 25.0f), KPA_OBJ_BRICK_3(1050.0f, 50.0f),
@@ -86,7 +81,7 @@ static EVT_BEGIN(kpa_fall)
         END_SWITCH
         CALL(evt_eff, STRING(""), STRING("splash"), 2, LW(0), LW(1), LW(2), LW(3), 0, 0, 0, 0, 0, 0, 0)
         CALL_CHILD(PTR(kpa_fall_sub))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(kpa_dead))
     END_IF
     RETURN
@@ -96,7 +91,7 @@ static EVT_BEGIN(jumpstand_evt)
     DELETE_EVENT(GW(15))
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
-        CALL(evt_koopa_get_level, GSW(1223))
+        CALL(evt_koopa_get_level, GSW(GSW_KPA_BOWSER_POWER))
         CALL(evt_bero_mapchange, STRING("kpa_06"), STRING("kpa_next_map"))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
@@ -112,7 +107,7 @@ static EVT_BEGIN(jumpstand_evt)
     CALL(evt_mobj_get_position, STRING("me"), LW(0), LW(1), LW(2))
     SET_VALUE(LW(3), LW(1))
     ADD(LW(3), 800)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_mario_jump_jumpstand, LW(0), LW(1), LW(2), LW(0), LW(3), LW(2), LW(0), LW(3), LW(2), 2000, 1)
 #else
     CALL(evt_mario_jump_jumpstand, LW(0), LW(1), LW(2), LW(0), LW(3), LW(2), LW(0), LW(3), LW(2), 4000, 3)
@@ -135,7 +130,7 @@ EVT_BEGIN(kpa_05_init_evt)
     CALL_CHILD(PTR(kpa_read_item))
     CALL(evt_map_playanim, STRING("anm_magu"), 1, 0)
     SPAWN_EVENT(PTR(kpa_fall))
-    CALL(kpa_status_init, 3, GSW(1221), GSW(1222))
+    CALL(kpa_status_init, 3, GSW(GSW_KPA_LIVES), GSW(GSW_KPA_TIME_LEFT))
     SET_VALUE(LSW(1), 2)
     SPAWN_EVENT(PTR(kpa_stage_start))
     SPAWN_EVENT_GET_ID(PTR(kpa_time), GW(15))

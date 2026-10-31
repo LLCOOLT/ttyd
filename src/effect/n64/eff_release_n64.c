@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: a flickering glowing orb that drifts, then flashes into expanding glow rings.
+#include "eff/n64/eff_release_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -5,30 +7,28 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffReleaseN64Work {
-    s32 type;      // 0x0
-    s32 sub;       // 0x4
-    Vec position;  // 0x8
-    s32 lifetime;  // 0x14
-    s32 frame;     // 0x18
-    s32 r;         // 0x1C
-    s32 g;         // 0x20
-    s32 b;         // 0x24
-    s32 a;         // 0x28
-    s32 r2;        // 0x2C
-    s32 g2;        // 0x30
-    s32 b2;        // 0x34
-    s32 a2;        // 0x38
-    f32 scale;     // 0x3C
-    f32 size[4];   // 0x40
-    s32 alpha[4];  // 0x50
+    s32 type;       // 0x0
+    s32 sub;        // 0x4
+    Vec position;   // 0x8
+    s32 lifetime;   // 0x14
+    s32 frame;      // 0x18
+    s32 r;          // 0x1C
+    s32 g;          // 0x20
+    s32 b;          // 0x24
+    s32 a;          // 0x28
+    s32 r2;         // 0x2C
+    s32 g2;         // 0x30
+    s32 b2;         // 0x34
+    s32 a2;         // 0x38
+    f32 scale;      // 0x3C
+    f32 size[4];    // 0x40
+    s32 alpha[4];   // 0x50
     s32 counter[4]; // 0x60, only cleared at entry
-    s32 state;     // 0x70
-    s32 step;      // 0x74
+    s32 state;      // 0x70
+    s32 step;       // 0x74
 } EffReleaseN64Work;
 
 typedef struct AnimeEntry {
@@ -36,10 +36,8 @@ typedef struct AnimeEntry {
     u16 value;
 } AnimeEntry;
 
-
 void effReleaseMain(EffectEntry* effect);
 void effReleaseDisp(CameraId cameraId, EffectEntry* effect);
-
 
 static AnimeEntry anime_data[30] = {
     {0x0064, 0x00FF},
@@ -245,8 +243,8 @@ void effReleaseMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     sub = work->sub;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -262,126 +260,126 @@ void effReleaseMain(EffectEntry* effect) {
         work->a = work->lifetime << 4;
     }
     switch (work->state) {
-    case 0:
-        work->step++;
-        work->alpha[0] = (frame & 3) * 30 + 200;
-        sn = (f32)sin(6.2831855f * (f32)(frame * 20) / 360.0f);
-        work->size[0] = 0.04f * sn + 0.5f;
-        if (work->type != 0) {
-            sn = (f32)sin(6.2831855f * (f32)frame / 360.0f);
-            work->position.x = work->position.x + sn;
-            work->position.y = work->position.y + (f32)cos(6.2831855f * (1.235631f * (f32)frame) / 360.0f);
-            if (work->step > 50) {
-                work->step = 0;
-                if (sub == 3) {
-                    work->state = 100;
-                } else {
-                    work->state = 1;
+        case 0:
+            work->step++;
+            work->alpha[0] = (frame & 3) * 30 + 200;
+            sn = (f32)sin(6.2831855f * (f32)(frame * 20) / 360.0f);
+            work->size[0] = 0.04f * sn + 0.5f;
+            if (work->type != 0) {
+                sn = (f32)sin(6.2831855f * (f32)frame / 360.0f);
+                work->position.x = work->position.x + sn;
+                work->position.y = work->position.y + (f32)cos(6.2831855f * (1.235631f * (f32)frame) / 360.0f);
+                if (work->step > 50) {
+                    work->step = 0;
+                    if (sub == 3) {
+                        work->state = 100;
+                    } else {
+                        work->state = 1;
+                    }
                 }
             }
-        }
-        break;
-    case 100:
-        switch (work->step) {
-        case 0:
-            work->size[3] = 4.0f;
-            work->alpha[3] = 255;
+            break;
+        case 100:
+            switch (work->step) {
+                case 0:
+                    work->size[3] = 4.0f;
+                    work->alpha[3] = 255;
+                    break;
+                case 1:
+                    work->size[3] = 8.0f;
+                    work->alpha[3] = 255;
+                    break;
+                default:
+                    work->size[3] = 0.0f;
+                    work->alpha[3] = 0;
+                    break;
+            }
+            if (work->step < 30) {
+                v = 0.01f * (f32)anime_data[work->step].time + 0.3f * (f32)work->step;
+                val = anime_data[work->step].value & 0xFF;
+            } else {
+                v = 0.01f * (f32)anime_data[29].time + 0.3f * (f32)work->step;
+                val = anime_data[29].value & 0xFF;
+            }
+            work->alpha[0] = 0;
+            work->size[0] = 0.0f;
+            work->alpha[1] = val & 0xFF;
+            work->alpha[2] = val & 0xFF;
+            work->size[1] = v;
+            work->size[2] = 0.6f + v;
+            work->step++;
             break;
         case 1:
-            work->size[3] = 8.0f;
-            work->alpha[3] = 255;
-            break;
-        default:
-            work->size[3] = 0.0f;
-            work->alpha[3] = 0;
-            break;
-        }
-        if (work->step < 30) {
-            v = 0.01f * (f32)anime_data[work->step].time + 0.3f * (f32)work->step;
+            switch (work->step) {
+                case 0:
+                    work->size[3] = 4.0f;
+                    work->alpha[3] = 255;
+                    break;
+                case 1:
+                    work->size[3] = 8.0f;
+                    work->alpha[3] = 255;
+                    break;
+                default:
+                    work->size[3] = 0.0f;
+                    work->alpha[3] = 0;
+                    break;
+            }
+            v = 0.01f * (f32)anime_data[work->step].time;
             val = anime_data[work->step].value & 0xFF;
-        } else {
-            v = 0.01f * (f32)anime_data[29].time + 0.3f * (f32)work->step;
-            val = anime_data[29].value & 0xFF;
-        }
-        work->alpha[0] = 0;
-        work->size[0] = 0.0f;
-        work->alpha[1] = val & 0xFF;
-        work->alpha[2] = val & 0xFF;
-        work->size[1] = v;
-        work->size[2] = 0.6f + v;
-        work->step++;
-        break;
-    case 1:
-        switch (work->step) {
-        case 0:
-            work->size[3] = 4.0f;
-            work->alpha[3] = 255;
+            work->alpha[0] = 0;
+            work->alpha[1] = val;
+            work->alpha[2] = val;
+            work->size[0] = 0.0f;
+            work->size[1] = v;
+            work->size[2] = 1.2f * v + 4.0f;
+            work->step++;
+            if (work->step >= 30) {
+                work->step = 0;
+                work->state = 4;
+            }
             break;
-        case 1:
-            work->size[3] = 8.0f;
-            work->alpha[3] = 255;
+        case 4:
+            switch (29 - work->step) {
+                case 0:
+                    work->size[3] = 4.0f;
+                    work->alpha[3] = 255;
+                    break;
+                case 1:
+                    work->size[3] = 8.0f;
+                    work->alpha[3] = 255;
+                    break;
+                default:
+                    work->size[3] = 0.0f;
+                    work->alpha[3] = 0;
+                    break;
+            }
+            v = 0.01f * (f32)anime_data_2[work->step].time;
+            val = anime_data_2[work->step].value & 0xFF;
+            work->alpha[0] = 0;
+            work->size[0] = 0.0f;
+            work->alpha[1] = val;
+            work->alpha[2] = 0;
+            work->size[1] = v;
+            work->size[2] = 0.0f;
+            work->step++;
+            if (work->step >= 30) {
+                work->step = 0;
+                work->state = 5;
+            }
             break;
+        case 5:
         default:
+            work->size[0] = 0.0f;
+            work->size[1] = 0.0f;
+            work->size[2] = 0.0f;
+            work->alpha[0] = 0;
+            work->alpha[1] = 0;
+            work->alpha[2] = 0;
             work->size[3] = 0.0f;
             work->alpha[3] = 0;
-            break;
-        }
-        v = 0.01f * (f32)anime_data[work->step].time;
-        val = anime_data[work->step].value & 0xFF;
-        work->alpha[0] = 0;
-        work->alpha[1] = val;
-        work->alpha[2] = val;
-        work->size[0] = 0.0f;
-        work->size[1] = v;
-        work->size[2] = 1.2f * v + 4.0f;
-        work->step++;
-        if (work->step >= 30) {
-            work->step = 0;
-            work->state = 4;
-        }
-        break;
-    case 4:
-        switch (29 - work->step) {
-        case 0:
-            work->size[3] = 4.0f;
-            work->alpha[3] = 255;
-            break;
-        case 1:
-            work->size[3] = 8.0f;
-            work->alpha[3] = 255;
-            break;
-        default:
             work->size[3] = 0.0f;
-            work->alpha[3] = 0;
+            work->step++;
             break;
-        }
-        v = 0.01f * (f32)anime_data_2[work->step].time;
-        val = anime_data_2[work->step].value & 0xFF;
-        work->alpha[0] = 0;
-        work->size[0] = 0.0f;
-        work->alpha[1] = val;
-        work->alpha[2] = 0;
-        work->size[1] = v;
-        work->size[2] = 0.0f;
-        work->step++;
-        if (work->step >= 30) {
-            work->step = 0;
-            work->state = 5;
-        }
-        break;
-    case 5:
-    default:
-        work->size[0] = 0.0f;
-        work->size[1] = 0.0f;
-        work->size[2] = 0.0f;
-        work->alpha[0] = 0;
-        work->alpha[1] = 0;
-        work->alpha[2] = 0;
-        work->size[3] = 0.0f;
-        work->alpha[3] = 0;
-        work->size[3] = 0.0f;
-        work->step++;
-        break;
     }
     for (i = 0; i < 4; i++) {
         if (work->alpha[i] > 255) {
@@ -394,7 +392,7 @@ void effReleaseMain(EffectEntry* effect) {
             work->size[i] = 0.0f;
         }
     }
-    dispEntry(4, dispCalcZ(&position), 2, (DispCallback)effReleaseDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effReleaseDisp, effect);
 }
 
 void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
@@ -432,7 +430,6 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     {
 
-
         GXSetTevColor(GX_TEVREG1, (GXColor){work->r2, work->g2, work->b2, work->a2});
     }
     GXSetCullMode(GX_CULL_NONE);
@@ -450,72 +447,71 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetCurrentMtx(0);
         {
 
-
             GXSetTevColor(GX_TEVREG0, (GXColor){work->r, work->g, work->b, work->alpha[i]});
         }
         switch (i) {
-        case 0:
-            effGetTexObjN64(0x44, &texObj);
-            GXLoadTexObj(&texObj, GX_TEXMAP0);
-            PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            effSetVtxDescN64(size16x16_tex64x64_vtx);
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(0, 1, 2, 0, 0, 2, 3, 0);
-            break;
-        case 1:
-            effGetTexObjN64(0x45, &texObj);
-            GXLoadTexObj(&texObj, GX_TEXMAP0);
-            effSetVtxDescN64(size16x16_tex256x32_vtx);
-            PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
-            PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
-            PSMTXConcat(scale, mtx, scale);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
-            tri2(0, 1, 2, 0, 0, 2, 3, 0);
-            tri2(0x1c, 0x1d, 0x1e, 0x1c, 0x1c, 0x1e, 0x1f, 0x1c);
-            PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
-            PSMTXTrans(mtx, 0.0f, 32.0f, 0.0f);
-            PSMTXConcat(scale, mtx, scale);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
-            tri2(4, 5, 6, 4, 4, 6, 7, 4);
-            tri2(0x18, 0x19, 0x1a, 0x18, 0x18, 0x1a, 0x1b, 0x18);
-            PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
-            PSMTXTrans(mtx, 0.0f, 64.0f, 0.0f);
-            PSMTXConcat(scale, mtx, scale);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
-            tri2(8, 9, 10, 8, 8, 10, 11, 8);
-            tri2(0x14, 0x15, 0x16, 0x14, 0x14, 0x16, 0x17, 0x14);
-            PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
-            PSMTXTrans(mtx, 0.0f, 96.0f, 0.0f);
-            PSMTXConcat(scale, mtx, scale);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
-            tri2(0xc, 0xd, 0xe, 0xc, 0xc, 0xe, 0xf, 0xc);
-            tri2(0x10, 0x11, 0x12, 0x10, 0x10, 0x12, 0x13, 0x10);
-            break;
-        case 2:
-            effGetTexObjN64(0x46, &texObj);
-            GXLoadTexObj(&texObj, GX_TEXMAP0);
-            PSMTXScale(scale, 0.015625f, 0.015625f, 0.0f);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            effSetVtxDescN64(size16x16_tex128x128_vtx);
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(0, 1, 2, 0, 0, 2, 3, 0);
-        case 3:
-            effGetTexObjN64(0x47, &texObj);
-            GXLoadTexObj(&texObj, GX_TEXMAP0);
-            PSMTXScale(scale, 0.015625f, 0.03125f, 0.0f);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            effSetVtxDescN64(size16x16_tex64x64_0_vtx);
-            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
-            tri2(0, 1, 2, 0, 0, 2, 3, 0);
-            tri2(4, 5, 6, 4, 4, 6, 7, 4);
-            break;
-        case 4:
-            break;
+            case 0:
+                effGetTexObjN64(0x44, &texObj);
+                GXLoadTexObj(&texObj, GX_TEXMAP0);
+                PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
+                GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+                effSetVtxDescN64(size16x16_tex64x64_vtx);
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
+                break;
+            case 1:
+                effGetTexObjN64(0x45, &texObj);
+                GXLoadTexObj(&texObj, GX_TEXMAP0);
+                effSetVtxDescN64(size16x16_tex256x32_vtx);
+                PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
+                PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
+                PSMTXConcat(scale, mtx, scale);
+                GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(0x1c, 0x1d, 0x1e, 0x1c, 0x1c, 0x1e, 0x1f, 0x1c);
+                PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
+                PSMTXTrans(mtx, 0.0f, 32.0f, 0.0f);
+                PSMTXConcat(scale, mtx, scale);
+                GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
+                tri2(4, 5, 6, 4, 4, 6, 7, 4);
+                tri2(0x18, 0x19, 0x1a, 0x18, 0x18, 0x1a, 0x1b, 0x18);
+                PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
+                PSMTXTrans(mtx, 0.0f, 64.0f, 0.0f);
+                PSMTXConcat(scale, mtx, scale);
+                GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
+                tri2(8, 9, 10, 8, 8, 10, 11, 8);
+                tri2(0x14, 0x15, 0x16, 0x14, 0x14, 0x16, 0x17, 0x14);
+                PSMTXScale(scale, 0.00390625f, 0.00390625f, 0.0f);
+                PSMTXTrans(mtx, 0.0f, 96.0f, 0.0f);
+                PSMTXConcat(scale, mtx, scale);
+                GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
+                tri2(0xc, 0xd, 0xe, 0xc, 0xc, 0xe, 0xf, 0xc);
+                tri2(0x10, 0x11, 0x12, 0x10, 0x10, 0x12, 0x13, 0x10);
+                break;
+            case 2:
+                effGetTexObjN64(0x46, &texObj);
+                GXLoadTexObj(&texObj, GX_TEXMAP0);
+                PSMTXScale(scale, 0.015625f, 0.015625f, 0.0f);
+                GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+                effSetVtxDescN64(size16x16_tex128x128_vtx);
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
+            case 3:
+                effGetTexObjN64(0x47, &texObj);
+                GXLoadTexObj(&texObj, GX_TEXMAP0);
+                PSMTXScale(scale, 0.015625f, 0.03125f, 0.0f);
+                GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+                effSetVtxDescN64(size16x16_tex64x64_0_vtx);
+                GXBegin(GX_TRIANGLES, GX_VTXFMT0, 12);
+                tri2(0, 1, 2, 0, 0, 2, 3, 0);
+                tri2(4, 5, 6, 4, 4, 6, 7, 4);
+                break;
+            case 4:
+                break;
         }
     }
     if (variant == 2 || variant == 3) {

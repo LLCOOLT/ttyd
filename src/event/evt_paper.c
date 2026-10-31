@@ -1,3 +1,4 @@
+// Script commands that load and release paper-pose animations (animPaperPose).
 #include "evt/evt_paper.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/animdrv.h"

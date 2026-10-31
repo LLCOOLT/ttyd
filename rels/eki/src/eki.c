@@ -1,16 +1,10 @@
+// eki.rel (駅, Riverside Station): REL prolog/epilog; registers the init events of eki_00 to eki_06 and the area battle tables.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
 #include "eki.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
+#include "rel_module.h"
 
 void _prolog(void) {
     voidfunctionptr* ctor;

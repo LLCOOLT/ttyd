@@ -1,3 +1,6 @@
+// Damage star burst (DamageStar): a star pops out and spins with the damage number; type 1 is the FP-damage variant.
+// Spawned for HP and FP damage in battle.
+#include "eff/eff_damage_star.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -8,50 +11,13 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
+#include "eff/eff_number.h"
+#include "libc_decls.h"
 
 #define PI 3.1415927f
 #define HALF_PI 1.5707964f
 
-int sprintf(char* str, const char* format, ...);
 u32 strlen(const char* s);
-void* memset(void* dst, int val, u32 n);
-void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra);
-
-typedef struct MayaPoly {
-    s32 keyCount;          // 0x0
-    MayaHermitKey* keys;   // 0x4
-    s32 count;
-    s16** strips;
-} MayaPoly;
-
-typedef struct MayaKeyList {
-    s32 count;
-    MayaPoly* polys;
-} MayaKeyList;
-
-typedef struct MayaAnimData {
-    u8 pad0[4];
-    f32 endTime;
-    MayaKeyList* lists;
-} MayaAnimData;
-
-typedef struct MayaJoint {
-    Mtx mtx;
-    f32 alpha;
-} MayaJoint;
-
-typedef struct MayaAnim {
-    u16 flags;
-    f32 time;
-    OSTime startTime;
-    MayaAnimData* data;
-    MayaJoint joints[1];
-} MayaAnim;
-
-MayaAnim* effMayaAnimAlloc(MayaAnimData* data);
-void effDeleteMayaAnim(MayaAnim* anim);
-void effPlayMayaAnim(MayaAnim* anim);
-void effCalcMayaAnim(MayaAnim* anim);
 
 typedef struct DamageStarWork {
     s32 type;       // 0x0
@@ -342,7 +308,6 @@ MayaHermitKey damageStar_effHermit_1[] = {
     },
 };
 
-
 s16 damageStar_effFace_pPlane168_0[] = {
     4, // vertex count
     -1024, -1024, 0, 0, 512,
@@ -355,14 +320,15 @@ MayaPoly damageStar_effAnimRST[] = {
     {7, damageStar_effHermit_0, 0, NULL},
     {10, damageStar_effHermit_1, 1, &damageStar_effFaceDt_pPlane168},
 };
-MayaKeyList damageStar_effAnimRSTDt = {2, damageStar_effAnimRST};
-MayaAnimData damageStar_effAnimDt = { { 0 }, 65.0f, &damageStar_effAnimRSTDt };
-
+MayaPolyList damageStar_effAnimRSTDt = {2, damageStar_effAnimRST};
+MayaAnimData damageStar_effAnimDt = {{0}, 65.0f, &damageStar_effAnimRSTDt};
 
 void effDamageStarMain(EffectEntry* effect);
 void effDamageStarDisp(CameraId cameraId, EffectEntry* effect);
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+// lifetimes optimisation off for effDamageStarEntry: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 scale, f32 angle) {
     EffectEntry* effect;
@@ -423,7 +389,7 @@ EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 s
 void effDamageStarMain(EffectEntry* effect) {
     DamageStarWork* work = effect->userdata;
     Vec calcPos;
-    Vec pos = { 0.0f, 0.0f, 0.0f };
+    Vec pos = {0.0f, 0.0f, 0.0f};
     u32 n = 0;
     s32 i;
     s32 frame;
@@ -458,14 +424,14 @@ void effDamageStarMain(EffectEntry* effect) {
             if (frame < 20) {
                 work->scale.x = work->scale.y = work->scale.z = 0.01f * scale_data[frame];
             } else if (frame < 40) {
-                work->rotation = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 720.0f, 11, frame - 20, 19);
+                work->rotation = intplGetValue(11, 0.0f, 720.0f, frame - 20, 19);
             } else if (frame < 50) {
-                work->scale.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(1.0f, 1.5f, 4, frame - 40, 9);
-                work->scale.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(1.0f, 0.5f, 4, frame - 40, 9);
+                work->scale.x = intplGetValue(4, 1.0f, 1.5f, frame - 40, 9);
+                work->scale.y = intplGetValue(4, 1.0f, 0.5f, frame - 40, 9);
             } else if (frame < 60) {
-                work->scale.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(1.5f, 0.1f, 1, frame - 50, 9);
-                work->scale.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.5f, 1.0f, 1, frame - 50, 9);
-                work->position.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(work->position.y, 10.0f + work->position.y, 1, frame - 50, 9);
+                work->scale.x = intplGetValue(1, 1.5f, 0.1f, frame - 50, 9);
+                work->scale.y = intplGetValue(1, 0.5f, 1.0f, frame - 50, 9);
+                work->position.y = intplGetValue(1, work->position.y, 10.0f + work->position.y, frame - 50, 9);
             } else {
                 work->scale.x = work->scale.y = work->scale.z = 0.0f;
             }
@@ -477,16 +443,21 @@ void effDamageStarMain(EffectEntry* effect) {
             work->position.z += work->velocity.z;
         }
     }
-    ((DamageStarWork*)effect->userdata)->tick = gp->retraceCount;
+    work = effect->userdata;
+    work->tick = gp->retraceCount;
     dispEntry(CAMERA_3D, dispCalcZ(&calcPos), 8, (DispCallback)effDamageStarDisp, effect);
 }
 
-#define QUAD(h, u) \
+#define QUAD(h, u)                    \
     GXBegin(GX_QUADS, GX_VTXFMT0, 4); \
-    GXPosition3f32(-(h), (h), 0.0f); GXTexCoord2f32(0.0f, 0.0f); \
-    GXPosition3f32((h), (h), 0.0f); GXTexCoord2f32((u), 0.0f); \
-    GXPosition3f32((h), -(h), 0.0f); GXTexCoord2f32((u), 1.0f); \
-    GXPosition3f32(-(h), -(h), 0.0f); GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(-(h), (h), 0.0f);  \
+    GXTexCoord2f32(0.0f, 0.0f);       \
+    GXPosition3f32((h), (h), 0.0f);   \
+    GXTexCoord2f32((u), 0.0f);        \
+    GXPosition3f32((h), -(h), 0.0f);  \
+    GXTexCoord2f32((u), 1.0f);        \
+    GXPosition3f32(-(h), -(h), 0.0f); \
+    GXTexCoord2f32(0.0f, 1.0f);
 
 void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
@@ -540,14 +511,14 @@ void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanAmbColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetChanAmbColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetCullMode(GX_CULL_NONE);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    part = (DamageStarWork*)effect->userdata + 2;
+    part = (DamageStarWork*)effect->userdata + 2; // the star pieces start at entry 2
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
@@ -563,10 +534,10 @@ void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadTexObj(&texObj, GX_TEXMAP2);
     }
     for (i = 2; i < effect->count; i++, part++) {
-        color = (GXColor){ color_rotation_data[((i + frame) % 12) * 3],
-                                                  color_rotation_data[((i + frame) % 12) * 3 + 1],
-                                                  color_rotation_data[((i + frame) % 12) * 3 + 2],
-                                                  part->alpha };
+        color = (GXColor){color_rotation_data[((i + frame) % 12) * 3],
+                          color_rotation_data[((i + frame) % 12) * 3 + 1],
+                          color_rotation_data[((i + frame) % 12) * 3 + 2],
+                          part->alpha};
         GXSetChanMatColor(GX_COLOR0A0, color);
         PSMTXIdentity(partMtx);
         PSMTXScaleApply(partMtx, partMtx, part->scale.x, part->scale.y, part->scale.z);
@@ -631,7 +602,7 @@ void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-    GXSetTevColor(GX_TEVREG0, (GXColor){ 0xFF, 0xFF, 0x00, 0xFF });
+    GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0x00, 0xFF});
     if (type == 1) {
         effGetTexObj(19, &texObj);
         GXLoadTexObj(&texObj, GX_TEXMAP2);

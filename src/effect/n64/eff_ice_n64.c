@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: ice shards, eight ice pieces thrown up and spinning.
+#include "eff/n64/eff_ice_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,32 +8,30 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffIceN64Piece {
-    s32 type;     // 0x0, unused; same slot as EffIceN64Work.type
-    f32 x;        // 0x4
-    f32 y;        // 0x8
-    f32 z;        // 0xC
-    f32 velX;     // 0x10
-    f32 velY;     // 0x14
-    f32 rotZ;     // 0x18
-    f32 rotVel;   // 0x1C
-    f32 rotY;     // 0x20
+    s32 type;        // 0x0, unused; same slot as EffIceN64Work.type
+    f32 x;           // 0x4
+    f32 y;           // 0x8
+    f32 z;           // 0xC
+    f32 velX;        // 0x10
+    f32 velY;        // 0x14
+    f32 rotZ;        // 0x18
+    f32 rotVel;      // 0x1C
+    f32 rotY;        // 0x20
     f32 reserved_24; // 0x24, unused; EffIceN64Work keeps alpha here
     f32 reserved_28; // 0x28, unused; EffIceN64Work keeps lifetime here
     f32 reserved_2C; // 0x2C, unused; EffIceN64Work keeps frame here
 } EffIceN64Piece;
 
 typedef struct EffIceN64Work {
-    s32 type;       // 0x0
-    Vec position;   // 0x4
-    s32 pad10[5];   // 0x10
-    s32 alpha;      // 0x24
-    s32 lifetime;   // 0x28
-    s32 frame;      // 0x2C
+    s32 type;                 // 0x0
+    Vec position;             // 0x4
+    s32 pad10[5];             // 0x10
+    s32 alpha;                // 0x24
+    s32 lifetime;             // 0x28
+    s32 frame;                // 0x2C
     EffIceN64Piece pieces[8]; // 0x30
 } EffIceN64Work;
 
@@ -84,11 +84,12 @@ EffectEntry* effIceN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_lifetimes off
 static void effIceMain(EffectEntry* effect) {
     EffIceN64Work* work = effect->userdata;
     Vec calcPos;
-    Vec pos = { 0.0f, 0.0f, 0.0f };
+    Vec pos = {0.0f, 0.0f, 0.0f};
     f32 t;
     f32 u;
     f32 s;
@@ -164,7 +165,7 @@ static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(trans, rot, mtx);
     PSMTXConcat(cam->view, mtx, mtx);
     {
-        GXSetTevColor(GX_TEVREG0, (GXColor){ 0x14, 0x64, 0x14, work->alpha });
+        GXSetTevColor(GX_TEVREG0, (GXColor){0x14, 0x64, 0x14, work->alpha});
     }
     work = (EffIceN64Work*)((EffIceN64Piece*)work + 1);
     for (i = 1; i < effect->count; i++, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {

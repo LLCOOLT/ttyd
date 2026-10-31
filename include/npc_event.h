@@ -1,3 +1,4 @@
+// npc_event.c: the field enemy and NPC behaviour scripts, per enemy kind (init, move, find, lost, return, blow, dead).
 #pragma once
 
 #include "dolphin/types.h"
@@ -209,3 +210,5 @@ extern EvtWord zakowiz_init_event[];
 extern EvtWord zakowiz_lost_event[];
 extern EvtWord zakowiz_move_event[];
 extern EvtWord zakowiz_return_event[];
+
+extern EvtWord npc_loiter_move_event[];

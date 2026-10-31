@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: akari (light) pose, count flares step through a texture sequence and fade around a point.
+#include "eff/n64/eff_akari_pose_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -5,9 +7,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffAkariPoseN64Work {
     s32 type;     // 0x0
@@ -53,7 +53,6 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-
 void effAkariPoseMain(EffectEntry* effect);
 void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -70,7 +69,7 @@ EffectEntry* effAkariPoseN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     work = __memAlloc(HEAP_EFFECT, (count + 1) * sizeof(EffAkariPoseN64Work));
     effect->userdata = work;
     effect->callback = effAkariPoseMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -105,8 +104,8 @@ void effAkariPoseMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -172,7 +171,7 @@ void effAkariPoseMain(EffectEntry* effect) {
         work->vx += b * (work->targetVx - work->vx);
         work->vy += b * (work->targetVy - work->vy);
     }
-    
+
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effAkariPoseDisp, effect);
 }
 
@@ -226,4 +225,3 @@ void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect) {
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
 }
-

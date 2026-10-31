@@ -1,41 +1,23 @@
+// kpa_00 (クッパ編, Bowser's interludes): a Bowser's Castle scene with Kammy Koopa; continues in kpa_01 and ends in
+// Petalburg (nok_01).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_memcard.h"
 #include "evt/evt_npc.h"
 #include "party/party_motion.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "kpa.h"
+#include "version.h"
+#include "evt/evt_story.h"
 
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_kamek_kemuri2);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff_f);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-
-extern EvtWord kpa_00_first_evt[];
-extern EvtWord kpa_00_fly_evt[];
 static NpcSetupInfo npcEnt[3];
-extern EvtWord kpa_00_init_evt[];
 
 EVT_BEGIN(kpa_00_first_evt)
     CALL(evt_mario_cont_onoff, 0)
@@ -46,7 +28,7 @@ EVT_BEGIN(kpa_00_first_evt)
     CALL(evt_seq_wait, 2)
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_CASTLE1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_CASTLE1"))
         CALL(evt_snd_bgm_scope, 0, 1)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, 0, 134, 534, 0, 45, -8, 5000, 11)
@@ -60,7 +42,7 @@ EVT_END()
 EVT_BEGIN(kpa_00_fly_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), 262144)
+    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), NPC_FLAG_NO_SHADOW)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("飛クッパ"), 0, 30, -15)
     CALL(evt_npc_set_scale, STRING("飛クッパ"), FLOAT(0.099609375f), FLOAT(0.099609375f), FLOAT(0.099609375f))
@@ -171,25 +153,21 @@ EVT_BEGIN(kpa_00_fly_evt)
     END_IF
     CALL(evt_snd_sfxoff, LW(3))
     WAIT_MS(800)
-    SET_VALUE(GSW(0), 61)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 6, 300, 0, 0, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_19_02_BOWSER_CASTLE_INTERIOR)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_SPOT_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(2000)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 3)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL_CHILD(PTR(evt_memcard_save_wrapper))
 #else
     CALL_CHILD(PTR(evt_memcard_save))
 #endif
     CALL(evt_mario_set_mode, 0)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
-#else
-    CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
-#endif
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_BOWSER_A1, 0, FADE_STORY_BOWSER_A3, 0)
     CALL(evt_bero_mapchange, STRING("nok_01"), STRING("nokotarou"))
     RETURN
 EVT_END()
@@ -197,7 +175,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"ババ"*/"\x83\x6F\x83\x6F", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -207,7 +185,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -220,14 +198,13 @@ static NpcSetupInfo npcEnt[] = {
 
 EVT_BEGIN(kpa_00_init_evt)
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_envon, 272, STRING("ENV_KOOPA_KPA1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_KOOPA_KPA1"))
     CALL(evt_npc_setup, PTR(npcEnt))
-    SWITCH(GSW(0))
-        CASE_EQUAL(59)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG1_19_PEACH_TEC)
         SPAWN_EVENT(kpa_00_first_evt)
-        CASE_EQUAL(60)
+        CASE_EQUAL(STORY_STG1_19_01_BOWSER_CASTLE)
         SPAWN_EVENT(kpa_00_fly_evt)
     END_SWITCH
     RETURN
 EVT_END_PAD()
-

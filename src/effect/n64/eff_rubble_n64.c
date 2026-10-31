@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: a rubble chunk thrown with velocity and gravity until it lands, then kicks up dust (hokori).
+#include "eff/n64/eff_rubble_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -5,6 +7,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/n64/eff_hokori_n64.h"
 #include <stdlib.h>
 
 typedef struct EffRubbleN64Work {
@@ -27,8 +30,6 @@ typedef struct EffRubbleN64Work {
     s32 lifetime; // 0x48
     s32 frame;    // 0x4C
 } EffRubbleN64Work;
-
-EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z);
 
 effN64Vtx stg_hahen_v[58] = {
     {3, 3, -3, 0, 0, 50, 50, 50, 255},

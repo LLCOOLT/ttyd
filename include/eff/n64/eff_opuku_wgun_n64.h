@@ -1,3 +1,4 @@
+// eff_opuku_wgun_n64.c: water-gun effect entry (effOpukuWgunN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

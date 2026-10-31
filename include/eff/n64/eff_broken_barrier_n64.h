@@ -1,3 +1,4 @@
+// eff_broken_barrier_n64.c: Paper Mario 64 BrokenBarrier effect entry (effBrokenBarrierN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

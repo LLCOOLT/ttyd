@@ -1,37 +1,27 @@
+// mri_10 (巨木の中, The Great Tree): a small room off mri_09 with an item box.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_item.h"
+#include "evt/evt_lecture.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "mri_puni.h"
 #include "mri.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_important_item);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_item_get_item_end_wait);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_puni_mem_init);
-USER_FUNC(evt_puni_puninum_onoff);
-USER_FUNC(evt_puni_set_hamari);
-USER_FUNC(evt_puni_set_yuka);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(lect_juyoitem_rel_set);
+#include "version.h"
+#include "evt/evt_story.h"
 
 static BeroEntry bero_entry_data[2];
-extern EvtWord mri_10_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -47,26 +37,26 @@ static BeroEntry bero_entry_data[] = {
 };
 
 static EVT_BEGIN(item_evt)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_envoff, 1024)
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_puni_puninum_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, STRING("item00"), 7, LW(0), LW(1), LW(2), 16, -1, 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, STRING("item00"), ITEM_SUPER_BOOTS, LW(0), LW(1), LW(2), 16, -1, 0)
 #else
-    CALL(evt_item_entry, STRING("item00"), 7, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_SUPER_BOOTS, LW(0), LW(1), LW(2), 17, -1, 0)
 #endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_important_item, STRING("item00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_item_get_item_end_wait, STRING("item00"))
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
-    SET_VALUE(GSW(0), 105)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_03_SUPER_BOOTS)
     CALL(evt_puni_puninum_onoff, 1)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -86,19 +76,18 @@ EVT_BEGIN(mri_10_init_evt)
     CALL_CHILD(PTR(evt_bero_info_run))
     SPAWN_EVENT(PTR(puni_disp_info))
     SPAWN_EVENT(PTR(mri_countdown))
-    SWITCH(GSW(0))
-        CASE_BETWEEN(109, 110)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI1"))
     END_SWITCH
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
-    CALL(evt_mobj_itembox, STRING("mobj_box00"), 0, 0, 25, 1, 0, PTR(item_evt), GSWF(2854))
+    CALL(evt_mobj_itembox, STRING("mobj_box00"), 0, 0, 25, 1, 0, PTR(item_evt), GSWF(GSWF_MRI10_SUPER_BOOTS_CHEST_OPENED))
     RETURN
 EVT_END()
-

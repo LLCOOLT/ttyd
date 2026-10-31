@@ -1,3 +1,4 @@
+// Declares the Toad (kinopio) audience control function.
 #pragma once
 
 #include "dolphin/types.h"

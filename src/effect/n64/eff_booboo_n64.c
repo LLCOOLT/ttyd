@@ -1,3 +1,7 @@
+// Paper Mario 64 effect: booboo, up to 11 3D Boo models (three walk-cycle model frames, ten skins by type, skins 8-9
+// pulse) that stand, bob, hop or sway; the entry takes no arguments and the caller fills in each slot's flags,
+// position and state.
+#include "eff/n64/eff_booboo_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,8 +10,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
+#include "libc_decls.h"
 
 typedef struct EffBoobooN64Work {
     s32 life;         // 0x0, set to 1000 at entry; never read
@@ -25,9 +28,9 @@ typedef struct EffBoobooN64Work {
     s8 frame[11];     // 0x13C
 } EffBoobooN64Work;
 
-#ifdef __MWERKS__
-#endif
-
+// Model data in the exporter's layout: indexed vertex arrays (positions, normals, colours, texture coordinates),
+// display lists of GX commands (each padded to 32 bytes with GX_NOP) and, per list table, the list sizes in
+// 32-byte units for GXCallDisplayList.
 s16 boo_vertex_tbl[] __attribute__((aligned(32))) = {
     6474, 32221, -10223, 6474, 32221, 8093,
     14568, 19169, 10223, 14568, 19169, -12353,
@@ -232,21 +235,22 @@ u32 boo_dl_2_30[] __attribute__((aligned(32))) = {0x9800038C, 0x2504116D, 0x1301
 u32 boo_dl_2_31[] __attribute__((aligned(32))) = {0x98000389, 0x2504118A, 0x2601046E, 0x16010400, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 u8 anime_data_walk[] = {1, 1, 2, 2, 1, 1, 0, 0};
 
-#define BOO_ARRAYS()                                                                                       \
-    GXClearVtxDesc();                                                                                      \
-    GXSetVtxDesc(GX_VA_POS, GX_INDEX8);                                                                    \
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 14);                                        \
-    GXSetArray(GX_VA_POS, boo_vertex_tbl, 6);                                                              \
-    GXSetVtxDesc(GX_VA_NRM, GX_INDEX8);                                                                    \
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S8, 6);                                          \
-    GXSetArray(GX_VA_NRM, boo_normal_tbl, 3);                                                              \
-    GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);                                                                   \
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);                                     \
-    GXSetArray(GX_VA_CLR0, boo_color0_tbl, 4);                                                             \
-    GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);                                                                   \
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);                                        \
+#define BOO_ARRAYS()                                                   \
+    GXClearVtxDesc();                                                  \
+    GXSetVtxDesc(GX_VA_POS, GX_INDEX8);                                \
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 14);    \
+    GXSetArray(GX_VA_POS, boo_vertex_tbl, 6);                          \
+    GXSetVtxDesc(GX_VA_NRM, GX_INDEX8);                                \
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S8, 6);      \
+    GXSetArray(GX_VA_NRM, boo_normal_tbl, 3);                          \
+    GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);                               \
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0); \
+    GXSetArray(GX_VA_CLR0, boo_color0_tbl, 4);                         \
+    GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);                               \
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);    \
     GXSetArray(GX_VA_TEX0, boo_texcoord0_tbl, 4);
 
+// clang-format off
 #define DL(n, sz) GXCallDisplayList(n, sz);
 #define DL4(a, b, c, d) DL(a, 0x40) DL(b, 0x40) DL(c, 0x40) DL(d, 0x40)
 #define DLS(p, a) DL(p##a, 0x20)
@@ -255,6 +259,7 @@ u8 anime_data_walk[] = {1, 1, 2, 2, 1, 1, 0, 0};
     DLS(p, 13) DLS(p, 14) DLS(p, 15) DLS(p, 16) DLS(p, 17) DLS(p, 18) DLS(p, 19) DLS(p, 20) DLS(p, 21)    \
     DLS(p, 22) DLS(p, 23) DLS(p, 24) DLS(p, 25) DLS(p, 26) DLS(p, 27) DLS(p, 28) DLS(p, 29) DLS(p, 30)    \
     DLS(p, 31)
+// clang-format on
 
 void boo_polygon_0(void) {
     BOO_ARRAYS()
@@ -277,7 +282,7 @@ void boo_polygon_2(void) {
 void effBoobooMain(EffectEntry* effect);
 void effBoobooDisp(CameraId cameraId, EffectEntry* effect);
 
-EffectEntry* effBoobooN64Entry(void) {
+EffectEntry* effBoobooN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffBoobooN64Work* work;
     s32 i;
@@ -316,54 +321,54 @@ void effBoobooMain(EffectEntry* effect) {
         done = 0;
         frame = work->frame[i];
         switch (work->state[i]) {
-        case 0:
-            done = 1;
-            break;
-        case 1:
-            done = 1;
-            work->anim[i] = 1;
-            break;
-        case 3:
-            work->anim[i] = anime_data_walk[frame % 8];
-            s = (f32)sin(6.2831855f * (f32)(frame * 10) / 360.0f);
-            work->rot[i] += s;
-            if (frame >= 36) {
+            case 0:
                 done = 1;
-                work->frame[i] = 0;
-            }
-            break;
-        case 2:
-            work->anim[i] = anime_data_walk[frame % 8];
-            s = (f32)sin(6.2831855f * (f32)(frame * 20) / 360.0f);
-            done = 1;
-            work->yoff[i] = 2.0f * s;
-            if (frame >= 9) {
-                work->yoff[i] = 0.0f;
+                break;
+            case 1:
                 done = 1;
-                work->frame[i] = 0;
-            }
-            break;
-        case 4:
-            work->anim[i] = anime_data_walk[frame % 8];
-            s = (f32)sin(6.2831855f * (f32)(frame * 20) / 360.0f);
-            work->yoff[i] = 4.0f * s;
-            if (frame >= 9) {
-                work->yoff[i] = 0.0f;
+                work->anim[i] = 1;
+                break;
+            case 3:
+                work->anim[i] = anime_data_walk[frame % 8];
+                s = (f32)sin(6.2831855f * (f32)(frame * 10) / 360.0f);
+                work->rot[i] += s;
+                if (frame >= 36) {
+                    done = 1;
+                    work->frame[i] = 0;
+                }
+                break;
+            case 2:
+                work->anim[i] = anime_data_walk[frame % 8];
+                s = (f32)sin(6.2831855f * (f32)(frame * 20) / 360.0f);
                 done = 1;
-                work->frame[i] = 0;
-            }
-            break;
-        case 5:
-        default:
-            work->anim[i] = anime_data_walk[frame % 8];
-            s = (f32)sin(6.2831855f * (f32)(frame * 5) / 360.0f);
-            work->yoff[i] = 12.0f * s;
-            if (frame >= 36) {
-                work->yoff[i] = 0.0f;
-                done = 1;
-                work->frame[i] = 0;
-            }
-            break;
+                work->yoff[i] = 2.0f * s;
+                if (frame >= 9) {
+                    work->yoff[i] = 0.0f;
+                    done = 1;
+                    work->frame[i] = 0;
+                }
+                break;
+            case 4:
+                work->anim[i] = anime_data_walk[frame % 8];
+                s = (f32)sin(6.2831855f * (f32)(frame * 20) / 360.0f);
+                work->yoff[i] = 4.0f * s;
+                if (frame >= 9) {
+                    work->yoff[i] = 0.0f;
+                    done = 1;
+                    work->frame[i] = 0;
+                }
+                break;
+            case 5:
+            default:
+                work->anim[i] = anime_data_walk[frame % 8];
+                s = (f32)sin(6.2831855f * (f32)(frame * 5) / 360.0f);
+                work->yoff[i] = 12.0f * s;
+                if (frame >= 36) {
+                    work->yoff[i] = 0.0f;
+                    done = 1;
+                    work->frame[i] = 0;
+                }
+                break;
         }
         work->frame[i]++;
         if (done && (work->flags[i] & 2)) {
@@ -372,19 +377,19 @@ void effBoobooMain(EffectEntry* effect) {
             work->frame[i] = 0;
         }
     }
-    dispEntry(4, 0.0f, 0, (DispCallback)effBoobooDisp, effect);
+    dispEntry(CAMERA_3D, 0.0f, 0, (DispCallback)effBoobooDisp, effect);
 }
 
-#define TEX_COMMON(id, cin_d)                                                                              \
-    effGetTexObjN64(id, &texObj);                                                                          \
-    GXLoadTexObj(&texObj, GX_TEXMAP0);                                                                     \
-    GXSetNumTexGens(1);                                                                                    \
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);       \
-    GXSetNumTevStages(1);                                                                                  \
-    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);                                    \
-    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);             \
-    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);             \
-    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, cin_d);                              \
+#define TEX_COMMON(id, cin_d)                                                                        \
+    effGetTexObjN64(id, &texObj);                                                                    \
+    GXLoadTexObj(&texObj, GX_TEXMAP0);                                                               \
+    GXSetNumTexGens(1);                                                                              \
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY); \
+    GXSetNumTevStages(1);                                                                            \
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);                              \
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);       \
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);       \
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, cin_d);                        \
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
 
 BOOL texture_dl(EffectEntry* effect, s32 idx, u32 type) {
@@ -396,42 +401,42 @@ BOOL texture_dl(EffectEntry* effect, s32 idx, u32 type) {
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     switch (type) {
-    case 0:
-        TEX_COMMON(0x38, GX_CC_ZERO)
-        break;
-    case 1:
-        GXSetNumTexGens(0);
-        GXSetNumTevStages(1);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
-        break;
-    case 2:
-        TEX_COMMON(0x39, GX_CC_ZERO)
-        break;
-    case 3:
-        TEX_COMMON(0x3A, GX_CC_ZERO)
-        break;
-    case 4:
-        TEX_COMMON(0x3B, GX_CC_ZERO)
-        break;
-    case 5:
-        TEX_COMMON(0x3C, GX_CC_ZERO)
-        break;
-    case 6:
-        TEX_COMMON(0x3D, GX_CC_ZERO)
-        break;
-    case 7:
-        TEX_COMMON(0x3E, GX_CC_ZERO)
-        break;
-    case 8:
-        TEX_COMMON(0x3F, GX_CC_C0)
-        break;
-    case 9:
-        TEX_COMMON(0x40, GX_CC_C0)
-        break;
+        case 0:
+            TEX_COMMON(0x38, GX_CC_ZERO)
+            break;
+        case 1:
+            GXSetNumTexGens(0);
+            GXSetNumTevStages(1);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+            break;
+        case 2:
+            TEX_COMMON(0x39, GX_CC_ZERO)
+            break;
+        case 3:
+            TEX_COMMON(0x3A, GX_CC_ZERO)
+            break;
+        case 4:
+            TEX_COMMON(0x3B, GX_CC_ZERO)
+            break;
+        case 5:
+            TEX_COMMON(0x3C, GX_CC_ZERO)
+            break;
+        case 6:
+            TEX_COMMON(0x3D, GX_CC_ZERO)
+            break;
+        case 7:
+            TEX_COMMON(0x3E, GX_CC_ZERO)
+            break;
+        case 8:
+            TEX_COMMON(0x3F, GX_CC_C0)
+            break;
+        case 9:
+            TEX_COMMON(0x40, GX_CC_C0)
+            break;
     }
     if ((mapGetWork()->entries[0].flags & 2) && (work->flags[idx] & 8)) {
         mapGetBlend(&blend);
@@ -485,15 +490,15 @@ void effBoobooDisp(CameraId cameraId, EffectEntry* effect) {
         animPhase[0] = work->anim[i];
         GXSetCullMode(GX_CULL_BACK);
         switch (animPhase[0]) {
-        case 0:
-            boo_polygon_0();
-            break;
-        case 1:
-            boo_polygon_1();
-            break;
-        case 2:
-            boo_polygon_2();
-            break;
+            case 0:
+                boo_polygon_0();
+                break;
+            case 1:
+                boo_polygon_1();
+                break;
+            case 2:
+                boo_polygon_2();
+                break;
         }
     }
 }

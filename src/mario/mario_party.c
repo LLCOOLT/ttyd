@@ -1,78 +1,70 @@
-// the best Mario Party, partners with actual abilities in Paper Mario,
-// something Nintendo's forgotten about
+// Mario's side of the partners: which partner is out, calling them (entry/hello/goodbye/kill), the partner
+// button, and partner join/leave, HP and level helpers.
 #include "mario/mario_party.h"
 #include "mario/mario.h"
+#include "driver/npcdrv.h"
 #include "party.h"
-
-s32 partyEntry(PartyId id);
-s32 partyEntry2(PartyId id);
-s32 partyEntryHello(PartyId id);
-s32 partyEntry2Hello(PartyId id);
-void partyHello(PartyEntry* party);
-void partyGoodbye(s32 slot);
-void partyKill(s32 slot);
-s32 partyDoWork(void);
-BOOL N_marioChkUseParty(void);
-BOOL N_fbatPreventMarioEventChk(void);
-BOOL yoshiGetStatus(void);
+#include "party/party_yoshi.h"
+#include "version.h"
+#include <dolphin/pad.h>
 
 static inline void marioPartyKillSlot0(void) {
-    MarioWork* wp = marioGetPtr();
-    if (wp->currPartySlotId[0] >= 0) {
-        partyKill(wp->currPartySlotId[0]);
-        wp->currPartySlotId[0] = -1;
+    MarioWork* mario = marioGetPtr();
+    if (mario->currPartySlotId[0] >= 0) {
+        partyKill(mario->currPartySlotId[0]);
+        mario->currPartySlotId[0] = -1;
     }
 }
 
 static inline void marioPartyKillSlot1(void) {
-    MarioWork* wp = marioGetPtr();
-    if (wp->currPartySlotId[1] >= 0) {
-        partyKill(wp->currPartySlotId[1]);
-        wp->currPartySlotId[1] = -1;
+    MarioWork* mario = marioGetPtr();
+    if (mario->currPartySlotId[1] >= 0) {
+        partyKill(mario->currPartySlotId[1]);
+        mario->currPartySlotId[1] = -1;
     }
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 s32 marioUseParty(void) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     PartyEntry* party;
 
     if (N_marioChkUseParty()) {
-        wp->partyUseDelay = 0;
-        wp->trigFlags &= ~2;
+        mario->partyUseDelay = 0;
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
         return 0;
     }
-    if ((wp->trigFlags & 2) && marioKeyOffChk()) {
-        wp->partyUseDelay = 0;
-        wp->trigFlags &= ~2;
+    if ((mario->trigFlags & MARIO_TRIG_FLAG_USE_PARTNER) && marioKeyOffChk()) {
+        mario->partyUseDelay = 0;
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
         return 0;
     }
     party = partyGetPtr(marioGetPartyId());
     if (party != NULL && party->runMode == 3) {
         return 0;
     }
-    if (wp->currPartySlotId[0] < 0) {
-        wp->trigFlags &= ~2;
+    if (mario->currPartySlotId[0] < 0) {
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
         return 0;
     }
-    if (wp->flags & 0x80000000) {
+    if (mario->flags & MARIO_FLAG_IS_8_BIT) {
         return 0;
     }
     if (N_fbatPreventMarioEventChk()) {
-        wp->partyUseDelay = 0;
-        wp->trigFlags &= ~2;
+        mario->partyUseDelay = 0;
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
         return 0;
     }
-    if ((wp->flags & 0x30000) || wp->airTimer != 0) {
-        wp->partyUseDelay = 0;
-        wp->trigFlags &= ~2;
+    if ((mario->flags & (MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING)) || mario->airTimer != 0) {
+        mario->partyUseDelay = 0;
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
         return 0;
     }
-    if (wp->currMotionId != 0 && wp->currMotionId != 1 && wp->currMotionId != 2) {
-        wp->trigFlags &= ~2;
+    if (mario->currMotionId != MARIO_MOTION_STAY && mario->currMotionId != MARIO_MOTION_WALK && mario->currMotionId != MARIO_MOTION_DASH) {
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
         return 0;
     }
-    if ((wp->dispFlags & 0x1000000) || party->slitOn == 1) {
+    if ((mario->dispFlags & MARIO_DISP_FLAG_SLIT) || party->slitOn == 1) {
         return 0;
     }
     if (partyGetPtr(marioGetPartyId())->flags & 0x100) {
@@ -82,31 +74,32 @@ s32 marioUseParty(void) {
     if (party == NULL) {
         return 0;
     }
-    if (party->currentMemberId == 1 && !(party->flags & 2)) {
+    // 1 = PARTY_MEMBER_GOOMBELLA, 4 = PARTY_MEMBER_YOSHI: the char-sized enum constants change the s8 compares
+    if (party->currentMemberId == 1 && !(party->flags & PARTY_FLAG_IS_GROUNDED)) {
         return 0;
     }
     if (party->currentMemberId == 4 && yoshiGetStatus()) {
         return 0;
     }
-    if (!(wp->trigFlags & 2) && (wp->buttonTrg & 0x400)) {
-        wp->trigFlags |= 2;
-        wp->partyUseDelay = 5;
+    if (!(mario->trigFlags & MARIO_TRIG_FLAG_USE_PARTNER) && (mario->buttonTrg & PAD_BUTTON_X)) {
+        mario->trigFlags |= MARIO_TRIG_FLAG_USE_PARTNER;
+        mario->partyUseDelay = 5;
     }
     return 0;
 }
 
 s32 marioUsePartyMain(void) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
 
-    if (wp->trigFlags & 2) {
+    if (mario->trigFlags & MARIO_TRIG_FLAG_USE_PARTNER) {
         if (marioKeyOffChk()) {
-            wp->partyUseDelay = 0;
-            wp->trigFlags &= ~2;
+            mario->partyUseDelay = 0;
+            mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
             return 0;
         }
-        if (--wp->partyUseDelay <= 0) {
-            wp->partyUseDelay = 0;
-            wp->trigFlags &= ~2;
+        if (--mario->partyUseDelay <= 0) {
+            mario->partyUseDelay = 0;
+            mario->trigFlags &= ~MARIO_TRIG_FLAG_USE_PARTNER;
             return partyDoWork();
         }
     }
@@ -115,28 +108,28 @@ s32 marioUsePartyMain(void) {
 #endif
 
 s32 marioPartyEntry(PartyId id) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     s32 ret;
 
     if (id < 8) {
         if (!partyChkJoin(id)) {
             return -1;
         }
-        if (wp->currPartySlotId[0] >= 0) {
+        if (mario->currPartySlotId[0] >= 0) {
             marioPartyKillSlot0();
         }
         ret = partyEntry(id);
         if (ret >= 0) {
-            wp->currPartySlotId[0] = ret;
+            mario->currPartySlotId[0] = ret;
             partyHello(partyGetPtr(ret));
         }
     } else {
-        if (wp->currPartySlotId[1] >= 0) {
+        if (mario->currPartySlotId[1] >= 0) {
             marioPartyKillSlot1();
         }
         ret = partyEntry2(id);
         if (ret >= 0) {
-            wp->currPartySlotId[1] = ret;
+            mario->currPartySlotId[1] = ret;
             partyHello(partyGetPtr(ret));
         }
     }
@@ -145,22 +138,22 @@ s32 marioPartyEntry(PartyId id) {
 
 s32 marioPartyHello(PartyId id) {
     s32 ret = -1;
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
 
     if (id < 8) {
         if (!partyChkJoin(id)) {
             return -1;
         }
-        if (wp->currPartySlotId[0] < 0) {
+        if (mario->currPartySlotId[0] < 0) {
             ret = partyEntryHello(id);
             if (ret >= 0) {
-                wp->currPartySlotId[0] = ret;
+                mario->currPartySlotId[0] = ret;
             }
         }
     } else {
         ret = partyEntry2Hello(id);
         if (ret >= 0) {
-            wp->currPartySlotId[1] = ret;
+            mario->currPartySlotId[1] = ret;
         }
     }
     return ret;
@@ -181,33 +174,33 @@ void marioPartyKill(void) {
     marioPartyKillSlot1();
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo has one function for the partner button: the request flag is trigFlags 0x100000, and the wait for
 // partyDoWork runs here (retail splits it out into marioUsePartyMain).
 s32 marioUseParty(void) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     PartyEntry* party;
 
-    if ((wp->trigFlags & 0x100000) && marioKeyOffChk()) {
-        wp->trigFlags &= ~0x100000;
+    if ((mario->trigFlags & MARIO_TRIG_FLAG_JABARA_CHK) && marioKeyOffChk()) {
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_JABARA_CHK;
         return 0;
     }
-    if (wp->currPartySlotId[0] < 0) {
-        wp->trigFlags &= ~0x100000;
+    if (mario->currPartySlotId[0] < 0) {
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_JABARA_CHK;
         return 0;
     }
-    if (wp->flags & 0x80000000) {
+    if (mario->flags & MARIO_FLAG_IS_8_BIT) {
         return 0;
     }
-    if ((wp->flags & 0x30000) || wp->airTimer != 0) {
-        wp->trigFlags &= ~0x100000;
+    if ((mario->flags & (MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING)) || mario->airTimer != 0) {
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_JABARA_CHK;
         return 0;
     }
-    if (wp->currMotionId != 0 && wp->currMotionId != 1 && wp->currMotionId != 2) {
-        wp->trigFlags &= ~0x100000;
+    if (mario->currMotionId != MARIO_MOTION_STAY && mario->currMotionId != MARIO_MOTION_WALK && mario->currMotionId != MARIO_MOTION_DASH) {
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_JABARA_CHK;
         return 0;
     }
-    if (wp->dispFlags & 0x1000000) {
+    if (mario->dispFlags & MARIO_DISP_FLAG_SLIT) {
         return 0;
     }
     if (partyGetPtr(marioGetPartyId())->flags & 0x100) {
@@ -217,20 +210,21 @@ s32 marioUseParty(void) {
     if (party == NULL) {
         return 0;
     }
-    if (party->currentMemberId == 1 && !(party->flags & 2)) {
+    // 1 = PARTY_MEMBER_GOOMBELLA, 4 = PARTY_MEMBER_YOSHI: the char-sized enum constants change the s8 compares
+    if (party->currentMemberId == 1 && !(party->flags & PARTY_FLAG_IS_GROUNDED)) {
         return 0;
     }
     if (party->currentMemberId == 4 && yoshiGetStatus()) {
         return 0;
     }
-    if (!(wp->trigFlags & 0x100000)) {
-        if (wp->buttonTrg & 0x400) {
-            wp->trigFlags |= 0x100000;
-            wp->partyUseDelay = 5;
+    if (!(mario->trigFlags & MARIO_TRIG_FLAG_JABARA_CHK)) {
+        if (mario->buttonTrg & PAD_BUTTON_X) {
+            mario->trigFlags |= MARIO_TRIG_FLAG_JABARA_CHK;
+            mario->partyUseDelay = 5;
         }
-    } else if (--wp->partyUseDelay <= 0) {
-        wp->partyUseDelay = 0;
-        wp->trigFlags &= ~0x100000;
+    } else if (--mario->partyUseDelay <= 0) {
+        mario->partyUseDelay = 0;
+        mario->trigFlags &= ~MARIO_TRIG_FLAG_JABARA_CHK;
         return partyDoWork();
     }
     return 0;
@@ -249,21 +243,21 @@ s32 marioGetParty(void) {
 }
 
 s32 marioGetPartyId(void) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     PartyEntry* party;
     s32 partyId;
 
-    partyId = wp->currPartySlotId[0];
+    partyId = mario->currPartySlotId[0];
     if (partyId >= 0) {
         party = partyGetPtr(partyId);
-        if ((party != NULL) && !(party->flags & 8)) {
+        if ((party != NULL) && !(party->flags & PARTY_FLAG_IS_PARTNER)) {
             return partyId;
         }
     }
-    partyId = wp->currPartySlotId[1];
+    partyId = mario->currPartySlotId[1];
     if (partyId >= 0) {
         party = partyGetPtr(partyId);
-        if ((party != NULL) && !(party->flags & 8)) {
+        if ((party != NULL) && !(party->flags & PARTY_FLAG_IS_PARTNER)) {
             return partyId;
         }
     }
@@ -271,22 +265,22 @@ s32 marioGetPartyId(void) {
 }
 
 s32 marioGetExtraPartyId(void) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     PartyEntry* party;
     s32 partyId;
 
-    partyId = wp->currPartySlotId[0];
+    partyId = mario->currPartySlotId[0];
     if (partyId >= 0) {
         party = partyGetPtr(partyId);
-        if ((party != NULL) && (party->flags & 8)) {
+        if ((party != NULL) && (party->flags & PARTY_FLAG_IS_PARTNER)) {
             return partyId;
         }
     }
 
-    partyId = wp->currPartySlotId[1];
+    partyId = mario->currPartySlotId[1];
     if (partyId >= 0) {
         party = partyGetPtr(partyId);
-        if ((party != NULL) && (party->flags & 8)) {
+        if ((party != NULL) && (party->flags & PARTY_FLAG_IS_PARTNER)) {
             return partyId;
         }
     }

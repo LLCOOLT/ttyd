@@ -1,3 +1,4 @@
+// eff_itemget.c: item-get sparkles (アイテム取得): 7 sparkles for types 0, 3 and 9 (item obtained), 5 for type 10 (item used in battle). effItemGetEntry and ItemGetWork.
 #pragma once
 
 #include "driver/effdrv.h"

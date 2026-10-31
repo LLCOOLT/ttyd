@@ -1,36 +1,32 @@
+// eki_03 (駅, Riverside Station): paper-panel poster puzzle room with a power-up block and bricks
+// Thunder Rage and HP Plus items; doors to eki_01 and eki_04.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "memory.h"
 #include "mario/mariost.h"
+#include "driver/envdrv.h"
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
 #include "dolphin/os.h"
 #include "mario/mario.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_cloud.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "eki.h"
+#include "version.h"
+#include "evt/evt_story.h"
 
-double sin(double x);
 static smartEntry* ind_lp;
-void envGlareFilter(s32 on, s16 x0, s16 y0, s16 x1, s16 y1);
-void envGlareFilterZ(f32 z);
+// FAKE: eki_03.c calls envGlareFilter through this prototype (the types it was compiled with) instead of the one in driver/envdrv.h; same registers, behaviour-identical.
+typedef void (*EnvGlareFilterS16Fn)(s32, s16, s16, s16, s16);
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_cloud_ent);
-USER_FUNC(evt_cloud_init);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_mobj_blk);
-#endif
 static USER_FUNC(test_glare);
 static void sun_tev(MapTevCallbackInfo* info);
 
@@ -42,7 +38,6 @@ extern EvtWord evt_poster_12[];
 extern EvtWord evt_poster_13[];
 extern EvtWord evt_poster_14[];
 extern EvtWord evt_poster_15[];
-extern EvtWord eki_03_init_evt[];
 
 static EVT_BEGIN(w1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -73,8 +68,8 @@ static BeroEntry bero_data[] = {
         "w_bero_1", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -91,8 +86,8 @@ static BeroEntry bero_data[] = {
         "w_bero_2", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -109,118 +104,118 @@ static BeroEntry bero_data[] = {
 };
 
 EVT_BEGIN(evt_poster)
-    SET_VALUE(GSW(0), 316)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_33_BLOW_THE_POSTER)
     SET_VALUE(LW(0), 1)
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_chk)
-    IF_INT_EQUAL(GSWF(3733), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_5_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3734), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_6_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3735), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_7_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3736), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_8_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3737), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_9_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3738), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_10_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3739), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_11_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3740), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_12_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3741), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_13_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3742), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_14_BLOWN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3743), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_15_BLOWN), 0)
         RETURN
     END_IF
     SET_VALUE(LW(0), 1)
     CALL_CHILD(PTR(bero_case_switch_on))
     CALL(evt_hitobj_onoff, STRING("a_kabe"), 1, 0)
-    IF_INT_LESS(GSW(0), 316)
-        SET_VALUE(GSW(0), 316)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_33_BLOW_THE_POSTER)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_33_BLOW_THE_POSTER)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_1)
-    SET_VALUE(GSWF(3729), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_1_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_2)
-    SET_VALUE(GSWF(3730), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_2_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_3)
-    SET_VALUE(GSWF(3731), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_3_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_4)
-    SET_VALUE(GSWF(3732), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_4_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_5)
-    SET_VALUE(GSWF(3733), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_5_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_6)
-    SET_VALUE(GSWF(3734), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_6_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_7)
-    SET_VALUE(GSWF(3735), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_7_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_8)
-    SET_VALUE(GSWF(3736), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_8_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_poster_9)
-    SET_VALUE(GSWF(3737), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_9_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_poster_10)
-    SET_VALUE(GSWF(3738), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_10_BLOWN), 1)
     CALL(evt_hitobj_onoff, STRING("a_kami_13"), 1, 0)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_poster_11)
-    SET_VALUE(GSWF(3739), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_11_BLOWN), 1)
     CALL(evt_hitobj_onoff, STRING("a_kami_14"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("a_kami_15"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("a_kami_6"), 1, 0)
@@ -230,7 +225,7 @@ EVT_BEGIN(evt_poster_11)
 EVT_END()
 
 EVT_BEGIN(evt_poster_12)
-    SET_VALUE(GSWF(3740), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_12_BLOWN), 1)
     CALL(evt_hitobj_onoff, STRING("a_kami_8"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("a_kami_9"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("a_kami_5"), 1, 0)
@@ -239,19 +234,19 @@ EVT_BEGIN(evt_poster_12)
 EVT_END()
 
 EVT_BEGIN(evt_poster_13)
-    SET_VALUE(GSWF(3741), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_13_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_poster_14)
-    SET_VALUE(GSWF(3742), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_14_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_poster_15)
-    SET_VALUE(GSWF(3743), 1)
+    SET_VALUE(GSWF(GSWF_EKI03_POSTER_15_BLOWN), 1)
     CALL_CHILD(PTR(evt_chk))
     RETURN
 EVT_END()
@@ -261,121 +256,121 @@ EVT_BEGIN(eki_03_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_cam_road_reset)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_HOM1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI4"))
-    CALL(evt_snd_bgmoff, 26624)
-    CALL(evt_item_entry, STRING("item"), 278, -550, 220, -50, 16, GSWF(3746), 0)
-    CALL(evt_mobj_powerupblk, STRING("pblk01"), 450, 100, 10, 0, GSWF(5561), 0)
-#ifdef VERSION_G8ME01
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_HOM1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI4"))
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
+    CALL(evt_item_entry, STRING("item"), ITEM_HP_PLUS, -550, 220, -50, 16, GSWF(GSWF_EKI03_HP_PLUS), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk01"), 450, 100, 10, 0, GSWF(GSWF_EKI03_SHINE_SPRITE), 0)
+#if VERSION >= VERSION_US
     CALL(evt_mobj_blk, STRING("blk01"), 250, 300, -100, 0, 0, LSWF(1))
 #else
     CALL(evt_mobj_brick, STRING("blk01"), 250, 300, -100, 0, 0, 0, LSWF(1))
 #endif
-    CALL(evt_mobj_brick, STRING("blk02"), 250, 385, -100, 129, 11, 0, GSWF(3754))
+    CALL(evt_mobj_brick, STRING("blk02"), 250, 385, -100, ITEM_THUNDER_RAGE, 11, 0, GSWF(GSWF_EKI03_THUNDER_RAGE_BLOCK_HIT))
     CALL(evt_map_set_tevcallback, 2, PTR(sun_tev))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sun"), 33554432)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("sun"), 256)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sun"), 268435456)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sun"), MAPOBJ_TEV_CALLBACK(2))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sun"), MAPOBJ_FLAG_DISPLAY_LIST)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sun"), MAPOBJ_FLAG_NO_COLOR_STAGE)
     BEGIN_INLINE_EVENT
         CALL(test_glare)
     END_INLINE_EVENT
     CALL(evt_cloud_init)
-    IF_INT_EQUAL(GSWF(3729), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_1_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_0"), STRING("a_kami_1"), PTR(evt_poster_1))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_0"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_0"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_1"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3730), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_2_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_17"), STRING("a_kami_2"), PTR(evt_poster_2))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_17"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_17"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_2"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3731), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_3_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_16"), STRING("a_kami_3"), PTR(evt_poster_3))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_16"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_16"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_3"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3732), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_4_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_4"), STRING("a_kami_4"), PTR(evt_poster_4))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_4"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_4"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_4"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3733), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_5_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_5"), STRING("a_kami_12"), PTR(evt_poster_5))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_5"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_5"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_12"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3734), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_6_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_6"), STRING("a_kami_11"), PTR(evt_poster_6))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_6"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_6"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3735), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_7_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_7"), STRING("a_kami_11"), PTR(evt_poster_7))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_7"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_7"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3736), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_8_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_8"), STRING("a_kami_12"), PTR(evt_poster_8))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_8"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_8"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_12"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3737), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_9_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_9"), STRING("a_kami_12"), PTR(evt_poster_9))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_9"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_9"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_12"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3738), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_10_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_10"), STRING("a_kami_10"), PTR(evt_poster_10))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_10"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_10"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_13"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3739), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_11_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_11"), STRING("a_kami_10"), PTR(evt_poster_11))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_11"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_11"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_14"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_15"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_6"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_7"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3740), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_12_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_12"), STRING("a_kami_10"), PTR(evt_poster_12))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_12"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_12"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_8"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_9"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("a_kami_5"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3741), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_13_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_13"), STRING("a_kami_10"), PTR(evt_poster_13))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_13"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_13"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3742), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_14_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_14"), STRING("a_kami_11"), PTR(evt_poster_14))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_14"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_14"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3743), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_15_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_15"), STRING("a_kami_11"), PTR(evt_poster_15))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_15"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_15"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
     END_IF
     CALL(evt_hitobj_onoff, STRING("a_kabe"), 1, 0)
@@ -387,8 +382,16 @@ EVT_END()
 
 static void sun_tev(MapTevCallbackInfo* info) {
     static const s32 texmtx_tbl[] = {
-        GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4,
-        GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9,
+        GX_TEXMTX0,
+        GX_TEXMTX1,
+        GX_TEXMTX2,
+        GX_TEXMTX3,
+        GX_TEXMTX4,
+        GX_TEXMTX5,
+        GX_TEXMTX6,
+        GX_TEXMTX7,
+        GX_TEXMTX8,
+        GX_TEXMTX9,
     };
     s32 stage = info->tevStage;
     s32 texMap = info->texCoord;
@@ -443,7 +446,7 @@ static USER_FUNC(test_glare) {
 
     marioGetPtr();
     if (isFirstCall) {
-        sun->flags |= 0x20000000;
+        sun->flags |= MAPOBJ_FLAG_BBOX;
         return EVT_RETURN_BLOCK;
     }
     rect = sun->screenRect;
@@ -452,9 +455,8 @@ static USER_FUNC(test_glare) {
     } else if (rect[0] == 0 && rect[1] == 0 && rect[2] == 0 && rect[3] == 0) {
         envGlareFilter(0, 0, 0, 0, 0);
     } else {
-        envGlareFilter(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
+        ((EnvGlareFilterS16Fn)envGlareFilter)(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
         envGlareFilterZ(1.148f);
     }
     return EVT_RETURN_BLOCK;
 }
-

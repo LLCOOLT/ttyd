@@ -1,5 +1,9 @@
+// kpa (クッパ編, Bowser's interludes): registers kpa_00..kpa_07 and runs the side-scrolling stages: the object and item
+// streams, coins, score, lives, the timer and the status display.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/animdrv.h"
 
 #include "manager/evtmgr_cmd.h"
 #include "driver/camdrv.h"
@@ -13,83 +17,42 @@
 #include "mario/mario.h"
 #include "data/mapdata.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_twoddisp.h"
+#include "koopa.h"
+#include "kpa_act.h"
+#include "party/party_motion.h"
 #include "kpa.h"
+#include "driver/icondrv.h"
+#include "driver/itemdrv.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "rel_module.h"
+// FAKE: kpa.c calls iconDispGx through this prototype (the types it was compiled with) instead of the one in driver/icondrv.h; same registers, behaviour-identical.
+typedef void (*IconDispGxArgOrderFn)(f32, Vec*, s16, u16);
 
-typedef struct KpaWork { u8 stage; u8 lives; u8 time; } KpaWork;
-KpaWork* kwp;
-void kpaAddScore(s32 score);
+typedef struct KpaGameWork {
+    u8 stage;
+    u8 lives;
+    u8 time;
+} KpaGameWork;
+KpaGameWork* kwp;
 void kpa_stageclear_disp(CameraId camera, void* param);
-void FontDrawScale(f32 scale);
-void FontDrawString(f32 x, f32 y, const char* message);
 void kpa_status_disp(CameraId camera, void* param);
-void iconDispGx(f32 scale, Vec* position, s16 flags, u16 iconId);
 #define NUMERIC_ID ((u16*)numeric_id)
-s32 kpaMutekiCheck(void);
-f32 kpaGetWidth(s32 type);
-void kpaFireDelete(void);
-void kpaAddCoinPos(s32 num, Vec* pos);
-void mobjKoopaOn(void);
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
 
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_ctrl_onoff);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_cam_type_change);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_fade_in);
-USER_FUNC(evt_fade_out);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_koopa_chk_dead);
-USER_FUNC(evt_map_blend_off);
-USER_FUNC(evt_map_blend_set_flag);
-USER_FUNC(evt_map_set_blend);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_name_hitobj_ride);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_set_dispdir);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_motion);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mobj_jumpstand_blue);
-USER_FUNC(evt_mobj_jumpstand_red);
-USER_FUNC(evt_mobj_koopa_badgeblk);
-USER_FUNC(evt_mobj_koopa_blk);
-USER_FUNC(evt_mobj_koopa_brick);
-USER_FUNC(evt_mobj_koopa_dokan);
-USER_FUNC(evt_mobj_koopa_fireber_dodai);
-USER_FUNC(evt_mobj_koopa_hidden_blk);
-USER_FUNC(evt_mobj_koopa_ojama_blk);
-USER_FUNC(evt_mobj_koopa_pole);
-USER_FUNC(evt_mobj_koopa_sango);
-USER_FUNC(evt_mobj_koopa_stone_blk);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_sub_get_mapname);
-USER_FUNC(evt_sub_get_stopwatch);
-USER_FUNC(evt_twoddisp_entry);
-USER_FUNC(evt_twoddisp_flag_onoff);
-USER_FUNC(evt_twoddisp_init);
-USER_FUNC(evt_twoddisp_set_base_position);
-USER_FUNC(evt_twoddisp_set_position);
 USER_FUNC(kpa_add_coin);
-USER_FUNC(kpa_chg_pose);
 USER_FUNC(kpa_get_msg);
 USER_FUNC(kpa_make_item_name);
 USER_FUNC(kpa_make_mobj_name);
@@ -97,33 +60,12 @@ USER_FUNC(kpa_mobj_on);
 USER_FUNC(kpa_muteki_check);
 USER_FUNC(kpa_nohitenemy_ct_clear);
 USER_FUNC(kpa_pole_hitoff);
-USER_FUNC(kpa_score_disp_init);
-USER_FUNC(kpa_set_scale);
 USER_FUNC(kpa_set_time);
-USER_FUNC(kpa_status_get_stage);
 USER_FUNC(kpa_status_main);
 USER_FUNC(kpa_time_countdown);
 USER_FUNC(kpa_fire_off);
-USER_FUNC(kpa_get_cam_pt);
-USER_FUNC(kpa_stageclear_disp_entry);
-void kpa_stageclear_disp(CameraId camera, void* param);
-USER_FUNC(kpa_status_init);
-void kpa_status_disp(CameraId camera, void* param);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
 
-extern EvtWord kpa_init[];
-extern EvtWord kpa_read_mobj[];
-extern EvtWord kpa_coin_evt[];
-extern EvtWord kpa_read_item[];
-extern EvtWord kpa_dead[];
-extern EvtWord kpa_fall_sub[];
-extern EvtWord kpa_bgm_change[];
-extern EvtWord kpa_stage_start[];
 s32 numeric_id[5];
-extern EvtWord kpa_status_main_evt[];
-extern EvtWord kpa_time[];
 extern EvtWord kpa_stage_clear[];
 
 EVT_BEGIN(kpa_init)
@@ -133,14 +75,14 @@ EVT_BEGIN(kpa_init)
     CALL(kpa_score_disp_init)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("kpa_replay"))
-        SET_VALUE(GSW(1222), 180)
-        ELSE
+        SET_VALUE(GSW(GSW_KPA_TIME_LEFT), 180)
+    ELSE
         IF_STR_NOT_EQUAL(LW(0), STRING("kpa_next_map"))
-            SET_VALUE(GSW(1221), 1)
-            SET_VALUE(GSW(1222), 180)
+            SET_VALUE(GSW(GSW_KPA_LIVES), 1)
+            SET_VALUE(GSW(GSW_KPA_TIME_LEFT), 180)
         END_IF
     END_IF
-    CALL(evt_cam_type_change, 1, 4)
+    CALL(evt_cam_type_change, 1, CAMERA_3D)
     SET_VALUE(LSWF(2), 0)
     SET_VALUE(LSWF(3), 0)
     SET_VALUE(LSWF(4), 0)
@@ -230,12 +172,12 @@ EVT_BEGIN(kpa_read_item)
         END_IF
         CALL(kpa_make_item_name, LW(2))
         READ_INT2(LW(3), LW(4))
-#ifdef VERSION_G8ME01_DEMO
-        CALL(evt_item_entry, LW(2), 121, LW(3), LW(4), 0, 15, -1, PTR(kpa_coin_evt))
+#if VERSION == VERSION_DEMO
+        CALL(evt_item_entry, LW(2), ITEM_COIN, LW(3), LW(4), 0, 15, -1, PTR(kpa_coin_evt))
 #else
-        CALL(evt_item_entry, LW(2), 121, LW(3), LW(4), 0, 16, -1, PTR(kpa_coin_evt))
+        CALL(evt_item_entry, LW(2), ITEM_COIN, LW(3), LW(4), 0, 16, -1, PTR(kpa_coin_evt))
 #endif
-        CALL(evt_item_flag_on, LW(2), 4)
+        CALL(evt_item_flag_on, LW(2), ITEM_FLAG_INSTANT_GET)
     END_LOOP
     RETURN
 EVT_END()
@@ -314,14 +256,14 @@ EVT_BEGIN(kpa_dead)
     SET_VALUE(LSWF(3), 1)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(kpa_fire_off)
 #endif
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_adjust_dir)
     CALL(kpa_nohitenemy_ct_clear)
-    CALL(evt_cam_ctrl_onoff, 4, 0)
+    CALL(evt_cam_ctrl_onoff, CAMERA_3D, 0)
     CALL(evt_mario_set_motion, 0)
     CALL(kpa_chg_pose, STRING("KPA2_D_4"))
     SET_VALUE(LSWF(4), 1)
@@ -339,13 +281,13 @@ EVT_BEGIN(kpa_dead)
     CALL(evt_sub_get_mapname, LW(15))
     IF_STR_EQUAL(LW(15), STRING("kpa_03"))
         SET_VALUE(LW(5), 150)
-        ELSE
+    ELSE
         SET_VALUE(LW(5), 155)
     END_IF
     LOOP(0)
         IF_INT_GREATER_OR_EQUAL(LW(1), 0)
             SET_FLOAT_VALUE(LF(0), 0)
-            ELSE
+        ELSE
             SET_FLOAT_VALUE(LF(0), 1)
         END_IF
         ADD_FLOAT(LW(0), LW(1))
@@ -360,8 +302,8 @@ EVT_BEGIN(kpa_dead)
         CALL(evt_mario_set_pos, LW(4), LW(0), LW(5))
         WAIT_FRAMES(1)
     END_LOOP
-    IF_INT_LESS(GSW(1221), 99)
-        ADD(GSW(1221), 1)
+    IF_INT_LESS(GSW(GSW_KPA_LIVES), 99)
+        ADD(GSW(GSW_KPA_LIVES), 1)
     END_IF
     CALL(kpa_status_get_stage, LW(0))
     SWITCH(LW(0))
@@ -384,7 +326,7 @@ EVT_BEGIN(kpa_fall_sub)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_cam_ctrl_onoff, 4, 0)
+    CALL(evt_cam_ctrl_onoff, CAMERA_3D, 0)
     CALL(evt_mario_get_pos, 0, LW(13), LW(14), LW(15))
     LOOP(0)
         CALL(evt_mario_get_name_hitobj_ride, LW(0))
@@ -404,7 +346,7 @@ USER_FUNC(kpa_nohitenemy_ct_clear) {
     return EVT_RETURN_DONE;
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 USER_FUNC(kpa_fire_off) {
     kpaFireDelete();
     return EVT_RETURN_DONE;
@@ -422,22 +364,22 @@ USER_FUNC(kpa_set_scale) {
 }
 
 EVT_BEGIN(kpa_bgm_change)
-    IF_INT_GREATER(GSW(1222), 30)
+    IF_INT_GREATER(GSW(GSW_KPA_TIME_LEFT), 30)
         SET_VALUE(LW(2), 0)
-        ELSE
+    ELSE
         SET_VALUE(LW(2), 1)
     END_IF
     SET_VALUE(LW(3), -1)
     SET_VALUE(LW(4), -1)
     LABEL(10)
-    IF_INT_GREATER(GSW(1222), 30)
+    IF_INT_GREATER(GSW(GSW_KPA_TIME_LEFT), 30)
         SET_VALUE(LW(3), 0)
         ADD(LW(3), LSW(1))
-        ELSE
+    ELSE
         IF_INT_EQUAL(LW(2), 0)
             SET_VALUE(LW(3), 3)
             ADD(LW(3), LSW(1))
-            ELSE
+        ELSE
             SET_VALUE(LW(3), 6)
         END_IF
     END_IF
@@ -456,36 +398,36 @@ EVT_BEGIN(kpa_bgm_change)
         SET_VALUE(LW(4), LW(3))
         SWITCH(LW(3))
             CASE_EQUAL(0)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_FIELD1"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_FIELD1"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             CASE_EQUAL(1)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_FIELD3"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_FIELD3"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             CASE_EQUAL(2)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_FIELD4"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_FIELD4"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             CASE_EQUAL(3)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_FIELD1_UP1"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_FIELD1_UP1"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             CASE_EQUAL(4)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_FIELD3_UP1"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_FIELD3_UP1"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             CASE_EQUAL(5)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_FIELD4_UP1"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_FIELD4_UP1"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             CASE_EQUAL(6)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_FIELD1_UP2"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_FIELD1_UP2"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             CASE_EQUAL(7)
-            CALL(evt_snd_bgmoff, 512)
-            CALL(evt_snd_bgmon, 513, STRING("BGM_STGK_FIELD2"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_STGK_FIELD2"))
             CASE_EQUAL(8)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_FF_KUPPA_DOWN1"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_FF_KUPPA_DOWN1"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             RETURN
             CASE_EQUAL(9)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_FF_KUPPA_GOAL1"))
-            CALL(evt_snd_bgmoff, 513)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_FF_KUPPA_GOAL1"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
             RETURN
         END_SWITCH
         WAIT_MS(300)
@@ -499,10 +441,10 @@ EVT_BEGIN(kpa_stage_start)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff, 512)
-    CALL(evt_map_blend_set_flag, 1, STRING("mario"), 2048)
-    CALL(evt_map_blend_set_flag, 1, STRING("mario"), 4096)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
+    CALL(evt_map_blend_set_flag, 1, STRING("mario"), ANIM_MATERIAL_FLAG_NO_BLEND)
+    CALL(evt_map_blend_set_flag, 1, STRING("mario"), ANIM_MATERIAL_FLAG_NO_BLEND2)
     CALL(evt_map_set_blend, 0, 0, 0, 0, 255)
     CALL(evt_map_set_blend, 1, 0, 0, 0, 255)
     CALL(kpa_set_scale, FLOAT(0.39941406f))
@@ -515,14 +457,14 @@ EVT_BEGIN(kpa_stage_start)
     CALL(evt_mario_set_dispdir, 180)
     CALL(evt_seq_wait, 2)
     CALL(evt_twoddisp_init)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_twoddisp_entry, STRING("batu"), 477)
 #else
     CALL(evt_twoddisp_entry, STRING("batu"), 469)
 #endif
     CALL(evt_twoddisp_set_base_position, STRING("batu"), 20, -50)
     CALL(evt_twoddisp_set_position, STRING("batu"), 10, 0)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_twoddisp_entry, STRING("mugen"), 529)
 #else
     CALL(evt_twoddisp_entry, STRING("mugen"), 526)
@@ -534,7 +476,7 @@ EVT_BEGIN(kpa_stage_start)
     CALL(evt_msg_print, 0, LW(0), 0, STRING("mario"))
     CALL(evt_fade_out, 1000)
     SPAWN_EVENT(PTR(kpa_bgm_change))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_map_blend_off, 0)
     CALL(evt_map_blend_off, 1)
     CALL(evt_twoddisp_flag_onoff, 0, STRING("batu"), 1)
@@ -550,14 +492,14 @@ EVT_BEGIN(kpa_stage_start)
 EVT_END()
 
 s32 numeric_id[] = {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     31523299, 31785447, 32047595, 32309743, 32571891,
 #else
     30999003, 31261151, 31523299, 31785447, 32047595,
 #endif
 };
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 u16 kpa_status_icon_tbl[6][3] = {
     { 0x21A, 0x221, 0x21C }, { 0x21B, 0x221, 0x21C }, { 0x21B, 0x222, 0x21D },
     { 0x21B, 0x223, 0x21E }, { 0x21B, 0x224, 0x21F }, { 0x21B, 0x225, 0x220 },
@@ -575,7 +517,7 @@ EVT_END()
 EVT_BEGIN(kpa_time)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(1), 180)
-    SUBTRACT(LW(1), GSW(1222))
+    SUBTRACT(LW(1), GSW(GSW_KPA_TIME_LEFT))
     SET_VALUE(LW(3), LW(1))
     DIVIDE(LW(1), 10)
     MODULO(LW(3), 10)
@@ -597,7 +539,7 @@ EVT_BEGIN(kpa_time)
             IF_INT_EQUAL(LF(0), 0)
                 ADD(LW(2), LW(3))
             END_IF
-            CALL(kpa_set_time, LW(2), LW(1), GSW(1222))
+            CALL(kpa_set_time, LW(2), LW(1), GSW(GSW_KPA_TIME_LEFT))
             IF_INT_GREATER_OR_EQUAL(LW(2), 10000)
                 BREAK_LOOP
             END_IF
@@ -633,16 +575,11 @@ USER_FUNC(kpa_muteki_check) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01
+// US moved these icons up by 8 in the icon table.
+#if VERSION >= VERSION_US
 #define KPA_ICON_OFS 8
 #else
 #define KPA_ICON_OFS 0
-#endif
-
-#ifdef VERSION_G8ME01_DEMO
-#define KPA_ICON_FLAGS 4
-#else
-#define KPA_ICON_FLAGS 0x10
 #endif
 
 void kpa_status_disp(CameraId camera, void* param) {
@@ -653,24 +590,24 @@ void kpa_status_disp(CameraId camera, void* param) {
 
     pos.x = -210.0f;
     pos.y = 160.0f;
-#ifdef VERSION_G8ME01
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, kpa_status_icon_tbl[gp->language][0]);
+#if VERSION >= VERSION_US
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, kpa_status_icon_tbl[gp->language][0]);
 #else
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, (u32)gp->language ? 0x210 : 0x206);
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, (u32)gp->language ? 0x210 : 0x206);
 #endif
     pos.x = 50.0f;
     pos.y = 160.0f;
-#ifdef VERSION_G8ME01
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, kpa_status_icon_tbl[gp->language][1]);
+#if VERSION >= VERSION_US
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, kpa_status_icon_tbl[gp->language][1]);
 #else
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x208);
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, 0x208);
 #endif
     pos.x = 220.0f;
     pos.y = 160.0f;
-#ifdef VERSION_G8ME01
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, kpa_status_icon_tbl[gp->language][2]);
+#if VERSION >= VERSION_US
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, kpa_status_icon_tbl[gp->language][2]);
 #else
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x207);
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, 0x207);
 #endif
 
     n = pouchGetKpaScore();
@@ -687,34 +624,34 @@ void kpa_status_disp(CameraId camera, void* param) {
     digit[4] = n / 10;
     digit[5] = n % 10;
     for (i = 0; i < 6; i++) {
-        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
+        ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
     pos.x += 20.0f;
-    iconDispGx(0.7f, &pos, KPA_ICON_FLAGS, 0x18B + KPA_ICON_OFS);
+    ((IconDispGxArgOrderFn)iconDispGx)(0.7f, &pos, ICON_DISP_2D, 0x18B + KPA_ICON_OFS);
     pos.x += 30.0f;
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x1D5 + KPA_ICON_OFS);
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, 0x1D5 + KPA_ICON_OFS);
 
     n = pouchGetKpaCoin();
     digit[0] = n / 10;
     digit[1] = n % 10;
     pos.x += 20.0f;
     for (i = 0; i < 2; i++) {
-        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
+        ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
 
     pos.x = 50.0f;
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[kwp->stage]);
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, NUMERIC_ID[kwp->stage]);
     pos.x += 20.0f;
-    iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, 0x1EE + KPA_ICON_OFS);
+    ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, 0x1EE + KPA_ICON_OFS);
 
     n = kwp->lives;
     digit[0] = n / 10;
     digit[1] = n % 10;
     pos.x += 20.0f;
     for (i = digit[0] == 0; i < 2; i++) {
-        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
+        ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
 
@@ -725,7 +662,7 @@ void kpa_status_disp(CameraId camera, void* param) {
     digit[1] = n / 10;
     digit[2] = n % 10;
     for (i = 0; i < 3; i++) {
-        iconDispGx(1.0f, &pos, KPA_ICON_FLAGS, NUMERIC_ID[digit[i]]);
+        ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, ICON_DISP_2D, NUMERIC_ID[digit[i]]);
         pos.x += 20.0f;
     }
 }
@@ -753,7 +690,7 @@ USER_FUNC(kpa_status_init) {
     }
     evt->uwBase = event->uwBase;
     evt->ufBase = event->ufBase;
-    kwp = _mapAlloc(sizeof(KpaWork));
+    kwp = _mapAlloc(sizeof(KpaGameWork));
     kwp->stage = stage;
     kwp->lives = lives;
     kwp->time = time;
@@ -777,7 +714,7 @@ USER_FUNC(kpa_pole_hitoff) {
     MapObjectEntry* mobj = mobjNameToPtrNoAssert("pole");
 
     if (mobj != NULL) {
-        mobj->flags |= 0x100;
+        mobj->flags |= MOBJ_FLAG_NO_HIT;
     }
     return EVT_RETURN_DONE;
 }
@@ -808,7 +745,7 @@ USER_FUNC(kpa_stageclear_disp_entry) {
 }
 
 USER_FUNC(kpa_time_countdown) {
-    KpaWork* wp = kwp;
+    KpaGameWork* wp = kwp;
 
     if (wp->time != 0) {
         wp->time--;

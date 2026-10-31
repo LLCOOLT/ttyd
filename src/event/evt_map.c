@@ -1,3 +1,5 @@
+// Script commands for map objects and map-wide settings: animations, blend, fog, colour and
+// offscreen drawing (mapdrv).
 #include "eff/eff_fire.h"
 #include "driver/animdrv.h"
 #include "driver/hitdrv.h"
@@ -14,75 +16,12 @@
 #include <dolphin/gx.h>
 #include <string.h>
 #include "evt/evt_map.h"
+#include "eff/eff_torch.h"
+#include "version.h"
+// FAKE: evt_map.c calls mapObjSetColor through this prototype (the types it was compiled with) instead of the one in driver/mapdrv.h; same registers, behaviour-identical.
+typedef void (*MapObjSetColorGxcolorFn)(const char*, GXColor);
 
-EffectEntry* effTorchEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-EffectEntry* effFireEntry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
-
-void mapObjGetPos(const char* name, Vec* pos);
-void mapObjFlagOn(const char* name, u32 flags);
-void mapObjFlagOff(const char* name, u32 flags);
-void mapGrpFlagOn(const char* name, u32 flags);
-void mapGrpFlagOff(const char* name, u32 flags);
-void mapObjGetFlushColor(const char* name, u8* r, u8* g, u8* b, u8* a);
-void mapObjSetFlushColor(const char* name, u8 r, u8 g, u8 b, u8 a);
-void mapGrpSetFlushColor(const char* name, u8 r, u8 g, u8 b, u8 a);
-void mapObjFlushOn(const char* name);
-void mapObjFlushOff(const char* name);
-void mapGrpFlushOn(const char* name);
-void mapGrpFlushOff(const char* name);
-void mapObjClearOffScreen(const char* name);
-void mapGrpClearOffScreen(const char* name);
-void mapObjSetOffScreen(const char* name, s32 val);
-void mapGrpSetOffScreen(const char* name, s32 val);
-void mapSetPlayRate(const char* name, f32 rate);
-void mapReStartAnimation(const char* name);
-void mapReStartAnimationAll(const char* name);
-void mapPauseAnimation(const char* name);
-void mapPauseAnimationAll(const char* name);
-void mapPlayAnimationLv(const char* name, s32 mode, s32 level);
-void mapObjSetColor(const char* name, GXColor color);
-void mapGrpSetColor(const char* name, GXColor color);
-void mapBlendOff(void);
-void mapBlendOff2(void);
-void mapSetBlend(GXColor color);
-void mapSetBlend2(GXColor color);
-void mapFogOn(void);
-void mapFogOff(void);
-void mapGetFog(s32* type, f32* start, f32* end, GXColor* color);
-void mapSetFog(s32 type, f32 start, f32 end, GXColor color);
-void mapObjScale(const char* name, f32 x, f32 y, f32 z);
-void mapObjRotate(const char* name, f32 x, f32 y, f32 z);
-void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
-
-USER_FUNC(N_evt_mapdisp_onoff);
-USER_FUNC(evt_map_replace_mapobj);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(check2);
 static USER_FUNC(check);
-USER_FUNC(evt_map_get_flush_color);
-USER_FUNC(evt_map_set_flush_color);
-USER_FUNC(evt_map_set_flush_onoff);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_map_set_playrate);
-USER_FUNC(evt_map_replayanim);
-USER_FUNC(evt_map_pauseanim);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_color);
-USER_FUNC(evt_map_blend_set_mobj_flag);
-USER_FUNC(evt_map_blend_set_flag);
-USER_FUNC(evt_map_blend_off);
-USER_FUNC(evt_map_set_blend);
-USER_FUNC(evt_map_fog_onoff);
-USER_FUNC(evt_map_get_fog);
-USER_FUNC(evt_map_set_fog);
-USER_FUNC(evt_mapobj_scale);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
 
 USER_FUNC(evt_mapobj_trans) {
     EvtWord* args = event->args;
@@ -199,13 +138,19 @@ USER_FUNC(evt_map_blend_set_flag) {
         MarioWork* mp = marioGetPtr();
         s32* poses = &mp->paperAnimGroupId[0];
         if (on == 1) {
-            if (poses[0] != -1) animPoseSetMaterialFlagOn(poses[0], flags);
-            if (poses[1] != -1) animPoseSetMaterialFlagOn(poses[1], flags);
-            if (poses[2] != -1) animPoseSetMaterialFlagOn(poses[2], flags);
+            if (poses[0] != -1)
+                animPoseSetMaterialFlagOn(poses[0], flags);
+            if (poses[1] != -1)
+                animPoseSetMaterialFlagOn(poses[1], flags);
+            if (poses[2] != -1)
+                animPoseSetMaterialFlagOn(poses[2], flags);
         } else {
-            if (poses[0] != -1) animPoseSetMaterialFlagOff(poses[0], flags);
-            if (poses[1] != -1) animPoseSetMaterialFlagOff(poses[1], flags);
-            if (poses[2] != -1) animPoseSetMaterialFlagOff(poses[2], flags);
+            if (poses[0] != -1)
+                animPoseSetMaterialFlagOff(poses[0], flags);
+            if (poses[1] != -1)
+                animPoseSetMaterialFlagOff(poses[1], flags);
+            if (poses[2] != -1)
+                animPoseSetMaterialFlagOff(poses[2], flags);
         }
     } else if (strcmp(name, "party") == 0) {
         // BUG: no check that a partner (or, below, a follower) is out: partyGetPtr returns NULL for id -1
@@ -257,7 +202,7 @@ USER_FUNC(evt_mapobj_color) {
     u8 b = evtGetValue(event, args[4]);
     u8 a = evtGetValue(event, args[5]);
     if (type == 0) {
-        mapObjSetColor(name, (GXColor){r, g, b, a});
+        ((MapObjSetColorGxcolorFn)mapObjSetColor)(name, (GXColor){r, g, b, a});
     } else {
         mapGrpSetColor(name, (GXColor){r, g, b, a});
     }
@@ -342,9 +287,9 @@ USER_FUNC(evt_mapobj_set_offscreen) {
     const char* name = (const char*)evtGetValue(event, args[1]);
     s32 val = evtGetValue(event, args[2]);
     if (type == 0) {
-        mapObjSetOffScreen(name, val);
+        mapObjSetOffScreen(name, (const char*)val);
     } else {
-        mapGrpSetOffScreen(name, val);
+        mapGrpSetOffScreen(name, (const char*)val);
     }
     return EVT_RETURN_DONE;
 }
@@ -462,28 +407,30 @@ USER_FUNC(evt_map_entry_airport_harbor) {
     EvtWord lw[16];
     mapGetMapObj(name);
     switch (type) {
-    case 0:
-        if (!animGroupBaseAsync("p_hikohki", 0, NULL)) return EVT_RETURN_BLOCK;
-        if ((s32)pouchCheckItem(4) == 1) {
-            lw[0] = (EvtWord)name;
-            lw[1] = (EvtWord)hit;
-            evtRunCaseEntry(0, 0, hit, 0, evt_ride_airport, lw);
-            lw[0] = (EvtWord)name;
-            lw[1] = (EvtWord)hit;
-            evtRunCaseEntry(1, 0, hit, 0, evt_nonride_airport, lw);
-        }
-        break;
-    case 1:
-        if (!animGroupBaseAsync("p_hune", 0, NULL)) return EVT_RETURN_BLOCK;
-        if ((s32)pouchCheckItem(5) == 1) {
-            lw[0] = (EvtWord)name;
-            lw[1] = (EvtWord)hit;
-            evtRunCaseEntry(0, 0, hit, 0, evt_ride_airport, lw);
-            lw[0] = (EvtWord)name;
-            lw[1] = (EvtWord)hit;
-            evtRunCaseEntry(1, 0, hit, 0, evt_nonride_airport, lw);
-        }
-        break;
+        case 0:
+            if (!animGroupBaseAsync("p_hikohki", 0, NULL))
+                return EVT_RETURN_BLOCK;
+            if ((s32)pouchCheckItem(ITEM_PLANE_CURSE) == 1) {
+                lw[0] = (EvtWord)name;
+                lw[1] = (EvtWord)hit;
+                evtRunCaseEntry(0, 0, hit, 0, evt_ride_airport, lw);
+                lw[0] = (EvtWord)name;
+                lw[1] = (EvtWord)hit;
+                evtRunCaseEntry(1, 0, hit, 0, evt_nonride_airport, lw);
+            }
+            break;
+        case 1:
+            if (!animGroupBaseAsync("p_hune", 0, NULL))
+                return EVT_RETURN_BLOCK;
+            if ((s32)pouchCheckItem(ITEM_BOAT_CURSE) == 1) {
+                lw[0] = (EvtWord)name;
+                lw[1] = (EvtWord)hit;
+                evtRunCaseEntry(0, 0, hit, 0, evt_ride_airport, lw);
+                lw[0] = (EvtWord)name;
+                lw[1] = (EvtWord)hit;
+                evtRunCaseEntry(1, 0, hit, 0, evt_nonride_airport, lw);
+            }
+            break;
     }
     return EVT_RETURN_DONE;
 }
@@ -496,19 +443,19 @@ USER_FUNC(evt_map_replace_mapobj) {
     mapObjGetPos(name, &pos);
     mapObjFlagOn(name, 0x4000);
     switch (type) {
-    case 0:
-        effTorchEntry(0, pos.x, pos.y - 3.0f, pos.z, 0.6f);
-        break;
-#ifdef VERSION_G8ME01_DEMO
-    case 1:
-        effFireEntry(5, 0, pos.x, pos.y, pos.z, 0.4f);
-        break;
+        case 0:
+            effTorchEntry(0, pos.x, pos.y - 3.0f, pos.z, 0.6f);
+            break;
+#if VERSION == VERSION_DEMO
+        case 1:
+            effFireEntry(5, 0, pos.x, pos.y, pos.z, 0.4f);
+            break;
 #else
-    case 1: {
-        EffectEntry* eff = effFireEntry(5, 0, pos.x, pos.y, pos.z, 0.4f);
-        ((EffFireWork*)eff->userdata)->useMapBlend = 1;
-        break;
-    }
+        case 1: {
+            EffectEntry* eff = effFireEntry(5, 0, pos.x, pos.y, pos.z, 0.4f);
+            ((EffFireWork*)eff->userdata)->useMapBlend = 1;
+            break;
+        }
 #endif
     }
     return EVT_RETURN_DONE;
@@ -524,7 +471,7 @@ USER_FUNC(N_evt_mapdisp_onoff) {
 }
 
 EVT_BEGIN(evt_ride_airport)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_DISPLAY_LIST)
     LABEL(0)
     CALL(evt_map_get_flush_color, LW(0), LW(10), LW(11), LW(12), LW(13))
     ADD(LW(13), 2)

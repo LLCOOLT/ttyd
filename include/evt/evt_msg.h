@@ -1,3 +1,4 @@
+// evt_msg.c: script commands for message windows: printing, choices, inserted strings and closing.
 #pragma once
 
 #include <dolphin/types.h>
@@ -19,3 +20,14 @@ extern char msg_article_buf[0xA00];
 extern char msg_count_buf[0xA00];
 extern char msg_num_buf[0xA00];
 extern char msg_plural_buf[0xA00];
+
+USER_FUNC(evt_msg_print_party_add);
+USER_FUNC(evt_msg_print_insert);
+USER_FUNC(evt_msg_print_add_insert);
+USER_FUNC(evt_msg_togelr);
+USER_FUNC(evt_msg_pri);
+USER_FUNC(evt_msg_npc);
+USER_FUNC(evt_msg_fmt_str);
+USER_FUNC(evt_msg_fmt_int);
+void evtMsgFmtInt(char* buf, s32 count);
+void evtMsgFmtStr(char* buf, const char* name);

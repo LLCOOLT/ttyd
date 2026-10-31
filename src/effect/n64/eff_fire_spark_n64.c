@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: fire sparks, count sparks launched within a range with a set upward and forward speed.
+#include "eff/n64/eff_fire_spark_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -5,8 +7,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-int rand(void);
+#include "libc_decls.h"
 
 typedef struct EffFireSparkN64Work {
     s32 type;           // 0x0
@@ -55,7 +56,7 @@ EffectEntry* effFireSparkN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFireSparkN64Work) * count);
     effect->userdata = work;
     effect->callback = effFireSparkMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -105,8 +106,8 @@ void effFireSparkMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {

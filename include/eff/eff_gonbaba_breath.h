@@ -1,3 +1,4 @@
+// eff_gonbaba_breath.c: fire breath (ファイアブレス) of Hooktail, Bonetail and Bowser: type % 10 picks the colour set (normal, poison, mega, cold, confuse, sleep, mini, Bowser), types 10-17 are the companion layer. effGonbabaBreathEntry and EffGonbabaBreathWork.
 #pragma once
 
 #include "driver/effdrv.h"
@@ -9,7 +10,7 @@ typedef struct EffGonbabaBreathWork {
     Vec position;       // 0x4
     f32 velX;           // 0x10
     f32 velY;           // 0x14
-    f32 pad_18;          // 0x18, never accessed
+    f32 pad_18;         // 0x18, never accessed
     s32 life;           // 0x1C
     s32 timer;          // 0x20
     s32 from[3];        // 0x24

@@ -1,3 +1,4 @@
+// eff_sstar_n64.c: streaking star effect entry (effSstarN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

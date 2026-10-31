@@ -1,3 +1,4 @@
+// Paper Mario 64 smoke effect 7 (kemuri: smoke) at a point with an angle and a side.
 #include "eff/n64/eff_kemuri7_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -6,30 +7,28 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double x);
-double cos(double x);
+#include "libc_decls.h"
 
 typedef struct EffKemuri7N64Work {
-    BOOL active;      // 0x0
-    s16 type;         // 0x4, never read or written
-    s16 timer;        // 0x6
-    u8 alpha;         // 0x8
-    u8 pad_9[3];      // 0x9
-    Vec position;     // 0xC
-    Vec scale;        // 0x18
-    Vec rotation;     // 0x24
-    Mtx mtx;          // 0x30
-    f32 side;         // 0x60
-    f32 accel;        // 0x64, motion terms mirror Kemuri3; this effect never moves
-    f32 accelStep;    // 0x68
-    f32 accelStep2;   // 0x6C
-    f32 velY;         // 0x70
-    f32 accelY;       // 0x74
-    f32 accelStepY;   // 0x78
-    f32 accelStep2Y;  // 0x7C
-    f32 sinAngle;     // 0x80
-    f32 cosAngle;     // 0x84
+    BOOL active;     // 0x0
+    s16 type;        // 0x4, never read or written
+    s16 timer;       // 0x6
+    u8 alpha;        // 0x8
+    u8 pad_9[3];     // 0x9
+    Vec position;    // 0xC
+    Vec scale;       // 0x18
+    Vec rotation;    // 0x24
+    Mtx mtx;         // 0x30
+    f32 side;        // 0x60
+    f32 accel;       // 0x64, motion terms mirror Kemuri3; this effect never moves
+    f32 accelStep;   // 0x68
+    f32 accelStep2;  // 0x6C
+    f32 velY;        // 0x70
+    f32 accelY;      // 0x74
+    f32 accelStepY;  // 0x78
+    f32 accelStep2Y; // 0x7C
+    f32 sinAngle;    // 0x80
+    f32 cosAngle;    // 0x84
 } EffKemuri7N64Work;
 
 effN64Vtx foot_vtx[] = {

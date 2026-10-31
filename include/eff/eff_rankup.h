@@ -1,3 +1,4 @@
+// eff_rankup.c: rank-up banner (ランクアップ), used by ItemEvent_Teki_Kyouka; effRankupEntry with its main and draw callbacks.
 #pragma once
 
 #include "driver/camdrv.h"

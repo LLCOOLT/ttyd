@@ -1,3 +1,4 @@
+// Paper Mario 64 smoke effect 3 (kemuri: smoke) at a point, oriented by an angle.
 #include "eff/n64/eff_kemuri3_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -6,37 +7,35 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double x);
-double cos(double x);
+#include "libc_decls.h"
 
 typedef struct EffKemuri3N64Work {
-    BOOL active;      // 0x0
-    s16 type;         // 0x4, never read or written
-    s16 timer;        // 0x6
-    u8 alpha;         // 0x8
-    u8 pad_9[3];      // 0x9
-    Vec position;     // 0xC
-    Vec scale;        // 0x18
-    Vec rotation;     // 0x24
-    Mtx mtx;          // 0x30
-    f32 speed;        // 0x60
-    f32 accel;        // 0x64, horizontal accel terms are set but never applied
-    f32 accelStep;    // 0x68
-    f32 accelStep2;   // 0x6C
-    f32 velY;         // 0x70
-    f32 accelY;       // 0x74
-    f32 accelStepY;   // 0x78
-    f32 accelStep2Y;  // 0x7C
-    f32 sinAngle;     // 0x80
-    f32 cosAngle;     // 0x84
+    BOOL active;     // 0x0
+    s16 type;        // 0x4, never read or written
+    s16 timer;       // 0x6
+    u8 alpha;        // 0x8
+    u8 pad_9[3];     // 0x9
+    Vec position;    // 0xC
+    Vec scale;       // 0x18
+    Vec rotation;    // 0x24
+    Mtx mtx;         // 0x30
+    f32 speed;       // 0x60
+    f32 accel;       // 0x64, horizontal accel terms are set but never applied
+    f32 accelStep;   // 0x68
+    f32 accelStep2;  // 0x6C
+    f32 velY;        // 0x70
+    f32 accelY;      // 0x74
+    f32 accelStepY;  // 0x78
+    f32 accelStep2Y; // 0x7C
+    f32 sinAngle;    // 0x80
+    f32 cosAngle;    // 0x84
 } EffKemuri3N64Work;
 
 void effKemuri3Main(EffectEntry* effect);
 void effKemuri3Disp(CameraId cameraId, EffectEntry* effect);
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-#pragma opt_lifetimes off
 EffectEntry* effKemuri3N64Entry(f32 x, f32 y, f32 z, f32 angle) {
     s32 ofs;
     EffectEntry* effect;
@@ -82,7 +81,6 @@ EffectEntry* effKemuri3N64Entry(f32 x, f32 y, f32 z, f32 angle) {
 }
 
 #pragma opt_propagation reset
-#pragma opt_lifetimes reset
 void effKemuri3Main(EffectEntry* effect) {
     EffKemuri3N64Work* work = effect->userdata;
     s32 i;

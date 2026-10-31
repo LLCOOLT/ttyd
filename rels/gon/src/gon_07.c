@@ -1,68 +1,34 @@
+// gon_07 (ゴンババ, Hooktail Castle): room beyond gon_06 with a treasure chest holding the Black Key (0x22) (story 43).
+// Has a danger-music sequence and a door to gon_13.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_exec_get);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_set_at);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_pauseanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_replayanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_offscreen_get_boundingbox2);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_set_seq);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_countdown_end);
-USER_FUNC(evt_sub_countdown_get_status);
-USER_FUNC(evt_sub_countdown_start);
-USER_FUNC(evt_sub_rumble_onoff);
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "driver/itemdrv.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "gon.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
+#include "driver/seqdrv.h"
 
 extern EvtWord out_func[];
 static BeroEntry bero_entry_data[3];
-extern EvtWord gon_07_init_evt[];
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -78,7 +44,7 @@ EVT_END()
 
 EVT_BEGIN(out_func)
     CALL(evt_sub_countdown_end)
-    IF_INT_EQUAL(GSW(0), 43)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
         CALL(evt_snd_sfxoff, GW(10))
     END_IF
     SET_VALUE(LW(0), 0)
@@ -90,8 +56,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         12, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -107,8 +73,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -164,20 +130,20 @@ static EVT_BEGIN(shake_evt)
 EVT_END()
 
 static EVT_BEGIN(item_evt)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 43)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
         RETURN
     END_IF
-    SET_VALUE(GSW(0), 43)
-    SET_VALUE(GSWF(1494), 1)
-    CALL(evt_snd_bgmoff, 512)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
+    SET_VALUE(GSWF(GSWF_GON07_BLACK_KEY_CHEST_OPENED), 1)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("gon07treasure"), LW(0), LW(1), LW(2))
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, STRING("k_slit"), 34, LW(0), LW(1), LW(2), 15, -1, 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, STRING("k_slit"), ITEM_BLACK_KEY_0x22, LW(0), LW(1), LW(2), 15, -1, 0)
 #else
-    CALL(evt_item_entry, STRING("k_slit"), 34, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("k_slit"), ITEM_BLACK_KEY_0x22, LW(0), LW(1), LW(2), 16, -1, 0)
 #endif
-    CALL(evt_item_flag_on, STRING("k_slit"), 2)
+    CALL(evt_item_flag_on, STRING("k_slit"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("gon07treasure"))
     CALL(evt_item_get_item, STRING("k_slit"))
     CALL(evt_snd_sfxon, STRING("SFX_STG1_QUAKE4"), GW(10))
@@ -211,7 +177,7 @@ static EVT_BEGIN(item_evt)
     WAIT_MS(200)
     CALL(evt_msg_print_party, STRING("stg1_gon_15"))
     CALL(evt_map_playanim, STRING("a_to_ue"), 0, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER1"))
     CALL(evt_cam3d_evt_set_at, 0, 300, 0, 0, 900, 11)
     WAIT_MS(2600)
     CALL(evt_cam3d_evt_set, 0, 124, 408, 0, 57, 21, 500, 11)
@@ -236,7 +202,7 @@ static EVT_BEGIN(item_evt)
             IF_INT_EQUAL(LW(0), 1)
                 SET_VALUE(LW(0), STRING("w_bero"))
                 CALL_CHILD(PTR(bero_case_switch_off))
-                CALL(evt_seq_set_seq, 5, 0, 0)
+                CALL(evt_seq_set_seq, SEQ_GAME_OVER, 0, 0)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
@@ -279,19 +245,19 @@ static EVT_BEGIN(bomb_wall_evt)
     IF_INT_EQUAL(LF(0), 0)
         CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("ofs"), 1, LW(0), LW(1), LW(2), LW(3))
         WAIT_FRAMES(1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
         CALL(evt_img_clear_virtual_point, STRING("img"))
         CALL(evt_img_onoff, STRING("img"), 1)
         CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
         CALL(evt_img_wait_animend, STRING("img"))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
     END_IF
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
@@ -300,17 +266,17 @@ static EVT_BEGIN(bomb_wall_evt)
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_ana"))
     CALL(evt_paper_delete, STRING("OFF_d_bom_ver2"))
     CALL(evt_offscreen_delete, STRING("ofs"))
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
     WAIT_MS(2000)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-#ifndef VERSION_G8ME01_DEMO
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+#if VERSION != VERSION_DEMO
     CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
 #endif
-    SET_VALUE(GSWF(1495), 1)
+    SET_VALUE(GSWF(GSWF_GON07_WALL_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_exit_case_evt)
     RETURN
@@ -320,25 +286,24 @@ EVT_BEGIN(gon_07_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_GON1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL(evt_snd_bgmoff, 18432)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 43)
-        SET_VALUE(GSWF(1494), 1)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
+        SET_VALUE(GSWF(GSWF_GON07_BLACK_KEY_CHEST_OPENED), 1)
     END_IF
-    CALL(evt_mobj_itembox, STRING("gon07treasure"), 0, 0, 0, 0, 0, PTR(item_evt), GSWF(1494))
+    CALL(evt_mobj_itembox, STRING("gon07treasure"), 0, 0, 0, 0, 0, PTR(item_evt), GSWF(GSWF_GON07_BLACK_KEY_CHEST_OPENED))
     CALL(evt_hitobj_onoff, STRING("a_togeshita"), 1, 0)
-    IF_INT_EQUAL(GSWF(1495), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_after"), 1)
+    IF_INT_EQUAL(GSWF(GSWF_GON07_WALL_BOMBED), 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 15, 1, STRING("san"), 0, PTR(bomb_wall_evt), 0)
-        ELSE
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("san"), 0, PTR(bomb_wall_evt), 0)
+    ELSE
         CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
     END_IF
     RETURN
 EVT_END()
-

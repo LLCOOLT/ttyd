@@ -1,3 +1,5 @@
+// dou_11 (洞窟, Pirate's Grotto): large room with sailors (suifu) including Monie and Peeton, floating islands, bobbing platforms and a bomb wall (story 249 to 256).
+// Doors to dou_10 and to Keelhaul Key (muj_10, muj_00).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -13,109 +15,32 @@
 #include "evt/evt_nannpc.h"
 #include "dou.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "data_tables.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "libc_decls.h"
+#include "driver/casedrv.h"
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
-BOOL hitIsGroup(HitEntry* target, HitEntry* group);
-double sin(double x);
-double cos(double x);
 
 USER_FUNC(dou_mario_kaiten_hosei);
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_dou_normal_puka);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_hitobj_attr_onoff);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_name_hitobj_ride);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_party_use_check);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_nannpc_entry);
-USER_FUNC(evt_nannpc_flag_onoff);
-USER_FUNC(evt_nannpc_get_position);
-USER_FUNC(evt_nannpc_get_work);
-USER_FUNC(evt_nannpc_init);
-USER_FUNC(evt_nannpc_jump_position);
-USER_FUNC(evt_nannpc_move_position2);
-USER_FUNC(evt_nannpc_ppflag_onoff);
-USER_FUNC(evt_nannpc_set_animtbl);
-USER_FUNC(evt_nannpc_set_dir);
-USER_FUNC(evt_nannpc_set_func);
-USER_FUNC(evt_nannpc_set_hosei_position);
-USER_FUNC(evt_nannpc_set_position);
-USER_FUNC(evt_nannpc_set_shadow_position);
-USER_FUNC(evt_nannpc_set_size);
-USER_FUNC(evt_nannpc_set_subfunc);
-USER_FUNC(evt_nannpc_set_work);
-USER_FUNC(evt_npc_change_interrupt);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_ry_lr);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_offscreen_get_boundingbox2);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_party_wait_landon);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
-static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
 static ExtTexInfo ext_entry_data[31];
 static s16 suifu_animtbl[42];
@@ -163,7 +88,6 @@ extern EvtWord pukapuka_watari_init01[];
 extern EvtWord pukapuka_watari_init02[];
 HitDamageReturn hitDmgRetPoints_1st[17];
 static HitDamageReturn hitDmgRetPoints[17];
-extern EvtWord dou_11_init_evt[];
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
@@ -233,52 +157,52 @@ static s16 suifu_run_animtbl[] = {
 };
 
 static EVT_BEGIN(suifu_c_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 255)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_npc_set_position, STRING("me"), 825, 100, -125)
     END_SWITCH
-    IF_INT_EQUAL(GSW(0), 254)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_34_KICKED_OFF)
         CALL(evt_npc_set_ry, STRING("me"), 90)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(suifu_c_talk)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 254)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
         CALL(evt_msg_print, 0, STRING("stg5_dou_16_09"), 0, STRING("me"))
-        CASE_EQUAL(255)
+        CASE_EQUAL(STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_msg_print, 0, STRING("stg5_dou_17_09"), 0, STRING("me"))
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(suifu_d_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 255)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_npc_set_position, STRING("me"), 775, 50, 50)
     END_SWITCH
-    IF_INT_EQUAL(GSW(0), 254)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_34_KICKED_OFF)
         CALL(evt_npc_set_ry, STRING("me"), 90)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(suifu_d_talk)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 254)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
         CALL(evt_msg_print, 0, STRING("stg5_dou_16_07"), 0, STRING("me"))
-        CASE_EQUAL(255)
+        CASE_EQUAL(STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_msg_print, 0, STRING("stg5_dou_17_07"), 0, STRING("me"))
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(suifu_e_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 255)
-#ifdef VERSION_G8ME01
-#ifdef VERSION_G8MP01
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
+#if VERSION >= VERSION_US
+#if VERSION == VERSION_EU
         CALL(evt_npc_set_position, STRING("水夫E"), 736, 50, 113)
 #else
         CALL(evt_npc_set_position, STRING("me"), 736, 50, 113)
@@ -287,37 +211,37 @@ static EVT_BEGIN(suifu_e_init)
         CALL(evt_npc_set_position, STRING("me"), 750, 50, -25)
 #endif
     END_SWITCH
-    IF_INT_EQUAL(GSW(0), 254)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_34_KICKED_OFF)
         CALL(evt_npc_set_ry, STRING("me"), 90)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(suifu_e_talk)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 254)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
         CALL(evt_msg_print, 0, STRING("stg5_dou_16_08"), 0, STRING("me"))
-        CASE_EQUAL(255)
+        CASE_EQUAL(STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_msg_print, 0, STRING("stg5_dou_17_08"), 0, STRING("me"))
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(mony_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 255)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_npc_set_position, STRING("me"), 700, 50, 0)
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(mony_talk)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 254)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
         CALL(evt_msg_print, 0, STRING("stg5_dou_16_10"), 0, STRING("モニー"))
         CALL(evt_set_dir_to_target, STRING("ピートン"), STRING("モニー"))
         CALL(evt_msg_print, 0, STRING("stg5_dou_16_11"), 0, STRING("ピートン"))
-        CASE_EQUAL(255)
+        CASE_EQUAL(STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_msg_print, 0, STRING("stg5_dou_17_10"), 0, STRING("モニー"))
         CALL(evt_set_dir_to_target, STRING("ピートン"), STRING("モニー"))
         CALL(evt_msg_print, 0, STRING("stg5_dou_17_11"), 0, STRING("ピートン"))
@@ -326,23 +250,23 @@ static EVT_BEGIN(mony_talk)
 EVT_END()
 
 static EVT_BEGIN(peton_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 255)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_npc_set_position, STRING("me"), 750, 50, 0)
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peton_talk)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(250, 254)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
         CALL(evt_set_dir_to_target, STRING("モニー"), STRING("mario"))
         WAIT_MS(300)
         CALL(evt_msg_print, 0, STRING("stg5_dou_16_10"), 0, STRING("モニー"))
         CALL(evt_set_dir_to_target, STRING("ピートン"), STRING("モニー"))
         WAIT_MS(300)
         CALL(evt_msg_print, 0, STRING("stg5_dou_16_11"), 0, STRING("ピートン"))
-        CASE_EQUAL(255)
+        CASE_EQUAL(STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_set_dir_to_target, STRING("モニー"), STRING("mario"))
         WAIT_MS(300)
         CALL(evt_msg_print, 0, STRING("stg5_dou_17_10"), 0, STRING("モニー"))
@@ -356,7 +280,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"水夫C"*/"\x90\x85\x95\x76\x43", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_c_init, // initEvent
         NULL, // regularEvent
@@ -368,7 +292,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"水夫D"*/"\x90\x85\x95\x76\x44", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_d_init, // initEvent
         NULL, // regularEvent
@@ -380,7 +304,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"水夫E"*/"\x90\x85\x95\x76\x45", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_e_init, // initEvent
         NULL, // regularEvent
@@ -392,7 +316,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         mony_init, // initEvent
         NULL, // regularEvent
@@ -404,7 +328,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         peton_init, // initEvent
         NULL, // regularEvent
@@ -421,8 +345,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -437,8 +361,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -453,8 +377,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "n_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -470,8 +394,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -486,8 +410,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_4", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -502,8 +426,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -518,8 +442,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_6", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -534,8 +458,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_3", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -550,8 +474,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_5", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -566,8 +490,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_7", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -582,8 +506,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_8", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -725,7 +649,7 @@ EVT_BEGIN(watarikiri_suifu_init)
         CALL(evt_nannpc_set_position, LW(0), LW(1), LW(2), LW(3))
         CALL(evt_nannpc_flag_onoff, LW(0), 0, 4)
         CALL(evt_nannpc_set_size, LW(0), 30, 8)
-        IF_INT_EQUAL(GSW(0), 254)
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_34_KICKED_OFF)
             SET_VALUE(LW(4), 90)
         END_IF
         CALL(evt_nannpc_set_dir, LW(0), LW(4))
@@ -834,23 +758,23 @@ EVT_BEGIN(ukishima_watari_run)
         CALL(evt_nannpc_ppflag_onoff, 97, 0, 4)
         CALL(evt_npc_set_position, STRING("水夫C"), 825, 100, -125)
         CALL(evt_npc_set_ry, STRING("水夫C"), 270)
-        CALL(evt_npc_flag_onoff, 0, STRING("水夫C"), 1073741856)
+        CALL(evt_npc_flag_onoff, 0, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
         CASE_EQUAL(98)
         CALL(evt_nannpc_set_position, 98, 0, -1000, 0)
         CALL(evt_nannpc_ppflag_onoff, 98, 0, 4)
         CALL(evt_npc_set_position, STRING("水夫D"), 775, 50, 50)
         CALL(evt_npc_set_ry, STRING("水夫D"), 270)
-        CALL(evt_npc_flag_onoff, 0, STRING("水夫D"), 1073741856)
+        CALL(evt_npc_flag_onoff, 0, STRING("水夫D"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
         CASE_EQUAL(99)
         CALL(evt_nannpc_set_position, 99, 0, -1000, 0)
         CALL(evt_nannpc_ppflag_onoff, 99, 0, 4)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         CALL(evt_npc_set_position, STRING("水夫E"), 736, 50, 113)
 #else
         CALL(evt_npc_set_position, STRING("水夫E"), 750, 50, -25)
 #endif
         CALL(evt_npc_set_ry, STRING("水夫E"), 270)
-        CALL(evt_npc_flag_onoff, 0, STRING("水夫E"), 1073741856)
+        CALL(evt_npc_flag_onoff, 0, STRING("水夫E"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
         CASE_DEFAULT
         SET_INT_READ_ADDR(PTR(suifudata_after))
         SET_VALUE(LW(10), LW(0))
@@ -920,7 +844,7 @@ EVT_BEGIN(ukishima_watari)
     END_LOOP
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSWF(2992), 1)
+    SET_VALUE(GSWF(GSWF_DOU11_SAILORS_CROSSED), 1)
     CALL(evt_hitobj_onoff, STRING("fune_atari"), 1, 0)
     CALL(evt_mario_key_onoff, 1)
     SPAWN_EVENT(PTR(suifu_orei))
@@ -928,18 +852,18 @@ EVT_BEGIN(ukishima_watari)
 EVT_END()
 
 EVT_BEGIN(ukishima_check)
-    SET_VALUE(LW(0), GSWF(2983))
-    ADD(LW(0), GSWF(2984))
+    SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+    ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_NOT_EQUAL(LW(0), 2)
         CALL(evt_cam3d_evt_off, 500, 11)
         WAIT_MS(1000)
-        ELSE
+    ELSE
         CALL(evt_mario_key_onoff, 0)
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
         WAIT_MS(2000)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
         SPAWN_EVENT(PTR(ukishima_watari))
     END_IF
     RETURN
@@ -957,7 +881,7 @@ static EVT_BEGIN(ukishima_apper)
         WAIT_MS(400)
         CALL(evt_eff64, STRING(""), STRING("ripple_n64"), 0, LW(10), 5, LW(12), 0, 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(2), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(2), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, LW(3), 1, 1)
     CALL(evt_hit_bind_mapobj, LW(3), LW(2))
     CALL(evt_sub_intpl_msec_init, 1, -100, 0, 800)
@@ -1034,12 +958,12 @@ static EVT_BEGIN(ukishima_apper)
 EVT_END()
 
 EVT_BEGIN(ukishima_init1)
-    SET_VALUE(LW(0), GSWF(2983))
-    ADD(LW(0), GSWF(2984))
+    SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+    ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_LESS(LW(0), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_taru_n01"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n01"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n01"), 1, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_taru_n02"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n02"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n02"), 1, 0)
     END_IF
     RETURN
@@ -1068,12 +992,12 @@ EVT_BEGIN(ukishima_part1)
 EVT_END()
 
 EVT_BEGIN(ukishima_init2)
-    SET_VALUE(LW(0), GSWF(2983))
-    ADD(LW(0), GSWF(2984))
+    SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+    ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_LESS(LW(0), 2)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_taru_n03"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n03"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n03"), 1, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_taru_n04"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n04"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n04"), 1, 0)
     END_IF
     RETURN
@@ -1102,9 +1026,9 @@ EVT_BEGIN(ukishima_part2)
 EVT_END()
 
 EVT_BEGIN(ukishima_switch1_evt)
-    SET_VALUE(GSWF(2983), 1)
-    SET_VALUE(LW(0), GSWF(2983))
-    ADD(LW(0), GSWF(2984))
+    SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
+    SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+    ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_EQUAL(LW(0), 1)
         SPAWN_EVENT(PTR(ukishima_part1))
     END_IF
@@ -1115,9 +1039,9 @@ EVT_BEGIN(ukishima_switch1_evt)
 EVT_END()
 
 EVT_BEGIN(ukishima_switch2_evt)
-    SET_VALUE(GSWF(2984), 1)
-    SET_VALUE(LW(0), GSWF(2983))
-    ADD(LW(0), GSWF(2984))
+    SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 1)
+    SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+    ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_EQUAL(LW(0), 1)
         SPAWN_EVENT(PTR(ukishima_part1))
     END_IF
@@ -1138,12 +1062,12 @@ EVT_BEGIN(torinoko_suifu_pukapuka)
                 CALL(evt_nannpc_get_position, LW(0), LW(1), LW(2), LW(3))
                 IF_INT_LESS_OR_EQUAL(LW(3), 0)
                     SET_FLOAT_VALUE(LW(1), FLOAT(39.0f))
-                    ELSE
+                ELSE
                     SET_FLOAT_VALUE(LW(1), FLOAT(26.0f))
                 END_IF
                 ADD_FLOAT(LW(1), LW(10))
                 CALL(evt_nannpc_set_shadow_position, LW(0), LW(1))
-                ELSE
+            ELSE
                 CALL(evt_nannpc_get_position, LW(0), LW(1), LW(2), LW(3))
                 CALL(evt_nannpc_set_shadow_position, LW(0), LW(2))
             END_IF
@@ -1207,8 +1131,8 @@ EVT_BEGIN(torinoko_suifu_sakebu)
                     END_IF
                 END_IF
             END_IF
-            IF_INT_EQUAL(GSWF(2983), 1)
-                IF_INT_EQUAL(GSWF(2984), 1)
+            IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
+                IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 1)
                     RETURN
                 END_IF
             END_IF
@@ -1243,12 +1167,12 @@ EVT_BEGIN(torinoko_suifu_sakebu)
 EVT_END()
 
 EVT_BEGIN(torinoko_suifu_init)
-    CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("水夫D"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("水夫E"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("モニー"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫D"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫E"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("モニー"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_change_interrupt, STRING("モニー"), 6, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_change_interrupt, STRING("ピートン"), 6, 0)
     CALL(evt_nannpc_init, PTR(ext_entry_data), 0, 0, 0, 101)
     CALL(evt_nannpc_set_subfunc, 1, PTR(nannpc_ext_main_sub_fast))
@@ -1344,7 +1268,7 @@ EVT_BEGIN(torinoko_suifu)
     CALL(evt_msg_toge, 2, -400, 60, 30)
     CALL(evt_msg_print, 0, STRING("stg5_dou_13"), 0, 0)
     CALL(evt_mario_key_onoff, 1)
-    SET_VALUE(GSWF(2982), 1)
+    SET_VALUE(GSWF(GSWF_DOU11_STRANDED_SAILORS_SEEN), 1)
     RETURN
 EVT_END()
 
@@ -1353,7 +1277,7 @@ EVT_BEGIN(suifu_orei)
     CALL(evt_npc_set_ry, STRING("水夫C"), 270)
     CALL(evt_npc_set_position, STRING("水夫D"), 775, 50, 50)
     CALL(evt_npc_set_ry, STRING("水夫D"), 270)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_npc_set_position, STRING("水夫E"), 736, 50, 113)
 #else
     CALL(evt_npc_set_position, STRING("水夫E"), 750, 50, -25)
@@ -1377,8 +1301,8 @@ EVT_BEGIN(suifu_orei)
     DELETE_EVENT(GW(10))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
-    CALL(evt_npc_flag_onoff, 1, STRING("モニー"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("モニー"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir, 90, 200, 0)
     END_INLINE_EVENT
@@ -1387,7 +1311,7 @@ EVT_BEGIN(suifu_orei)
         CALL(evt_party_stop, 0)
         CALL(evt_party_set_dir, 0, 90, 200)
     END_INLINE_EVENT
-    CALL(evt_snd_bgmoff_f, 512, 3000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
     CALL(evt_set_dir_to_target, STRING("水夫D"), STRING("mario"))
     CALL(evt_msg_print, 0, STRING("stg5_dou_16"), 0, STRING("水夫D"))
     CALL(evt_set_dir_to_target, STRING("水夫E"), STRING("mario"))
@@ -1437,11 +1361,11 @@ EVT_BEGIN(suifu_orei)
     CALL(evt_mario_set_pose, STRING("M_I_2"))
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("stg5_dou_16_06"), 0, STRING("モニー"))
-    CALL(evt_npc_flag_onoff, 0, STRING("モニー"), 1073741856)
+    CALL(evt_npc_flag_onoff, 0, STRING("モニー"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_change_interrupt, STRING("モニー"), 6, PTR(mony_talk))
-    CALL(evt_npc_flag_onoff, 0, STRING("ピートン"), 1073741856)
+    CALL(evt_npc_flag_onoff, 0, STRING("ピートン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_change_interrupt, STRING("ピートン"), 6, PTR(peton_talk))
-    SET_VALUE(GSW(0), 250)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_30_SHIPWRECKED_SAILORS)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1470,13 +1394,13 @@ EVT_BEGIN(escapeway_event)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("stg5_dou_17_06"), 0, STRING("水夫E"))
-    SET_VALUE(GSW(0), 255)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_35_ESCAPE_ROUTE)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(bombwall_escape_move)
-    CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
         IF_INT_LESS(LW(1), 100)
@@ -1523,14 +1447,14 @@ static EVT_BEGIN(bombwall_bomb)
         CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, LW(10), LW(11), LW(12), LW(13))
         CALL(evt_img_clear_virtual_point, STRING("capture_img"))
         CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
         CALL(evt_img_wait_animend, STRING("capture_img"))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_ana_before"))
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
@@ -1550,7 +1474,7 @@ static EVT_BEGIN(bombwall_bomb)
     SET_VALUE(LW(0), STRING("n_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("n_bero"), 4)
-    SET_VALUE(GSW(0), 256)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_36_HOLE_IN_THE_WALL)
     WAIT_FRAMES(2)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_exit_case_evt)
@@ -1558,30 +1482,30 @@ static EVT_BEGIN(bombwall_bomb)
 EVT_END()
 
 static EVT_BEGIN(bombwall_init)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_after"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hibiato"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hibimae"), 1)
-    SWITCH(GSW(0))
-        CASE_LESS_OR_EQUAL(253)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hibimae"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_before"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hibiato"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hibimae"), MAPOBJ_FLAG_HIDE)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS_OR_EQUAL(STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hibimae"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("n_bero"), 4)
-        CASE_BETWEEN(254, 255)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hibiato"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_before"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_before1"), 1)
+        CASE_BETWEEN(STORY_STG5_34_KICKED_OFF, STORY_STG5_35_ESCAPE_ROUTE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hibiato"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_before1"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("n_bero"), 4)
         CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
-        CALL(evt_run_case_evt, 15, 1, STRING("n_bero"), 0, PTR(bombwall_bomb), 0)
-        CASE_GREATER_OR_EQUAL(256)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hibiato"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("n_bero"), 0, PTR(bombwall_bomb), 0)
+        CASE_GREATER_OR_EQUAL(STORY_STG5_36_HOLE_IN_THE_WALL)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hibiato"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(PTR(bero_case_switch_on))
         CALL(evt_hitobj_attr_onoff, 1, 1, STRING("n_bero"), 4)
@@ -1611,7 +1535,7 @@ EVT_BEGIN(bombwall_suifuout_secheck)
                 CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_KINOPIO_MOVE1"), LW(0), LW(1), LW(2), LW(13))
                 SET_VALUE(LW(12), 1)
             END_IF
-            ELSE
+        ELSE
             IF_INT_EQUAL(LW(12), 1)
                 CALL(evt_snd_sfxoff, LW(13))
                 SET_VALUE(LW(12), 0)
@@ -1628,10 +1552,10 @@ EVT_BEGIN(bombwall_suifuout)
     IF_INT_EQUAL(LW(2), 50)
         IF_INT_GREATER_OR_EQUAL(LW(1), 710)
             GOTO(10)
-            ELSE
+        ELSE
             GOTO(20)
         END_IF
-        ELSE
+    ELSE
         GOTO(30)
     END_IF
     LABEL(10)
@@ -1687,14 +1611,14 @@ EVT_BEGIN(bombwall_after)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     IF_INT_LESS_OR_EQUAL(LW(0), 780)
         CALL(evt_mario_set_dir, 90, 200, 0)
-        ELSE
+    ELSE
         CALL(evt_mario_set_dir, 270, 200, 0)
     END_IF
-    CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("水夫D"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("水夫E"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("モニー"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫D"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫E"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("モニー"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_cam3d_evt_set, 742, 233, 429, 742, 147, -63, 500, 11)
     CALL(evt_npc_move_position, STRING("水夫C"), 780, -135, 0, FLOAT(180.0f), 0)
     CALL(evt_set_dir_to_target, STRING("水夫C"), STRING("mario"))
@@ -2367,8 +2291,8 @@ EVT_BEGIN(pukapuka_watari_init01)
     CALL_CHILD(PTR(dou_puka_event_init1))
     SPAWN_EVENT(PTR(dou_puka_event_main1))
     SPAWN_EVENT(PTR(dou_puka_event_sub1))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_taru_n01"), 0, PTR(dou_puka_event_1), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("A_taru_n01"), 0, PTR(dou_puka_event_rev_1), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n01"), 0, PTR(dou_puka_event_1), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n01"), 0, PTR(dou_puka_event_rev_1), 0)
     SET_VALUE(LW(0), STRING("S_taru_n02"))
     SET_VALUE(LW(1), STRING("A_taru_n02"))
     SET_VALUE(LW(2), STRING("A_taru_n02"))
@@ -2376,8 +2300,8 @@ EVT_BEGIN(pukapuka_watari_init01)
     CALL_CHILD(PTR(dou_puka_event_init2))
     SPAWN_EVENT(PTR(dou_puka_event_main2))
     SPAWN_EVENT(PTR(dou_puka_event_sub2))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_taru_n02"), 0, PTR(dou_puka_event_2), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("A_taru_n02"), 0, PTR(dou_puka_event_rev_2), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n02"), 0, PTR(dou_puka_event_2), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n02"), 0, PTR(dou_puka_event_rev_2), 0)
     RETURN
 EVT_END()
 
@@ -2389,8 +2313,8 @@ EVT_BEGIN(pukapuka_watari_init02)
     CALL_CHILD(PTR(dou_puka_event_init3))
     SPAWN_EVENT(PTR(dou_puka_event_main3))
     SPAWN_EVENT(PTR(dou_puka_event_sub3))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_taru_n03"), 0, PTR(dou_puka_event_3), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("A_taru_n03"), 0, PTR(dou_puka_event_rev_3), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n03"), 0, PTR(dou_puka_event_3), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n03"), 0, PTR(dou_puka_event_rev_3), 0)
     SET_VALUE(LW(0), STRING("S_taru_n04"))
     SET_VALUE(LW(1), STRING("A_taru_n04"))
     SET_VALUE(LW(2), STRING("A_taru_n04"))
@@ -2398,8 +2322,8 @@ EVT_BEGIN(pukapuka_watari_init02)
     CALL_CHILD(PTR(dou_puka_event_init4))
     SPAWN_EVENT(PTR(dou_puka_event_main4))
     SPAWN_EVENT(PTR(dou_puka_event_sub4))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_taru_n04"), 0, PTR(dou_puka_event_4), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("A_taru_n04"), 0, PTR(dou_puka_event_rev_4), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n04"), 0, PTR(dou_puka_event_4), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n04"), 0, PTR(dou_puka_event_rev_4), 0)
     RETURN
 EVT_END()
 
@@ -2444,8 +2368,8 @@ static HitDamageReturn hitDmgRetPoints[] = {
 };
 
 EVT_BEGIN(dou_11_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU12"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU12"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -2456,23 +2380,23 @@ EVT_BEGIN(dou_11_init_evt)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
     SPAWN_EVENT(PTR(bombwall_init))
-    SWITCH(GSW(0))
-        CASE_EQUAL(249)
-        IF_INT_EQUAL(GSWF(2982), 0)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG5_29_WAVE_DODGING)
+        IF_INT_EQUAL(GSWF(GSWF_DOU11_STRANDED_SAILORS_SEEN), 0)
             SPAWN_EVENT(PTR(torinoko_suifu))
         END_IF
-        IF_INT_EQUAL(GSWF(2992), 0)
+        IF_INT_EQUAL(GSWF(GSWF_DOU11_SAILORS_CROSSED), 0)
             SPAWN_EVENT(PTR(torinoko_suifu_init))
             SPAWN_EVENT(PTR(torinoko_suifu_sakebu))
         END_IF
-        CASE_EQUAL(254)
+        CASE_EQUAL(STORY_STG5_34_KICKED_OFF)
         SPAWN_EVENT(PTR(escapeway_event))
     END_SWITCH
-    IF_INT_EQUAL(GSWF(2992), 1)
+    IF_INT_EQUAL(GSWF(GSWF_DOU11_SAILORS_CROSSED), 1)
         CALL(evt_hitobj_onoff, STRING("fune_atari"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSW(0), 249)
-        IF_INT_EQUAL(GSWF(2992), 1)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_29_WAVE_DODGING)
+        IF_INT_EQUAL(GSWF(GSWF_DOU11_SAILORS_CROSSED), 1)
             SPAWN_EVENT(PTR(watarikiri_suifu_init))
             CALL(evt_npc_set_position, STRING("モニー"), 681, 50, -75)
             CALL(evt_npc_set_ry_lr, STRING("モニー"), 1)
@@ -2482,26 +2406,26 @@ EVT_BEGIN(dou_11_init_evt)
             SPAWN_EVENT(PTR(suifu_orei))
         END_IF
     END_IF
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 250)
-        IF_INT_LESS_OR_EQUAL(GSW(0), 255)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_30_SHIPWRECKED_SAILORS)
+        IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_35_ESCAPE_ROUTE)
             SPAWN_EVENT(PTR(watarikiri_suifu_init))
         END_IF
     END_IF
-    CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(ukishima_switch1_evt), GSWF(2983))
-    CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(ukishima_switch2_evt), GSWF(2984))
+    CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(ukishima_switch1_evt), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+    CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(ukishima_switch2_evt), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     SPAWN_EVENT(PTR(ukishima_init1))
     SPAWN_EVENT(PTR(ukishima_init2))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 253)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_taru_n03"), 1)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n03"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n03"), 1, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_taru_n04"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n04"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n04"), 1, 0)
     END_IF
     SPAWN_EVENT(PTR(haikei_funeyure))
     CALL(evt_map_entry_airport_harbor, 0, STRING("S_hikou"), STRING("A_hikou"))
-    IF_INT_LESS(GSW(0), 250)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_30_SHIPWRECKED_SAILORS)
         CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints_1st))
-        ELSE
+    ELSE
         CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     END_IF
     CALL_CHILD(PTR(evt_gazigazi_entry))
@@ -2532,8 +2456,8 @@ EVT_BEGIN(dou_11_init_evt)
     SET_VALUE(LW(0), STRING("S_bin04"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main17), LW(10))
-    SET_VALUE(LW(0), GSWF(2983))
-    ADD(LW(0), GSWF(2984))
+    SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+    ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         SPAWN_EVENT(PTR(pukapuka_watari_init01))
     END_IF
@@ -2541,12 +2465,11 @@ EVT_BEGIN(dou_11_init_evt)
         SPAWN_EVENT(PTR(pukapuka_watari_init02))
     END_IF
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_01"), STRING("Ship_Change_01"))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 257)
-        IF_INT_LESS(GSW(0), 258)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_40_TRUE_IDENTITY)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_41_RETURN_TO_THE_GROTTO)
             SPAWN_EVENT(PTR(dai3_shurai_after))
         END_IF
     END_IF
     CALL(evt_hitobj_onoff, STRING("A_ana_before"), 1, 0)
     RETURN
 EVT_END()
-

@@ -1,3 +1,5 @@
+// unit_togedaruma: togedaruma battle unit (spiked round enemy).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -7,26 +9,14 @@
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
-
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_CheckStatus);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_OffPartsCounterAttribute);
-USER_FUNC(btlevtcmd_OnPartsCounterAttribute);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_eff);
+#include "battle/battle_sub.h"
+#include "evt/evt_eff.h"
 
 BattleUnitKind unit_togedaruma;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static BattleUnitDefense defence_turn;
 static StatusVulnerability regist;
-static PoseTableEntry pose_table[18];
-static PoseTableEntry pose_table_turn[15];
 static BattleDataEntry data_table[6];
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_togedaruma_attack;
@@ -172,23 +162,23 @@ static BattleWeapon weapon_togedaruma_attack = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x21002000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x1E, // counterResistFlags
-    0x2004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -196,28 +186,28 @@ static BattleWeapon weapon_togedaruma_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(attack_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, -2, 10, LW(3))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 58)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 32)
         GOTO(90)
@@ -231,34 +221,34 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
 EVT_END()
 
 static EVT_BEGIN(dmg_avoid_counter_thorn_front_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_CheckStatus, -2, 17, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 17, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_3"))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_3"))
             WAIT_FRAMES(60)
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_4"))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_4"))
         ELSE
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_1"))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_1"))
             WAIT_FRAMES(60)
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_2"))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_2"))
         END_IF
     END_SIBLING_EVENT
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, -2, 10, LW(3))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 53)
+        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 53)
         ADD(LW(1), 26)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 33)
+        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 33)
         ADD(LW(1), 16)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 43)
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 43)
     ADD(LW(1), 21)
     GOTO(90)
     LABEL(90)
@@ -283,11 +273,11 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_GetOverTurnCount, LW(10), LW(12))
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
-    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ENM_INSIDE1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("TGD_S_1"))
     IF_INT_LESS_OR_EQUAL(LW(12), 0)
         SET_VALUE(LW(12), 0)
-        CALL(btlevtcmd_SetRotateOffset, -2, 0, 10, 0)
+        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 10, 0)
         BEGIN_SIBLING_EVENT
             LOOP(0)
                 IF_INT_GREATER_OR_EQUAL(LW(12), 10)
@@ -295,19 +285,19 @@ static EVT_BEGIN(dmg_turn_event)
                 END_IF
                 ADD(LW(12), 1)
                 WAIT_FRAMES(1)
-                CALL(btlevtcmd_AddRotate, -2, 0, 0, -18)
+                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, -18)
             END_LOOP
         END_SIBLING_EVENT
     END_IF
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 25, -1)
-    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
-    CALL(btlevtcmd_SetRotateOffset, -2, 0, 0, 0)
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 25, -1)
+    CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+    CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("TGD_S_5"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -2, LW(0), 10, LW(2))
-    CALL(btlevtcmd_SetHomePos, -2, LW(0), 10, LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 10, LW(2))
+    CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 10, LW(2))
     RETURN
 EVT_END()
 
@@ -318,14 +308,14 @@ static EVT_BEGIN(wakeup_event)
     SUBTRACT(LW(0), 1)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
     CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     SET_VALUE(LW(12), 0)
-    CALL(btlevtcmd_SetRotateOffset, -2, 0, 10, 0)
+    CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 10, 0)
     BEGIN_SIBLING_EVENT
         LOOP(0)
             IF_INT_GREATER_OR_EQUAL(LW(12), 10)
@@ -333,25 +323,25 @@ static EVT_BEGIN(wakeup_event)
             END_IF
             ADD(LW(12), 1)
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_AddRotate, -2, 0, 0, -18)
+            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, -18)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ENM_TOGEDA_MOVE6"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(1.0f))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 18, -1)
-    CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
-    CALL(btlevtcmd_SetRotateOffset, -2, 0, 0, 0)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ENM_TOGEDA_MOVE6"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 18, -1)
+    CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+    CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("TGD_S_4"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -2, LW(0), 0, LW(2))
-    CALL(btlevtcmd_SetHomePos, -2, LW(0), 0, LW(2))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
+    CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_GetOverTurnCount, -2, LW(0))
+    CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
@@ -361,18 +351,18 @@ static EVT_BEGIN(attack_event)
         WAIT_MS(750)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
-        CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+        CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(LW(0))
-            CALL(btlevtcmd_StartWaitEvent, -2)
+            CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             RETURN
         END_IF
-        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_togedaruma_attack))
+        CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_togedaruma_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_togedaruma_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -380,23 +370,23 @@ static EVT_BEGIN(attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_togedaruma_attack))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_togedaruma_attack))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_togedaruma_attack))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_1"))
     WAIT_FRAMES(10)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE2"), -250000000, 0, LW(15))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_A_1"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE2"), EVT_NULLPTR, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_A_1"))
     WAIT_MS(400)
     CALL(evt_btl_camera_set_mode, 0, 8)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(7.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_togedaruma_attack), 256, LW(5))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togedaruma_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -419,77 +409,76 @@ static EVT_BEGIN(attack_event)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_A_1"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(2), 5)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE3"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_JumpSetting, -2, 0, 0, FLOAT(0.099609375f))
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), 0, LW(2), FLOAT(60.0f), -1)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE4"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_N_1"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, 0, FLOAT(0.099609375f))
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), FLOAT(60.0f), -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE4"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_N_1"))
     WAIT_MS(1500)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_1"))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE5"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_1"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE5"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_togedaruma_attack))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_togedaruma_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togedaruma_attack), 256, LW(5))
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_TOGEDA_MOVE3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpSetting, -2, 0, FLOAT(5.0f), FLOAT(0.19921875f))
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 0, -1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_J_2"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(5.0f), FLOAT(0.19921875f))
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_2"))
     WAIT_FRAMES(15)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("TGD_S_4"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_S_4"))
     WAIT_MS(400)
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
     SET_VALUE(LW(15), 0)
-    CALL(btlevtcmd_CheckStatus, -2, 1, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 2, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 3, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 3, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 4, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 5, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 9, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 9, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
     IF_INT_NOT_EQUAL(LW(15), 0)
-        CALL(btlevtcmd_OffPartsCounterAttribute, -2, 1, 2)
-        ELSE
-        CALL(btlevtcmd_OnPartsCounterAttribute, -2, 1, 2)
+        CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 2)
+    ELSE
+        CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 2)
     END_IF
     WAIT_FRAMES(1)
     GOTO(0)
     RETURN
 EVT_END()
-

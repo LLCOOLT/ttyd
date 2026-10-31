@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: balloon with a Shy Guy (heiho); types 0-2 pick one of three textures, moved by speed and accel.
 #include "eff/n64/eff_balloon_heiho_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"

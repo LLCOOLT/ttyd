@@ -1,3 +1,4 @@
+// Declares __assert2, the assert handler in system.c that tst's units call with their file name and line.
 #pragma once
 
 #include "dolphin/types.h"

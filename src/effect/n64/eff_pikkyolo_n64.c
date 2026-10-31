@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: pikkyolo effect at a point with a scale and life.
 #include "eff/n64/eff_pikkyolo_n64.h"
 #include "driver/effdrv.h"
 #include "driver/camdrv.h"
@@ -6,14 +7,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-typedef struct effN64Vtx {
-    s16 x, y, z;
-    s16 s, t;
-    u8 r, g, b, a;
-} effN64Vtx;
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
 
 typedef struct EffPikkyoloN64Work {
     s32 type;     // 0x0
@@ -66,7 +60,7 @@ EffectEntry* effPikkyoloN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 sc
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPikkyoloN64Work) * 6);
     effect->userdata = work;
     effect->callback = effPikkyoloMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->counter = 0;
     if (life <= 0) {
@@ -116,8 +110,8 @@ void effPikkyoloMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 16;
     }
     if (work->life < 1000) {

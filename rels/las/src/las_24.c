@@ -1,40 +1,24 @@
+// las_24 (ラストダンジョン, Palace of Shadow): the room with the cloud blocks and the breaking floor.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cloud.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "las.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cloud_ent);
-USER_FUNC(evt_cloud_init);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_jump_jumpstand);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_breaking_floor);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_flag_onoff);
-USER_FUNC(evt_mobj_floatswitch_red);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_jumpstand_red);
-USER_FUNC(evt_mobj_lv_blk);
-USER_FUNC(evt_mobj_set_scale);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_party_get_name_hitobj_ride);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_jump_pos);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_get_sincos);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 USER_FUNC(las_24_adjust_for_framerate);
 #endif
 
@@ -43,10 +27,6 @@ static const char* haguruma_hontai[15];
 static const char* haguruma_hontai2[6];
 static const char* haguruma_kage[12];
 static const char* haguruma_kage2[5];
-extern EvtWord cloud_blk_evt[];
-extern EvtWord break_floor_evt[];
-extern EvtWord jump_evt[];
-extern EvtWord las_24_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -69,8 +49,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -86,8 +66,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "s_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -102,8 +82,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "s_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -233,13 +213,13 @@ static EVT_BEGIN(haguruma_evt)
 EVT_END()
 
 EVT_BEGIN(cloud_blk_evt)
-    SET_VALUE(GSWF(4356), 1)
-    CALL(evt_mobj_flag_onoff, 0, STRING("blk"), 256)
+    SET_VALUE(GSWF(GSWF_LAS24_BLOCK_UNCOVERED), 1)
+    CALL(evt_mobj_flag_onoff, 0, STRING("blk"), MOBJ_FLAG_NO_HIT)
     RETURN
 EVT_END()
 
 EVT_BEGIN(break_floor_evt)
-    SET_VALUE(GSW(0), 396)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_12_LARGE_STONE_BLOCK)
     RETURN
 EVT_END()
 
@@ -273,7 +253,7 @@ static EVT_BEGIN(dai_evt)
     SET_VALUE(LW(0), STRING("S_move_dai"))
     SET_VALUE(LW(1), STRING("A_move_dai"))
     SET_VALUE(LW(2), 7200)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(las_24_adjust_for_framerate, LW(2), LW(2))
 #endif
     CALL_CHILD(PTR(move_dai))
@@ -283,59 +263,59 @@ EVT_END()
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), 48, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x30, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
-    SET_VALUE(GSW(0), 397)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_13_KEY)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(las_24_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST3"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS7"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS7"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_hgm_05a"), 2)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_hgm_19a"), 2)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_hgm_24a"), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_05a"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_19a"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_24a"), MAPOBJ_FLAG_BBOX_CULL)
     SPAWN_EVENT(PTR(haguruma_evt))
     CALL(evt_map_playanim, STRING("kusari"), 1, 0)
-    IF_INT_LESS(GSW(0), 396)
-        IF_INT_EQUAL(GSWF(4356), 0)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_12_LARGE_STONE_BLOCK)
+        IF_INT_EQUAL(GSWF(GSWF_LAS24_BLOCK_UNCOVERED), 0)
             CALL(evt_cloud_init)
             CALL(evt_cloud_ent, 0, STRING("S_hako"), STRING("A_hako"), PTR(cloud_blk_evt))
-            ELSE
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hako"), 1)
+        ELSE
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hako"), MAPOBJ_FLAG_HIDE)
             CALL(evt_hitobj_onoff, STRING("A_hako"), 1, 0)
         END_IF
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hako"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hako"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_hako"), 1, 0)
     END_IF
-    CALL(evt_mobj_lv_blk, STRING("blk"), -495, 100, 0, 0, GSWF(4357), STRING("MOBJ_Lv2BigBigBlock"))
-    IF_INT_EQUAL(GSWF(4357), 0)
-        CALL(evt_mobj_flag_onoff, 0, STRING("blk"), 64)
-        IF_INT_EQUAL(GSWF(4356), 0)
-            CALL(evt_mobj_flag_onoff, 1, STRING("blk"), 256)
+    CALL(evt_mobj_lv_blk, STRING("blk"), -495, 100, 0, 0, GSWF(GSWF_LAS24_BIG_BLOCK_BROKEN), STRING("MOBJ_Lv2BigBigBlock"))
+    IF_INT_EQUAL(GSWF(GSWF_LAS24_BIG_BLOCK_BROKEN), 0)
+        CALL(evt_mobj_flag_onoff, 0, STRING("blk"), MOBJ_FLAG_FALL)
+        IF_INT_EQUAL(GSWF(GSWF_LAS24_BLOCK_UNCOVERED), 0)
+            CALL(evt_mobj_flag_onoff, 1, STRING("blk"), MOBJ_FLAG_NO_HIT)
             CALL(evt_mobj_set_scale, STRING("blk"), FLOAT(0.9980469f), FLOAT(0.9980469f), FLOAT(0.9980469f))
         END_IF
     END_IF
-    CALL(evt_mobj_breaking_floor, STRING("brkflr"), -500, 100, 0, 0, PTR(break_floor_evt), GSWF(4358))
+    CALL(evt_mobj_breaking_floor, STRING("brkflr"), -500, 100, 0, 0, PTR(break_floor_evt), GSWF(GSWF_LAS24_FLOOR_BROKEN))
     CALL(evt_mobj_jumpstand_red, 0, STRING("jump"), -500, -200, 0, PTR(jump_evt), 0)
     CALL(evt_hit_bind_mapobj, STRING("A_move_dai"), STRING("S_move_dai"))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_move_dai"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_move_dai"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_move_dai"), 0, 0)
     CALL(evt_mobj_floatswitch_red, 0, STRING("dai_switch"), -150, -440, 75, PTR(dai_evt), 0)
-    CALL(evt_mobj_badgeblk, STRING("mobj_hatena_gat"), -625, -200, -100, 121, 0, GSWF(4390), 0)
-    CALL(evt_mobj_brick, STRING("mobj_kakusi"), -625, -115, -100, 161, 11, 0, GSWF(4391))
-    CALL(evt_mobj_itembox, STRING("box"), -255, -380, 75, 0, 0, PTR(box_evt), GSWF(4370))
+    CALL(evt_mobj_badgeblk, STRING("mobj_hatena_gat"), -625, -200, -100, ITEM_COIN, 0, GSWF(GSWF_LAS24_COIN_BLOCK_HIT), 0)
+    CALL(evt_mobj_brick, STRING("mobj_kakusi"), -625, -115, -100, ITEM_POINT_SWAP, 11, 0, GSWF(GSWF_LAS24_POINT_SWAP_HIDDEN_BLOCK_HIT))
+    CALL(evt_mobj_itembox, STRING("box"), -255, -380, 75, 0, 0, PTR(box_evt), GSWF(GSWF_LAS24_KEY_CHEST_OPENED))
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 #include "mario/mariost.h"
 #include "manager/evtmgr_cmd.h"
 

@@ -1,3 +1,5 @@
+// Battle message announcements: the on-screen text banner shown by battle scripts.
+#include <dolphin/pad.h>
 #include "battle/battle.h"
 #include "data/item_data.h"
 #include "driver/dispdrv.h"
@@ -5,27 +7,28 @@
 #include "driver/windowdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "manager/fontmgr.h"
+#include "evt/evt_msg.h"
 #include <stdio.h>
-#ifdef VERSION_G8ME01
+#include "version.h"
+#if VERSION >= VERSION_US
 #include <string.h>
 #include "mario/mariost.h"
-void evtMsgFmtStr(char* dst, const char* src);
 #endif
-
-extern ItemData itemDataTable[];
+// FAKE: battle_message.c calls windowDispGX_Waku_col through this prototype (the types it was compiled with) instead of the one in driver/windowdrv.h; same registers, behaviour-identical.
+typedef void (*WindowDispWakuColPtrFn)(u16, GXColor*, f32, f32, f32, f32, f32);
 
 void _disp(CameraId cameraId, void* param);
 
 // s32 type, s32 x, s32 y, const char* msg, s32 frames
 USER_FUNC(btlevtcmd_AnnounceMessage) {
     BattleAnnounce* announce = &_battleWorkPointer->announce;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     const char* text;
 #endif
     EvtWord* args = event->args;
     s32 type, x, y, frames;
     const char* msg;
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
     const char* text;
 #endif
 
@@ -44,7 +47,7 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
         text = msgSearch(msg);
         switch (type) {
             case 1:
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                 if ((u32)gp->language == 0) {
                     sprintf(announce->text, text, msgSearch(itemDataTable[announce->params[0]].name));
                 } else {
@@ -61,9 +64,9 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
         }
     }
     dispEntry(CAMERA_2D, 900.0f, 1, _disp, NULL);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     if (type == 2) {
-        if (BattlePadCheckTrigger(0x100) || BattlePadCheckTrigger(0x200)) {
+        if (BattlePadCheckTrigger(PAD_BUTTON_A) || BattlePadCheckTrigger(PAD_BUTTON_B)) {
             event->userdata[0] = 0;
         }
     }
@@ -87,7 +90,7 @@ void _disp(CameraId cameraId, void* param) {
     w = (s32)width + 20;
     x -= (s32)width / 2;
     h = (s32)(lines * 29) + 3;
-    ((void (*)(u16, GXColor*, f32, f32, f32, f32, f32))windowDispGX_Waku_col)(0, col, x - 10.0f, -29.0f + (3.0f + y), w, h, 10.0f);
+    ((WindowDispWakuColPtrFn)windowDispGX_Waku_col)(0, col, x - 10.0f, -29.0f + (3.0f + y), w, h, 10.0f);
     FontDrawStart();
     FontDrawMessage(x, (s32)y - 29, announce->text);
 }

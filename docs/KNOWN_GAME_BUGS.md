@@ -1,0 +1,60 @@
+# Known game bugs
+
+The builds are byte-identical, so the code reproduces the original game's bugs too. This page lists the ones found so far, with the place in the code. Most are marked in the source with a `// BUG:` comment. Do not fix them in the matching code: a fix changes the output. A mod that wants the fix can make it, and the comment says what the fix is.
+
+Each entry names the file and the function (or script) that holds the bug, with a short quote of the line where that helps; search for the `BUG` comment in that function.
+
+## Crashes and memory corruption
+
+| Where | Versions | Bug |
+|---|---|---|
+| `src/driver/msgdrv.c`, `msgWindow_Entry` (the `windowEntry` result is used unchecked) | all | `msgWindow_Entry` does not check the window id: when all 7 window slots are in use, `windowEntry` returns -1 and the window setup writes before the start of the window table. |
+| `rels/bom/src/bom_01.c`, script `minnnanokoe_evt` (two places); `rels/las/src/las_29.c`, script `last_evt_3_2`; `rels/mri/src/mri_00.c`, script `minnnanokoe_evt` | all | The text box limit. These scenes open a new message window every 300 ms with no other check, which is not always enough for the old ones to close; together with the bug above, too many open windows corrupt memory. |
+| `src/driver/msgdrv.c`, `msgWindow_Entry` (the allocation before the `strcpy`) | all | The message copy is allocated with `strlen(msg)` bytes, without room for the terminator, so `strcpy` writes one byte past the block. |
+| `src/mario/mario_motion.c`, `mot_talk` (the `fbatGetPointer()->npc` read) | all | Mario's pose change after a conversation uses `fbatGetPointer()->npc`, the NPC Mario last talked to or fought, which may belong to another map. Known crash: talk to one of about twenty affected NPCs, then enter Petalburg for the first time without talking to anyone else, fighting or reloading; the first-entry cutscene (Mario waves at the Koopa) crashes. |
+| `src/event/evt_map.c`, `evt_map_blend_set_flag` (the `"party"` branch) | all | No check that a partner (or a follower) is out: `partyGetPtr` returns NULL for id -1 and the partner's animation group is read through a null pointer. |
+| `src/mario/mario_pouch.c`, `pouchInit` | all | `pouchInit` allocates a new inventory without freeing the old one. It runs at boot and again when a new file starts, so the first block leaks. |
+| `src/driver/msgdrv.c`, `msgAnalize` (the `<select>` tag's `sscanf`) | all | The format has five `%hd` but only four pointers follow, so a `<select>` tag with a fifth number writes it through whatever is in the next argument register. |
+| `src/driver/lightdrv.c`, `lightEntry` (the `name_0000` loop) | all | When the name is taken, the loop formats `uniqueName` from `name` and then points `name` at `uniqueName`; on a second clash `sprintf` reads its own output buffer, so the suffixes stack up (and the copy overlaps). |
+
+## Wrong logic
+
+| Where | Versions | Bug |
+|---|---|---|
+| `src/driver/icondrv.c`, `iconNumberDispGx3D` (`s32 digits[4]`) | all | The digit array is one short: the ten-thousands digit is stored in the first word of the matrix `m`, which `MTXTrans` overwrites before the loop draws it, so a 3D icon number of 10000 or more indexes the digit table with the bits of a float (a wrong or garbage icon for the leading digit). |
+| `src/driver/icondrv.c`, `iconMain` (the deferred set-up of an entry made before icon.bin had loaded) | JP and demo (fixed in US and PAL) | The set-up reads the icon size and frames through `data` without fetching it for this entry, so it uses whatever `data` last held (another entry's frame data). Only icons created before icon.bin finishes loading are affected. |
+| `src/event/evt_mobj.c`, `mobj_lock` (the `pouchCheckItem` result) | JP and demo (fixed in US and PAL) | The key lock stores the *count* of the key the player holds (from `pouchCheckItem`) instead of its id, and passes that count to `pouchRemoveItem` as an item id. Holding one key removes item 1, the Strange Sack: unlocking the blue cage door in the Great Tree tries to take the Strange Sack. |
+| `rels/tik/src/unit/unit_kamec.c`, script `all_recover_magic_event` (`IF_INT_NOT_EQUAL(LW(3), -1)`); the same script is copied in `rels/tou2/src/unit/unit_kamec_green.c`, `unit_kamec_red.c`, `unit_kamec_white.c` and `rels/tst/src/unit/unit_kamec.c`, `unit_kamec_green.c`, `unit_kamec_red.c` and `unit_kamec_white.c` | all | Magikoopa's heal check is inverted: it gives up whenever there *is* a next enemy, so only the first enemy is checked for missing HP; if that one is alone and at full HP, the loop runs again with no enemy. |
+| `rels/jin/src/unit/unit_teresa.c`, script `move_event` (`SET_VALUE(LW(15), 0)` inside the loop); the same script is in `rels/jon/src/unit/unit_teresa.c`, `rels/jon/src/unit/unit_purple_teresa.c` and `rels/pik/src/unit/unit_purple_teresa.c` | PAL (the counter exists only there) | The Boo's counter is cleared on every pass of the loop, so it never reaches 2 and the minimum below never applies. |
+| `src/unit/party/unit_party_chuchurina.c`, script `partyChuchurinaAttack_NormalAttack` (the `BEGIN_SIBLING_EVENT_GET_ID(LW(15))` block) | all | An `IF` in Ms. Mowz's Love Slap has no `END_IF`; the script's `END_SIBLING_EVENT` comes first. |
+| `src/event/evt_npc.c`, `evt_npc_glide_position` (`angleABf(0.0f, 0.0f, dx, dx)`) | all | An NPC turns toward `(dx, dx)` instead of `(dx, dz)` when it faces its movement direction. |
+| `src/parse.c`, `parseGet1Next` (`p[i] == '/n'`) | all | The `//` comment skipper of the text parser compares with `'/n'` (a two-character constant) instead of `'\n'`, so it never stops at the end of the line and skips to the end of the block. |
+| `src/manager/fontmgr.c`, `FontDrawStringMtx`, `FontDrawMessage`, `FontDrawMessageMtx` and `FontGetMessageWidthLine` (`tag[0] == (u32)'/r'`) | all | The closing `/r` tag test compares one character with the two-character constant `'/r'`, which is always false, so only `R` is recognised. |
+| `src/driver/mapdrv.c`, `mapDisp` / the map object culling loop (the `(max.x, max.y, min.z)` corner) | all | The bounding-box visibility test transforms one of the eight corners by the model matrix twice, so that corner is tested at a wrong place; a map object can be culled while part of it is still on screen, or kept when it is not. |
+| `rels/hei/src/hei_05.c`, script `hashira_evt` (`GSWF_HEI03_PILLAR_ENEMY_A_DEFEATED` / `_B_DEFEATED`) | all | The pillar scene in hei_05 tests the two pillar-enemy flags of hei_03 instead of flags of its own, so once the hei_03 pillar enemies are beaten the second enemy no longer jumps out from behind its hei_05 pillar. |
+| `rels/tik/src/tik_06.c`, script `evt_kanban2` (`GSW(GSW_JON_STAR_PIECES_FOUND)`) | all | The Pit of 100 Trials sign prints GSW 34 as a Star Piece count out of 100, but nothing in the game writes GSW 34, so the count is always 0. |
+| `src/driver/msgdrv.c`, `msgAnalize` (the `<R>` / `</r>` ruby tags) | all | The closing ruby tag test compares one character with the two-character constant `'/r'` (the fontmgr bug again), so only `<R...>` tags are handled there. |
+| `src/manager/evtmgr_cmd.c`, `evt_readf_n` (`READ_FLOAT_INDEXED`, `entry->readAddr[offset]`) | all | The indexed float read takes the word through the integer view of the read pointer and converts it, so a float table entry comes out as the integer value of its bits; `READ_FLOAT` to `READ_FLOAT4` read floats correctly. |
+| `src/party/party_move.c`, `partyMoveBehindMario3` (the `party_set_behind_dir` call) | all | `party_set_behind_dir` takes a direction, but the call passes none, so the partner's home direction is whatever is left in the first float register. |
+| `src/party/party_yoshi.c`, `L_getStick` (inlined into `yoshi_use`, the `marioGetMoveRate` calls) | JP, US and PAL (the demo passes the angle) | `marioGetMoveRate` takes a direction, but both calls pass none, so it reads the angle just stored, which is left in the first float register. |
+| `rels/las/src/las_05.c`, `_kurokaron_run_away` (`result`) | all | With no candidate position and the current distance not smaller than the next one, `result` is never set and the function returns whatever its register held. |
+| `rels/rsh/src/rsh.c`, `rsh_window_tev` (`x0`..`y1`) | all | When no parent map object has flag 0x10, the screen rectangle `x0`, `y0`, `x1`, `y1` is never set and is read uninitialised. |
+| `src/battle/battle_disp.c`, `btlDispMain` (`part->animFlags &= ~PART_ANIM_RESTART` in an `if`) | all | `&=` where `&` was meant: the test clears PART_ANIM_RESTART and checks the flags that are left, so the pose restarts whenever another flag (normally PART_ANIM_MANUAL_POSE) is set. Only Hooktail sets PART_ANIM_RESTART, and gets the restart anyway: no visible effect. |
+
+## Fragile but harmless in the shipped game
+
+| Where | Versions | Note |
+|---|---|---|
+| `src/sequence/seq_mapchange.c`, `seq_mapChangeMain` (the `rel_bss` clear before `OSLink`) | all | The REL bss buffer is a fixed 0xF10 bytes and only 0x3C4 of them are cleared; the REL's bss size and alignment are not checked and `OSLink`'s result is ignored. The shipped RELs fit; a modified REL with a larger bss fails to link or overruns the buffer. |
+| `src/event/evt_mobj.c`, `evt_mobj_hit_onoff` (`if (mobj->hitObj[i].name)`, twice) | all | `if (mobj->hitObj[i].name)` tests a `char[16]` array, which is always true; the empty-name case is never skipped. |
+| `src/driver/mapdrv.c`, `mapObjSetOffScreen` | all | An unknown object name leaves the object pointer NULL and the function writes its offscreen id and flag near address 0; it is only safe while every caller passes a name that exists in the loaded map. |
+| `rels/win/src/data/battle/battle_database_win.c`, the two win_02 encounters with `GSWF(GSWF_WIN02_ALT_BATTLES)` | all | Their alternate battle groups are selected by GSWF 2680, which nothing sets, so the alternates are never used. |
+| `rels/aji/src/aji_10.c`, script `aji_10_init_evt` (`GSWF_AJI10_VISITED`) | all | The script sets the flag and tests it for 0 on the next line, so the east-door lock in that branch never runs. |
+
+## Demo only
+
+| Where | Bug |
+|---|---|
+| `src/mario/mario_hit.c`, `marioChkOverhead` (the demo's `marioSearchHead(&pos, &h, d)`) | `marioSearchHead` is passed `d` before it is set (it is set only for the plain search after it). |
+| `src/manager/cardmgr.c`, `memcard_probe` (demo only) | The demo's memory card probe tests a slot B result that it never probes, so `resultB` is read uninitialised. |
+| `rels/mri/src/mri_09.c`, script `breakyuka_init` (`GSWF_MRI09_FLOOR_BROKEN`) | The demo tests the floor flag for 1 instead of 0 and has no `ELSE`, so it sets the intact-floor collision state of `A_f2_rak_02` only once the floor is broken; the later builds test for 0 and set the other state in an `ELSE`. |

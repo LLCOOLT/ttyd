@@ -1,7 +1,9 @@
+// Glitz Pit (tou, togijo "arena"): declarations shared by the area's maps (tou_00 to tou_13, tou_20).
 #pragma once
 
 #include "dolphin/types.h"
 #include "evt/evt_word.h"
+#include "evt/evt_cmd.h"
 
 extern EvtWord all_juyoitem_lecture_rel[];
 extern EvtWord all_party_lecture[];
@@ -32,3 +34,9 @@ extern EvtWord tou_13_init_evt[];
 extern EvtWord tou_20_init_evt[];
 
 extern EvtWord evt_match_after_stop_npcs[];
+
+USER_FUNC(evt_rankingReset);
+USER_FUNC(evt_tou_get_fighter_info);
+USER_FUNC(evt_tou_get_ranking);
+USER_FUNC(evt_tou_get_rule_msg2);
+USER_FUNC(tou_champion_belt);

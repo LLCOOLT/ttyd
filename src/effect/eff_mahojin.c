@@ -1,3 +1,4 @@
+// Magic circle (mahojin) from the MOBJ_EFF_mahojin_omote/ura animations, with a star-stone effect drawn over it.
 #include "driver/animdrv.h"
 #include "eff/eff_mahojin.h"
 #include "driver/camdrv.h"
@@ -9,10 +10,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z);
 void effMahojinMain(EffectEntry* effect);
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect);
-
 
 s32 mahojin_rate;
 
@@ -31,15 +30,13 @@ Vec pos_tbl[7] = {
     { -11.1931f, 0.0f, -9.0435f },
 };
 
-
-
 static void callback(MapTevCallbackInfo* info) {
     s32 tevStage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
     s32 indStage = info->indStage;
 
-    GXSetTevColor(GX_TEVREG0, (GXColor){ 0xE8, 0x00, 0xE8, mahojin_rate });
+    GXSetTevColor(GX_TEVREG0, (GXColor){0xE8, 0x00, 0xE8, mahojin_rate});
     GXSetTevOrder(tevStage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -66,7 +63,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, n * sizeof(EffMahojinWork));
     effect->userdata = work;
     effect->callback = effMahojinMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
 
     p = work;
     p->type = type;
@@ -118,7 +115,7 @@ void effMahojinMain(EffectEntry* effect) {
     s32 inBattle;
     f32 loops;
     Vec position;
-    Vec tmp = { 0.0f, 0.0f, 0.0f };
+    Vec tmp = {0.0f, 0.0f, 0.0f};
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -146,8 +143,8 @@ void effMahojinMain(EffectEntry* effect) {
         work = effect->userdata;
     }
 
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {
@@ -193,8 +190,8 @@ void effMahojinMain(EffectEntry* effect) {
                         EffMahojinWork* q = p;
                         s32 k;
                         for (k = 0; k < effect->count; q++, k++) {
-                            animPoseSetMaterialFlagOn(q->poseId[0], 0xA000000);
-                            animPoseSetMaterialFlagOn(q->poseId[1], 0xA000000);
+                            animPoseSetMaterialFlagOn(q->poseId[0], ANIM_MATERIAL_TEV_CALLBACK(10));
+                            animPoseSetMaterialFlagOn(q->poseId[1], ANIM_MATERIAL_TEV_CALLBACK(10));
                         }
                     }
                     mahojin_rate = 0;
@@ -283,8 +280,6 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     zp = z;
     flags = map->entries[0].flags;
 
-
-
     for (pass = 0; pass < 2; pass++) {
         n = 0;
         if (pass == 0) {
@@ -325,8 +320,8 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
             }
             if (p->poseId[pass] != -1) {
                 animPoseMain(p->poseId[pass]);
-                animPoseSetMaterialFlagOn(p->poseId[pass], 0x40);
-                animPoseSetMaterialEvtColor(p->poseId[pass], (GXColor){ 0xFF, 0xFF, 0xFF, p->alpha * alpha / 255 });
+                animPoseSetMaterialFlagOn(p->poseId[pass], ANIM_MATERIAL_FLAG_EVT_COLOR);
+                animPoseSetMaterialEvtColor(p->poseId[pass], (GXColor){0xFF, 0xFF, 0xFF, p->alpha * alpha / 255});
                 animPoseDrawMtx(p->poseId[pass], mtx, 3, 0.0f, 10.0f);
             }
         }

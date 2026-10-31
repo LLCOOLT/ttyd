@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
+ * SGI Free Software License B (Version 2.0, Sept. 18, 2008), http://oss.sgi.com/projects/FreeB/;
+ * the full notice is at the top of src/glu/tess.c.
+ */
+
 #ifndef __priorityq_heap_h_
 #define __priorityq_heap_h_
 

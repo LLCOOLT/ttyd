@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: fireworks, a rocket launched with a velocity vector and trailing points; w is the target scale.
+#include "eff/n64/eff_fireworks_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,10 +8,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-double cos(double);
-int rand(void);
+#include "libc_decls.h"
 
 typedef struct EffFireworksN64Work {
     s32 type;        // 0x0
@@ -74,7 +73,6 @@ struct {
     s8* v;
     s32 n;
 } vtx_data[3] = {{vtx, 95}, {vtx2, 66}, {vtx3, 56}};
-
 
 void effFireworksMain(EffectEntry* effect);
 void effFireworksDisp(CameraId cameraId, EffectEntry* effect);
@@ -149,14 +147,12 @@ void effFireworksMain(EffectEntry* effect) {
     s32 idx;
     f32 s;
 
-
-
     position.x = work->position.x;
     position.y = work->position.y;
     position.z = work->position.z;
     position2 = position;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -307,34 +303,26 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
             sx = t.x * gp->fbWidth / 2.0f;
             sy = t.y * gp->efbHeight / 2.0f;
             {
-            target = (Vec){0.0f, 0.0f, 0.0f};
-            pos = (Vec){0.0f, 0.0f, 1000.0f};
-            up = (Vec){0.0f, 1.0f, 0.0f};
-            GXGetProjectionv(proj);
-            MTXOrtho(ortho, 480.0f, 0.0f, 0.0f, 608.0f, 1.0f, 32768.0f);
-            GXSetProjection(ortho, GX_ORTHOGRAPHIC);
-            MTXLookAt(view, &pos, &up, &target);
-            GXLoadPosMtxImm(view, GX_PNMTX0);
-            GXSetCurrentMtx(0);
-            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(sx, sy, 0.0f);
-            GXTexCoord2s16(0, 1);
-            GXPosition3f32(sx + 8.0f, sy, 0.0f);
-            GXTexCoord2s16(1, 1);
-            GXPosition3f32(sx + 8.0f, sy - 8.0f, 0.0f);
-            GXTexCoord2s16(1, 0);
-            GXPosition3f32(sx, sy - 8.0f, 0.0f);
-            GXTexCoord2s16(0, 0);
-            GXSetProjectionv(proj);
+                target = (Vec){0.0f, 0.0f, 0.0f};
+                pos = (Vec){0.0f, 0.0f, 1000.0f};
+                up = (Vec){0.0f, 1.0f, 0.0f};
+                GXGetProjectionv(proj);
+                MTXOrtho(ortho, 480.0f, 0.0f, 0.0f, 608.0f, 1.0f, 32768.0f);
+                GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+                MTXLookAt(view, &pos, &up, &target);
+                GXLoadPosMtxImm(view, GX_PNMTX0);
+                GXSetCurrentMtx(0);
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                GXPosition3f32(sx, sy, 0.0f);
+                GXTexCoord2s16(0, 1);
+                GXPosition3f32(sx + 8.0f, sy, 0.0f);
+                GXTexCoord2s16(1, 1);
+                GXPosition3f32(sx + 8.0f, sy - 8.0f, 0.0f);
+                GXTexCoord2s16(1, 0);
+                GXPosition3f32(sx, sy - 8.0f, 0.0f);
+                GXTexCoord2s16(0, 0);
+                GXSetProjectionv(proj);
             }
         }
     }
 }
-
-
-
-
-
-
-
-

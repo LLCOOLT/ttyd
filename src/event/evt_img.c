@@ -1,3 +1,5 @@
+// Script commands for 2D images and pictures (imgdrv).
+#include "evt/evt_img.h"
 #include "driver/animdrv.h"
 #include "driver/imgdrv.h"
 #include "driver/offscreendrv.h"
@@ -5,13 +7,7 @@
 #include "mario/mariost.h"
 #include "manager/evtmgr_cmd.h"
 #include <dolphin/gx.h>
-
-typedef struct DEMORenderModeObj {
-    u8 pad[4];
-    u16 fbWidth;
-    u16 efbHeight;
-} DEMORenderModeObj;
-extern DEMORenderModeObj* DEMOGetRenderModeObj(void);
+#include "sdk/DEMOInit.h"
 
 USER_FUNC(evt_img_entry) {
     imgEntry((const char*)evtGetValue(event, event->args[0]), gp->inBattle != 0);
@@ -37,7 +33,7 @@ USER_FUNC(evt_img_set_paper) {
     ImageEntry* img = imgNameToPtr(name, group);
     img->poseId = animPaperPoseGetId(anim, group);
     img->animTime = animTimeGetTime(group);
-    animPoseSetMaterialFlagOn(img->poseId, 0x1800);
+    animPoseSetMaterialFlagOn(img->poseId, ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2);
     return EVT_RETURN_DONE;
 }
 
@@ -57,7 +53,7 @@ USER_FUNC(evt_img_alloc_capture) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 shadowId = evtGetValue(event, args[1]);
     const char* offName = (const char*)evtGetValue(event, args[2]);
-    s32 unk = evtGetValue(event, args[3]);
+    s32 allocMode = evtGetValue(event, args[3]);
     s32 x = evtGetValue(event, args[4]);
     s32 y = evtGetValue(event, args[5]);
     s32 w = evtGetValue(event, args[6]);
@@ -116,8 +112,8 @@ USER_FUNC(evt_img_alloc_capture) {
     }
     sh->offscreenId = offId;
     sh->flags = 0x14;
-    sh->allocMode = unk;
-    if (unk != 0) {
+    sh->allocMode = allocMode;
+    if (allocMode != 0) {
         sh->flags |= 0x100;
     }
     return EVT_RETURN_DONE;
@@ -152,7 +148,7 @@ USER_FUNC(evt_img_set_virtual_point) {
     f32 z = evtGetFloat(event, args[3]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
     Vec tmp;
-    Vec pos = { 0.0f, 0.0f, 0.0f };
+    Vec pos = {0.0f, 0.0f, 0.0f};
     pos.x = x;
     pos.y = y;
     pos.z = z;
@@ -208,7 +204,7 @@ USER_FUNC(evt_img_set_color) {
     u8 b = evtGetValue(event, args[3]);
     u8 a = evtGetValue(event, args[4]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
-    animPoseSetMaterialFlagOn(img->poseId, 0x40);
+    animPoseSetMaterialFlagOn(img->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
     animPoseSetMaterialEvtColor(img->poseId, (GXColor){r, g, b, a});
     return EVT_RETURN_DONE;
 }

@@ -1,3 +1,5 @@
+// Water ripple entry points: thin wrappers over the Paper Mario 64 ripple effect (effRippleN64*)
+// that set its position, tilt (rx/rz) and camera.
 #include "eff/eff_ripple.h"
 #include "eff/n64/eff_ripple_n64.h"
 #include <dolphin/mtx.h>
@@ -12,7 +14,9 @@ void effRippleSetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
 }
 
 void effRippleSetCamId(EffectEntry* effect, s32 cameraId) {
-    ((EffRippleN64Work*)effect->userdata)->cameraId = cameraId;
+    EffRippleN64Work* work = effect->userdata;
+
+    work->cameraId = cameraId;
 }
 
 void effRippleSetPosition(EffectEntry* effect, f32 x, f32 y, f32 z) {

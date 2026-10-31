@@ -1,73 +1,32 @@
+// tik_01 (埋没した都市, Rogueport Sewers): the first room below Rogueport (gor_02): the three Goomba bullies
+// (gorotuki_sanninngumi), bombable walls, a save block, and the scene after the badge lecture.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_movefloor.h"
-
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_hitobj_attr_onoff);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dir_npc);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_kururing_floor);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_npc_battle_start);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_battle_info);
-USER_FUNC(evt_npc_set_damage_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_run_anim);
-USER_FUNC(evt_npc_wait_battle_end);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_offscreen_get_boundingbox2);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_dir_npc);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_get_equipbadgecnt);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_bgmon_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "driver/itemdrv.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "tik.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "evt/evt_pouch.h"
 
 extern EvtWord lecture_badge_after_00_evt[];
 extern EvtWord dokan_2_in_evt[];
@@ -76,7 +35,6 @@ extern EvtWord ashioto[];
 extern EvtWord gorotuki_sanninngumi[];
 extern EvtWord wall_bomb00[];
 extern EvtWord wall_bomb01[];
-extern EvtWord tik_01_init_evt[];
 
 EVT_BEGIN(lecture_badge_after_00_evt)
     CALL(evt_mario_key_onoff, 0)
@@ -91,8 +49,8 @@ EVT_BEGIN(lecture_badge_after_00_evt)
 EVT_END()
 
 EVT_BEGIN(dokan_2_in_evt)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 20)
-        IF_INT_LESS(GSW(0), 21)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_17_BADGE_TUTORIAL)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_19_BLOOPER_BATTLE)
             CALL(evt_pouch_get_equipbadgecnt, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 SPAWN_EVENT(PTR(lecture_badge_after_00_evt))
@@ -107,8 +65,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -123,8 +81,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -139,8 +97,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -156,8 +114,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -173,8 +131,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         2, // type
         0, // sfxId
-        6, // directionId
-        100000, // centerPosition
+        BERO_DIR_W, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)dokan_2_in_evt, // enterEvent
@@ -190,8 +148,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_3", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -206,8 +164,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_4", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -222,8 +180,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_5", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -238,8 +196,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_6", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -254,8 +212,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         4096, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, NULL, // enterEvent..exitEvent
@@ -269,8 +227,8 @@ static BeroEntry bero_entry_data[] = {
         "w_dero_2", // hitName
         4096, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, NULL, // enterEvent..exitEvent
@@ -299,9 +257,9 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_npc_set_position, STRING("クリボー１"), 110, 75, 65)
     CALL(evt_npc_set_position, STRING("クリボー２"), 140, 95, 35)
     CALL(evt_npc_set_position, STRING("クリボー３"), 155, 75, 85)
-    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), 1073742368)
-    CALL(evt_npc_flag_onoff, 1, STRING("クリボー２"), 1073742368)
-    CALL(evt_npc_flag_onoff, 1, STRING("クリボー３"), 1073742368)
+    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("クリボー２"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("クリボー３"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         IF_INT_GREATER_OR_EQUAL(LW(0), -100)
@@ -309,7 +267,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("mac_0_086"), 0, STRING("クリボー１"))
     CALL(evt_party_stop, 0)
@@ -394,7 +352,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_npc_set_damage_anim, STRING("クリボー３"))
     CALL(evt_cam3d_evt_set, -120, 150, 588, -120, 55, 37, 0, 11)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING("クリボー１"), 512)
+    CALL(evt_npc_flag_onoff, 0, STRING("クリボー１"), NPC_FLAG_TALK_ANIM)
     CALL(evt_msg_print, 0, STRING("mac_0_093"), 0, STRING("クリボー１"))
     SET_VALUE(GF(0), 1)
     SET_VALUE(GF(1), 1)
@@ -451,10 +409,10 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
-    SET_VALUE(GSW(0), 12)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_11_3_GOOMBA_GOONS)
     CALL(evt_hitobj_onoff, STRING("a_rec"), 1, 0)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_TIK1"), 2000)
+    CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_TIK1"), 2000)
     RETURN
 EVT_END()
 
@@ -466,7 +424,7 @@ EVT_BEGIN(wall_bomb00)
     END_INLINE_EVENT
     CALL(evt_hitobj_onoff, STRING("a_dom_kabe_1"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("a_dom_kabe_2"), 1, 1)
-    SET_VALUE(GSWF(1331), 1)
+    SET_VALUE(GSWF(GSWF_TIK01_WALL1_BOMBED), 1)
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_bom_ver2"))
     CALL(evt_offscreen_entry, STRING("offscreen"))
@@ -482,12 +440,12 @@ EVT_BEGIN(wall_bomb00)
         CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, LW(10), LW(11), LW(12), LW(13))
         CALL(evt_img_clear_virtual_point, STRING("capture_img"))
         CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("bom_kabe_2"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("bom_kabe_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_img_wait_animend, STRING("capture_img"))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("bom_kabe_2"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("bom_kabe_2"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_mapobj_clear_offscreen, 1, STRING("bom_kabe_1"))
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
@@ -507,7 +465,7 @@ EVT_BEGIN(wall_bomb01)
     SET_VALUE(LW(0), STRING("e_bero_2"))
     CALL_CHILD(PTR(bero_case_switch_on))
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("e_bero_2"), 4)
-    SET_VALUE(GSWF(1332), 1)
+    SET_VALUE(GSWF(GSWF_TIK01_WALL2_BOMBED), 1)
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_bom_ver2"))
     CALL(evt_offscreen_entry, STRING("offscreen"))
@@ -523,12 +481,12 @@ EVT_BEGIN(wall_bomb01)
         CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, LW(10), LW(11), LW(12), LW(13))
         CALL(evt_img_clear_virtual_point, STRING("capture_img"))
         CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_3"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("bom_kabe_4"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_3"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("bom_kabe_4"), MAPOBJ_FLAG_HIDE)
         CALL(evt_img_wait_animend, STRING("capture_img"))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_3"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("bom_kabe_4"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_3"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("bom_kabe_4"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_mapobj_clear_offscreen, 1, STRING("bom_kabe_3"))
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
@@ -542,8 +500,8 @@ EVT_END()
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), 275, LW(0), LW(1), LW(2), 16, -1, 0)
-    CALL(evt_item_flag_on, STRING("item00"), 258)
+    CALL(evt_item_entry, STRING("item00"), ITEM_DEFEND_PLUS_P, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -551,49 +509,49 @@ static EVT_BEGIN(mobj_box00)
 EVT_END()
 
 EVT_BEGIN(tik_01_init_evt)
-    SET_VALUE(GSWF(254), 1)
-    IF_INT_EQUAL(GSWF(1369), 1)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-        ELSE
-        CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG0_TIK1"), 3000)
-        SET_VALUE(GSWF(1369), 1)
+    SET_VALUE(GSWF(GSWF_LOG_MAP_TIK_ROUTE_SHOWN), 1)
+    IF_INT_EQUAL(GSWF(GSWF_TIK01_BGM_STARTED), 1)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    ELSE
+        CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_TIK1"), 3000)
+        SET_VALUE(GSWF(GSWF_TIK01_BGM_STARTED), 1)
     END_IF
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    IF_INT_EQUAL(GSWF(1191), 0)
-        IF_INT_EQUAL(GSWF(1190), 1)
-            IF_INT_GREATER_OR_EQUAL(GSW(0), 56)
-                SET_VALUE(GSWF(1191), 1)
+    IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ARRIVED), 0)
+        IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ORDERED_ALT), 1)
+            IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
+                SET_VALUE(GSWF(GSWF_GOR01_LENS_ARRIVED), 1)
             END_IF
         END_IF
     END_IF
     CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
-    IF_INT_EQUAL(GSWF(1331), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_2"), 1)
+    IF_INT_EQUAL(GSWF(GSWF_TIK01_WALL1_BOMBED), 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_dom_kabe_2"), 1, 0)
-        CALL(evt_run_case_evt, 15, 1, STRING("a_dom_kabe_1"), 0, PTR(wall_bomb00), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_1"), 1)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("a_dom_kabe_1"), 0, PTR(wall_bomb00), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_dom_kabe_1"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(1332), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_4"), 1)
+    IF_INT_EQUAL(GSWF(GSWF_TIK01_WALL2_BOMBED), 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_4"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("e_bero_2"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("e_bero_2"), 4)
-        CALL(evt_run_case_evt, 15, 1, STRING("e_bero_2"), 0, PTR(wall_bomb01), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("bom_kabe_3"), 1)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("e_bero_2"), 0, PTR(wall_bomb01), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_3"), MAPOBJ_FLAG_HIDE)
     END_IF
-    CALL(evt_mobj_itembox, STRING("mobj_box00"), 540, 125, -100, 0, 0, PTR(mobj_box00), GSWF(1355))
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), -100, 0, 50, STRING("jimen"), 125, GSWF(5589))
+    CALL(evt_mobj_itembox, STRING("mobj_box00"), 540, 125, -100, 0, 0, PTR(mobj_box00), GSWF(GSWF_TIK01_DEFEND_PLUS_P_CHEST_OPENED))
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), -100, 0, 50, STRING("jimen"), 125, GSWF(GSWF_TIK01_STAR_PIECE_PANEL))
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -455, 135, -60, 0, 0)
     SET_VALUE(LW(0), STRING("ugo_yuka_1"))
     SET_VALUE(LW(1), STRING("a_ugo_yuka_1"))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     SET_VALUE(LW(2), -15)
     SET_VALUE(LW(3), 103)
     SET_VALUE(LW(4), 2700)
@@ -609,14 +567,13 @@ EVT_BEGIN(tik_01_init_evt)
     SET_VALUE(LW(12), 0)
     SPAWN_EVENT(PTR(moving_floor))
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi1"))
-    IF_INT_LESS(GSW(0), 19)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_16_FRANKLYS_HOUSE)
         CALL(evt_npc_check_delete, STRING("トゲクリボー"))
     END_IF
-    IF_INT_LESS_OR_EQUAL(GSW(0), 11)
+    IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_10_01_FRANKLYS_TUTORIAL)
         SPAWN_EVENT(PTR(gorotuki_sanninngumi))
-        ELSE
+    ELSE
         CALL(evt_hitobj_onoff, STRING("a_rec"), 1, 0)
     END_IF
     RETURN
 EVT_END()
-

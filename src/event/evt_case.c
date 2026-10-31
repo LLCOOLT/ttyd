@@ -1,3 +1,4 @@
+// Script commands that register, run and remove case events (hit-triggered scripts, casedrv).
 #include "evt/evt_case.h"
 #include "driver/casedrv.h"
 #include "manager/evtmgr.h"
@@ -20,8 +21,7 @@ static inline s32 _caseEntry(s32 conditionId, BOOL flag, const char* hitObjName,
     ptr->priority = priority;
     if (lwData) {
         memcpy(ptr->lwData, lwData, sizeof(setup.lwData));
-    }
-    else {
+    } else {
         memset(ptr->lwData, 0, sizeof(setup.lwData));
     }
     return caseEntry(ptr);

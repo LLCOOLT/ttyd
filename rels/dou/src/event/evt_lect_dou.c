@@ -1,3 +1,4 @@
+// Pirate's Grotto (dou) lecture script: the paper genie (peramajin) teaches the boat move on a ship-change platform, run when the Boat Curse is found in dou_07.
 #include "icon_ids.h"
 #include "eff/eff_fukidashi.h"
 #include "eff/eff_itemget.h"
@@ -19,63 +20,53 @@
 #include "driver/fadedrv.h"
 #include "system.h"
 #include "evt/evt_map.h"
+#include "evt/evt_lect.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_lecture.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_window.h"
+#include "mot/mot_slit.h"
+#include "party/party_motion.h"
+#include "pmario_sound.h"
+#include "statuswindow.h"
+#include "dou.h"
+#include "driver/hitdrv.h"
+#include <dolphin/pad.h>
 
 static OSTime wwstart;
-void statusWinForceClose(void);
-void statusWinForceCloseClear(void);
 static s32 x_flag_data[2];
 static void lecture_button_disp(CameraId camera, void* param);
-typedef struct LectButtonDisp { s32 dispFlags; Vec pos; } LectButtonDisp; /* dispFlags: never accessed */
-typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDisp disp; u8 pad_18[0x40 - 0x18]; s16 iconId; s16 alpha; } LectButton;
 static LectButton lbtn[2];
-static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
-void hitGrpFlagOn(const char* name, u32 flags);
+static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
+    camera->presetPos = camera->cameraPos;
+    camera->presetAt = camera->cameraAt;
+    PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos);
+    PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt);
+    camera->startTimeA = gp->renderTime;
+    camera->durationA = 0;
+    camera->stateA = 3;
+    camera->curveA = 11;
+}
 static Vec daiv;
 void marioRollTryCancel(void);
-void motSlitCancel3(void);
 BOOL marioRollKeyDisable(void);
 
 static USER_FUNC(dai_moveti_get);
 static USER_FUNC(dai_moveti_set);
-USER_FUNC(evt_cam3d_evt_set_rel);
-USER_FUNC(evt_cam_get_at);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_motion);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_enable_key);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_trigflag_onoff);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_camid);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
 static USER_FUNC(evtflash);
 static USER_FUNC(lect_map_cam_chg);
-USER_FUNC(lect_set_systemlevel);
 static USER_FUNC(lect_status_off);
 static USER_FUNC(lect_status_on);
-USER_FUNC(lect_test_systemlevel);
 static USER_FUNC(lecture_button_flag_on_off);
 static USER_FUNC(lecture_button_rtn);
 static USER_FUNC(lecture_button_seq_wait);
 static USER_FUNC(lecture_button_set_icon_id);
 static USER_FUNC(lecture_button_set_pos);
 static USER_FUNC(lecture_button_set_seq);
-USER_FUNC(mainwindow_opendisable);
-USER_FUNC(mainwindow_openenable);
 static USER_FUNC(x_flag_get);
 static USER_FUNC(x_flag_set);
 static USER_FUNC(x_flag_wait);
@@ -92,13 +83,9 @@ static USER_FUNC(effitemgetchange_cam);
 static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings);
 static USER_FUNC(lecture_button_get_icon_id);
 static USER_FUNC(lecture_button_set_alpha);
-static void lecture_button_disp(CameraId camera, void* param);
 static USER_FUNC(x_flag_add);
 static USER_FUNC(lect_mario_ido_sum);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
-
-extern EvtWord ship_majin_lecture_init[];
-extern EvtWord ship_majin_lecture[];
 
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
@@ -183,7 +170,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
         LectButton* btn = &lbtn[i];
         LectButtonDisp* disp = &btn->disp;
 
-        if (!(btn->flags & 1)) {
+        if (!(btn->flags & LECT_BUTTON_FLAG_HIDDEN)) {
             f32 ofs;
             Vec pos;
 
@@ -248,7 +235,7 @@ static USER_FUNC(lecture_button_rtn) {
                 }
                 break;
             case 4:
-                btn->flags |= 1;
+                btn->flags |= LECT_BUTTON_FLAG_HIDDEN;
                 done++;
                 break;
         }
@@ -366,35 +353,41 @@ static USER_FUNC(effitemgetchange_cam) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 camId = evtGetValue(event, args[1]);
 
-    ((ItemGetWork*)effNameToPtr(name)->userdata)->camera = camId;
+    ItemGetWork* work = effNameToPtr(name)->userdata;
+
+    work->camera = camId;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemgetchange_cam_ptr) {
     EvtWord* args = event->args;
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, args[0]);
+    s32 camId = evtGetValue(event, args[1]);
+    ItemGetWork* work = eff->userdata;
 
-    ((ItemGetWork*)eff->userdata)->camera = evtGetValue(event, args[1]);
+    work->camera = camId;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_open) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+    ItemGetWork* work = eff->userdata;
 
-    ((ItemGetWork*)eff->userdata)->state = 1;
+    work->state = 1;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_open_ptr) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
+    ItemGetWork* work = eff->userdata;
 
-    ((ItemGetWork*)eff->userdata)->state = 1;
+    work->state = 1;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
     Vec ofs;
 
     if (up) {
@@ -417,6 +410,7 @@ static USER_FUNC(lect_mobj_hit_nasi) {
         mobj = event->thisMapObj;
     }
     for (i = 0; i < 2; i++) {
+        // hitObj[i].name is an array, so the NULL test is always true; the original code has it and MWCC still emits the compare.
         if (mobj->hitObj[i].name != NULL && strcmp(mobj->hitObj[i].name, "") != 0) {
             hitGrpFlagOn(mobj->hitObj[i].name, 1);
         }
@@ -446,7 +440,7 @@ static USER_FUNC(dai_moveti_get) {
 static USER_FUNC(lect_slit_check) {
     EvtWord* args = event->args;
 
-    if (marioGetPtr()->flags & 0x100000) {
+    if (marioGetPtr()->flags & MARIO_FLAG_PAPER_MODE) {
         evtSetValue(event, args[0], TRUE);
     } else {
         evtSetValue(event, args[0], FALSE);
@@ -460,7 +454,7 @@ static USER_FUNC(evtflash) {
     }
     switch (event->userdata[2]) {
         case 0:
-            fadeEntry(10, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+            fadeEntry(FADE_OUT_BLACK, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             event->userdata[2]++;
         case 1:
             if (fadeIsFinish() != TRUE) {
@@ -480,7 +474,7 @@ static USER_FUNC(evtflash) {
             event->userdata[2]++;
             return EVT_RETURN_BLOCK;
         case 3:
-            fadeEntry(9, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+            fadeEntry(FADE_IN_BLACK, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             event->userdata[2]++;
         case 4:
             if (fadeIsFinish() != TRUE) {
@@ -520,7 +514,7 @@ EVT_BEGIN(ship_majin_lecture_init)
 EVT_END()
 
 EVT_BEGIN(ship_majin_lecture)
-    CALL(evt_mario_trigflag_onoff, 1, 4)
+    CALL(evt_mario_trigflag_onoff, 1, MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON)
     BEGIN_SIBLING_EVENT
         CALL(lecture_button_rtn)
     END_SIBLING_EVENT
@@ -538,8 +532,8 @@ EVT_BEGIN(ship_majin_lecture)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
-    CALL(evt_npc_flag_onoff, 1, STRING("ペラ魔人"), 1536)
-    CALL(evt_npc_flag_onoff, 1, STRING("ペラ魔人"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("ペラ魔人"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("ペラ魔人"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_camid, STRING("ペラ魔人"), 7)
     WAIT_FRAMES(1)
     BEGIN_SIBLING_EVENT
@@ -572,7 +566,7 @@ EVT_BEGIN(ship_majin_lecture)
             SET_FLOAT_VALUE(LW(0), FLOAT(-270.0f))
             CALL(dai_moveti_set, LW(0), LW(2), LW(3))
             BREAK_LOOP
-            ELSE
+        ELSE
             CALL(dai_moveti_set, LW(0), LW(2), LW(3))
         END_IF
         WAIT_FRAMES(1)
@@ -649,8 +643,8 @@ EVT_BEGIN(ship_majin_lecture)
         END_INLINE_EVENT
         CALL(evt_cam_letter_box_disable, 1)
         CALL(mainwindow_opendisable)
-        CALL(evt_mario_trigflag_onoff, 1, 134217728)
-        CALL(evt_mario_trigflag_onoff, 1, 67108864)
+        CALL(evt_mario_trigflag_onoff, 1, MARIO_TRIG_FLAG_DISABLE_STICK)
+        CALL(evt_mario_trigflag_onoff, 1, MARIO_TRIG_FLAG_DISABLE_SUB_STICK)
         CALL(evt_mario_set_enable_key, 2048)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_mario_key_onoff, 1)
@@ -665,8 +659,8 @@ EVT_BEGIN(ship_majin_lecture)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_key_onoff, 0)
         CALL(lect_status_off)
-        CALL(evt_mario_trigflag_onoff, 0, 134217728)
-        CALL(evt_mario_trigflag_onoff, 0, 67108864)
+        CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_STICK)
+        CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_SUB_STICK)
         CALL(evt_mario_set_enable_key, 0)
         CALL(mainwindow_openenable)
         CALL(evt_cam_letter_box_disable, 0)
@@ -728,8 +722,8 @@ EVT_BEGIN(ship_majin_lecture)
         END_INLINE_EVENT
         CALL(evt_cam_letter_box_disable, 1)
         CALL(mainwindow_opendisable)
-        CALL(evt_mario_trigflag_onoff, 1, 134217728)
-        CALL(evt_mario_trigflag_onoff, 1, 67108864)
+        CALL(evt_mario_trigflag_onoff, 1, MARIO_TRIG_FLAG_DISABLE_STICK)
+        CALL(evt_mario_trigflag_onoff, 1, MARIO_TRIG_FLAG_DISABLE_SUB_STICK)
         CALL(evt_mario_set_enable_key, 2048)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_mario_key_onoff, 1)
@@ -744,8 +738,8 @@ EVT_BEGIN(ship_majin_lecture)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_key_onoff, 0)
         CALL(lect_status_off)
-        CALL(evt_mario_trigflag_onoff, 0, 134217728)
-        CALL(evt_mario_trigflag_onoff, 0, 67108864)
+        CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_STICK)
+        CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_SUB_STICK)
         CALL(evt_mario_set_enable_key, 0)
         CALL(mainwindow_openenable)
         CALL(x_flag_set, 0, 2)
@@ -789,7 +783,7 @@ EVT_BEGIN(ship_majin_lecture)
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_mario_set_dir, 90, 300, 0)
             CALL(evt_msg_print_add, 0, STRING("stg1_gon_majin4_17"))
-            ELSE
+        ELSE
             CALL(x_flag_set, 0, 2)
             WAIT_FRAMES(2)
             BREAK_LOOP
@@ -806,7 +800,7 @@ EVT_BEGIN(ship_majin_lecture)
                 CALL(dai_moveti_set, LW(0), LW(2), LW(3))
                 CALL(x_flag_set, 0, 2)
                 BREAK_LOOP
-                ELSE
+            ELSE
                 CALL(dai_moveti_set, LW(0), LW(2), LW(3))
             END_IF
             WAIT_FRAMES(1)
@@ -820,14 +814,14 @@ EVT_BEGIN(ship_majin_lecture)
     WAIT_MS(200)
     CALL(evt_npc_set_camid, STRING("ペラ魔人"), 4)
     CALL(evt_npc_set_position, STRING("ペラ魔人"), 0, -1000, 0)
-    CALL(evt_mario_trigflag_onoff, 0, 4)
+    CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON)
     RETURN
 EVT_END()
 
 static USER_FUNC(lect_push_r_check) {
     EvtWord* args = event->args;
 
-    if (keyGetButton(0) & 0x20) {
+    if (keyGetButton(0) & PAD_TRIGGER_R) {
         evtSetValue(event, args[0], TRUE);
     } else {
         evtSetValue(event, args[0], FALSE);
@@ -840,19 +834,16 @@ static USER_FUNC(evt_nomal_cange) {
 
     if (isFirstCall) {
         marioRollTryCancel();
-        if (mario->flags & 0x100000) {
+        if (mario->flags & MARIO_FLAG_PAPER_MODE) {
             motSlitCancel3();
         }
     }
     if (!marioRollKeyDisable()) {
         return EVT_RETURN_BLOCK;
     }
-    return (mario->dispFlags & 0x1000000) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
+    return (mario->dispFlags & MARIO_DISP_FLAG_SLIT) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
-
-BOOL psndBGMStartCheck(s32 id);
 
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-

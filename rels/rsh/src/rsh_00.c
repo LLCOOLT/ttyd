@@ -1,3 +1,7 @@
+// rsh_00 (列車, Excess Express): the driver's cab: driver NPC, controls and schedule board, a Smorg (moamoa) window
+// scene; door to rsh_01.
+
+// defer_codegen: the original emits this unit's functions in deferred order (checked by removing it).
 #pragma defer_codegen on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -16,80 +20,54 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 #include "driver/extdrv.h"
+#include "map/moamoa.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "libc_decls.h"
 
-typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; Vec pos; f32 angle; s16 pose; u64 startTime; } Moamoa;
-typedef struct MoamoaWork { s32 flags; s32 count; Moamoa* moa; s32 numDefs; MoamoaPoseDef defs[32]; } MoamoaWork;
-typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
-static MoamoaWork* wp;
-int rand(void);
+typedef struct MoamoaScene {
+    u16 flags;
+    s16 state;
+    s16 timer;
+    Vec pos;
+    f32 angle;
+    s16 pose;
+    u64 startTime;
+} MoamoaScene;
+typedef struct MoamoaSceneWork {
+    s32 flags;
+    s32 count;
+    MoamoaScene* moa;
+    s32 numDefs;
+    MoamoaPoseDef defs[32];
+} MoamoaSceneWork;
+
+static MoamoaSceneWork* wp;
 static f32 randf(f32 min, f32 max);
 static void moamoa_pose_init(void);
-static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-double sin(double x);
-double cos(double x);
+static void moamoa_pose_change(MoamoaScene* moa, const char* model, const char* anim);
 static void moamoa_pose_main(void);
 static void ext_disp(CameraId camera, void* param);
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_item_get_item_end_wait);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_moamoa_set_one);
-USER_FUNC(evt_moamoa_set_seq_all);
-USER_FUNC(evt_mobj_kururing_floor);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfx_vol);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_mapname);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
 void moamoa_dispent(void);
 void moamoa_main(void);
-static void ext_disp(CameraId camera, void* param);
 void moamoa_init(void);
-static f32 randf(f32 min, f32 max);
-static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-static void moamoa_pose_main(void);
-static void moamoa_pose_init(void);
 
-ExtTexInfo moamoa_data[81];
-extern EvtWord evt_rsh_moamoa_on_window[];
+MoamoaData moamoa_data[81];
 static BeroEntry bero_data_a[2];
 static BeroEntry bero_data_b[2];
 static BeroEntry bero_data_c[2];
@@ -98,16 +76,10 @@ extern EvtWord regu_unten[];
 static NpcSetupInfo npc_data[2];
 static const char* access_tbl[5];
 extern EvtWord rsh_00_init_evt[];
-extern EvtWord rsh_00_a_init_evt[];
-extern EvtWord rsh_00_b_init_evt[];
 static const char* window_tbl[5];
-extern EvtWord rsh_00_c_init_evt[];
 extern EvtWord rsh_00_init_evt_nidome[];
-extern EvtWord rsh_00_a_init_evt_nidome[];
-extern EvtWord rsh_00_b_init_evt_nidome[];
-extern EvtWord rsh_00_c_init_evt_nidome[];
 
-ExtTexInfo moamoa_data[] = {
+MoamoaData moamoa_data[] = {
     {"c_n_moa_a", "S_1", 0.0f},
     {"c_n_moa_a", "S_1", 1.0f},
     {"c_n_moa_a", "S_1", 2.0f},
@@ -191,9 +163,10 @@ ExtTexInfo moamoa_data[] = {
     {0},
 };
 
+// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 static void moamoa_pose_init(void) {
-    MoamoaData* data = (MoamoaData*)moamoa_data;
+    MoamoaData* data = moamoa_data;
     s32 i = 0;
     s32 start;
     char model[32];
@@ -232,7 +205,7 @@ static void moamoa_pose_main(void) {
     u64 now;
     s32 i;
     ExtdrvPose* pose;
-    Moamoa* moa;
+    MoamoaScene* moa;
     MoamoaPoseDef* def;
 
     pose = extGetPosePtr();
@@ -254,7 +227,7 @@ static void moamoa_pose_main(void) {
     }
 }
 
-static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
+static void moamoa_pose_change(MoamoaScene* moa, const char* model, const char* anim) {
     MoamoaPoseDef* def = wp->defs;
     s32 i;
 
@@ -281,14 +254,14 @@ static f32 randf(f32 min, f32 max) {
 void moamoa_init(void) {
     s32 i;
     ExtdrvPose* pose;
-    Moamoa* moa;
+    MoamoaScene* moa;
     f32 x, y, z;
 
-    wp = _mapAlloc(sizeof(MoamoaWork));
-    memset(wp, 0, sizeof(MoamoaWork));
+    wp = _mapAlloc(sizeof(MoamoaSceneWork));
+    memset(wp, 0, sizeof(MoamoaSceneWork));
     wp->count = extGetPoseNum();
-    wp->moa = _mapAlloc(wp->count * sizeof(Moamoa));
-    memset(wp->moa, 0, wp->count * sizeof(Moamoa));
+    wp->moa = _mapAlloc(wp->count * sizeof(MoamoaScene));
+    memset(wp->moa, 0, wp->count * sizeof(MoamoaScene));
     moamoa_pose_init();
     pose = extGetPosePtr();
     moa = wp->moa;
@@ -307,14 +280,14 @@ void moamoa_init(void) {
             if (x < 185.0f) {
                 z = randf(-160.0f, -165.0f);
             } else if (x < 257.0f) {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                 z = 0.8f * (x - 185.0f) + -160.0f;
                 z += 50.0f;
 #else
                 z = 0.8f * (x - 185.0f) + -160.0f;
 #endif
             } else {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                 z = randf(-90.0f, -20.0f);
                 z += 50.0f;
 #else
@@ -383,7 +356,7 @@ static void ext_disp(CameraId camera, void* param) {
 void moamoa_main(void) {
     s32 i;
     ExtdrvPose* pose;
-    Moamoa* moa;
+    MoamoaScene* moa;
     f32 r;
 
     pose = extGetPosePtr();
@@ -406,12 +379,12 @@ void moamoa_main(void) {
             case 3:
                 if (moa->timer < 20) {
                     if (!(moa->flags & 1)) {
-                        r = intplGetValue(2, ++moa->timer, 20, 50.0f, 0.0f);
+                        r = intplGetValue(2, 50.0f, 0.0f, ++moa->timer, 20);
                         (*pose->mtx)[0][3] = moa->pos.x + r * (f32)sin(moa->angle);
                         (*pose->mtx)[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
                         (*pose->mtx)[2][3] = moa->pos.z;
                     } else {
-                        r = intplGetValue(2, ++moa->timer, 20, 50.0f, 0.0f);
+                        r = intplGetValue(2, 50.0f, 0.0f, ++moa->timer, 20);
                         (*pose->mtx)[0][3] = moa->pos.x;
                         (*pose->mtx)[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
                         (*pose->mtx)[2][3] = moa->pos.z;
@@ -439,7 +412,7 @@ void moamoa_dispent(void) {
 
 USER_FUNC(evt_moamoa_set_one) {
     EvtWord* args = event->args;
-    Moamoa* moa;
+    MoamoaScene* moa;
     s32 idx = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
@@ -460,7 +433,7 @@ USER_FUNC(evt_moamoa_set_one) {
 USER_FUNC(evt_moamoa_set_seq_all) {
     s32 seq = evtGetValue(event, event->args[0]);
     s32 i;
-    Moamoa* moa;
+    MoamoaScene* moa;
 
     extGetPosePtr();
     moa = wp->moa;
@@ -471,10 +444,10 @@ USER_FUNC(evt_moamoa_set_seq_all) {
 }
 
 static EVT_BEGIN(evt_moamoa)
-    CALL(evt_snd_bgmoff_f, 512, 120)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 120)
     CALL(evt_cam3d_evt_set, -70, 113, 373, 126, 38, -13, 500, 11)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 1, STRING("運転手"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("運転手"), NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, 85, -110, FLOAT(80.0f))
         CALL(evt_party_set_dir, 0, 90, 200)
@@ -483,7 +456,7 @@ static EVT_BEGIN(evt_moamoa)
     CALL(evt_mario_set_dir, 90, 200, 0)
     CALL(evt_set_dir_to_target, STRING("運転手"), STRING("mario"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_231"), 0, STRING("me"))
-    CALL(evt_npc_flag_onoff, 0, STRING("運転手"), 32)
+    CALL(evt_npc_flag_onoff, 0, STRING("運転手"), NPC_FLAG_INTANGIBLE)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_VOICE1"), 265, 25, -145, 0)
     CALL(evt_moamoa_set_one, 0, 265, 25, -145)
     CALL(evt_moamoa_set_one, 1, 265, 35, -230)
@@ -491,10 +464,10 @@ static EVT_BEGIN(evt_moamoa)
     CALL(evt_npc_reverse_ry, STRING("me"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_232"), 0, STRING("me"))
     BEGIN_INLINE_EVENT
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SURPRISED1"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SURPRISED1"))
         WAIT_MS(2000)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_snd_sfxon, STRING("SFX_STG6_MOAMOA_VOICE2"), LW(10))
@@ -503,7 +476,7 @@ static EVT_BEGIN(evt_moamoa)
     END_INLINE_EVENT
     CALL(evt_moamoa_set_seq_all, 1)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 329)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_46_ENGINEER)
     LOOP(3)
         CALL(evt_cam3d_evt_set, -2, 86, 230, 126, 38, -13, 350, 11)
         WAIT_MS(350)
@@ -514,7 +487,7 @@ static EVT_BEGIN(evt_moamoa)
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 0, STRING("a"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff_fukidashi, 3, STRING("b"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    CALL(evt_npc_flag_onoff, 0, STRING("me"), 1536)
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_set_anim, STRING("me"), STRING("B_1"))
     CALL(evt_mario_set_pose, STRING("M_I_N"))
     WAIT_MS(1000)
@@ -553,8 +526,8 @@ static EVT_BEGIN(evt_moamoa)
 EVT_END()
 
 EVT_BEGIN(evt_rsh_moamoa_on_window)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(329, 331)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG6_46_ENGINEER, STORY_STG6_47_ESCAPING_THE_SMORGS)
         CALL(evt_snd_sfxon, STRING("SFX_STG6_MOAMOA_VOICE2"), LW(10))
         CALL(evt_snd_sfx_vol, LW(10), 88)
         CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
@@ -572,8 +545,8 @@ static BeroEntry bero_data_a[] = {
         "w_bero", // hitName
         1, // type
         8, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -594,8 +567,8 @@ static BeroEntry bero_data_b[] = {
         "w_bero", // hitName
         1, // type
         8, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -616,8 +589,8 @@ static BeroEntry bero_data_c[] = {
         "w_bero", // hitName
         1, // type
         8, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -635,8 +608,8 @@ static BeroEntry bero_data_c[] = {
 
 EVT_BEGIN(evt_handle)
     LOOP(0)
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 329)
-            IF_INT_LESS(GSW(0), 334)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_46_ENGINEER)
+            IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_49_POSHLEY_HEIGHTS)
                 BREAK_LOOP
             END_IF
         END_IF
@@ -685,31 +658,31 @@ EVT_BEGIN(regu_unten)
     SET_VALUE(LW(6), 0)
     SET_VALUE(LW(7), 0)
     LOOP(0)
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 310)
-            IF_INT_LESS(GSW(0), 326)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_27_RIVERSIDE_STATION)
+            IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_43_CONDUCTOR_APPEARS)
                 RETURN
             END_IF
         END_IF
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 329)
-            IF_INT_LESS(GSW(0), 339)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_46_ENGINEER)
+            IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_54_WELCOME_BACK)
                 RETURN
             END_IF
         END_IF
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 346)
-            IF_INT_EQUAL(GSWF(3579), 1)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_57_A_MAIL_FROM_PEACH)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 1)
                 RETURN
             END_IF
-            IF_INT_EQUAL(GSWF(3581), 1)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 1)
                 RETURN
             END_IF
-            IF_INT_EQUAL(GSWF(3580), 1)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_POSHLEY), 1)
                 RETURN
             END_IF
         END_IF
         CALL(evt_sub_random, 300, LW(10))
         SWITCH(LW(10))
             CASE_LESS(100)
-            IF_INT_LESS(GSW(0), 328)
+            IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_45_DAY_3_STARTS)
             END_IF
             SET_VALUE(LW(2), LW(3))
             CALL(evt_sub_random, 135, LW(10))
@@ -724,7 +697,7 @@ EVT_BEGIN(regu_unten)
                 GOTO(0)
             END_IF
             CASE_LESS(200)
-            IF_INT_LESS(GSW(0), 328)
+            IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_45_DAY_3_STARTS)
             END_IF
             SET_VALUE(LW(4), LW(5))
             CALL(evt_sub_random, 40, LW(10))
@@ -739,7 +712,7 @@ EVT_BEGIN(regu_unten)
                 GOTO(1)
             END_IF
             CASE_DEFAULT
-            IF_INT_LESS(GSW(0), 328)
+            IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_45_DAY_3_STARTS)
             END_IF
             SET_VALUE(LW(6), LW(7))
             CALL(evt_sub_random, 135, LW(10))
@@ -763,27 +736,27 @@ EVT_BEGIN(regu_unten)
 EVT_END()
 
 static EVT_BEGIN(init_unten)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(329, 331)
-        CALL(evt_npc_flag_onoff, 0, STRING("me"), 1536)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG6_46_ENGINEER, STORY_STG6_47_ESCAPING_THE_SMORGS)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
         CALL(evt_npc_set_anim, STRING("me"), STRING("B_2"))
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(talk_unten)
-    SWITCH(GSW(0))
-        CASE_LESS(288)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_06_PENNINGTONS_ASSISTANT)
         IF_INT_EQUAL(LSWF(1), 0)
             CALL(evt_msg_print, 0, STRING("stg6_rsh_00"), 0, 0)
             SET_VALUE(LSWF(1), 1)
-            ELSE
+        ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_01"), 0, 0)
             SET_VALUE(LSWF(1), 0)
         END_IF
-        CASE_LESS(292)
+        CASE_LESS(STORY_STG6_10_THE_CONDUCTOR_ZIP_TOAD)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
-        CASE_LESS(293)
+        CASE_LESS(STORY_STG6_11_OBTAIN_AUTOGRAPH)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_108"), 0, STRING("me"))
         CALL(evt_npc_set_anim, STRING("me"), STRING("A_1"))
         WAIT_MS(500)
@@ -793,48 +766,48 @@ static EVT_BEGIN(talk_unten)
         WAIT_MS(2000)
         CALL(evt_npc_set_anim, STRING("me"), STRING("A_3"))
         WAIT_MS(500)
-        CALL(evt_item_entry, STRING("sign"), 77, 0, 0, 0, 17, -1, 0)
+        CALL(evt_item_entry, STRING("sign"), ITEM_AUTOGRAPH, 0, 0, 0, 17, -1, 0)
         CALL(evt_item_get_item, STRING("sign"))
         CALL(evt_item_get_item_end_wait, STRING("sign"))
         CALL(evt_npc_set_anim, STRING("me"), STRING("T_1"))
         CALL(evt_msg_print, 0, STRING("stg6_rsh_110"), 0, STRING("me"))
-        SET_VALUE(GSW(0), 293)
-        CASE_LESS(294)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_11_OBTAIN_AUTOGRAPH)
+        CASE_LESS(STORY_STG6_12_GIVE_AUTOGRAPH)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
-        CASE_LESS(301)
+        CASE_LESS(STORY_STG6_19_GIVE_BLANKET)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_02"), 0, 0)
-        CASE_LESS(303)
+        CASE_LESS(STORY_STG6_21_DAY_2)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_147_01"), 0, 0)
-        CASE_LESS(310)
+        CASE_LESS(STORY_STG6_27_RIVERSIDE_STATION)
         IF_INT_EQUAL(LSWF(2), 0)
             CALL(evt_msg_print, 0, STRING("stg6_rsh_152"), 0, 0)
             SET_VALUE(LSWF(2), 1)
-            ELSE
+        ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_153"), 0, 0)
         END_IF
-        CASE_LESS(326)
+        CASE_LESS(STORY_STG6_43_CONDUCTOR_APPEARS)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_209"), 0, 0)
-        CASE_LESS(327)
+        CASE_LESS(STORY_STG6_44_END_OF_DAY_2)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_217"), 0, 0)
-        CASE_LESS(329)
+        CASE_LESS(STORY_STG6_46_ENGINEER)
         CALL_CHILD(PTR(evt_moamoa))
-        CASE_LESS(332)
+        CASE_LESS(STORY_STG6_48_SMORG_MIASMA)
         CALL(evt_npc_set_anim, STRING("me"), STRING("T_2"))
         CALL(evt_msg_print, 0, STRING("stg6_rsh_235"), 0, 0)
         CALL(evt_npc_set_anim, STRING("me"), STRING("B_2"))
-        CASE_LESS(346)
+        CASE_LESS(STORY_STG6_57_A_MAIL_FROM_PEACH)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_253"), 0, 0)
         CASE_DEFAULT
-        IF_INT_EQUAL(GSWF(3580), 1)
+        IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_POSHLEY), 1)
             CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08_1"), 0, 0)
             RETURN
         END_IF
-        IF_INT_EQUAL(GSWF(3578), 0)
+        IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
             CALL(evt_msg_print, 0, STRING("stg6_rsh_c_07"), 0, 0)
-            ELSE
-            IF_INT_EQUAL(GSWF(3581), 0)
+        ELSE
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
                 CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
-                ELSE
+            ELSE
                 CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08_1"), 0, 0)
             END_IF
         END_IF
@@ -845,7 +818,7 @@ EVT_END()
 static NpcSetupInfo npc_data[] = {
     {
         /*"運転手"*/"\x89\x5E\x93\x5D\x8E\xE8", // name
-        0x40020610, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, // reactionFlags
         init_unten, // initEvent
         regu_unten, // regularEvent
@@ -880,15 +853,15 @@ static EVT_BEGIN(evt_access_entry)
         IF_INT_EQUAL(LW(0), 0)
             BREAK_LOOP
         END_IF
-        CALL(evt_run_case_evt, 9, 1, LW(0), 0, PTR(evt_access), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(0), 0, PTR(evt_access), 0)
     END_LOOP
     RETURN
 EVT_END()
 
 EVT_BEGIN(rsh_00_init_evt)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(310, 325)
-        CASE_GREATER_OR_EQUAL(333)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG6_27_RIVERSIDE_STATION, STORY_STG6_42_DRAWBRIDGE_DOWN)
+        CASE_GREATER_OR_EQUAL(STORY_STG6_48_01_ARRIVING_AT_POSHLEY)
         CASE_DEFAULT
         CALL(evt_map_playanim, STRING("yure"), 1, 0)
         CALL(evt_map_playanim, STRING("hai_sora"), 1, 0)
@@ -903,44 +876,44 @@ EVT_BEGIN(rsh_00_init_evt)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -210, 60, -145, 0, 0)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_NOT_EQUAL(LW(0), STRING("rsh_00_c"))
-        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_zentai"), 125, GSWF(5648))
-        ELSE
-        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_yuka1"), 125, GSWF(5648))
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_zentai"), 125, GSWF(GSWF_RSH00_STAR_PIECE_PANEL))
+    ELSE
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_yuka1"), 125, GSWF(GSWF_RSH00_STAR_PIECE_PANEL))
     END_IF
-    SWITCH(GSW(0))
-        CASE_BETWEEN(284, 286)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
-        CASE_BETWEEN(304, 309)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
-        CASE_BETWEEN(310, 325)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_HOM1"))
-        CALL(evt_snd_envoff, 512)
-        CALL(evt_snd_bgmoff, 26624)
-        CASE_BETWEEN(327, 328)
-        CALL(evt_snd_bgmoff, 512)
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
-        CASE_BETWEEN(329, 331)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
-        CASE_BETWEEN(334, 344)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_PIK1"))
-        CALL(evt_snd_envoff, 512)
-        CALL(evt_snd_bgmoff, 26624)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG6_02_A_CASE_OF_LOST_STEW, STORY_STG6_04_GRILLING_HEFF_T)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_POWAN1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(STORY_STG6_22_DOCUMENT, STORY_STG6_26_ZIP_TOAD_CAUGHT)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_POWAN1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(STORY_STG6_27_RIVERSIDE_STATION, STORY_STG6_42_DRAWBRIDGE_DOWN)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_HOM1"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
+        CASE_BETWEEN(STORY_STG6_44_END_OF_DAY_2, STORY_STG6_45_DAY_3_STARTS)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(STORY_STG6_46_ENGINEER, STORY_STG6_47_ESCAPING_THE_SMORGS)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(STORY_STG6_49_POSHLEY_HEIGHTS, STORY_STG6_55_04_BOWSER_RAWK_HAWK)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         CASE_DEFAULT
         CALL(evt_sub_get_mapname, LW(0))
         IF_STR_EQUAL(LW(0), STRING("rsh_00_a"))
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH1"))
-            CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_RSH1"))
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
         END_IF
         IF_STR_EQUAL(LW(0), STRING("rsh_00_b"))
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH3"))
-            CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_RSH3"))
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
         END_IF
         IF_STR_EQUAL(LW(0), STRING("rsh_00_c"))
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH2"))
-            CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_RSH2"))
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
         END_IF
     END_SWITCH
     RETURN
@@ -951,14 +924,14 @@ EVT_BEGIN(rsh_00_a_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(rsh_00_init_evt))
-    SWITCH(GSW(0))
-        CASE_BETWEEN(328, 331)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG6_45_DAY_3_STARTS, STORY_STG6_47_ESCAPING_THE_SMORGS)
         CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
         CALL(evt_npc_set_position, STRING("moa_a"), 0, -1000, 0)
         CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
         CALL(evt_npc_set_position, STRING("moa_b"), 0, -1000, 0)
         CALL(evt_ext_entry, 1000, PTR(moamoa_data), PTR(moamoa_init), PTR(moamoa_main), PTR(moamoa_dispent))
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 329)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_46_ENGINEER)
             CALL(evt_moamoa_set_seq_all, 4)
         END_IF
     END_SWITCH
@@ -992,16 +965,16 @@ EVT_BEGIN(rsh_00_c_init_evt)
 EVT_END()
 
 EVT_BEGIN(rsh_00_init_evt_nidome)
-    IF_INT_EQUAL(GSWF(3579), 0)
-        IF_INT_EQUAL(GSWF(3580), 0)
-            IF_INT_EQUAL(GSWF(3581), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
+        IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
                 CALL(evt_map_playanim, STRING("yure"), 1, 0)
-                IF_INT_EQUAL(GSWF(3578), 0)
+                IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
                     CALL(evt_map_playanim, STRING("hai_sora"), 1, 0)
                     CALL(evt_map_playanim, STRING("hai_yama"), 1, 0)
                     CALL(evt_map_playanim, STRING("hai_iwayama"), 1, 0)
                     CALL(evt_map_playanim, STRING("hai_saboten"), 1, 0)
-                    ELSE
+                ELSE
                     CALL(evt_map_playanim, STRING("rt_hai_sora"), 1, 0)
                     CALL(evt_map_playanim, STRING("rt_hai_yama"), 1, 0)
                     CALL(evt_map_playanim, STRING("rt_hai_iwayama"), 1, 0)
@@ -1014,31 +987,31 @@ EVT_BEGIN(rsh_00_init_evt_nidome)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -210, 60, -145, 0, 0)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_NOT_EQUAL(LW(0), STRING("rsh_00_c"))
-        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_zentai"), 125, GSWF(5648))
-        ELSE
-        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_yuka1"), 125, GSWF(5648))
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_zentai"), 125, GSWF(GSWF_RSH00_STAR_PIECE_PANEL))
+    ELSE
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_yuka1"), 125, GSWF(GSWF_RSH00_STAR_PIECE_PANEL))
     END_IF
     CALL_CHILD(PTR(evt_access_entry))
-    IF_INT_EQUAL(GSWF(3460), 1)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_PIK1"))
-        CALL(evt_snd_envoff, 512)
-        CALL(evt_snd_bgmoff, 26624)
+    IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_POSHLEY), 1)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
+    ELSE
+        IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
+            CALL(evt_snd_envoff, PSND_FADE_OUT)
+            CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         ELSE
-        IF_INT_EQUAL(GSWF(3461), 1)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
-            CALL(evt_snd_envoff, 512)
-            CALL(evt_snd_bgmoff, 26624)
-            ELSE
             CALL(evt_sub_get_mapname, LW(0))
             IF_STR_EQUAL(LW(0), STRING("rsh_00_a"))
-                CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH1"))
-                CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+                CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_RSH1"))
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
             END_IF
             IF_STR_EQUAL(LW(0), STRING("rsh_00_b"))
             END_IF
             IF_STR_EQUAL(LW(0), STRING("rsh_00_c"))
-                CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH2"))
-                CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+                CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_RSH2"))
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
             END_IF
         END_IF
     END_IF
@@ -1070,5 +1043,3 @@ EVT_BEGIN(rsh_00_c_init_evt_nidome)
     CALL_CHILD(PTR(evt_rsh_window))
     RETURN
 EVT_END()
-
-int rand(void);

@@ -1,3 +1,5 @@
+// aji_01 (敵のアジト, X-Naut Fortress): the central hall: its many doors, the card-key elevators (ele_1,
+// ele_2, key_lock), the password (evt_aikotoba), the X-Naut underlings, and Peach's visits.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -8,103 +10,28 @@
 #include "evt/evt_npc.h"
 #include "aji.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_cam3d_event_from_road);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_set_now);
-USER_FUNC(evt_cam3d_get_shift);
-USER_FUNC(evt_cam3d_road_shift_onoff);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_cam_shift_reset);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_mode);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_change_interrupt);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_height);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_stay_anim);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_set_width);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_get_status);
-USER_FUNC(evt_party_jump_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_nokotaro_get_status);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_peach_transform_gundan_on);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_win_item_select);
-USER_FUNC(evt_win_nameent_name);
-USER_FUNC(evt_win_nameent_off);
-USER_FUNC(evt_win_nameent_on);
-USER_FUNC(evt_win_nameent_wait);
 USER_FUNC(get_password);
 static USER_FUNC(peach_evt_toumei);
 static USER_FUNC(peach_set_pose);
@@ -151,7 +78,6 @@ extern EvtWord teshita2_regl[];
 extern EvtWord teshita3_talk[];
 extern EvtWord teshita3_regl[];
 static NpcSetupInfo npcEnt[4];
-extern EvtWord aji_01_init_evt[];
 
 static EVT_BEGIN(w1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -382,8 +308,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_1", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -400,8 +326,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_1", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -418,8 +344,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_2", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -436,8 +362,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_2", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -454,8 +380,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero_1", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -472,8 +398,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero_2", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -490,8 +416,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero_3", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -508,8 +434,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero_4", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -526,8 +452,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_3", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -544,8 +470,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero3", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -562,8 +488,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_4", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -580,8 +506,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_4", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -598,8 +524,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_5", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -616,8 +542,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_5", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -637,8 +563,8 @@ BeroEntry e_bero_5_peach[] = {
     {
         "e_bero_5", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -658,29 +584,29 @@ s32 elv_key1[] = {
 EVT_BEGIN(elv_unlock1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_65"), 0, 0)
-    CALL(evt_pouch_check_item, 27, LW(0))
+    CALL(evt_pouch_check_item, ITEM_ELEVATOR_KEY_0x1B, LW(0))
     IF_INT_LESS(LW(0), 1)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
     CALL(evt_win_item_select, 0, PTR(elv_key1), LW(0), 0)
     IF_INT_NOT_EQUAL(LW(0), -1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi1_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi2_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi3_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi1_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi2_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi3_mid"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi1_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi2_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi3_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi1_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi2_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi3_mid"), MAPOBJ_FLAG_HIDE)
         CALL(evt_pouch_remove_item, LW(0), LW(1))
         SET_VALUE(LW(0), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi1"), 0, PTR(ele_1), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi1"), 0, PTR(ele_1), 0)
         SET_VALUE(LW(0), 1)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi2"), 0, PTR(ele_1), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi2"), 0, PTR(ele_1), 0)
         SET_VALUE(LW(0), 2)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi3"), 0, PTR(ele_1), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi3"), 0, PTR(ele_1), 0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_ELEVATOR_KEY1"), LW(0), LW(1), LW(2), 0)
-        SET_VALUE(GSW(0), 363)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_10_ELEVATOR_ACTIVATED)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_exit_case_evt)
         RETURN
@@ -696,29 +622,29 @@ s32 elv_key2[] = {
 EVT_BEGIN(elv_unlock2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_65"), 0, 0)
-    CALL(evt_pouch_check_item, 28, LW(0))
+    CALL(evt_pouch_check_item, ITEM_ELEVATOR_KEY_0x1C, LW(0))
     IF_INT_LESS(LW(0), 1)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
     CALL(evt_win_item_select, 0, PTR(elv_key2), LW(0), 0)
     IF_INT_NOT_EQUAL(LW(0), -1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi4_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi5_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi6_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi4_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi5_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi6_mid"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi4_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi5_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi6_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi4_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi5_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi6_mid"), MAPOBJ_FLAG_HIDE)
         CALL(evt_pouch_remove_item, LW(0), LW(1))
         SET_VALUE(LW(0), 2)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi4"), 0, PTR(ele_2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi4"), 0, PTR(ele_2), 0)
         SET_VALUE(LW(0), 3)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi5"), 0, PTR(ele_2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi5"), 0, PTR(ele_2), 0)
         SET_VALUE(LW(0), 4)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi6"), 0, PTR(ele_2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi6"), 0, PTR(ele_2), 0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_ELEVATOR_KEY1"), LW(0), LW(1), LW(2), 0)
-        SET_VALUE(GSW(0), 368)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_15_ROOM_KEYS)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_exit_case_evt)
         RETURN
@@ -1000,7 +926,7 @@ EVT_BEGIN(ele_1)
     CALL(evt_sub_intpl_msec_get_value)
     CALL(evt_mapobj_trans, 1, STRING("ere1_m"), 0, LW(0), 0)
     CALL(evt_hit_bind_update, STRING("A_ere1_m"))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mapobj_get_position, STRING("ere1_m"), LW(2), LW(3), LW(4))
     CALL(evt_snd_sfx_pos, LW(9), LW(2), LW(3), LW(4))
 #endif
@@ -1131,7 +1057,7 @@ EVT_END()
 
 EVT_BEGIN(ele_2)
     SET_VALUE(LW(5), LW(0))
-    IF_INT_LESS(GSW(0), 367)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_14_ELEVATOR_KEY_B)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_msg_print, 0, STRING("stg7_aji_65"), 0, 0)
         CALL(evt_mario_key_onoff, 1)
@@ -1314,7 +1240,7 @@ EVT_BEGIN(ele_2)
     CALL(evt_sub_intpl_msec_get_value)
     CALL(evt_mapobj_trans, 1, STRING("ere2_m"), 0, LW(0), 0)
     CALL(evt_hit_bind_update, STRING("A_ere2_m"))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mapobj_get_position, STRING("ere2_m"), LW(2), LW(3), LW(4))
     CALL(evt_snd_sfx_pos, LW(9), LW(2), LW(3), LW(4))
 #endif
@@ -1348,54 +1274,54 @@ EVT_BEGIN(ele_2)
 EVT_END()
 
 static EVT_BEGIN(evt_elv_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(373, 375)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi1_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi2_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi3_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi1_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi2_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi3_mid"), 1)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi1"), 0, PTR(last_elv_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi2"), 0, PTR(last_elv_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi3"), 0, PTR(last_elv_lock), 0)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG7_20_LORD_CRUMP_DEFEATED, STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi1_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi2_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi3_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi1_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi2_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi3_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi1"), 0, PTR(last_elv_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi2"), 0, PTR(last_elv_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi3"), 0, PTR(last_elv_lock), 0)
         CASE_DEFAULT
-        IF_INT_LESS(GSW(0), 363)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi1_aka"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi1_mid"), 1)
-            CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi1"), 0, PTR(elv_unlock1), 0)
-            ELSE
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi1_aka"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi2_aka"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi3_aka"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi1_mid"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi2_mid"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi3_mid"), 1)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_10_ELEVATOR_ACTIVATED)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi1_aka"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi1_mid"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi1"), 0, PTR(elv_unlock1), 0)
+        ELSE
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi1_aka"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi2_aka"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi3_aka"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi1_mid"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi2_mid"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi3_mid"), MAPOBJ_FLAG_HIDE)
             SET_VALUE(LW(0), 0)
-            CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi1"), 0, PTR(ele_1), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi1"), 0, PTR(ele_1), 0)
             SET_VALUE(LW(0), 1)
-            CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi2"), 0, PTR(ele_1), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi2"), 0, PTR(ele_1), 0)
             SET_VALUE(LW(0), 2)
-            CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi3"), 0, PTR(ele_1), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi3"), 0, PTR(ele_1), 0)
         END_IF
     END_SWITCH
-    IF_INT_LESS(GSW(0), 368)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi4_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi4_mid"), 1)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi4"), 0, PTR(elv_unlock2), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi4_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi5_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi6_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi4_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi5_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi6_mid"), 1)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_15_ROOM_KEYS)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi4_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi4_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi4"), 0, PTR(elv_unlock2), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi4_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi5_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi6_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi4_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi5_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi6_mid"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), 2)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi4"), 0, PTR(ele_2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi4"), 0, PTR(ele_2), 0)
         SET_VALUE(LW(0), 3)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi5"), 0, PTR(ele_2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi5"), 0, PTR(ele_2), 0)
         SET_VALUE(LW(0), 4)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi6"), 0, PTR(ele_2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi6"), 0, PTR(ele_2), 0)
     END_IF
     SET_VALUE(GW(0), 2)
     SET_VALUE(GW(1), 4)
@@ -1414,9 +1340,9 @@ EVT_END()
 EVT_BEGIN(last_key_lock)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_45_02"), 0, 0)
-    IF_INT_LESS(GSW(1071), 3)
-        ADD(GSW(1071), 1)
-        IF_INT_EQUAL(GSW(1071), 3)
+    IF_INT_LESS(GSW(GSW_AJI01_LOCKED_DOOR_TRIES), 3)
+        ADD(GSW(GSW_AJI01_LOCKED_DOOR_TRIES), 1)
+        IF_INT_EQUAL(GSW(GSW_AJI01_LOCKED_DOOR_TRIES), 3)
             CALL(evt_party_stop, 0)
             WAIT_MS(500)
             CALL(evt_msg_print_party, STRING("stg7_aji_45_03"))
@@ -1430,9 +1356,9 @@ EVT_END()
 EVT_BEGIN(last_elv_lock)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_45_01"), 0, 0)
-    IF_INT_LESS(GSW(1071), 3)
-        ADD(GSW(1071), 1)
-        IF_INT_EQUAL(GSW(1071), 3)
+    IF_INT_LESS(GSW(GSW_AJI01_LOCKED_DOOR_TRIES), 3)
+        ADD(GSW(GSW_AJI01_LOCKED_DOOR_TRIES), 1)
+        IF_INT_EQUAL(GSW(GSW_AJI01_LOCKED_DOOR_TRIES), 3)
             CALL(evt_party_stop, 0)
             WAIT_MS(500)
             CALL(evt_msg_print_party, STRING("stg7_aji_45_03"))
@@ -1444,25 +1370,25 @@ EVT_BEGIN(last_elv_lock)
 EVT_END()
 
 EVT_BEGIN(evt_key_init)
-    IF_INT_LESS(GSW(0), 373)
-        CALL(evt_run_case_evt, 9, 1, STRING("e_bero_5"), 0, PTR(key_lock), 0)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero_5"), 0, PTR(key_lock), 0)
         SET_VALUE(LW(0), STRING("e_bero_5"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
-    IF_INT_EQUAL(GSW(0), 376)
-        CALL(evt_run_case_evt, 9, 1, STRING("e_bero_5"), 0, PTR(last_key_lock), 0)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_THE_LAST_MAIL)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero_5"), 0, PTR(last_key_lock), 0)
         SET_VALUE(LW(0), STRING("e_bero_5"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
-    SWITCH(GSW(0))
-        CASE_BETWEEN(373, 375)
-        CALL(evt_run_case_evt, 9, 1, STRING("n_bero_1"), 0, PTR(last_key_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("n_bero_2"), 0, PTR(last_key_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("n_bero_3"), 0, PTR(last_key_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("n_bero_4"), 0, PTR(last_key_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("e_bero3"), 0, PTR(last_key_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("w_bero_3"), 0, PTR(last_key_lock), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("w_bero_4"), 0, PTR(last_key_lock), 0)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG7_20_LORD_CRUMP_DEFEATED, STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_1"), 0, PTR(last_key_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_2"), 0, PTR(last_key_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_3"), 0, PTR(last_key_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_4"), 0, PTR(last_key_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero3"), 0, PTR(last_key_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_3"), 0, PTR(last_key_lock), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_4"), 0, PTR(last_key_lock), 0)
         SET_VALUE(LW(0), STRING("n_bero_1"))
         CALL_CHILD(PTR(bero_case_switch_off))
         SET_VALUE(LW(0), STRING("n_bero_2"))
@@ -1477,25 +1403,25 @@ EVT_BEGIN(evt_key_init)
         CALL_CHILD(PTR(bero_case_switch_off))
         SET_VALUE(LW(0), STRING("w_bero_4"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights1_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights1_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights2_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights2_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights3_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights3_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights4_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights4_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights5_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights5_r"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights2_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights2_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights3_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights3_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights4_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights4_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights5_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights5_r"), MAPOBJ_FLAG_HIDE)
         CASE_DEFAULT
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights1_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights1_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights2_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights2_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights3_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights3_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights4_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights4_m"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights2_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights2_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights3_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights3_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights4_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights4_m"), MAPOBJ_FLAG_HIDE)
     END_SWITCH
     RETURN
 EVT_END()
@@ -1537,17 +1463,17 @@ EVT_BEGIN(evt_aikotoba)
     CALL(get_password, LW(1))
     IF_STR_EQUAL(LW(0), LW(1))
         CALL(evt_msg_print, 0, STRING("stg7_aji_70"), 0, 0)
-        SET_VALUE(GSW(0), 365)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_12_PASSWORD_ENTRY)
         SET_VALUE(LW(0), STRING("e_bero_2"))
         CALL_CHILD(PTR(bero_case_switch_on))
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kagi1_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kagi1_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights5_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights5_m"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kagi1_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kagi1_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights5_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights5_m"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_DOOR_UNLOCK1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_exit_case_evt)
-        ELSE
+    ELSE
         CALL(evt_msg_print, 0, STRING("stg7_aji_69"), 0, 0)
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -1555,19 +1481,19 @@ EVT_BEGIN(evt_aikotoba)
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1500)
-    CALL(evt_fade_set_mapchange_type, 0, 12, 100, 11, 100)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_BLACK_2D, 100, FADE_IN_BLACK_2D, 100)
     CALL(evt_bero_mapchange, STRING("aji_02"), STRING("peach_evt_stg1"))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg1_1)
-    IF_INT_EQUAL(GSWF(4200), 1)
+    IF_INT_EQUAL(GSWF(GSWF_AJI16_PEACH1_AFTER_SHOWER_REMARK), 1)
         RETURN
     END_IF
     CALL(evt_mario_key_onoff, 0)
@@ -1576,14 +1502,14 @@ static EVT_BEGIN(peach_evt_stg1_1)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_4"), STRING("P_T_4"))
     CALL(evt_msg_print, 0, STRING("peach_aji_39"), 0, STRING("mario"))
     CALL(peach_set_pose, STRING("P_S_1"))
-    SET_VALUE(GSWF(4200), 1)
+    SET_VALUE(GSWF(GSWF_AJI16_PEACH1_AFTER_SHOWER_REMARK), 1)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(peach_evt_stg1_2)
-    IF_INT_EQUAL(GSWF(4201), 1)
+    IF_INT_EQUAL(GSWF(GSWF_AJI01_PEACH1_DOOR_OPENED), 1)
         RETURN
     END_IF
     CALL(evt_seq_wait, 2)
@@ -1614,7 +1540,7 @@ EVT_BEGIN(peach_evt_stg1_2)
     CALL_CHILD(PTR(bero_case_switch_on))
     WAIT_MS(700)
     CALL(evt_msg_print, 0, STRING("peach_aji_41"), 0, STRING("mario"))
-    SET_VALUE(GSWF(4201), 1)
+    SET_VALUE(GSWF(GSWF_AJI01_PEACH1_DOOR_OPENED), 1)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -1650,7 +1576,7 @@ static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_msg_print, 0, STRING("peach_aji_126"), 0, STRING("mario"))
-    SET_VALUE(GSW(0), 166)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
     SPAWN_EVENT(PTR(peach_evt_stg3_1))
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1701,10 +1627,10 @@ EVT_BEGIN(peach_evt_ele_2)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(9), LW(1))
     CALL(evt_mario_key_onoff, 0)
-    SWITCH(GSW(0))
-        CASE_EQUAL(166)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG3_33_01_PEACH_TECS_REQUEST)
         SET_VALUE(LW(8), 2)
-        CASE_EQUAL(262)
+        CASE_EQUAL(STORY_STG5_44_PEACH_TECS_REQUEST_2)
         SET_VALUE(LW(8), 2)
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING("peach_aji_40"), 0, STRING("mario"))
@@ -1749,7 +1675,7 @@ EVT_BEGIN(peach_evt_ele_2)
         CALL(evt_snd_sfxoff, LW(10))
         CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_ELEVATOR_APPEAR1"), LW(3), LW(0), LW(6), 0)
     END_IF
-    IF_INT_NOT_EQUAL(GSW(0), 166)
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
         SET_VALUE(LW(0), LW(5))
         CALL_CHILD(PTR(ele2_door_open))
     END_IF
@@ -1815,20 +1741,20 @@ EVT_BEGIN(peach_evt_ele_2)
     CALL(evt_mapobj_get_position, STRING("ere2_m"), LW(3), LW(4), LW(6))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_ELEVATOR_APPEAR1"), LW(3), LW(4), LW(6), 0)
     CALL(evt_mario_cont_onoff, 1)
-    IF_INT_EQUAL(GSW(0), 166)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
         CALL(evt_msg_print, 0, STRING("peach_aji_128"), 0, 0)
         WAIT_MS(500)
         CALL(evt_msg_print, 0, STRING("peach_aji_129"), 0, STRING("mario"))
-        CALL(evt_npc_flag_onoff, 0, STRING("手下１"), 128)
+        CALL(evt_npc_flag_onoff, 0, STRING("手下１"), NPC_FLAG_HIDDEN)
         CALL(evt_npc_set_position, STRING("手下１"), 700, 1000, 0)
         CALL(evt_npc_set_ry, STRING("手下１"), 270)
         CALL(evt_npc_move_position, STRING("手下１"), 300, 0, 0, 70, 0)
         CALL(evt_npc_set_position, STRING("手下１"), 0, -1000, 0)
-        CALL(evt_npc_flag_onoff, 1, STRING("手下１"), 128)
+        CALL(evt_npc_flag_onoff, 1, STRING("手下１"), NPC_FLAG_HIDDEN)
         WAIT_MS(2000)
         CALL(evt_msg_print, 0, STRING("peach_aji_131"), 0, 0)
     END_IF
-    IF_INT_EQUAL(GSW(0), 262)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
         CALL(evt_msg_print, 0, STRING("peach_aji_218"), 0, 0)
     END_IF
     SET_VALUE(LW(0), LW(8))
@@ -1838,55 +1764,55 @@ EVT_BEGIN(peach_evt_ele_2)
     CALL_CHILD(PTR(ele2_door_close))
     CALL(evt_cam3d_road_shift_onoff, 1)
     SET_VALUE(GW(1), LW(8))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi4_aka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi4_mid"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi5_aka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi5_mid"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi6_aka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi6_mid"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi4_aka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi4_mid"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi5_aka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi5_mid"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi6_aka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi6_mid"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
 EVT_BEGIN(peach_evt_ele_init)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi3_aka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi3_mid"), 1)
-    IF_INT_EQUAL(GSW(0), 262)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi4_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi5_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi6_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi4_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi5_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi6_mid"), 1)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi4_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi5_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi6_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi4_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi5_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi6_mid"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi3_aka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi3_mid"), MAPOBJ_FLAG_HIDE)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi4_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi5_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi6_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi4_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi5_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi6_mid"), MAPOBJ_FLAG_HIDE)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi4_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi5_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi6_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi4_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi5_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi6_mid"), MAPOBJ_FLAG_HIDE)
     END_IF
     SET_VALUE(GW(1), 4)
-    IF_INT_EQUAL(GSW(0), 165)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("e_bero_5"))
             SET_VALUE(LW(0), 4)
             SET_VALUE(LW(1), 0)
-            CALL(evt_run_case_evt, 8, 1, STRING("A_e2_6_door1"), 0, PTR(peach_evt_ele_2), 0)
-            CALL(evt_run_case_evt, 8, 1, STRING("A_e2_6_door2"), 0, PTR(peach_evt_ele_2), 0)
-            ELSE
+            CALL(evt_run_case_evt, CASE_COND_FRONT, 1, STRING("A_e2_6_door1"), 0, PTR(peach_evt_ele_2), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT, 1, STRING("A_e2_6_door2"), 0, PTR(peach_evt_ele_2), 0)
+        ELSE
             SET_VALUE(LW(0), 4)
             SET_VALUE(LW(1), 1)
-            CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi6"), 0, PTR(peach_evt_ele_2), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi6"), 0, PTR(peach_evt_ele_2), 0)
         END_IF
-        ELSE
+    ELSE
         SET_VALUE(LW(0), 4)
         SET_VALUE(LW(1), 1)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi6"), 0, PTR(peach_evt_ele_2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi6"), 0, PTR(peach_evt_ele_2), 0)
     END_IF
-    CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi4"), 0, PTR(peach_evt_door_stop), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_ekagi3"), 0, PTR(peach_evt_door_stop), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi4"), 0, PTR(peach_evt_door_stop), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ekagi3"), 0, PTR(peach_evt_door_stop), 0)
     CALL(evt_hit_bind_mapobj, STRING("A_ere2_m"), STRING("ere2_m"))
     RETURN
 EVT_END()
@@ -1894,37 +1820,37 @@ EVT_END()
 EVT_BEGIN(peach_evt_key_init)
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 165)
-        IF_INT_LESS(GSW(0), 169)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_04_PEACH_BACK_TO_TEC)
             SET_VALUE(LF(0), 1)
         END_IF
     END_IF
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 262)
-        IF_INT_LESS(GSW(0), 265)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_47_PEACH_TEC_TALK)
             SET_VALUE(LF(1), 1)
         END_IF
     END_IF
     IF_INT_EQUAL(LF(0), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights1_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights1_m"), 1)
-        CALL(evt_run_case_evt, 9, 1, STRING("n_bero_4"), 0, PTR(peach_evt_door_stop), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights1_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights1_m"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_4"), 0, PTR(peach_evt_door_stop), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights2_r"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights2_m"), 1)
-    CALL(evt_run_case_evt, 9, 1, STRING("n_bero_3"), 0, PTR(peach_evt_door_stop), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights3_r"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights3_m"), 1)
-    CALL(evt_run_case_evt, 9, 1, STRING("n_bero_2"), 0, PTR(peach_evt_door_stop), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights2_r"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights2_m"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_3"), 0, PTR(peach_evt_door_stop), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights3_r"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights3_m"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_2"), 0, PTR(peach_evt_door_stop), 0)
     IF_INT_EQUAL(LF(1), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights4_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights4_m"), 1)
-        CALL(evt_run_case_evt, 9, 1, STRING("n_bero_1"), 0, PTR(peach_evt_door_stop), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights4_r"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights4_m"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights4_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights4_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero_1"), 0, PTR(peach_evt_door_stop), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights4_r"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights4_m"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
@@ -1950,7 +1876,7 @@ EVT_BEGIN(peach_evt_init)
         RETURN
     END_IF
     CALL(evt_mario_set_mode, 1)
-    IF_INT_EQUAL(GSWF(4204), 1)
+    IF_INT_EQUAL(GSWF(GSWF_AJI09_PEACH3_DISGUISED), 1)
         CALL(evt_peach_transform_gundan_on)
     END_IF
     CALL(evt_npc_setup, PTR(npcEnt))
@@ -1962,27 +1888,27 @@ EVT_BEGIN(peach_evt_init)
         SET_VALUE(LW(15), 1)
         RETURN
     END_IF
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     SPAWN_EVENT(PTR(peach_evt_ele_init))
     SPAWN_EVENT(PTR(peach_evt_key_init))
-    IF_INT_EQUAL(GSW(0), 58)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
         SPAWN_EVENT(PTR(peach_evt_stg1_1))
         SPAWN_EVENT(PTR(peach_evt_stg1_2))
     END_IF
-    IF_INT_EQUAL(GSW(0), 165)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("e_bero_5"))
             SPAWN_EVENT(PTR(peach_evt_stg3))
             BEGIN_INLINE_EVENT
                 CALL(evt_seq_wait, 2)
                 CALL(evt_bero_exec_wait, 65536)
-                CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi4_aka"), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi4_mid"), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi5_aka"), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi5_mid"), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ekagi6_aka"), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ekagi6_mid"), 1)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi4_aka"), MAPOBJ_FLAG_HIDE)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi4_mid"), MAPOBJ_FLAG_HIDE)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi5_aka"), MAPOBJ_FLAG_HIDE)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi5_mid"), MAPOBJ_FLAG_HIDE)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ekagi6_aka"), MAPOBJ_FLAG_HIDE)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ekagi6_mid"), MAPOBJ_FLAG_HIDE)
                 SET_VALUE(LW(0), STRING("w_bero_3"))
                 CALL_CHILD(PTR(bero_case_switch_off))
                 SET_VALUE(LW(0), STRING("e_bero3"))
@@ -1991,34 +1917,34 @@ EVT_BEGIN(peach_evt_init)
                 CALL_CHILD(PTR(bero_case_switch_off))
                 SET_VALUE(LW(0), STRING("e_bero_5"))
                 CALL_CHILD(PTR(bero_case_switch_off))
-                CALL(evt_run_case_evt, 9, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
-                CALL(evt_run_case_evt, 9, 1, STRING("e_bero3"), 0, PTR(peach_evt_door_stop), 0)
-                CALL(evt_run_case_evt, 9, 1, STRING("w_bero_5"), 0, PTR(peach_evt_door_stop), 0)
-                CALL(evt_run_case_evt, 9, 1, STRING("e_bero_5"), 0, PTR(peach_evt_door_stop), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero3"), 0, PTR(peach_evt_door_stop), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_5"), 0, PTR(peach_evt_door_stop), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero_5"), 0, PTR(peach_evt_door_stop), 0)
             END_INLINE_EVENT
         END_IF
     END_IF
-    IF_INT_EQUAL(GSW(0), 166)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
         SPAWN_EVENT(PTR(peach_evt_stg3_1))
     END_IF
-    IF_INT_EQUAL(GSW(0), 167)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
         BEGIN_INLINE_EVENT
             CALL(evt_seq_wait, 2)
             CALL(evt_bero_exec_wait, 65536)
             SET_VALUE(LW(0), STRING("w_bero_3"))
             CALL_CHILD(PTR(bero_case_switch_off))
-            CALL(evt_run_case_evt, 9, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
         END_INLINE_EVENT
     END_IF
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 263)
-        IF_INT_LESS_OR_EQUAL(GSW(0), 264)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
+        IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
             CALL(evt_npc_entry, STRING("見張り"), STRING("c_zako_n"))
             CALL(evt_npc_set_tribe, STRING("見張り"), STRING("第三勢力部下"))
             CALL(evt_npc_set_position, STRING("見張り"), -900, 1000, -50)
             CALL(evt_npc_set_ry, STRING("見張り"), 90)
             CALL(evt_npc_set_width, STRING("見張り"), 30)
             CALL(evt_npc_set_height, STRING("見張り"), 33)
-            CALL(evt_npc_flag_onoff, 1, STRING("見張り"), 1536)
+            CALL(evt_npc_flag_onoff, 1, STRING("見張り"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
             CALL(evt_npc_set_stay_anim, STRING("見張り"))
             BEGIN_INLINE_EVENT
                 CALL(evt_seq_wait, 2)
@@ -2029,13 +1955,13 @@ EVT_BEGIN(peach_evt_init)
                 CALL_CHILD(PTR(bero_case_switch_off))
                 SET_VALUE(LW(0), STRING("e_bero_5"))
                 CALL_CHILD(PTR(bero_case_switch_off))
-                CALL(evt_run_case_evt, 9, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
-                CALL(evt_run_case_evt, 9, 1, STRING("w_bero_5"), 0, PTR(peach_evt_door_stop), 0)
-                CALL(evt_run_case_evt, 9, 1, STRING("e_bero_5"), 0, PTR(peach_evt_door_stop), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_5"), 0, PTR(peach_evt_door_stop), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero_5"), 0, PTR(peach_evt_door_stop), 0)
             END_INLINE_EVENT
         END_IF
     END_IF
-    IF_INT_EQUAL(GSW(0), 262)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
         SPAWN_EVENT(PTR(peach_evt_stg5))
         BEGIN_INLINE_EVENT
             CALL(evt_seq_wait, 2)
@@ -2046,16 +1972,16 @@ EVT_BEGIN(peach_evt_init)
             CALL_CHILD(PTR(bero_case_switch_off))
             SET_VALUE(LW(0), STRING("e_bero_5"))
             CALL_CHILD(PTR(bero_case_switch_off))
-            CALL(evt_run_case_evt, 9, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
-            CALL(evt_run_case_evt, 9, 1, STRING("w_bero_5"), 0, PTR(peach_evt_door_stop), 0)
-            CALL(evt_run_case_evt, 9, 1, STRING("e_bero_5"), 0, PTR(peach_evt_door_stop), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_5"), 0, PTR(peach_evt_door_stop), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero_5"), 0, PTR(peach_evt_door_stop), 0)
         END_INLINE_EVENT
     END_IF
-    IF_INT_EQUAL(GSW(0), 263)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
         CALL(peach_evt_toumei)
         SPAWN_EVENT(PTR(peach_evt_stg5_1))
     END_IF
-    IF_INT_EQUAL(GSW(0), 264)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
         CALL(peach_evt_toumei)
     END_IF
     RETURN
@@ -2063,15 +1989,15 @@ EVT_END()
 
 static EVT_BEGIN(teshita1_init)
     CALL_CHILD(PTR(npc_init_evt))
-    CALL(evt_npc_flag_onoff, 0, STRING("me"), 268435456)
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
-    SWITCH(GSW(0))
-        CASE_EQUAL(167)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG3_33_02_PEACH_INCOGNITO)
         CALL(evt_npc_set_position, STRING("me"), 100, 1000, -50)
         RETURN
         CASE_DEFAULT
         CALL(evt_npc_change_interrupt, STRING("me"), 1, 0)
-        CALL(evt_npc_flag_onoff, 1, STRING("me"), 160)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE)
     END_SWITCH
     CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
     RETURN
@@ -2086,17 +2012,17 @@ EVT_END()
 
 static EVT_BEGIN(teshita2_init)
     CALL_CHILD(PTR(npc_init_evt))
-    CALL(evt_npc_flag_onoff, 0, STRING("me"), 268435456)
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
-    SWITCH(GSW(0))
-        CASE_EQUAL(167)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG3_33_02_PEACH_INCOGNITO)
         CALL(evt_npc_set_position, STRING("me"), 0, 1000, -15)
         RETURN
-        CASE_BETWEEN(263, 265)
+        CASE_BETWEEN(STORY_STG5_45_PEACH_POTION_PUZZLE, STORY_STG5_47_PEACH_TEC_TALK)
         CALL(evt_npc_set_position, STRING("me"), 0, 1000, -15)
         CASE_DEFAULT
         CALL(evt_npc_change_interrupt, STRING("me"), 1, 0)
-        CALL(evt_npc_flag_onoff, 1, STRING("me"), 160)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE)
     END_SWITCH
     CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
     RETURN
@@ -2126,15 +2052,15 @@ EVT_END()
 static EVT_BEGIN(teshita3_init)
     CALL_CHILD(PTR(npc_init_evt))
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
-    SWITCH(GSW(0))
-        CASE_EQUAL(167)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG3_33_02_PEACH_INCOGNITO)
         CALL(evt_npc_set_position, STRING("me"), 750, 1000, 20)
         RETURN
-        CASE_BETWEEN(263, 265)
+        CASE_BETWEEN(STORY_STG5_45_PEACH_POTION_PUZZLE, STORY_STG5_47_PEACH_TEC_TALK)
         CALL(evt_npc_set_position, STRING("me"), 750, 1000, 20)
         CASE_DEFAULT
         CALL(evt_npc_change_interrupt, STRING("me"), 1, 0)
-        CALL(evt_npc_flag_onoff, 1, STRING("me"), 160)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE)
     END_SWITCH
     CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
     RETURN
@@ -2210,21 +2136,21 @@ EVT_BEGIN(aji_01_init_evt)
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_02"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_03"), 1, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("polySurface1300_q00266"), 2)
-    IF_INT_LESS(GSW(0), 365)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("polySurface1300_q00266"), MAPOBJ_FLAG_BBOX_CULL)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_12_PASSWORD_ENTRY)
         SET_VALUE(LW(0), STRING("e_bero_2"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_kagi1"), 0, PTR(evt_aikotoba), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kagi1_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kagi1_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights5_m"), 1)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kagi1_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kagi1_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights5_r"), 1)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kagi1"), 0, PTR(evt_aikotoba), 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kagi1_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kagi1_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights5_m"), MAPOBJ_FLAG_HIDE)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kagi1_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kagi1_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights5_r"), MAPOBJ_FLAG_HIDE)
     END_IF
     SPAWN_EVENT(PTR(evt_emergency))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 373)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("軍団ザコ１"))
         CALL(evt_npc_check_delete, STRING("軍団ザコ２"))
         CALL(evt_npc_check_delete, STRING("軍団ザコ３"))
@@ -2245,9 +2171,9 @@ EVT_BEGIN(aji_01_init_evt)
         CALL(evt_npc_check_delete, STRING("軍団ザコ６"))
         CALL(evt_npc_check_delete, STRING("軍団ザコ７"))
         CALL(evt_npc_check_delete, STRING("バリアーンＺ"))
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI1"))
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
         CALL_CHILD(PTR(evt_elv_init))
         CALL_CHILD(PTR(evt_key_init))
     END_IF

@@ -1,3 +1,6 @@
+// Sheep (hituji: sheep): a herd of 50 sheep (EFF_hituji model) running and hopping across the screen
+// with the item sleep sounds and puffs of smoke.
+#include "eff/eff_sheep.h"
 #include "eff/eff_kemu_test.h"
 #include "battle/battle.h"
 #include "driver/animdrv.h"
@@ -10,21 +13,18 @@
 #include <dolphin/mtx.h>
 
 typedef struct EffSheepWork {
-    s32 type;       // 0x0
-    Vec position;   // 0x4
-    f32 scale;      // 0x10
-    s32 hopFrames;  // 0x14, frames per hop
-    f32 hopVelY;    // 0x18
-    f32 gravity;    // 0x1C
-    s32 poseId;     // 0x20
-    s32 state;      // 0x24
-    s32 timer;      // 0x28
-    f32 speed;      // 0x2C
-    s32 sfxId;      // 0x30
+    s32 type;      // 0x0
+    Vec position;  // 0x4
+    f32 scale;     // 0x10
+    s32 hopFrames; // 0x14, frames per hop
+    f32 hopVelY;   // 0x18
+    f32 gravity;   // 0x1C
+    s32 poseId;    // 0x20
+    s32 state;     // 0x24
+    s32 timer;     // 0x28
+    f32 speed;     // 0x2C
+    s32 sfxId;     // 0x30
 } EffSheepWork;
-
-f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
-void psndSFX_pos(s32 id, Vec* position);
 
 void effSheepDisp(CameraId cameraId, EffectEntry* effect);
 void effSheepMain(EffectEntry* effect);
@@ -44,7 +44,7 @@ EffectEntry* effSheepEntry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(EffSheepWork));
     effect->userdata = work;
     effect->callback = effSheepMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -86,7 +86,7 @@ void effSheepMain(EffectEntry* effect) {
     s32 done = 0;
     s32 inBattle;
     Vec position;
-    Vec tmp = { 0.0f, 0.0f, 0.0f };
+    Vec tmp = {0.0f, 0.0f, 0.0f};
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -94,8 +94,8 @@ void effSheepMain(EffectEntry* effect) {
     position = tmp;
     inBattle = gp->inBattle != 0;
 
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         {
             EffSheepWork* q;
             s32 k;
@@ -129,14 +129,13 @@ void effSheepMain(EffectEntry* effect) {
                 if (--p->timer < 0) {
                     p->timer = 0;
                     if (i == 1) {
-                        Vec v = { 0.0f, 0.0f, 0.0f };
+                        Vec v = {0.0f, 0.0f, 0.0f};
                         v.x = position.x + p->position.x;
                         v.y = position.y + p->position.y;
                         v.z = position.z + p->position.z;
                         p->sfxId = psndSFXOn_3D(sfx1, &v);
-                    }
-                    else if (i == effect->count - 1) {
-                        Vec v = { 0.0f, 0.0f, 0.0f };
+                    } else if (i == effect->count - 1) {
+                        Vec v = {0.0f, 0.0f, 0.0f};
                         v.x = position.x + p->position.x;
                         v.y = position.y + p->position.y;
                         v.z = position.z + p->position.z;
@@ -147,7 +146,7 @@ void effSheepMain(EffectEntry* effect) {
                 break;
             case 2:
                 if (i == 1 || i == effect->count - 1) {
-                    Vec v = { 0.0f, 0.0f, 0.0f };
+                    Vec v = {0.0f, 0.0f, 0.0f};
                     v.x = position.x + p->position.x;
                     v.y = position.y + p->position.y;
                     v.z = position.z + p->position.z;
@@ -163,8 +162,7 @@ void effSheepMain(EffectEntry* effect) {
                             p->hopVelY *= -1.0f;
                         }
                     }
-                }
-                else {
+                } else {
                     p->state++;
                 }
                 if ((gp->retraceCount + i) % 10 == 0) {
@@ -193,8 +191,7 @@ void effSheepMain(EffectEntry* effect) {
     }
     if (done >= effect->count - 1) {
         effDelete(effect);
-    }
-    else {
+    } else {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 1, (DispCallback)effSheepDisp, effect);
     }
 }

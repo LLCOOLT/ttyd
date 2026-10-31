@@ -1,3 +1,5 @@
+// hei_00 (平原, Petal Meadows): room with the Sun Stone and Moon Stone statues and the way to Hooktail Castle (gon_00).
+// Has Hooktail's flyover, a Bowser cutscene leading to kpa_02, a pipe to tik_02 and the epilogue scene that goes to nok_01.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -17,135 +19,46 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_telop.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "hei.h"
 #include "cam_road.h"
+#include "driver/mapdrv.h"
+#include "version.h"
+#include "mario/mariost.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
-typedef struct GonbabaProj { GXTexObj obj; smartEntry* tex; } GonbabaProj;
-void mapSetProjTexObj(GXTexObj* obj, smartEntry* tex);
+typedef struct GonbabaProj {
+    GXTexObj obj;
+    smartEntry* tex;
+} GonbabaProj;
 void make_gonbaba_projection(CameraId camera, void* param);
-void mapSetProjMtx(Mtx mtx);
 
 USER_FUNC(cam_test);
 USER_FUNC(dist_check);
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_set_xyz);
-USER_FUNC(evt_cam3d_evt_xyz_off);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_cam_shift_reset);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-#ifdef VERSION_G8ME01_DEMO
-USER_FUNC(evt_img_clear_virtual_point);
-#endif
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_position);
-USER_FUNC(evt_img_set_shadow);
-USER_FUNC(evt_img_set_virtual_point);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_color);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_goodbye_party);
-USER_FUNC(evt_mario_hello_party);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dir_npc);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_wait_move_end);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_mobj_timerswitch);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_glide_position);
-USER_FUNC(evt_npc_kamek_kemuri1);
-USER_FUNC(evt_npc_kamek_move_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_pera_onoff);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_bgmon_f);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envoff_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_system_flag);
-USER_FUNC(evt_sub_intpl_get_value);
-USER_FUNC(evt_sub_intpl_init);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_telop_entry);
-USER_FUNC(evt_win_item_select);
-USER_FUNC(make_gonbaba_projection_evt);
 static USER_FUNC(proj_mtx);
 static USER_FUNC(proj_off);
 static USER_FUNC(proj_on);
-USER_FUNC(shake);
-USER_FUNC(shake_reset);
 USER_FUNC(hei_00_mario_keyoff_check);
-USER_FUNC(cam_test2);
-void make_gonbaba_projection(CameraId camera, void* param);
 
 extern EvtWord make_proj_evt[];
 extern EvtWord evt_gonbaba_shadow[];
@@ -164,21 +77,20 @@ extern EvtWord ki_data_evt_02[];
 static TreeAccess ki_data[4];
 static NpcSetupInfo npcEnt[2];
 extern EvtWord hei_00_koopa_evt[];
-extern EvtWord hei_00_init_evt[];
 
 static USER_FUNC(proj_on) {
-    animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[0], 0x400);
-    animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[1], 0x400);
-    animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[2], 0x400);
-    animPoseSetMaterialFlagOn(partyGetPtr(marioGetPartyId())->paperAnimGroup, 0x400);
+    animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
+    animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[1], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
+    animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[2], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
+    animPoseSetMaterialFlagOn(partyGetPtr(marioGetPartyId())->paperAnimGroup, ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(proj_off) {
-    animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[0], 0x400);
-    animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[1], 0x400);
-    animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[2], 0x400);
-    animPoseSetMaterialFlagOff(partyGetPtr(marioGetPartyId())->paperAnimGroup, 0x400);
+    animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
+    animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[1], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
+    animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[2], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
+    animPoseSetMaterialFlagOff(partyGetPtr(marioGetPartyId())->paperAnimGroup, ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
     return EVT_RETURN_DONE;
 }
 
@@ -266,7 +178,7 @@ static USER_FUNC(proj_mtx) {
 }
 
 USER_FUNC(shake) {
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
 
     if (isFirstCall) {
         event->userdata[0] = 0;
@@ -286,7 +198,7 @@ USER_FUNC(shake) {
 }
 
 USER_FUNC(shake_reset) {
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
 
     camera->viewOffset.z = 0.0f;
     return EVT_RETURN_DONE;
@@ -327,10 +239,10 @@ EVT_BEGIN(evt_gonbaba_shadow)
         END_LOOP
     END_INLINE_EVENT
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 1024)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 256)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("HAIKEI"), 1024)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("HAIKEI"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S"), MAPOBJ_FLAG_PROJ_TEXTURE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_DISPLAY_LIST)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("HAIKEI"), MAPOBJ_FLAG_PROJ_TEXTURE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("HAIKEI"), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(proj_on)
     BEGIN_INLINE_EVENT_GET_ID(LW(8))
         CALL(shake)
@@ -351,8 +263,8 @@ EVT_BEGIN(evt_gonbaba_shadow)
     DELETE_EVENT(LW(9))
     DELETE_EVENT(LW(8))
     CALL(shake_reset)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 1024)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_PROJ_TEXTURE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S"), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(proj_off)
     RETURN
 EVT_END()
@@ -360,7 +272,7 @@ EVT_END()
 USER_FUNC(cam_test) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(marioGetPartyId());
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
     f32 cx = (mario->position.x + party->position.x) / 2;
     f32 cz = (mario->position.z + party->position.z) / 2;
     CameraParams road;
@@ -381,7 +293,7 @@ USER_FUNC(cam_test) {
 USER_FUNC(cam_test2) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(marioGetPartyId());
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
     f32 cx = (mario->position.x + party->position.x) / 2;
     f32 cz = (mario->position.z + party->position.z) / 2;
     CameraParams road;
@@ -400,21 +312,16 @@ USER_FUNC(cam_test2) {
 }
 
 static EVT_BEGIN(first_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_set_mapchange_type, 0, -1, -1, 7, 300)
-    CALL(evt_fade_set_mapchange_type, 1, -1, -1, 7, 300)
-#else
-    CALL(evt_fade_set_mapchange_type, 0, -1, -1, 9, 300)
-    CALL(evt_fade_set_mapchange_type, 1, -1, -1, 9, 300)
-#endif
+    CALL(evt_fade_set_mapchange_type, 0, -1, -1, FADE_IN_BLACK, 300)
+    CALL(evt_fade_set_mapchange_type, 1, -1, -1, FADE_IN_BLACK, 300)
     CALL(evt_cam_letter_box_onoff, 1, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
-    CALL(evt_party_dispflg_onoff, 0, 1, 1)
+    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_cam3d_evt_set, 250, 350, 1041, 250, 130, -36, 0, 11)
     CALL(evt_seq_wait, 2)
@@ -428,7 +335,7 @@ static EVT_BEGIN(first_evt)
     SET_VALUE(GF(0), 0)
     WAIT_FRAMES(1)
     CALL(evt_mario_dispflag_onoff, 0, 1)
-    CALL(evt_party_dispflg_onoff, 0, 1, 0)
+    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 0)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_party_stop, 0)
     WAIT_MS(500)
@@ -454,7 +361,7 @@ static EVT_BEGIN(first_evt)
     CALL(evt_msg_print, 0, STRING("stg1_hei_00"), 0, STRING("party"))
     CALL(evt_mario_set_dir, 90, 300, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
-    SET_VALUE(GSW(0), 23)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_PETAL_MEADOWS)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
     RETURN
@@ -474,9 +381,9 @@ EVT_BEGIN(gonbaba_evt)
     END_IF
     CALL(evt_mario_key_onoff, 0)
     WAIT_FRAMES(1)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_GONBABA_FLY1"))
-    CALL(evt_snd_envoff, 1024)
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_GONBABA_FLY1"))
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_GNB_ROAR1"), -117, 300, 1000, 0)
     WAIT_MS(700)
     CALL(evt_eff_fukidashi, 0, STRING("eff0"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -498,7 +405,7 @@ EVT_BEGIN(gonbaba_evt)
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     IF_INT_LESS(LW(0), LW(3))
         CALL(evt_party_set_dir, 0, 270, 200)
-        ELSE
+    ELSE
         CALL(evt_party_set_dir, 0, 90, 200)
     END_IF
     CALL(evt_party_stop, 0)
@@ -574,17 +481,17 @@ EVT_BEGIN(gonbaba_evt)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     CALL(evt_party_set_pos, 0, LW(3), LW(4), LW(2))
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_mario_set_dir, 270, 300, 0)
     CALL(evt_msg_print, 0, STRING("stg1_hei_02"), 0, STRING("party"))
     CALL(evt_cam_shift_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
-    SET_VALUE(GSW(0), 23)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-    SET_VALUE(GSW(0), 24)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_PETAL_MEADOWS)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_01_THE_SHADOW_OF_HOOKTAIL)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
@@ -592,7 +499,7 @@ EVT_BEGIN(gonbaba_evt)
 EVT_END()
 
 static EVT_BEGIN(first_evt_dokan)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 23)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_PETAL_MEADOWS)
         SET_VALUE(LW(0), 0)
         RETURN
     END_IF
@@ -606,8 +513,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -623,8 +530,8 @@ static BeroEntry bero_entry_data[] = {
         "a_usiro_bero", // hitName
         4096, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, NULL, // enterEvent..exitEvent
@@ -638,8 +545,8 @@ static BeroEntry bero_entry_data[] = {
         "a_h_dokan", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -654,8 +561,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -670,8 +577,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)first_evt_dokan, // enterEvent
@@ -691,8 +598,8 @@ static BeroEntry e3_bero[] = {
         "dokan_2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -816,7 +723,7 @@ USER_FUNC(dist_check) {
 }
 
 EVT_BEGIN(moji_msg)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(hei_00_mario_keyoff_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
@@ -829,10 +736,10 @@ EVT_BEGIN(moji_msg)
 EVT_END()
 
 static EVT_BEGIN(switch_evt)
-    IF_INT_EQUAL(GSWF(1776), 0)
+    IF_INT_EQUAL(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(1777), 0)
+    IF_INT_EQUAL(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 0)
         RETURN
     END_IF
     CALL(evt_mario_key_onoff, 0)
@@ -841,7 +748,7 @@ static EVT_BEGIN(switch_evt)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         IF_INT_LESS(LW(2), 0)
             ADD(LW(2), -50)
-            ELSE
+        ELSE
             ADD(LW(2), 50)
         END_IF
         CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(80.0f))
@@ -851,7 +758,7 @@ static EVT_BEGIN(switch_evt)
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
         IF_INT_LESS(LW(2), 0)
             ADD(LW(2), -50)
-            ELSE
+        ELSE
             ADD(LW(2), 50)
         END_IF
         CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
@@ -895,9 +802,9 @@ static EVT_BEGIN(switch_evt)
     CALL(evt_hit_bind_update, STRING("a_isi_4"))
     CALL(evt_cam3d_evt_set, 146, 127, 328, 146, 75, 33, 1000, 11)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_moji"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_moji"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_moji"), 1, 1)
-    CALL(evt_run_case_evt, 9, 1, STRING("a_moji"), 0, PTR(moji_msg), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_moji"), 0, PTR(moji_msg), 0)
     CALL(evt_snd_sfxon, STRING("SFX_STG1ROCK_FONT_APPEAR1"), 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 1000)
     LOOP(0)
@@ -919,7 +826,7 @@ EVT_END()
 static EVT_BEGIN(dokan_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(dist_check)
@@ -931,7 +838,7 @@ static EVT_BEGIN(dokan_evt)
                     CALL(evt_party_move_pos, 0, 90, 0, 500)
                     CALL(evt_party_set_dir, 0, 90, 300)
                 END_IF
-                ELSE
+            ELSE
                 CALL(evt_mario_set_dir, 270, 300, 0)
                 IF_INT_LESS(LW(0), 200)
                     CALL(evt_party_move_pos, 0, 200, 0, 500)
@@ -958,7 +865,7 @@ static EVT_BEGIN(dokan_evt)
     DELETE_EVENT(LW(0))
     CALL(evt_cam3d_evt_set, 145, 100, 450, 145, 40, -140, 1000, 11)
     CALL_CHILD(PTR(cam_shake2))
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     WAIT_MS(1000)
 #endif
     SET_VALUE(GF(1), 1)
@@ -970,11 +877,11 @@ static EVT_BEGIN(dokan_evt)
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_hei_00"))
     CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_img_set_virtual_point, STRING("img"), 150, 25, 20)
     CALL(evt_img_set_position, STRING("img"), 9, -14)
 #endif
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_img_clear_virtual_point, STRING("img"))
 #endif
     CALL(evt_img_set_shadow, STRING("img"), 2)
@@ -982,11 +889,11 @@ static EVT_BEGIN(dokan_evt)
     SPAWN_EVENT(PTR(evt_snd))
     BEGIN_INLINE_EVENT
         WAIT_MS(3200)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_FF_ENV_SUCCESS1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_FF_ENV_SUCCESS1"))
     END_INLINE_EVENT
     CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("isi_0"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("s_moji"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("isi_0"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("s_moji"), MAPOBJ_FLAG_HIDE)
     CALL(evt_img_wait_animend, STRING("img"))
     CALL(evt_img_free_capture, STRING("img"), 0)
     CALL(evt_img_free_capture, STRING("img"), 1)
@@ -996,7 +903,7 @@ static EVT_BEGIN(dokan_evt)
     CALL(evt_mapobj_get_position, STRING("h_dokan"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOKAN_APPEAR1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mapobj_trans, 0, STRING("h_dokan"), 0, -20, 0)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("h_dokan"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("h_dokan"), MAPOBJ_FLAG_HIDE)
     CALL(evt_sub_intpl_init, 11, -20, 0, 60)
     LABEL(0)
     CALL(evt_sub_intpl_get_value)
@@ -1009,15 +916,15 @@ static EVT_BEGIN(dokan_evt)
     WAIT_MS(500)
     CALL(evt_mapobj_clear_offscreen, 1, STRING("isi_0"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("s_moji"))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("isi_0"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("isi_0"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_isi_0"), 0, 0)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("s_moji"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("s_moji"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_moji"), 0, 0)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("h_dokan"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("h_dokan"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LW(0), STRING("dokan"))
     CALL_CHILD(PTR(bero_case_switch_on))
-    SET_VALUE(GSW(0), 34)
-    CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG1_HEI1"), 2000)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_08_OPENING_THE_PATH)
+    CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG1_HEI1"), 2000)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     CALL(evt_mario_key_onoff, 1)
@@ -1025,7 +932,7 @@ static EVT_BEGIN(dokan_evt)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 USER_FUNC(hei_00_mario_keyoff_check) {
     EvtWord* args = event->args;
 
@@ -1039,10 +946,10 @@ USER_FUNC(hei_00_mario_keyoff_check) {
 #endif
 
 EVT_BEGIN(setting_sun_stone)
-    IF_INT_EQUAL(GSWF(1776), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("taiyou_ana"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("taiyounoisi"), 1)
-        IF_INT_EQUAL(GSWF(1777), 1)
+    IF_INT_EQUAL(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("taiyou_ana"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("taiyounoisi"), MAPOBJ_FLAG_HIDE)
+        IF_INT_EQUAL(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 1)
             CALL(evt_mapobj_trans, 1, STRING("isi_4"), -80, 0, 0)
             CALL(evt_mapobj_trans, 1, STRING("taiyounoisi"), -80, 0, 0)
             CALL(evt_hit_bind_mapobj, STRING("a_isi_4"), STRING("isi_4"))
@@ -1057,9 +964,9 @@ static s32 itemsel_table00[] = {
 };
 
 EVT_BEGIN(sun_stone_set_event)
-    IF_INT_EQUAL(GSWF(1776), 0)
+    IF_INT_EQUAL(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 0)
         CALL(evt_mario_key_onoff, 0)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
         CALL(evt_win_item_select, PTR(itemsel_table00), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(itemsel_table00), LW(0), 0)
@@ -1068,10 +975,10 @@ EVT_BEGIN(sun_stone_set_event)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
-        SET_VALUE(GSWF(1776), 1)
-        CALL(evt_pouch_remove_item, 62, LW(0))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("taiyou_ana"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("taiyounoisi"), 1)
+        SET_VALUE(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 1)
+        CALL(evt_pouch_remove_item, ITEM_SUN_STONE, LW(0))
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("taiyou_ana"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("taiyounoisi"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_get_position, STRING("taiyounoisi"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_STONE_SET1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_msg_print, 0, STRING("stg1_hei_00_sun"), 0, 0)
@@ -1083,10 +990,10 @@ EVT_BEGIN(sun_stone_set_event)
 EVT_END()
 
 EVT_BEGIN(setting_moon_stone)
-    IF_INT_EQUAL(GSWF(1777), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("tuki_ana"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("tukinoisi"), 1)
-        IF_INT_EQUAL(GSWF(1776), 1)
+    IF_INT_EQUAL(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tuki_ana"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("tukinoisi"), MAPOBJ_FLAG_HIDE)
+        IF_INT_EQUAL(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 1)
             CALL(evt_mapobj_trans, 1, STRING("isi_3"), 80, 0, 0)
             CALL(evt_mapobj_trans, 1, STRING("tukinoisi"), 80, 0, 0)
             CALL(evt_hit_bind_mapobj, STRING("a_isi_3"), STRING("isi_3"))
@@ -1101,9 +1008,9 @@ static s32 itemsel_table01[] = {
 };
 
 EVT_BEGIN(moon_stone_set_event)
-    IF_INT_EQUAL(GSWF(1777), 0)
+    IF_INT_EQUAL(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 0)
         CALL(evt_mario_key_onoff, 0)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
         CALL(evt_win_item_select, PTR(itemsel_table01), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(itemsel_table01), LW(0), 0)
@@ -1112,10 +1019,10 @@ EVT_BEGIN(moon_stone_set_event)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
-        SET_VALUE(GSWF(1777), 1)
-        CALL(evt_pouch_remove_item, 61, LW(0))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("tuki_ana"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("tukinoisi"), 1)
+        SET_VALUE(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 1)
+        CALL(evt_pouch_remove_item, ITEM_MOON_STONE, LW(0))
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tuki_ana"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("tukinoisi"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_get_position, STRING("tukinoisi"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_STONE_SET1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_msg_print, 0, STRING("stg1_hei_00_moon"), 0, 0)
@@ -1129,10 +1036,10 @@ EVT_END()
 static EVT_BEGIN(ki_data_evt_01)
     CALL(evt_item_delete_check, STRING("item_ki01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-#ifdef VERSION_G8ME01_DEMO
-        CALL(evt_item_entry, STRING("item_ki01"), 125, -468, 139, -127, 13, GSWF(5598), 0)
+#if VERSION == VERSION_DEMO
+        CALL(evt_item_entry, STRING("item_ki01"), ITEM_STAR_PIECE, -468, 139, -127, 13, GSWF(GSWF_HEI00_STAR_PIECE_TREE), 0)
 #else
-        CALL(evt_item_entry, STRING("item_ki01"), 125, -468, 139, -127, 14, GSWF(5598), 0)
+        CALL(evt_item_entry, STRING("item_ki01"), ITEM_STAR_PIECE, -468, 139, -127, 14, GSWF(GSWF_HEI00_STAR_PIECE_TREE), 0)
 #endif
     END_IF
     RETURN
@@ -1141,10 +1048,10 @@ EVT_END()
 EVT_BEGIN(ki_data_evt_02)
     CALL(evt_item_delete_check, STRING("item_ki02"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-#ifdef VERSION_G8ME01_DEMO
-        CALL(evt_item_entry, STRING("item_ki02"), 148, -408, 139, -127, 13, GSWF(1778), 0)
+#if VERSION == VERSION_DEMO
+        CALL(evt_item_entry, STRING("item_ki02"), ITEM_MUSHROOM, -408, 139, -127, 13, GSWF(GSWF_HEI00_TREE_MUSHROOM_TAKEN), 0)
 #else
-        CALL(evt_item_entry, STRING("item_ki02"), 148, -408, 139, -127, 14, GSWF(1778), 0)
+        CALL(evt_item_entry, STRING("item_ki02"), ITEM_MUSHROOM, -408, 139, -127, 14, GSWF(GSWF_HEI00_TREE_MUSHROOM_TAKEN), 0)
 #endif
     END_IF
     RETURN
@@ -1179,12 +1086,12 @@ EVT_BEGIN(hei_00_koopa_evt)
     CALL(evt_cam3d_evt_set, -148, 195, 539, -148, 95, -22, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mario_kill_party, 0)
 #endif
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_KUPPA1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
     CALL(evt_snd_bgm_scope, 0, 1)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
     CALL(evt_mario_mov_pos2, -262, -50, 60)
     CALL(evt_mario_jump_pos, -190, 25, -40, 700, 0, -1000)
     BEGIN_INLINE_EVENT
@@ -1222,7 +1129,7 @@ EVT_BEGIN(hei_00_koopa_evt)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_1"), STRING("KPA_T_1"))
     CALL(evt_msg_print, 0, STRING("kpa_stg2_002"), 0, STRING("mario"))
     CALL(evt_msg_print, 0, STRING("kpa_stg2_003"), 0, STRING("ババ"))
-    SET_VALUE(GSW(0), 115)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_03_BOWSER_MEADOWS)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_KOOPA_LAUGH2_2"), LW(0), LW(1), LW(2), 0)
@@ -1254,15 +1161,15 @@ static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_set_tribe, STRING("クリスチーヌ"), STRING("クリスチーヌ"))
     CALL(evt_npc_set_position, STRING("クリスチーヌ"), -200, 25, 35)
     CALL(evt_npc_set_ry, STRING("クリスチーヌ"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("クリスチーヌ"), 1073742880)
+    CALL(evt_npc_flag_onoff, 1, STRING("クリスチーヌ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_status_onoff, 1, STRING("クリスチーヌ"), 2)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(epilogue_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
     CALL(evt_snd_bgm_scope, 0, 1)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
@@ -1278,19 +1185,15 @@ static EVT_BEGIN(epilogue_evt)
         CALL(evt_npc_move_position, STRING("クリスチーヌ"), 130, 35, 0, 60, 0)
     END_INLINE_EVENT
     WAIT_MS(2000)
-    CALL(evt_snd_bgmoff_f, 512, 3000)
-    CALL(evt_snd_envoff_f, 512, 3000)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_set_mapchange_type, 1, 8, 900, 7, 900)
-#else
-    CALL(evt_fade_set_mapchange_type, 1, 10, 900, 9, 900)
-#endif
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 3000)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 900, FADE_IN_BLACK, 900)
     CALL(evt_bero_mapchange, STRING("nok_01"), STRING(""))
     RETURN
 EVT_END()
 
 EVT_BEGIN(hei_00_init_evt)
-    IF_INT_EQUAL(GSW(0), 114)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_02_PEACH_SHALL_WE_DANCE)
         CALL(evt_mario_set_mode, 2)
         SPAWN_EVENT(PTR(hei_00_koopa_evt))
     END_IF
@@ -1300,78 +1203,78 @@ EVT_BEGIN(hei_00_init_evt)
     SET_VALUE(LW(0), STRING("dokan"))
     CALL_CHILD(PTR(bero_case_switch_off))
     CALL(evt_npc_setup, PTR(npcEnt))
-    IF_INT_LESS(GSW(0), 23)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_PETAL_MEADOWS)
         SPAWN_EVENT(PTR(first_evt))
     END_IF
-    IF_INT_LESS(GSW(0), 24)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_01_THE_SHADOW_OF_HOOKTAIL)
         SPAWN_EVENT(PTR(gonbaba_evt))
     END_IF
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 34)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("isi_0"), 1)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_08_OPENING_THE_PATH)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("isi_0"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_isi_0"), 0, 0)
         CALL(evt_mapobj_trans, 0, STRING("h_dokan"), 0, 0, 0)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("h_dokan"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("h_dokan"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("dokan"))
         CALL_CHILD(PTR(bero_case_switch_on))
-        SET_VALUE(GSWF(1774), 1)
-        SET_VALUE(GSWF(1775), 1)
-        SET_VALUE(GSWF(1776), 1)
-        SET_VALUE(GSWF(1777), 1)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("h_dokan"), 1)
+        SET_VALUE(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 1)
+        SET_VALUE(GSWF(GSWF_HEI_MOON_STONE_TAKEN), 1)
+        SET_VALUE(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 1)
+        SET_VALUE(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("h_dokan"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_trans, 0, STRING("h_dokan"), 0, -20, 0)
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_moji"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_moji"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_moji"), 1, 0)
-    IF_INT_LESS(GSW(0), 34)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_08_OPENING_THE_PATH)
         CALL(evt_mapobj_get_position, STRING("isi_3"), LW(0), LW(1), LW(2))
         CALL(evt_mapobj_get_position, STRING("isi_4"), LW(10), LW(11), LW(12))
-        CALL(evt_mobj_timerswitch, 0, STRING("sw_1"), LW(0), 25, LW(2), STRING("sw_2"), LW(10), 25, LW(12), 120, PTR(dokan_evt), GSWF(1804))
-        IF_INT_EQUAL(GSWF(1776), 1)
-            IF_INT_EQUAL(GSWF(1777), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_moji"), 1)
+        CALL(evt_mobj_timerswitch, 0, STRING("sw_1"), LW(0), 25, LW(2), STRING("sw_2"), LW(10), 25, LW(12), 120, PTR(dokan_evt), GSWF(GSWF_HEI00_TIMER_SWITCH))
+        IF_INT_EQUAL(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 1)
+            IF_INT_EQUAL(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 1)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_moji"), MAPOBJ_FLAG_HIDE)
                 CALL(evt_hitobj_onoff, STRING("a_moji"), 1, 1)
-                CALL(evt_run_case_evt, 9, 1, STRING("a_moji"), 0, PTR(moji_msg), 0)
+                CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_moji"), 0, PTR(moji_msg), 0)
             END_IF
         END_IF
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("taiyounoisi"), 1)
-    IF_INT_EQUAL(GSWF(1774), 1)
-        IF_INT_EQUAL(GSWF(1776), 0)
-            CALL(evt_run_case_evt, 9, 1, STRING("a_isi_4"), 0, PTR(sun_stone_set_event), 0)
-            ELSE
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("taiyounoisi"), MAPOBJ_FLAG_HIDE)
+    IF_INT_EQUAL(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 1)
+        IF_INT_EQUAL(GSWF(GSWF_HEI00_SUN_STONE_PLACED), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_isi_4"), 0, PTR(sun_stone_set_event), 0)
+        ELSE
             CALL_CHILD(PTR(setting_sun_stone))
         END_IF
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("tukinoisi"), 1)
-    IF_INT_EQUAL(GSWF(1775), 1)
-        IF_INT_EQUAL(GSWF(1777), 0)
-            CALL(evt_run_case_evt, 9, 1, STRING("a_isi_3"), 0, PTR(moon_stone_set_event), 0)
-            ELSE
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tukinoisi"), MAPOBJ_FLAG_HIDE)
+    IF_INT_EQUAL(GSWF(GSWF_HEI_MOON_STONE_TAKEN), 1)
+        IF_INT_EQUAL(GSWF(GSWF_HEI00_MOON_STONE_PLACED), 0)
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_isi_3"), 0, PTR(moon_stone_set_event), 0)
+        ELSE
             CALL_CHILD(PTR(setting_moon_stone))
         END_IF
     END_IF
     SET_VALUE(LW(0), PTR(ki_data))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     CALL(evt_map_playanim, STRING("anm_mugi_1"), 1, 0)
-    CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), 450, 60, 0, 148, 0, GSWF(1780), 0)
+    CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), 450, 60, 0, ITEM_MUSHROOM, 0, GSWF(GSWF_HEI00_MUSHROOM_BLOCK_HIT), 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -455, 135, -75, 0, 0)
     CALL(evt_npc_pera_onoff, STRING("ゴンババ影"), 0)
-    IF_INT_NOT_EQUAL(GSW(0), 114)
-        IF_INT_NOT_EQUAL(GSW(0), 402)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-            CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI1"))
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_02_PEACH_SHALL_WE_DANCE)
+        IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
         END_IF
     END_IF
     CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_SET(LW(0), 4096)
+    IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
         SET_VALUE(LW(0), STRING("dokan_2"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_bero_overwrite, STRING("dokan_2"), PTR(e3_bero))
         SET_VALUE(LW(0), STRING("dokan_2"))
         CALL_CHILD(PTR(bero_case_switch_on))
     END_IF
-    IF_INT_EQUAL(GSW(0), 402)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
         CALL_CHILD(PTR(epilogue_npc_entry))
         SPAWN_EVENT(PTR(epilogue_evt))
@@ -1379,4 +1282,3 @@ EVT_BEGIN(hei_00_init_evt)
     DEBUG_PUT_MSG(STRING("おわったよ"))
     RETURN
 EVT_END()
-

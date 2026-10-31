@@ -1,3 +1,4 @@
+// Petal Meadows (hei) battle setups: enemy groups, battle stages and the field-battle tables for the area's maps.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -6,6 +7,7 @@
 #include "battle/battle_stage.h"
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
+#include "version.h"
 
 extern BattleUnitKind unit_gold_chorobon;
 
@@ -97,7 +99,7 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_06_02_off[2];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_06_03_off[3];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_07_01_off[2];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_08_01_off[2];
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_08_02_off[2];
 #endif
 NpcBattleSelect btlgrpsel_hei_btlno_hei_09_01_off[3];
@@ -106,13 +108,13 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_10_01_off[2];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_11_01_off[3];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_11_03_off[3];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_12_01_off[2];
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_12_02_off[2];
 #endif
 NpcBattleSelect btlgrpsel_hei_btlno_hei_13_02_off[5];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_13_03_off[4];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_13_04_off[4];
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 NpcSetupBattleInfo btlsetup_hei_tbl[26];
 NpcTerritoryInfo btl_hei_setup_no_tbl[26];
 #else
@@ -129,7 +131,7 @@ BattleStageObjectData hei_btlobject_data[] = {
     {"kusa_3", 2, 1, {-165.0f, 0.0f, 49.0f}, 20, 40, {0}},
     {"hana_1", 2, 1, {100.0f, 0.0f, 76.0f}, 30, 30, {0}},
     {"hana_2", 2, 1, {-44.0f, 0.0f, 74.0f}, 0, 60, {0}},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {"saku_1", 2, 1, {-11.0f, 0.0f, -24.0f}, 10, 50, {0}},
 #else
     {"saku_1", 2, 1, {-24.0f, 0.0f, -39.0f}, 10, 50, {0}},
@@ -188,110 +190,110 @@ BattleStageObjectData hei_btlobject_data[] = {
 
 BattleStageData hei_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_0", // mSpecificStageDataDir
-        13, // mNumObjects
-        hei_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_0", // specificStageDataDir
+        13, // numObjects
+        hei_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_4", // mSpecificStageDataDir
-        6, // mNumObjects
-        &hei_btlobject_data[13], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_4", // specificStageDataDir
+        6, // numObjects
+        &hei_btlobject_data[13], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_4", // mSpecificStageDataDir
-        6, // mNumObjects
-        &hei_btlobject_data[19], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_4", // specificStageDataDir
+        6, // numObjects
+        &hei_btlobject_data[19], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_4", // mSpecificStageDataDir
-        6, // mNumObjects
-        &hei_btlobject_data[25], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_4", // specificStageDataDir
+        6, // numObjects
+        &hei_btlobject_data[25], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_4", // mSpecificStageDataDir
-        6, // mNumObjects
-        &hei_btlobject_data[31], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_4", // specificStageDataDir
+        6, // numObjects
+        &hei_btlobject_data[31], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_4", // mSpecificStageDataDir
-        6, // mNumObjects
-        &hei_btlobject_data[37], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_4", // specificStageDataDir
+        6, // numObjects
+        &hei_btlobject_data[37], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_4", // mSpecificStageDataDir
-        6, // mNumObjects
-        &hei_btlobject_data[43], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_4", // specificStageDataDir
+        6, // numObjects
+        &hei_btlobject_data[43], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_1", // mSpecificStageDataDir
-        3, // mNumObjects
-        &hei_btlobject_data[49], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_1", // specificStageDataDir
+        3, // numObjects
+        &hei_btlobject_data[49], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_1", // mSpecificStageDataDir
-        3, // mNumObjects
-        &hei_btlobject_data[52], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_1", // specificStageDataDir
+        3, // numObjects
+        &hei_btlobject_data[52], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_1", // mSpecificStageDataDir
-        2, // mNumObjects
-        &hei_btlobject_data[55], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_1", // specificStageDataDir
+        2, // numObjects
+        &hei_btlobject_data[55], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_2", // mSpecificStageDataDir
-        2, // mNumObjects
-        &hei_btlobject_data[57], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_2", // specificStageDataDir
+        2, // numObjects
+        &hei_btlobject_data[57], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -301,40 +303,40 @@ BattleStageData hei_btlstage_data[] = {
 
 BattleUnitSetup btlparty_hei_hei_01_01_off_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -355,20 +357,20 @@ BattleGroupSetup btlgrp_hei_hei_01_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_02_02_off_1[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -389,20 +391,20 @@ BattleGroupSetup btlgrp_hei_hei_02_02_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_02_03_off_1[] = {
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -423,20 +425,20 @@ BattleGroupSetup btlgrp_hei_hei_02_03_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_02_04_off_1[] = {
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -457,20 +459,20 @@ BattleGroupSetup btlgrp_hei_hei_02_04_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_03_01_off_1[] = {
     {
-        &unit_sinnosuke, // mUnitKindParams
+        &unit_sinnosuke, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinnosuke, // itemDropTable
     },
     {
-        &unit_sinnosuke, // mUnitKindParams
+        &unit_sinnosuke, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -490,30 +492,30 @@ BattleGroupSetup btlgrp_hei_hei_03_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_04_01_off_1[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -534,20 +536,20 @@ BattleGroupSetup btlgrp_hei_hei_04_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_04_01_off_2[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -568,20 +570,20 @@ BattleGroupSetup btlgrp_hei_hei_04_01_off_2 = {
 
 BattleUnitSetup btlparty_hei_hei_04_02_off_1[] = {
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -602,30 +604,30 @@ BattleGroupSetup btlgrp_hei_hei_04_02_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_04_02_off_2[] = {
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -646,20 +648,20 @@ BattleGroupSetup btlgrp_hei_hei_04_02_off_2 = {
 
 BattleUnitSetup btlparty_hei_hei_05_01_off_1[] = {
     {
-        &unit_togedaruma, // mUnitKindParams
+        &unit_togedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {80.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togedaruma, // itemDropTable
     },
     {
-        &unit_togedaruma, // mUnitKindParams
+        &unit_togedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -679,20 +681,20 @@ BattleGroupSetup btlgrp_hei_hei_05_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_06_02_off_1[] = {
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -713,30 +715,30 @@ BattleGroupSetup btlgrp_hei_hei_06_02_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_06_03_off_1[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -757,30 +759,30 @@ BattleGroupSetup btlgrp_hei_hei_06_03_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_06_03_off_2[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -801,40 +803,40 @@ BattleGroupSetup btlgrp_hei_hei_06_03_off_2 = {
 
 BattleUnitSetup btlparty_hei_hei_07_01_off_1[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -854,40 +856,40 @@ BattleGroupSetup btlgrp_hei_hei_07_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_08_01_off_1[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -907,20 +909,20 @@ BattleGroupSetup btlgrp_hei_hei_08_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_09_01_off_1[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -941,30 +943,30 @@ BattleGroupSetup btlgrp_hei_hei_09_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_09_01_off_2[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -985,20 +987,20 @@ BattleGroupSetup btlgrp_hei_hei_09_01_off_2 = {
 
 BattleUnitSetup btlparty_hei_hei_09_03_off_1[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1019,30 +1021,30 @@ BattleGroupSetup btlgrp_hei_hei_09_03_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_09_03_off_2[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1063,10 +1065,10 @@ BattleGroupSetup btlgrp_hei_hei_09_03_off_2 = {
 
 BattleUnitSetup btlparty_hei_hei_10_01_off_1[] = {
     {
-        &unit_gold_chorobon, // mUnitKindParams
+        &unit_gold_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {125.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1086,20 +1088,20 @@ BattleGroupSetup btlgrp_hei_hei_10_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_11_01_off_1[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1120,30 +1122,30 @@ BattleGroupSetup btlgrp_hei_hei_11_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_11_01_off_2[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1164,20 +1166,20 @@ BattleGroupSetup btlgrp_hei_hei_11_01_off_2 = {
 
 BattleUnitSetup btlparty_hei_hei_11_03_off_1[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1198,30 +1200,30 @@ BattleGroupSetup btlgrp_hei_hei_11_03_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_11_03_off_2[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1242,40 +1244,40 @@ BattleGroupSetup btlgrp_hei_hei_11_03_off_2 = {
 
 BattleUnitSetup btlparty_hei_hei_12_01_off_1[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1295,20 +1297,20 @@ BattleGroupSetup btlgrp_hei_hei_12_01_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_13_02_off_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1329,30 +1331,30 @@ BattleGroupSetup btlgrp_hei_hei_13_02_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_13_02_on_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1373,40 +1375,40 @@ BattleGroupSetup btlgrp_hei_hei_13_02_on_1 = {
 
 BattleUnitSetup btlparty_hei_hei_13_02_on_2[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1427,50 +1429,50 @@ BattleGroupSetup btlgrp_hei_hei_13_02_on_2 = {
 
 BattleUnitSetup btlparty_hei_hei_13_02_on_3[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kuriboo, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1491,20 +1493,20 @@ BattleGroupSetup btlgrp_hei_hei_13_02_on_3 = {
 
 BattleUnitSetup btlparty_hei_hei_13_03_off_1[] = {
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1525,20 +1527,20 @@ BattleGroupSetup btlgrp_hei_hei_13_03_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_13_03_on_1[] = {
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1559,30 +1561,30 @@ BattleGroupSetup btlgrp_hei_hei_13_03_on_1 = {
 
 BattleUnitSetup btlparty_hei_hei_13_03_on_2[] = {
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togekuri, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1603,20 +1605,20 @@ BattleGroupSetup btlgrp_hei_hei_13_03_on_2 = {
 
 BattleUnitSetup btlparty_hei_hei_13_04_off_1[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1637,20 +1639,20 @@ BattleGroupSetup btlgrp_hei_hei_13_04_off_1 = {
 
 BattleUnitSetup btlparty_hei_hei_13_04_on_1[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1671,40 +1673,40 @@ BattleGroupSetup btlgrp_hei_hei_13_04_on_1 = {
 
 BattleUnitSetup btlparty_hei_hei_13_04_on_2[] = {
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patakuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1806,7 +1808,7 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_08_01_off[] = {
     {0},
 };
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_08_02_off[] = {
     {10, &btlgrp_hei_hei_08_01_off_1, &hei_btlstage_data[10]},
     {0},
@@ -1847,7 +1849,7 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_12_01_off[] = {
     {0},
 };
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_12_02_off[] = {
     {10, &btlgrp_hei_hei_12_01_off_1, &hei_btlstage_data[10]},
     {0},
@@ -1963,7 +1965,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_hei_btlno_hei_03_01_off, // select
-        0x2000000F, // battleFlags
+        NPC_BATTLE_NO_COINS | NPC_BATTLE_NO_HEARTS | NPC_BATTLE_NO_FLOWERS | NPC_BATTLE_NO_ITEM | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -1994,7 +1996,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_hei_btlno_hei_05_01_off, // select
-        0x2000000F, // battleFlags
+        NPC_BATTLE_NO_COINS | NPC_BATTLE_NO_HEARTS | NPC_BATTLE_NO_FLOWERS | NPC_BATTLE_NO_ITEM | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -2025,7 +2027,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_hei_btlno_hei_07_01_off, // select
-        0x2000001F, // battleFlags
+        NPC_BATTLE_NO_COINS | NPC_BATTLE_NO_HEARTS | NPC_BATTLE_NO_FLOWERS | NPC_BATTLE_NO_ITEM | NPC_BATTLE_NO_ESCAPE | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -2036,12 +2038,12 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_hei_btlno_hei_08_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_NO_ESCAPE | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     {
         /*"hei08チョロボン２"*/"\x68\x65\x69\x30\x38\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x82\x51", // name
         NULL, 0, // mapName..fixedItem
@@ -2080,7 +2082,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_hei_btlno_hei_10_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_NO_ESCAPE | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -2111,12 +2113,12 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_hei_btlno_hei_12_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_NO_ESCAPE | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     {
         /*"hei12チョロボン２"*/"\x68\x65\x69\x31\x32\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x82\x51", // name
         NULL, 0, // mapName..fixedItem
@@ -2178,10 +2180,10 @@ NpcTerritoryInfo btl_hei_setup_no_tbl[] = {
     {"BTLNO_HEI_06_03", 13},
     {"BTLNO_HEI_07_01", 14},
     {"BTLNO_HEI_08_01", 15},
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     {"BTLNO_HEI_08_02", 16},
 #endif
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {"BTLNO_HEI_09_01", 16},
     {"BTLNO_HEI_09_03", 17},
     {"BTLNO_HEI_10_01", 18},
@@ -2196,10 +2198,10 @@ NpcTerritoryInfo btl_hei_setup_no_tbl[] = {
     {"BTLNO_HEI_11_03", 21},
     {"BTLNO_HEI_12_01", 22},
 #endif
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     {"BTLNO_HEI_12_02", 23},
 #endif
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {"BTLNO_HEI_13_02", 22},
     {"BTLNO_HEI_13_03", 23},
     {"BTLNO_HEI_13_04", 24},
@@ -2210,4 +2212,3 @@ NpcTerritoryInfo btl_hei_setup_no_tbl[] = {
 #endif
     {0},
 };
-

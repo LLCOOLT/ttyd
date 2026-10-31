@@ -1,3 +1,5 @@
+// tou_00 (闘技場, Glitzville): the blimp landing outside the arena; exits to tou_01 and back to gor_04.
+
 #include "eff/n64/eff_kemuri12_n64.h"
 #include "version.h"
 #include "battle/battle_unit.h"
@@ -9,73 +11,28 @@
 #include "manager/evtmgr_cmd.h"
 #include "driver/effdrv.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_bg.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "tou.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bg_auto_scroll_onoff);
-USER_FUNC(evt_bg_set_scrl_offset);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_bgmode_on);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_rotate);
-USER_FUNC(evt_npc_set_rotate_offset);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_npc_wait_pera);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgm_freq);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfx_pit);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_intpl_get_value);
-USER_FUNC(evt_sub_intpl_init);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
 USER_FUNC(kemuri_move);
 static USER_FUNC(kpa_hikousen_yure);
-USER_FUNC(time_shift);
-USER_FUNC(evt_snd_bgmon_f_d);
 static USER_FUNC(npc_set_pos);
 
-extern EvtWord evt_to_tou[];
-extern EvtWord evt_pos_keep[];
-extern EvtWord evt_to_gor[];
 const char* kemuri_name[5];
-extern EvtWord tou_00_koopa_evt[];
-static NpcSetupInfo npcEnt[2];
-extern EvtWord evt_skip[];
-extern EvtWord tou_00_init_evt[];
 
 USER_FUNC(time_shift) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -156,7 +113,7 @@ static EVT_BEGIN(evt_wing)
                     WAIT_FRAMES(1)
                 END_LOOP
             END_LOOP
-            ELSE
+        ELSE
             CALL(evt_sub_intpl_init, 12, -10, 10, 30)
             LOOP(31)
                 CALL(evt_sub_intpl_get_value)
@@ -176,12 +133,12 @@ static EVT_BEGIN(evt_wing)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(evt_to_tou)
     CALL(evt_cam3d_evt_set, -2000, 241, 534, -2000, 145, -8, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_snd_bgmon_f_d, 768, STRING("BGM_STG3_URN1"), 18000, 18000)
-    CALL(evt_snd_bgmoff, 26624)
+    CALL(evt_snd_bgmon_f_d, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG3_URN1"), 18000, 18000)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -190,15 +147,15 @@ EVT_BEGIN(evt_to_tou)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_mario_bgmode_on)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gondora_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hako_1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gondora_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hako_1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING("gondora_1"), 0, 80, 0)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_10"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_9"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_8"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_7"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_4"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_10"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_9"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_8"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_7"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_4"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_snd_sfxon, STRING("SFX_STG3_AIR_SHIP_DRIVE3"), 0)
     CALL(evt_seq_wait, 2)
     CALL(evt_cam3d_evt_set, 0, 241, 534, 0, 145, -8, 15000, 11)
@@ -225,14 +182,14 @@ EVT_BEGIN(evt_to_tou)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_4"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_4"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(800)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_7"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_8"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_7"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_8"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(800)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_10"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_9"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_10"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_9"), MAPOBJ_FLAG_HIDE)
     END_INLINE_EVENT
     CALL(evt_mapobj_get_position, STRING("gondora_1"), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AIR_SHIP_GONDOLA_MOVE1"), LW(10), LW(11), LW(12), GW(11))
@@ -255,8 +212,8 @@ EVT_END()
 EVT_BEGIN(evt_to_tou)
     CALL(evt_cam3d_evt_set, -2000, 241, 534, -2000, 145, -8, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_snd_bgmon_f_d, 768, STRING("BGM_STG3_URN1"), 18000, 18000)
-    CALL(evt_snd_bgmoff, 26624)
+    CALL(evt_snd_bgmon_f_d, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG3_URN1"), 18000, 18000)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -265,15 +222,15 @@ EVT_BEGIN(evt_to_tou)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_mario_bgmode_on)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gondora_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hako_1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gondora_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hako_1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING("gondora_1"), 0, 80, 0)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_10"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_9"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_8"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_7"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_4"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_10"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_9"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_8"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_7"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_4"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_snd_sfxon, STRING("SFX_STG3_AIR_SHIP_DRIVE3"), 0)
     CALL(evt_seq_wait, 2)
     CALL(evt_cam3d_evt_set, 0, 241, 534, 0, 145, -8, 15000, 11)
@@ -300,14 +257,14 @@ EVT_BEGIN(evt_to_tou)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_4"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_4"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(800)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_7"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_8"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_7"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_8"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(800)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_10"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 0, STRING("bou_9"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_10"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("bou_9"), MAPOBJ_FLAG_HIDE)
     END_INLINE_EVENT
     CALL(evt_mapobj_get_position, STRING("gondora_1"), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AIR_SHIP_GONDOLA_MOVE1"), LW(10), LW(11), LW(12), GW(11))
@@ -350,8 +307,8 @@ EVT_BEGIN(evt_to_gor)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gondora_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hako_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gondora_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hako_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING("hikousen"), -30, 20, 0)
     CALL(evt_mapobj_rotate, 1, STRING("hikousen"), 0, 180, 0)
     CALL(evt_mario_bgmode_on)
@@ -359,14 +316,14 @@ EVT_BEGIN(evt_to_gor)
     SPAWN_EVENT_GET_ID(PTR(evt_pos_keep), LW(9))
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_20"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_19"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_20"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_19"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(1000)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_17"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_18"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_17"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_18"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(1000)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_12"), 1)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("bou_14"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_12"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("bou_14"), MAPOBJ_FLAG_HIDE)
     END_INLINE_EVENT
     CALL(evt_mapobj_get_position, STRING("gondora_2"), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AIR_SHIP_GONDOLA_MOVE1"), LW(10), LW(11), LW(12), GW(11))
@@ -384,7 +341,7 @@ EVT_BEGIN(evt_to_gor)
     DELETE_EVENT(LW(9))
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gondora_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gondora_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_snd_sfxon, STRING("SFX_STG3_AIR_SHIP_DRIVE4"), 0)
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, -30, -2000, 20000)
@@ -400,7 +357,7 @@ EVT_BEGIN(evt_to_gor)
     CALL(evt_cam3d_evt_set, -2000, 241, 534, -2000, 145, -8, 20000, 11)
     WAIT_MS(8000)
     DELETE_EVENT(GW(15))
-    SET_VALUE(GSWF(1244), 1)
+    SET_VALUE(GSWF(GSWF_TOU00_BLIMP_RETURNED), 1)
     CALL(evt_bero_mapchange, STRING("gor_04"), STRING("hikousen_return"))
     RETURN
 EVT_END()
@@ -495,7 +452,7 @@ EVT_BEGIN(tou_00_koopa_evt)
             CALL(evt_snd_bgm_freq, 0, LW(0))
             WAIT_MS(50)
         END_LOOP
-        CALL(evt_snd_bgmoff_f, 512, 2000)
+        CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     END_INLINE_EVENT
     SUBTRACT_FLOAT(LW(0), FLOAT(10.0f))
     ADD_FLOAT(LW(1), FLOAT(20.0f))
@@ -564,7 +521,7 @@ EVT_BEGIN(tou_00_koopa_evt)
             END_IF
             IF_INT_EQUAL(LF(0), 0)
                 MULTIPLY_FLOAT(LW(6), FLOAT(1.0f))
-                ELSE
+            ELSE
                 MULTIPLY_FLOAT(LW(6), FLOAT(5.0f))
             END_IF
             ADD_FLOAT(LW(6), LW(3))
@@ -577,7 +534,7 @@ EVT_BEGIN(tou_00_koopa_evt)
             END_IF
             IF_INT_EQUAL(LF(0), 0)
                 ADD_FLOAT(LW(5), FLOAT(2.0f))
-                ELSE
+            ELSE
                 ADD_FLOAT(LW(5), FLOAT(6.0f))
             END_IF
             IF_INT_GREATER_OR_EQUAL(LW(5), FLOAT(360.0f))
@@ -625,7 +582,7 @@ EVT_BEGIN(tou_00_koopa_evt)
     CALL(evt_npc_set_anim, STRING("飛クッパ"), STRING("HKPA_O_2"))
     WAIT_MS(200)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING("飛クッパ"), 512)
+    CALL(evt_npc_flag_onoff, 0, STRING("飛クッパ"), NPC_FLAG_TALK_ANIM)
     BEGIN_INLINE_EVENT
         CALL(evt_msg_print, 0, STRING("kpa_stg4_009"), 0, STRING("飛クッパ"))
     END_INLINE_EVENT
@@ -651,7 +608,7 @@ EVT_BEGIN(tou_00_koopa_evt)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(6)
     END_IF
-    CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING("muj_20"), STRING(""))
     RETURN
 EVT_END()
@@ -680,7 +637,7 @@ USER_FUNC(kemuri_move) {
 static NpcSetupInfo npcEnt[] = {
     {
         /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
-        0x200, // flags
+        NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         hkoopa_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -704,9 +661,9 @@ EVT_BEGIN(evt_skip)
     CALL(evt_snd_sfxoff, GW(11))
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("modoru"))
-        SET_VALUE(GSWF(1244), 1)
+        SET_VALUE(GSWF(GSWF_TOU00_BLIMP_RETURNED), 1)
         CALL(evt_bero_mapchange, STRING("gor_04"), STRING("hikousen_return"))
-        ELSE
+    ELSE
         CALL(evt_bero_mapchange, STRING("tou_01"), 0)
     END_IF
     RETURN
@@ -715,13 +672,13 @@ EVT_END()
 EVT_BEGIN(tou_00_init_evt)
     SET_VALUE(GW(11), 0)
     CALL(evt_npc_setup, PTR(npcEnt))
-    IF_INT_EQUAL(GSW(0), 215)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 1)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mario_set_mode, 2)
         SPAWN_EVENT(PTR(tou_00_koopa_evt))
         RETURN
     END_IF
-    CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU8"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU8"))
     CALL(evt_map_playanim, STRING("jet"), 1, 0)
     CALL(evt_map_playanim, STRING("lightcoloer"), 1, 0)
     SET_VALUE(LW(0), STRING("coloer_light_1"))
@@ -734,13 +691,12 @@ EVT_BEGIN(tou_00_init_evt)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("modoru"))
         SPAWN_EVENT(PTR(evt_to_gor))
-        ELSE
+    ELSE
         SPAWN_EVENT(PTR(evt_to_tou))
     END_IF
     SPAWN_EVENT(PTR(evt_tou_balloon))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 127)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_00_WELCOME_TO_GLITZVILLE)
         SPAWN_EVENT_GET_ID(PTR(evt_skip), GW(15))
     END_IF
     RETURN
 EVT_END()
-

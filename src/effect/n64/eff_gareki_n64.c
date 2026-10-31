@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: rubble (gareki), eight debris pieces that fall to a ground height and fade.
+#include "eff/n64/eff_gareki_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -8,20 +10,20 @@
 #include <stdlib.h>
 
 typedef struct EffGarekiN64Work {
-    Vec position;  // 0x0
-    f32 groundY;   // 0xC
-    f32 velX;      // 0x10
-    f32 velY;      // 0x14
-    f32 offsetX;   // 0x18
-    f32 offsetY;   // 0x1C
-    s32 lifetime;  // 0x20
-    s32 state;     // 0x24
-    s32 alpha;     // 0x28
-    f32 rotX;      // 0x2C
-    f32 rotY;      // 0x30
-    f32 rotZ;      // 0x34
-    f32 rotVelX;   // 0x38
-    f32 rotVelY;   // 0x3C
+    Vec position; // 0x0
+    f32 groundY;  // 0xC
+    f32 velX;     // 0x10
+    f32 velY;     // 0x14
+    f32 offsetX;  // 0x18
+    f32 offsetY;  // 0x1C
+    s32 lifetime; // 0x20
+    s32 state;    // 0x24
+    s32 alpha;    // 0x28
+    f32 rotX;     // 0x2C
+    f32 rotY;     // 0x30
+    f32 rotZ;     // 0x34
+    f32 rotVelX;  // 0x38
+    f32 rotVelY;  // 0x3C
 } EffGarekiN64Work;
 
 void gareki_dl(s32 type);
@@ -95,7 +97,7 @@ static effN64Vtx stg__s_v[] = {
     {1, -4, 0, 1024, 2304, 255, 255, 255, 255},
 };
 
-EffectEntry* effGarekiN64Entry(f32 x, f32 y, f32 z, f32 groundY) {
+EffectEntry* effGarekiN64Entry(s32 type, f32 x, f32 y, f32 z, f32 groundY) {
     f32* tp;
     EffGarekiN64Work* work;
     f32* vp;

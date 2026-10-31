@@ -1,3 +1,5 @@
+// Bomb blast (Bomb): eight blast rays 45 degrees apart that stretch along two scale tables, plus a confetti burst;
+// lasts 36 frames. Element 0 of the work array is the header and is not drawn.
 #include "eff/eff_bomb.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,7 +8,6 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 
 typedef struct EffBombWork {
@@ -83,7 +84,7 @@ EffectEntry* effBombEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
 static void effBombMain(EffectEntry* effect) {
     EffBombWork* work = effect->userdata;
     Vec position;
-    Vec local = { 0.0f, 0.0f, 0.0f };
+    Vec local = {0.0f, 0.0f, 0.0f};
     s32 i, frame;
 
     local.x = work->position.x;
@@ -104,8 +105,7 @@ static void effBombMain(EffectEntry* effect) {
                 work->scaleX = scale_dt[frame * 3 + 1] / 100.0f;
                 work->scaleY = scale_dt[frame * 3 + 2] / 100.0f;
             }
-        }
-        else if ((u32)frame < 54) {
+        } else if ((u32)frame < 54) {
             work->offset = scale_dt2[frame * 3];
             work->scaleX = scale_dt2[frame * 3 + 1] / 100.0f;
             work->scaleY = scale_dt2[frame * 3 + 2] / 100.0f;
@@ -138,7 +138,7 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE,
                   GX_AF_NONE);
-    GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
@@ -157,7 +157,7 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
     GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_TEXA, GX_CA_KONST, GX_CA_A1, GX_CA_ZERO);
     GXSetTevKAlphaSel(GX_TEVSTAGE1, GX_TEV_KASEL_1_2);
-    GXSetTevColor(GX_TEVREG1, (GXColor){ 0xFF, 0xFF, 0xFF, 0x30 });
+    GXSetTevColor(GX_TEVREG1, (GXColor){0xFF, 0xFF, 0xFF, 0x30});
     GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -177,7 +177,6 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     scale = 30.0f * scale;
     half = 0.5f;
     one = 1.0f;
-
 
     work++;
     for (i = 1; i < effect->count; i++, work++) {

@@ -1,3 +1,4 @@
+// eff_magic1_n64.c: Paper Mario 64 magic effect 1 entry (effMagic1N64Entry), its work struct and sine blend helpers.
 #pragma once
 
 #include <dolphin/types.h>
@@ -18,7 +19,9 @@ typedef struct EffMagic1N64Work {
 extern double sin(double x);
 
 // sin of an angle given in degrees
-static inline f32 effMagic1SinDeg(f32 deg) { return sin(6.2831855f * deg / 360.0f); }
+static inline f32 effMagic1SinDeg(f32 deg) {
+    return sin(6.2831855f * deg / 360.0f);
+}
 
 // color pulse between two channel values: from + (to - from) * (1 + sin(deg)) / 2
 static inline f32 effMagic1Blend(s32 from, s32 to, f32 deg) {

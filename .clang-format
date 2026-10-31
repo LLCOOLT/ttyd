@@ -5,7 +5,7 @@ ColumnLimit: 0
 PointerAlignment: Left
 BreakBeforeBraces: Attach
 SpaceAfterCStyleCast: false
-Cpp11BracedListStyle: false
+Cpp11BracedListStyle: true
 IndentCaseLabels: true
 BinPackArguments: true
 BinPackParameters: true

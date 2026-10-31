@@ -1,3 +1,5 @@
+// jin_10 (ダイム寺院, Creepy Steeple): room with a sliding gate and a block with the Tornado Jump badge;
+// doors to jin_09 and jin_11.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -5,38 +7,24 @@
 #include "manager/evtmgr_cmd.h"
 #include "party.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "jin.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_kagemario_init);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_exparty);
-USER_FUNC(evt_mario_get_name_hitobj_push);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_push);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_get_status);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
 static USER_FUNC(get_pos);
 USER_FUNC(get_width);
-USER_FUNC(set_pos);
 
 static BeroEntry bero_entry_data[3];
 extern EvtWord unpush_evt[];
 extern EvtWord vivi_chk[];
-extern EvtWord jin_10_init_evt[];
 
 static USER_FUNC(get_pos) {
     EvtWord* args = event->args;
@@ -64,8 +52,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -81,8 +69,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -114,7 +102,7 @@ static EVT_BEGIN(push_evt)
         CALL(evt_mapobj_get_position, STRING("saku"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_GRID_MOVE1"), LW(0), LW(1), LW(2), GW(3))
         SET_VALUE(GF(0), 1)
-        ELSE
+    ELSE
         CALL(evt_mapobj_get_position, STRING("saku"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfx_pos, GW(3), LW(0), LW(1), LW(2))
     END_IF
@@ -123,7 +111,7 @@ static EVT_BEGIN(push_evt)
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
     IF_INT_LESS(LW(3), LW(0))
         SET_FLOAT_VALUE(LW(10), FLOAT(0.5f))
-        ELSE
+    ELSE
         SET_FLOAT_VALUE(LW(10), FLOAT(-1.0f))
     END_IF
     ADD_FLOAT(GW(10), LW(10))
@@ -217,7 +205,7 @@ EVT_BEGIN(unpush_evt)
                 CALL(evt_snd_sfxoff, GW(3))
                 SET_VALUE(GF(0), 0)
             END_IF
-            ELSE
+        ELSE
             SUBTRACT_FLOAT(GW(10), FLOAT(0.5f))
             IF_FLOAT_LESS(GW(10), FLOAT(0.0f))
                 SET_FLOAT_VALUE(GW(10), FLOAT(0.0f))
@@ -225,7 +213,7 @@ EVT_BEGIN(unpush_evt)
                     CALL(evt_snd_sfxoff, GW(3))
                     SET_VALUE(GF(0), 0)
                 END_IF
-                ELSE
+            ELSE
                 IF_INT_EQUAL(GF(0), 0)
                     CALL(evt_mapobj_get_position, STRING("saku"), LW(0), LW(1), LW(2))
                     CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_GRID_MOVE1"), LW(0), LW(1), LW(2), GW(3))
@@ -257,7 +245,7 @@ EVT_BEGIN(vivi_chk)
                 MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
             END_IF
             IF_FLOAT_LESS(LW(0), FLOAT(25.0f))
-                ELSE
+            ELSE
             END_IF
         END_IF
         WAIT_FRAMES(1)
@@ -267,19 +255,19 @@ EVT_END()
 
 EVT_BEGIN(jin_10_init_evt)
     SET_VALUE(GF(0), 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
-    CALL(evt_mobj_badgeblk, STRING("m"), 60, 60, -25, 243, 0, GSWF(2241), 1)
+    CALL(evt_mobj_badgeblk, STRING("m"), 60, 60, -25, ITEM_TORNADO_JUMP, 0, GSWF(GSWF_JIN10_TORNADO_JUMP_BLOCK_HIT), 1)
     SET_FLOAT_VALUE(GW(10), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(11), FLOAT(0.0f))
     CALL(evt_hit_bind_mapobj, STRING("a_saku"), STRING("saku"))
-    CALL(evt_run_case_evt, 10, 1, STRING("a_saku"), 0, PTR(push_evt), 0)
+    CALL(evt_run_case_evt, CASE_COND_PUSH, 1, STRING("a_saku"), 0, PTR(push_evt), 0)
     SPAWN_EVENT(PTR(unpush_evt))
     SPAWN_EVENT(PTR(vivi_chk))
     RETURN
@@ -292,4 +280,3 @@ USER_FUNC(get_width) {
     evtSetFloat(event, args[1], 0.8f * party->width);
     return EVT_RETURN_DONE;
 }
-

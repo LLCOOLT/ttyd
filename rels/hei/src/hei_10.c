@@ -1,3 +1,6 @@
+// hei_10 (平原, Petal Meadows): Shhwonk Fortress central room linking hei_07, hei_09 and hei_11.
+// The Gold Fuzzy (gold_chorobon) and its Fuzzy swarm appear and are fought here (story 32); Multibounce block.
+// Deferred code generation for this unit (removal tested: function order and code differ).
 #pragma defer_codegen on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -16,85 +19,149 @@
 #include "manager/evtmgr_cmd.h"
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "hei.h"
 #include "data_tables.h"
+#include "version.h"
+#include "evt/evt_story.h"
 void PSMTXIdentity(Mtx m);
 f32 PSVECDistance(const Vec* a, const Vec* b);
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
 void* _mapAlloc(u32 size);
 #else
 #include "memory.h"
 #endif
 #include "driver/extdrv.h"
-AnimationPose* animPoseGetAnimPosePtr(s32 poseId);
-f32 animPoseGetLoopTimes(s32 id);
-void dispEntry(CameraId camera, f32 order, s32 renderMode, DispCallback callback, void* param);
-f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
-f32 evtGetFloat(EventEntry* entry, EvtWord index);
-MarioWork* marioGetPtr(void);
-void *memset(void *dest, int ch, size_t count);
-NpcEntry* npcNameToPtr(const char* name);
-s32 psndSFXOn_3D(const char* name, Vec* position);
+#include "libc_decls.h"
+#include "driver/mapdrv.h"
+void* memset(void* dest, int ch, size_t count);
 
-typedef struct Chorobon { s16 flags; s16 state; s16 stateTimer; u8 pad_6[2]; Vec target; f32 vy; s16 timer; u8 pad_1a[2]; f32 speed; f32 gravity; s16 next; u8 reserved_26[0x30 - 0x26]; } Chorobon;
-typedef struct ChorobonWork { s32 flags; s32 count; Chorobon* chb; } ChorobonWork;
+typedef struct Chorobon {
+    s16 flags;
+    s16 state;
+    s16 stateTimer;
+    u8 pad_6[2];
+    Vec target;
+    f32 vy;
+    s16 timer;
+    u8 pad_1a[2];
+    f32 speed;
+    f32 gravity;
+    s16 next;
+    u8 reserved_26[0x30 - 0x26];
+} Chorobon;
+typedef struct ChorobonWork {
+    s32 flags;
+    s32 count;
+    Chorobon* chb;
+} ChorobonWork;
 static ChorobonWork* wp;
 static f32 randf(f32 min, f32 max);
-static inline f32 chb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = a * y; a = -a; } return a; }
-static inline f32 chb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a; } return a; }
+// Polynomial sine/cosine approximations for the Fuzzy swarm (radians, 0..2pi).
+// FAKE: the no-op `a = a;` statements are needed for a match (without them the code differs); behaviour-identical.
+static inline f32 chb_sin(f32 x) {
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a;
+            a = a * x;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a;
+            a = a * y;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a;
+        a = a * y;
+        a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a;
+        a = a * y;
+        a = -a;
+    }
+    return a;
+}
+static inline f32 chb_cos(f32 x) {
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a;
+            a = -a;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a;
+        a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a;
+    }
+    return a;
+}
 void chb_jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void ext_disp(CameraId camera, void* param);
 
-s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_event_from_road(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_evt_off(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_evt_set(EventEntry* event, BOOL isFirstCall);
 s32 evt_chorobon_escape(EventEntry* event, BOOL isFirstCall);
 s32 evt_chorobon_wait(EventEntry* event, BOOL isFirstCall);
-s32 evt_eff_fukidashi(EventEntry* event, BOOL isFirstCall);
-s32 evt_ext_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_playanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_set_tevcallback(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_dispflag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_key_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_pose(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_wait_movable(EventEntry* event, BOOL isFirstCall);
-s32 evt_mobj_badgeblk(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_print(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_battle_start(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_change_fbat_mode(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_jump_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_anim(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_wait_battle_end(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_set_rev_mode(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall);
 static s32 npc_jump(EventEntry* event, BOOL isFirstCall);
 s32 wait_anim_end(EventEntry* event, BOOL isFirstCall);
 s32 wait_anim_frame(EventEntry* event, BOOL isFirstCall);
 static void ext_dispent(void);
 static void ext_main(void);
-void chb_jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void ext_shadow_disp(CameraId camera, void* param);
-static void ext_disp(CameraId camera, void* param);
 static void ext_init(void);
-static f32 randf(f32 min, f32 max);
 extern s32 hei_test_water_tev[];
 
 static BeroEntry bero_entry_data[4];
 static ExtTexInfo ext_data[21];
 extern EvtWord golden_se[];
 extern EvtWord evt_golden[];
-extern EvtWord hei_10_init_evt[];
-
-int rand(void);
 
 static inline f32 rand01(void) {
     return rand() / 32767.0f;
@@ -147,8 +214,8 @@ static BeroEntry bero_entry_data[] = {
     {
         ("w_bero"), // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -163,8 +230,8 @@ static BeroEntry bero_entry_data[] = {
     {
         ("e_bero"), // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -180,8 +247,8 @@ static BeroEntry bero_entry_data[] = {
         ("dokan"), // hitName
         2, // type
         0, // sfxId
-        6, // directionId
-        100000, // centerPosition
+        BERO_DIR_W, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -250,7 +317,13 @@ void chb_jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f3
     chb->state = 100;
     chb->next = next;
 }
-static inline void jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, rs * (smax - smin) + smin, rg * (gmax - gmin) + gmin); } static inline void escape(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, 2.0f * (rs * (smax - smin) + smin), rg * (gmax - gmin) + gmin); }
+static inline void jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) {
+    chb_jump(pose, chb, next, x, y, z, rs * (smax - smin) + smin, rg * (gmax - gmin) + gmin);
+}
+static inline void escape(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) {
+    chb_jump(pose, chb, next, x, y, z, 2.0f * (rs * (smax - smin) + smin), rg * (gmax - gmin) + gmin);
+}
+// Lifetime analysis and dead-assignment removal off for jump_r, escape_r and ext_main (removal tested).
 #pragma push
 #pragma opt_lifetimes off
 #pragma opt_dead_assignments off
@@ -274,27 +347,26 @@ static void ext_main(void) {
     f32 speed;
     f32 x;
     f32 z;
-    f32 gravity;
     f32 angle;
     f32 y;
     Vec pos;
 
     pose = extGetPosePtr();
     chb = wp->chb;
-    sfx = (0, "SFX_STG1_CHORO_ESCAPE1");
+    sfx = (0, "SFX_STG1_CHORO_ESCAPE1"); // FAKE: the comma expression is needed for a match (a plain assignment changes the code); same value
     for (i = 0; i < wp->count; i++, pose++, chb++) {
         switch (chb->state) {
             case 0: {
-                f32 z, dist, x, y;
-                x = rand() / 32767.0f;
-                dist = randf(4.0f, 7.0f);
+                f32 hopZ, hopDist, hopX, hopY;
+                hopX = rand() / 32767.0f;
+                hopDist = randf(4.0f, 7.0f);
                 {
-                    f32 rad = 3.1415927f * randf_scale(x, 0.0f, 360.0f) / 180.0f;
-                    x = (*pose->mtx)[0][3] + chb_sin(rad) * dist;
-                    y = (*pose->mtx)[1][3];
-                    z = (*pose->mtx)[2][3] - dist * chb_cos(rad);
+                    f32 rad = 3.1415927f * randf_scale(hopX, 0.0f, 360.0f) / 180.0f;
+                    hopX = (*pose->mtx)[0][3] + chb_sin(rad) * hopDist;
+                    hopY = (*pose->mtx)[1][3];
+                    hopZ = (*pose->mtx)[2][3] - hopDist * chb_cos(rad);
                 }
-                jump_r(pose, chb, x, y, z);
+                jump_r(pose, chb, hopX, hopY, hopZ);
                 break;
             }
             case 1:
@@ -401,6 +473,7 @@ static inline s32 npc_jump_get_time(EventEntry* event, EvtWord* args) {
     return evtGetValue(event, args[6]);
 }
 
+// Copy propagation and lifetime analysis off for npc_jump, as in the other ext-pose swarm code (removal tested).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static s32 npc_jump(EventEntry* event, BOOL isFirstCall) {
@@ -424,8 +497,12 @@ static s32 npc_jump(EventEntry* event, BOOL isFirstCall) {
         Vec a;
         Vec b;
 
-        b = vb; b.x = npc->position.x; b.z = npc->position.z;
-        a = va; a.x = x; a.z = z;
+        b = vb;
+        b.x = npc->position.x;
+        b.z = npc->position.z;
+        a = va;
+        a.x = x;
+        a.z = z;
         dist = PSVECDistance(&a, &b);
         dy = y - npc->position.y;
         if (t == 0.0f) {
@@ -434,6 +511,7 @@ static s32 npc_jump(EventEntry* event, BOOL isFirstCall) {
             speed = dist / t;
         }
         vy = dy / t + gravity * t / 2.0f;
+        // The floats are stored as their bit patterns through the word view (a float store gives different code).
         event->userdata[0] = *(s32*)&t;
         event->userdata[1] = *(s32*)&vy;
         event->userdata[2] = *(s32*)&speed;
@@ -503,7 +581,7 @@ EVT_BEGIN(evt_golden)
     WAIT_FRAMES(10)
     CALL(evt_mario_wait_movable)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_MARIO_FIND1_3")), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 0, STRING(("eff0")), 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -522,13 +600,13 @@ EVT_BEGIN(evt_golden)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     DIVIDE_FLOAT(LW(0), FLOAT((4.0f)))
     SET_FLOAT_VALUE(LW(3), FLOAT((0.0f)))
-    CALL(evt_npc_flag_onoff, 1, STRING(("ゴールドチョロボン")), 131088)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ゴールドチョロボン")), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     LOOP(3)
         ADD_FLOAT(LW(3), LW(0))
         CALL(evt_snd_sfxon_3d, STRING(("SFX_STG1_CHORO_MOVE1")), LW(3), LW(1), LW(2), 0)
         CALL(evt_npc_jump_position, STRING(("ゴールドチョロボン")), LW(3), LW(1), LW(2), 300, 0, FLOAT(30.0f), 0)
     END_LOOP
-    CALL(evt_npc_flag_onoff, 1, STRING(("ゴールドチョロボン")), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ゴールドチョロボン")), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 30)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -538,20 +616,20 @@ EVT_BEGIN(evt_golden)
     WAIT_MS(500)
     CALL(evt_npc_get_position, STRING(("ゴールドチョロボン")), LW(3), LW(4), LW(5))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_STG1_CHORO_MOVE1")), LW(3), LW(4), LW(5), 0)
-    CALL(evt_npc_flag_onoff, 0, STRING(("ゴールドチョロボン")), 131088)
+    CALL(evt_npc_flag_onoff, 0, STRING(("ゴールドチョロボン")), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     CALL(npc_jump, STRING(("ゴールドチョロボン")), LW(0), LW(1), LW(2), FLOAT(3.5f), FLOAT((2.0f)), 0)
     CALL(evt_npc_battle_start, STRING(("ゴールドチョロボン")))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_mario_dispflag_onoff, 0, 2)
     CALL(evt_mario_set_pose, STRING(("M_S_1")))
-    CALL(evt_snd_bgmon, 512, STRING(("BGM_STG1_TORIDE1")))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(("BGM_STG1_TORIDE1")))
     CALL(evt_npc_set_position, STRING(("ゴールドチョロボン")), 0, -15, 0)
     CALL(evt_ext_entry, 500, PTR(ext_data), PTR(ext_init), PTR(ext_main), PTR(ext_dispent))
     CALL(evt_msg_print, 0, STRING(("stg1_hei_44")), 0, STRING(("ゴールドチョロボン")))
     WAIT_MS(300)
     CALL(evt_chorobon_escape)
     CALL(evt_npc_set_position, STRING(("ゴールドチョロボン")), 0, -1000, 0)
-    SET_VALUE(GSW(0), 32)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_06_01_GOLD_FUZZY)
     CALL(evt_mario_key_onoff, 1)
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(LW(0), FLOAT((0.0f)))
@@ -559,7 +637,7 @@ EVT_BEGIN(evt_golden)
         SET_FLOAT_VALUE(LW(2), FLOAT(500.0f))
         DIVIDE_FLOAT(LW(2), FLOAT(40.0f))
         SET_FLOAT_VALUE(LW(3), FLOAT((0.0f)))
-        CALL(evt_npc_flag_onoff, 0, STRING(("ゴールドチョロボン")), 131088)
+        CALL(evt_npc_flag_onoff, 0, STRING(("ゴールドチョロボン")), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
         LOOP(40)
             ADD_FLOAT(LW(3), LW(2))
             CALL(npc_jump, STRING(("ゴールドチョロボン")), LW(0), LW(1), LW(3), FLOAT(0.7998047f), FLOAT((1.0f)), 0)
@@ -574,14 +652,14 @@ EVT_BEGIN(hei_10_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING(("BGM_STG1_TORIDE1")))
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG1_HEI3")))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(("BGM_STG1_TORIDE1")))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG1_HEI3")))
     CALL(evt_snd_set_rev_mode, 1)
-    CALL(evt_mobj_badgeblk, STRING(("m")), 100, 46, -75, 241, 0, GSWF(1796), 1)
+    CALL(evt_mobj_badgeblk, STRING(("m")), 100, 46, -75, ITEM_MULTIBOUNCE, 0, GSWF(GSWF_HEI10_MULTIBOUNCE_BLOCK_HIT), 1)
     CALL(evt_npc_set_position, STRING(("ゴールドチョロボン")), 0, -1000, 0)
-    IF_INT_EQUAL(GSWF(1774), 1)
-        IF_INT_EQUAL(GSWF(1775), 1)
-            IF_INT_LESS(GSW(0), 32)
+    IF_INT_EQUAL(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 1)
+        IF_INT_EQUAL(GSWF(GSWF_HEI_MOON_STONE_TAKEN), 1)
+            IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_06_01_GOLD_FUZZY)
                 CALL(evt_npc_set_position, STRING(("ゴールドチョロボン")), 0, -15, 0)
                 CALL(evt_npc_change_fbat_mode, 1)
                 SPAWN_EVENT(PTR(evt_golden))
@@ -590,8 +668,7 @@ EVT_BEGIN(hei_10_init_evt)
     END_IF
     CALL(evt_map_playanim, STRING(("mizu")), 1, 0)
     CALL(evt_map_set_tevcallback, 1, PTR(hei_test_water_tev))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("mizu")), 16777216)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("mizu")), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("mizu")), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("mizu")), MAPOBJ_FLAG_DISPLAY_LIST)
     RETURN
 EVT_END()
-

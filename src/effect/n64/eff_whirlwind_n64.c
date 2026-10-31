@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: four spinning wind bands around a Mario target, used in battle; `life` sets the duration.
 #include "mario/mario.h"
 #include "eff/eff_n64.h"
 #include "eff/n64/eff_whirlwind_n64.h"
@@ -8,7 +9,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
 
 u8 col_r[3] = {0xFF, 0xFF, 0x40};
 u8 col_g[3] = {0xFF, 0x40, 0x40};
@@ -163,22 +163,22 @@ void effWhirlwindMain(EffectEntry* effect) {
     type = work->type;
     switch (type) {
         case 8:
-        if (life > 5) {
-            work->alpha = work->alpha + 0.05f * (255 - work->alpha);
-        }
-        work->scale = work->baseScale * life / work->duration;
-        if (life < 10) {
-            work->alpha = life * 25;
-        }
+            if (life > 5) {
+                work->alpha = work->alpha + 0.05f * (255 - work->alpha);
+            }
+            work->scale = work->baseScale * life / work->duration;
+            if (life < 10) {
+                work->alpha = life * 25;
+            }
             break;
         default:
-        if (life > 5) {
-            work->alpha = work->alpha + 0.3f * (100 - work->alpha);
-        }
-        if (life < 10) {
-            work->alpha *= 0.8f;
-            work->scale += 0.1f * (2.0f * work->baseScale - work->scale);
-        }
+            if (life > 5) {
+                work->alpha = work->alpha + 0.3f * (100 - work->alpha);
+            }
+            if (life < 10) {
+                work->alpha *= 0.8f;
+                work->scale += 0.1f * (2.0f * work->baseScale - work->scale);
+            }
     }
     if (work->target != NULL) {
         Vec* p = &work->target->position;

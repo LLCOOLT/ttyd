@@ -1,44 +1,44 @@
 /*
- * libtess (SGI OpenGL Sample Implementation GLU): geometric predicates on the sweep plane.
+ * SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008)
+ * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice including the dates of first publication and
+ * either this permission notice or a reference to
+ * http://oss.sgi.com/projects/FreeB/
+ * shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * SILICON GRAPHICS, INC. BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+ * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Except as contained in this notice, the name of Silicon Graphics, Inc.
+ * shall not be used in advertising or otherwise to promote the sale, use or
+ * other dealings in this Software without prior written authorization from
+ * Silicon Graphics, Inc.
+ */
+
+/*
  * Author: Eric Veach, July 1994.
  *
- * tst.rel carries a copy of the GLU polygon tessellator from the OpenGL Sample Implementation (Silicon Graphics,
- * Inc., SGI Free Software License B). The assertions of this copy are compiled in, and each one passes its source
- * line to __assert, so the layout of every file follows the original: the license and author header take the
- * first lines, and the functions keep their original order and length.
+ * libtess geometric predicates on the (s,t) sweep plane (normal.c projects the vertices onto it):
+ * __gl_vertLeq, __gl_edgeEval/__gl_edgeSign, __gl_transEval/__gl_transSign (s and t exchanged),
+ * __gl_vertCCW and __gl_edgeIntersect. geom.h's macros (VertLeq, EdgeEval, ...) are the usual way
+ * to call them. Deferred inlining puts the Eval/Sign functions, with their assertions and the same
+ * line numbers, inside __gl_edgeIntersect, and emits the functions last to first.
  *
- * Contents of this file:
- *
- *   __gl_vertLeq        lexicographic (s, then t) order of two vertices
- *   __gl_edgeEval       signed t-distance from an edge to a vertex between its ends
- *   __gl_edgeSign       the sign of __gl_edgeEval, cheaper to compute
- *   __gl_transEval      __gl_edgeEval with s and t exchanged
- *   __gl_transSign      __gl_edgeSign with s and t exchanged
- *   __gl_vertCCW        orientation of a vertex triple
- *   __gl_edgeIntersect  intersection point of two edges
- *
- * All of them work on the (s,t) projection of the vertices onto the sweep plane (normal.c); the 3D coordinates are
- * not used.
- *
- * The macros of geom.h (VertLeq, EdgeEval, TransLeq, ...) are the usual way to call these; the sweep (sweep.c),
- * the monotone tessellation (tessmono.c) and the priority queue ordering (priorityq.c) use them.
- *
- * Numerical notes from the original:
- *
- *   - EdgeEval and TransEval are exact when the vertex lies on the edge, and never return a value
- *     outside the range of the edge's end coordinates.
- *   - EdgeSign and TransSign give the same sign as the Eval versions with one multiply less.
- *   - EdgeIntersect interpolates from the two middle vertices of the four, once in each ordering,
- *     which keeps the computed point inside the bounding boxes of both edges.
- *
- * Inlining: with deferred inlining the compiler inlines the four Eval/Sign functions into
- * __gl_edgeIntersect, so their assertions appear there as well, with the same line numbers.
- *
- * Emission order: deferred inlining also emits the functions last to first, so
- * __gl_edgeIntersect comes first in .text and __gl_vertLeq last.
- *
- * Constants: 0.5 for the midpoint of the "no intersection" cases, 0.0 for the comparisons.
- *
+ * tst.rel keeps this copy's assertions, and each passes its source line to __assert, so every line
+ * of this file stays where the original has it: this notice and the author header fill lines 1-44.
  *
  *
  */

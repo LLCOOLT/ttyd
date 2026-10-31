@@ -1,6 +1,9 @@
+// jin_07 (ダイム寺院, Creepy Steeple): Boo (teresa) room with flames and a treasure chest, and a Star Piece;
+// doors to jin_06 and jin_08.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
+// Deferred code generation: without it the functions are not emitted in the original order (jin.rel differs).
 #pragma defer_codegen on
 #include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
@@ -8,102 +11,54 @@
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/extdrv.h"
+#include "driver/itemdrv.h"
 #include "mario/mario.h"
 #include "mario/mariost.h"
 #include "memory.h"
 #include "evt/evt_bero.h"
 #include "jin.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "data_tables.h"
+#include "evt/evt_story.h"
+#include "libc_decls.h"
+#include "driver/casedrv.h"
 
-s32 extGetPoseNum(void);
-void extLoadShadowMtx(Mtx mtx);
-void extLoadShadowRenderMode(void);
-void extLoadShadowVertex(void);
-void extLoadShadowTev(void);
-void extDrawShadow(void);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
 static void senteresa_ext_disp(CameraId camera, void* param);
-typedef struct Teresa { Vec pos; Vec dst; f32 t; f32 bobPhase; f32 angleSpeed; f32 tangentX; s32 wait; u8 state; } Teresa;
-static Teresa* pTeresa;
+typedef struct SenTeresaPath {
+    Vec pos;
+    Vec dst;
+    f32 t;
+    f32 bobPhase;
+    f32 angleSpeed;
+    f32 tangentX;
+    s32 wait;
+    u8 state;
+} SenTeresaPath;
+static SenTeresaPath* pTeresa;
 static s32 g_nNumEndProc[1];
 s32 g_nNumOutBox[1];
-void computePosHermite(ExtdrvPose* pose, Teresa* ter);
-f32 randf(f32 min, f32 max);
-int rand(void);
-double cos(double x);
-static inline f32 cosf(f32 x) { return cos(x); }
+void computePosHermite(ExtdrvPose* pose, SenTeresaPath* ter);
+// Float wrapper of cos(), the inline cosf of the original C library headers
+// (renamed: the math.h used here declares cosf as an external function).
+static inline f32 cosf_inline(f32 x) {
+    return cos(x);
+}
 
-USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_cam_shift_reset);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_set_bound_rate);
-USER_FUNC(evt_item_set_gravity);
-USER_FUNC(evt_item_set_jump_power);
-USER_FUNC(evt_item_set_move_dir_speed);
-USER_FUNC(evt_item_status_on);
-USER_FUNC(evt_kagemario_init);
-USER_FUNC(evt_map_replace_mapobj);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_motion);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
-USER_FUNC(senteresa_okure_move);
-USER_FUNC(senteresa_okure_move_init);
-USER_FUNC(senteresa_get_position);
 static void senteresa_ext_shadow_disp(void);
-static void senteresa_ext_disp(CameraId camera, void* param);
 static void senteresa_ext_dispent(void);
 static void senteresa_ext_main(void);
-void computePosHermite(ExtdrvPose* pose, Teresa* ter);
 static f32 computePos(f32 a, f32 b, f32 t);
 static void senteresa_ext_init(void);
 static f32 randf(f32 min, f32 max);
@@ -114,7 +69,6 @@ extern EvtWord evt_locked[];
 static NpcSetupInfo npcEnt[2];
 static ExtTexInfo senteresa_ext_entry_data[5];
 extern EvtWord evt_teresa_box_open[];
-extern EvtWord jin_07_init_evt[];
 
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -165,7 +119,7 @@ static EVT_BEGIN(check_roll)
     CALL(evt_mario_get_motion, LW(0))
     IF_INT_EQUAL(LW(0), 22)
         SET_VALUE(LW(0), 0)
-        ELSE
+    ELSE
         SET_VALUE(LW(0), 1)
     END_IF
     RETURN
@@ -175,8 +129,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -192,8 +146,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_1", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         70, // length
         NULL, // enterEvent
@@ -210,8 +164,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -243,7 +197,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"テレサ"*/"\x83\x65\x83\x8C\x83\x54", // name
-        0x40000620, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -274,7 +228,7 @@ static void senteresa_ext_init(void) {
     f32 a;
     f32 r;
 
-    pTeresa = _mapAlloc(sizeof(Teresa) * 200);
+    pTeresa = _mapAlloc(sizeof(SenTeresaPath) * 200);
     for (i = 0; i < n; i++, pose++) {
         pose->flags = 2;
         pose->dir = 270.0f;
@@ -289,7 +243,7 @@ static void senteresa_ext_init(void) {
         r = randf(10.0f, 30.0f);
         pTeresa[i].dst.x = 200.0f;
         pTeresa[i].dst.y = pTeresa[i].pos.y + randf(27.0f, 170.0f);
-        pTeresa[i].dst.z = pTeresa[i].pos.z + r * cosf(a);
+        pTeresa[i].dst.z = pTeresa[i].pos.z + r * cosf_inline(a);
         pTeresa[i].bobPhase = 0.0f;
         pTeresa[i].angleSpeed = randf(-0.1f, 0.1f);
         pTeresa[i].t = 0.0f;
@@ -309,7 +263,7 @@ inline f32 jin07HermiteMul3(f32 a, f32 b, f32 c) {
     return (a * b) * c;
 }
 
-void computePosHermite(ExtdrvPose* pose, Teresa* ter) {
+void computePosHermite(ExtdrvPose* pose, SenTeresaPath* ter) {
     Vec m0 = {0.0f, 0.0f, 0.0f};
     Vec m1 = {1.0f, 0.0f, 0.0f};
     f32 t = ter->t;
@@ -432,7 +386,6 @@ USER_FUNC(senteresa_okure_move) {
     f32 t2 = 2.0f * t;
     f32 h00 = (1.0f + t2) * u * u;
     f32 h10 = t * u * u;
-    f32 tt = (0, t * t);
     f32 h11 = (t * t) * (t - 1.0f);
     f32 h01 = (3.0f - t2) * (t * t);
 
@@ -444,8 +397,8 @@ USER_FUNC(senteresa_okure_move) {
 }
 
 EVT_BEGIN(evt_teresa_box_open)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envoff, 1024)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 1, 100, 400, 0, 38, 48, 500, 11)
     CALL(evt_mapobj_get_position, STRING("hako"), LW(10), LW(11), LW(12))
@@ -484,8 +437,8 @@ EVT_BEGIN(evt_teresa_box_open)
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
     CALL(evt_ext_entry, 200, PTR(senteresa_ext_entry_data), PTR(senteresa_ext_init), PTR(senteresa_ext_main), PTR(senteresa_ext_dispent))
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SURPRISED2"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SURPRISED2"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_TELESA_APPEAR1"), LW(0), LW(1), LW(2), 0)
@@ -538,7 +491,7 @@ EVT_BEGIN(evt_teresa_box_open)
     WAIT_MS(1200)
     CALL(evt_npc_set_position, STRING("テレサ"), 0, 6, 80)
     CALL(evt_npc_set_ry, STRING("テレサ"), 90)
-    CALL(evt_npc_flag_onoff, 0, STRING("テレサ"), 128)
+    CALL(evt_npc_flag_onoff, 0, STRING("テレサ"), NPC_FLAG_HIDDEN)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(14), 0)
         SET_VALUE(LW(15), 0)
@@ -601,7 +554,7 @@ EVT_BEGIN(evt_teresa_box_open)
                 CALL(evt_item_set_gravity, STRING("teresa"), FLOAT(1.0f))
                 CALL(evt_item_set_bound_rate, STRING("teresa"), FLOAT(1.0f))
                 CALL(evt_item_set_jump_power, STRING("teresa"), FLOAT(100.0f))
-                CALL(evt_item_status_on, STRING("teresa"), 16)
+                CALL(evt_item_status_on, STRING("teresa"), ITEM_STATUS_CUSTOM_LAUNCH)
                 CALL(evt_msg_print, 0, STRING("stg4_jin_72"), 0, STRING("テレサ"))
                 CALL(evt_npc_reverse_ry, STRING("テレサ"))
                 CALL(evt_npc_get_position, STRING("テレサ"), LW(0), LW(1), LW(2))
@@ -614,18 +567,18 @@ EVT_BEGIN(evt_teresa_box_open)
     CALL(evt_cam_shift_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 196)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_02_BOO_BOX)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
 EVT_BEGIN(jin_07_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN3"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN3"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -634,9 +587,9 @@ EVT_BEGIN(jin_07_init_evt)
     CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
     CALL(evt_npc_setup, PTR(npcEnt))
     SPAWN_EVENT(PTR(jin_07_juyo_oumu_vivian))
-    CALL(evt_item_entry, STRING("item_00"), 125, 220, 75, -20, 16, GSWF(5636), 0)
-    IF_INT_NOT_EQUAL(GSWF(2079), 0)
-        SET_VALUE(GSWF(2079), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 220, 75, -20, 16, GSWF(GSWF_JIN07_STAR_PIECE), 0)
+    IF_INT_NOT_EQUAL(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 0)
+        SET_VALUE(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 0)
         BEGIN_INLINE_EVENT
             CALL(evt_mario_key_onoff, 0)
             CALL(evt_mario_set_pos, 0, 365, -50)
@@ -651,20 +604,20 @@ EVT_BEGIN(jin_07_init_evt)
             CALL(evt_mario_key_onoff, 1)
         END_INLINE_EVENT
     END_IF
-    IF_INT_EQUAL(GSWF(2231), 1)
+    IF_INT_EQUAL(GSWF(GSWF_JIN08_DOOR_UNLOCKED), 1)
         SET_VALUE(LW(0), STRING("w_bero_1"))
         CALL_CHILD(PTR(bero_case_switch_on))
-        ELSE
+    ELSE
         SET_VALUE(LW(0), STRING("w_bero_1"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
-    IF_INT_EQUAL(GSWF(2231), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("w_bero_1"), 0, PTR(evt_locked), 0)
+    IF_INT_EQUAL(GSWF(GSWF_JIN08_DOOR_UNLOCKED), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_1"), 0, PTR(evt_locked), 0)
     END_IF
-    IF_INT_LESS(GSW(0), 196)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_02_BOO_BOX)
         CALL(evt_mapobj_rotate, 1, STRING("hako_futa"), 95, 0, 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("a_hako"), 0, PTR(evt_teresa_box_open), 0)
-        ELSE
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_hako"), 0, PTR(evt_teresa_box_open), 0)
+    ELSE
         CALL(evt_mapobj_rotate, 1, STRING("hako_futa"), 5, 0, 0)
     END_IF
     CALL(evt_map_replace_mapobj, STRING("honou01"), 0)
@@ -673,4 +626,3 @@ EVT_BEGIN(jin_07_init_evt)
     CALL(evt_map_replace_mapobj, STRING("honou04"), 0)
     RETURN
 EVT_END()
-

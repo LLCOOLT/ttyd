@@ -1,49 +1,25 @@
+// moo_02 (月, the Moon): the field with the way into the X-Naut Fortress (aji_00); paths to moo_05 and moo_06.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "moo.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_shadow);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_bgmode_on);
-USER_FUNC(evt_mario_cam_y_off);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_offscreen_get_boundingbox2);
-#endif
-
-extern EvtWord n_bero_in[];
-extern EvtWord n_bero_out[];
 static BeroEntry bero_entry_data[6];
-extern EvtWord moo_02_init_evt[];
 
 EVT_BEGIN(n_bero_in)
     CALL(evt_mario_bgmode_on)
@@ -67,8 +43,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -84,8 +60,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -100,8 +76,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -116,8 +92,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero", // hitName
         4099, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)n_bero_in, // enterEvent
@@ -132,8 +108,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -149,8 +125,8 @@ static BeroEntry bero_entry_data[] = {
 };
 
 static EVT_BEGIN(dokan_evt)
-#ifdef VERSION_G8ME01
-    SET_VALUE(GSW(0), 359)
+#if VERSION >= VERSION_US
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_A_PIPE_APPEARS)
 #else
     CALL(evt_mario_key_onoff, 0)
 #endif
@@ -161,50 +137,50 @@ static EVT_BEGIN(dokan_evt)
     END_INLINE_EVENT
     CALL(evt_offscreen_entry, STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 0, STRING("S_iwa_04"), STRING("offscreen"))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_offscreen_get_boundingbox2, STRING("offscreen"), LW(0), LW(1), LW(2), LW(3))
     IF_INT_GREATER(LW(2), 0)
         IF_INT_GREATER(LW(3), 0)
 #endif
-    CALL(evt_img_entry, STRING("img"))
-    CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_bom_ver2"))
-#ifdef VERSION_G8ME01
+            CALL(evt_img_entry, STRING("img"))
+            CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_bom_ver2"))
+#if VERSION >= VERSION_US
             CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 1, 0, 0, 0, 0)
 #else
     CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
 #endif
-    CALL(evt_img_clear_virtual_point, STRING("img"))
-    CALL(evt_img_set_shadow, STRING("img"), 2)
-    CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_iwa_04"), 1)
-#ifdef VERSION_G8ME01
+            CALL(evt_img_clear_virtual_point, STRING("img"))
+            CALL(evt_img_set_shadow, STRING("img"), 2)
+            CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_iwa_04"), MAPOBJ_FLAG_HIDE)
+#if VERSION >= VERSION_US
             CALL(evt_hitobj_onoff, STRING("A_iwa_04"), 1, 0)
 #endif
-    CALL(evt_img_wait_animend, STRING("img"))
-    CALL(evt_img_free_capture, STRING("img"), 0)
-    CALL(evt_img_set_shadow, STRING("img"), 0)
-    CALL(evt_img_onoff, STRING("img"), 0)
-    CALL(evt_img_release, STRING("img"))
-#ifdef VERSION_G8ME01
+            CALL(evt_img_wait_animend, STRING("img"))
+            CALL(evt_img_free_capture, STRING("img"), 0)
+            CALL(evt_img_set_shadow, STRING("img"), 0)
+            CALL(evt_img_onoff, STRING("img"), 0)
+            CALL(evt_img_release, STRING("img"))
+#if VERSION >= VERSION_US
         END_IF
     END_IF
 #endif
     CALL(evt_offscreen_delete, STRING("offscreen"))
     CALL(evt_mapobj_clear_offscreen, 0, STRING("S_iwa_04"))
-#ifdef VERSION_G8ME01
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_iwa_04"), 1)
+#if VERSION >= VERSION_US
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_iwa_04"), MAPOBJ_FLAG_HIDE)
 #else
-    SET_VALUE(GSW(0), 359)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_A_PIPE_APPEARS)
 #endif
     CALL(evt_hitobj_onoff, STRING("A_iwa_04"), 1, 0)
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
     CALL(evt_mario_key_onoff, 1)
 #endif
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
 static EVT_BEGIN(rock_main)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -213,7 +189,7 @@ static EVT_BEGIN(rock_main)
     END_INLINE_EVENT
     CALL(evt_offscreen_entry, STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 0, LW(10), STRING("offscreen"))
-    CALL(evt_mapobj_flag_onoff, 0, 1, LW(10), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, LW(10), MAPOBJ_FLAG_HIDE)
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_bom_ver2"))
     CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
@@ -230,16 +206,16 @@ EVT_END()
 #endif
 
 static EVT_BEGIN(rock_evt0)
-#ifdef VERSION_G8ME01
-    SET_VALUE(GSWF(4029), 1)
+#if VERSION >= VERSION_US
+    SET_VALUE(GSWF(GSWF_MOO02_ROCK_A_BOMBED), 1)
 #else
     CALL(evt_mario_key_onoff, 0)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_01"))
     SET_VALUE(LW(11), STRING("A_iwa_01"))
     CALL_CHILD(PTR(rock_main))
-#ifndef VERSION_G8ME01
-    SET_VALUE(GSWF(4029), 1)
+#if VERSION <= VERSION_JP
+    SET_VALUE(GSWF(GSWF_MOO02_ROCK_A_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
 #endif
     CALL(evt_exit_case_evt)
@@ -247,16 +223,16 @@ static EVT_BEGIN(rock_evt0)
 EVT_END()
 
 static EVT_BEGIN(rock_evt1)
-#ifdef VERSION_G8ME01
-    SET_VALUE(GSWF(4030), 1)
+#if VERSION >= VERSION_US
+    SET_VALUE(GSWF(GSWF_MOO02_ROCK_B_BOMBED), 1)
 #else
     CALL(evt_mario_key_onoff, 0)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_07"))
     SET_VALUE(LW(11), STRING("A_iwa_07"))
     CALL_CHILD(PTR(rock_main))
-#ifndef VERSION_G8ME01
-    SET_VALUE(GSWF(4030), 1)
+#if VERSION <= VERSION_JP
+    SET_VALUE(GSWF(GSWF_MOO02_ROCK_B_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
 #endif
     CALL(evt_exit_case_evt)
@@ -267,33 +243,32 @@ EVT_BEGIN(moo_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_MON1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_MOO2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_MON1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_MOO2"))
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_02"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_03"), 1, 0)
     CALL(evt_map_playanim, STRING("light"), 1, 0)
-    CALL(evt_item_entry, STRING("item00"), 125, -55, 0, -135, 16, GSWF(5664), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -55, 0, -135, 16, GSWF(GSWF_MOO02_STAR_PIECE), 0)
     CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
-    IF_INT_LESS(GSW(0), 359)
-        CALL(evt_run_case_evt, 15, 1, STRING("A_iwa_04"), 0, PTR(dokan_evt), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_iwa_04"), 1)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_A_PIPE_APPEARS)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_iwa_04"), 0, PTR(dokan_evt), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_iwa_04"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_iwa_04"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(4029), 0)
-        CALL(evt_run_case_evt, 15, 1, STRING("A_iwa_01"), 0, PTR(rock_evt0), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_iwa_01"), 1)
+    IF_INT_EQUAL(GSWF(GSWF_MOO02_ROCK_A_BOMBED), 0)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_iwa_01"), 0, PTR(rock_evt0), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_iwa_01"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_iwa_01"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(4030), 0)
-        CALL(evt_run_case_evt, 15, 1, STRING("A_iwa_07"), 0, PTR(rock_evt1), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_iwa_07"), 1)
+    IF_INT_EQUAL(GSWF(GSWF_MOO02_ROCK_B_BOMBED), 0)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_iwa_07"), 0, PTR(rock_evt1), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_iwa_07"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_iwa_07"), 1, 0)
     END_IF
-    CALL(evt_item_entry, STRING("item_01"), 142, 330, 0, 403, 16, GSWF(4037), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_POWER_PUNCH, 330, 0, 403, 16, GSWF(GSWF_MOO02_POWER_PUNCH), 0)
     RETURN
 EVT_END()
-

@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: akari (light) charge, 21 yellow sparks spin around a glow; type 0 draws in the 3D scene,
+// other types as a 2D overlay.
 #include "eff/n64/eff_akari_charge_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -8,7 +10,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 #include <math.h>
 
@@ -34,7 +35,7 @@ EffectEntry* effAkariChargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
     work = __memAlloc(HEAP_EFFECT, sizeof(EffAkariChargeN64Work));
     effect->userdata = work;
     effect->callback = effAkariChargeMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->elem[0].type = type;
     work->elem[0].frame = 0;
     if (lifetime <= 0) {
@@ -81,8 +82,8 @@ void effAkariChargeMain(EffectEntry* effect) {
     tmp.z = p->position.z;
     position = tmp;
     type = p->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         p->lifetime = 16;
     }
     if (p->lifetime < 1000) {

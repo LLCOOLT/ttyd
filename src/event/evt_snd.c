@@ -1,3 +1,4 @@
+// The evt_snd unit as split: the end of the game over sequence and N_evt_snd_bgm_unpause.
 // NOTE: in G8MJ01 the event/evt_snd.c split (0x80077EC4..0x80077F88) actually holds
 // the tail of seq_gameover.c (seq_gameOverExit/Init); the real evt_snd functions
 // live at 0x8014C488 inside the party/party_motion.c split.
@@ -9,28 +10,25 @@
 #include "pmario_sound.h"
 #include "sound.h"
 #include "win/win_main.h"
-
-
-void psndSetReverb(s32 mode);
-BOOL N_pouchUnEquipBadgeID(s32 badgeId);
+#include "version.h"
 
 void seq_gameOverInit(SequenceWork* work) {
     winReInit();
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     psndStopAllFadeOut();
     psndSetReverb(0);
-    psndClearFlag(0x10);
-    psndClearFlag(0x80);
-    psndClearFlag(0x20);
-    psndClearFlag(0x40);
+    psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
+    psndClearFlag(PSND_FLAG_MUTE_SFX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX_OFF);
 #else
-    camDispOn(4);
+    camDispOn(CAMERA_3D);
     psndStopAllFadeOut();
     psndSetReverb(0);
     L_psndBGM_stop();
-    psndClearFlag(0x80);
-    psndClearFlag(0x20);
-    psndClearFlag(0x40);
+    psndClearFlag(PSND_FLAG_MUTE_SFX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX_OFF);
     N_pouchUnEquipBadgeID(0x143);
 #endif
     marioStSystemLevel(4);

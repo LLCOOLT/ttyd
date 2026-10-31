@@ -1,47 +1,25 @@
+// aji_15 (敵のアジト, X-Naut Fortress): the shower room where Peach takes a shower (peach_evt_syawa_main).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "aji.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_fog_onoff);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_fog);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_scale);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_mode);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_wait_move_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_peach_set_condition);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_dist);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
 USER_FUNC(peach_chk_aftershower);
 USER_FUNC(peach_set_pos);
 
@@ -49,7 +27,6 @@ static BeroEntry bero_entry_data[2];
 extern EvtWord peach_evt_yuge[];
 extern EvtWord peach_evt_syawa_main[];
 extern EvtWord peach_evt_syawa_init[];
-extern EvtWord aji_15_init_evt[];
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -72,8 +49,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -115,18 +92,18 @@ USER_FUNC(peach_set_pos) {
 }
 
 EVT_BEGIN(peach_evt_syawa_main)
-    CALL(evt_snd_bgmoff, 10240)
-    CALL(evt_snd_envoff, 1024)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(30))
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(evt_mario_key_onoff, 0)
     CALL(peach_chk_aftershower, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
-        ELSE
+    ELSE
         CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_2"), STRING("P_T_2"))
     END_IF
-    IF_INT_EQUAL(GSWF(4220), 0)
+    IF_INT_EQUAL(GSWF(GSWF_AJI15_PEACH_SHOWER_TAKEN), 0)
         CALL(evt_msg_print, 0, STRING("peach_aji_35"), 0, STRING("mario"))
-        ELSE
+    ELSE
         CALL(evt_msg_print, 0, STRING("peach_aji_35_1"), 0, STRING("mario"))
     END_IF
     CALL(evt_cam3d_evt_set, -30, 130, 336, -30, 68, -58, 1400, 11)
@@ -188,7 +165,7 @@ EVT_BEGIN(peach_evt_syawa_main)
     WAIT_MS(1000)
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_HANG_CLOTH1"), 0, 0, 0, 0)
     CALL(evt_mapobj_trans, 1, STRING("p_fuku"), 0, -10, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("p_fuku"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("p_fuku"), MAPOBJ_FLAG_HIDE)
     CALL(evt_sub_intpl_msec_init, 0, -10, 0, 100)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -275,11 +252,11 @@ EVT_BEGIN(peach_evt_syawa_main)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("taoru"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("taoru"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(1500)
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_HANG_CLOTH1"), 0, 0, 0, 0)
     CALL(evt_mapobj_trans, 1, STRING("taoru"), 0, -10, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("taoru"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("taoru"), MAPOBJ_FLAG_HIDE)
     CALL(evt_sub_intpl_msec_init, 0, -10, 0, 100)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -306,7 +283,7 @@ EVT_BEGIN(peach_evt_syawa_main)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_fuku"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("p_fuku"), MAPOBJ_FLAG_HIDE)
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_CHANGE_CLOTH1"), 0, 0, 0, 0)
     WAIT_MS(1000)
     CALL(evt_peach_set_condition, 1)
@@ -349,18 +326,18 @@ EVT_BEGIN(peach_evt_syawa_main)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_2"), STRING("P_T_2"))
     CALL(evt_msg_print, 0, STRING("peach_aji_37"), 0, STRING("mario"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
-    CALL(evt_snd_bgmon, 160, 0)
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
-    SET_VALUE(GSWF(4220), 1)
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    SET_VALUE(GSWF(GSWF_AJI15_PEACH_SHOWER_TAKEN), 1)
     CALL(evt_cam3d_evt_off, 800, 11)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(peach_evt_syawa_init)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("p_fuku"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("taoru"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("p_fuku"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("taoru"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_scale, 1, STRING("S_syawa"), 0, 1, 1)
     CALL(evt_map_playanim, STRING("syawa"), 1, 0)
     CALL(evt_mario_get_mode, LW(0))
@@ -368,11 +345,11 @@ EVT_BEGIN(peach_evt_syawa_init)
         RETURN
     END_IF
     CALL(evt_mario_kill_party, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("taoru"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("taoru"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("taoru"), 0, 0)
     CALL(evt_map_checkanim, STRING("taoru"), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_furo"), 0, PTR(peach_evt_syawa_main), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_furo"), 0, PTR(peach_evt_syawa_main), 0)
     RETURN
 EVT_END()
 
@@ -380,23 +357,23 @@ EVT_BEGIN(aji_15_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 373)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("軍団ザコエリート"))
     END_IF
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_npc_check_delete, STRING("軍団ザコエリート"))
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-        CALL(evt_snd_envoff, 512)
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-        CALL(evt_snd_envoff, 512)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
     END_IF
     CALL(evt_snd_set_rev_mode, 1)
     CALL_CHILD(PTR(peach_evt_syawa_init))
-    IF_INT_EQUAL(GSWF(4199), 0)
-        SET_VALUE(GSWF(4199), 1)
+    IF_INT_EQUAL(GSWF(GSWF_AJI15_PEACH1_SHOWER_ROOM_ENTERED), 0)
+        SET_VALUE(GSWF(GSWF_AJI15_PEACH1_SHOWER_ROOM_ENTERED), 1)
     END_IF
     SPAWN_EVENT(PTR(evt_emergency))
     RETURN

@@ -1,3 +1,4 @@
+// Status window: the field HUD (HP, FP, star power gauge, coins, star points) and its show/hide logic.
 #include "icon_ids.h"
 #include "statuswindow.h"
 #include "battle/battle.h"
@@ -13,8 +14,10 @@
 #include "memory.h"
 #include "pmario_sound.h"
 #include <string.h>
-
-double cos(double);
+#include "version.h"
+#include "evt/evt_story.h"
+#include <dolphin/pad.h>
+#include "libc_decls.h"
 
 typedef StatusValue SVal;
 
@@ -50,25 +53,23 @@ alwaysDtEntry partysDt[] = {
     { 38, 80, ICON_1A4, 1.0f },
     { 124, 70, ICON_1D8, 1.0f },
 };
-u16 party_icon[8] = { ICON_1A4, ICON_1A4, ICON_1A5, ICON_1A6, ICON_1A7, ICON_1AE, ICON_1AF, ICON_1B0 };
-u16 gauge_back[8] = { ICON_1B7, ICON_1B8, ICON_1B9, ICON_1BA, ICON_1BB, ICON_1BC, ICON_1BD, ICON_1BE };
+u16 party_icon[8] = {ICON_1A4, ICON_1A4, ICON_1A5, ICON_1A6, ICON_1A7, ICON_1AE, ICON_1AF, ICON_1B0};
+u16 gauge_back[8] = {ICON_1B7, ICON_1B8, ICON_1B9, ICON_1BA, ICON_1BB, ICON_1BC, ICON_1BD, ICON_1BE};
 u16 gauge_wakka[16] = { ICON_1C0, ICON_1C1, ICON_1C2, ICON_1C3, ICON_1C4, ICON_1C5, ICON_1C6, ICON_1C7,
                         ICON_1C8, ICON_1C9, ICON_1CA, ICON_1CB, ICON_1CC, ICON_1CD, ICON_1CE, ICON_1CF };
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 // US: pause-menu icons per language
-s16 party_icon_tbl[6] = { 0x215, 0x22B, 0x22C, 0x22D, 0x22E, 0x22F };
-s16 gear_icon_tbl[6] = { 0x216, 0x230, 0x231, 0x232, 0x233, 0x234 };
-s16 badge_icon_tbl[6] = { 0x217, 0x235, 0x236, 0x235, 0x237, 0x238 };
-s16 journal_icon_tbl[6] = { 0x218, 0x239, 0x239, 0x239, 0x23A, 0x23B };
+s16 party_icon_tbl[6] = {0x215, 0x22B, 0x22C, 0x22D, 0x22E, 0x22F};
+s16 gear_icon_tbl[6] = {0x216, 0x230, 0x231, 0x232, 0x233, 0x234};
+s16 badge_icon_tbl[6] = {0x217, 0x235, 0x236, 0x235, 0x237, 0x238};
+s16 journal_icon_tbl[6] = {0x218, 0x239, 0x239, 0x239, 0x23A, 0x23B};
 #endif
-
-
 
 //.sbss
 static SWork* wp;
 
 // The demo draws the status window icons with icon flag 0x4, retail with 0x10.
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 #define SW_ICON_FLAGS 0x4
 #else
 #define SW_ICON_FLAGS 0x10
@@ -79,9 +80,6 @@ void gaugeDisp(s32 sp, f32 x, f32 y);
 void statusGetValue(SVal* values);
 BOOL valueCheck(void);
 void valueUpdate(void);
-void statusWinOpen(void);
-void statusWinClose(void);
-BOOL statusWinCheck(void);
 
 void statusWinInit(void) {
     wp = __memAlloc(HEAP_DEFAULT, sizeof(SWork));
@@ -126,7 +124,6 @@ void statusWinMain(void) {
     f32 one;
     f32 t;
 
-
     one = 1.0f;
     mario = marioGetPtr();
     if (mario->characterId) {
@@ -143,7 +140,7 @@ void statusWinMain(void) {
     switch (seqGetSeq()) {
         case 2:
         case 3:
-            if ((marioChkCtrl() ? FALSE : TRUE) || (marioChkKey() ? FALSE : TRUE) || !(mario->flags & 1)) {
+            if ((marioChkCtrl() ? FALSE : TRUE) || (marioChkKey() ? FALSE : TRUE) || !(mario->flags & MARIO_FLAG_ACTIVE)) {
                 if (statusWinCheck()) {
                     statusWinClose();
                 }
@@ -157,7 +154,7 @@ void statusWinMain(void) {
                         wp->idle = gp->framerate * 10;
                         if (!wp->forcedClose && !wp->forceTimer && !statusWinCheck()) {
                             statusWinOpen();
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
                             wp->flags |= 0x100;
 #endif
                         }
@@ -169,7 +166,7 @@ void statusWinMain(void) {
                         statusWinClose();
                     }
                 }
-                if (mario->buttonTrg & 0x10) {
+                if (mario->buttonTrg & PAD_TRIGGER_Z) {
                     if (!statusWinCheck()) {
                         statusWinOpen();
                         wp->forceTimer = gp->framerate * 10;
@@ -218,7 +215,7 @@ void statusWinMain(void) {
         wp->flags &= ~0x40;
         wp->flags &= ~0x80;
     }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     wp->timer += 60.0f / gp->framerate;
 #else
     wp->timer += one;
@@ -255,7 +252,7 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
 
     max = 0;
     for (i = 0; i < sizeof(gauge_back) / sizeof(gauge_back[0]); i++) {
-        if (*(u16*)&pouchGetPtr()->mStarPowersObtained & (1 << i)) {
+        if (pouchGetPtr()->starPowersObtained & (1 << i)) {
             max += 100;
         }
     }
@@ -280,7 +277,7 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
     }
     for (i = 0; i < sizeof(gauge_back) / sizeof(gauge_back[0]); i++) {
         Vec pos2;
-        if (!(*(u16*)&pouchGetPtr()->mStarPowersObtained & (1 << i))) {
+        if (!(pouchGetPtr()->starPowersObtained & (1 << i))) {
             break;
         }
         pos2.x = x + (f32)(i * 32);
@@ -294,7 +291,7 @@ static inline void
 numDisp(f32 x, f32 y, s32 value, BOOL small) {
     Mtx m;
     MTXTrans(m, x, y, 0.0f);
-    iconNumberDispGx(m, value, small, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    iconNumberDispGx(m, value, small, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void statusWinDisp(CameraId camId, void* param) {
@@ -316,7 +313,7 @@ void statusWinDisp(CameraId camId, void* param) {
 
     e = alwaysDt;
     for (i = 0; i < sizeof(alwaysDt) / sizeof(alwaysDt[0]); i++, e++) {
-        if (e->iconId == ICON_1D2 && !*(u16*)&pouchGetPtr()->mStarPowersObtained) {
+        if (e->iconId == ICON_1D2 && !pouchGetPtr()->starPowersObtained) {
             break;
         }
         if (!blinkOn) {
@@ -337,7 +334,7 @@ void statusWinDisp(CameraId camId, void* param) {
         MTXTrans(m, x + (f32)e->xpos, y - (f32)e->ypos, 0.0f);
         MTXScale(s, e->scale, e->scale, e->scale);
         MTXConcat(m, s, m);
-        iconDispGxCol(m, SW_ICON_FLAGS, e->iconId, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        iconDispGxCol(m, SW_ICON_FLAGS, e->iconId, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     }
 
     if (!(wp->blink & 1) || blinkOn) {
@@ -392,7 +389,7 @@ void statusWinDisp(CameraId camId, void* param) {
             MTXTrans(m, x + (f32)e->xpos, y - (f32)e->ypos, 0.0f);
             MTXScale(s, e->scale, e->scale, e->scale);
             MTXConcat(m, s, m);
-            iconDispGxCol(m, SW_ICON_FLAGS, e->iconId, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            iconDispGxCol(m, SW_ICON_FLAGS, e->iconId, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         if (!(wp->blink & 8) || blinkOn) {
             numDisp(120.0f + x - 6.0f - 10.0f, 4.0f + (2.0f + (y - 78.0f)), wp->cur.partyHp, 0);
@@ -400,57 +397,57 @@ void statusWinDisp(CameraId camId, void* param) {
         numDisp(186.0f + x - 6.0f - 10.0f, 4.0f + (2.0f + (y - 78.0f)), wp->cur.partyMaxHp, 1);
     }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     if (wp->flags & 0x100 && !gp->inBattle) {
         y2 = -180.0f + (wp->openY - wp->y);
         MTXTrans(m2, -190.0f, y2, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
         MTXConcat(m2, s2, m2);
-#ifdef VERSION_G8ME01
-        iconDispGxCol(m2, 0x10, ICON_212, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-        if (swByteGet(0) >= 7 || partyChkJoin(1)) {
+#if VERSION >= VERSION_US
+        iconDispGxCol(m2, 0x10, ICON_212, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(1)) {
             MTXTrans(m2, -250.0f, 16.0f + y2, 0.0f);
             MTXScale(s2, 0.75f, 0.75f, 0.75f);
             MTXConcat(m2, s2, m2);
-            iconDispGxCol(m2, 0x10, (u16)party_icon_tbl[gp->language], (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            iconDispGxCol(m2, 0x10, (u16)party_icon_tbl[gp->language], (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         MTXTrans(m2, -190.0f, 50.0f + y2, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
         MTXConcat(m2, s2, m2);
-        iconDispGxCol(m2, 0x10, (u16)gear_icon_tbl[gp->language], (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-        if (swByteGet(0) >= 20 || pouchGetHaveBadgeCnt()) {
-            f32 xoff[6] = { 0.0f, 10.0f, 3.0f, 8.0f, 8.0f, 0.0f };
+        iconDispGxCol(m2, 0x10, (u16)gear_icon_tbl[gp->language], (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_17_BADGE_TUTORIAL || pouchGetHaveBadgeCnt()) {
+            f32 xoff[6] = {0.0f, 10.0f, 3.0f, 8.0f, 8.0f, 0.0f};
             MTXTrans(m2, -130.0f + xoff[gp->language], 16.0f + y2, 0.0f);
             MTXScale(s2, 0.75f, 0.75f, 0.75f);
             MTXConcat(m2, s2, m2);
-            iconDispGxCol(m2, 0x10, (u16)badge_icon_tbl[gp->language], (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            iconDispGxCol(m2, 0x10, (u16)badge_icon_tbl[gp->language], (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         MTXTrans(m2, -190.0f, y2 - 25.0f, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
         MTXConcat(m2, s2, m2);
-        iconDispGxCol(m2, 0x10, (u16)journal_icon_tbl[gp->language], (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        iconDispGxCol(m2, 0x10, (u16)journal_icon_tbl[gp->language], (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
-        iconDispGxCol(m2, 0x10, 0x212, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-        if (swByteGet(0) >= 7 || partyChkJoin(1)) {
+        iconDispGxCol(m2, 0x10, 0x212, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(1)) {
             MTXTrans(m2, -250.0f, 16.0f + y2, 0.0f);
             MTXScale(s2, 0.75f, 0.75f, 0.75f);
             MTXConcat(m2, s2, m2);
-            iconDispGxCol(m2, 0x10, 0x213, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            iconDispGxCol(m2, 0x10, 0x213, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         MTXTrans(m2, -190.0f, 50.0f + y2, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
         MTXConcat(m2, s2, m2);
-        iconDispGxCol(m2, 0x10, 0x214, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-        if (swByteGet(0) >= 20 || pouchGetHaveBadgeCnt()) {
+        iconDispGxCol(m2, 0x10, 0x214, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_17_BADGE_TUTORIAL || pouchGetHaveBadgeCnt()) {
             MTXTrans(m2, -130.0f, 16.0f + y2, 0.0f);
             MTXScale(s2, 0.75f, 0.75f, 0.75f);
             MTXConcat(m2, s2, m2);
-            iconDispGxCol(m2, 0x10, 0x215, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            iconDispGxCol(m2, 0x10, 0x215, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         MTXTrans(m2, -190.0f, y2 - 25.0f, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
         MTXConcat(m2, s2, m2);
-        iconDispGxCol(m2, 0x10, 0x216, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        iconDispGxCol(m2, 0x10, 0x216, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
     }
 #endif
@@ -461,7 +458,6 @@ void statusGetValue(SVal* values) {
     BattleUnit* mario;
     BattleUnit* party;
 
-
     if (!gp->inBattle) {
         values->hp = pouchGetHP();
         values->maxHp = pouchGetMaxHP();
@@ -471,17 +467,17 @@ void statusGetValue(SVal* values) {
         values->maxAp = pouchGetMaxAP();
         values->starPoints = pouchGetStarPoint();
         values->coins = pouchGetCoin();
-#ifdef VERSION_G8ME01_DEMO
-        // the demo remembers the last partner in cur.pad16 and shows it while in bg mode
+#if VERSION == VERSION_DEMO
+        // the demo remembers the last partner in cur.lastParty and shows it while in bg mode
         if (!marioBgmodeChk()) {
             values->party = marioGetParty();
             values->partyHp = pouchGetPtr()->partyData[values->party].currentHP;
             values->partyMaxHp = pouchGetPtr()->partyData[values->party].maximumHP;
             if (values->party) {
-                wp->cur.pad16 = values->party;
+                wp->cur.lastParty = values->party;
             }
         } else {
-            values->party = wp->cur.pad16;
+            values->party = wp->cur.lastParty;
             values->partyHp = pouchGetPtr()->partyData[values->party].currentHP;
             values->partyMaxHp = pouchGetPtr()->partyData[values->party].maximumHP;
         }
@@ -598,7 +594,7 @@ void valueUpdate(void) {
         return;
     }
     d = calcStep(v.coins, wp->cur.coins);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     if (d && !(count % 6)) {
 #else
     if (d && !(count % 8)) {
@@ -724,7 +720,7 @@ void statusAPBlink(s32 frames) {
 }
 
 // The demo has no N_statusClearBlink.
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 void N_statusClearBlink(void) {
     wp->blink = 0;
 }
@@ -747,7 +743,7 @@ void statusPartyHPBlink(s32 frames) {
 
 void statusWinEase(f32* f) {
     f[0] = 0.0f;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     // US pool order: 0, 60 (framerate step), pi, 1, 0.5
     f[4] = 60.0f;
     f[2] = 3.1415927f;

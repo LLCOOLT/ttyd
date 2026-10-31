@@ -1,10 +1,4 @@
-/* "seq_game" - Main Game Sequence
- * Status: 1:1, theoretically finished
- *
- * Function: the sequence running when on the overworld
- *
- * Last Update: 7/8/2022, finish seq_game
- */
+// Game sequence: the sequence that runs while Mario is in the field.
 
 #include "seq/seq_game.h"
 #include "driver/fadedrv.h"
@@ -14,18 +8,18 @@
 #include "pmario_sound.h"
 
 //.sbss
-static OSTime none_key;
+static OSTime lastKeyTime;
 
 //.sdata
 EVT_BEGIN(maku_spread)
-WAIT_MS(2000)
-CALL(evt_fade_entry, TITLE_SCREEN_CURTAIN_LEAVE_GRADUAL2, 0, 0, 0, 0)
-RETURN
+    WAIT_MS(2000)
+    CALL(evt_fade_entry, FADE_CURTAIN_LEAVE, 0, 0, 0, 0)
+    RETURN
 EVT_END()
 
 void seq_gameInit(SequenceWork* wp) {
-	none_key = OSGetTime();
-	gp->systemLevelFlags &= ~0x10;
+    lastKeyTime = OSGetTime();
+    gp->systemLevelFlags &= ~0x10;
 }
 
 void seq_gameMain(SequenceWork* wp) {
@@ -34,10 +28,10 @@ void seq_gameMain(SequenceWork* wp) {
 
     switch (wp->state) {
         case 0:
-            if ((gp->flags & 0x10) != 0) {
-                fadeEntry(FADE_IN_WHITE2, 900, (GXColor){0, 0, 0, 0xFF});
+            if ((gp->flags & GLOBAL_FLAG_CURTAIN_OPEN) != 0) {
+                fadeEntry(FADE_IN_WHITE_2D, 900, (GXColor){0, 0, 0, 0xFF});
                 evtEntryType(maku_spread, 0, 0, 0);
-                gp->flags &= ~0x10;
+                gp->flags &= ~GLOBAL_FLAG_CURTAIN_OPEN;
             } else if (!gp->didAreaChange) {
                 fadeEntry(gp->mapFadeOutType, gp->mapFadeOutDuration, (GXColor){0, 0, 0, 0xFF});
             } else {
@@ -49,13 +43,13 @@ void seq_gameMain(SequenceWork* wp) {
             gp->areaFadeOutDuration = 300;
             wp->state++;
             break;
-    
+
         case 1:
-            if (gp->flags & 0x1000 && gp->flags & 0x2000 && fadeIsFinish() && seqCheckSeq() == SEQ_LOGO) {
-                gp->flags &= ~0x2000;
-                seqSetSeq(SEQ_GAME_OVER, 0, 0);
+            if (gp->flags & GLOBAL_FLAG_KIOSK && gp->flags & GLOBAL_FLAG_KIOSK_TIMEOUT && fadeIsFinish() && !seqCheckSeq()) {
+                gp->flags &= ~GLOBAL_FLAG_KIOSK_TIMEOUT;
+                seqSetSeq(SEQ_GAME_OVER, NULL, NULL);
             }
-            marioGetPtr(); //unused
+            marioGetPtr(); // unused
             camera = camGetPtr(CAMERA_3D);
             position = camera->cameraPos;
             camera2 = camGetPtr(CAMERA_3D);
@@ -65,5 +59,5 @@ void seq_gameMain(SequenceWork* wp) {
 }
 
 void seq_gameExit(SequenceWork* wp) {
-    gp->flags &= ~2;
+    gp->flags &= ~GLOBAL_FLAG_SKIP_MAP_EVENTS;
 }

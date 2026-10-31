@@ -1,3 +1,4 @@
+// Paper Mario 64 smoke effect 10 (kemuri: smoke) moving along a direction vector with a scale.
 #include "eff/n64/eff_kemuri10_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -9,6 +10,7 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 #include <math.h>
+#include "version.h"
 
 static effN64Vtx stg_houki_kemuri_v[] = {
     {0, -50, 20, 0, 512, 255, 255, 255, 255},
@@ -137,7 +139,7 @@ EffectEntry* effKemuri10N64Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, 
     work->rot[1][3] = zr;
     work->rot[2][3] = zr;
     work->scale = 0.1f * scale;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     work->camera = 4;
 #endif
     return effect;
@@ -157,7 +159,7 @@ void effKemuri10Main(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     timer = work->timer;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     camera = work->camera;
 #endif
     work->timer = timer - 1;
@@ -175,7 +177,10 @@ void effKemuri10Main(EffectEntry* effect) {
             work->velocity.z *= 0.8f;
         }
         if (timer < 5) {
-            { f32 fa = work->alpha; work->alpha = (fa *= 0.6f); }
+            {
+                f32 fa = work->alpha;
+                work->alpha = (fa *= 0.6f);
+            }
             work->velocity.x *= 0.7f;
             work->velocity.y *= 0.7f;
             work->velocity.z *= 0.7f;
@@ -187,7 +192,7 @@ void effKemuri10Main(EffectEntry* effect) {
         work->scale *= 1.05f;
         work++;
     }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri10Disp, effect);
 #else
     dispEntry((CameraId)camera, dispCalcZ(&position), 2, (DispCallback)effKemuri10Disp, effect);

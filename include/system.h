@@ -1,14 +1,15 @@
+// system.c: angle and distance maths, interpolation, sorting, pad input (keyGet*), rumble and frame-time helpers.
 #pragma once
 
 #include <dolphin/mtx.h>
-
+#include "version.h"
 const char* getMarioStDvdRoot(void);
 f32 reviseAngle(f32 angle);
 f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
 f32 compAngle(f32 angle1, f32 angle2);
 f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2);
-f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end);
-//void qqsort(void* array, s32 num_elements, s32 element_size, s32(*compare)(const void**, const void**));
+f32 intplGetValue(s32 mode, f32 start, f32 end, s32 currStep, s32 steps);
+void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void* a, const void* b));
 void makeKey(void);
 u32 keyGetButton(u32 chan);
 u32 keyGetButtonTrg(u32 chan);
@@ -25,7 +26,7 @@ void padRumbleOn(u32 chan);
 void padRumbleHardOff(u32 chan);
 u8 padGetRumbleStatus(u32 chan);
 void sincosf(f32* ret_sin, f32* ret_cos, f32 degree);
-void movePos(float* ret_sin, float* ret_cos, f32 a3, f32 degree);
+void movePos(float* ret_sin, float* ret_cos, f32 dist, f32 degree);
 s32 irand(s32 scalar);
 u16 sysGetToken(void);
 void sysWaitDrawSync(void);
@@ -35,9 +36,9 @@ f32 sysFrame2SecFloat(f32 frame);
 s32 sysMsec2Frame(s32 msec);
 f32 sysMsec2FrameFloat(f32 msec);
 void mtxGetRotationElement(Mtx src, Mtx dst, s8 firstAxis, s8 secondAxis);
-#ifdef VERSION_G8MP01
-void sysDebugReport(const char* file, s32 line, const char* fmt, ...); // PAL only: OSReport "[file:line] message"
-#endif
+// PAL only (the functions exist only in the European build; declared for every build so unused PAL-only code reads normally)
+void sysDebugReport(const char* file, s32 line, const char* fmt, ...);                           // OSReport "[file:line] message"
+BOOL __assert2(const char* filename, s32 line, const char* assertion, const char* message, ...); // panics with the message
 s32 LZ77Decode(u8* input, u8* output);
 void* memcpy_as4(void* dest, const void* src, u32 count);
 

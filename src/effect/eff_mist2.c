@@ -1,3 +1,4 @@
+// Mist effect 2: puffs that grow, spin and fade around a point; type 0 spawns 30 puffs, other types 10.
 #include "driver/camdrv.h"
 #include "eff/eff_mist2.h"
 #include "driver/dispdrv.h"
@@ -8,8 +9,7 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 void effMist2Main(EffectEntry* effect);
 void effMist2Disp(CameraId cameraId, EffectEntry* effect);
@@ -30,7 +30,7 @@ EffectEntry* effMist2Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 a, f32 b
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffMist2Work));
     effect->userdata = work;
     effect->callback = effMist2Main;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -88,8 +88,8 @@ void effMist2Main(EffectEntry* effect) {
     v.z = work->position.z;
     position = v;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 32;
     }
     if (work->life < 1000) {

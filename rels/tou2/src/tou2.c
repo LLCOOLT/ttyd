@@ -1,5 +1,8 @@
+// tou2: Glitz Pit arena REL shared code/prolog (registers tou_03) plus ranking, rule and champion belt helpers.
+
 #include "tou2.h"
 #include "dolphin/types.h"
+#include "dolphin/pad.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "driver/swdrv.h"
@@ -27,106 +30,14 @@
 #include "icon_ids.h"
 #include "mario/mariost.h"
 #include "data/npc_data.h"
-
-typedef struct RankEntry {
-    u16 flags;
-    // pad 2 bytes
-    s32 id;
-    union {
-        s16 total;
-        u8 bytes[2];
-    } points;
-    // pad 2 bytes
-} RankEntry;
-
-typedef enum RankFlags {
-    RANK_BELOW = 1 << 0, // This fighter is below us in the rankings
-    RANK_HIDDEN = 1 << 1, // This fighter is hidden from us
-    RANK_PLAYER = 1 << 2, // This is the player
-} RankFlags;
-
-typedef struct RankData {
-    s32 count;
-    RankEntry* entries;
-} RankData;
-
-typedef struct FighterData {
-    u16 flags;
-    // pad 2 bytes
-    const char* name;
-    const char* title;
-    s32 setupId;
-    const char* taunt;
-    const char* victory;
-    s16 initPoints; // starting ranking points
-    // pad 2 bytes
-} FighterData;
-
-// This includes a bunch of "story markers" for the various important fights
-typedef enum FighterFlags {
-    FIGHT_MAJOR = 1 << 0,
-    FIGHT_MINOR = 1 << 1,
-    FIGHT_CHAMPION = 1 << 2,
-    FIGHT_PLAYER = 1 << 3,
-    FIGHT_BANDITS = 1 << 8,
-    FIGHT_KOOPAS = 1 << 9,
-    FIGHT_GOOMBAS = 1 << 10,
-    FIGHT_CLEFTS = 1 << 11,
-    FIGHT_KOOPATROL = 1 << 12,
-} FighterFlags;
-
-typedef enum FighterId {
-    FIGHTER_RAWK_HAWK = 0,
-    FIGHTER_KOOPINATOR = 1,
-    FIGHTER_CHOMPS = 2,
-    FIGHTER_BROS = 3,
-    FIGHTER_CRAW = 4,
-    FIGHTER_MAGIKOOPA = 5,
-    FIGHTER_FUZZY = 6,
-    FIGHTER_SHADY_KOOPAS = 7,
-    FIGHTER_BRISTLES = 8,
-    FIGHTER_SPIKE_TOPS = 9,
-    FIGHTER_IRON_CLEFTS = 10,
-    FIGHTER_BANDITS = 11,
-    FIGHTER_BOB_OMB = 12,
-    FIGHTER_BALD_CLEFTS = 13,
-    FIGHTER_BOGGLY = 14,
-    FIGHTER_LAKITU = 15,
-    FIGHTER_DULL_BONES = 16,
-    FIGHTER_POKEYS = 17,
-    FIGHTER_KP_KOOPAS = 18,
-    FIGHTER_GOOMBAS = 19,
-    FIGHTER_PLAYER = 20,
-    FIGHTER_SWOOPS = 21,
-    FIGHTER_SPINIA = 22,
-} FighterId;
-
-typedef struct RuleData {
-    const char* name;
-    const char* desc;
-    s32 id;
-    s32 param;
-    s32 param2;
-} RuleData;
-
-typedef struct DispWork {
-    f32 scroll;
-    f32 target;
-    s32 page;
-} DispWork;
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-extern NpcSetupBattleInfo btlsetup_tou_tbl[];
-
-double atan2(double y, double x);
-int rand(void);
-void FontDrawScale(f32 scale);
-void FontDrawMessageMtx(Mtx mtx, const char* msg);
+#include "map/tou_ranking.h"
+#include "libc_decls.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "rel_module.h"
 
 static RankData rank_work;
-static DispWork disp_work;
+static RankDispWork disp_work;
 static s32 champion_belt_onoff;
 
 static FighterData fighterDt[23] = {
@@ -229,19 +140,19 @@ static RuleData ruleDt_re[14] = {
 };
 
 static RankData* rank_wp = &rank_work;
-static DispWork* dwp = &disp_work;
-static const char* suuji[] = { "０", "１", "２", "３", "４", "５", "６", "７", "８", "９" };
+static RankDispWork* dwp = &disp_work;
+static const char* suuji[] = {"０", "１", "２", "３", "４", "５", "６", "７", "８", "９"};
 
 // disp_proc templates
-static const GXColor titleColor = { 0xDC, 0xC8, 0xDC, 0xFF };
-static const GXColor numberColor = { 0xDC, 0xC8, 0xDC, 0xFF };
-static const GXColor playerColor = { 0xFF, 0x00, 0x00, 0xFF };
-static const GXColor nameColor = { 0xDC, 0xC8, 0xDC, 0xFF };
-static const Vec cursorPos = { 0.0f, 0.0f, 0.0f };
-static const Vec upArrowPos = { 0.0f, 125.0f, 0.0f };
-static const Vec upButtonPos = { 0.0f, 75.0f, 0.0f };
-static const Vec downArrowPos = { 0.0f, -140.0f, 0.0f };
-static const Vec downButtonPos = { 0.0f, -125.0f, 0.0f };
+static const GXColor titleColor = {0xDC, 0xC8, 0xDC, 0xFF};
+static const GXColor numberColor = {0xDC, 0xC8, 0xDC, 0xFF};
+static const GXColor playerColor = {0xFF, 0x00, 0x00, 0xFF};
+static const GXColor nameColor = {0xDC, 0xC8, 0xDC, 0xFF};
+static const Vec cursorPos = {0.0f, 0.0f, 0.0f};
+static const Vec upArrowPos = {0.0f, 125.0f, 0.0f};
+static const Vec upButtonPos = {0.0f, 75.0f, 0.0f};
+static const Vec downArrowPos = {0.0f, -140.0f, 0.0f};
+static const Vec downButtonPos = {0.0f, -125.0f, 0.0f};
 
 // local prototypes
 static f32 camGetRy(void);
@@ -320,7 +231,7 @@ static USER_FUNC(evt_tou_print_ranking) {
     s32 rank;
 
     if (isFirstCall) {
-        memset(dwp, 0, sizeof(DispWork));
+        memset(dwp, 0, sizeof(RankDispWork));
         rank = 0;
         for (i = 0; i < rank_wp->count; i++) {
             if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
@@ -335,15 +246,15 @@ static USER_FUNC(evt_tou_print_ranking) {
         printRanking();
         return EVT_RETURN_BLOCK;
     }
-    if (keyGetButtonTrg(0) & 0x200) {
+    if (keyGetButtonTrg(0) & PAD_BUTTON_B) {
         psndSFXOn((const char*)0x13);
         return EVT_RETURN_YIELD;
     }
-    if (dwp->page > 0 && (keyGetButtonTrg(0) & 0x40)) {
+    if (dwp->page > 0 && (keyGetButtonTrg(0) & PAD_TRIGGER_L)) {
         psndSFXOn((const char*)5);
         dwp->page--;
     }
-    if (dwp->page < 1 && (keyGetButtonTrg(0) & 0x20)) {
+    if (dwp->page < 1 && (keyGetButtonTrg(0) & PAD_TRIGGER_R)) {
         dwp->page++;
         psndSFXOn((const char*)5);
     }
@@ -368,17 +279,17 @@ static void disp_proc(CameraId cameraId, void* param) {
     Mtx scale;
     Mtx mtx;
     char entry[0x100];
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     const char* title;
     const char* name;
     f32 nameW;
 #endif
 
-    fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+    fighters = evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT ? fighterDt : fighterDt_re;
     winW = 250.0f;
     left = -winW / 2.0f;
     windowDispGX_System(0, 0xFF, left - 30.0f, 165.0f, 310.0f, 330.0f);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     if ((u32)gp->language == 0) {
         title = "\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F";
     } else {
@@ -397,7 +308,7 @@ static void disp_proc(CameraId cameraId, void* param) {
         FontDrawColor(color);
     }
     top = 135.0f;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     FontDrawMessage(-width / 2, top, title);
 #else
     FontDrawMessage(-width / 2, top, "\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
@@ -419,7 +330,7 @@ static void disp_proc(CameraId cameraId, void* param) {
         }
         PSMTXScale(scale, 0.8f, 0.8f, 0.8f);
         if (num != 0) {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             if ((u32)gp->language == 0) {
                 sprintf(entry, "%s%s", num / 10 ? suuji[num / 10] : "", suuji[num % 10]);
             } else {
@@ -445,7 +356,7 @@ static void disp_proc(CameraId cameraId, void* param) {
             GXColor color = nameColor;
             FontDrawColor(color);
         }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         name = msgSearch(fighters[rank_wp->entries[i].id].name);
         nameW = FontGetMessageWidth(name);
         x = 40.0f + x;
@@ -503,11 +414,12 @@ static void disp_proc(CameraId cameraId, void* param) {
     }
 }
 
+// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 static void printRanking(void) {
     s32 i;
 
-    evtGetValue(NULL, GSW(0));
+    evtGetValue(NULL, GSW(GSW_STORY_PROGRESS));
     for (i = 0; i < rank_wp->count; i++) {
     }
 }
@@ -517,11 +429,11 @@ USER_FUNC(evt_tou_set_rule_result) {
     s32 result = evtGetValue(event, event->args[0]);
 
     if (result & 4) {
-        swSet(2443);
+        swSet(GSWF_TOU_LAST_RULE_MET);
     } else if (result & 2) {
-        swClear(2443);
+        swClear(GSWF_TOU_LAST_RULE_MET);
     } else if (result & 1) {
-        swClear(2443);
+        swClear(GSWF_TOU_LAST_RULE_MET);
     }
     return EVT_RETURN_DONE;
 }
@@ -541,7 +453,7 @@ USER_FUNC(evt_tou_set_ranking_win_lose) {
                 break;
             }
         }
-        swSet(2442);
+        swSet(GSWF_TOU_LAST_MATCH_WON);
     } else {
         for (i = 0; i < rank_wp->count; i++) {
             if (id == rank_wp->entries[i].id) {
@@ -549,7 +461,7 @@ USER_FUNC(evt_tou_set_ranking_win_lose) {
                 break;
             }
         }
-        swClear(2442);
+        swClear(GSWF_TOU_LAST_MATCH_WON);
     }
 
     min = 1000;
@@ -569,8 +481,8 @@ USER_FUNC(evt_tou_set_ranking_win_lose) {
             }
         }
     }
-    swByteSet(507, id);
-    swSet(2532);
+    swByteSet(GSW_TOU_LAST_OPPONENT_ID, id);
+    swSet(GSWF_TOU_LAST_OPPONENT_VALID);
     rankingControll();
     return EVT_RETURN_DONE;
 }
@@ -583,7 +495,7 @@ static USER_FUNC(evt_tou_get_rule_msg2) {
     s32 i;
     s32 rank;
 
-    if (evtGetValue(NULL, GSW(0)) < 172) {
+    if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
         rank = 0;
         for (i = 0; i < rank_wp->count; i++) {
             if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
@@ -624,7 +536,7 @@ static USER_FUNC(evt_tou_get_rule_info) {
     s32 i;
     s32 rank;
 
-    if (evtGetValue(NULL, GSW(0)) < 172) {
+    if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
         rank = 0;
         for (i = 0; i < rank_wp->count; i++) {
             if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
@@ -673,7 +585,7 @@ USER_FUNC(evt_tou_get_fighter_tribe) {
     s32 id = evtGetValue(event, args[0]);
     s32 idx = evtGetValue(event, args[1]);
     s32 setupId = fighterDt[id].setupId;
-    TattleEntry* tattle = battleGetUnitMonosiriPtr(btlsetup_tou_tbl[setupId].select->groupSetup->enemyData[idx].mUnitKindParams->mUnitType);
+    TattleEntry* tattle = battleGetUnitMonosiriPtr(btlsetup_tou_tbl[setupId].select->groupSetup->enemyData[idx].unitKindParams->unitType);
     NpcTribeInfo* tribe;
     const char* name;
     BOOL found = FALSE;
@@ -726,7 +638,7 @@ USER_FUNC(evt_tou_get_fighter_num) {
 USER_FUNC(evt_tou_get_fighter_battle_msg) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
-    FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+    FighterData* fighters = evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT ? fighterDt : fighterDt_re;
 
     evtSetValue(event, args[1], (EvtWord)fighters[id].taunt);
     evtSetValue(event, args[2], (EvtWord)fighters[id].victory);
@@ -755,7 +667,7 @@ static USER_FUNC(evt_tou_get_fighter_rank) {
 USER_FUNC(evt_tou_get_fighter_name2) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
-    FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+    FighterData* fighters = evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT ? fighterDt : fighterDt_re;
 
     evtSetValue(event, args[1], (EvtWord)msgSearch(fighters[id].title));
     return EVT_RETURN_DONE;
@@ -764,7 +676,7 @@ USER_FUNC(evt_tou_get_fighter_name2) {
 USER_FUNC(evt_tou_get_fighter_info) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
-    FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+    FighterData* fighters = evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT ? fighterDt : fighterDt_re;
 
     evtSetValue(event, args[1], (EvtWord)msgSearch(fighters[id].name));
     evtSetValue(event, args[2], fighterDt[id].setupId);
@@ -773,7 +685,7 @@ USER_FUNC(evt_tou_get_fighter_info) {
 
 static USER_FUNC(evt_tou_get_next_match) {
     EvtWord* args = event->args;
-    BOOL reverse = evtGetValue(event, GSWF(2443));
+    BOOL reverse = evtGetValue(event, GSWF(GSWF_TOU_LAST_RULE_MET));
     s32 list[32];
     s32 i;
     s32 rank;
@@ -944,10 +856,10 @@ static void rankingControll(void) {
             }
         }
 
-        // Check if a match is booked (2532), and move our opponent (507) to above us for the fight. 
-        if (swGet(2532)) {
+        // Check if a match is booked (2532), and move our opponent (507) to above us for the fight.
+        if (swGet(GSWF_TOU_LAST_OPPONENT_VALID)) {
             for (idx = 0; idx < nAbove; idx++) {
-                if (above[idx] == swByteGet(507)) {
+                if (above[idx] == swByteGet(GSW_TOU_LAST_OPPONENT_ID)) {
                     break;
                 }
             }
@@ -990,7 +902,7 @@ static void rankingControll(void) {
                 insert(below, nBelow, idx, 0);
             }
         }
-        
+
         if (nBelow > 0) {
             for (idx = 0; idx < nBelow; idx++) {
                 if (fighterDt[rank_wp->entries[below[idx]].id].flags & 0x800) {
@@ -1010,9 +922,9 @@ static void rankingControll(void) {
         }
 
         // Check if a match is booked (2532), and move our opponent (507) to above us for the fight.
-        if (swGet(2532)) {
+        if (swGet(GSWF_TOU_LAST_OPPONENT_VALID)) {
             for (idx = 0; idx < nBelow; idx++) {
-                if (below[idx] == swByteGet(507)) {
+                if (below[idx] == swByteGet(GSW_TOU_LAST_OPPONENT_ID)) {
                     break;
                 }
             }
@@ -1047,7 +959,7 @@ static void rankingControll(void) {
             rank++;
         }
     }
-    swByteSet(580, rank);
+    swByteSet(GSW_TOU_PLAYER_RANK, rank);
 }
 
 static void insert(s32* arr, s32 n, s32 from, s32 to) {
@@ -1074,15 +986,15 @@ USER_FUNC(tou2_rankingReset) {
     rankingExit();
     pouchRemoveItem(0x41);
     for (i = 0; i < 20; i++) {
-        swClear(i + 2465);
+        swClear(i + GSWF_TOU_FIGHTER_BELOW_BASE);
     }
-    swClear(2392);
-    swClear(2399);
-    swClear(2400);
-    swClear(2383);
-    swClear(2529);
-    swClear(2532);
-    swClear(2403);
+    swClear(GSWF_TOU10_FIRST_MATCH_AFTER_SEEN);
+    swClear(GSWF_TOU_CHAMP_OPENING_SEEN);
+    swClear(GSWF_TOU_CHAMP_WIN_SEEN);
+    swClear(GSWF_TOU_TITLE_MATCH_RESERVED);
+    swClear(GSWF_TOU_RANKING_SAVED);
+    swClear(GSWF_TOU_LAST_OPPONENT_VALID);
+    swClear(GSWF_TOU02_LOBBY_CROWD_CHAMP_SEEN);
     rankingInit();
     return EVT_RETURN_DONE;
 }
@@ -1093,6 +1005,7 @@ static USER_FUNC(evt_rankingReInit) {
     return EVT_RETURN_DONE;
 }
 
+// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 static void rankingExit(void) {
     s32 i;
@@ -1101,12 +1014,12 @@ static void rankingExit(void) {
 
     for (i = 0, entry = rank_wp->entries; i < rank_wp->count; i++, entry++) {
         if (entry->flags & RANK_BELOW) {
-            swSet(entry->id + 2465);
+            swSet(entry->id + GSWF_TOU_FIGHTER_BELOW_BASE);
         } else {
-            swClear(entry->id + 2465);
+            swClear(entry->id + GSWF_TOU_FIGHTER_BELOW_BASE);
         }
         for (j = 0; j < 2; j++) {
-            swByteSet(2 * entry->id + 519 + j, entry->points.bytes[j]);
+            swByteSet(2 * entry->id + GSW_TOU_FIGHTER_POINTS_BASE + j, entry->points.bytes[j]);
         }
     }
     _mapFree(rank_wp->entries);
@@ -1121,7 +1034,7 @@ static void rankingInit(void) {
 
     memset(rank_wp, 0, sizeof(RankData));
     // We need to handle the excluded entries if we're doing rematches
-    temp = evtGetValue(NULL, GSW(0));
+    temp = evtGetValue(NULL, GSW(GSW_STORY_PROGRESS));
     count = 21;
     if (temp < 172) {
         count = 23;
@@ -1133,13 +1046,13 @@ static void rankingInit(void) {
     for (i = 0, entry = rank_wp->entries; i < rank_wp->count; i++, entry++) {
         entry->flags = 0;
         entry->id = i;
-        if (swGet(entry->id + 2465)) {
+        if (swGet(entry->id + GSWF_TOU_FIGHTER_BELOW_BASE)) {
             entry->flags |= RANK_BELOW;
         }
-        if (swGet(2529)) {
+        if (swGet(GSWF_TOU_RANKING_SAVED)) {
             int j;
             for (j = 0; j < 2; j++) {
-                entry->points.bytes[j] = swByteGet(2 * entry->id + 519 + j);
+                entry->points.bytes[j] = swByteGet(2 * entry->id + GSW_TOU_FIGHTER_POINTS_BASE + j);
             }
         } else {
             entry->points.total = fighterDt[entry->id].initPoints;
@@ -1149,37 +1062,37 @@ static void rankingInit(void) {
         }
     }
 
-    swSet(2529);
+    swSet(GSWF_TOU_RANKING_SAVED);
 
     // Set up the initial run-through
-    if (evtGetValue(NULL, GSW(0)) < 172) {
+    if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
         rank_wp->entries[FIGHTER_SWOOPS].flags |= RANK_HIDDEN;
         rank_wp->entries[FIGHTER_SPINIA].flags |= RANK_HIDDEN;
 
         // If we're past this point in the story, hide King K
-        if (evtGetValue(NULL, GSWF(2412))) {
+        if (evtGetValue(NULL, GSWF(GSWF_TOU_RANK12_KING_K_GONE))) {
             rank_wp->entries[FIGHTER_KP_KOOPAS].flags |= RANK_HIDDEN;
         }
 
         // If we're past this story, Sir Swoop has been introduced
-        if (evtGetValue(NULL, GSWF(2413))) {
+        if (evtGetValue(NULL, GSWF(GSWF_TOU_RANK11_SWOOPS_JOINS))) {
             rank_wp->entries[FIGHTER_SWOOPS].flags &= ~RANK_HIDDEN;
 
-            if (!evtGetValue(NULL, GSWF(2530))) {
+            if (!evtGetValue(NULL, GSWF(GSWF_TOU_SWOOPS_ADDED))) {
                 rank_wp->entries[FIGHTER_SWOOPS].flags |= RANK_BELOW;
             }
-            evtSetValue(NULL, GSWF(2530), TRUE);
+            evtSetValue(NULL, GSWF(GSWF_TOU_SWOOPS_ADDED), TRUE);
         }
 
         // If we're past this point in the story, Bandy Andy got "retired" and The Destructors were added.
-        if (evtGetValue(NULL, GSWF(2421))) {
+        if (evtGetValue(NULL, GSWF(GSWF_TOU_MAIL4_RECEIVED))) {
             rank_wp->entries[FIGHTER_BANDITS].flags |= RANK_HIDDEN;
             rank_wp->entries[FIGHTER_SPINIA].flags &= ~RANK_HIDDEN;
 
-            if (!evtGetValue(NULL, GSWF(2531))) {
+            if (!evtGetValue(NULL, GSWF(GSWF_TOU_SPINIA_ADDED))) {
                 rank_wp->entries[FIGHTER_SPINIA].flags |= RANK_BELOW;
             }
-            evtSetValue(NULL, GSWF(2531), TRUE);
+            evtSetValue(NULL, GSWF(GSWF_TOU_SPINIA_ADDED), TRUE);
         }
     }
     rankingControll();
@@ -1209,4 +1122,3 @@ void _prolog(void) {
     relSetBtlAddr("tou", btlsetup_tou_tbl, btl_tou_setup_no_tbl);
     rankingInit();
 }
-

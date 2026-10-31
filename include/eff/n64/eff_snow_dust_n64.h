@@ -1,3 +1,4 @@
+// eff_snow_dust_n64.c: snow dust effect entry (effSnowDustN64Entry) and its work data (EffSnowDustN64Work).
 #pragma once
 
 #include "driver/effdrv.h"
@@ -12,10 +13,10 @@ typedef struct EffSnowDustN64Work {
     f32 height;   // 0x14
     f32 vx;       // 0x18
     f32 vy;       // 0x1C
-    f32 pad_20;    // 0x20, never accessed
+    f32 pad_20;   // 0x20, never accessed
     f32 tx;       // 0x24
     f32 ty;       // 0x28
-    f32 pad_2C;    // 0x2C, never accessed
+    f32 pad_2C;   // 0x2C, never accessed
     s32 seq;      // 0x30
     s32 lifetime; // 0x34
     s32 frame;    // 0x38

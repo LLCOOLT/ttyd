@@ -1,3 +1,5 @@
+// gra.rel (ウスグラの道, Twilight Trail): registers gra_00..gra_06 and the battle database.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -7,16 +9,9 @@
 #include "string.h"
 #include "data/party_data.h"
 #include "gra.h"
+#include "rel_module.h"
 
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
 static void* pose_buf;
-
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
-USER_FUNC(evt_gra_vivian_pose_set);
 
 USER_FUNC(evt_gra_vivian_pose_set) {
     EvtWord* args = event->args;
@@ -55,4 +50,3 @@ void _epilog(void) {
 
 void _unresolved(void) {
 }
-

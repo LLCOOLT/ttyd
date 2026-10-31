@@ -1,3 +1,5 @@
+// win_06 (ウィンディん家周辺, Boggly Woods): the edge of the woods with the pipe to Rogueport Sewers (tik_03); path to win_00.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -6,16 +8,28 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "string.h"
+#include "math.h"
 #include "dolphin/mtx.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
+#include "win.h"
+#include "cam_kaiten.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "libc_decls.h"
 
-typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
 static KaitenParam* ckp0;
 static KaitenParam* ckp1;
 static KaitenParam* ckpw;
-double sin(double x);
-double cos(double x);
-double atan2(double y, double x);
 
 static USER_FUNC(cam_kaiten_get_para);
 static USER_FUNC(cam_kaiten_init);
@@ -23,41 +37,11 @@ static USER_FUNC(cam_kaiten_set_direct);
 static USER_FUNC(cam_kaiten_set_para);
 USER_FUNC(camps25);
 USER_FUNC(camps30);
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_bgmon_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_telop_entry);
 
 static BeroEntry bero_entry_data[3];
-extern EvtWord welcome_wonderforest_init[];
-extern EvtWord welcome_wonderforest[];
-extern EvtWord win_06_init_evt[];
 
 static EVT_BEGIN(first_evt_dokan)
-    IF_INT_NOT_EQUAL(GSW(0), 70)
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_END_TO_STAGE_2)
         SET_VALUE(LW(0), 0)
         RETURN
     END_IF
@@ -72,8 +56,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)first_evt_dokan, // enterEvent
@@ -88,8 +72,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -178,7 +162,7 @@ EVT_BEGIN(welcome_wonderforest)
     CALL(evt_msg_print, 0, STRING("stg2_win_e00_00"), 0, STRING("extparty"))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 71)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_00_BOGGLY_WOODS)
     CALL(evt_snd_bgm_scope, 0, 0)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
@@ -188,26 +172,26 @@ EVT_BEGIN(welcome_wonderforest)
 EVT_END()
 
 EVT_BEGIN(win_06_init_evt)
-    IF_INT_LESS(GSW(0), 71)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_00_BOGGLY_WOODS)
         BEGIN_INLINE_EVENT
-            CALL(evt_snd_bgmoff, 512)
-            CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN1"))
+            CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN1"))
             WAIT_MS(9000)
-            CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG2_WIN1"), 2000)
+            CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG2_WIN1"), 2000)
             CALL(evt_snd_bgm_scope, 0, 1)
         END_INLINE_EVENT
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN1"))
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN1"))
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_tree_mki"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kusa"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group22"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_oku_01H081"), 2)
-    IF_INT_EQUAL(GSW(0), 70)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_tree_mki"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kusa"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("group22"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_oku_01H081"), MAPOBJ_FLAG_BBOX_CULL)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_END_TO_STAGE_2)
         CALL_CHILD(PTR(welcome_wonderforest_init))
         SPAWN_EVENT(PTR(welcome_wonderforest))
     END_IF
@@ -270,7 +254,7 @@ static USER_FUNC(cam_kaiten_get_para) {
 }
 
 static USER_FUNC(cam_kaiten_set_direct) {
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
     f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
     f32 c = cos(6.2831855f * ckpw->angle / 360.0f);
 
@@ -342,13 +326,13 @@ static USER_FUNC(cam_kaiten_init) {
 USER_FUNC(camps25) {
     f32 fovY = 25.0f;
 
-    camGetPtr(4)->fovY = fovY;
+    camGetPtr(CAMERA_3D)->fovY = fovY;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(camps30) {
     f32 fovY = 30.0f;
 
-    camGetPtr(4)->fovY = fovY;
+    camGetPtr(CAMERA_3D)->fovY = fovY;
     return EVT_RETURN_DONE;
 }

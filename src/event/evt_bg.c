@@ -1,3 +1,4 @@
+// Script commands for the map background (bgdrv).
 #include "evt/evt_bg.h"
 #include "driver/bgdrv.h"
 #include "manager/evtmgr_cmd.h"
@@ -6,8 +7,7 @@
 USER_FUNC(evt_bg_disp_onoff) {
     if (evtGetValue(event, *event->args)) {
         bgDispOn();
-    }
-    else {
+    } else {
         bgDispOff();
     }
     return EVT_RETURN_DONE;
@@ -22,7 +22,7 @@ USER_FUNC(evt_bg_set_color) {
     g = evtGetValue(event, args[1]);
     b = evtGetValue(event, args[2]);
     a = evtGetValue(event, args[3]);
-    bgSetColor((GXColor){ r, g, b, a });
+    bgSetColor((GXColor){r, g, b, a});
     return EVT_RETURN_DONE;
 }
 
@@ -30,8 +30,7 @@ USER_FUNC(evt_bg_set_color) {
 USER_FUNC(evt_bg_auto_scroll_onoff) {
     if (evtGetValue(event, *event->args)) {
         bgAutoScrollOff();
-    }
-    else {
+    } else {
         bgAutoScrollOn();
     }
     return EVT_RETURN_DONE;

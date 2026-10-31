@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: music notes (onpu: musical note) at a point; types 0 and 1.
 #include "eff/n64/eff_onpu_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -32,7 +33,6 @@ static effN64Vtx size16x32_tex16x32_vtx[] = {
     {8, 32, 0, 512, 1024, 0, 0, 0, 255},
     {-8, 32, 0, 0, 1024, 0, 0, 0, 255},
 };
-
 
 void effOnpuMain(EffectEntry* effect);
 void effOnpuDisp(CameraId cameraId, EffectEntry* effect);

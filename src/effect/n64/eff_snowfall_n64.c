@@ -1,8 +1,11 @@
+// Paper Mario 64 effect: snowfall: `count` snow particles drifting down the screen.
+#include "eff/n64/eff_snowfall_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
-#ifdef VERSION_G8ME01
+#include "version.h"
+#if VERSION >= VERSION_US
 #include "mario/mariost.h"
 #endif
 #include "memory.h"
@@ -24,16 +27,16 @@ typedef struct EffSnowfallParticle {
 } EffSnowfallParticle;
 
 typedef struct EffSnowfallWork {
-    s32 active;                // 0x0
-    s32 arg;                   // 0x4
-    Vec position;              // 0x8
-    u8 pad14[0xC];             // 0x14
-    s32 life;                  // 0x20
-    s32 frame;                 // 0x24
-    s32 alpha;                 // 0x28
-    s32 count;                 // 0x2C
-    s32 pad30;                 // 0x30
-    EffSnowfallParticle p[1];  // 0x34
+    s32 active;               // 0x0
+    s32 arg;                  // 0x4
+    Vec position;             // 0x8
+    u8 pad14[0xC];            // 0x14
+    s32 life;                 // 0x20
+    s32 frame;                // 0x24
+    s32 alpha;                // 0x28
+    s32 count;                // 0x2C
+    s32 pad30;                // 0x30
+    EffSnowfallParticle p[1]; // 0x34
 } EffSnowfallWork;
 
 void effSnowfallMain(EffectEntry* effect);
@@ -118,7 +121,6 @@ void cam_clip_chk(EffSnowfallParticle* p, s32 w, s32 h, s32 life) {
     }
 }
 
-
 EffectEntry* effSnowfallN64Entry(s32 arg, s32 count) {
     EffectEntry* effect;
     EffSnowfallWork* work;
@@ -200,13 +202,13 @@ void effSnowfallMain(EffectEntry* effect) {
         p->position.z += p->velocity.z;
         cam_clip_chk(p, 550, h, life);
     }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     if (gp->inBattle == 0) {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
     } else {
         dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
     }
-#elif defined(VERSION_G8ME01_DEMO)
+#elif VERSION == VERSION_DEMO
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSnowfallDisp, effect);
 #else
     dispEntry(CAMERA_3D, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);

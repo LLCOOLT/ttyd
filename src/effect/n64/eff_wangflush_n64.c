@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: a rotating, expanding sprite with a color-cycling flash behind it; lasts `timer` frames.
 #include "eff/n64/eff_wangflush_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -5,23 +6,24 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-double sin(double x);
+#include "version.h"
+#include "libc_decls.h"
 
 typedef struct EffWangFlushN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    f32 rotation;  // 0x10
-    f32 rotSpeed;  // 0x14
-    f32 scale;     // 0x18
-    f32 scaleAdd;  // 0x1C
+    s32 type;       // 0x0
+    Vec position;   // 0x4
+    f32 rotation;   // 0x10
+    f32 rotSpeed;   // 0x14
+    f32 scale;      // 0x18
+    f32 scaleAdd;   // 0x1C
     f32 flashScale; // 0x20
-    s32 alpha;     // 0x24
+    s32 alpha;      // 0x24
     s32 flashAlpha; // 0x28
-    s32 timer;     // 0x2C
-    s32 frame;     // 0x30
+    s32 timer;      // 0x2C
+    s32 frame;      // 0x30
 } EffWangFlushN64Work;
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo defines the colours first
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
@@ -37,7 +39,7 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, 8, 0, 0, 3072, 0, 0, 0, 255},
 };
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
     0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,

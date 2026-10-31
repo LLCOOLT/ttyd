@@ -1,3 +1,4 @@
+// Battle unit data for the Bob-omb bomb (unit_bomzou) and its explosion weapon, used by Bobbery.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -6,26 +7,10 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "battle/battle_database_common.h"
-
-USER_FUNC(btlevtcmd_AfterReactionEntry);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AnimeSetPoseTable);
-USER_FUNC(btlevtcmd_CheckPhase);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_PhaseEventStartDeclare);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventPhase);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetMaxMoveCount);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_sub_random);
+#include "battle/battle_sub.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "version.h"
 
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -44,7 +29,7 @@ static EvtWord attack_event[5];
 static EvtWord wait_event[57];
 static EvtWord dead_event[6];
 extern EvtWord end_battle_evt[];
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 static EvtWord explosion_event[172];
 #else
 static EvtWord explosion_event[173];
@@ -112,7 +97,7 @@ BattleUnitKind unit_bomzou = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x12400000,
+    UNIT_ATTR_NO_DAMAGE_NUMBER | UNIT_ATTR_NO_HP_GAUGE | UNIT_ATTR_IGNORE_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -130,16 +115,16 @@ BattleWeapon weapon_bomzou_explosion = {
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2200020, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ANY_PART | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     3, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x20080, // special
-    0x7FF, // counterResistFlags
-    4, // targetWeightFlags
+    SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -147,7 +132,7 @@ BattleWeapon weapon_bomzou_explosion = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 10, 10, 100, 30, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
@@ -157,7 +142,7 @@ static PoseTableEntry pose_table_3[] = {
     {28, "B_2"},
     {31, "B_2"},
     {39, "B_2"},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {67, "B_2"},
 #else
     {69, "B_2"},
@@ -168,7 +153,7 @@ static PoseTableEntry pose_table_2[] = {
     {28, "B_3"},
     {31, "B_3"},
     {39, "B_3"},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {67, "B_3"},
 #else
     {69, "B_3"},
@@ -179,7 +164,7 @@ static PoseTableEntry pose_table_1[] = {
     {28, "B_4"},
     {31, "B_4"},
     {39, "B_4"},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {67, "B_4"},
 #else
     {69, "B_4"},
@@ -194,28 +179,28 @@ static BattleDataEntry data_table[] = {
 };
 
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_bomzou", "c_bakudan", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x80009, 0, pose_table_3},
+    {1, "btl_un_bomzou", "c_bakudan", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_UNTATTLEABLE, 0, pose_table_3},
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 2)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
-    CALL(btlevtcmd_SetMaxMoveCount, -2, 0)
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
         CASE_GREATER_OR_EQUAL(3)
-        CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_3))
+        CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_3))
         CASE_GREATER_OR_EQUAL(2)
-        CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_2))
+        CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_2))
         CASE_GREATER_OR_EQUAL(1)
-        CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_1))
+        CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_1))
     END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("B_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("B_1"))
     RETURN
 EVT_END()
 
@@ -227,45 +212,45 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(phase_event)
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         SUBTRACT(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         SWITCH(LW(0))
             CASE_GREATER_OR_EQUAL(3)
-            CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_3))
+            CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_3))
             CASE_GREATER_OR_EQUAL(2)
-            CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_2))
+            CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_2))
             CASE_GREATER_OR_EQUAL(1)
-            CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_1))
+            CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_1))
         END_SWITCH
         IF_INT_LESS_OR_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_PhaseEventStartDeclare, -2)
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("B_2"))
+            CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("B_2"))
             WAIT_FRAMES(36)
             CALL_CHILD(PTR(explosion_event))
-            ELSE
-            CALL(btlevtcmd_StartWaitEvent, -2)
+        ELSE
+            CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         END_IF
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_GREATER(LW(0), 1)
         WAIT_FRAMES(1)
         GOTO(0)
     END_IF
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 10)
     CALL(evt_eff64, 0, STRING("sweat_n64"), 1, LW(0), LW(1), LW(2), 15, -45, 15, 0, 0, 0, 0, 0)
     CALL(evt_sub_random, 45, LW(0))
@@ -276,46 +261,46 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_AfterReactionEntry, -2, 53)
+    CALL(btlevtcmd_AfterReactionEntry, BTL_UNIT_SELF, 53)
     RETURN
 EVT_END()
 
 EVT_BEGIN(end_battle_evt)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(evt_snd_sfxoff, LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(explosion_event)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(evt_snd_sfxoff, LW(0))
-        CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
     END_IF
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, FLOAT(1.0f), 60, 0, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_THUNDERS_BOMB2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_THUNDERS_BOMB2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_StageDispellFog)
-    CALL(btlevtcmd_OnAttribute, -2, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 50331648)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
     CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("B_2"))
-    CALL(btlevtcmd_SamplingEnemy, -2, 1, PTR(&weapon_bomzou_explosion))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("B_2"))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, 1, PTR(&weapon_bomzou_explosion))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_bomzou_explosion), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     SET_VALUE(LW(10), 0)
     LABEL(10)
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), LW(3))
         GOTO(80)
     END_IF
-    CALL(btlevtcmd_GetPos, -2, LW(0), -250000000, -250000000)
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(1), -250000000, -250000000)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(1), EVT_NULLPTR, EVT_NULLPTR)
     SUBTRACT(LW(0), LW(1))
     IF_INT_LESS_OR_EQUAL(LW(0), -1)
         MULTIPLY(LW(0), -1)
@@ -323,9 +308,9 @@ static EVT_BEGIN(explosion_event)
     IF_INT_GREATER(LW(0), 50)
         GOTO(80)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_bomzou_explosion), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomzou_explosion), 256, LW(5))
     IF_INT_EQUAL(LW(5), 1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_bomzou_explosion), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomzou_explosion), 256, LW(5))
     END_IF
     LABEL(80)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -334,9 +319,9 @@ static EVT_BEGIN(explosion_event)
         GOTO(10)
     END_IF
     LABEL(99)
-    CALL(btlevtcmd_KillUnit, -2, 0)
+    CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_END()
 #else
 EVT_END_PAD()

@@ -1,3 +1,5 @@
+// aji_14 (敵のアジト, X-Naut Fortress): the Magnus von Grapple 2.0 boss room (evt_boss2), leading on to the
+// Moon (moo_04).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,69 +9,23 @@
 #include "evt/evt_sub.h"
 #include "aji.h"
 #include "evt/evt_npc.h"
-
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_eff_softdelete);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_position);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_battle_start);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_pera_onoff);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_battle_info);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_rotate);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_wait_anim);
-USER_FUNC(evt_npc_wait_battle_end);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
-USER_FUNC(waku);
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "evt/evt_story.h"
 
 static BeroEntry bero_entry_data[2];
 extern EvtWord evt_robot_waku[];
 extern EvtWord evt_boss2[];
 static NpcSetupInfo npcEnt[3];
-extern EvtWord aji_14_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -92,8 +48,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -109,7 +65,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-USER_FUNC(waku) {
+static USER_FUNC(waku) {
     NpcEntry* npc;
     AnimationPose* pose;
     s32 i;
@@ -166,10 +122,10 @@ USER_FUNC(waku) {
 
 EVT_BEGIN(evt_robot_waku)
     CALL(evt_npc_entry, STRING("枠"), STRING("c_mb_robo_2a"))
-    CALL(evt_npc_flag_onoff, 1, STRING("枠"), 786432)
+    CALL(evt_npc_flag_onoff, 1, STRING("枠"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_NO_SHADOW)
     CALL(evt_npc_set_anim, STRING("枠"), STRING("L_1"))
     CALL(evt_npc_entry, STRING("枠２"), STRING("c_mb_robo_2a"))
-    CALL(evt_npc_flag_onoff, 1, STRING("枠２"), 786432)
+    CALL(evt_npc_flag_onoff, 1, STRING("枠２"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_NO_SHADOW)
     CALL(evt_npc_set_anim, STRING("枠２"), STRING("L_1"))
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
@@ -184,8 +140,8 @@ static EVT_BEGIN(evt_boss)
     CALL(evt_npc_set_position, STRING("ロボット"), 260, 60, 0)
     CALL(evt_npc_set_ry, STRING("幹部"), 270)
     CALL(evt_npc_set_ry, STRING("ロボット"), 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), 33554432)
-    CALL(evt_npc_flag_onoff, 0, STRING("ロボット"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), NPC_FLAG_NO_BILLBOARD)
+    CALL(evt_npc_flag_onoff, 0, STRING("ロボット"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_pera_onoff, STRING("ロボット"), 0)
     CALL(evt_npc_set_anim, STRING("ロボット"), STRING("Z_1"))
     CALL(evt_cam3d_evt_set, 375, 420, 935, -225, -30, 0, 0, 11)
@@ -194,7 +150,7 @@ static EVT_BEGIN(evt_boss)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_mov_pos2, -420, 0, FLOAT(80.0f))
     WAIT_MS(1000)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_MAGNUM_APP1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MAGNUM_APP1"))
     CALL(evt_msg_print, 0, STRING("stg7_aji_36"), 0, STRING("幹部"))
     WAIT_MS(300)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -204,8 +160,8 @@ static EVT_BEGIN(evt_boss)
     WAIT_MS(1300)
     CALL(evt_cam3d_evt_set, 10, 190, 275, 175, 60, -142, 1000, 11)
     WAIT_MS(1000)
-    CALL(evt_npc_flag_onoff, 1, STRING("幹部"), 32768)
-    CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("幹部"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_msg_print, 0, STRING("stg7_aji_37"), 0, STRING("幹部"))
     WAIT_MS(300)
     CALL(evt_party_stop, 0)
@@ -230,8 +186,8 @@ static EVT_BEGIN(evt_boss)
     CALL(evt_msg_print, 0, STRING("stg7_aji_39"), 0, STRING("幹部"))
     WAIT_MS(300)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING("幹部"), 32768)
-    CALL(evt_npc_flag_onoff, 0, STRING("ロボット"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING("幹部"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("ロボット"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 250, 124, 545, 250, 140, -105, 500, 11)
     WAIT_MS(500)
     CALL(evt_set_dir_to_target, STRING("幹部"), STRING("ロボット"))
@@ -265,9 +221,9 @@ static EVT_BEGIN(evt_boss)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, 165, 183, 285, 281, 193, -98, 1000, 11)
     WAIT_MS(1000)
-    CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_msg_print, 0, STRING("stg7_aji_41"), 0, STRING("ロボット"))
-    CALL(evt_npc_flag_onoff, 0, STRING("ロボット"), 1536)
+    CALL(evt_npc_flag_onoff, 0, STRING("ロボット"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_cam3d_evt_set, 250, 124, 545, 250, 140, -105, 300, 11)
     WAIT_MS(300)
     WAIT_MS(2000)
@@ -306,8 +262,8 @@ static EVT_BEGIN(evt_boss)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, -50, 475, 1104, -50, 35, -13, 1000, 11)
     WAIT_MS(300)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_npc_set_battle_info, STRING("ロボット"), 5)
     CALL(evt_npc_battle_start, STRING("ロボット"))
     CALL(evt_npc_wait_battle_end)
@@ -352,14 +308,14 @@ static EVT_BEGIN(evt_boss)
     END_INLINE_EVENT
     WAIT_MS(3000)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 0, STRING("幹部"), 1536)
+        CALL(evt_npc_flag_onoff, 0, STRING("幹部"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
         CALL(evt_npc_set_anim, STRING("幹部"), STRING("D_1"))
         CALL(evt_npc_set_position, STRING("幹部"), 0, 70, 0)
         CALL(evt_npc_jump_position_nohit, STRING("幹部"), -200, 200, 100, 1000, FLOAT(80.0f))
     END_INLINE_EVENT
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_42"), 0, STRING("ロボット"))
-    CALL(evt_fade_set_mapchange_type, 1, 17, 900, 16, 900)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 900, FADE_IN_WHITE, 900)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_snd_sfxoff, LW(10))
@@ -375,7 +331,7 @@ EVT_BEGIN(evt_boss2)
     CALL(evt_party_set_pos, 0, -140, 0, 15)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1000)
-    CALL(evt_item_entry, STRING("dummy"), 120, 0, 1000, 0, 17, -1, 0)
+    CALL(evt_item_entry, STRING("dummy"), ITEM_CRYSTAL_STAR, 0, 1000, 0, 17, -1, 0)
     CALL(evt_sub_intpl_msec_init, 11, 1000, 25, 2000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -410,7 +366,7 @@ EVT_BEGIN(evt_boss2)
         CALL(evt_party_move_pos2, 0, -40, 15, FLOAT(80.0f))
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, 0, 0, FLOAT(80.0f))
-    SET_VALUE(GSW(0), 373)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
     DELETE_EVENT(LW(10))
     SET_VALUE(LW(0), 7)
     SET_VALUE(LW(1), STRING("dummy"))
@@ -421,7 +377,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"幹部"*/"\x8A\xB2\x95\x94", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -430,7 +386,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ロボット"*/"\x83\x8D\x83\x7B\x83\x62\x83\x67", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -443,11 +399,11 @@ static NpcSetupInfo npcEnt[] = {
 EVT_BEGIN(aji_14_init_evt)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_NOT_EQUAL(LW(0), STRING("tuzuki"))
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI2"))
-        ELSE
-        CALL(evt_snd_bgmoff, 512)
-        CALL(evt_snd_envoff, 512)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
+    ELSE
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
     END_IF
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -459,7 +415,7 @@ EVT_BEGIN(aji_14_init_evt)
         SPAWN_EVENT(PTR(evt_boss2))
         RETURN
     END_IF
-    IF_INT_LESS(GSW(0), 373)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_entry, STRING("ロボット２"), STRING("c_mb_robo_2b"))
         CALL(evt_npc_set_anim, STRING("ロボット２"), STRING("MGN_Q_1"))
         CALL(evt_npc_set_position, STRING("ロボット２"), 0, -1000, 0)
@@ -469,4 +425,3 @@ EVT_BEGIN(aji_14_init_evt)
     SPAWN_EVENT(PTR(evt_emergency))
     RETURN
 EVT_END()
-

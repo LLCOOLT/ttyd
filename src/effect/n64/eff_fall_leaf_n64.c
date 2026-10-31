@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: falling leaves, four leaves drifting down for the given lifetime; types 0-4.
+#include "eff/n64/eff_fall_leaf_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -8,24 +10,21 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 #include "version.h"
+#include "libc_decls.h"
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
-
-double sin(double);
-double cos(double);
-
 typedef struct EffFallLeafN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    f32 vx;        // 0x10
-    f32 vy;        // 0x14
-    f32 angleZ;    // 0x18
-    f32 spin;      // 0x1C
-    f32 angleY;    // 0x20
-    s32 alpha;     // 0x24
-    s32 lifetime;  // 0x28
-    s32 frame;     // 0x2C
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    f32 vx;       // 0x10
+    f32 vy;       // 0x14
+    f32 angleZ;   // 0x18
+    f32 spin;     // 0x1C
+    f32 angleY;   // 0x20
+    s32 alpha;    // 0x24
+    s32 lifetime; // 0x28
+    s32 frame;    // 0x2C
 } EffFallLeafN64Work;
 
 static effN64Vtx size12x12_tex64x64_vtx[] = {
@@ -38,7 +37,6 @@ static effN64Vtx size12x12_tex64x64_vtx[] = {
     {6, 6, 0, 2048, 4096, 0x30, 0x6C, 0x25, 0xFF},
     {-6, 6, 0, 0, 4096, 0x30, 0x6C, 0x25, 0xFF},
 };
-
 
 void effFallLeafMain(EffectEntry* effect);
 void effFallLeafDisp(CameraId cameraId, EffectEntry* effect);

@@ -1,3 +1,5 @@
+// las_04 (ラストダンジョン, Palace of Shadow): the hall with the fire bars (firebar) and the coin they drop.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -18,54 +20,66 @@
 #include "las.h"
 #include "libc_decls.h"
 #include "driver/hitdrv.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "mot/mot_damage.h"
+#include "mario/mario_motion.h"
+#include "party/party_motion.h"
+#include "driver/shadowdrv.h"
+#include "pmario_sound.h"
 #include <math.h>
+#include "evt/evt_story.h"
 
-typedef struct FirebarBall { s32 pose; Vec pos; } FirebarBall;
-typedef struct FirebarSetup { u8 type; u8 count; u8 pad_2[2]; Vec pos; f32 spacing; f32 ballSize; f32 speed; void* callback; f32 angleOrEndX; f32 radius; } FirebarSetup; /* ballSize: copied to FirebarWork, never read; angleOrEndX: start angle (type 0) or end x (type 1) */
-typedef struct FirebarWork { u8 type; u8 count; u16 flags; Vec pos; f32 prevAngle; f32 angle; f32 speed; f32 spacing; f32 ballSize; f32 scale; f32 endX; f32 radius; void (*callback)(struct FirebarWork* wp, s32 type); s32 hitCount; s32 sfxId; s32 state; f32 shadowAngle; FirebarBall* balls; FirebarSetup* setup; } FirebarWork;
-void set_damage_root_ypos(f32 y);
-void marioChgMot(s32 motion);
-ItemEntry* itemEntry(const char* name, s32 itemId, s32 mode, s32 flag, void* script, f32 x, f32 y, f32 z);
-void itemStatusOn(ItemEntry* item, s32 flags);
-double sin(double x);
-void shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 scale);
-void shadowSetVolumeDecay(f32 a, f32 b, f32 c);
+typedef struct FirebarBall {
+    s32 pose;
+    Vec pos;
+} FirebarBall;
+typedef struct FirebarSetup {
+    u8 type;
+    u8 count;
+    u8 pad_2[2];
+    Vec pos;
+    f32 spacing;
+    f32 ballSize;
+    f32 speed;
+    void* callback;
+    f32 angleOrEndX;
+    f32 radius;
+} FirebarSetup; /* ballSize: copied to FirebarWork, never read; angleOrEndX: start angle (type 0) or end x (type 1) */
+typedef struct FirebarWork {
+    u8 type;
+    u8 count;
+    u16 flags;
+    Vec pos;
+    f32 prevAngle;
+    f32 angle;
+    f32 speed;
+    f32 spacing;
+    f32 ballSize;
+    f32 scale;
+    f32 endX;
+    f32 radius;
+    void (*callback)(struct FirebarWork* wp, s32 type);
+    s32 hitCount;
+    s32 sfxId;
+    s32 state;
+    f32 shadowAngle;
+    FirebarBall* balls;
+    FirebarSetup* setup;
+} FirebarWork;
 void firebar_disp(CameraId camera, void* param);
-int rand(void);
-s32 psndSFXChk(s32 id);
-void psndSFXOff(s32 id);
-s32 psndSFXOn_3D(const char* name, Vec* position);
-void _firebar_rot(FirebarWork* wp);
-void _firebar_trans(FirebarWork* wp);
-double cos(double x);
-s32 _firebar_hitCheck2(FirebarWork* wp);
 
 USER_FUNC(coin_entry);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_random);
 USER_FUNC(firebar_disp_evt);
 USER_FUNC(firebar_entry);
 void firebar_cb(FirebarWork* wp, s32 type);
-void firebar_disp(CameraId camera, void* param);
-void _firebar_trans(FirebarWork* wp);
-void _firebar_rot(FirebarWork* wp);
-s32 _firebar_hitCheck2(FirebarWork* wp);
-s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball);
 
 static BeroEntry bero_entry_data[3];
-extern EvtWord firebar_coin[];
 FirebarSetup firebardesc[7];
-extern EvtWord firebar_evt[];
 static HitDamageReturn dmgRetPoint[4];
-extern EvtWord las_04_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -104,8 +118,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -122,8 +136,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -313,7 +327,7 @@ EVT_BEGIN(firebar_evt)
     RETURN
 EVT_END()
 
-s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball) {
+static s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball) {
     MarioWork* mario = marioGetPtr();
     f32 dx;
     f32 dz;
@@ -340,7 +354,7 @@ s32 _firebar_hitCheck(FirebarWork* wp, FirebarBall* ball) {
     return 0;
 }
 
-s32 _firebar_hitCheck2(FirebarWork* wp) {
+static s32 _firebar_hitCheck2(FirebarWork* wp) {
     FirebarBall* balls = wp->balls;
     MarioWork* mario = marioGetPtr();
     Vec rel;
@@ -387,14 +401,14 @@ s32 _firebar_hitCheck2(FirebarWork* wp) {
     return 0;
 }
 
-void _firebar_rot(FirebarWork* wp) {
+static void _firebar_rot(FirebarWork* wp) {
     FirebarBall* ball = wp->balls;
     MarioWork* mario = marioGetPtr();
     s32 hit;
     f32 dist;
     f32 limit;
-    f32 a1;
-    f32 a2;
+    f32 marioAngle;
+    f32 tipAngle;
     f32 diff;
     f32 r;
     f32 s;
@@ -422,9 +436,9 @@ void _firebar_rot(FirebarWork* wp) {
     dist = distABf(wp->pos.x, wp->pos.z, mario->position.x, mario->position.z);
     limit = mario->wPlayerCollisionBox.x / 2.0f / 2.0f + wp->spacing / 2.0f * wp->scale / 2.0f +
             distABf(wp->pos.x, wp->pos.z, wp->balls[wp->count - 1].pos.x, wp->balls[wp->count - 1].pos.z);
-    a1 = angleABf(wp->pos.x, wp->pos.z, mario->position.x, mario->position.z);
-    a2 = angleABf(wp->pos.x, wp->pos.z, wp->balls[wp->count - 1].pos.x, wp->balls[wp->count - 1].pos.z);
-    diff = compAngle(a1, a2);
+    marioAngle = angleABf(wp->pos.x, wp->pos.z, mario->position.x, mario->position.z);
+    tipAngle = angleABf(wp->pos.x, wp->pos.z, wp->balls[wp->count - 1].pos.x, wp->balls[wp->count - 1].pos.z);
+    diff = compAngle(marioAngle, tipAngle);
     if (hit > 0) {
         wp->hitCount = 0;
         if (wp->callback != NULL) {
@@ -450,12 +464,12 @@ void _firebar_rot(FirebarWork* wp) {
     wp->prevAngle = diff;
 }
 
-void _firebar_trans(FirebarWork* wp) {
+static void _firebar_trans(FirebarWork* wp) {
     FirebarBall* ball = wp->balls;
     MarioWork* mario = marioGetPtr();
     s32 hit;
-    f32 a1;
-    f32 a2;
+    f32 marioAngle;
+    f32 tipAngle;
     f32 diff;
     f32 k;
     f32 dy;
@@ -502,9 +516,9 @@ void _firebar_trans(FirebarWork* wp) {
     }
     if (wp->state == 1) {
         hit = _firebar_hitCheck2(wp);
-        a1 = angleABf(wp->pos.x, wp->pos.z, mario->position.x, mario->position.z);
-        a2 = angleABf(wp->pos.x, wp->pos.z, wp->balls[wp->count - 1].pos.x, wp->balls[wp->count - 1].pos.z);
-    diff = compAngle(a1, a2);
+        marioAngle = angleABf(wp->pos.x, wp->pos.z, mario->position.x, mario->position.z);
+        tipAngle = angleABf(wp->pos.x, wp->pos.z, wp->balls[wp->count - 1].pos.x, wp->balls[wp->count - 1].pos.z);
+        diff = compAngle(marioAngle, tipAngle);
         if (hit > 0) {
             wp->hitCount = 0;
             if (wp->callback != NULL) {
@@ -577,9 +591,11 @@ USER_FUNC(firebar_entry) {
             ball->pos = (Vec){0.0f, 0.0f, 0.0f};
             animPoseSetAnim(ball->pose, "FRB_S_1", TRUE);
         }
-        event->userdata[0] = (EvtWord)wp;
+        event->userdatap[0] = wp;
     }
-    *(s32*)&wp = event->userdata[0];
+    // FAKE: storing through &wp keeps wp in a stack slot for the whole function, as in the original
+    // code; it is the same as wp = event->userdatap[0].
+    *(FirebarWork**)&wp = event->userdatap[0];
     if (wp->flags & 8) {
         if (psndSFXChk(wp->sfxId) == 0) {
             psndSFXOff(wp->sfxId);
@@ -637,16 +653,17 @@ USER_FUNC(firebar_disp_evt) {
     FirebarWork* wp;
     FirebarBall* ball;
     f32 a;
+    s32 shadowId;
     s32 i;
 
     if (evtCheckID(event->lwData[0])) {
-        wp = (FirebarWork*)evtGetPtrID(event->lwData[0])->userdata[0];
+        wp = evtGetPtrID(event->lwData[0])->userdatap[0];
         a = sin(6.2831855f * wp->shadowAngle / 360.0f);
         a = 0.375f * a + 0.625f;
         ball = wp->balls;
         for (i = 0; i < wp->count; i++, ball++) {
-            shadowEntryMode(2, ball->pos.x, ball->pos.y, ball->pos.z, 17.0f * wp->scale);
-            shadowSetVolumeDecay(a, 0.2f * a, 0.4f * a);
+            shadowId = shadowEntryMode(2, ball->pos.x, ball->pos.y, ball->pos.z, 17.0f * wp->scale);
+            shadowSetVolumeDecay(shadowId, a, 0.2f * a, 0.4f * a);
         }
         dispEntry(CAMERA_3D, dispCalcZ(&wp->pos), 1, firebar_disp, wp);
         return EVT_RETURN_BLOCK;
@@ -674,9 +691,9 @@ USER_FUNC(coin_entry) {
     s32 y = evtGetValue(event, args[1]);
     s32 z = evtGetValue(event, args[2]);
     s32 w = evtGetValue(event, args[3]);
-    ItemEntry* item = itemEntry(NULL, 121, 3, -1, NULL, x, y, z);
+    ItemEntry* item = itemEntry(x, y, z, NULL, ITEM_COIN, 3, -1, NULL);
 
-    itemStatusOn(item, 0x10);
+    itemStatusOn(item, ITEM_STATUS_CUSTOM_LAUNCH);
     item->bounceFactor = 0.8f;
     item->gravityScale = 1.0f;
     item->maxBounces = 5;
@@ -702,7 +719,7 @@ void firebar_cb(FirebarWork* wp, s32 type) {
             break;
         case 2:
             set_damage_root_ypos(mario->position.y);
-            marioChgMot(0x20);
+            marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
             break;
     }
 }
@@ -715,8 +732,8 @@ static HitDamageReturn dmgRetPoint[] = {
 };
 
 EVT_BEGIN(las_04_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS2"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -726,7 +743,7 @@ EVT_BEGIN(las_04_init_evt)
     SPAWN_EVENT(PTR(firebar_evt))
     CALL(evt_map_playanim, STRING("mizu"), 1, 0)
     CALL(evt_map_playanim, STRING("hamon"), 1, 0)
-    CALL(evt_mobj_brick, STRING("mobj_01"), 0, 150, 0, 134, 11, 0, GSWF(4384))
+    CALL(evt_mobj_brick, STRING("mobj_01"), 0, 150, 0, ITEM_BOOS_SHEET, 11, 0, GSWF(GSWF_LAS04_BOOS_SHEET_BRICK))
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -950, 140, -100, 0, 0)
     RETURN
 EVT_END()

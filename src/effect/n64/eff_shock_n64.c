@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: a yellow electric shock flash that expands and fades; also spawned by the thunder effect.
 #include "eff/n64/eff_shock_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -140,24 +141,24 @@ EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     w->offset = 0.5f * a;
     w->offset2 = 0.5f * b;
     switch (type) {
-    case 0:
-    case 1:
-    case 3:
-        w->col0[0] = 255;
-        w->col0[1] = 255;
-        w->col0[2] = 0;
-        w->col1[0] = 255;
-        w->col1[1] = 255;
-        w->col1[2] = 255;
-        break;
-    default:
-        w->col0[0] = 70;
-        w->col0[1] = 180;
-        w->col0[2] = 120;
-        w->col1[0] = 255;
-        w->col1[1] = 255;
-        w->col1[2] = 255;
-        break;
+        case 0:
+        case 1:
+        case 3:
+            w->col0[0] = 255;
+            w->col0[1] = 255;
+            w->col0[2] = 0;
+            w->col1[0] = 255;
+            w->col1[1] = 255;
+            w->col1[2] = 255;
+            break;
+        default:
+            w->col0[0] = 70;
+            w->col0[1] = 180;
+            w->col0[2] = 120;
+            w->col1[0] = 255;
+            w->col1[1] = 255;
+            w->col1[2] = 255;
+            break;
     }
     return effect;
 }
@@ -193,7 +194,9 @@ void effShockMain(EffectEntry* effect) {
         w->scale += 0.05f * (8.0f - w->scale);
     }
     w->c14 *= 0.9f;
-    if (life < 5) { w->c18 *= 0.8f; }
+    if (life < 5) {
+        w->c18 *= 0.8f;
+    }
     if (age > 6) {
         w->c10 -= 13;
         if (w->c10 < 0) {
@@ -306,4 +309,3 @@ void effShockDisp(CameraId cameraId, EffectEntry* effect) {
         tri2(0x26, 0x25, 0x2f, 0x0, 0x26, 0x2f, 0x2c, 0x0);
     }
 }
-

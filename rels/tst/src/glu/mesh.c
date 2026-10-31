@@ -1,45 +1,45 @@
 /*
- * libtess (SGI OpenGL Sample Implementation GLU): half-edge mesh operations.
+ * SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008)
+ * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice including the dates of first publication and
+ * either this permission notice or a reference to
+ * http://oss.sgi.com/projects/FreeB/
+ * shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * SILICON GRAPHICS, INC. BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+ * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Except as contained in this notice, the name of Silicon Graphics, Inc.
+ * shall not be used in advertising or otherwise to promote the sale, use or
+ * other dealings in this Software without prior written authorization from
+ * Silicon Graphics, Inc.
+ */
+
+/*
  * Author: Eric Veach, July 1994.
  *
- * tst.rel carries a copy of the GLU polygon tessellator from the OpenGL Sample Implementation (Silicon Graphics,
- * Inc., SGI Free Software License B). The assertions of this copy are compiled in, and each one passes its source
- * line to __assert, so the layout of every file follows the original: the license and author header take the
- * first lines, and the functions keep their original order and length.
+ * libtess half-edge mesh operations (data structure in mesh.h): the primitives MakeEdge, Splice,
+ * MakeVertex, MakeFace and the Kill* helpers, and the __gl_mesh* operations built on them. Records
+ * come from the map heap (memalloc.h); half-edges are allocated in pairs (EdgePair). The
+ * consistency check __gl_meshCheckMesh is compiled out, and deferred inlining emits the functions
+ * last to first.
  *
- * Contents of this file (see mesh.h for the data structure):
+ * tst.rel keeps this copy's assertions, and each passes its source line to __assert, so every line
+ * of this file stays where the original has it: this notice and the author header fill lines 1-44.
  *
- *   allocVertex, allocFace      allocation of the vertex and face records
- *   MakeEdge, Splice            the two primitive edge operations
- *   MakeVertex, MakeFace        attach a new vertex or face to a loop
- *   KillEdge, KillVertex,       detach and free an edge, vertex or face
- *   KillFace
- *
- *   __gl_meshMakeEdge           one edge, two vertices and a loop
- *   __gl_meshSplice             the basic change of connectivity
- *   __gl_meshDelete             removes an edge
- *   __gl_meshAddEdgeVertex      new edge to a new vertex
- *   __gl_meshSplitEdge          splits an edge at a new vertex
- *   __gl_meshConnect            new edge between two existing vertices
- *   __gl_meshZapFace            removes a face (and edges left without faces)
- *   __gl_meshNewMesh            empty mesh
- *   __gl_meshUnion              merges two meshes
- *   __gl_meshDeleteMesh         frees a whole mesh
- *
- * The consistency check __gl_meshCheckMesh is compiled out (NDEBUG), and the
- * mesh is freed list by list rather than face by face (DELETE_BY_ZAPPING off).
- *
- * All records come from the map heap through memAlloc/memFree (memalloc.h).
- * Half-edges come in pairs (EdgePair), so one memFree releases an edge and
- * its Sym; a NULL from memAlloc makes the operation return NULL or 0, and
- * tess.c reports GLU_OUT_OF_MEMORY.
- *
- * Inlining: with deferred inlining the static helpers and allocVertex/allocFace
- * are inlined into the mesh operations, and __gl_meshAddEdgeVertex into
- * __gl_meshSplitEdge; the helpers are still emitted on their own.
- *
- * Emission order: deferred inlining emits the functions last to first, so
- * __gl_meshDeleteMesh comes first in .text and allocVertex last.
  *
  */
 

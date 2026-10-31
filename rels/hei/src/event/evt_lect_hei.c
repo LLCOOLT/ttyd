@@ -1,3 +1,4 @@
+// Petal Meadows (hei) partner-lecture scripts: the Koops (nokotarou) tutorial and the shared partner-join cutscene (all_party_lecture) with helpers.
 #include "icon_ids.h"
 #include "eff/eff_mario_balloon.h"
 #include "eff/eff_fukidashi.h"
@@ -20,90 +21,46 @@
 #include "party.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_lect.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_img.h"
+#include "evt/evt_lecture.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "pmario_sound.h"
+#include "statuswindow.h"
+#include "driver/hitdrv.h"
+#include "version.h"
+#include "evt/evt_story.h"
 
 static OSTime wwstart;
-void statusWinForceClose(void);
-void statusWinForceCloseClear(void);
 static s32 x_flag_data[2];
 static void lecture_button_disp(CameraId camera, void* param);
-typedef struct LectButtonDisp { s32 dispFlags; Vec pos; } LectButtonDisp; /* dispFlags: never accessed */
-typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDisp disp; u8 pad_18[0x40 - 0x18]; s16 iconId; s16 alpha; } LectButton;
 static LectButton lbtn[2];
-static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
-void hitGrpFlagOn(const char* name, u32 flags);
-EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
+static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
+    camera->presetPos = camera->cameraPos;
+    camera->presetAt = camera->cameraAt;
+    PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos);
+    PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt);
+    camera->startTimeA = gp->renderTime;
+    camera->durationA = 0;
+    camera->stateA = 3;
+    camera->curveA = 11;
+}
 static EffectEntry* eff;
 
 static USER_FUNC(effitemget_busaiku);
 static USER_FUNC(effitemget_open);
 static USER_FUNC(effitemgetchange_cam);
-USER_FUNC(evt_cam3d_evt_set_rel);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_softdelete);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_goodbye_party);
-USER_FUNC(evt_mario_init_camid);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_camid);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_party_pos);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_set_camid);
-USER_FUNC(evt_mobj_set_position);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_print_insert);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_npc_get_dir);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_start_for_event);
-USER_FUNC(evt_npc_stop_for_event);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_init_camid);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_nokotaro_hold_cancel);
-USER_FUNC(evt_party_nokotaro_kick);
-USER_FUNC(evt_party_nokotaro_kick_hold);
-USER_FUNC(evt_party_set_camid);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_get_yoshiname);
-USER_FUNC(evt_pouch_party_join);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(lect_cam_load);
-USER_FUNC(lect_cam_save);
 static USER_FUNC(lect_itemget_kesan);
 static USER_FUNC(lect_party_ido_sum);
-USER_FUNC(lect_test_systemlevel);
 static USER_FUNC(set_dir);
 static USER_FUNC(x_flag_set);
 static USER_FUNC(x_flag_wait);
@@ -124,7 +81,6 @@ static USER_FUNC(lecture_button_flag_on_off);
 static USER_FUNC(lecture_button_set_alpha);
 static USER_FUNC(lecture_button_set_icon_id);
 static USER_FUNC(lecture_button_rtn);
-static void lecture_button_disp(CameraId camera, void* param);
 static USER_FUNC(x_flag_get);
 static USER_FUNC(x_flag_add);
 static USER_FUNC(lect_status_on);
@@ -219,7 +175,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
         LectButton* btn = &lbtn[i];
         LectButtonDisp* disp = &btn->disp;
 
-        if (!(btn->flags & 1)) {
+        if (!(btn->flags & LECT_BUTTON_FLAG_HIDDEN)) {
             f32 ofs;
             Vec pos;
 
@@ -241,7 +197,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             iconDispGxAlpha(&pos, 0x84, btn->iconId, btn->alpha, 1.0f);
 #else
             iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
@@ -288,7 +244,7 @@ static USER_FUNC(lecture_button_rtn) {
                 }
                 break;
             case 4:
-                btn->flags |= 1;
+                btn->flags |= LECT_BUTTON_FLAG_HIDDEN;
                 done++;
                 break;
         }
@@ -406,35 +362,41 @@ static USER_FUNC(effitemgetchange_cam) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 camId = evtGetValue(event, args[1]);
 
-    ((ItemGetWork*)effNameToPtr(name)->userdata)->camera = camId;
+    ItemGetWork* work = effNameToPtr(name)->userdata;
+
+    work->camera = camId;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemgetchange_cam_ptr) {
     EvtWord* args = event->args;
-    EffectEntry* eff = (EffectEntry*)evtGetValue(event, args[0]);
+    EffectEntry* effect = (EffectEntry*)evtGetValue(event, args[0]);
+    s32 camId = evtGetValue(event, args[1]);
+    ItemGetWork* work = effect->userdata;
 
-    ((ItemGetWork*)eff->userdata)->camera = evtGetValue(event, args[1]);
+    work->camera = camId;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_open) {
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+    EffectEntry* effect = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+    ItemGetWork* work = effect->userdata;
 
-    ((ItemGetWork*)eff->userdata)->state = 1;
+    work->state = 1;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_open_ptr) {
-    EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
+    EffectEntry* effect = (EffectEntry*)evtGetValue(event, event->args[0]);
+    ItemGetWork* work = effect->userdata;
 
-    ((ItemGetWork*)eff->userdata)->state = 1;
+    work->state = 1;
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
     Vec ofs;
 
     if (up) {
@@ -463,7 +425,7 @@ EVT_BEGIN(nokotaro_party_lecture)
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_0_1"), 0, 0)
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_1"), 0, 0)
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(100.0f), FLOAT(630.0f), FLOAT(45.0f), FLOAT(39.0f), FLOAT(-100.0f), 1000, 0)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     WAIT_MS(1000)
 #else
     WAIT_MS(1500)
@@ -473,14 +435,14 @@ EVT_BEGIN(nokotaro_party_lecture)
         CALL(evt_party_nokotaro_kick, 0)
         WAIT_MS(500)
     END_LOOP
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(x_flag_set, 0, 1)
     BEGIN_INLINE_EVENT
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    SUBTRACT(LW(0), 30)
-    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
-    CALL(evt_party_set_dir, 0, 90, 300)
-    CALL(x_flag_set, 0, 0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SUBTRACT(LW(0), 30)
+        CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+        CALL(evt_party_set_dir, 0, 90, 300)
+        CALL(x_flag_set, 0, 0)
     END_INLINE_EVENT
     CALL(x_flag_wait, 0, 0)
 #endif
@@ -496,13 +458,13 @@ EVT_BEGIN(nokotaro_party_lecture)
         SET_VALUE(LW(1), STRING("TESTMOBJ"))
         CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
         ADD(LW(2), -70)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         ADD(LW(3), 100)
 #endif
-        SET_VALUE(GSWF(1803), 0)
-        CALL(evt_mobj_switch_blue, 0, LW(1), LW(2), LW(3), LW(4), 0, GSWF(1803))
+        SET_VALUE(GSWF(GSWF_HEI_KOOPS_LECTURE_SWITCH), 0)
+        CALL(evt_mobj_switch_blue, 0, LW(1), LW(2), LW(3), LW(4), 0, GSWF(GSWF_HEI_KOOPS_LECTURE_SWITCH))
         CALL(evt_mobj_set_camid, LW(1), 7)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         CALL(evt_snd_sfxon, STRING("SFX_EVT_LECTURE_BLOCK_FALL1"), LW(7))
         BEGIN_INLINE_EVENT
             LOOP(0)
@@ -524,7 +486,7 @@ EVT_BEGIN(nokotaro_party_lecture)
                 SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
                 CALL(evt_mobj_set_position, LW(1), LW(2), LW(3), LW(4))
                 BREAK_LOOP
-                ELSE
+            ELSE
                 CALL(evt_mobj_set_position, LW(1), LW(2), LW(3), LW(4))
             END_IF
             WAIT_FRAMES(1)
@@ -537,7 +499,7 @@ EVT_BEGIN(nokotaro_party_lecture)
             CASE_EQUAL(2)
             CALL(evt_msg_print_add, 0, STRING("lecture_friends_05_1"))
             CASE_EQUAL(1)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             CALL(evt_mario_mov_pos2, 367, 74, FLOAT(135.0f))
 #else
             CALL(evt_mario_mov_pos2, 367, -38, FLOAT(135.0f))
@@ -572,8 +534,8 @@ EVT_BEGIN(nokotaro_party_lecture)
 EVT_END()
 
 static EVT_BEGIN(all_party_lecture_otosub)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_GET_PARTY1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_GET_PARTY1"))
     WAIT_MS(2000)
     RETURN
 EVT_END()
@@ -583,7 +545,7 @@ EVT_BEGIN(all_party_lecture)
     IF_INT_NOT_EQUAL(LW(9), 1)
         IF_INT_NOT_EQUAL(LW(9), 5)
             CALL(evt_mario_goodbye_party, 0)
-            ELSE
+        ELSE
             CALL(evt_mario_kill_party, 0)
         END_IF
         WAIT_MS(500)
@@ -593,7 +555,7 @@ EVT_BEGIN(all_party_lecture)
         CALL(evt_pouch_party_join, LW(9))
         CALL(evt_mario_set_party_pos, 0, LW(9), LW(0), LW(1), LW(2))
         CALL(set_dir, LW(3))
-        ELSE
+    ELSE
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     END_IF
     CALL(evt_party_set_camid, 0, 7)
@@ -623,8 +585,8 @@ EVT_BEGIN(all_party_lecture)
     IS_EVENT_RUNNING(LW(11), LW(12))
     IF_INT_EQUAL(LW(12), 1)
         DELETE_EVENT(LW(11))
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_IF
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_mario_set_camid, 7)
@@ -633,9 +595,9 @@ EVT_BEGIN(all_party_lecture)
     CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PARTY_LECTURE1_1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_stop_for_event)
     WAIT_MS(1000)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_LECTURE1"))
-    CALL(evt_snd_envoff, 1024)
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_LECTURE1"))
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(lect_cam_save)
     CALL(effitemget_busaiku, 1)
     WAIT_FRAMES(1)
@@ -681,25 +643,25 @@ EVT_BEGIN(all_party_lecture)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)
-        CALL(evt_party_dispflg_onoff, 0, 1, 1)
+        CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
         WAIT_MS(100)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_LECTUREN_BLINKING1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_mario_dispflag_onoff, 0, 1)
-        CALL(evt_party_dispflg_onoff, 0, 1, 0)
+        CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 0)
         WAIT_MS(100)
     END_LOOP
     CALL(evt_mario_dispflag_onoff, 1, 1)
-    CALL(evt_party_dispflg_onoff, 0, 1, 1)
+    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(lect_cam_load, 0)
     CALL(evt_mario_dispflag_onoff, 0, 1)
-    CALL(evt_party_dispflg_onoff, 0, 1, 0)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
+    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PARTY_LECTURE1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
@@ -723,6 +685,7 @@ static USER_FUNC(lect_mobj_hit_nasi) {
         mobj = event->thisMapObj;
     }
     for (i = 0; i < 2; i++) {
+        // hitObj[i].name is an array, so the NULL test is always true; the original code has it and MWCC still emits the compare.
         if (mobj->hitObj[i].name != NULL && strcmp(mobj->hitObj[i].name, "") != 0) {
             hitGrpFlagOn(mobj->hitObj[i].name, 1);
         }
@@ -734,7 +697,7 @@ static USER_FUNC(lect_itemget_kesan) {
     EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(args[0] == 0 ? partyCtrlNo : 1);
     f32 dist = evtGetFloat(event, args[1]);
-    CameraEntry* cam = camGetPtr(4);
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
     Vec pos;
     Vec dir;
 
@@ -762,8 +725,11 @@ static USER_FUNC(lect_npc_balloon_on_off) {
     NpcEntry* npc = evtNpcNameToPtr(event, name);
 
     if (evtGetValue(event, args[1])) {
+        MarioBalloonWork* balloon;
+
         eff = effMarioBalloonEntry(1, npc);
-        ((MarioBalloonWork*)eff->userdata)->camera = 7;
+        balloon = eff->userdata;
+        balloon->camera = 7;
     } else {
         effDelete(eff);
     }
@@ -822,9 +788,6 @@ static USER_FUNC(set_dir) {
     return EVT_RETURN_DONE;
 }
 
-BOOL psndBGMStartCheck(s32 id);
-
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-

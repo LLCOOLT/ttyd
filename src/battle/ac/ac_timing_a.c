@@ -1,3 +1,4 @@
+// Action command: press A in time with the timing gauge (ac_timing_a); the standard attack timing prompt.
 #pragma defer_codegen off
 #include "battle/ac/ac_timing_a.h"
 #include "battle/battle.h"
@@ -9,14 +10,9 @@
 #include "system.h"
 #include <string.h>
 #include "icon_ids.h"
+#include "version.h"
 
-// The demo draws the action command icons with icon flag 4; retail uses 0x10.
-#ifdef VERSION_G8ME01_DEMO
-#define AC_ICON_FLAGS 4
-#else
-#define AC_ICON_FLAGS 0x10
-#endif
-
+// this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 
 typedef struct TimingAEntry {
@@ -54,40 +50,41 @@ TimingAEntry* _ac_timing_a_timing_tbl[] = {
     _ac_timing_a_timing_lv_6,
 };
 
+// inlining off for actionCommandDisp, as in the original (the object differs without it)
 #pragma dont_inline on
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     s32* frame = (s32*)&ac->disp;
-    camGetPtr(8);
+    camGetPtr(CAMERA_2D);
     if (TA_WORK(ac)->flags & 1) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 50.0f + y;
-        iconDispGx(&pos, AC_ICON_FLAGS, ICON_065, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_065, 1.0f);
     } else {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -200.0f + x;
         pos.y = 50.0f + y;
-        iconDispGx(&pos, AC_ICON_FLAGS, ICON_064, 1.0f);
+        iconDispGx(&pos, ICON_DISP_2D, ICON_064, 1.0f);
     }
     (*frame)++;
 }
 
 #pragma dont_inline reset
 void battleAcDelete_TimingA(BattleWork* work) {
-    work->actionCommands.mAcState = 1000;
+    work->actionCommands.acState = 1000;
 }
 
 void battleAcDisp_TimingA(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
     BattleACDispParams* disp = &ac->disp;
-    switch (ac->mAcState) {
+    switch (ac->acState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, -300.0f, 30.0f, 20 - disp->slideTimer, 20);
         case 100:
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
             disp->iconX = 30.0f;
 #endif
             actionCommandDisp(disp->iconX, disp->iconY);
@@ -98,7 +95,7 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
         case 1000:
         case 1001:
             if (disp->slideTimer >= 40) {
-                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
+                disp->iconX = intplGetValue(4, 30.0f, -300.0f, disp->slideTimer - 40, 20);
             } else {
                 disp->iconX = 30.0f;
             }
@@ -110,32 +107,29 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
     }
 }
 
-s32 battleAcTimingA_GetSuccessFrame(BattleWork* work);
-#pragma dont_inline on
-
 s32 battleAcResult_TimingA(BattleWork* work) {
     s32 successFrame = battleAcTimingA_GetSuccessFrame(work);
     s32 count = 0;
     s32 i;
-    if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)) {
+    if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
         if (irand(100) >= 0) {
             work->actionCommands.result = 0;
         } else {
             work->actionCommands.result = 2;
-            work->actionCommands.mResultCount++;
+            work->actionCommands.resultCount++;
         }
         return work->actionCommands.result;
     }
-    if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
+    if (work->actionCommands.acUnit->badgesEquipped.AutoCommand) {
         work->actionCommands.result = 2;
-        work->actionCommands.mResultCount++;
+        work->actionCommands.resultCount++;
         return work->actionCommands.result;
     }
     work->actionCommands.result = 0;
-    if (work->flags & 0x1000000) {
+    if (work->flags & BATTLE_FLAG_LECTURE_JUMP) {
         work->actionCommands.outputParams[0] = 3;
         work->actionCommands.result = 2;
-        work->actionCommands.mResultCount++;
+        work->actionCommands.resultCount++;
         return work->actionCommands.result;
     }
     for (i = 0; i < 20; i++) {
@@ -162,15 +156,15 @@ s32 battleAcResult_TimingA(BattleWork* work) {
     }
     work->actionCommands.outputParams[0] = 3;
     work->actionCommands.result = 2;
-    work->actionCommands.mResultCount++;
+    work->actionCommands.resultCount++;
     return work->actionCommands.result;
 }
 
 s32 battleAcTimingA_GetSuccessFrame(BattleWork* work) {
-    s32 diff = ((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(work);
+    s32 diff = BattleActionCommandGetDifficulty(work);
     TimingAEntry* e = _ac_timing_a_timing_tbl[diff];
     s32 ret = e->value;
-    s32 count = work->actionCommands.mResultCount;
+    s32 count = work->actionCommands.resultCount;
     if (TA_WORK(&work->actionCommands)->flags & 2) {
         if (count >= 100000) {
             return 0;
@@ -186,19 +180,18 @@ s32 battleAcTimingA_GetSuccessFrame(BattleWork* work) {
     return ret;
 }
 
-#pragma dont_inline reset
 s32 battleAcMain_TimingA(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     TimingAWork* tw = TA_WORK(ac);
     BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
 
-    switch (work->actionCommands.mAcState) {
+    switch (work->actionCommands.acState) {
         case 0:
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
             disp->iconY = 0.0f;
             disp->slideTimer = 20;
-            work->actionCommands.mAcState = 99;
+            work->actionCommands.acState = 99;
             TA_WORK(&work->actionCommands)->flags &= ~1;
             work->actionCommands.outputParams[0] = 0;
             break;
@@ -206,11 +199,11 @@ s32 battleAcMain_TimingA(BattleWork* work) {
             break;
         case 1000:
             tw->endTimer = 60;
-            work->actionCommands.mAcState = 1001;
+            work->actionCommands.acState = 1001;
         case 1001:
             tw->endTimer--;
             if (tw->endTimer <= 0) {
-                work->actionCommands.mAcState = 1002;
+                work->actionCommands.acState = 1002;
             }
             break;
         case 1002:

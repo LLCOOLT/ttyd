@@ -1,11 +1,13 @@
+// unit_party_christine.c: Goombella's (Christine) battle weapons, pose table and unit kind as a partner.
 #pragma once
 
 #include "battle/battle_database_common.h"
+#include "battle/battle_unit.h"
 #include "dolphin/types.h"
 
 extern BattleWeapon partyWeapon_ChristineKiss;
 extern BattleWeapon partyWeapon_ChristineMonosiri;
 extern BattleWeapon partyWeapon_ChristineNormalAttack;
 extern BattleWeapon partyWeapon_ChristineRenzokuAttack;
-extern s32 pose_table_christine_stay[];
+extern PoseTableEntry pose_table_christine_stay[];
 extern BattleUnitKind unitdata_Party_Christine;

@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: balloon that inflates to a target scale while rotating; type picks the shape.
+#include "eff/n64/eff_balloon_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -6,9 +8,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSFastCast.h>
 #include <string.h>
-
-double sin(double);
-double cos(double);
+#include "eff/eff_n64_vtx.h"
+#include "libc_decls.h"
 
 typedef struct EffBalloonN64Point {
     f32 x, y;
@@ -27,14 +28,11 @@ typedef struct EffBalloonN64Work {
     f32 offsetY;                   // 0xC8
 } EffBalloonN64Work;
 
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
 void effGetTexObjN64(u32 id, GXTexObj* obj);
 void effSetVtxDescN64(effN64Vtx* vtx);
+// Unprototyped on purpose: this file passes tri1 its vertex indices as plain ints, without the
+// u16 conversion that eff_n64.h's prototype would add, so it includes only the vertex type.
+// FAKE: local prototype: tri1 is declared without parameters (eff_n64.h: (u16, u16, u16, u16)); this file was compiled with it and the header prototype changes the code.
 void tri1();
 
 static effN64Vtx balloon_vtx[] = {
@@ -65,7 +63,6 @@ static effN64Vtx balloon_vtx[] = {
 void effBalloonMain(EffectEntry* effect);
 void effBalloonDisp(CameraId cameraId, EffectEntry* effect);
 
-
 EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, f32 rotation) {
     EffectEntry* effect;
     EffBalloonN64Work* work;
@@ -76,7 +73,7 @@ EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffBalloonN64Work));
     effect->userdata = work;
     effect->callback = effBalloonMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -104,8 +101,8 @@ void effBalloonMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 99;
     }
     if (work->lifetime < 100) {
@@ -245,4 +242,3 @@ void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-

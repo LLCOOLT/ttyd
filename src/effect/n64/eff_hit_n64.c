@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: hit flash made of radiating pieces; size sets the piece count and the type the colour.
 #include "eff/n64/eff_hit_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -8,21 +9,21 @@
 #include <stdlib.h>
 
 typedef struct EffHitN64Work {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    f32 vel10;    // 0x10
-    f32 vel14;    // 0x14
-    f32 pad18;    // 0x18
-    f32 rotZ;     // 0x1C
-    f32 pad20;    // 0x20
-    f32 rotY;     // 0x24
-    f32 scale;    // 0x28
-    s32 alpha;    // 0x2C
-    s32 lifetime; // 0x30
-    s32 frame;    // 0x34
-    f32 progress; // 0x38
-    u8 color[6];  // 0x3C
-    u8 pad_42[2]; // 0x42
+    s32 type;        // 0x0
+    Vec position;    // 0x4
+    f32 vel10;       // 0x10
+    f32 vel14;       // 0x14
+    f32 pad18;       // 0x18
+    f32 rotZ;        // 0x1C
+    f32 reserved_20; // 0x20, cleared at entry, never read
+    f32 rotY;        // 0x24
+    f32 scale;       // 0x28
+    s32 alpha;       // 0x2C
+    s32 lifetime;    // 0x30
+    s32 frame;       // 0x34
+    f32 progress;    // 0x38
+    u8 color[6];     // 0x3C
+    u8 pad_42[2];    // 0x42
 } EffHitN64Work;
 
 static effN64Vtx size32x32_tex32x32_vtx[] = {
@@ -80,39 +81,39 @@ EffectEntry* effHitN64Entry(s32 type, s32 size, f32 x, f32 y, f32 z, f32 scale) 
     work->frame = 0;
     work->progress = 0.0f;
     switch (type) {
-    case 0:
-        work->color[0] = 255;
-        work->color[1] = 255;
-        work->color[2] = 255;
-        work->color[3] = 255;
-        work->color[4] = 255;
-        work->color[5] = 255;
-        break;
-    case 1:
-        work->color[0] = 255;
-        work->color[1] = 255;
-        work->color[2] = 0;
-        work->color[3] = 255;
-        work->color[4] = 0;
-        work->color[5] = 0;
-        break;
-    case 2:
-        work->color[0] = 255;
-        work->color[1] = 255;
-        work->color[2] = 0;
-        work->color[3] = 200;
-        work->color[4] = 255;
-        work->color[5] = 230;
-        break;
-    case 3:
-    default:
-        work->color[0] = 0;
-        work->color[1] = 255;
-        work->color[2] = 255;
-        work->color[3] = 0;
-        work->color[4] = 0;
-        work->color[5] = 230;
-        break;
+        case 0:
+            work->color[0] = 255;
+            work->color[1] = 255;
+            work->color[2] = 255;
+            work->color[3] = 255;
+            work->color[4] = 255;
+            work->color[5] = 255;
+            break;
+        case 1:
+            work->color[0] = 255;
+            work->color[1] = 255;
+            work->color[2] = 0;
+            work->color[3] = 255;
+            work->color[4] = 0;
+            work->color[5] = 0;
+            break;
+        case 2:
+            work->color[0] = 255;
+            work->color[1] = 255;
+            work->color[2] = 0;
+            work->color[3] = 200;
+            work->color[4] = 255;
+            work->color[5] = 230;
+            break;
+        case 3:
+        default:
+            work->color[0] = 0;
+            work->color[1] = 255;
+            work->color[2] = 255;
+            work->color[3] = 0;
+            work->color[4] = 0;
+            work->color[5] = 230;
+            break;
     }
     work->scale = scale;
     p = work + 1;
@@ -123,7 +124,7 @@ EffectEntry* effHitN64Entry(s32 type, s32 size, f32 x, f32 y, f32 z, f32 scale) 
         p->position.z = 0.0f;
         p->vel10 = 0.0f;
         p->vel14 = 0.0f;
-        p->pad20 = 0.0f;
+        p->reserved_20 = 0.0f;
         p->type = 0;
         p->rotZ = (f32)(i * 360 / (count - 1));
         p->rotY = r;
@@ -212,45 +213,45 @@ void effHitDisp(CameraId cameraId, EffectEntry* effect) {
     alpha = work->alpha;
     frac = (s32)(256.0f * (prog - (f32)idx));
     switch (type) {
-    case 1:
-        if (frame - 1 < 13) {
-            t = fire_data[frame - 1];
-        } else {
-            t = 0;
-        }
-        r0 = work->color[0];
-        g0 = (work->color[1] * t) >> 8;
-        b0 = (work->color[2] * t) >> 8;
-        r1 = (work->color[3] * t) >> 8;
-        g1 = (work->color[4] * t) >> 8;
-        b1 = (work->color[5] * t) >> 8;
-        break;
-    case 2:
-        if (frame & 1) {
+        case 1:
+            if (frame - 1 < 13) {
+                t = fire_data[frame - 1];
+            } else {
+                t = 0;
+            }
+            r0 = work->color[0];
+            g0 = (work->color[1] * t) >> 8;
+            b0 = (work->color[2] * t) >> 8;
+            r1 = (work->color[3] * t) >> 8;
+            g1 = (work->color[4] * t) >> 8;
+            b1 = (work->color[5] * t) >> 8;
+            break;
+        case 2:
+            if (frame & 1) {
+                r0 = work->color[0];
+                g0 = work->color[1];
+                b0 = work->color[2];
+                r1 = work->color[3];
+                g1 = work->color[4];
+                b1 = work->color[5];
+            } else {
+                r0 = 0;
+                g0 = 0;
+                b0 = 0;
+                r1 = work->color[0];
+                g1 = work->color[1];
+                b1 = work->color[2];
+            }
+            break;
+        case 0:
+        default:
             r0 = work->color[0];
             g0 = work->color[1];
             b0 = work->color[2];
             r1 = work->color[3];
             g1 = work->color[4];
             b1 = work->color[5];
-        } else {
-            r0 = 0;
-            g0 = 0;
-            b0 = 0;
-            r1 = work->color[0];
-            g1 = work->color[1];
-            b1 = work->color[2];
-        }
-        break;
-    case 0:
-    default:
-        r0 = work->color[0];
-        g0 = work->color[1];
-        b0 = work->color[2];
-        r1 = work->color[3];
-        g1 = work->color[4];
-        b1 = work->color[5];
-        break;
+            break;
     }
     GXSetNumChans(0);
     GXSetNumTevStages(2);

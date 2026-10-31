@@ -1,4 +1,6 @@
+// Action command: rotate the control stick in circles (ac_stick_rotate); more rotations, stronger result.
 #include "icon_ids.h"
+// this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
@@ -11,14 +13,14 @@
 
 typedef struct StickRotateParams {
     u8 header[0x34 - 0x0]; // 0x0, BattleActions header up to acFlags
-    u32 flags;       // 0x34
-    s32 maxCount;    // 0x38
-    s32 startTime;   // 0x3C
-    u32 button;      // 0x40
-    s32 needCount;   // 0x44
-    s32 stepsA;      // 0x48
-    s32 stepsB;      // 0x4C
-    s32 timeout;     // 0x50
+    u32 flags;             // 0x34
+    s32 maxCount;          // 0x38
+    s32 startTime;         // 0x3C
+    u32 button;            // 0x40
+    s32 needCount;         // 0x44
+    s32 stepsA;            // 0x48
+    s32 stepsB;            // 0x4C
+    s32 timeout;           // 0x50
 } StickRotateParams;
 
 typedef struct StickRotateWork {
@@ -31,10 +33,8 @@ typedef struct StickRotateWork {
     s8 iconDir;   // 0x6
     u8 iconTimer; // 0x7
     u16 count;    // 0x8
-    u8 pad_A[2];
     s32 timer;    // 0xC
     u16 slow;     // 0x10
-    u8 pad_12[2];
     s32 endTimer; // 0x14
 } StickRotateWork;
 
@@ -47,6 +47,7 @@ static void actionCommandDisp(f32 x, f32 y);
 void actionCommandDisp2(f32 x, f32 y);
 u16 _get_icon_id(s8 dir);
 
+// inlining off for _GetInputDir, _CalcRollDir, as in the original (the object differs without it)
 #pragma dont_inline on
 s32 _GetInputDir(void) {
     if (AC_PARAMS(_battleWorkPointer)->button != 0 && !PAD(AC_PARAMS(_battleWorkPointer)->button)) {
@@ -65,12 +66,12 @@ s32 _GetInputDir(void) {
         if (PAD(0x80000)) {
             return 4;
         }
-        return (BattlePadCheckNow(0x40000) != 0U) + 5;
+        return (BattlePadCheckNow(BTL_PAD_STICK_LEFT) != 0U) + 5;
     }
     if (PAD(0x80000)) {
         return 3;
     }
-    return BattlePadCheckNow(0x40000) != 0U ? 7 : 0;
+    return BattlePadCheckNow(BTL_PAD_STICK_LEFT) != 0U ? 7 : 0;
 }
 
 s32 _CalcRollDir(void) {
@@ -100,11 +101,11 @@ s32 _CalcRollDir(void) {
     return d;
 }
 
-#define FINISH(w)                            \
-    do {                                     \
-        (w)->actionCommands.result &= ~1;    \
-        (w)->actionCommands.mAcState = 1002; \
-        restart = TRUE;                      \
+#define FINISH(w)                           \
+    do {                                    \
+        (w)->actionCommands.result &= ~1;   \
+        (w)->actionCommands.acState = 1002; \
+        restart = TRUE;                     \
     } while (0)
 
 #pragma dont_inline reset
@@ -118,7 +119,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
 
     do {
         restart = FALSE;
-        switch (ac->mAcState) {
+        switch (ac->acState) {
             case 0:
                 ac->result = 1;
                 memset(disp, 0, sizeof(BattleACDispParams));
@@ -131,13 +132,13 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 sw->iconTimer = 0;
                 sw->slow = 0;
                 sw->stall = 0;
-                ac->mAcState = 99;
+                ac->acState = 99;
                 break;
             case 99:
                 break;
             case 100:
                 sw->timer = 120;
-                ac->mAcState = 1000;
+                ac->acState = 1000;
                 sw->roll = 0;
                 sw->count = 0;
                 ac->outputParams[0] = 0;
@@ -146,7 +147,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                     sw->iconB = 2;
                 }
             case 1000:
-                if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
+                if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
                     if (ac->setupFlags & 2) {
                         ac->setupParam--;
                         if (ac->setupParam >= 0) {
@@ -157,7 +158,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                         ac->result = 0;
                     } else {
                         ac->result = 2;
-                        ac->mResultCount++;
+                        ac->resultCount++;
                     }
                     return 0;
                 }
@@ -169,11 +170,11 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                         }
                         ac->result = 0;
                         restart = TRUE;
-                        ac->mAcState = 1002;
+                        ac->acState = 1002;
                         break;
                     }
                 }
-                ac->mAcState = 1001;
+                ac->acState = 1001;
                 sw->prevDir = 0;
                 ac->outputParams[0]++;
                 sw->timer = AC_PARAMS(work)->startTime;
@@ -188,7 +189,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                     (ac->countdown)--;
                     ac->result = 2;
                     restart = TRUE;
-                    ac->mAcState = 1002;
+                    ac->acState = 1002;
                     ac->outputParams[0] = AC_PARAMS(work)->maxCount;
                 }
                 sw->timer--;
@@ -202,7 +203,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                     }
                     ac->result &= ~1;
                     restart = TRUE;
-                    ac->mAcState = 1002;
+                    ac->acState = 1002;
                     break;
                 }
                 sw->dir = _GetInputDir();
@@ -212,7 +213,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                     }
                     ac->result &= ~1;
                     restart = TRUE;
-                    ac->mAcState = 1002;
+                    ac->acState = 1002;
                     break;
                 }
                 if (sw->dir == 0) {
@@ -301,18 +302,18 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 break;
             }
             case 1002:
-                ac->mAcState = 1003;
+                ac->acState = 1003;
                 break;
             case 1003:
                 break;
             case 1004:
                 sw->endTimer = 60;
                 disp->slideTimer = 60;
-                ac->mAcState = 1005;
+                ac->acState = 1005;
             case 1005:
                 sw->endTimer--;
                 if (sw->endTimer <= 0) {
-                    ac->mAcState = 1006;
+                    ac->acState = 1006;
                 }
                 break;
             case 1006:
@@ -341,9 +342,9 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
     } else {
         fn = actionCommandDisp2;
     }
-    switch (ac->mAcState) {
+    switch (ac->acState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, -300.0f, 30.0f, 20 - disp->slideTimer, 20);
             fn(disp->iconX, disp->iconY);
             if (disp->slideTimer > 0) {
                 disp->slideTimer--;
@@ -364,7 +365,7 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
                 disp->slideTimer--;
             }
             if (disp->slideTimer <= 40) {
-                disp->iconX = intplGetValue(4, disp->slideTimer, 40, -300.0f, 30.0f);
+                disp->iconX = intplGetValue(4, -300.0f, 30.0f, disp->slideTimer, 40);
             } else {
                 disp->iconX = 30.0f;
             }
@@ -373,6 +374,7 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
     }
 }
 
+// no automatic inlining for _get_icon_id, actionCommandDisp, actionCommandDisp2, as in the original (the object differs without it)
 #pragma auto_inline off
 u16 _get_icon_id(s8 dir) {
     switch (dir) {
@@ -397,10 +399,10 @@ u16 _get_icon_id(s8 dir) {
     }
 }
 
-#define ICON(v, id)                  \
-    (v) = (Vec){0.0f, 0.0f, 0.0f};   \
-    (v).x = -200.0f + x;             \
-    (v).y = 70.0f + y;               \
+#define ICON(v, id)                \
+    (v) = (Vec){0.0f, 0.0f, 0.0f}; \
+    (v).x = -200.0f + x;           \
+    (v).y = 70.0f + y;             \
     iconDispGx(&(v), ICON_DISP_2D, (id), 1.0f)
 
 static void actionCommandDisp(f32 x, f32 y) {
@@ -410,7 +412,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     StickRotateWork* sw = (StickRotateWork*)ac->work;
     Vec v0, v1, v2, v3, v4, v5;
 
-    switch (work->actionCommands.mAcState) {
+    switch (work->actionCommands.acState) {
         case 99:
         case 100:
             ICON(v0, ICON_079);
@@ -446,7 +448,7 @@ void actionCommandDisp2(f32 x, f32 y) {
     StickRotateWork* sw = (StickRotateWork*)ac->work;
     Vec v0, v1, v2;
 
-    switch (work->actionCommands.mAcState) {
+    switch (work->actionCommands.acState) {
         case 99:
         case 100:
             ICON(v0, ICON_079);
@@ -486,5 +488,5 @@ void actionCommandDisp2(f32 x, f32 y) {
 
 #pragma auto_inline reset
 void battleAcDelete_StickRotate(BattleWork* work) {
-    work->actionCommands.mAcState = 1004;
+    work->actionCommands.acState = 1004;
 }

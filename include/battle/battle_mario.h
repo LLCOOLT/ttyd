@@ -1,3 +1,4 @@
+// Declares Mario's badge weapons and attack events for battle.
 #pragma once
 
 #include "battle/battle_database_common.h"

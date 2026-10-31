@@ -1,3 +1,5 @@
+// The Great Tree (mri) battle unit: Mini-Yux (barriern_satellite), the shield a Yux creates: its parts, defence/status
+// tables, and attack events.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -6,20 +8,10 @@
 #include "battle/battle_sub.h"
 #include "battle/battle_event_default.h"
 #include "manager/evtmgr_cmd.h"
+#include "battle/battle_event_cmd.h"
+#include "evt/evt_sub.h"
+#include "version.h"
 
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_CheckActStatus);
-USER_FUNC(btlevtcmd_CheckStatus);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_OnUnitFlag);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventUnisonPhase);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_sub_random);
 static USER_FUNC(battleGetBarriernSatelliteInitPos);
 
 BattleUnitKind unit_barriern_satellite;
@@ -56,7 +48,7 @@ BattleUnitKind unit_barriern_satellite = {
     0.0f,
     0.0f,
     0.0f,
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     0,
     -16,
 #else
@@ -119,7 +111,7 @@ static BattleUnitKindPart parts[] = {
     {6, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 90, 90, 0, 100, 100, 90, 100, 100, 100};
 #else
 static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 95, 90, 0, 100, 100, 90, 100, 100, 100};
@@ -142,7 +134,7 @@ static PoseTableEntry pose_table[] = {
     {40, "W_2"},
     {56, "X_2"},
     {57, "X_2"},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {67, "S_2"},
 #else
     {69, "S_2"},
@@ -154,13 +146,13 @@ static BattleDataEntry data_table[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventUnisonPhase, -2, PTR(unison_phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, -2, 3145728)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 3145728)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -176,30 +168,30 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 static EVT_BEGIN(unison_phase_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
     CALL(evt_sub_random, 120, LW(0))
     ADD(LW(0), 30)
     WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+        CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_CheckStatus, -2, 5, LW(0))
+            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-                CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_4"))
+                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_4"))
                 WAIT_FRAMES(180)
-                CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+                CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
             END_IF
         END_IF
     END_IF
@@ -210,7 +202,7 @@ EVT_END()
 static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     EvtWord* args = event->args;
     BattleUnit* unit;
-    s32 num;
+    s32 max;
     s32 index;
     s32 id;
     s32 x;
@@ -240,13 +232,13 @@ static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    num = evtGetValue(event, args[1]);
+    max = evtGetValue(event, args[1]);
     index = evtGetValue(event, args[2]);
     x = args[3];
     y = args[4];
     z = args[5];
     p = VecData;
-    for (i = 0; i < num; i++) {
+    for (i = 0; i < max; i++) {
         for (j = 0; j < i; j++) {
             p++;
         }
@@ -259,4 +251,3 @@ static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     evtSetValue(event, z, (s32)p->z);
     return EVT_RETURN_DONE;
 }
-

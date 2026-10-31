@@ -1,3 +1,5 @@
+// Generic particle effect (Particle): count particles with random motion from a point for a given life.
+#include "eff/eff_particle.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -12,22 +14,22 @@
 double log(double);
 
 typedef struct ParticleItem {
-    s32 next;  // 0x0
-    Vec pos;   // 0x4
-    Vec vel;   // 0x10
-    s32 life;  // 0x1C
+    s32 next; // 0x0
+    Vec pos;  // 0x4
+    Vec vel;  // 0x10
+    s32 life; // 0x1C
 } ParticleItem;
 
 typedef struct ParticleEmitter {
-    Mtx mtx;       // 0x0
-    Vec pos;       // 0x30
-    Vec vecA;      // 0x3C
-    Vec vecB;      // 0x48
-    f32 accum;     // 0x54
-    f32 rate;      // 0x58
-    f32 lifeMean;  // 0x5C
-    f32 lifeStd;   // 0x60
-    f32 pad[2];    // 0x64
+    Mtx mtx;      // 0x0
+    Vec pos;      // 0x30
+    Vec vecA;     // 0x3C
+    Vec vecB;     // 0x48
+    f32 accum;    // 0x54
+    f32 rate;     // 0x58
+    f32 lifeMean; // 0x5C
+    f32 lifeStd;  // 0x60
+    f32 pad[2];   // 0x64
 } ParticleEmitter;
 
 typedef struct ParticleWork {
@@ -186,7 +188,7 @@ EffectEntry* effParticleEntry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(ParticleWork) + (count + 2) * sizeof(ParticleItem));
     effect->userdata = work;
     effect->callback = effParticleMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->pos.x = x;
     work->pos.y = y;
@@ -251,8 +253,8 @@ void effParticleMain(EffectEntry* effect) {
     t.y = work->pos.y;
     t.z = work->pos.z;
     pos = t;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 16;
     }
     if (work->life < 1000) {

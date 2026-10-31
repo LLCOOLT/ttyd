@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: fire flower, 30 fireballs shot out one after another; type 1 mirrors the direction.
+#include "eff/n64/eff_fireflower_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -29,9 +31,6 @@ typedef struct EffFireFlowerN64Work {
     s32 delay;    // 0x4C
     s32 flip;     // 0x50
 } EffFireFlowerN64Work;
-
-#ifdef __MWERKS__
-#endif
 
 static s8 scale_data[] = "27<AFKPUZ_dgigd";
 
@@ -136,71 +135,71 @@ void effFireFlowerMain(EffectEntry* effect) {
     }
     timer = work->timer;
     switch (state) {
-    case 0:
-        effRotHammerSuccessN64Entry(0, work->flip == 0 ? work->position.x - 10.0f : 10.0f + work->position.x, work->position.y, work->position.z, 7, 20);
-        work->stage = 0;
-        work->alpha2 = 0;
-        work->state++;
-        work->timer = 0;
-        break;
-    case 1:
-        if (timer >= 16) {
-            work->state++;
-            work->timer = 0;
-        } else {
-            work->scale = 0.01f * (f32)scale_data[timer - 1];
+        case 0:
+            effRotHammerSuccessN64Entry(0, work->flip == 0 ? work->position.x - 10.0f : 10.0f + work->position.x, work->position.y, work->position.z, 7, 20);
             work->stage = 0;
             work->alpha2 = 0;
-        }
-        break;
-    case 2:
-        if (timer >= 4) {
             work->state++;
             work->timer = 0;
-        } else {
-            work->stage = 1;
-        }
-        break;
-    case 3:
-        if (timer >= 30) {
-            work->state++;
-            work->timer = 0;
-        } else {
-            work->stage = 2;
-        }
-        break;
-    case 4:
-        if (timer > work->maxTime) {
-            work->state++;
-            work->timer = 0;
-        } else {
-            work->offsetY = 0.0f;
-            work->stage = 3;
-            if ((timer >> 2) & 1) {
-                work->scale = 1.0f;
+            break;
+        case 1:
+            if (timer >= 16) {
+                work->state++;
+                work->timer = 0;
             } else {
-                work->scale = 1.05f;
+                work->scale = 0.01f * (f32)scale_data[timer - 1];
+                work->stage = 0;
+                work->alpha2 = 0;
             }
-        }
-        break;
-    case 5:
-        if (timer >= 20) {
-            work->state++;
-            work->timer = 0;
-        } else {
+            break;
+        case 2:
+            if (timer >= 4) {
+                work->state++;
+                work->timer = 0;
+            } else {
+                work->stage = 1;
+            }
+            break;
+        case 3:
+            if (timer >= 30) {
+                work->state++;
+                work->timer = 0;
+            } else {
+                work->stage = 2;
+            }
+            break;
+        case 4:
+            if (timer > work->maxTime) {
+                work->state++;
+                work->timer = 0;
+            } else {
+                work->offsetY = 0.0f;
+                work->stage = 3;
+                if ((timer >> 2) & 1) {
+                    work->scale = 1.0f;
+                } else {
+                    work->scale = 1.05f;
+                }
+            }
+            break;
+        case 5:
+            if (timer >= 20) {
+                work->state++;
+                work->timer = 0;
+            } else {
+                work->stage = 0;
+                work->offsetY = -10.0f;
+            }
+            break;
+        case 6:
             work->stage = 0;
-            work->offsetY = -10.0f;
-        }
-        break;
-    case 6:
-        work->stage = 0;
-        work->rotX += 18.0f;
-        work->alpha *= 0.9f;
-        if (work->rotX >= 720.0f) {
-            work->rotX = 720.0f;
-            work->state++;
-        }
-        break;
+            work->rotX += 18.0f;
+            work->alpha *= 0.9f;
+            if (work->rotX >= 720.0f) {
+                work->rotX = 720.0f;
+                work->state++;
+            }
+            break;
     }
     timer = work->state;
     work++;

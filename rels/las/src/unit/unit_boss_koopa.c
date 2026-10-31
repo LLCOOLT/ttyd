@@ -1,3 +1,5 @@
+// Palace of Shadow battle unit: the Bowser (fought with Kammy Koopa) (`boss_koopa`): parts, stats, poses and AI scripts.
+
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -18,58 +20,14 @@
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
+#include "unit/unit_boss_koopa.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_sub.h"
+#include "las.h"
 
-void btlMovePos(f32 speed, f32 angle, f32* x, f32* z);
-typedef struct IconJumpWork { Vec start; Vec pos; Vec end; s32 frames; f32 speed; f32 gravity; f32 vy; u8 pad[0x7C - 0x34]; } IconJumpWork;
-static void _disp_icon(CameraId camera, void* param);
-
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
-USER_FUNC(btlevtcmd_AnimeSetPoseTable);
-USER_FUNC(btlevtcmd_CheckActStatus);
-USER_FUNC(btlevtcmd_CheckDamageCode);
-USER_FUNC(btlevtcmd_CheckPhase);
-USER_FUNC(btlevtcmd_CheckStatus);
-USER_FUNC(btlevtcmd_DrawLots);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_FaceDirectionSub);
-USER_FUNC(btlevtcmd_GetHp);
-USER_FUNC(btlevtcmd_GetMaxHp);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_GetTotalDamage);
-USER_FUNC(btlevtcmd_GetUnitId);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_OffPartsCounterAttribute);
-USER_FUNC(btlevtcmd_OnPartsCounterAttribute);
-USER_FUNC(btlevtcmd_PhaseEventStartDeclare);
-USER_FUNC(btlevtcmd_ResetFaceDirection);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventEntry);
-USER_FUNC(btlevtcmd_SetEventPhase);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetHomePos);
-USER_FUNC(btlevtcmd_SetPos);
-USER_FUNC(btlevtcmd_SetRunSound);
-USER_FUNC(btlevtcmd_SetStayPose);
-USER_FUNC(btlevtcmd_SetTalkPose);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_SetWalkSound);
-USER_FUNC(btlevtcmd_SpawnUnit);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StatusWindowOnOff);
-USER_FUNC(btlevtcmd_get_turn);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_moveto);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_sub_random);
-static void _disp_icon(CameraId camera, void* param);
 static USER_FUNC(_icon_jump_icon);
 static USER_FUNC(party_cannot_use_command);
 static USER_FUNC(mario_cannot_use_command);
-extern BattleUnitKind unit_boss_kamec_obaba;
 
 BattleUnitKind unit_boss_koopa;
 static BattleUnitDefense defence;
@@ -238,24 +196,24 @@ static BattleWeapon weapon_koopa_hip_attack = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20001004, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, // element
     10, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x1087, // special
-    0xC, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_FLIPS_SHELLED, // special
+    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -263,7 +221,7 @@ static BattleWeapon weapon_koopa_hip_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -275,23 +233,23 @@ static BattleWeapon weapon_koopa_bite_attack = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x21002000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    2, // counterResistFlags
-    4, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_TOP_SPIKY, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT, // targetWeightFlags
     0, 0, 0, 0, 0, 0, // sleepChance..dizzyTime
     30, // poisonChance
     10, // poisonTime
@@ -302,7 +260,7 @@ static BattleWeapon weapon_koopa_bite_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -314,23 +272,23 @@ static BattleWeapon weapon_koopa_critical_bite_attack = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x21002000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    2, // counterResistFlags
-    4, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_TOP_SPIKY, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -338,7 +296,7 @@ static BattleWeapon weapon_koopa_critical_bite_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -348,29 +306,29 @@ static BattleWeapon weapon_koopa_fire_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     1, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -378,15 +336,15 @@ static BattleWeapon weapon_koopa_fire_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 BattleUnitSetup entry_kamec_obaba = {
-    &unit_boss_kamec_obaba, // mUnitKindParams
+    &unit_boss_kamec_obaba, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {1000.0f, 0.0f, 1000.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -395,7 +353,7 @@ BattleUnitSetup entry_kamec_obaba = {
 
 static EVT_BEGIN(koopa_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_btl_camera_set_moveto, 0, LW(0), 95, 350, LW(0), 45, -300, 30, 11)
     WAIT_FRAMES(37)
     RETURN
@@ -406,7 +364,7 @@ static EVT_BEGIN(kamec_obaba_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_EQUAL(LW(1), 1)
         CALL(evt_btl_camera_set_moveto, 0, 135, 106, 296, 135, 55, -402, 30, 11)
-        ELSE
+    ELSE
         CALL(evt_btl_camera_set_moveto, 0, 140, 34, 296, 140, 50, -402, 30, 11)
     END_IF
     WAIT_FRAMES(37)
@@ -414,46 +372,46 @@ static EVT_BEGIN(kamec_obaba_zoom)
 EVT_END()
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetEventEntry, -2, PTR(entry_event))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(entry_event))
     CALL(btlevtcmd_SpawnUnit, GW(9), PTR(&entry_kamec_obaba), 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 60)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
     ADD(LW(1), 40)
     ADD(LW(2), 10)
     CALL(btlevtcmd_SetPos, GW(9), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, GW(9), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     SET_VALUE(GW(8), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
-    CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
     DIVIDE(LW(0), 2)
-    CALL(btlevtcmd_SetUnitWork, -2, 2, LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 3, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 4, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
     SET_VALUE(GW(10), 0)
     SET_VALUE(GW(11), 0)
-    CALL(btlevtcmd_SetWalkSound, -2, STRING("SFX_BOSS_KOOPA_MOVE1L"), STRING("SFX_BOSS_KOOPA_MOVE1R"), 0, 15, 15)
-    CALL(btlevtcmd_SetRunSound, -2, STRING("SFX_BOSS_KOOPA_MOVE1L"), STRING("SFX_BOSS_KOOPA_MOVE1R"), 0, 8, 8)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_MOVE1L"), STRING("SFX_BOSS_KOOPA_MOVE1R"), 0, 15, 15)
+    CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_MOVE1L"), STRING("SFX_BOSS_KOOPA_MOVE1R"), 0, 8, 8)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     WAIT_FRAMES(60)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_S_1"))
     WAIT_FRAMES(60)
     CALL_CHILD(koopa_zoom)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_KOOPA_LAUGH2_1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_Y_2"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_KOOPA_LAUGH2_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_Y_2"))
     WAIT_MS(1000)
-    CALL(evt_msg_print, 2, STRING("stg8_las_96"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("stg8_las_96"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
     CALL_CHILD(kamec_obaba_zoom)
     CALL(evt_msg_print, 2, STRING("stg8_las_97"), 0, GW(9))
@@ -464,7 +422,7 @@ static EVT_BEGIN(entry_event)
 EVT_END()
 
 static EVT_BEGIN(damage_event)
-    CALL(btlevtcmd_CheckDamageCode, -2, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(10), 1)
     END_IF
@@ -475,8 +433,8 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetPos, -2, LW(3), LW(4), LW(5))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
     SET_VALUE(LW(6), 1)
     IF_INT_EQUAL(LW(0), LW(3))
         IF_INT_EQUAL(LW(1), LW(4))
@@ -486,11 +444,11 @@ static EVT_BEGIN(dead_event)
         END_IF
     END_IF
     IF_INT_EQUAL(LW(6), 1)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
-        CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
-        CALL(btlevtcmd_ResetFaceDirection, -2)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+        CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
     WAIT_FRAMES(1)
     CALL(btlevtcmd_WaitAttackEnd)
@@ -499,26 +457,26 @@ static EVT_BEGIN(dead_event)
     CALL_CHILD(koopa_zoom)
     SWITCH(GW(11))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_KOOPA_SATIATED2_2"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_D_2"))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_KOOPA_SATIATED2_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_D_2"))
         WAIT_MS(200)
-        CALL(btlevtcmd_SetTalkPose, -2, STRING("KPA_T_8"))
-        CALL(btlevtcmd_SetStayPose, -2, STRING("KPA_Z_3"))
-        CALL(evt_msg_print, 2, STRING("stg8_las_100_02"), 0, -2)
+        CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KPA_T_8"))
+        CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("KPA_Z_3"))
+        CALL(evt_msg_print, 2, STRING("stg8_las_100_02"), 0, BTL_UNIT_SELF)
         WAIT_MS(300)
-        CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_dead))
+        CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_dead))
         SET_VALUE(GW(10), 2)
         SET_VALUE(LW(10), -2)
         CALL_CHILD(subsetevt_dead_core_nospin_norotate)
         CASE_DEFAULT
-        CALL(btlevtcmd_SetTalkPose, -2, STRING("KPA_D_1"))
-        CALL(btlevtcmd_SetStayPose, -2, STRING("KPA_D_1"))
-        CALL(evt_msg_print, 2, STRING("stg8_las_100_04"), 0, -2)
+        CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KPA_D_1"))
+        CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("KPA_D_1"))
+        CALL(evt_msg_print, 2, STRING("stg8_las_100_04"), 0, BTL_UNIT_SELF)
         WAIT_MS(300)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_KOOPA_SATIATED2_2"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_D_2"))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_KOOPA_SATIATED2_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_D_2"))
         WAIT_MS(700)
-        CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_dead))
+        CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_dead))
         SET_VALUE(GW(10), 2)
         SET_VALUE(LW(10), -2)
         CALL_CHILD(subsetevt_dead_core_nospin_norotate)
@@ -529,7 +487,7 @@ static EVT_BEGIN(dead_event)
 EVT_END()
 
 static EVT_BEGIN(phase_event)
-    CALL(btlevtcmd_CheckStatus, -2, 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
@@ -537,97 +495,97 @@ static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(LW(0), 1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108865)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+        CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_PhaseEventStartDeclare, -2)
-            CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+            CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(evt_sub_random, 99, LW(1))
                 IF_INT_LESS(LW(1), 0)
-                    CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
-                    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_U_2"))
+                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_U_2"))
                     WAIT_MS(200)
-                    CALL(btlevtcmd_OnPartsCounterAttribute, -2, 1, 1)
-                    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_forward_leaning))
+                    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+                    CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_forward_leaning))
                 END_IF
-                ELSE
+            ELSE
                 CALL(evt_sub_random, 99, LW(1))
                 IF_INT_LESS(LW(1), 100)
-                    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-                    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_U_3"))
+                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_U_3"))
                     WAIT_MS(200)
-                    CALL(btlevtcmd_OffPartsCounterAttribute, -2, 1, 1)
-                    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table))
+                    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+                    CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
                 END_IF
             END_IF
-            CALL(btlevtcmd_StartWaitEvent, -2)
+            CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         END_IF
     END_IF
     LABEL(90)
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_PhaseEventStartDeclare, -2)
+        CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
         CALL_CHILD(PTR(harf_hp_event))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     END_IF
     LABEL(99)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(harf_hp_event)
-    CALL(btlevtcmd_GetUnitWork, -2, 3, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
     IF_INT_EQUAL(LW(1), 0)
-        CALL(btlevtcmd_GetHp, -2, LW(0))
-        CALL(btlevtcmd_GetUnitWork, -2, 2, LW(1))
+        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
         IF_INT_LESS(LW(0), LW(1))
-            CALL(btlevtcmd_SetUnitWork, -2, 3, 1)
-            CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 1)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
             IF_INT_EQUAL(LW(0), 1)
-                CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_U_3"))
+                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_U_3"))
                 WAIT_MS(200)
             END_IF
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             CALL_CHILD(PTR(koopa_zoom))
-            CALL(btlevtcmd_SetTalkPose, -2, STRING("KPA_T_3"))
-            CALL(btlevtcmd_SetStayPose, -2, STRING("KPA_S_4"))
-            CALL(evt_msg_print, 2, STRING("stg8_las_100"), 0, -2)
+            CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KPA_T_3"))
+            CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("KPA_S_4"))
+            CALL(evt_msg_print, 2, STRING("stg8_las_100"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
-            CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
             IF_INT_EQUAL(LW(0), 1)
-                CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_U_2"))
+                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_U_2"))
                 WAIT_MS(200)
             END_IF
-            CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+            CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
         END_IF
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
         SET_VALUE(LW(9), PTR(&weapon_koopa_fire_attack))
         CALL_CHILD(PTR(fire_attack_event))
-        CALL(btlevtcmd_SetUnitWork, -2, 4, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 1)
         CASE_EQUAL(1)
         SET_VALUE(LW(9), PTR(&weapon_koopa_bite_attack))
         CALL_CHILD(PTR(bite_attack_event))
-        CALL(btlevtcmd_SetUnitWork, -2, 4, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 2)
         CASE_EQUAL(2)
         SET_VALUE(LW(9), PTR(&weapon_koopa_hip_attack))
         CALL_CHILD(PTR(hip_attack_event))
-        CALL(btlevtcmd_SetUnitWork, -2, 4, 3)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 3)
         CASE_DEFAULT
         CALL(btlevtcmd_DrawLots, LW(0), 4, 20, 20, 0, 40)
         SWITCH(LW(0))
@@ -646,53 +604,53 @@ static EVT_BEGIN(attack_event)
         END_SWITCH
     END_SWITCH
     LABEL(90)
-    CALL(btlevtcmd_ResetFaceDirection, -2)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL_CHILD(PTR(first_mario_damage_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 static EVT_BEGIN(hip_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_GetUnitKind, LW(3), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 40)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_JUMP1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2A"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(2.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2A"))
     WAIT_MS(300)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2B"))
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(25)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2C"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2C"))
         WAIT_FRAMES(15)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2D"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2D"))
     END_SIBLING_EVENT
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.25f))
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.25f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SUBTRACT(LW(2), 20)
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 50, -1)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_HIP_ATTACK1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 50, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_HIP_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -715,22 +673,22 @@ static EVT_BEGIN(hip_attack_event)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL(btlevtcmd_JumpContinue, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2E"))
+    CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2E"))
     WAIT_MS(500)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     CALL(evt_btl_camera_shake_h, 0, 3, 0, 50, 13)
-    CALL(btlevtcmd_JumpContinue, -2)
+    CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     WAIT_MS(500)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2E"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2E"))
     WAIT_MS(300)
     CALL(btlevtcmd_GetResultACDefence, LW(7))
     IF_INT_LESS_OR_EQUAL(LW(7), 3)
         SET_VALUE(LW(15), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(222)
             CALL(mario_cannot_use_command, LW(15))
@@ -742,8 +700,8 @@ static EVT_BEGIN(hip_attack_event)
         IF_INT_NOT_EQUAL(LW(0), -1)
             IF_INT_NOT_EQUAL(LW(15), 0)
                 BEGIN_INLINE_EVENT
-                    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-                    CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
+                    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+                    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
                     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(5), 60)
                     CALL(btlevtcmd_TransStageFloorPosition, LW(5), LW(6), LW(7))
                     CALL(_icon_jump_icon, LW(15), LW(0), LW(1), LW(2), LW(5), LW(6), LW(7), FLOAT(0.5f), 30)
@@ -767,55 +725,55 @@ static EVT_BEGIN(hip_attack_event)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_S_1"))
     CALL_CHILD(first_mario_damage_check)
     RETURN
 EVT_END()
 #else
 static EVT_BEGIN(hip_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_GetUnitKind, LW(3), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 40)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(2.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_JUMP1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2A"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(2.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2A"))
     WAIT_MS(300)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2B"))
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(25)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2C"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2C"))
         WAIT_FRAMES(15)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2D"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2D"))
     END_SIBLING_EVENT
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.25f))
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.25f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SUBTRACT(LW(2), 20)
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 50, -1)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_HIP_ATTACK1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 50, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_HIP_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -838,22 +796,22 @@ static EVT_BEGIN(hip_attack_event)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL(btlevtcmd_JumpContinue, -2)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2E"))
+    CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2E"))
     WAIT_MS(500)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     CALL(evt_btl_camera_shake_h, 0, 3, 0, 50, 13)
-    CALL(btlevtcmd_JumpContinue, -2)
+    CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     WAIT_MS(500)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_2E"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_2E"))
     WAIT_MS(300)
     CALL(btlevtcmd_GetResultACDefence, LW(7))
     IF_INT_LESS_OR_EQUAL(LW(7), 3)
         SET_VALUE(LW(15), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(222)
             CALL(mario_cannot_use_command, LW(15))
@@ -865,8 +823,8 @@ static EVT_BEGIN(hip_attack_event)
         IF_INT_NOT_EQUAL(LW(0), -1)
             IF_INT_NOT_EQUAL(LW(15), 0)
                 BEGIN_INLINE_EVENT
-                    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-                    CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
+                    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+                    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
                     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(5), 60)
                     CALL(btlevtcmd_TransStageFloorPosition, LW(5), LW(6), LW(7))
                     CALL(_icon_jump_icon, LW(15), LW(0), LW(1), LW(2), LW(5), LW(6), LW(7), FLOAT(0.5f), 30)
@@ -890,53 +848,53 @@ static EVT_BEGIN(hip_attack_event)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_S_1"))
     CALL_CHILD(first_mario_damage_check)
     RETURN
 EVT_END()
 #endif
 
 static EVT_BEGIN(bite_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_GetUnitKind, LW(3), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(evt_btl_camera_set_mode, 0, 8)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 65)
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3A"))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_BITE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_BITE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(170)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3B"))
     WAIT_MS(150)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_BITE2"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_BITE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -960,60 +918,60 @@ static EVT_BEGIN(bite_attack_event)
     END_SWITCH
     LABEL(90)
     WAIT_MS(100)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3C"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3C"))
     WAIT_MS(150)
     GOTO(98)
     LABEL(91)
     WAIT_MS(100)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3C"))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3C"))
     WAIT_MS(150)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_S_1"))
     CALL_CHILD(first_mario_damage_check)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(critical_bite_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_GetUnitKind, LW(3), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 65)
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3A"))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_BITE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3A"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_BITE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(170)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3B"))
     WAIT_MS(150)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_BITE3"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_BITE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1037,85 +995,85 @@ static EVT_BEGIN(critical_bite_attack_event)
     END_SWITCH
     LABEL(90)
     WAIT_MS(100)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3C"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3C"))
     WAIT_MS(150)
     GOTO(98)
     LABEL(91)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_4"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_4"))
     WAIT_MS(1500)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_3C"))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_3C"))
     WAIT_MS(150)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL_CHILD(first_mario_damage_check)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(fire_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_GetUnitKind, LW(3), LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 120)
     CALL(evt_btl_camera_set_mode, 0, 8)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(15))
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(170)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_1A"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_1A"))
     WAIT_MS(300)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_KOOPA_FIRE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_KOOPA_FIRE_BREATH1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_KOOPA_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOOPA_FIRE_BREATH1"), EVT_NULLPTR, 0, LW(15))
     BEGIN_INLINE_EVENT
         WAIT_MS(1500)
         CALL(evt_snd_sfxoff, LW(15))
     END_INLINE_EVENT
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_1B"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_1B"))
     WAIT_MS(300)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetStatusMg, -2, LW(5))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(5))
     SET_FLOAT_VALUE(LW(6), FLOAT(60.0f))
     MULTIPLY_FLOAT(LW(6), LW(5))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(6))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(6))
     SET_FLOAT_VALUE(LW(6), FLOAT(22.5f))
     MULTIPLY_FLOAT(LW(6), LW(5))
     ADD_FLOAT(LW(1), LW(6))
     SUBTRACT(LW(2), 5)
     MULTIPLY_FLOAT(LW(5), FLOAT(3.5f))
     CALL(evt_eff, STRING(""), STRING("gonbaba_breath"), 7, LW(0), LW(1), LW(2), LW(5), 90, 0, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_1C"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_1C"))
     WAIT_MS(300)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1143,7 +1101,7 @@ static EVT_BEGIN(fire_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     LABEL(97)
     CALL_CHILD(first_mario_damage_check)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -1153,24 +1111,24 @@ static EVT_BEGIN(fire_attack_event)
     END_IF
     LABEL(98)
     WAIT_MS(1200)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_A_1D"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_A_1D"))
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_R_1"))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_R_1"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(first_mario_damage_check)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         IF_INT_EQUAL(LW(0), 222)
             CALL(btlevtcmd_GetTotalDamage, LW(3), LW(1))
             IF_INT_NOT_EQUAL(LW(1), 0)
-                CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
             END_IF
         END_IF
     END_IF
@@ -1178,33 +1136,33 @@ EVT_BEGIN(first_mario_damage_check)
 EVT_END()
 
 EVT_BEGIN(first_mario_damage_event)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, -2, 1, 2)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_S_1"))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_S_1"))
         CALL(btlevtcmd_StatusWindowOnOff, 0)
         CALL_CHILD(koopa_zoom)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_U_3"))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_U_3"))
             WAIT_MS(200)
         END_IF
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_VOICE_KOOPA_LAUGH2_1"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_Y_2"))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_KOOPA_LAUGH2_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_Y_2"))
         WAIT_MS(1000)
-        CALL(btlevtcmd_SetTalkPose, -2, STRING("KPA_T_2"))
-        CALL(btlevtcmd_SetStayPose, -2, STRING("KPA_S_3"))
-        CALL(evt_msg_print, 2, STRING("stg8_las_98"), 0, -2)
+        CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("KPA_T_2"))
+        CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("KPA_S_3"))
+        CALL(evt_msg_print, 2, STRING("stg8_las_98"), 0, BTL_UNIT_SELF)
         WAIT_MS(300)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_S_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_S_1"))
         IF_INT_EQUAL(GW(11), 0)
             CALL_CHILD(kamec_obaba_zoom)
             CALL(evt_msg_print, 2, STRING("stg8_las_99"), 0, GW(9))
             WAIT_MS(300)
         END_IF
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KPA_U_2"))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KPA_U_2"))
             WAIT_MS(200)
         END_IF
         CALL(btlevtcmd_StatusWindowOnOff, 1)
@@ -1214,7 +1172,7 @@ EVT_BEGIN(first_mario_damage_event)
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
@@ -1289,7 +1247,7 @@ static USER_FUNC(party_cannot_use_command) {
     BattleWork* wp = _battleWorkPointer;
     s32 r = irand(1);
     s32 var = event->args[0];
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     s32 id = evtGetValue(event, event->args[1]);
     s32 weapon = 0;
     BattleUnit* unit;
@@ -1299,7 +1257,7 @@ static USER_FUNC(party_cannot_use_command) {
 #else
     s32 weapon = 0;
 #endif
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 
     switch (r) {
         case 0:
@@ -1341,7 +1299,7 @@ static USER_FUNC(mario_cannot_use_command) {
     switch (r) {
         case 0:
             wp->commandDisabled[0] = 3;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             weapon = 334;
 #else
             weapon = 326;
@@ -1349,7 +1307,7 @@ static USER_FUNC(mario_cannot_use_command) {
             break;
         case 1:
             wp->commandDisabled[1] = 3;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             weapon = 337;
 #else
             weapon = 329;
@@ -1357,7 +1315,7 @@ static USER_FUNC(mario_cannot_use_command) {
             break;
         case 2:
             wp->commandDisabled[2] = 3;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             weapon = 340;
 #else
             weapon = 332;
@@ -1368,4 +1326,3 @@ static USER_FUNC(mario_cannot_use_command) {
     evtSetValue(event, var, weapon);
     return EVT_RETURN_DONE;
 }
-

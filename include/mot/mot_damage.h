@@ -1,3 +1,4 @@
+// mot_damage.c: Mario's damage motion (mot_damage, mot_damageToge), splash and quake helpers.
 #pragma once
 
 #include "dolphin/types.h"
@@ -5,3 +6,8 @@
 
 void marioSetSplash(s32 kind, Vec* pos);
 void set_damage_root_ypos(f32 y);
+
+void marioDmgRetQuakeOn(void);
+void mot_damage(void);
+void mot_damageToge(void);
+BOOL marioChkDamageSink(void);

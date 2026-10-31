@@ -1,3 +1,5 @@
+// las_30 (ラストダンジョン, Palace of Shadow): the stairs between las_28 and las_29.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,23 +9,20 @@
 #include "party/party_motion.h"
 #include "evt/evt_snd.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_item.h"
+#include "driver/itemdrv.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "las.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static char name[8];
 
-USER_FUNC(evt_eff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_wait_animation_end);
 static USER_FUNC(make_name);
 
 static BeroEntry bero_entry_data[3];
-extern EvtWord las_30_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -61,8 +60,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -78,8 +77,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -99,7 +98,7 @@ static EVT_BEGIN(rousoku_init)
     SET_VALUE(LW(0), 1)
     LOOP(12)
         CALL(make_name, LW(0), LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_get_position, LW(1), LW(2), LW(3), LW(4))
         SUBTRACT_FLOAT(LW(3), FLOAT(7.0f))
         CALL(evt_eff, 0, STRING("fire"), 3, LW(2), LW(3), LW(4), FLOAT(0.5f), 1000, 0, 0, 0, 0, 0, 0)
@@ -111,8 +110,8 @@ EVT_END()
 static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item01"), 150, LW(0), LW(1), LW(2), 16, -1, 0)
-    CALL(evt_item_flag_on, STRING("item01"), 2)
+    CALL(evt_item_entry, STRING("item01"), ITEM_ULTRA_SHROOM, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box01"))
     CALL(evt_item_get_item, STRING("item01"))
     CALL(evt_mario_key_onoff, 1)
@@ -122,8 +121,8 @@ EVT_END()
 static EVT_BEGIN(mobj_box02)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box02"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item02"), 156, LW(0), LW(1), LW(2), 16, -1, 0)
-    CALL(evt_item_flag_on, STRING("item02"), 2)
+    CALL(evt_item_entry, STRING("item02"), ITEM_JAMMIN_JELLY, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("item02"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box02"))
     CALL(evt_item_get_item, STRING("item02"))
     CALL(evt_mario_key_onoff, 1)
@@ -131,12 +130,12 @@ static EVT_BEGIN(mobj_box02)
 EVT_END()
 
 EVT_BEGIN(las_30_init_evt)
-    IF_INT_EQUAL(GSW(0), 400)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER2"))
-        CALL(evt_snd_envoff, 512)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
     ELSE
-        CALL(evt_snd_bgmoff, 512)
-        CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS1"))
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
     END_IF
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -144,8 +143,8 @@ EVT_BEGIN(las_30_init_evt)
     CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 1150, 60, -125, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("r_blk"), 10, -1050, 860, -75, 0, 0)
-    CALL(evt_mobj_itembox, STRING("mobj_box01"), -1150, 800, -75, 0, 0, PTR(mobj_box01), GSWF(4393))
-    CALL(evt_mobj_itembox, STRING("mobj_box02"), 1050, 0, -125, 0, 0, PTR(mobj_box02), GSWF(4394))
+    CALL(evt_mobj_itembox, STRING("mobj_box01"), -1150, 800, -75, 0, 0, PTR(mobj_box01), GSWF(GSWF_LAS30_ITEMBOX_01))
+    CALL(evt_mobj_itembox, STRING("mobj_box02"), 1050, 0, -125, 0, 0, PTR(mobj_box02), GSWF(GSWF_LAS30_ITEMBOX_02))
     CALL_CHILD(rousoku_init)
     RETURN
 EVT_END_PAD()
@@ -157,4 +156,3 @@ static USER_FUNC(make_name) {
     evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
-

@@ -1,77 +1,82 @@
+// Declares the battle action-record condition types and the functions that update them.
 #pragma once
 
 #include <dolphin/types.h>
 #include "battle/battle.h"
 
 typedef enum BattleActRecordConditionType {
-	kNoFailureCondition, //0x0
-	kConditionJumpLess, //0x1
-	kConditionJumpMore, //0x2
-	kConditionHammerLess, //0x3
-	kConditionHammerMore, //0x4
-	kConditionUseSpecialMovesLess, //0x5
-	kConditionUseSpecialMovesMore, //0x6
-	kConditionMarioTakeLessDamage, //0x7
-	kConditionMarioTakeMoreDamage, //0x8
-	kConditionPartnersTakeLessDamage, //0x9
-	kConditionPartnersTakeMoreDamage, //0xA
-	kConditionPartyTakeLessDamage, //0xB
-	kConditionPartyTakeMoreDamage, //0xC
-	kConditionMarioTakeFewerHits, //0xD
-	kConditionMarioTakeMoreHits, //0xE
-	kConditionPartnersTakeFewerHits, //0xF
-	kConditionPartnersTakeMoreHits, //0x10
-	kConditionPartyTakeFewerHits, //0x11
-	kConditionPartyTakeMoreHits, //0x12
-	kConditionMarioWinMoreHp, //0x13
-	kConditionMarioWinLessHp, //0x14
-	kConditionPowerBounceCombo, //0x15
-	kConditionMarioUseFewerItems, //0x16
-	kConditionMarioUseMoreItems, //0x17
-	kConditionPartnersUseFewerItems, //0x18
-	kConditionPartnersUseMoreItems, //0x19
-	kConditionPartyUseFewerItems, //0x1A
-	kConditionPartyUseMoreItems, //0x1B
-	kConditionMarioSwapPartnersLess, //0x1C
-	kConditionMarioSwapPartnersMore, //0x1D
-	kConditionPartnersSwapPartnersLess, //0x1E
-	kConditionPartnersSwapPartnersMore, //0x1F
-	kConditionPartySwapPartnersLess, //0x20
-	kConditionPartySwapPartnersMore, //0x21
-	kConditionMarioAttackAudienceLess, //0x22
-	kConditionMarioAttackAudienceMore, //0x23
-	kConditionPartnersAttackAudienceLess, //0x24
-	kConditionPartnersAttackAudienceMore, //0x25
-	kConditionMarioAppealLess, //0x26
-	kConditionMarioAppealMore, //0x27
-	kConditionPartnersAppealLess, //0x28
-	kConditionPartnersAppealMore, //0x29
-	kConditionPartyAppealLess, //0x2A
-	kConditionPartyAppealMore, //0x2B
-	kConditionMarioSpendLessFp, //0x2C
-	kConditionMarioSpendMoreFp, //0x2D
-	kConditionPartnersSpendLessFp, //0x2E
-	kConditionPartnersSpendMoreFp, //0x2F
-	kConditionPartySpendLessFp_0x30, //0x30
-	kConditionPartySpendMoreFp_0x31, //0x31
-	kConditionMarioUseMovesLess, //0x32
-	kConditionMarioUseMovesMore, //0x33
-	kConditionPartnerUseMovesLess, //0x34
-	kConditionPartnerUseMovesMore, //0x35
-	kConditionPartySpendLessFp_0x36, //0x36
-	kConditionPartySpendMoreFp_0x37, //0x37
-	kConditionPartyUseMovesLess, //0x38
-	kConditionPartyUseMovesMore, //0x39
-	kConditionWinInMoreTurns, //0x3A
-	kConditionWinInFewerTurns, //0x3B
-	kConditionWaitTurnsBeforeMarioActions, //0x3C
-	kConditionWaitTurnsBeforePartnerActions, //0x3D
-	kConditionWaitTurnsBeforePartyActions, //0x3E
-	kConditionWaitTurnsBeforeMarioAttacks, //0x3F
-	kConditionWaitTurnsBeforePartnerAttacks, //0x40
-	kConditionWaitTurnsBeforePartyAttacks, //0x41
-	kConditionMarioOnlyJumpOrDefend, //0x42
-	kConditionMarioOnlyHammerOrDefend, //0x43
+    ACT_RECORD_COND_NONE,                              // 0x0
+    ACT_RECORD_COND_JUMP_LESS,                         // 0x1
+    ACT_RECORD_COND_JUMP_MORE,                         // 0x2
+    ACT_RECORD_COND_HAMMER_LESS,                       // 0x3
+    ACT_RECORD_COND_HAMMER_MORE,                       // 0x4
+    ACT_RECORD_COND_USE_SPECIAL_MOVES_LESS,            // 0x5
+    ACT_RECORD_COND_USE_SPECIAL_MOVES_MORE,            // 0x6
+    ACT_RECORD_COND_MARIO_TAKE_LESS_DAMAGE,            // 0x7
+    ACT_RECORD_COND_MARIO_TAKE_MORE_DAMAGE,            // 0x8
+    ACT_RECORD_COND_PARTNERS_TAKE_LESS_DAMAGE,         // 0x9
+    ACT_RECORD_COND_PARTNERS_TAKE_MORE_DAMAGE,         // 0xA
+    ACT_RECORD_COND_PARTY_TAKE_LESS_DAMAGE,            // 0xB
+    ACT_RECORD_COND_PARTY_TAKE_MORE_DAMAGE,            // 0xC
+    ACT_RECORD_COND_MARIO_TAKE_FEWER_HITS,             // 0xD
+    ACT_RECORD_COND_MARIO_TAKE_MORE_HITS,              // 0xE
+    ACT_RECORD_COND_PARTNERS_TAKE_FEWER_HITS,          // 0xF
+    ACT_RECORD_COND_PARTNERS_TAKE_MORE_HITS,           // 0x10
+    ACT_RECORD_COND_PARTY_TAKE_FEWER_HITS,             // 0x11
+    ACT_RECORD_COND_PARTY_TAKE_MORE_HITS,              // 0x12
+    ACT_RECORD_COND_MARIO_WIN_MORE_HP,                 // 0x13
+    ACT_RECORD_COND_MARIO_WIN_LESS_HP,                 // 0x14
+    ACT_RECORD_COND_POWER_BOUNCE_COMBO,                // 0x15
+    ACT_RECORD_COND_MARIO_USE_FEWER_ITEMS,             // 0x16
+    ACT_RECORD_COND_MARIO_USE_MORE_ITEMS,              // 0x17
+    ACT_RECORD_COND_PARTNERS_USE_FEWER_ITEMS,          // 0x18
+    ACT_RECORD_COND_PARTNERS_USE_MORE_ITEMS,           // 0x19
+    ACT_RECORD_COND_PARTY_USE_FEWER_ITEMS,             // 0x1A
+    ACT_RECORD_COND_PARTY_USE_MORE_ITEMS,              // 0x1B
+    ACT_RECORD_COND_MARIO_SWAP_PARTNERS_LESS,          // 0x1C
+    ACT_RECORD_COND_MARIO_SWAP_PARTNERS_MORE,          // 0x1D
+    ACT_RECORD_COND_PARTNERS_SWAP_PARTNERS_LESS,       // 0x1E
+    ACT_RECORD_COND_PARTNERS_SWAP_PARTNERS_MORE,       // 0x1F
+    ACT_RECORD_COND_PARTY_SWAP_PARTNERS_LESS,          // 0x20
+    ACT_RECORD_COND_PARTY_SWAP_PARTNERS_MORE,          // 0x21
+    ACT_RECORD_COND_MARIO_ATTACK_AUDIENCE_LESS,        // 0x22
+    ACT_RECORD_COND_MARIO_ATTACK_AUDIENCE_MORE,        // 0x23
+    ACT_RECORD_COND_PARTNERS_ATTACK_AUDIENCE_LESS,     // 0x24
+    ACT_RECORD_COND_PARTNERS_ATTACK_AUDIENCE_MORE,     // 0x25
+    ACT_RECORD_COND_MARIO_APPEAL_LESS,                 // 0x26
+    ACT_RECORD_COND_MARIO_APPEAL_MORE,                 // 0x27
+    ACT_RECORD_COND_PARTNERS_APPEAL_LESS,              // 0x28
+    ACT_RECORD_COND_PARTNERS_APPEAL_MORE,              // 0x29
+    ACT_RECORD_COND_PARTY_APPEAL_LESS,                 // 0x2A
+    ACT_RECORD_COND_PARTY_APPEAL_MORE,                 // 0x2B
+    ACT_RECORD_COND_MARIO_SPEND_LESS_FP,               // 0x2C
+    ACT_RECORD_COND_MARIO_SPEND_MORE_FP,               // 0x2D
+    ACT_RECORD_COND_PARTNERS_SPEND_LESS_FP,            // 0x2E
+    ACT_RECORD_COND_PARTNERS_SPEND_MORE_FP,            // 0x2F
+    ACT_RECORD_COND_PARTY_SPEND_LESS_FP_0x30,          // 0x30
+    ACT_RECORD_COND_PARTY_SPEND_MORE_FP_0x31,          // 0x31
+    ACT_RECORD_COND_MARIO_USE_MOVES_LESS,              // 0x32
+    ACT_RECORD_COND_MARIO_USE_MOVES_MORE,              // 0x33
+    ACT_RECORD_COND_PARTNERS_USE_MOVES_LESS,           // 0x34
+    ACT_RECORD_COND_PARTNERS_USE_MOVES_MORE,           // 0x35
+    ACT_RECORD_COND_PARTY_SPEND_LESS_FP_0x36,          // 0x36
+    ACT_RECORD_COND_PARTY_SPEND_MORE_FP_0x37,          // 0x37
+    ACT_RECORD_COND_PARTY_USE_MOVES_LESS,              // 0x38
+    ACT_RECORD_COND_PARTY_USE_MOVES_MORE,              // 0x39
+    ACT_RECORD_COND_WIN_IN_MORE_TURNS,                 // 0x3A
+    ACT_RECORD_COND_WIN_IN_FEWER_TURNS,                // 0x3B
+    ACT_RECORD_COND_WAIT_TURNS_BEFORE_MARIO_ACTIONS,   // 0x3C
+    ACT_RECORD_COND_WAIT_TURNS_BEFORE_PARTNER_ACTIONS, // 0x3D
+    ACT_RECORD_COND_WAIT_TURNS_BEFORE_PARTY_ACTIONS,   // 0x3E
+    ACT_RECORD_COND_WAIT_TURNS_BEFORE_MARIO_ATTACKS,   // 0x3F
+    ACT_RECORD_COND_WAIT_TURNS_BEFORE_PARTNER_ATTACKS, // 0x40
+    ACT_RECORD_COND_WAIT_TURNS_BEFORE_PARTY_ATTACKS,   // 0x41
+    ACT_RECORD_COND_MARIO_ONLY_JUMP_OR_DEFEND,         // 0x42
+    ACT_RECORD_COND_MARIO_ONLY_HAMMER_OR_DEFEND,       // 0x43
 } BattleActRecordConditionType;
 
 void BtlActRec_JudgeRuleKeep(void);
+
+void BtlActRec_AddCount(u8* count);
+void BtlActRec_AddPoint(u8* point, s32 amount);
+void BtlActRec_JudgeTurnRuleKeep(void);

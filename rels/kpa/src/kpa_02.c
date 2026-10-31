@@ -1,25 +1,23 @@
+// kpa_02 (クッパ編, Bowser's interludes): the first side-scrolling stage; it ends in Petalburg (nok_00).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "kpa.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_sub.h"
 #include "kpa_stage_data.h"
-
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_koopa_chk_dead);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_seq_set_seq);
-USER_FUNC(evt_sub_get_system_flag);
-USER_FUNC(kpa_status_init);
+#include "mario/mariost.h"
+#include "evt/evt_story.h"
+#include "driver/seqdrv.h"
 
 EvtWord kpa_act_stg1_mobj[151];
 EvtWord kpa_act_stg1_item[31];
 static EvtWord kpa_goal[38];
 static NpcSetupInfo npcEnt[1];
-extern EvtWord kpa_02_init_evt[];
 
 EvtWord kpa_act_stg1_mobj[] = {
     KPA_OBJ_BRICK_2(-1225.0f, 125.0f), KPA_OBJ_BRICK_2(-1100.0f, 125.0f), KPA_OBJ_OJAMA_BLK(-1050.0f, 125.0f),
@@ -64,7 +62,7 @@ static EVT_BEGIN(kpa_fall)
     END_LOOP
     IF_INT_EQUAL(LF(0), 0)
         CALL_CHILD(PTR(kpa_fall_sub))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(kpa_dead))
     END_IF
     RETURN
@@ -72,12 +70,12 @@ EVT_END()
 
 static EVT_BEGIN(kpa_goal)
     CALL(evt_mario_key_onoff, 0)
-    SET_VALUE(GSW(0), 116)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_04_BOWSER_ACTION_STAGE)
     CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_SET(LW(0), 4096)
+    IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
         CALL(evt_cam_letter_box_disable, 0)
-        CALL(evt_seq_set_seq, 5, 0, 0)
-        ELSE
+        CALL(evt_seq_set_seq, SEQ_GAME_OVER, 0, 0)
+    ELSE
         BEGIN_INLINE_EVENT
             WAIT_MS(300)
             CALL(evt_cam_letter_box_disable, 0)
@@ -101,10 +99,9 @@ EVT_BEGIN(kpa_02_init_evt)
     SET_VALUE(LW(0), PTR(kpa_act_stg1_item))
     CALL_CHILD(PTR(kpa_read_item))
     SPAWN_EVENT(PTR(kpa_fall))
-    CALL(kpa_status_init, 1, GSW(1221), GSW(1222))
+    CALL(kpa_status_init, 1, GSW(GSW_KPA_LIVES), GSW(GSW_KPA_TIME_LEFT))
     SET_VALUE(LSW(1), 0)
     SPAWN_EVENT(PTR(kpa_stage_start))
     SPAWN_EVENT(PTR(kpa_time))
     RETURN
 EVT_END()
-

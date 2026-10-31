@@ -1,8 +1,11 @@
 #pragma once
 
+// Palace of Shadow (las): declarations shared by the area's maps (init scripts, shared scripts, battle tables).
+
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"
+#include "evt/evt_cmd.h"
 
 extern EvtWord box_syutugen[];
 extern NpcTerritoryInfo btl_las_setup_no_tbl[];
@@ -40,6 +43,9 @@ extern EvtWord las_28_init_evt[];
 extern EvtWord las_29_init_evt[];
 extern EvtWord las_30_init_evt[];
 extern EvtWord move_dai[];
+// las's evt_shuryolight.c exports these two (aji's copy keeps them static)
+USER_FUNC(evt_shuryolight_run_head_evt);
+USER_FUNC(evt_shuryolight_delete);
 extern EvtWord shuryolight_head_normal[];
 extern EvtWord shuryolight_head_off[];
 extern EvtWord shuryolight_head_tenmetu[];
@@ -56,7 +62,6 @@ extern BattleUnitKind unit_super_killer;
 extern BattleUnitKind unit_super_mahorn;
 extern BattleUnitKind unit_wanwan;
 
-extern s32 evt_cloud_main_evt[];
 extern EvtWord firebar_coin[];
 extern EvtWord hikari_off_evt[];
 extern EvtWord hikari_on_evt[];
@@ -69,3 +74,17 @@ extern u8 kurokaron_same_goal;
 extern u8 kurokaron_stop_cnt;
 extern s32 kurokaron_vivian_prev_sts;
 extern s32 move_check_list[];
+
+extern BattleUnitKind unit_black_karon;
+extern BattleUnitKind unit_boss_batten_leader;
+extern BattleUnitKind unit_boss_batten_satellite;
+extern BattleUnitKind unit_boss_kamec_obaba;
+extern BattleUnitKind unit_boss_koopa;
+extern BattleUnitKind unit_boss_majolyne_las;
+extern BattleUnitKind unit_boss_marilyn_las;
+extern BattleUnitKind unit_boss_rampell_las;
+
+// unit_boss_batten_satellite.c: the X-flag counter Sir Grodus's scripts share with his satellites.
+USER_FUNC(bts_x_flag_add);
+USER_FUNC(bts_x_flag_set);
+USER_FUNC(bts_x_flag_wait);

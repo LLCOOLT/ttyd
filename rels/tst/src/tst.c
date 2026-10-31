@@ -1,17 +1,11 @@
+// tst.rel (PAL only): the developers' test maps (tst_*), registered with their init events from evt_init.c, and
+// the test battle setups of battle_bgset_test.c with copies of many enemy units (unit/).
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
+#include "evt_init.h"
 #include "tst.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-
-void _prolog(void);
-void _epilog(void);
-void _unresolved(void);
-
-void mobjKoopaOn(void);
+#include "rel_module.h"
 
 USER_FUNC(tst_mobj_koopa_on) {
     mobjKoopaOn();

@@ -1,3 +1,4 @@
+// Battle unit Atomic Boo (`atmic_teresa`): tst.rel's copy of rels/jin/src/unit/unit_atmic_teresa.c.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -18,37 +19,20 @@
 #include "driver/extdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_sub.h"
+#include "unit/unit_atmic_teresa.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_sub.h"
+#include "system.h"
+#include "version.h"
+#include "libc_decls.h"
 
-typedef struct AtmTeresa { u8 state; u8 flag; s32 anim; s32 wait; s32 timer; Vec vel; Vec start; Vec target; u8 mode; } AtmTeresa;
 AtmTeresa* teresa;
 #define ATMIC_TERESA_SCALE atmic_teresa_scale
 s32 teresa_count;
-s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* name, u32 flags, s32 pitch, Vec* pos);
-s32 irand(s32 scalar);
-f32 intplGetValue(s32 mode, f32 start, f32 end, s32 cur, s32 steps);
-s32 irand(s32 scalar);
-f32 intplGetValue(s32 mode, f32 start, f32 end, s32 cur, s32 steps);
-double cos(double x);
-double sin(double x);
 void teresa_ext_disp(CameraId camera, void* param);
 
 USER_FUNC(atmic_teresa_id_set);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_PreCheckDamage);
-USER_FUNC(btlevtcmd_ResultACDefence);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_StartAvoid);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_sub_random);
 USER_FUNC(teresa_wait_breath2);
 USER_FUNC(teresa_wait_breath);
 USER_FUNC(teresa_appear_breath);
@@ -102,7 +86,7 @@ BattleUnitKind unit_atmic_teresa = {
     100,
     0,
     50,
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     6,
 #else
     9999,
@@ -221,22 +205,22 @@ BattleWeapon weapon_atmic_teresa_press = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x1087, // special
-    0x6C, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_FLIPS_SHELLED, // special
+    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -244,7 +228,7 @@ BattleWeapon weapon_atmic_teresa_press = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 50, 50, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -254,28 +238,28 @@ BattleWeapon weapon_atmic_teresa_bikkuri = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
     50, // stopChance
     3, // stopTime
@@ -286,7 +270,7 @@ BattleWeapon weapon_atmic_teresa_bikkuri = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -296,28 +280,28 @@ BattleWeapon weapon_atmic_teresa_surprise = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x67, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_TARGET | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, // poisonTime..poisonStrength
     50, // confuseChance
@@ -328,7 +312,7 @@ BattleWeapon weapon_atmic_teresa_surprise = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -338,29 +322,29 @@ BattleWeapon weapon_atmic_teresa_breath = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x97, // special
-    0x7FF, // counterResistFlags
-    0x80000004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_HIT | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -368,18 +352,18 @@ BattleWeapon weapon_atmic_teresa_breath = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(atmic_teresa_id_set, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(atmic_teresa_id_set, BTL_UNIT_SELF)
     CALL_CHILD(PTR(teresa_entry))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -391,13 +375,13 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         SET_VALUE(LW(1), 30)
         ADD(LW(1), 20)
@@ -416,7 +400,7 @@ static EVT_BEGIN(attack_event)
         END_IF
         CALL_CHILD(PTR(bikkuri_event))
         GOTO(99)
-        ELSE
+    ELSE
         SET_VALUE(LW(1), 50)
         ADD(LW(1), 50)
         SUBTRACT(LW(1), 1)
@@ -430,42 +414,42 @@ static EVT_BEGIN(attack_event)
         GOTO(99)
     END_IF
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(kaokakusi_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_MOVE2"), -250000000, 0, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 60)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_MOVE2"), EVT_NULLPTR, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 60)
     SUBTRACT(LW(1), 10)
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
     WAIT_FRAMES(20)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_1"))
-    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 180, 0)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 20, 0, 5, 0, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1"))
+    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 180, 0)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, 0, 5, 0, -1)
     WAIT_FRAMES(10)
     LOOP(15)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_AddPartsRotate, -2, 1, 0, 12, 0)
+        CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, 1, 0, 12, 0)
     END_LOOP
     WAIT_FRAMES(20)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
-    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table_kaokakusi))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_kaokakusi))
     RETURN
 EVT_END()
 
 EVT_BEGIN(press_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_atmic_teresa_press))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_press))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_press), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -473,26 +457,26 @@ EVT_BEGIN(press_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_atmic_teresa_press))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_atmic_teresa_press))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_atmic_teresa_press))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_MOVE2"), -250000000, 0, LW(15))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("R_1"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_MOVE2"), EVT_NULLPTR, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SUBTRACT(LW(2), 10)
-    CALL(btlevtcmd_DivePosition, -2, -125, 100, LW(2), 120, 10, 4, 0, -1)
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, -125, 100, LW(2), 120, 10, 4, 0, -1)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("Z_1"))
-    CALL(btlevtcmd_DivePosition, -2, -125, 0, LW(2), 30, 0, 1, 0, -1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("Z_1"))
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, -125, 0, LW(2), 30, 0, 1, 0, -1)
     CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 0)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_press), 0, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_press), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -521,7 +505,7 @@ EVT_BEGIN(press_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_press))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_press), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_press), 256, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -533,21 +517,21 @@ EVT_BEGIN(press_event)
     LABEL(98)
     WAIT_FRAMES(60)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("W_1"))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, 50, 6, 0, -1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("W_1"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 50, 6, 0, -1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     WAIT_MS(250)
     LABEL(99)
     RETURN
 EVT_END()
 
 EVT_BEGIN(surprise_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_atmic_teresa_surprise))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_surprise))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_surprise), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -555,32 +539,32 @@ EVT_BEGIN(surprise_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_atmic_teresa_surprise))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_atmic_teresa_surprise))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
-    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 180, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 30)
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_atmic_teresa_surprise))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 180, 0)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
     SUBTRACT(LW(1), 10)
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
     CALL(evt_btl_camera_set_mode, 0, 8)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_2"))
-    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
-    CALL(btlevtcmd_DivePosition, -2, 0, LW(1), LW(2), 10, 0, 5, 0, -1)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_SURPRISED1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
+    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 0, 0)
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, 0, LW(1), LW(2), 10, 0, 5, 0, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_SURPRISED1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_shake_w, 0, 10, 0, 60, 0)
     CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_surprise), 0, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_surprise), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -609,7 +593,7 @@ EVT_BEGIN(surprise_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_surprise))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_surprise), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_surprise), 256, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -621,21 +605,21 @@ EVT_BEGIN(surprise_event)
     LABEL(98)
     WAIT_FRAMES(90)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("W_1"))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, -20, 6, 0, -1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("W_1"))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -20, 6, 0, -1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     WAIT_MS(250)
     LABEL(99)
     RETURN
 EVT_END()
 
 EVT_BEGIN(bikkuri_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_atmic_teresa_bikkuri))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_bikkuri))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_bikkuri), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -643,28 +627,28 @@ EVT_BEGIN(bikkuri_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_atmic_teresa_bikkuri))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_atmic_teresa_press))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_atmic_teresa_press))
     CALL(teresa_appear_bikkuri)
     WAIT_FRAMES(75)
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, LW(3), -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, LW(3), BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 5)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_FRAMES(20)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_S_ROUND1"), -250000000, 0, LW(15))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_S_ROUND1"), EVT_NULLPTR, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     CALL(teresa_wait_bikkuri)
     CALL(evt_snd_sfxoff, LW(15))
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_SURPRISED2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_SURPRISED2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 350)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_bikkuri), 0, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_bikkuri), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -692,7 +676,7 @@ EVT_BEGIN(bikkuri_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_bikkuri))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_bikkuri), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_bikkuri), 256, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -704,14 +688,14 @@ EVT_BEGIN(bikkuri_event)
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(60)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_WHISTLE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_WHISTLE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_4"))
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     CALL(teresa_wait_bikkuri2)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_UNION1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_UNION1"), EVT_NULLPTR, 0, LW(15))
     LOOP(3)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 40)
         ADD(LW(2), 1)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 8, LW(0), LW(1), LW(2), FLOAT(1.25f), 0, 0, 0, 0, 0, 0, 0)
@@ -719,17 +703,17 @@ EVT_BEGIN(bikkuri_event)
     END_LOOP
     CALL(evt_snd_sfxoff, LW(15))
     WAIT_MS(250)
-    CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     LABEL(99)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(breath_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_atmic_teresa_breath))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_breath))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_breath), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -738,24 +722,24 @@ static EVT_BEGIN(breath_event)
     END_IF
     CALL(target_id_set, LW(3), LW(4))
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_atmic_teresa_breath))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_atmic_teresa_breath))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 40)
-    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 180, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 30)
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_atmic_teresa_breath))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 180, 0)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
     SUBTRACT(LW(1), 10)
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_3"))
-    CALL(btlevtcmd_SetPartsRotate, -2, 1, 0, 0, 0)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_DivePosition, -2, LW(0), LW(1), LW(2), 10, 0, 5, 0, -1)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_BLOW2"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
+    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 0, 0)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, 0, 5, 0, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_BLOW2"), EVT_NULLPTR, 0, LW(15))
     CALL(teresa_appear_breath, 0)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(10)
@@ -770,14 +754,14 @@ static EVT_BEGIN(breath_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(teresa_wait_breath)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_WHISTLE1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_4"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_WHISTLE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_4"))
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     CALL(teresa_wait_breath2)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_ATMTLSA_UNION1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_UNION1"), EVT_NULLPTR, 0, LW(15))
     LOOP(3)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 40)
         ADD(LW(2), 1)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 8, LW(0), LW(1), LW(2), FLOAT(1.25f), 0, 0, 0, 0, 0, 0, 0)
@@ -785,12 +769,12 @@ static EVT_BEGIN(breath_event)
     END_LOOP
     CALL(evt_snd_sfxoff, LW(15))
     WAIT_MS(1500)
-    CALL(btlevtcmd_SetScale, -2, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     RETURN
 EVT_END()
 
 EVT_BEGIN(breath_event_sub)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -817,19 +801,19 @@ EVT_BEGIN(breath_event_sub)
     LABEL(91)
     WAIT_FRAMES(15)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_breath))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
     WAIT_FRAMES(30)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_breath))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
     WAIT_FRAMES(30)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_breath))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 256, LW(5))
     LABEL(99)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
@@ -887,8 +871,8 @@ void teresa_ext_init(void) {
         (*pose->mtx)[2][3] = 0.0f;
         pose->dir = 90.0f;
         teresa[i].state = 0;
-        teresa[i].flag = 0;
-        teresa[i].anim = 0;
+        teresa[i].animType = 0;
+        teresa[i].animFrame = 0;
         {
             Vec zero = {0.0f, 0.0f, 0.0f};
             teresa[i].vel = zero;
@@ -907,12 +891,36 @@ void teresa_ext_main(void) {
     f32 angle;
     s32 waits[8] = {0, 2, 5, 7, 10, 12, 15, 17};
     f32 ofs[30][2] = {
-        {-30.0f, 8.0f}, {-28.0f, 10.0f}, {-26.0f, 6.0f}, {-24.0f, 30.0f}, {-22.0f, 16.0f},
-        {-20.0f, 50.0f}, {-18.0f, 14.0f}, {-16.0f, 18.0f}, {-14.0f, 60.0f}, {-12.0f, 34.0f},
-        {-10.0f, 66.0f}, {-8.0f, 8.0f}, {-6.0f, 28.0f}, {-4.0f, 40.0f}, {-2.0f, 46.0f},
-        {0.0f, 20.0f}, {2.0f, 26.0f}, {4.0f, 52.0f}, {6.0f, 74.0f}, {8.0f, 68.0f},
-        {10.0f, 0.0f}, {12.0f, 28.0f}, {14.0f, 44.0f}, {16.0f, 72.0f}, {18.0f, 42.0f},
-        {20.0f, 76.0f}, {22.0f, 56.0f}, {24.0f, 32.0f}, {26.0f, 4.0f}, {28.0f, 2.0f},
+        {-30.0f, 8.0f},
+        {-28.0f, 10.0f},
+        {-26.0f, 6.0f},
+        {-24.0f, 30.0f},
+        {-22.0f, 16.0f},
+        {-20.0f, 50.0f},
+        {-18.0f, 14.0f},
+        {-16.0f, 18.0f},
+        {-14.0f, 60.0f},
+        {-12.0f, 34.0f},
+        {-10.0f, 66.0f},
+        {-8.0f, 8.0f},
+        {-6.0f, 28.0f},
+        {-4.0f, 40.0f},
+        {-2.0f, 46.0f},
+        {0.0f, 20.0f},
+        {2.0f, 26.0f},
+        {4.0f, 52.0f},
+        {6.0f, 74.0f},
+        {8.0f, 68.0f},
+        {10.0f, 0.0f},
+        {12.0f, 28.0f},
+        {14.0f, 44.0f},
+        {16.0f, 72.0f},
+        {18.0f, 42.0f},
+        {20.0f, 76.0f},
+        {22.0f, 56.0f},
+        {24.0f, 32.0f},
+        {26.0f, 4.0f},
+        {28.0f, 2.0f},
     };
     u8 modes[7] = {0, 1, 2, 3, 4, 5, 6};
     f32 x, y, z;
@@ -948,23 +956,23 @@ void teresa_ext_main(void) {
 
     for (i = 0; i < extGetPoseNum(); i++, pose++) {
         t = &teresa[i];
-        switch (t->flag) {
+        switch (t->animType) {
             case 1:
-                t->anim++;
-                if (t->anim <= 30) {
+                t->animFrame++;
+                if (t->animFrame <= 30) {
                     pose->texId = 8;
-                } else if (t->anim < 44) {
-                    pose->texId = (t->anim - 30) / 2 + 9;
+                } else if (t->animFrame < 44) {
+                    pose->texId = (t->animFrame - 30) / 2 + 9;
                 } else {
                     pose->texId = 15;
                 }
                 break;
             default:
-                t->anim++;
-                if (t->anim >= 24) {
-                    t->anim -= 24;
+                t->animFrame++;
+                if (t->animFrame >= 24) {
+                    t->animFrame -= 24;
                 }
-                pose->texId = t->anim / 3;
+                pose->texId = t->animFrame / 3;
                 break;
         }
         if (t->wait >= 1) {
@@ -1077,8 +1085,8 @@ void teresa_ext_main(void) {
                     for (j = 0; j < 8; j++) {
                         AtmTeresa* p = &teresa[j];
                         p->state = 20;
-                        p->flag = 1;
-                        p->anim = 0;
+                        p->animType = 1;
+                        p->animFrame = 0;
                         p->vel.x = 0.0f;
                         p->vel.y = 0.0f;
                         p->vel.z = 0.0f;
@@ -1086,10 +1094,10 @@ void teresa_ext_main(void) {
                 }
                 break;
             case 20:
-                if (t->anim >= 180) {
+                if (t->animFrame >= 180) {
                     t->state = 23;
-                    t->flag = 0;
-                    t->anim = 0;
+                    t->animType = 0;
+                    t->animFrame = 0;
                     t->timer = 60;
                     t->wait = waits[i];
                     pose->dir = 90.0f;
@@ -1157,7 +1165,7 @@ void teresa_ext_main(void) {
                 t->wait = i * 3;
                 t->timer = 0;
                 t->state = 53;
-                t->mode = modes[irand(7)];
+                t->intplMode = modes[irand(7)];
                 break;
             case 53:
                 ATMIC_TERESA_SCALE -= 0.015f;
@@ -1169,9 +1177,9 @@ void teresa_ext_main(void) {
                     (*pose->mtx)[0][0] = 1.0f;
                 }
                 (*pose->mtx)[1][1] = (*pose->mtx)[0][0];
-                (*pose->mtx)[0][3] = intplGetValue(t->mode, t->start.x, t->target.x, t->timer, 30);
-                (*pose->mtx)[1][3] = intplGetValue(t->mode, t->start.y, t->target.y, t->timer, 30);
-                (*pose->mtx)[2][3] = intplGetValue(t->mode, t->start.z, t->target.z, t->timer, 30);
+                (*pose->mtx)[0][3] = intplGetValue(t->intplMode, t->start.x, t->target.x, t->timer, 30);
+                (*pose->mtx)[1][3] = intplGetValue(t->intplMode, t->start.y, t->target.y, t->timer, 30);
+                (*pose->mtx)[2][3] = intplGetValue(t->intplMode, t->start.z, t->target.z, t->timer, 30);
                 if (t->timer >= 30) {
                     t->state = 60;
                 }
@@ -1234,10 +1242,10 @@ USER_FUNC(atmic_teresa_id_set) {
 USER_FUNC(target_id_set) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
-    s32 parts = evtGetValue(event, args[1]);
+    s32 partId = evtGetValue(event, args[1]);
 
     target_unit_id[0] = BattleTransID(event, id);
-    target_parts_id[0] = parts;
+    target_parts_id[0] = partId;
     return EVT_RETURN_DONE;
 }
 

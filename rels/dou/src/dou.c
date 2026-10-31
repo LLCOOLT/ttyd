@@ -1,28 +1,20 @@
+// dou.rel (洞窟, Pirate's Grotto): _prolog registers each map's init script (dou_00 to dou_13) and the area's battle tables.
+// Also the shared bobbing-platform (puka) events.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
 #include "manager/evtmgr_cmd.h"
 #include "mario/mario.h"
+#include "evt/evt_sub.h"
 #include "system.h"
 #include "dou.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
+#include "rel_module.h"
 
 USER_FUNC(dou_mario_pos_osreport_func);
-USER_FUNC(evt_dou_normal_puka);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
 
 f32 dou_normal_puka_data[16];
-extern EvtWord dou_normal_puka[];
 extern EvtWord dou_puka_event_sub[];
-extern EvtWord dou_puka_event[];
 extern EvtWord dou_mario_pos_osreport[];
 
 f32 dou_normal_puka_data[] = {

@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: water jet (jetw) from a point with a scale and lifetime.
 #include "eff/n64/eff_opuku_jetw_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -12,7 +13,6 @@ typedef struct JetwEnt {
     s16 sx, sy, rot;
     u8 alpha, pad;
 } JetwEnt;
-
 
 static JetwEnt adata[] = {
     {0, 0, 30, 140, 0, 255, 0},
@@ -81,40 +81,41 @@ static struct {
     JetwEnt e[33];
     s16 pad;
 } a2data = {{
-    {0, 0, 30, 140, 0, 255, 0},
-    {0, 6, 30, 120, 0, 240, 0},
-    {1, 12, 30, 110, -5, 230, 0},
-    {1, 17, 50, 100, -20, 220, 0},
-    {2, 22, 60, 90, -30, 210, 0},
-    {2, 26, 70, 90, -40, 200, 0},
-    {3, 28, 80, 85, -50, 190, 0},
-    {4, 32, 90, 80, -60, 180, 0},
-    {5, 35, 100, 77, -70, 120, 0},
-    {7, 38, 110, 65, -80, 80, 0},
-    {8, 40, 120, 54, -90, 40, 0},
-    {0, 0, 30, 140, 0, 255, 0},
-    {0, 6, 30, 120, 0, 240, 0},
-    {-1, 12, 30, 110, 5, 230, 0},
-    {-1, 17, 50, 100, 20, 220, 0},
-    {-2, 22, 60, 90, 30, 210, 0},
-    {-2, 26, 70, 90, 40, 200, 0},
-    {-3, 28, 80, 85, 50, 190, 0},
-    {-4, 32, 90, 80, 60, 180, 0},
-    {-5, 35, 100, 77, 70, 120, 0},
-    {-7, 38, 110, 65, 80, 80, 0},
-    {-8, 40, 120, 54, 90, 40, 0},
-    {0, 0, 30, 140, 0, 255, 0},
-    {0, 6, 30, 120, 0, 240, 0},
-    {0, 12, 30, 110, 5, 230, 0},
-    {0, 17, 50, 100, 20, 220, 0},
-    {0, 22, 60, 90, 30, 210, 0},
-    {0, 26, 70, 90, 40, 200, 0},
-    {0, 28, 80, 85, 50, 190, 0},
-    {0, 32, 90, 80, 60, 180, 0},
-    {0, 36, 100, 77, 70, 120, 0},
-    {0, 39, 110, 65, 80, 80, 0},
-    {0, 42, 120, 54, 90, 40, 0},
-}, 0};
+                {0, 0, 30, 140, 0, 255, 0},
+                {0, 6, 30, 120, 0, 240, 0},
+                {1, 12, 30, 110, -5, 230, 0},
+                {1, 17, 50, 100, -20, 220, 0},
+                {2, 22, 60, 90, -30, 210, 0},
+                {2, 26, 70, 90, -40, 200, 0},
+                {3, 28, 80, 85, -50, 190, 0},
+                {4, 32, 90, 80, -60, 180, 0},
+                {5, 35, 100, 77, -70, 120, 0},
+                {7, 38, 110, 65, -80, 80, 0},
+                {8, 40, 120, 54, -90, 40, 0},
+                {0, 0, 30, 140, 0, 255, 0},
+                {0, 6, 30, 120, 0, 240, 0},
+                {-1, 12, 30, 110, 5, 230, 0},
+                {-1, 17, 50, 100, 20, 220, 0},
+                {-2, 22, 60, 90, 30, 210, 0},
+                {-2, 26, 70, 90, 40, 200, 0},
+                {-3, 28, 80, 85, 50, 190, 0},
+                {-4, 32, 90, 80, 60, 180, 0},
+                {-5, 35, 100, 77, 70, 120, 0},
+                {-7, 38, 110, 65, 80, 80, 0},
+                {-8, 40, 120, 54, 90, 40, 0},
+                {0, 0, 30, 140, 0, 255, 0},
+                {0, 6, 30, 120, 0, 240, 0},
+                {0, 12, 30, 110, 5, 230, 0},
+                {0, 17, 50, 100, 20, 220, 0},
+                {0, 22, 60, 90, 30, 210, 0},
+                {0, 26, 70, 90, 40, 200, 0},
+                {0, 28, 80, 85, 50, 190, 0},
+                {0, 32, 90, 80, 60, 180, 0},
+                {0, 36, 100, 77, 70, 120, 0},
+                {0, 39, 110, 65, 80, 80, 0},
+                {0, 42, 120, 54, 90, 40, 0},
+            },
+            0};
 
 static s32 jetw_ry_tbl[] = {0, 40, 55, 190, 20, 130, 270, 300};
 
@@ -132,8 +133,6 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
     {-3, 22, 0, 0, 1024, 255, 255, 255, 255},
 };
 
-
-
 void effOpukuJetwMain(EffectEntry* effect);
 void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -147,7 +146,7 @@ EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwN64Work));
     effect->userdata = work;
     effect->callback = effOpukuJetwMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -181,8 +180,8 @@ void effOpukuJetwMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -220,16 +219,16 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     g = work->colorG;
     b = work->colorB;
     switch (work->type) {
-    case 0:
-        tbl = adata;
-        n = 20;
-        m = 3;
-        break;
-    default:
-        tbl = a2data.e;
-        n = 11;
-        m = 3;
-        break;
+        case 0:
+            tbl = adata;
+            n = 20;
+            m = 3;
+            break;
+        default:
+            tbl = a2data.e;
+            n = 11;
+            m = 3;
+            break;
     }
     PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
@@ -288,4 +287,3 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-

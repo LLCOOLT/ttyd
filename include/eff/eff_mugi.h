@@ -1,3 +1,4 @@
+// eff_mugi.c: the bits kicked up by Mario's footsteps (むぎばたけ); effMugiKemuriEntry, effMugiKemuri2Entry.
 #pragma once
 
 #include "driver/effdrv.h"

@@ -1,3 +1,6 @@
+// Up/down number pop-up: a signed number drawn from icon textures that bounces in and fades;
+// used in battle for status strength changes (types 0 and 1 choose the style).
+#include "eff/eff_updown.h"
 #include "icon_ids.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,7 +9,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-#include "eff/eff_magic1_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffUpdownWork {
     s32 type;     // 0x0
@@ -19,11 +22,12 @@ typedef struct EffUpdownWork {
     u8 alpha;     // 0x24
 } EffUpdownWork;
 
+// FAKE: local prototype: iconGetTexObj takes the icon id as u16 (icondrv.h: s16/s32 by version); this file was compiled with it and the header prototype changes the code.
 extern void iconGetTexObj(GXTexObj* texObj, u16 iconId);
 void effUpdownMain(EffectEntry* effect);
 void effUpdownDisp(CameraId cameraId, EffectEntry* effect);
 
-static u16 icon_id[10] = { ICON_1DA, ICON_1DC, ICON_1DE, ICON_1E0, ICON_1E2, ICON_1E4, ICON_1E6, ICON_1E8, ICON_1EA, ICON_1EC };
+static u16 icon_id[10] = {ICON_1DA, ICON_1DC, ICON_1DE, ICON_1E0, ICON_1E2, ICON_1E4, ICON_1E6, ICON_1E8, ICON_1EA, ICON_1EC};
 
 static u8 scale_data[30] = {
     0x78, 0x00, 0x73, 0x0D, 0x6E, 0x1C, 0x68, 0x2C, 0x63, 0x3B, 0x5E, 0x4A, 0x59, 0x58, 0x55, 0x64,
@@ -40,7 +44,7 @@ EffectEntry* effUpdownEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 timer
     work = __memAlloc(HEAP_EFFECT, sizeof(EffUpdownWork));
     effect->userdata = work;
     effect->callback = effUpdownMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -59,8 +63,8 @@ void effUpdownMain(EffectEntry* effect) {
     s32 type = work->type;
     s32 mode;
 
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {
@@ -77,8 +81,7 @@ void effUpdownMain(EffectEntry* effect) {
         if (work->frame < 15) {
             work->scaleX = scale_data[work->frame * 2] / 100.0f;
             work->scaleY = scale_data[work->frame * 2 + 1] / 100.0f;
-        }
-        else {
+        } else {
             f32 arg = (s32)(work->frame - 15);
             f32 sv;
             work->scaleX = 1.0f;
@@ -89,15 +92,15 @@ void effUpdownMain(EffectEntry* effect) {
     work->frame++;
     mode = 1;
     {
-    Vec position = { 0.0f, 0.0f, 0.0f };
-    Vec* p = &position;
-    p->x = work->position.x;
-    p->y = work->position.y;
-    p->z = work->position.z;
-    if (work->alpha != 0xFF) {
-        mode = 2;
-    }
-    dispEntry(CAMERA_3D, dispCalcZ(p), mode, (DispCallback)effUpdownDisp, effect);
+        Vec position = {0.0f, 0.0f, 0.0f};
+        Vec* p = &position;
+        p->x = work->position.x;
+        p->y = work->position.y;
+        p->z = work->position.z;
+        if (work->alpha != 0xFF) {
+            mode = 2;
+        }
+        dispEntry(CAMERA_3D, dispCalcZ(p), mode, (DispCallback)effUpdownDisp, effect);
     }
 }
 
@@ -105,33 +108,33 @@ static void polygon(s32 type, s32 alpha, f32 x, f32 y, f32 w, f32 h, f32 s, f32 
     u8 r0, g0, b0, a, r1, g1, b1;
 
     switch (type) {
-    case 0:
-        a = alpha;
-        b0 = 0xFF;
-        g0 = 0xFF;
-        r0 = 0xFF;
-        b1 = 0xFF;
-        g1 = 0xFF;
-        r1 = 0xFF;
-        break;
-    case 1:
-        a = alpha;
-        r0 = 0xE9;
-        g0 = 0x4A;
-        b0 = 0x3F;
-        r1 = 0xFE;
-        g1 = 0xE6;
-        b1 = 0x3E;
-        break;
-    case 2:
-        a = alpha;
-        r0 = 0x3F;
-        g0 = 0x3F;
-        b0 = 0xE9;
-        r1 = 0x74;
-        g1 = 0xC9;
-        b1 = 0xFF;
-        break;
+        case 0:
+            a = alpha;
+            b0 = 0xFF;
+            g0 = 0xFF;
+            r0 = 0xFF;
+            b1 = 0xFF;
+            g1 = 0xFF;
+            r1 = 0xFF;
+            break;
+        case 1:
+            a = alpha;
+            r0 = 0xE9;
+            g0 = 0x4A;
+            b0 = 0x3F;
+            r1 = 0xFE;
+            g1 = 0xE6;
+            b1 = 0x3E;
+            break;
+        case 2:
+            a = alpha;
+            r0 = 0x3F;
+            g0 = 0x3F;
+            b0 = 0xE9;
+            r1 = 0x74;
+            g1 = 0xC9;
+            b1 = 0xFF;
+            break;
     }
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(x, y, 0.0f);
@@ -157,7 +160,6 @@ void effUpdownDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     Mtx m5, m4, m3, m2, m1, m0;
 
-
     effGetTexObj(0x1D, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetNumChans(1);
@@ -166,8 +168,7 @@ void effUpdownDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     if (number < 0) {
         PSMTXRotRad(m4, 'z', 3.1415927f);
-    }
-    else {
+    } else {
         PSMTXIdentity(m4);
     }
     GXLoadTexMtxImm(m4, GX_TEXMTX0, GX_MTX2x4);
@@ -193,8 +194,7 @@ void effUpdownDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCurrentMtx(GX_PNMTX0);
     if (type == 0 || type == 2) {
         polygon(1, alpha, -12.0f, 24.0f, 24.0f, 24.0f, 1.0f, 1.0f);
-    }
-    else {
+    } else {
         polygon(2, alpha, -12.0f, 24.0f, 24.0f, 24.0f, 1.0f, 1.0f);
     }
 
@@ -204,14 +204,12 @@ void effUpdownDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
     if (number >= 0) {
         PSMTXTrans(m5, 5.0f, 0.0f, 1.0f);
-    }
-    else {
+    } else {
         PSMTXTrans(m5, 5.0f, 7.0f, 1.0f);
     }
     if (work->frame < 15) {
         PSMTXConcat(m1, m5, m2);
-    }
-    else {
+    } else {
         PSMTXConcat(m0, m5, m2);
     }
     PSMTXConcat(camera->view, m2, m2);
@@ -222,16 +220,14 @@ void effUpdownDisp(CameraId cameraId, EffectEntry* effect) {
         iconGetTexObj(&texObj, ICON_1ED);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         PSMTXTrans(m5, -5.0f, 0.0f, 1.0f);
-    }
-    else {
+    } else {
         iconGetTexObj(&texObj, ICON_1EE);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         PSMTXTrans(m5, -5.0f, 7.0f, 1.0f);
     }
     if (work->frame < 15) {
         PSMTXConcat(m1, m5, m2);
-    }
-    else {
+    } else {
         PSMTXConcat(m0, m5, m2);
     }
     PSMTXConcat(camera->view, m2, m2);

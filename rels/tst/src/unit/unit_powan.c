@@ -15,68 +15,9 @@
 #include "driver/npcdrv.h"
 #include "manager/evtmgr_cmd.h"
 #include "tst.h"
+#include "battle/battle_sub.h"
+#include "evt/evt_msg.h"
 
-USER_FUNC(btlevtcmd_AddPartsRotate);
-USER_FUNC(btlevtcmd_AddRotate);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
-USER_FUNC(btlevtcmd_AttackDeclare);
-USER_FUNC(btlevtcmd_ChangeFaceDirection);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_CheckDamageCode);
-USER_FUNC(btlevtcmd_CheckToken);
-USER_FUNC(btlevtcmd_ChoiceSamplingEnemy);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_FaceDirectionAdd);
-USER_FUNC(btlevtcmd_GetCoin);
-USER_FUNC(btlevtcmd_GetEnemyBelong);
-USER_FUNC(btlevtcmd_GetExp);
-USER_FUNC(btlevtcmd_GetFaceDirection);
-USER_FUNC(btlevtcmd_GetHitPos);
-USER_FUNC(btlevtcmd_GetHomePos);
-USER_FUNC(btlevtcmd_GetPartsPos);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_GetStageSize);
-USER_FUNC(btlevtcmd_GetUnitId);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_JumpPartsPosition);
-USER_FUNC(btlevtcmd_JumpPosition);
-USER_FUNC(btlevtcmd_KillUnit);
-USER_FUNC(btlevtcmd_MovePosition);
-USER_FUNC(btlevtcmd_OffPartsAttribute);
-USER_FUNC(btlevtcmd_OnPartsAttribute);
-USER_FUNC(btlevtcmd_PayWeaponCost);
-USER_FUNC(btlevtcmd_PreCheckDamage);
-USER_FUNC(btlevtcmd_ResetFaceDirection);
-USER_FUNC(btlevtcmd_ResultACDefence);
-USER_FUNC(btlevtcmd_SamplingEnemy);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventHit);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetFallAccel);
-USER_FUNC(btlevtcmd_SetHomePos);
-USER_FUNC(btlevtcmd_SetMoveSpeed);
-USER_FUNC(btlevtcmd_SetPartsFallAccel);
-USER_FUNC(btlevtcmd_SetPartsPos);
-USER_FUNC(btlevtcmd_SetPos);
-USER_FUNC(btlevtcmd_SetRotate);
-USER_FUNC(btlevtcmd_SetRotateOffset);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_SpawnUnit);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StoreCoin);
-USER_FUNC(btlevtcmd_StoreExp);
-USER_FUNC(btlevtcmd_TransStageFloorPosition);
-USER_FUNC(btlevtcmd_WaitGuardMove);
-USER_FUNC(btlevtcmd_WeaponAftereffect);
-USER_FUNC(evt_btl_camera_set_homing_unit);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_moveSpeedLv);
-USER_FUNC(evt_btl_camera_set_zoom);
-USER_FUNC(evt_msg_print);
 static USER_FUNC(powan_set_post_battle_mode);
 static USER_FUNC(powan_set_post_battle_event);
 static USER_FUNC(powan_rider_follow);
@@ -204,23 +145,23 @@ static BattleUnitKindPart parts[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(powan_set_post_battle_event, PTR(post_battle_event_2))
     SPAWN_EVENT(rider_follow_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(rider_follow_event)
     LABEL(0)
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
-    CALL(powan_rider_follow, -2, 2)
+    CALL(powan_rider_follow, BTL_UNIT_SELF, 2)
     WAIT_FRAMES(1)
     GOTO(0)
     RETURN
@@ -245,23 +186,23 @@ static BattleWeapon weapon_powan_attack = {
     0, 0, // baseFpCost..baseSpCost
     4, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x21002000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x2, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_TOP_SPIKY, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -269,24 +210,24 @@ static BattleWeapon weapon_powan_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_SetEventHit, -2, PTR(hit_event))
+    CALL(btlevtcmd_SetEventHit, BTL_UNIT_SELF, PTR(hit_event))
     SET_VALUE(LW(12), PTR(&weapon_powan_attack))
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(PTR(subsetevt_confuse_flustered))
             RETURN
@@ -294,88 +235,88 @@ static EVT_BEGIN(attack_event)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 8)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 100)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(12))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 20)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
     WAIT_FRAMES(20)
-    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("GAZ_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("GAZ_A_1"))
     WAIT_FRAMES(12)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 40, -2, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, -2, 0)
     LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, -2)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 // On a hit the Toad is knocked off: the second body (part 3) flies out and lands while the rider runs away
 // and comes back.
 static EVT_BEGIN(hit_event)
-    CALL(btlevtcmd_OnPartsAttribute, -2, 2, 0x1000000)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 0x1000000)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 10)
     ADD(LW(2), 6)
-    CALL(btlevtcmd_SetPartsPos, -2, 3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OffPartsAttribute, -2, 3, 0x1000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KNP_O_1"))
-    CALL(btlevtcmd_GetPartsPos, -2, 3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetStageSize, LW(0), -250000000, -250000000)
-    CALL(btlevtcmd_SetPartsFallAccel, -2, 3, FLOAT(0.07f))
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 0x1000000)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KNP_O_1"))
+    CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetStageSize, LW(0), EVT_NULLPTR, EVT_NULLPTR)
+    CALL(btlevtcmd_SetPartsFallAccel, BTL_UNIT_SELF, 3, FLOAT(0.07f))
     BEGIN_SIBLING_EVENT
         LOOP(90)
-            CALL(btlevtcmd_AddPartsRotate, -2, 3, 0, 40, 0)
+            CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, 3, 0, 40, 0)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_JumpPartsPosition, -2, 3, LW(0), LW(1), LW(2), 90, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2), 90, -1)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
     MULTIPLY(LW(5), -1)
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(5))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(8.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(5))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     MULTIPLY(LW(5), -1)
-    CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_OnPartsAttribute, -2, 3, 0x1000000)
-    CALL(btlevtcmd_OffPartsAttribute, -2, 2, 0x1000000)
-    CALL(btlevtcmd_ResetFaceDirection, -2)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(4.0f))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 0x1000000)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 0x1000000)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
 static BattleUnitSetup entry_powan = {
-    &unit_powan, // mUnitKindParams
+    &unit_powan, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {1000.0f, 0.0f, 1000.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -429,26 +370,26 @@ static EVT_BEGIN(respawn_event)
     WAIT_FRAMES(30)
     SWITCH(LW(5))
         CASE_EQUAL(2)
-            CALL(evt_msg_print, 3, STRING("あいたた<key><scrl auto> \nひどいじゃないか\nでもいまのは　カゲムシャ<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("あいたた<key><scrl auto> \nひどいじゃないか\nでもいまのは　カゲムシャ<key>"), 0, LW(3))
         CASE_EQUAL(3)
-            CALL(evt_msg_print, 3, STRING("あいたた<key>"), 0, LW(3))
-            CALL(evt_msg_print, 3, STRING("もしかして<key>"), 0, LW(3))
-            CALL(evt_msg_print, 3, STRING("このまえきみを\nはんにんあつかいしたことを\nうらんでいるのかね<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("あいたた<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("もしかして<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("このまえきみを\nはんにんあつかいしたことを\nうらんでいるのかね<key>"), 0, LW(3))
         CASE_EQUAL(4)
-            CALL(evt_msg_print, 3, STRING("あいたた<key>"), 0, LW(3))
-            CALL(evt_msg_print, 3, STRING("もうそろそろやばいって\nしゃれにならんて<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("あいたた<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("もうそろそろやばいって\nしゃれにならんて<key>"), 0, LW(3))
         CASE_EQUAL(5)
-            CALL(evt_msg_print, 3, STRING("ぐふっ<key>"), 0, LW(3))
-            CALL(evt_msg_print, 3, STRING("もうこれいじょうはあかんて。\nいや、ほんまに。<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("ぐふっ<key>"), 0, LW(3))
+        CALL(evt_msg_print, 3, STRING("もうこれいじょうはあかんて。\nいや、ほんまに。<key>"), 0, LW(3))
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_GetUnitId, -2, LW(10))
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(5))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(10))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(5))
     IF_INT_EQUAL(LW(5), 5)
-        CALL(evt_msg_print, 3, STRING("もう\nからだもたんわー<key>"), 0, -2)
+        CALL(evt_msg_print, 3, STRING("もう\nからだもたんわー<key>"), 0, BTL_UNIT_SELF)
     END_IF
     SET_VALUE(LW(0), 48)
     LABEL(10)

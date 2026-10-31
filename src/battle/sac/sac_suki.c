@@ -1,4 +1,6 @@
+// Star-power special move Showstopper (sac_suki): the button-sequence game that can defeat enemies outright.
 #pragma optimize_for_size on
+#include <dolphin/pad.h>
 #include "eff/n64/eff_crystal_n64.h"
 #include "eff/eff_starstone.h"
 #include "battle/battle.h"
@@ -24,13 +26,16 @@
 #include "battle/sac/sac_suki.h"
 #include "battle/battle_database_common.h"
 #include "pmario_sound.h"
-
-EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
-EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 size);
-EffectEntry* effCrystalN64Entry(s32 a, s32 b, f32 x, f32 y, f32 z, f32 size);
-void btlGetScreenPoint(Vec* in, Vec* out);
-void BattleAudienceSoundWhistleKind(s32 kind);
-void BattleAudienceSoundCallKind(s32 kind);
+#include "battle/battle_sub.h"
+#include "battle/battle_disp.h"
+#include "eff/n64/eff_stardust_n64.h"
+#include "evt/evt_batstage.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_paper.h"
+#include "party/party_motion.h"
+#include "version.h"
 
 typedef struct SukiBtn {
     s32 state;  // 0x0
@@ -40,107 +45,37 @@ typedef struct SukiBtn {
 } SukiBtn;
 
 typedef struct SukiWork {
-    s32 state;          // 0x0
-    s32 timer;          // 0x4
-    s32 unitId;         // 0x8
-    s32 round;          // 0xC
-    s32 cur;            // 0x10
-    s32 prev;           // 0x14
-    s32 need;           // 0x18
-    s32 time;           // 0x1C
-    u8 flash;           // 0x20
-    u8 pad21[3];
-    f32 offsetY;        // 0x24
-    Vec starPos[6];     // 0x28
-    char names[6][16];  // 0x70
-    Vec pos;            // 0xD0
-    SukiBtn btn[7];     // 0xDC
-    SukiBtn btn2[7];    // 0x184
-    s32 starState;      // 0x22C
-    s32 starTimer;      // 0x230
-    Vec spos;           // 0x234
-    Vec from;           // 0x240
-    Vec to;             // 0x24C
-    u8 pad258[0xC];
-    Vec scale;          // 0x264
-    Vec rot;            // 0x270
-    EffectEntry* eff;   // 0x27C
-    s32 effMode;        // 0x280
-    u8 weapon[0xC0];    // 0x284
-    u8 pad344[0x4C8 - 0x344];
+    s32 state;                      // 0x0
+    s32 timer;                      // 0x4
+    s32 unitId;                     // 0x8
+    s32 round;                      // 0xC
+    s32 cur;                        // 0x10
+    s32 prev;                       // 0x14
+    s32 need;                       // 0x18
+    s32 time;                       // 0x1C
+    u8 flash;                       // 0x20
+    f32 offsetY;                    // 0x24
+    Vec starPos[6];                 // 0x28
+    char names[6][16];              // 0x70
+    Vec pos;                        // 0xD0
+    SukiBtn btn[7];                 // 0xDC
+    SukiBtn btn2[7];                // 0x184
+    s32 starState;                  // 0x22C
+    s32 starTimer;                  // 0x230
+    Vec spos;                       // 0x234
+    Vec from;                       // 0x240
+    Vec to;                         // 0x24C
+    u8 reserved_258[0xC];           // 0x258, never accessed
+    Vec scale;                      // 0x264
+    Vec rot;                        // 0x270
+    EffectEntry* eff;               // 0x27C
+    s32 effMode;                    // 0x280
+    BattleWeapon weapon;            // 0x284, copy of the attack with the per-level OHKO rate
+    u8 reserved_344[0x4C8 - 0x344]; // 0x344, never accessed (only cleared)
 } SukiWork;
 
-typedef struct StarEffWork {
-    u8 pad0[8];
-    Vec pos;  // 0x8
-    f32 scl;  // 0x14
-    Vec rot;  // 0x18
-    u8 pad24[0x38 - 0x24];
-    s32 mode; // 0x38
-} StarEffWork;
-
-USER_FUNC(btlevtcmd_ACSuccessEffect);
-USER_FUNC(btlevtcmd_ChoiceSamplingEnemy);
-USER_FUNC(btlevtcmd_GetEnemyBelong);
-USER_FUNC(btlevtcmd_GetSelectEnemy);
-USER_FUNC(btlevtcmd_GetSelectNextEnemy);
-USER_FUNC(btlevtcmd_OffPartsAttribute);
-USER_FUNC(btlevtcmd_OnPartsAttribute);
-USER_FUNC(btlevtcmd_SamplingEnemy);
-USER_FUNC(btlevtcmd_SetAlpha);
-USER_FUNC(btlevtcmd_SetRGB);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
-USER_FUNC(btlevtcmd_AttackDeclare);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_CheckPartsAttribute);
-USER_FUNC(btlevtcmd_CheckStatus);
-USER_FUNC(btlevtcmd_CommandGetWeaponAddress);
-USER_FUNC(btlevtcmd_CommandPayWeaponCost);
-USER_FUNC(btlevtcmd_GetBodyId);
-USER_FUNC(btlevtcmd_GetUnitId);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_WaitGuardMove);
-USER_FUNC(btlevtcmd_WeaponAftereffect);
-USER_FUNC(btlevtcmd_reset_move_color_lv_all);
-USER_FUNC(btlevtcmd_snd_se);
-USER_FUNC(evt_batstage_return_aud_dark_base);
-USER_FUNC(evt_batstage_return_stg_dark_base);
-USER_FUNC(evt_batstage_set_aud_dark);
-USER_FUNC(evt_batstage_set_stg_dark);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_moveSpeedLv);
-USER_FUNC(evt_btl_camera_shake_h);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(sac_ac_help_off);
-USER_FUNC(sac_ac_help_on);
-USER_FUNC(sac_cheer);
-USER_FUNC(sac_cheer_end);
 extern s32 tou_gamen_screen_tev[];
 
-USER_FUNC(aud_set_draw);
-USER_FUNC(exist_map);
-USER_FUNC(flash_update);
-USER_FUNC(get_img_name);
-USER_FUNC(eff_crystal);
-USER_FUNC(get_screen_point);
-USER_FUNC(wait_star_stone_attack_end);
-USER_FUNC(star_stone_get_attack_point);
-USER_FUNC(wait_star_stone_up_end);
-USER_FUNC(end_suki);
 USER_FUNC(main_suki);
 void set_tev(MapTevCallbackInfo* info);
 static USER_FUNC(set_weapon);
@@ -168,27 +103,27 @@ static BattleWeapon weapon = {
     2, // baseSpCost
     0, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     5, // reserved_19
-    100, // mBingoSlotChance
+    100, // bingoSlotChance
     50, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_sac_7", // acHelpMsg
-    0x20008, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     0, // ohkoChance
 #else
     100, // ohkoChance
@@ -196,7 +131,7 @@ static BattleWeapon weapon = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    marioAttackEvent_Suki, // mAttackEvtScript
+    marioAttackEvent_Suki, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -205,19 +140,33 @@ static EVT_BEGIN(nice_event)
     RETURN
 EVT_END()
 
-#define INTPL(mode, cur, steps, a, b) ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, mode, cur, steps)
-
 USER_FUNC(main_suki) {
     SukiWork* w = get_ptr();
     EvtWord* args = event->args;
     f32 posTbl[18] = {
-        95.0f, 35.0f, -150.0f, 180.0f, 80.0f, -150.0f, 95.0f, 110.0f, -150.0f,
-        10.0f, 80.0f, -150.0f, 30.0f, -10.0f, -150.0f, 160.0f, -10.0f, -150.0f,
+        95.0f,
+        35.0f,
+        -150.0f,
+        180.0f,
+        80.0f,
+        -150.0f,
+        95.0f,
+        110.0f,
+        -150.0f,
+        10.0f,
+        80.0f,
+        -150.0f,
+        30.0f,
+        -10.0f,
+        -150.0f,
+        160.0f,
+        -10.0f,
+        -150.0f,
     };
     s32 i;
 
     if (isFirstCall) {
-        memset(w, 0, 0x4C8);
+        memset(w, 0, sizeof(SukiWork));
         w->unitId = evtGetValue(event, args[0]);
         memcpy(w->starPos, posTbl, sizeof(posTbl));
         strcpy(w->names[0], "sac_suki_img0");
@@ -233,9 +182,9 @@ USER_FUNC(main_suki) {
         main_button(i);
     }
     main_star();
-    dispEntry(8, 901.0f, 1, disp_2D, 0);
-    dispEntry(4, 0.0f, 1, disp_3D, 0);
-    dispEntry(4, 0.0f, 2, disp_3D_alpha, 0);
+    dispEntry(CAMERA_2D, 901.0f, 1, disp_2D, 0);
+    dispEntry(CAMERA_3D, 0.0f, 1, disp_3D, 0);
+    dispEntry(CAMERA_3D, 0.0f, 2, disp_3D_alpha, 0);
     return 0;
 }
 
@@ -245,128 +194,129 @@ static void main_base(void) {
     s32 i;
 
     switch (w->state) {
-    case 1:
-        w->state = 2;
-        w->timer = 0;
-    case 2:
-        if (w->round == 0) {
-            Vec v = {0.0f, -45.0f, 0.0f};
-            v.x = INTPL(4, w->timer, 15, -1000.0f, 0.0f);
-            w->pos = v;
-        }
-        if (w->timer == 0) {
-            if (w->starState != 4) {
-                break;
+        case 1:
+            w->state = 2;
+            w->timer = 0;
+        case 2:
+            if (w->round == 0) {
+                Vec v = {0.0f, -45.0f, 0.0f};
+                v.x = intplGetValue(4, -1000.0f, 0.0f, w->timer, 15);
+                w->pos = v;
             }
-            memcpy(w->btn2, w->btn, sizeof(w->btn));
-            w->prev = w->cur;
-            if (w->round < 5) {
-                w->cur = 0;
-                w->need = w->round + 3;
-                w->time = w->round * 10 + 180;
-                for (i = 0; i < 7; i++) {
-                    SukiBtn* bt = &w->btn[i];
-                    if (i < w->need) {
-                        bt->state = 1;
-                    } else {
-                        bt->state = 0;
+            if (w->timer == 0) {
+                if (w->starState != 4) {
+                    break;
+                }
+                memcpy(w->btn2, w->btn, sizeof(w->btn));
+                w->prev = w->cur;
+                if (w->round < 5) {
+                    w->cur = 0;
+                    w->need = w->round + 3;
+                    w->time = w->round * 10 + 180;
+                    for (i = 0; i < 7; i++) {
+                        SukiBtn* bt = &w->btn[i];
+                        if (i < w->need) {
+                            bt->state = 1;
+                        } else {
+                            bt->state = 0;
+                        }
+                    }
+                } else {
+                    for (i = 0; i < 7; i++) {
+                        w->btn[i].state = 0;
                     }
                 }
-            } else {
+            }
+            w->offsetY = intplGetValue(0, -80.0f, 0.0f, w->timer, 15);
+            w->timer++;
+            if (w->timer >= 15) {
+                if (w->round >= 5) {
+                    w->state = 5;
+                    w->timer = 0;
+                    w->starState = 8;
+                } else {
+                    w->state = 4;
+                }
+                w->pos = (Vec){0.0f, -45.0f, 0.0f};
+            }
+            break;
+        case 3:
+            if (w->timer == 0) {
+                if (w->starState != 4) {
+                    break;
+                }
+                psndSFXOn("SFX_BTL_SAC_SUKKIRI2");
+                memcpy(w->btn2, w->btn, sizeof(w->btn));
+                w->prev = w->cur;
                 for (i = 0; i < 7; i++) {
                     w->btn[i].state = 0;
                 }
             }
-        }
-        w->offsetY = INTPL(0, w->timer, 15, -80.0f, 0.0f);
-        w->timer++;
-        if (w->timer >= 15) {
-            if (w->round >= 5) {
+            w->offsetY = intplGetValue(0, -60.0f, 0.0f, w->timer, 15);
+            w->timer++;
+            if (w->timer >= 15) {
                 w->state = 5;
                 w->timer = 0;
                 w->starState = 8;
-            } else {
-                w->state = 4;
             }
-            w->pos = (Vec){0.0f, -45.0f, 0.0f};
-        }
-        break;
-    case 3:
-        if (w->timer == 0) {
-            if (w->starState != 4) {
-                break;
-            }
-            psndSFXOn("SFX_BTL_SAC_SUKKIRI2");
-            memcpy(w->btn2, w->btn, sizeof(w->btn));
-            w->prev = w->cur;
-            for (i = 0; i < 7; i++) {
-                w->btn[i].state = 0;
-            }
-        }
-        w->offsetY = INTPL(0, w->timer, 15, -60.0f, 0.0f);
-        w->timer++;
-        if (w->timer >= 15) {
-            w->state = 5;
-            w->timer = 0;
-            w->starState = 8;
-        }
-        break;
-    case 4:
-        w->time--;
-        if (w->time <= 0) {
-            w->state = 3;
-            w->timer = 0;
             break;
-        }
-        if (keyGetButtonTrg(0) & 0xF00) {
-            u32 trg = keyGetButtonTrg(0);
-            if (w->btn[w->cur].button & trg) {
-                EventEntry* e;
-                s32 n;
-                w->cur++;
-                psndSFXOn("SFX_BTL_SAC_SUKKIRI1");
-                if (w->cur < w->need) {
-                    break;
-                }
-                w->state = 2;
-                w->timer = 0;
-                w->round++;
-                w->starState = 5;
-                e = evtEntry(nice_event, 0, 0x20);
-                n = w->round + 1;
-                e->lwData[0] = n < 6 ? n : 6;
-                if (num >= 1 && num <= 49) {
-                    BattleAudienceSoundCallKind(1);
-                }
-                if (num >= 50 && num <= 99) {
-                    BattleAudienceSoundCallKind(1);
-                    BattleAudienceSoundWhistleKind(1);
-                }
-                if (num >= 100 && num <= 149) {
-                    BattleAudienceSoundCallKind(2);
-                    BattleAudienceSoundWhistleKind(2);
-                }
-                if (num >= 150) {
-                    BattleAudienceSoundCallKind(2);
-                    BattleAudienceSoundWhistleKind(3);
-                }
-            } else {
+        case 4:
+            w->time--;
+            if (w->time <= 0) {
                 w->state = 3;
                 w->timer = 0;
+                break;
             }
-        }
-        break;
-    case 5:
-        w->timer++;
-        if (w->timer <= 30) {
-            Vec v = {0.0f, -45.0f, 0.0f};
-            v.x = INTPL(4, w->timer, 30, 0.0f, -1000.0f);
-            w->pos = v;
-        }
-        break;
+            if (keyGetButtonTrg(0) & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_Y)) {
+                u32 trg = keyGetButtonTrg(0);
+                if (w->btn[w->cur].button & trg) {
+                    EventEntry* e;
+                    s32 n;
+                    w->cur++;
+                    psndSFXOn("SFX_BTL_SAC_SUKKIRI1");
+                    if (w->cur < w->need) {
+                        break;
+                    }
+                    w->state = 2;
+                    w->timer = 0;
+                    w->round++;
+                    w->starState = 5;
+                    e = evtEntry(nice_event, 0, 0x20);
+                    n = w->round + 1;
+                    e->lwData[0] = n < 6 ? n : 6;
+                    if (num >= 1 && num <= 49) {
+                        BattleAudienceSoundCallKind(1);
+                    }
+                    if (num >= 50 && num <= 99) {
+                        BattleAudienceSoundCallKind(1);
+                        BattleAudienceSoundWhistleKind(1);
+                    }
+                    if (num >= 100 && num <= 149) {
+                        BattleAudienceSoundCallKind(2);
+                        BattleAudienceSoundWhistleKind(2);
+                    }
+                    if (num >= 150) {
+                        BattleAudienceSoundCallKind(2);
+                        BattleAudienceSoundWhistleKind(3);
+                    }
+                } else {
+                    w->state = 3;
+                    w->timer = 0;
+                }
+            }
+            break;
+        case 5:
+            w->timer++;
+            if (w->timer <= 30) {
+                Vec v = {0.0f, -45.0f, 0.0f};
+                v.x = intplGetValue(4, 0.0f, -1000.0f, w->timer, 30);
+                w->pos = v;
+            }
+            break;
     }
 }
 
+// inlining off for main_button, as in the original (the object differs without it)
 #pragma dont_inline on
 void main_button(s32 idx) {
     SukiWork* w = get_ptr();
@@ -374,19 +324,19 @@ void main_button(s32 idx) {
     s32 tbl[4] = {0x100, 0x200, 0x400, 0x800};
 
     switch (b->state) {
-    case 0:
-        break;
-    case 2:
-        break;
-    case 1:
-        b->state = 2;
-        {
-            Vec v = {0.0f, -40.0f, 0.0f};
-            v.x = 60.0f * (f32)idx - 30.0f * (f32)(w->need - 1);
-            b->pos = v;
-        }
-        b->button = tbl[irand(4)];
-        break;
+        case 0:
+            break;
+        case 2:
+            break;
+        case 1:
+            b->state = 2;
+            {
+                Vec v = {0.0f, -40.0f, 0.0f};
+                v.x = 60.0f * (f32)idx - 30.0f * (f32)(w->need - 1);
+                b->pos = v;
+            }
+            b->button = tbl[irand(4)];
+            break;
     }
 }
 #pragma dont_inline reset
@@ -396,113 +346,113 @@ static void main_star(void) {
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
 
     switch (w->starState) {
-    case 1:
-        w->starState = 2;
-        w->starTimer = 0;
-        w->eff = effStarStoneEntry(5, 0.0f, -1000.0f, 0.0f, 1.0f);
-        BtlUnit_GetPos(mario, &w->spos.x, &w->spos.y, &w->spos.z);
-        w->spos.y += mario->mSizeMultiplier * (f32)mario->mHeight + 37.0f;
-        w->from = w->spos;
-        w->to = w->spos;
-        w->to.y += 50.0f;
-        w->to.z += -1.0f;
-        w->scale = (Vec){0.0f, 0.0f, 0.0f};
-        w->rot = (Vec){0.0f, 0.0f, 0.0f};
-        w->effMode = 4;
-    case 2:
-        w->starTimer++;
-        if (w->starTimer <= 100) {
-            w->spos.x = INTPL(0, w->starTimer, 100, w->from.x, w->to.x);
-            w->spos.y = INTPL(0, w->starTimer, 100, w->from.y, w->to.y);
-            w->spos.z = INTPL(0, w->starTimer, 100, w->from.z, w->to.z);
-            w->scale.x = w->scale.y = w->scale.z = INTPL(0, w->starTimer, 100, 0.0f, 2.0f);
-        } else {
-            w->spos.x = w->to.x;
-            w->spos.y = w->to.y;
-            w->spos.z = w->to.z;
-            w->scale.x = w->scale.y = w->scale.z = 2.0f;
-        }
-        w->rot.y = INTPL(4, w->starTimer, 120, 0.0f, 2160.0f);
-        if (w->starTimer >= 120) {
-            w->starState = 3;
+        case 1:
+            w->starState = 2;
             w->starTimer = 0;
+            w->eff = effStarStoneEntry(5, 0.0f, -1000.0f, 0.0f, 1.0f);
+            BtlUnit_GetPos(mario, &w->spos.x, &w->spos.y, &w->spos.z);
+            w->spos.y += mario->sizeMultiplier * (f32)mario->height + 37.0f;
             w->from = w->spos;
+            w->to = w->spos;
+            w->to.y += 50.0f;
+            w->to.z += -1.0f;
+            w->scale = (Vec){0.0f, 0.0f, 0.0f};
+            w->rot = (Vec){0.0f, 0.0f, 0.0f};
+            w->effMode = 4;
+        case 2:
+            w->starTimer++;
+            if (w->starTimer <= 100) {
+                w->spos.x = intplGetValue(0, w->from.x, w->to.x, w->starTimer, 100);
+                w->spos.y = intplGetValue(0, w->from.y, w->to.y, w->starTimer, 100);
+                w->spos.z = intplGetValue(0, w->from.z, w->to.z, w->starTimer, 100);
+                w->scale.x = w->scale.y = w->scale.z = intplGetValue(0, 0.0f, 2.0f, w->starTimer, 100);
+            } else {
+                w->spos.x = w->to.x;
+                w->spos.y = w->to.y;
+                w->spos.z = w->to.z;
+                w->scale.x = w->scale.y = w->scale.z = 2.0f;
+            }
+            w->rot.y = intplGetValue(4, 0.0f, 2160.0f, w->starTimer, 120);
+            if (w->starTimer >= 120) {
+                w->starState = 3;
+                w->starTimer = 0;
+                w->from = w->spos;
+                w->to.y = 300.0f;
+            }
+            break;
+        case 3:
+            w->starTimer++;
+            w->spos.y = intplGetValue(1, w->from.y, w->to.y, w->starTimer, 60);
+            if (w->starTimer >= 60) {
+                w->starState = 4;
+                w->starTimer = 0;
+                w->spos = (Vec){0.0f, 300.0f, 0.0f};
+                w->scale = (Vec){2.0f, 2.0f, 2.0f};
+                w->rot = (Vec){0.0f, 0.0f, 0.0f};
+            }
+            break;
+        case 5:
+            w->starState = 6;
+            w->starTimer = 0;
+            BtlUnit_GetPos(mario, &w->spos.x, &w->spos.y, &w->spos.z);
+            w->spos.y += 100.0f;
+            w->scale = (Vec){1.5f, 1.5f, 1.5f};
+            w->rot = (Vec){0.0f, 0.0f, 0.0f};
+            w->from.y = w->spos.y;
             w->to.y = 300.0f;
-        }
-        break;
-    case 3:
-        w->starTimer++;
-        w->spos.y = INTPL(1, w->starTimer, 60, w->from.y, w->to.y);
-        if (w->starTimer >= 60) {
-            w->starState = 4;
-            w->starTimer = 0;
-            w->spos = (Vec){0.0f, 300.0f, 0.0f};
-            w->scale = (Vec){2.0f, 2.0f, 2.0f};
-            w->rot = (Vec){0.0f, 0.0f, 0.0f};
-        }
-        break;
-    case 5:
-        w->starState = 6;
-        w->starTimer = 0;
-        BtlUnit_GetPos(mario, &w->spos.x, &w->spos.y, &w->spos.z);
-        w->spos.y += 100.0f;
-        w->scale = (Vec){1.5f, 1.5f, 1.5f};
-        w->rot = (Vec){0.0f, 0.0f, 0.0f};
-        w->from.y = w->spos.y;
-        w->to.y = 300.0f;
-        effStardustN64Entry(0, w->spos.x, w->spos.y, w->spos.z, 32.0f);
-        break;
-    case 6:
-        w->starTimer++;
-        w->rot.y = INTPL(0, w->starTimer, 40, 0.0f, 1440.0f);
-        if (w->starTimer >= 40) {
-            w->starState = 7;
-            w->starTimer = 0;
-            effStardustN64Entry(4, w->spos.x, w->spos.y - 5.0f, w->spos.z, 40.0f);
-            effStardustN64Entry(4, 30.0f + w->spos.x, w->spos.y, w->spos.z, 40.0f);
-            effStardustN64Entry(4, w->spos.x - 30.0f, w->spos.y, w->spos.z, 40.0f);
-            psndSFXOn("SFX_BTL_SAC_SUKKIRI3");
-        }
-        break;
-    case 7:
-        w->starTimer++;
-        w->spos.y = INTPL(4, w->starTimer, 30, w->from.y, w->to.y);
-        if (w->starTimer >= 30) {
-            w->starState = 4;
-            w->starTimer = 0;
-            w->spos = (Vec){0.0f, 300.0f, 0.0f};
-            w->scale = (Vec){2.0f, 2.0f, 2.0f};
-            w->rot = (Vec){0.0f, 0.0f, 0.0f};
-        }
-        break;
-    case 8:
-        w->effMode = 4;
-        break;
-    case 9:
-        w->starTimer++;
-        w->spos.x = INTPL(0, w->starTimer, 20, w->from.x, w->to.x);
-        w->spos.y = INTPL(1, w->starTimer, 20, w->from.y, w->to.y);
-        w->spos.z = INTPL(0, w->starTimer, 20, w->from.z, w->to.z);
-        w->effMode = 7;
-        if (w->starTimer >= 20) {
-            w->starState = 8;
-            w->starTimer = 0;
-        }
-        break;
-    case 0:
-    case 10:
-        break;
+            effStardustN64Entry(0, w->spos.x, w->spos.y, w->spos.z, 32.0f);
+            break;
+        case 6:
+            w->starTimer++;
+            w->rot.y = intplGetValue(0, 0.0f, 1440.0f, w->starTimer, 40);
+            if (w->starTimer >= 40) {
+                w->starState = 7;
+                w->starTimer = 0;
+                effStardustN64Entry(4, w->spos.x, w->spos.y - 5.0f, w->spos.z, 40.0f);
+                effStardustN64Entry(4, 30.0f + w->spos.x, w->spos.y, w->spos.z, 40.0f);
+                effStardustN64Entry(4, w->spos.x - 30.0f, w->spos.y, w->spos.z, 40.0f);
+                psndSFXOn("SFX_BTL_SAC_SUKKIRI3");
+            }
+            break;
+        case 7:
+            w->starTimer++;
+            w->spos.y = intplGetValue(4, w->from.y, w->to.y, w->starTimer, 30);
+            if (w->starTimer >= 30) {
+                w->starState = 4;
+                w->starTimer = 0;
+                w->spos = (Vec){0.0f, 300.0f, 0.0f};
+                w->scale = (Vec){2.0f, 2.0f, 2.0f};
+                w->rot = (Vec){0.0f, 0.0f, 0.0f};
+            }
+            break;
+        case 8:
+            w->effMode = 4;
+            break;
+        case 9:
+            w->starTimer++;
+            w->spos.x = intplGetValue(0, w->from.x, w->to.x, w->starTimer, 20);
+            w->spos.y = intplGetValue(1, w->from.y, w->to.y, w->starTimer, 20);
+            w->spos.z = intplGetValue(0, w->from.z, w->to.z, w->starTimer, 20);
+            w->effMode = 7;
+            if (w->starTimer >= 20) {
+                w->starState = 8;
+                w->starTimer = 0;
+            }
+            break;
+        case 0:
+        case 10:
+            break;
     }
     if (w->eff) {
-        StarEffWork* e = (StarEffWork*)w->eff->userdata;
-        e->pos.x = w->spos.x;
-        e->pos.y = w->spos.y;
-        e->pos.z = w->spos.z;
-        e->rot.x = w->rot.x;
-        e->rot.y = w->rot.y;
-        e->rot.z = w->rot.z;
-        e->scl = 1.5f * w->scale.x;
-        e->mode = w->effMode;
+        EffStarStoneWork* e = w->eff->userdata;
+        e->position.x = w->spos.x;
+        e->position.y = w->spos.y;
+        e->position.z = w->spos.z;
+        e->spinY = w->rot.x;
+        e->rotY = w->rot.y;
+        e->tiltZ = w->rot.z;
+        e->scale = 1.5f * w->scale.x;
+        e->cam = w->effMode;
     }
 }
 
@@ -536,63 +486,63 @@ static void disp_2D(CameraId cam, void* param) {
         iconDispGx(&b, ICON_DISP_2D, ICON_08F, 1.0f);
     }
     GXSetScissor(0, 0x91, gp->fbWidth, 0x50);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     for (i = 0; i < 7; i++) {
         u16 icon;
         if (w->btn2[i].state != 0) {
             if (i < w->prev) {
                 switch (w->btn2[i].button) {
-                case 0x100:
-                    icon = ICON_065;
-                    break;
-                case 0x200:
-                    icon = ICON_067;
-                    break;
-                case 0x400:
-                    icon = ICON_069;
-                    break;
-                case 0x800:
-                    icon = ICON_06B;
-                    break;
-                case 0x40:
-                    icon = ICON_07F;
-                    break;
-                case 0x20:
-                    icon = ICON_081;
-                    break;
-                case 0x10:
-                    icon = ICON_083;
-                    break;
-                default:
-                    icon = 0;
-                    break;
+                    case 0x100:
+                        icon = ICON_065;
+                        break;
+                    case 0x200:
+                        icon = ICON_067;
+                        break;
+                    case 0x400:
+                        icon = ICON_069;
+                        break;
+                    case 0x800:
+                        icon = ICON_06B;
+                        break;
+                    case 0x40:
+                        icon = ICON_07F;
+                        break;
+                    case 0x20:
+                        icon = ICON_081;
+                        break;
+                    case 0x10:
+                        icon = ICON_083;
+                        break;
+                    default:
+                        icon = 0;
+                        break;
                 }
             } else {
                 switch (w->btn2[i].button) {
-                case 0x100:
-                    icon = ICON_064;
-                    break;
-                case 0x200:
-                    icon = ICON_066;
-                    break;
-                case 0x400:
-                    icon = ICON_068;
-                    break;
-                case 0x800:
-                    icon = ICON_06A;
-                    break;
-                case 0x40:
-                    icon = ICON_07E;
-                    break;
-                case 0x20:
-                    icon = ICON_080;
-                    break;
-                case 0x10:
-                    icon = ICON_082;
-                    break;
-                default:
-                    icon = 0;
-                    break;
+                    case 0x100:
+                        icon = ICON_064;
+                        break;
+                    case 0x200:
+                        icon = ICON_066;
+                        break;
+                    case 0x400:
+                        icon = ICON_068;
+                        break;
+                    case 0x800:
+                        icon = ICON_06A;
+                        break;
+                    case 0x40:
+                        icon = ICON_07E;
+                        break;
+                    case 0x20:
+                        icon = ICON_080;
+                        break;
+                    case 0x10:
+                        icon = ICON_082;
+                        break;
+                    default:
+                        icon = 0;
+                        break;
                 }
             }
             if (icon) {
@@ -606,57 +556,57 @@ static void disp_2D(CameraId cam, void* param) {
         if (w->btn[i].state == 2) {
             if (i < w->cur) {
                 switch (w->btn[i].button) {
-                case 0x100:
-                    icon = ICON_065;
-                    break;
-                case 0x200:
-                    icon = ICON_067;
-                    break;
-                case 0x400:
-                    icon = ICON_069;
-                    break;
-                case 0x800:
-                    icon = ICON_06B;
-                    break;
-                case 0x40:
-                    icon = ICON_07F;
-                    break;
-                case 0x20:
-                    icon = ICON_081;
-                    break;
-                case 0x10:
-                    icon = ICON_083;
-                    break;
-                default:
-                    icon = 0;
-                    break;
+                    case 0x100:
+                        icon = ICON_065;
+                        break;
+                    case 0x200:
+                        icon = ICON_067;
+                        break;
+                    case 0x400:
+                        icon = ICON_069;
+                        break;
+                    case 0x800:
+                        icon = ICON_06B;
+                        break;
+                    case 0x40:
+                        icon = ICON_07F;
+                        break;
+                    case 0x20:
+                        icon = ICON_081;
+                        break;
+                    case 0x10:
+                        icon = ICON_083;
+                        break;
+                    default:
+                        icon = 0;
+                        break;
                 }
             } else {
                 switch (w->btn[i].button) {
-                case 0x100:
-                    icon = ICON_064;
-                    break;
-                case 0x200:
-                    icon = ICON_066;
-                    break;
-                case 0x400:
-                    icon = ICON_068;
-                    break;
-                case 0x800:
-                    icon = ICON_06A;
-                    break;
-                case 0x40:
-                    icon = ICON_07E;
-                    break;
-                case 0x20:
-                    icon = ICON_080;
-                    break;
-                case 0x10:
-                    icon = ICON_082;
-                    break;
-                default:
-                    icon = 0;
-                    break;
+                    case 0x100:
+                        icon = ICON_064;
+                        break;
+                    case 0x200:
+                        icon = ICON_066;
+                        break;
+                    case 0x400:
+                        icon = ICON_068;
+                        break;
+                    case 0x800:
+                        icon = ICON_06A;
+                        break;
+                    case 0x40:
+                        icon = ICON_07E;
+                        break;
+                    case 0x20:
+                        icon = ICON_080;
+                        break;
+                    case 0x10:
+                        icon = ICON_082;
+                        break;
+                    default:
+                        icon = 0;
+                        break;
                 }
             }
             if (icon) {
@@ -677,7 +627,7 @@ static void disp_2D(CameraId cam, void* param) {
     GXSetScissor(0, 0, gp->fbWidth, gp->efbHeight);
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 void N__disp_2D(s32 side, s32 idx) {
     SukiWork* w = get_ptr();
     SukiBtn* b;
@@ -702,55 +652,55 @@ void N__disp_2D(s32 side, s32 idx) {
         return;
     }
     switch (b->button) {
-    case 0x100:
-        t = ICON_064;
-        if (idx < cur) {
-            t = ICON_065;
-        }
-        icon = t;
-        break;
-    case 0x200:
-        t = ICON_066;
-        if (idx < cur) {
-            t = ICON_067;
-        }
-        icon = t;
-        break;
-    case 0x400:
-        t = ICON_068;
-        if (idx < cur) {
-            t = ICON_069;
-        }
-        icon = t;
-        break;
-    case 0x800:
-        t = ICON_06A;
-        if (idx < cur) {
-            t = ICON_06B;
-        }
-        icon = t;
-        break;
-    case 0x40:
-        t = ICON_07E;
-        if (idx < cur) {
-            t = ICON_07F;
-        }
-        icon = t;
-        break;
-    case 0x20:
-        t = ICON_080;
-        if (idx < cur) {
-            t = ICON_081;
-        }
-        icon = t;
-        break;
-    case 0x10:
-        t = ICON_082;
-        if (idx < cur) {
-            t = ICON_083;
-        }
-        icon = t;
-        break;
+        case 0x100:
+            t = ICON_064;
+            if (idx < cur) {
+                t = ICON_065;
+            }
+            icon = t;
+            break;
+        case 0x200:
+            t = ICON_066;
+            if (idx < cur) {
+                t = ICON_067;
+            }
+            icon = t;
+            break;
+        case 0x400:
+            t = ICON_068;
+            if (idx < cur) {
+                t = ICON_069;
+            }
+            icon = t;
+            break;
+        case 0x800:
+            t = ICON_06A;
+            if (idx < cur) {
+                t = ICON_06B;
+            }
+            icon = t;
+            break;
+        case 0x40:
+            t = ICON_07E;
+            if (idx < cur) {
+                t = ICON_07F;
+            }
+            icon = t;
+            break;
+        case 0x20:
+            t = ICON_080;
+            if (idx < cur) {
+                t = ICON_081;
+            }
+            icon = t;
+            break;
+        case 0x10:
+            t = ICON_082;
+            if (idx < cur) {
+                t = ICON_083;
+            }
+            icon = t;
+            break;
     }
     if (icon) {
         Vec pos = {0.0f, 0.0f, 0.0f};
@@ -763,7 +713,7 @@ void N__disp_2D(s32 side, s32 idx) {
 #endif
 
 static void disp_3D(CameraId cam, void* param) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     get_ptr();
 #endif
 }
@@ -771,6 +721,7 @@ static void disp_3D(CameraId cam, void* param) {
 static void disp_3D_alpha(CameraId cam, void* param) {
 }
 
+// inlining off for get_ptr, as in the original (the object differs without it)
 #pragma dont_inline on
 static SukiWork* get_ptr(void) {
     return (SukiWork*)_battleWorkPointer->actionCommands.work;
@@ -821,7 +772,7 @@ static USER_FUNC(star_stone_attack) {
     w->starTimer = 0;
     w->from = w->starPos[i];
     w->spos = w->from;
-    cam = (u8*)camGetPtr(4);
+    cam = (u8*)camGetPtr(CAMERA_3D);
     w->to = *(Vec*)(cam + 0xC);
     w->to.y += 20.0f;
     w->to.z += 10.0f;
@@ -843,9 +794,9 @@ static USER_FUNC(set_weapon) {
     s32 idx = evtGetValue(event, args[0]);
     SukiWork* w = get_ptr();
     OhkoRateTbl tbl = N_ohko_rate_tbl;
-    memcpy(w->weapon, &weapon, 0xC0);
-    w->weapon[0x9E] = tbl.rate[idx - 1];
-    evtSetValue(event, args[1], (EvtWord)w->weapon);
+    memcpy(&w->weapon, &weapon, sizeof(BattleWeapon));
+    w->weapon.ohkoChance = tbl.rate[idx - 1];
+    evtSetValue(event, args[1], (EvtWord)&w->weapon);
     return 2;
 }
 
@@ -853,9 +804,9 @@ USER_FUNC(aud_set_draw) {
     EvtWord* args = event->args;
     BattleAudience* a = BattleAudienceBaseGetPtr();
     if (evtGetValue(event, args[0]) == 0) {
-        a->flags |= AUDIENCE_FLAG(0x20000);
+        a->flags |= AUDIENCE_FLAG_HIDDEN;
     } else {
-        a->flags &= ~AUDIENCE_FLAG(0x20000);
+        a->flags &= ~AUDIENCE_FLAG_HIDDEN;
     }
     return 2;
 }
@@ -905,7 +856,13 @@ USER_FUNC(get_img_name) {
     return 2;
 }
 
-static inline GXColor mk_suki(u8 v) { GXColor c = {0, 0, 0, 255}; c.r = v; c.g = v; c.b = v; return c; }
+static inline GXColor mk_suki(u8 v) {
+    GXColor c = {0, 0, 0, 255};
+    c.r = v;
+    c.g = v;
+    c.b = v;
+    return c;
+}
 void set_tev(MapTevCallbackInfo* info) {
     u8 v = get_ptr()->flash;
     GXSetTevOrder(0, 0xFF, 0xFF, 4);
@@ -919,9 +876,8 @@ void set_tev(MapTevCallbackInfo* info) {
     info->texCoord = 0;
 }
 
-
 EVT_BEGIN(marioAttackEvent_Suki)
-    CALL(btlevtcmd_GetUnitId, -4, LW(14))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(14))
     CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
     CALL(btlevtcmd_CheckStatus, LW(14), 27, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -932,10 +888,10 @@ EVT_BEGIN(marioAttackEvent_Suki)
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, -2)
-    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
+    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_WeaponAftereffect, LW(0))
     CALL(btlevtcmd_reset_move_color_lv_all)
     BEGIN_SIBLING_EVENT
@@ -943,21 +899,21 @@ EVT_BEGIN(marioAttackEvent_Suki)
     END_SIBLING_EVENT
     CALL_CHILD(sac_start_camera_evt)
     WAIT_MS(500)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL_CHILD(sac_mario_item_on_evt)
     WAIT_MS(500)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START2"), EVT_NULLPTR, 0, LW(11))
     CALL(star_stone_appear)
     BEGIN_SIBLING_EVENT
         CALL_CHILD(sac_start_stardust)
     END_SIBLING_EVENT
     WAIT_FRAMES(100)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_snd_sfxoff, LW(11))
     WAIT_FRAMES(40)
     CALL_CHILD(sac_mario_item_on_end_evt)
     CALL_CHILD(sac_mario_back_home)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
     CALL(wait_star_stone_up_end)
     WAIT_MS(100)
     BEGIN_SIBLING_EVENT
@@ -998,15 +954,15 @@ EVT_BEGIN(marioAttackEvent_Suki)
         CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_SUKKIRI4"), 0)
         CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_SUKKIRI4_2"), 0)
         IF_INT_EQUAL(LW(10), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(1))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(1), PTR(&weapon))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(1))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(1), PTR(&weapon))
             CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
             CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
             LABEL(5)
             IF_INT_EQUAL(LW(3), -1)
                 GOTO(8)
             END_IF
-            CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), 536870912, LW(1))
+            CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS, LW(1))
             IF_INT_EQUAL(LW(1), 0)
                 CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
             END_IF
@@ -1044,17 +1000,17 @@ EVT_BEGIN(marioAttackEvent_Suki)
         END_LOOP
     END_LOOP
     CALL_CHILD(flash_cancel_evt)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(10)
     IF_INT_EQUAL(LW(3), -1)
         GOTO(20)
     END_IF
-    CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), 16384, LW(0))
+    CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), PART_ATTR_EVASIVE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     END_IF
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     GOTO(10)
@@ -1062,7 +1018,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(end_suki)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1091,14 +1047,14 @@ EVT_BEGIN(flash_evt)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("C"), 16777216)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("C"), 256)
     END_IF
-    CALL(btlevtcmd_SetAlpha, -2, 1, 0)
-    CALL(btlevtcmd_OnPartsAttribute, -2, 1, 33554432)
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     IF_INT_NOT_EQUAL(LW(14), -1)
         CALL(btlevtcmd_SetAlpha, LW(14), LW(15), 0)
-        CALL(btlevtcmd_OnPartsAttribute, LW(14), LW(15), 33554432)
+        CALL(btlevtcmd_OnPartsAttribute, LW(14), LW(15), PART_ATTR_NO_SHADOW)
     END_IF
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(5)
@@ -1119,8 +1075,8 @@ EVT_BEGIN(flash_main_evt)
     SET_VALUE(LW(11), 255)
     SUBTRACT(LW(11), LW(10))
     CALL(flash_update, LW(10))
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(5)
@@ -1163,14 +1119,14 @@ EVT_BEGIN(flash_cancel_evt)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gamen"), 134217728)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING("gamen"), 256)
     END_IF
-    CALL(btlevtcmd_SetAlpha, -2, 1, 255)
-    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 33554432)
+    CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     IF_INT_NOT_EQUAL(LW(14), -1)
         CALL(btlevtcmd_SetAlpha, LW(14), LW(15), 255)
-        CALL(btlevtcmd_OffPartsAttribute, LW(14), LW(15), 33554432)
+        CALL(btlevtcmd_OffPartsAttribute, LW(14), LW(15), PART_ATTR_NO_SHADOW)
     END_IF
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(5)

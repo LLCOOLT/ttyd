@@ -1,20 +1,22 @@
+// The moving boulder (iwa) of Twilight Trail: one shared work block and the script that drives it.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "mario/mario.h"
 #include "driver/hitdrv.h"
+#include "party.h"
+#include "statuswindow.h"
 #include "system.h"
 
-typedef struct IwaMoveWork { s32 init; s32 timer; s32 state; EventEntry* event; EvtWord* script; } IwaMoveWork;
+typedef struct IwaMoveWork {
+    s32 init;
+    s32 timer;
+    s32 state;
+    EventEntry* event;
+    EvtWord* script;
+} IwaMoveWork;
 IwaMoveWork iwamove;
-void partyKeyOn(void);
-void partyKeyOff(void);
-void statusWinForceOpen(void);
-void statusWinForceOff(void);
-
-USER_FUNC(evt_iwamove_main);
-USER_FUNC(evt_iwamove_ent);
-USER_FUNC(evt_iwamove_init);
 
 extern EvtWord evt_iwamove_main_evt[];
 
@@ -48,7 +50,7 @@ USER_FUNC(evt_iwamove_main) {
                 marioKeyOff();
                 partyKeyOff();
                 marioChgPose("M_O_1");
-                mario->dispFlags |= 2;
+                mario->dispFlags |= MARIO_DISP_FLAG_POSE_LOCK;
                 statusWinForceOpen();
             }
             break;
@@ -59,7 +61,7 @@ USER_FUNC(evt_iwamove_main) {
                 }
             } else {
                 wk->state--;
-                mario->dispFlags &= ~2;
+                mario->dispFlags &= ~MARIO_DISP_FLAG_POSE_LOCK;
                 marioChgPose("M_S_1");
                 marioKeyOn();
                 partyKeyOn();
@@ -83,4 +85,3 @@ EVT_BEGIN(evt_iwamove_main_evt)
     CALL(evt_iwamove_main)
     RETURN
 EVT_END()
-

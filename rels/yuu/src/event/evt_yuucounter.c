@@ -1,3 +1,5 @@
+// evt_yuucounter: Pianta Parlor score/counter display: flag and data store plus on-screen counter.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -10,28 +12,30 @@
 #include "dolphin/mtx.h"
 #include "mario/mario.h"
 #include "driver/camdrv.h"
+#include "driver/icondrv.h"
+#include "yuu.h"
 #include "icon_ids.h"
 
-typedef struct YuuCounterWork { EventEntry* event; u16 flags; u32 dispFlags; s32 type; f32 x; f32 y; s32 data; s32 pad_1C; s64 elapsed; OSTime lastTime; s32 limit; s32 startCount; } YuuCounterWork;
+typedef struct YuuCounterWork {
+    EventEntry* event;
+    u16 flags;
+    u32 dispFlags;
+    s32 type;
+    f32 x;
+    f32 y;
+    s32 data;
+    s32 pad_1C;
+    s64 elapsed;
+    OSTime lastTime;
+    s32 limit;
+    s32 startCount;
+} YuuCounterWork;
 static void* yuunpc_wp;
 static YuuCounterWork* _wp;
 void evtYuuSetWindowEvt(EvtWord* evt);
 void evt_yuucounter_disp_func(CameraId camera, void* param);
 static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor bgColor = {0xFF, 0xFF, 0xFF, 0x99};
-s32 yuunpc_juni(Vec* pos);
-void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color);
-
-USER_FUNC(evt_yuucounter_main_func);
-USER_FUNC(yuucounter_disp_flag_onoff);
-u32 yuucounter_flag(u32 mask);
-void yuucounter_flag_off(u32 mask);
-void yuucounter_flag_on(u32 mask);
-void yuucounter_set_data(s32 data);
-s32 yuucounter_get_data(void);
-USER_FUNC(evt_yuucounter_free);
-USER_FUNC(evt_yuucounter_alloc);
-void evt_yuucounter_disp_func(CameraId camera, void* param);
 
 static EvtWord main_evt[4];
 extern EvtWord yuucounter_window_disp_evt[];

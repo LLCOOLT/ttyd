@@ -1,49 +1,26 @@
+// gra_04 (ウスグラの道, Twilight Trail): the woods between gra_03 and gra_05.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "gra.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_cloud.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set_now);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_cam_shift_reset);
-USER_FUNC(evt_cloud_ent);
-USER_FUNC(evt_cloud_init);
-USER_FUNC(evt_cloud_set_cap_size);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_kagemario_init);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_bgmode_off);
-USER_FUNC(evt_mario_bgmode_on);
-USER_FUNC(evt_mario_cam_y_off);
-USER_FUNC(evt_mario_cam_y_on);
-USER_FUNC(evt_mario_get_exparty);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_party_use_check);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_prev_party_pos);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
 USER_FUNC(roll_release_check);
 
 static BeroEntry bero_entry_data[5];
-extern EvtWord gra_04_tree_open_evt[];
 static const char* fukitobashi_tbl[6];
-extern EvtWord gra_04_init_evt[];
 
 static EVT_BEGIN(in_evt)
     SET_VALUE(LW(0), 1)
@@ -110,7 +87,7 @@ static EVT_BEGIN(out_evt2)
     CALL(roll_release_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_normalize)
-        ELSE
+    ELSE
         DEBUG_PUT_MSG(STRING("ロール解除できません"))
     END_IF
     CALL(evt_mario_mov_pos2, -242, -450, FLOAT(150.0f))
@@ -147,8 +124,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -163,8 +140,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
         0, 0, // type..sfxId
-        6, // directionId
-        100000, // centerPosition
+        BERO_DIR_W, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)in_evt, // enterEvent
@@ -180,8 +157,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_2", // hitName
         4096, // type
         0, // sfxId
-        6, // directionId
-        100000, // centerPosition
+        BERO_DIR_W, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)in_evt, // enterEvent
@@ -197,7 +174,7 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_2", // hitName
         4096, // type
         0, // sfxId
-        2, // directionId
+        BERO_DIR_E, // directionId
         -132, // centerPosition
         63, // centerPositionY
         -450, // centerPositionZ
@@ -214,11 +191,11 @@ static BeroEntry bero_entry_data[] = {
 
 EVT_BEGIN(gra_04_tree_open_evt)
     BEGIN_INLINE_EVENT
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
         WAIT_MS(1000)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     LOOP(0)
         CALL(evt_mario_party_use_check, LW(0))
@@ -228,7 +205,7 @@ EVT_BEGIN(gra_04_tree_open_evt)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_hitobj_onoff, STRING("w_bero_1"), 0, 1)
-    SET_VALUE(GSW(0), 189)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_06_TREE_TRUNK)
     RETURN
 EVT_END()
 
@@ -242,23 +219,23 @@ static const char* fukitobashi_tbl[] = {
 };
 
 EVT_BEGIN(gra_04_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_GRA1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_GRA1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
-    IF_INT_LESS(GSW(0), 189)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_06_TREE_TRUNK)
         CALL(evt_cloud_init)
         CALL(evt_cloud_ent, 1, PTR(&fukitobashi_tbl), STRING("A_futa"), PTR(gra_04_tree_open_evt))
         CALL(evt_cloud_set_cap_size, 256, 256)
         CALL(evt_hitobj_onoff, STRING("w_bero_1"), 0, 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_futa"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_futa"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_futa"), 0, 0)
     END_IF
-    CALL(evt_mobj_badgeblk, STRING("m"), 250, 60, -20, 249, 0, GSWF(2086), 1)
+    CALL(evt_mobj_badgeblk, STRING("m"), 250, 60, -20, ITEM_HAMMER_THROW, 0, GSWF(GSWF_GRA04_HAMMER_THROW_BLOCK_HIT), 1)
     RETURN
 EVT_END()
 

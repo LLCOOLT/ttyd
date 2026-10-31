@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: holography, a ten-segment ribbon with two textures that unfurls through a 55-step vertex
+// animation, each segment fainter toward the tail; fades in over 16 frames and out over the last 16.
 #include "eff/n64/eff_holography_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -1342,8 +1344,6 @@ effN64Vtx ach_01_v[55][22] = {
     },
 };
 
-
-
 void effHolographyMain(EffectEntry* effect);
 void effHolographyDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -1357,7 +1357,7 @@ EffectEntry* effHolographyN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffHolographyN64Work));
     effect->userdata = work;
     effect->callback = effHolographyMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -1386,8 +1386,8 @@ void effHolographyMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {

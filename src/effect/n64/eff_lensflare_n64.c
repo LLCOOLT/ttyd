@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: lens flare made of a bright head and five rings along a flare axis.
+#include "eff/n64/eff_lensflare_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -5,9 +7,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double cos(double);
-s32 rand(void);
+#include "libc_decls.h"
 
 // One element per flare: element 0 is the head (type, position, fade and timers),
 // elements 1-5 are the rings (angle, scale, distance along the flare axis, speed).
@@ -54,7 +54,7 @@ static effN64Vtx size10x10_tex32x32_vtx[] = {
 void effLensflareMain(EffectEntry* effect);
 void effLensflareDisp(CameraId cameraId, EffectEntry* effect);
 
-EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
+EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffLensflareN64Elem* work;
     EffLensflareN64Elem* e;
@@ -66,7 +66,7 @@ EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffLensflareN64Elem) * 6);
     effect->userdata = work;
     effect->callback = effLensflareMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -99,8 +99,8 @@ void effLensflareMain(EffectEntry* effect) {
     tmp.y = e->position.y;
     tmp.z = e->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         e->lifetime = 30;
     }
     if (e->lifetime < 100) {

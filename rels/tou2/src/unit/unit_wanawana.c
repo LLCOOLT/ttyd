@@ -1,3 +1,5 @@
+// unit_wanawana: wanawana battle unit (a trap; UNIT_UNUSED_WANAWANA in the unit table).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -13,32 +15,16 @@
 #include "driver/dispdrv.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_sub.h"
-
-double tan(double x);
-typedef struct WanaWork { s32 ready; s32 poseId; Mtx mtx; GXTexObj obj; BattleUnitPart* part; smartEntry* tex; } WanaWork;
-void test_kururing_mapdisp(CameraId camera);
-static f32 tanf(f32 x);
-void replace_callback(BattleUnitPart* part, s32 type);
-void replace_disp(CameraId camera, void* param);
-
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(replace_evt);
-void replace_callback(BattleUnitPart* part, s32 type);
-void replace_disp(CameraId camera, void* param);
-static f32 tanf(f32 x);
+#include "unit/unit_wanawana.h"
+#include "battle/battle_event_cmd.h"
+#include "evt/evt_map.h"
+#include "driver/mapdrv.h"
+#include "libc_decls.h"
 
 BattleUnitKind unit_wanawana;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-static PoseTableEntry pose_table[4];
 static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[29];
@@ -46,7 +32,7 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[19];
 static EvtWord wait_event[6];
 
-static f32 tanf(f32 x) {
+static f32 tanFloat(f32 x) {
     return tan(x);
 }
 
@@ -161,7 +147,7 @@ void replace_disp(CameraId camera, void* param) {
     cam->cameraUp = (Vec){0.0f, 0.0f, -1.0f};
     cam->cameraAt = pos;
     cam->cameraPos = pos;
-    cam->cameraPos.y += (h / 2.0f) / tanf(0.21816616f);
+    cam->cameraPos.y += (h / 2.0f) / tanFloat(0.21816616f);
     C_MTXPerspective(cam->projection, 25.0f, (f32)w / (f32)h, 1.0f, 32767.0f);
     cam->projType = GX_PERSPECTIVE;
     C_MTXLookAt(cam->view, &cam->cameraPos, &cam->cameraUp, &cam->cameraAt);
@@ -182,7 +168,7 @@ void replace_disp(CameraId camera, void* param) {
 }
 
 void replace_callback(BattleUnitPart* part, s32 type) {
-    WanaWork* wp = (WanaWork*)part->mOwner->countersetWeapon;
+    WanaWork* wp = (WanaWork*)part->owner->countersetWeapon;
 
     if (wp->ready) {
         Mtx mtx;
@@ -225,7 +211,7 @@ USER_FUNC(replace_evt) {
     GXInitTexObj(&wp->obj, wp->tex->address, w / 2, h / 2, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&wp->obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     PSMTXIdentity(wp->mtx);
-    animGetPtr()->poses[part->poseId].flags |= 0x10;
+    animGetPtr()->poses[part->poseId].flags |= ANIM_POSE_FLAG_TEX_OVERLAY;
     part->dispCallback = replace_callback;
     unit->countersetWeapon = (struct BattleWeapon*)wp; // reused as the WanaWork pointer
     unit->screenTexBuf = wp->tex;
@@ -235,13 +221,13 @@ USER_FUNC(replace_evt) {
 }
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_yuka"), 4194304)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_yuka"), MAPOBJ_FLAG_KURURING_PASS)
     CALL(replace_evt)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -257,18 +243,17 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

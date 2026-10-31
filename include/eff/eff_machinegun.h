@@ -1,3 +1,4 @@
+// eff_machinegun.c: machine-gun effect entry (effMachinegunEntry) with its main and draw callbacks.
 #pragma once
 
 #include "driver/camdrv.h"

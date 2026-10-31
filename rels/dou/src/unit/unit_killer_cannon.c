@@ -1,3 +1,4 @@
+// Bill Blaster (killer_cannon): battle unit used in Pirate's Grotto.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,29 +10,10 @@
 #include "battle/battle_camera.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
+#include "dou.h"
 
-USER_FUNC(btlevtcmd_AddHomePos);
-USER_FUNC(btlevtcmd_AddPos);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_CheckSpace);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_FaceDirectionAdd);
-USER_FUNC(btlevtcmd_GetFaceDirection);
-USER_FUNC(btlevtcmd_GetPartsRotate);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_OffPartsAttribute);
-USER_FUNC(btlevtcmd_OnPartsAttribute);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetPartsRotate);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_sub_random);
 static USER_FUNC(killer_get_angle);
 static USER_FUNC(killer_copy_status);
-extern BattleUnitKind unit_killer;
 
 BattleUnitKind unit_killer_cannon;
 static BattleUnitDefense defence;
@@ -56,8 +38,8 @@ static USER_FUNC(killer_copy_status) {
     BattleUnit* unit1 = BattleGetUnitPtr(wp, id1);
     BattleUnit* unit2 = BattleGetUnitPtr(wp, id2);
 
-    unit2->mSizeChangeTurns = unit1->mSizeChangeTurns;
-    unit2->mSizeChangeStrength = unit1->mSizeChangeStrength;
+    unit2->sizeChangeTurns = unit1->sizeChangeTurns;
+    unit2->sizeChangeStrength = unit1->sizeChangeStrength;
     return EVT_RETURN_DONE;
 }
 
@@ -140,10 +122,10 @@ static BattleUnitKindPart parts[] = {
 };
 
 static BattleUnitSetup entry_killer = {
-    &unit_killer, // mUnitKindParams
+    &unit_killer, // unitKindParams
     1, // alliance
     {0}, // pad_05
-    0x4000004, // attackPhase
+    BATTLE_PHASE_ENEMY, // attackPhase
     {-1000.0f, -1000.0f, -1000.0f}, // position
     0, // hitOffsetX
     {0}, // unitWork
@@ -174,19 +156,19 @@ static BattleDataEntry data_table[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(attack_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
-    CALL(btlevtcmd_AddPos, -2, 20, 0, 0)
-    CALL(btlevtcmd_AddHomePos, -2, 20, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_Z_3"))
-    CALL(btlevtcmd_AnimeChangePose, -2, 3, STRING("KTA_Z_2"))
-    CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, -2, 3, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, -2, 2, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, -2, 3, 33554432)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
+    CALL(btlevtcmd_AddPos, BTL_UNIT_SELF, 20, 0, 0)
+    CALL(btlevtcmd_AddHomePos, BTL_UNIT_SELF, 20, 0, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_Z_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KTA_Z_2"))
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 33554432)
     RETURN
 EVT_END()
 
@@ -198,10 +180,10 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     SET_VALUE(LW(0), 15)
@@ -218,10 +200,10 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
         LOOP(0)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(14))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
             SET_VALUE(LW(4), LW(0))
-            CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
@@ -247,10 +229,10 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
         LOOP(0)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(14))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
             SET_VALUE(LW(4), LW(0))
-            CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
@@ -276,10 +258,10 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
         LOOP(0)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(14))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
             SET_VALUE(LW(4), LW(0))
-            CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
@@ -303,15 +285,15 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, 0)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(14))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
             SET_VALUE(LW(4), LW(0))
-            CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
@@ -319,18 +301,18 @@ static EVT_BEGIN(attack_event)
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
                     CALL_CHILD(PTR(friend_event_sky))
-                    CALL(btlevtcmd_GetPartsRotate, -2, 2, LW(5), LW(6), LW(11))
+                    CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
                     LOOP(0)
                         IF_INT_GREATER_OR_EQUAL(LW(11), 0)
                             BREAK_LOOP
                         END_IF
                         ADD(LW(11), 2)
-                        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(11))
+                        CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
                         WAIT_FRAMES(1)
                     END_LOOP
-                    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, -2, 3, 16777216)
+                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
                     GOTO(99)
                 END_IF
             END_IF
@@ -348,15 +330,15 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, 0)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(14))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
             SET_VALUE(LW(4), LW(0))
-            CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
@@ -364,18 +346,18 @@ static EVT_BEGIN(attack_event)
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 1)
                     CALL_CHILD(PTR(friend_event_sky))
-                    CALL(btlevtcmd_GetPartsRotate, -2, 2, LW(5), LW(6), LW(11))
+                    CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
                     LOOP(0)
                         IF_INT_GREATER_OR_EQUAL(LW(11), 0)
                             BREAK_LOOP
                         END_IF
                         ADD(LW(11), 2)
-                        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(11))
+                        CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
                         WAIT_FRAMES(1)
                     END_LOOP
-                    CALL(btlevtcmd_OffPartsAttribute, -2, 1, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, -2, 3, 16777216)
+                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
                     GOTO(99)
                 END_IF
             END_IF
@@ -393,15 +375,15 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, 3, 16777216)
-        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, 0)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), LW(14))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
             SET_VALUE(LW(4), LW(0))
-            CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
@@ -418,70 +400,70 @@ static EVT_BEGIN(attack_event)
                 BREAK_LOOP
             END_IF
         END_LOOP
-        CALL(btlevtcmd_GetPartsRotate, -2, 2, LW(5), LW(6), LW(11))
+        CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
         LOOP(0)
             IF_INT_GREATER_OR_EQUAL(LW(11), 0)
                 BREAK_LOOP
             END_IF
             ADD(LW(11), 2)
-            CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(11))
+            CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_OffPartsAttribute, -2, 1, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
         GOTO(99)
     END_IF
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(friend_event)
     IF_INT_EQUAL(LW(12), 1)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON_CHARGE1"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_A_2A"))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KTA_A_2A"))
         WAIT_FRAMES(10)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_Z_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KTA_Z_1"))
         WAIT_FRAMES(10)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_A_2A"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KTA_A_2A"))
         WAIT_FRAMES(10)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_Z_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KTA_Z_1"))
         WAIT_FRAMES(10)
     END_IF
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("KTA_A_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KTA_A_1"))
     WAIT_FRAMES(40)
     IF_INT_EQUAL(LW(12), 1)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON3"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     ELSE
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 10, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
-        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 70)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 70)
         ADD(LW(9), 10)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 50, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 11, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
-        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 28)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 28)
         ADD(LW(9), 10)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 15, LW(9), FLOAT(0.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 40)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 40)
     ADD(LW(9), 10)
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 30, LW(9), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     GOTO(10)
     LABEL(10)
     CALL(evt_btl_camera_shake_w, 0, 5, 0, 20, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_killer), 0)
-    CALL(killer_copy_status, -2, LW(3))
+    CALL(killer_copy_status, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_SetPos, LW(3), LW(7), 10, LW(2))
     CALL(btlevtcmd_SetFallAccel, LW(3), 0)
     CALL(btlevtcmd_SetJumpSpeed, LW(3), 0)
@@ -494,10 +476,10 @@ static EVT_BEGIN(friend_event)
 EVT_END()
 
 static EVT_BEGIN(friend_event_sky)
-    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
     CALL(evt_sub_get_dir, LW(7), LW(8), LW(0), 40, LW(10))
     CALL(killer_get_angle, LW(7), LW(8), LW(0), 40, LW(10))
-    CALL(btlevtcmd_GetPartsRotate, -2, 2, LW(5), LW(6), LW(11))
+    CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
     LOOP(0)
         IF_INT_GREATER(LW(11), 0)
             BREAK_LOOP
@@ -506,52 +488,52 @@ static EVT_BEGIN(friend_event_sky)
             BREAK_LOOP
         END_IF
         SUBTRACT(LW(11), 2)
-        CALL(btlevtcmd_SetPartsRotate, -2, 2, 0, 0, LW(11))
+        CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
         WAIT_FRAMES(1)
     END_LOOP
     IF_INT_EQUAL(LW(12), 1)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON_CHARGE1"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_A_3A"))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_A_3A"))
         WAIT_FRAMES(10)
-        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_Z_3"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_Z_3"))
         WAIT_FRAMES(10)
-        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_A_3A"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_A_3A"))
         WAIT_FRAMES(10)
-        CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_Z_3"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_Z_3"))
         WAIT_FRAMES(10)
     END_IF
-    CALL(btlevtcmd_AnimeChangePose, -2, 2, STRING("KTA_A_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_A_3"))
     WAIT_FRAMES(40)
     IF_INT_EQUAL(LW(12), 1)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON4"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     ELSE
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_KILLER_CANNON2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 10, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
-        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 60)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 60)
         ADD(LW(9), 10)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 75, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 11, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
-        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 28)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
+        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 28)
         ADD(LW(9), 10)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 20, LW(9), FLOAT(0.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_GetPos, -2, LW(7), LW(8), LW(9))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(7), 40)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 40)
     ADD(LW(9), 10)
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 38, LW(9), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     GOTO(10)
     LABEL(10)
     CALL(evt_btl_camera_shake_w, 0, 5, 0, 20, 0)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_killer), 0)
-    CALL(killer_copy_status, -2, LW(3))
+    CALL(killer_copy_status, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     CALL(btlevtcmd_SetPos, LW(3), LW(7), 10, LW(2))
     CALL(btlevtcmd_SetPartsRotate, LW(3), LW(4), 0, 0, LW(10))
@@ -583,7 +565,6 @@ static USER_FUNC(killer_get_angle) {
 }
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

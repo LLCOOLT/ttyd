@@ -1,3 +1,5 @@
+// Rogueport Sewers (tik, chika: underground): the paper demon's (peramajin) lecture on the plane power
+// (plane_majin_lecture).
 #include "icon_ids.h"
 #include "eff/eff_fukidashi.h"
 #include "eff/eff_itemget.h"
@@ -7,6 +9,7 @@
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/os.h"
+#include "dolphin/pad.h"
 #include "driver/icondrv.h"
 #include "driver/dispdrv.h"
 #include "string.h"
@@ -26,29 +29,32 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
+#include "evt/evt_lect.h"
+#include "evt/evt_lecture.h"
+#include "mot/mot_slit.h"
+#include "pmario_sound.h"
+#include "statuswindow.h"
+#include "tik.h"
+#include "driver/hitdrv.h"
+#include "mot/mot_roll.h"
 
 static OSTime wwstart;
-void statusWinForceClose(void);
-void statusWinForceCloseClear(void);
 static s32 x_flag_data[2];
 static void lecture_button_disp(CameraId camera, void* param);
-typedef struct LectButtonDisp { s32 dispFlags; Vec pos; } LectButtonDisp; /* dispFlags: never accessed */
-typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDisp disp; u8 pad_18[0x40 - 0x18]; s16 iconId; s16 alpha; } LectButton;
 static LectButton lbtn[2];
-static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
-void hitGrpFlagOn(const char* name, u32 flags);
+static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
+    camera->presetPos = camera->cameraPos;
+    camera->presetAt = camera->cameraAt;
+    PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos);
+    PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt);
+    camera->startTimeA = gp->renderTime;
+    camera->durationA = 0;
+    camera->stateA = 3;
+    camera->curveA = 11;
+}
 static Vec daiv;
-void marioRollTryCancel(void);
-void motSlitCancel3(void);
-BOOL marioRollKeyDisable(void);
 
-USER_FUNC(evt_cam3d_evt_set_rel);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
 static USER_FUNC(lect_map_cam_chg);
-USER_FUNC(lect_set_systemlevel);
-USER_FUNC(lect_test_systemlevel);
 static USER_FUNC(bgm_start_wait);
 static USER_FUNC(evt_nomal_cange);
 static USER_FUNC(lect_push_r_check);
@@ -80,9 +86,6 @@ static USER_FUNC(lect_status_on);
 static USER_FUNC(lect_status_off);
 static USER_FUNC(lect_mario_ido_sum);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
-
-extern EvtWord plane_majin_lecture_init[];
-extern EvtWord plane_majin_lecture[];
 
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
@@ -167,7 +170,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
         LectButton* btn = &lbtn[i];
         LectButtonDisp* disp = &btn->disp;
 
-        if (!(btn->flags & 1)) {
+        if (!(btn->flags & LECT_BUTTON_FLAG_HIDDEN)) {
             f32 ofs;
             Vec pos;
 
@@ -232,7 +235,7 @@ static USER_FUNC(lecture_button_rtn) {
                 }
                 break;
             case 4:
-                btn->flags |= 1;
+                btn->flags |= LECT_BUTTON_FLAG_HIDDEN;
                 done++;
                 break;
         }
@@ -378,7 +381,7 @@ static USER_FUNC(effitemget_open_ptr) {
 
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
     Vec ofs;
 
     if (up) {
@@ -401,6 +404,7 @@ static USER_FUNC(lect_mobj_hit_nasi) {
         mobj = event->thisMapObj;
     }
     for (i = 0; i < 2; i++) {
+        // name is an array inside MapObjectHitEntry, so the NULL test is always true (as in the game); strcmp does the work
         if (mobj->hitObj[i].name != NULL && strcmp(mobj->hitObj[i].name, "") != 0) {
             hitGrpFlagOn(mobj->hitObj[i].name, 1);
         }
@@ -430,7 +434,7 @@ static USER_FUNC(dai_moveti_get) {
 static USER_FUNC(lect_slit_check) {
     EvtWord* args = event->args;
 
-    if (marioGetPtr()->flags & 0x100000) {
+    if (marioGetPtr()->flags & MARIO_FLAG_PAPER_MODE) {
         evtSetValue(event, args[0], TRUE);
     } else {
         evtSetValue(event, args[0], FALSE);
@@ -444,7 +448,7 @@ static USER_FUNC(evtflash) {
     }
     switch (event->userdata[2]) {
         case 0:
-            fadeEntry(10, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+            fadeEntry(FADE_OUT_BLACK, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             event->userdata[2]++;
         case 1:
             if (fadeIsFinish() != TRUE) {
@@ -464,7 +468,7 @@ static USER_FUNC(evtflash) {
             event->userdata[2]++;
             return EVT_RETURN_BLOCK;
         case 3:
-            fadeEntry(9, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+            fadeEntry(FADE_IN_BLACK, 40, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             event->userdata[2]++;
         case 4:
             if (fadeIsFinish() != TRUE) {
@@ -525,13 +529,13 @@ EVT_BEGIN(plane_majin_lecture)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 1536)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_camid, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), 7)
     WAIT_FRAMES(1)
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(evt_cam_get_at, 4, LW(0), LW(1), LW(2))
+            CALL(evt_cam_get_at, CAMERA_3D, LW(0), LW(1), LW(2))
             SUBTRACT(LW(1), 25)
             CALL(evt_npc_set_position, STRING(/*"ペラ魔人"*/"\x83\x79\x83\x89\x96\x82\x90\x6C"), LW(0), LW(1), LW(2))
             WAIT_FRAMES(1)
@@ -745,7 +749,7 @@ EVT_END_PAD()
 static USER_FUNC(lect_push_r_check) {
     EvtWord* args = event->args;
 
-    if (keyGetButton(0) & 0x20) {
+    if (keyGetButton(0) & PAD_TRIGGER_R) {
         evtSetValue(event, args[0], TRUE);
     } else {
         evtSetValue(event, args[0], FALSE);
@@ -758,19 +762,16 @@ static USER_FUNC(evt_nomal_cange) {
 
     if (isFirstCall) {
         marioRollTryCancel();
-        if (mario->flags & 0x100000) {
+        if (mario->flags & MARIO_FLAG_PAPER_MODE) {
             motSlitCancel3();
         }
     }
     if (!marioRollKeyDisable()) {
         return EVT_RETURN_BLOCK;
     }
-    return (mario->dispFlags & 0x1000000) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
+    return (mario->dispFlags & MARIO_DISP_FLAG_SLIT) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
-
-BOOL psndBGMStartCheck(s32 id);
 
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-

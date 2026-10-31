@@ -1,9 +1,10 @@
+// Audience data: the item and animation tables for each kind of audience member.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "mario/mario_pouch.h"
 #include "battle/battle_audience_kind_data.h"
 #include "battle/battle_audience_anim.h"
-
+#include "version.h"
 
 s32 audience_kinopio_run_front[14];
 s32 audience_daisan_run_front[14];
@@ -32,7 +33,7 @@ s32* audience_anim_kuriboo[19];
 s32* audience_anim_pakkun[19];
 s32* audience_anim_luigi[19];
 BattleAudienceItemKind audience_item_kinopio[12];
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 BattleAudienceItemKind audience_item_heiho[18];
 #else
 BattleAudienceItemKind audience_item_heiho[17];
@@ -1309,7 +1310,7 @@ BattleAudienceItemKind audience_item_heiho[] = {
     {ITEM_RUIN_POWDER, 10},
     {ITEM_POWER_PUNCH, 10},
     {ITEM_STOPWATCH, 10},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {ITEM_TRADE_OFF, 10},
 #endif
     {ITEM_MINI_MR_MINI, 10},
@@ -1396,4 +1397,3 @@ BattleAudienceKind audience_kind[] = {
 BattleAudienceItemKind audience_item_pakkun[] = {
     {0, 0},
 };
-

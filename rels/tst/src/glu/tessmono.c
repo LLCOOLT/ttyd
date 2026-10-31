@@ -1,44 +1,44 @@
 /*
- * libtess (SGI OpenGL Sample Implementation GLU): tessellation of monotone regions.
+ * SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008)
+ * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice including the dates of first publication and
+ * either this permission notice or a reference to
+ * http://oss.sgi.com/projects/FreeB/
+ * shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * SILICON GRAPHICS, INC. BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+ * OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Except as contained in this notice, the name of Silicon Graphics, Inc.
+ * shall not be used in advertising or otherwise to promote the sale, use or
+ * other dealings in this Software without prior written authorization from
+ * Silicon Graphics, Inc.
+ */
+
+/*
  * Author: Eric Veach, July 1994.
  *
- * tst.rel carries a copy of the GLU polygon tessellator from the OpenGL Sample Implementation (Silicon Graphics,
- * Inc., SGI Free Software License B). The assertions of this copy are compiled in, and each one passes its source
- * line to __assert, so the layout of every file follows the original: the license and author header take the
- * first lines, and the functions keep their original order and length.
+ * libtess tessellation of the monotone regions the sweep (sweep.c) leaves: __gl_meshTessellateMonoRegion,
+ * __gl_meshTessellateInterior, __gl_meshDiscardExterior and __gl_meshSetWindingNumber;
+ * gluTessEndPolygon (tess.c) picks which to call. Faces made by __gl_meshConnect go before the face
+ * being split, so the loops over the face list never visit a new triangle. Deferred inlining emits
+ * the functions last to first.
  *
- * Contents of this file:
- *
- *   __gl_meshTessellateMonoRegion  triangulates one monotone face
- *   __gl_meshTessellateInterior    triangulates every face marked inside
- *   __gl_meshDiscardExterior       zaps every face not marked inside
- *   __gl_meshSetWindingNumber      sets boundary windings, optionally keeps only the boundary
- *
- * They run after the sweep (sweep.c) has split the arrangement into monotone regions and marked
- * each one inside or outside by the winding rule; gluTessEndPolygon (tess.c) picks which of
- * them to call:
- *
- *   - triangles:        __gl_meshTessellateInterior, then the mesh is rendered (render.c);
- *   - boundary only:    __gl_meshSetWindingNumber( mesh, 1, TRUE ), then the contours are
- *                       rendered;
- *   - mesh callback:    __gl_meshDiscardExterior, and the client gets the mesh itself.
- *
- * The faces made by __gl_meshConnect are inserted before the face being split, so the
- * loops over the face list never visit a new triangle.
- *
- * Inlining: with deferred inlining nothing here is inlined into a caller in this file
- * except through the geom.h macros (VertLeq, EdgeGoesLeft, EdgeGoesRight); EdgeSign stays
- * a call to __gl_edgeSign in geom.c.
- *
- * Emission order: deferred inlining emits the functions last to first, so
- * __gl_meshSetWindingNumber comes first in .text.
- *
- * Assertions: __gl_meshTessellateMonoRegion checks that the face has at least three
- * edges, and that the fan it builds at the end has a triangle left to cut off.
- *
- * Memory: a failed __gl_meshConnect makes the caller return 0, which tess.c turns into
- * GLU_OUT_OF_MEMORY.
- *
+ * tst.rel keeps this copy's assertions, and each passes its source line to __assert, so every line
+ * of this file stays where the original has it: this notice and the author header fill lines 1-44.
  *
  *
  */

@@ -1,3 +1,5 @@
+// las_18 (ラストダンジョン, Palace of Shadow): a riddle room off las_10: the switch only Vivian reaches.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -5,38 +7,24 @@
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "las.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_flag_onoff);
-USER_FUNC(evt_mobj_floatswitch_blue);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_hit_onoff);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_set_position);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_party_get_status);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
 USER_FUNC(get_mobj_seq);
-USER_FUNC(switch_alpha_off);
-USER_FUNC(switch_set_alpha);
 
 static BeroEntry bero_entry_data[2];
-extern EvtWord vivian_check[];
-extern EvtWord las_18_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -55,8 +43,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_1", // hitName
         1, // type
         1, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -75,14 +63,14 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), 45, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2D, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
-USER_FUNC(switch_set_alpha) {
+static USER_FUNC(switch_set_alpha) {
     s32 alpha = evtGetValue(event, event->args[0]);
     MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
 
@@ -90,24 +78,24 @@ USER_FUNC(switch_set_alpha) {
         return EVT_RETURN_DONE;
     }
     if (alpha > 0x24) {
-        mobj->flags &= ~2;
+        mobj->flags &= ~MOBJ_FLAG_NO_SHADOW;
     } else {
-        mobj->flags |= 2;
+        mobj->flags |= MOBJ_FLAG_NO_SHADOW;
     }
     animPoseSetMaterialEvtColor(mobj->poseId, (GXColor){255, 255, 255, alpha});
-    animPoseSetMaterialFlagOn(mobj->poseId, 0x40);
+    animPoseSetMaterialFlagOn(mobj->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(switch_alpha_off) {
+static USER_FUNC(switch_alpha_off) {
     MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
 
     if (mobj == NULL) {
         return EVT_RETURN_DONE;
     }
-    mobj->flags &= ~2;
+    mobj->flags &= ~MOBJ_FLAG_NO_SHADOW;
     animPoseSetMaterialEvtColor(mobj->poseId, (GXColor){255, 255, 255, 255});
-    animPoseSetMaterialFlagOff(mobj->poseId, 0x40);
+    animPoseSetMaterialFlagOff(mobj->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
     return EVT_RETURN_DONE;
 }
 
@@ -124,10 +112,10 @@ EVT_BEGIN(vivian_check)
             CALL(evt_party_get_status, 6, LW(0))
             IF_INT_EQUAL(LW(0), 2)
                 ADD(LW(15), 4)
-                ELSE
+            ELSE
                 SUBTRACT(LW(15), 4)
             END_IF
-            ELSE
+        ELSE
             SUBTRACT(LW(15), 4)
         END_IF
         IF_INT_GREATER(LW(15), 160)
@@ -138,13 +126,13 @@ EVT_BEGIN(vivian_check)
         END_IF
         CALL(switch_set_alpha, LW(15))
         IF_INT_EQUAL(LW(15), 160)
-            IF_INT_EQUAL(GSWF(4382), 0)
-                SET_VALUE(GSWF(4382), 1)
-                CALL(evt_snd_bgmoff, 1024)
-                CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+            IF_INT_EQUAL(GSWF(GSWF_LAS18_HIDDEN_SWITCH_REVEALED), 0)
+                SET_VALUE(GSWF(GSWF_LAS18_HIDDEN_SWITCH_REVEALED), 1)
+                CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+                CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
                 WAIT_MS(2000)
-                CALL(evt_snd_bgmoff, 513)
-                CALL(evt_snd_bgmon, 288, 0)
+                CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+                CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
             END_IF
         END_IF
         WAIT_FRAMES(1)
@@ -171,7 +159,7 @@ static EVT_BEGIN(switch_evt)
     CALL(evt_cam3d_evt_set, 0, 100, 363, 0, 30, -30, 500, 11)
     WAIT_MS(1000)
     CALL(evt_mobj_set_position, STRING("box"), 0, -30, 0)
-    CALL(evt_mobj_flag_onoff, 0, STRING("box"), 16448)
+    CALL(evt_mobj_flag_onoff, 0, STRING("box"), MOBJ_FLAG_INVISIBLE | MOBJ_FLAG_FALL)
     CALL(evt_mobj_hit_onoff, STRING("box"), 1)
     SET_VALUE(LW(0), STRING("box"))
     CALL_CHILD(PTR(box_syutugen))
@@ -188,23 +176,22 @@ static EVT_BEGIN(hint_plate)
 EVT_END()
 
 EVT_BEGIN(las_18_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST2"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_mobj_floatswitch_blue, 0, STRING("switch"), 75, 60, 0, PTR(switch_evt), GSWF(4352))
-    CALL(evt_mobj_flag_onoff, 1, STRING("switch"), 2)
-    IF_INT_EQUAL(GSWF(4352), 0)
+    CALL(evt_mobj_floatswitch_blue, 0, STRING("switch"), 75, 60, 0, PTR(switch_evt), GSWF(GSWF_LAS18_SWITCH_PRESSED))
+    CALL(evt_mobj_flag_onoff, 1, STRING("switch"), MOBJ_FLAG_NO_SHADOW)
+    IF_INT_EQUAL(GSWF(GSWF_LAS18_SWITCH_PRESSED), 0)
         SPAWN_EVENT(PTR(vivian_check))
     END_IF
-    CALL(evt_mobj_itembox, STRING("box"), 0, 0, 0, 0, 0, PTR(box_evt), GSWF(4369))
-    IF_INT_EQUAL(GSWF(4352), 0)
-        CALL(evt_mobj_flag_onoff, 1, STRING("box"), 16384)
+    CALL(evt_mobj_itembox, STRING("box"), 0, 0, 0, 0, 0, PTR(box_evt), GSWF(GSWF_LAS18_KEY_CHEST_OPENED))
+    IF_INT_EQUAL(GSWF(GSWF_LAS18_SWITCH_PRESSED), 0)
+        CALL(evt_mobj_flag_onoff, 1, STRING("box"), MOBJ_FLAG_INVISIBLE)
         CALL(evt_mobj_hit_onoff, STRING("box"), 0)
     END_IF
-    CALL(evt_run_case_evt, 9, 1, STRING("A_pure"), 0, PTR(hint_plate), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_pure"), 0, PTR(hint_plate), 0)
     RETURN
 EVT_END()
-

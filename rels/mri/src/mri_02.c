@@ -1,3 +1,5 @@
+// mri_02 (巨木の中, The Great Tree): the room where a Puni switch (punipuni_switch) makes a pipe rise out of
+// the floor (dokan_event); planters and pipes to mri_01, mri_05 and mri_20.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -5,70 +7,47 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "mri_puni.h"
 #include "mri.h"
 #include "data_tables.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
 
-typedef struct Mri02Switch { f32 base; f32 weight; f32 target; f32 pos; } Mri02Switch;
+typedef struct Mri02Switch {
+    f32 base;
+    f32 weight;
+    f32 target;
+    f32 pos;
+} Mri02Switch;
 Mri02Switch mri02switch;
-void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
-void hitBindUpdate(const char* name);
-
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_kururing_floor);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_puni_dokan_onoff);
-USER_FUNC(evt_puni_get_flag);
-USER_FUNC(evt_puni_get_position);
-USER_FUNC(evt_puni_mem_init);
-USER_FUNC(evt_puni_set_hamari);
-USER_FUNC(evt_puni_set_yuka);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_area_check);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_target_flag_onoff);
-USER_FUNC(evt_target_set_position);
-USER_FUNC(getSwitch);
-USER_FUNC(moveSwitch);
-USER_FUNC(setPuniWeight);
-f32 getMri02Yuka(void);
 
 static BeroEntry bero_entry_data[4];
 static KusaAccess ueki_access_data[6];
 extern EvtWord punipuni_switch[];
 extern EvtWord dokan_event[];
 extern EvtWord dokan_init[];
-extern EvtWord mri_02_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "dokan1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -84,8 +63,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -101,8 +80,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan3", // hitName
         2, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -120,7 +99,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(evt_ueki_04)
     CALL(evt_item_delete_check, STRING("item_ueki_04"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki_04"), 142, 100, 0, -20, 4, GSWF(2831), 0)
+        CALL(evt_item_entry, STRING("item_ueki_04"), ITEM_POWER_PUNCH, 100, 0, -20, 4, GSWF(GSWF_MRI02_PLANTER_POWER_PUNCH_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -134,7 +113,7 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
-USER_FUNC(moveSwitch) {
+static USER_FUNC(moveSwitch) {
     Mri02Switch* sw = &mri02switch;
     f32 delta;
 
@@ -190,12 +169,12 @@ f32 getMri02Yuka(void) {
     return mri02switch.pos;
 }
 
-USER_FUNC(setPuniWeight) {
+static USER_FUNC(setPuniWeight) {
     mri02switch.weight = evtGetFloat(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(getSwitch) {
+static USER_FUNC(getSwitch) {
     EvtWord* args = event->args;
     s32 on = FALSE;
 
@@ -216,7 +195,7 @@ EVT_BEGIN(dokan_event)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 4500)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.009765625f), 4500)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_get_position, STRING("S_dokan2"), LW(0), LW(1), LW(2))
@@ -247,7 +226,7 @@ EVT_BEGIN(dokan_event)
     CALL(evt_msg_print_party, STRING("stg2_mri_e16_00"))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 96)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_16_PUNI_ELDER_POWERS)
     CALL(evt_puni_dokan_onoff, STRING("dokan2"), 0)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
@@ -261,7 +240,7 @@ EVT_BEGIN(dokan_init)
     LOOP(0)
         CALL(getSwitch, LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            IF_INT_EQUAL(GSWF(2830), 1)
+            IF_INT_EQUAL(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 1)
                 CALL_CHILD(PTR(dokan_event))
                 BREAK_LOOP
             END_IF
@@ -272,7 +251,7 @@ EVT_BEGIN(dokan_init)
 EVT_END()
 
 static EVT_BEGIN(yuka_main)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isk_01_03_C"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_01_03_C"), MAPOBJ_FLAG_HIDE)
     LOOP(0)
         SET_VALUE(LW(1), GW(0))
         DIVIDE(LW(1), 10)
@@ -327,9 +306,9 @@ static EVT_BEGIN(yuka_move)
         END_IF
         SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
         SUBTRACT_FLOAT(LW(0), LW(11))
-        IF_INT_EQUAL(GSWF(2830), 1)
+        IF_INT_EQUAL(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 1)
             CALL(setPuniWeight, LW(0))
-            ELSE
+        ELSE
             CALL(setPuniWeight, 0)
         END_IF
         IF_INT_NOT_EQUAL(GW(0), LW(12))
@@ -343,11 +322,11 @@ EVT_END()
 
 static EVT_BEGIN(punipuni_ball00_init)
     CALL_CHILD(PTR(mri_punipuni_setup))
-    IF_INT_EQUAL(GSWF(2830), 1)
+    IF_INT_EQUAL(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), 0, 30, -68)
         CALL(evt_target_flag_onoff, LW(11), 0, 3)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_sui_hikari"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_target_set_position, LW(11), 0, 0, -8)
     SET_VALUE(GF(15), 0)
@@ -356,21 +335,21 @@ EVT_END()
 
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
-    IF_INT_EQUAL(GSWF(2830), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 0)
         CALL_CHILD(PTR(mri_punipuni_itemselect))
         IF_INT_EQUAL(LW(1), 0)
             GOTO(100)
         END_IF
         CALL(evt_item_set_position, LW(10), 0, 30, -68)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_sui_hikari"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(GF(15), 1)
         CALL_CHILD(PTR(mri_punipuni_itemset))
-        SET_VALUE(GSWF(2830), 1)
+        SET_VALUE(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 1)
         WAIT_MS(500)
         SET_VALUE(GF(15), 0)
-        ELSE
-        SET_VALUE(GSWF(2830), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_sui_hikari"), 1)
+    ELSE
+        SET_VALUE(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
         CALL_CHILD(PTR(mri_punipuni_itemremove))
     END_IF
     LABEL(100)
@@ -394,14 +373,14 @@ EVT_BEGIN(mri_02_init_evt)
     SPAWN_EVENT(PTR(mri_countdown))
     SET_VALUE(LW(0), PTR(ueki_access_data))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 155, 0, 50, STRING("S_yuka"), 125, GSWF(5612))
-    SWITCH(GSW(0))
-        CASE_BETWEEN(109, 110)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 155, 0, 50, STRING("S_yuka"), 125, GSWF(GSWF_MRI02_STAR_PIECE_PANEL))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI1"))
     END_SWITCH
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
@@ -413,11 +392,11 @@ EVT_BEGIN(mri_02_init_evt)
     SET_VALUE(LW(10), STRING("punipuni"))
     SET_VALUE(LW(11), 0)
     SPAWN_EVENT(PTR(punipuni_ball00_init))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball00), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball00), 0)
     SET_VALUE(GW(0), 10)
     SPAWN_EVENT(PTR(yuka_main))
     SPAWN_EVENT(PTR(yuka_move))
-    IF_INT_LESS(GSW(0), 96)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_16_PUNI_ELDER_POWERS)
         SPAWN_EVENT(PTR(dokan_init))
         BEGIN_INLINE_EVENT
             CALL(evt_bero_exec_wait, 65536)
@@ -431,4 +410,3 @@ EVT_BEGIN(mri_02_init_evt)
     SPAWN_EVENT(PTR(mri_hikari_color))
     RETURN
 EVT_END()
-

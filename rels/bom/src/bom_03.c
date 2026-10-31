@@ -1,19 +1,19 @@
+// bom_03 (ボム村, Fahr Outpost): the snowfield between bom_00 and bom_04.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_item.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "bom.h"
 #include "data_tables.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
+#include "evt/evt_story.h"
 
 static TreeAccess tree_tbl[4];
 static BeroEntry bero_entry_data[3];
-extern EvtWord bom_03_init_evt[];
 
 static TreeAccess tree_tbl[] = {
     {3, "A_ki1", "S_ki_1", "S_ha_1", 0, NULL},
@@ -32,8 +32,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -48,8 +48,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -70,10 +70,9 @@ EVT_BEGIN(bom_03_init_evt)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(evt_bom_snowfall))
     CALL_CHILD(PTR(evt_tree))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_BOM1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_BOM1"))
-    CALL(evt_mobj_powerupblk, STRING("pblk00"), -405, 60, 25, 0, GSWF(5566), 0)
-    CALL(evt_item_entry, STRING("item00"), 125, 45, 5, 120, 16, GSWF(5662), 0)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_BOM1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_BOM1"))
+    CALL(evt_mobj_powerupblk, STRING("pblk00"), -405, 60, 25, 0, GSWF(GSWF_BOM03_SHINE_SPRITE), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, 45, 5, 120, 16, GSWF(GSWF_BOM03_STAR_PIECE), 0)
     RETURN
 EVT_END()
-

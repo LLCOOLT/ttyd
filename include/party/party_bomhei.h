@@ -1,3 +1,4 @@
+// party_bomhei.c: Admiral Bobbery's (bomhei) field partner functions (init, use, bye, exit) and bomb key checks.
 #pragma once
 
 #include "party.h"
@@ -9,3 +10,9 @@ void bomhei_use(PartyEntry* party);
 void bomhei_use_cancel();
 void bomhei_use_post(PartyEntry* party);
 void partyGetReturnPos(Vec* out);
+
+void bomhei_init(PartyEntry* party);
+u8 bomheiGetStatus(void);
+void bomhei_use_cancel2(void);
+s32 mario_bomhei_keychk(void);
+s32 mario_bomhei_keychk2(void);

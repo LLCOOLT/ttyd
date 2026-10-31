@@ -1,3 +1,6 @@
+// kpa_07 (クッパ編, Bowser's interludes): the scene after the third side-scrolling stage, with a fake (nise) Mario and
+// a conveyor belt; it returns to Rogueport (gor_04).
+
 #include "version.h"
 #include "eff/eff_starstone.h"
 #include "battle/battle_unit.h"
@@ -11,56 +14,22 @@
 #include "evt/evt_memcard.h"
 #include "evt/evt_npc.h"
 #include "driver/msgdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "kpa_act.h"
+#include "party/party_motion.h"
+#include "kpa.h"
+#include "evt/evt_story.h"
+#include "driver/camdrv.h"
 
-EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_zoom_in);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_koopa_hip_attack);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_height);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_pera_onoff);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_height);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_npc_set_stay_anim);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(get_starstone_pos);
-USER_FUNC(kpa_chg_pose);
 static USER_FUNC(set_starstone_pos);
 USER_FUNC(set_starstone_ry);
 static USER_FUNC(starstone_entry);
@@ -69,14 +38,11 @@ void kpa_stg6_014_cb(s32 type, smartEntry* smart);
 void kpa_stg6_012_1_cb(s32 type, smartEntry* smart);
 
 static NpcSetupInfo npcEnt[3];
-extern EvtWord kpa_07_hipattack_eff[];
-extern EvtWord kpa_07_evt[];
-extern EvtWord kpa_07_init_evt[];
 
 static NpcSetupInfo npcEnt[] = {
     {
         /*"ババ"*/"\x83\x6F\x83\x6F", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -86,7 +52,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -129,7 +95,7 @@ EVT_BEGIN(kpa_07_hipattack_eff)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(kpa_07_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -249, 0, 0)
@@ -137,7 +103,7 @@ EVT_BEGIN(kpa_07_evt)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_npc_set_ry, STRING("ババ"), 90)
     CALL(evt_mario_dispflag_onoff, 1, 1)
-    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), NPC_FLAG_HIDDEN)
     CALL(starstone_entry, STRING("nise"), 9, 180, 55, 0, FLOAT(0.75f))
     CALL(set_starstone_ry, STRING("nise"), 270)
     CALL(evt_cam3d_evt_set, 158, 190, 441, -109, 90, -61, 0, 11)
@@ -146,7 +112,7 @@ EVT_BEGIN(kpa_07_evt)
     CALL(evt_cam3d_evt_set, 158, 160, 441, -109, 60, -61, 1500, 11)
     WAIT_MS(1500)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 0, STRING("ババ"), 128)
+        CALL(evt_npc_flag_onoff, 0, STRING("ババ"), NPC_FLAG_HIDDEN)
         CALL(evt_npc_move_position, STRING("ババ"), -168, 0, 0, FLOAT(60.0f), 0)
     END_INLINE_EVENT
     CALL(evt_mario_dispflag_onoff, 0, 1)
@@ -301,7 +267,7 @@ EVT_BEGIN(kpa_07_evt)
             END_IF
             IF_INT_EQUAL(GF(0), 0)
                 WAIT_FRAMES(1)
-                ELSE
+            ELSE
                 ADD(LW(3), 4)
                 CALL(set_starstone_pos, STRING("nise"), LW(0), LW(1), LW(3))
                 WAIT_MS(50)
@@ -345,7 +311,7 @@ EVT_BEGIN(kpa_07_evt)
                 MULTIPLY_FLOAT(LW(4), FLOAT(-0.5f))
                 CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_STONE_HIT1"), LW(0), LW(1), LW(2), 0)
             END_IF
-            ELSE
+        ELSE
             IF_INT_LESS_OR_EQUAL(LW(1), 10)
                 BREAK_LOOP
             END_IF
@@ -404,7 +370,7 @@ EVT_BEGIN(kpa_07_evt)
             IF_INT_NOT_EQUAL(GF(0), 0)
                 BREAK_LOOP
             END_IF
-            CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 150)
+            CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.009765625f), 150)
             WAIT_MS(150)
         END_LOOP
     END_INLINE_EVENT
@@ -421,9 +387,9 @@ EVT_BEGIN(kpa_07_evt)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(2000)
-    SET_VALUE(GSW(0), 344)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_fade_entry, 6, 300, 0, 0, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_04_BOWSER_RAWK_HAWK)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_SPOT_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     SET_VALUE(GF(0), 1)
     WAIT_MS(2000)
@@ -431,7 +397,7 @@ EVT_BEGIN(kpa_07_evt)
     SET_VALUE(LW(0), 18)
     CALL_CHILD(PTR(evt_memcard_save_wrapper))
     CALL(evt_mario_set_mode, 0)
-    CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_BOWSER_A1, 0, FADE_STORY_BOWSER_A3, 0)
     CALL(evt_bero_mapchange, STRING("gor_04"), STRING("resha_return"))
     RETURN
 EVT_END()
@@ -443,7 +409,7 @@ EVT_BEGIN(kpa_07_evt)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_npc_set_ry, STRING("ババ"), 90)
     CALL(evt_mario_dispflag_onoff, 1, 1)
-    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), NPC_FLAG_HIDDEN)
     CALL(starstone_entry, STRING("nise"), 9, 180, 55, 0, FLOAT(0.75f))
     CALL(set_starstone_ry, STRING("nise"), 270)
     CALL(evt_cam3d_evt_set, 158, 190, 441, -109, 90, -61, 0, 11)
@@ -452,7 +418,7 @@ EVT_BEGIN(kpa_07_evt)
     CALL(evt_cam3d_evt_set, 158, 160, 441, -109, 60, -61, 1500, 11)
     WAIT_MS(1500)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 0, STRING("ババ"), 128)
+        CALL(evt_npc_flag_onoff, 0, STRING("ババ"), NPC_FLAG_HIDDEN)
         CALL(evt_npc_move_position, STRING("ババ"), -168, 0, 0, FLOAT(60.0f), 0)
     END_INLINE_EVENT
     CALL(evt_mario_dispflag_onoff, 0, 1)
@@ -607,7 +573,7 @@ EVT_BEGIN(kpa_07_evt)
             END_IF
             IF_INT_EQUAL(GF(0), 0)
                 WAIT_FRAMES(1)
-                ELSE
+            ELSE
                 ADD(LW(3), 4)
                 CALL(set_starstone_pos, STRING("nise"), LW(0), LW(1), LW(3))
                 WAIT_MS(50)
@@ -651,7 +617,7 @@ EVT_BEGIN(kpa_07_evt)
                 MULTIPLY_FLOAT(LW(4), FLOAT(-0.5f))
                 CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_STONE_HIT1"), LW(0), LW(1), LW(2), 0)
             END_IF
-            ELSE
+        ELSE
             IF_INT_LESS_OR_EQUAL(LW(1), 10)
                 BREAK_LOOP
             END_IF
@@ -710,7 +676,7 @@ EVT_BEGIN(kpa_07_evt)
             IF_INT_NOT_EQUAL(GF(0), 0)
                 BREAK_LOOP
             END_IF
-            CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 150)
+            CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.009765625f), 150)
             WAIT_MS(150)
         END_LOOP
     END_INLINE_EVENT
@@ -727,9 +693,9 @@ EVT_BEGIN(kpa_07_evt)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(2000)
-    SET_VALUE(GSW(0), 344)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_fade_entry, 6, 300, 0, 0, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_04_BOWSER_RAWK_HAWK)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_SPOT_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     SET_VALUE(GF(0), 1)
     WAIT_MS(2000)
@@ -737,11 +703,7 @@ EVT_BEGIN(kpa_07_evt)
     SET_VALUE(LW(0), 18)
     CALL_CHILD(PTR(evt_memcard_save))
     CALL(evt_mario_set_mode, 0)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
-#else
-    CALL(evt_fade_set_mapchange_type, 1, 59, 0, 58, 0)
-#endif
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_BOWSER_A1, 0, FADE_STORY_BOWSER_A3, 0)
     CALL(evt_bero_mapchange, STRING("gor_04"), STRING("resha_return"))
     RETURN
 EVT_END()
@@ -749,17 +711,17 @@ EVT_END()
 
 EVT_BEGIN(kpa_07_init_evt)
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_KUPPA1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_entry, STRING("belt"), STRING("c_bred_h"))
     CALL(evt_npc_set_tribe, STRING("belt"), STRING("ブレッドハート"))
-    CALL(evt_npc_flag_onoff, 1, STRING("belt"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("belt"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_pera_onoff, STRING("belt"), 0)
     CALL(evt_npc_set_anim, STRING("belt"), STRING("C_1"))
     CALL(evt_npc_set_ry, STRING("belt"), 80)
     CALL(evt_npc_set_position, STRING("belt"), 190, 52, 0)
-    IF_INT_EQUAL(GSW(0), 343)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_03_BOWSER_ACTION_STAGE)
         SPAWN_EVENT(PTR(kpa_07_evt))
     END_IF
     RETURN
@@ -815,7 +777,7 @@ static USER_FUNC(starstone_entry) {
     EffectEntry* eff = effStarStoneEntry(type, x, y, z, scale);
 
     effSetName(eff, name);
-    ((EffStarStoneWork*)eff->userdata)->flags |= 0x10;
+    ((EffStarStoneWork*)eff->userdata)->flags |= STARSTONE_FLAG_NO_JUMP_SFX;
     return EVT_RETURN_DONE;
 }
 
@@ -858,4 +820,3 @@ static USER_FUNC(starstone_fall) {
     ((EffStarStoneWork*)eff->userdata)->state = 1;
     return EVT_RETURN_DONE;
 }
-

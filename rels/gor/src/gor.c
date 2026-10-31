@@ -1,3 +1,6 @@
+// gor.rel (ゴロツキタウン, Rogueport): shared code and the REL prolog/epilog.
+// Registers the init events of gor_00..gor_04 and gor_10..gor_12.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,54 +12,23 @@
 #include "stdio.h"
 #include "manager/evtmgr_cmd.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_johoya.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_urouro.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
 #include "system.h"
 #include "pmario_sound.h"
 #include "gor.h"
+#include "evt/evt_story.h"
+#include "rel_module.h"
 
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-void tegami_delete(void);
 static s32 gor_inemuri_snd_id;
 static char* gor_msg_cat_buf;
-
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_bgmon_f);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_win_other_select);
-USER_FUNC(johoya_data_alloc);
-USER_FUNC(johoya_data_free);
-USER_FUNC(johoya_luigi_newjoho_setreadflag);
-USER_FUNC(evt_gor_inemuri_snd_off);
-USER_FUNC(evt_gor_inemuri_snd_set);
-USER_FUNC(urouro_init_func);
-USER_FUNC(urouro_main_func);
-USER_FUNC(evt_goki_sub_intpl_get_value);
-USER_FUNC(evt_goki_sub_intpl_init);
-USER_FUNC(evt_gor_villager_urouro_check_func);
-USER_FUNC(evt_gor_msg_cat_alloc);
-USER_FUNC(evt_gor_msg_cat_free);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
-
-extern EvtWord gor_villager_urouro[];
-extern EvtWord inemuri_snd[];
-extern EvtWord mario_and_party_sleep[];
-extern EvtWord luigi_gor_first_talk[];
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -154,8 +126,8 @@ USER_FUNC(evt_goki_sub_intpl_init) {
 }
 
 USER_FUNC(evt_goki_sub_intpl_get_value) {
-    event->lwData[0] = intplGetValue(event->lwData[9], event->lwData[14], event->lwData[15], event->lwData[10], event->lwData[11]);
-    event->lwData[1] = intplGetValue(event->lwData[9], event->lwData[14], event->lwData[15], event->lwData[12], event->lwData[13]);
+    event->lwData[0] = intplGetValue(event->lwData[9], event->lwData[10], event->lwData[11], event->lwData[14], event->lwData[15]);
+    event->lwData[1] = intplGetValue(event->lwData[9], event->lwData[12], event->lwData[13], event->lwData[14], event->lwData[15]);
     event->lwData[14]++;
     return EVT_RETURN_DONE;
 }
@@ -229,7 +201,7 @@ EVT_BEGIN(mario_and_party_sleep)
                 CALL(evt_mario_get_pos, 0, LW(4), LW(5), LW(6))
                 CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_YAWN1"), LW(4), LW(5), LW(6), 0)
                 CALL(evt_mario_set_pose, STRING("M_I_5"))
-                ELSE
+            ELSE
                 SET_VALUE(LF(0), 0)
                 CALL(evt_mario_set_pose, STRING("M_S_1"))
             END_IF
@@ -293,36 +265,36 @@ EVT_END()
 
 EVT_BEGIN(luigi_gor_first_talk)
     CALL(evt_party_stop, 0)
-    IF_INT_EQUAL(GSWF(1175), 0)
+    IF_INT_EQUAL(GSWF(GSWF_GOR_LUIGI_FIRST_TALK), 0)
         CALL(evt_msg_print, 0, STRING("gor_luigi_00"), 0, STRING("me"))
         CALL(evt_mario_set_pose, STRING("M_I_2"))
         WAIT_MS(500)
-        IF_INT_LESS(GSW(0), 401)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_16_SHADOW_QUEEN)
             SET_VALUE(LW(2), STRING("gor_luigi_01"))
-            ELSE
+        ELSE
             SET_VALUE(LW(2), STRING("gor_luigi_01_1"))
         END_IF
         CALL(evt_msg_print, 0, LW(2), 0, STRING("me"))
         CALL(evt_mario_set_pose, STRING("M_N_5B"))
         WAIT_MS(500)
-        SET_VALUE(GSWF(1175), 1)
+        SET_VALUE(GSWF(GSWF_GOR_LUIGI_FIRST_TALK), 1)
     END_IF
-    SWITCH(GSW(0))
-        CASE_BETWEEN(56, 111)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG1_17_FATHER_AND_SON_REUNITED, STORY_STG2_24_BOSS_BATTLE)
         SET_VALUE(LW(2), STRING("gor_luigi_02"))
-        CASE_BETWEEN(112, 163)
+        CASE_BETWEEN(STORY_STG2_25_AFTER_THE_BOSS_BATTLE, STORY_STG3_31_GRUBBAS_PLANS)
         SET_VALUE(LW(2), STRING("gor_luigi_03"))
-        CASE_BETWEEN(164, 214)
+        CASE_BETWEEN(STORY_STG3_32_BOSS_BATTLE, STORY_STG4_15_04_SHADOW_SIRENS_AND_DOOPLISS)
         SET_VALUE(LW(2), STRING("gor_luigi_04"))
-        CASE_BETWEEN(215, 260)
+        CASE_BETWEEN(STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT, STORY_STG5_42_PIRATES_VS_X_NAUTS)
         SET_VALUE(LW(2), STRING("gor_luigi_05"))
-        CASE_BETWEEN(261, 338)
+        CASE_BETWEEN(STORY_STG5_43_X_NAUTS_RETREAT, STORY_STG6_53_THE_REAL_GARNET_STAR)
         SET_VALUE(LW(2), STRING("gor_luigi_06"))
-        CASE_BETWEEN(339, 372)
+        CASE_BETWEEN(STORY_STG6_54_WELCOME_BACK, STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP)
         SET_VALUE(LW(2), STRING("gor_luigi_07"))
-        CASE_BETWEEN(373, 400)
+        CASE_BETWEEN(STORY_STG7_20_LORD_CRUMP_DEFEATED, STORY_STG8_15_GRODUS)
         SET_VALUE(LW(2), STRING("gor_luigi_08"))
-        CASE_GREATER_OR_EQUAL(401)
+        CASE_GREATER_OR_EQUAL(STORY_STG8_16_SHADOW_QUEEN)
         SET_VALUE(LW(2), STRING("gor_luigi_09"))
     END_SWITCH
     CALL(evt_msg_print, 0, LW(2), 0, STRING("me"))
@@ -342,9 +314,9 @@ EVT_BEGIN(luigi_gor_first_talk)
         GOTO(1)
     END_IF
     IF_INT_EQUAL(LW(10), 0)
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon_f, 257, STRING("BGM_EVT_RUIJI1"), 500)
-        CALL(evt_snd_envoff, 1024)
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_CH(1), STRING("BGM_EVT_RUIJI1"), 500)
+        CALL(evt_snd_envoff, PSND_FADE_HOLD)
         SET_VALUE(LW(10), 1)
     END_IF
     SET_VALUE(GF(0), 0)
@@ -356,12 +328,11 @@ EVT_BEGIN(luigi_gor_first_talk)
     GOTO(0)
     LABEL(1)
     IF_INT_EQUAL(LW(10), 1)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
-        CALL(evt_snd_envoff, 513)
-        CALL(evt_snd_envon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+        CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_IF
     CALL(evt_party_run, 0)
     RETURN
 EVT_END()
-

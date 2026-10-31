@@ -1,3 +1,4 @@
+// eff_star_power_n64.c: star power effect entry (effStarPowerN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

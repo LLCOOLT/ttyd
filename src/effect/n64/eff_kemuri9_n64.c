@@ -1,32 +1,39 @@
+// Paper Mario 64 smoke effect 9 (kemuri: smoke): a set of puffs spreading to an end radius over a given life.
+#include "eff/n64/eff_kemuri9_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
 #include "eff/eff_n64.h"
 #include "memory.h"
 #include "system.h"
+#include "version.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
-double sin(double x);
-double cos(double x);
-
-#ifdef VERSION_G8ME01_DEMO
-// The demo draws the smoke as N64 quads, blending two frames of one texture strip.
 typedef struct EffKemuri9N64Work {
-    u16 type;        // 0x0
-    u8 pad_2[2];     // 0x2
-    Vec position;    // 0x4
-    f32 dirX;        // 0x10
-    f32 velY;        // 0x14
-    f32 dirZ;        // 0x18
-    f32 radius;      // 0x1C
-    f32 radiusEnd;   // 0x20
-    s32 timer;       // 0x24
-    s32 counter;     // 0x28
-    s32 lifetime;    // 0x2C
-    f32 anim;        // 0x30, animation frame 0..8
+    u16 type;      // 0x0
+    u8 pad_2[2];   // 0x2
+    Vec position;  // 0x4
+    f32 dirX;      // 0x10
+    f32 velY;      // 0x14
+    f32 dirZ;      // 0x18
+    f32 radius;    // 0x1C
+    f32 radiusEnd; // 0x20
+    s32 timer;     // 0x24
+    s32 counter;   // 0x28
+    s32 lifetime;  // 0x2C
+#if VERSION == VERSION_DEMO
+    f32 anim; // 0x30, animation frame 0..8
+#else
+    s32 texU;     // 0x30, texture strip cell of the current frame (0..15)
+    s32 texV;     // 0x34, cell of the next frame
+    s32 frame;    // 0x38
+    s32 frameMax; // 0x3C
+#endif
 } EffKemuri9N64Work;
 
+#if VERSION == VERSION_DEMO
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, -1024, 0, 0, 0, 0, 255},
@@ -40,6 +47,7 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {16, 16, 0, -1024, 1024, 0, 0, 0, 255},
     {-16, 16, 0, 0, 1024, 0, 0, 0, 255},
 };
+#endif
 
 void effKemuri9Main(EffectEntry* effect);
 void effKemuri9Disp(CameraId cameraId, EffectEntry* effect);
@@ -60,13 +68,23 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     work->timer = life;
     work->counter = 0;
     work->lifetime = life;
+#if VERSION == VERSION_DEMO
     work->anim = 0.0f;
+#else
+    work->texU = 0;
+#endif
     work->type = type;
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
     work->radius = 10.0f;
     work->radiusEnd = radiusEnd;
+#if VERSION != VERSION_DEMO
+    work->texU = 0;
+    work->texV = 0;
+    work->frameMax = life;
+    work->frame = 0;
+#endif
     p = work + 1;
     for (i = 1; i < count + 1; i++, p++) {
         p->position.x = 0.0f;
@@ -91,7 +109,22 @@ void effKemuri9Main(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
+#if VERSION == VERSION_DEMO
     work->anim = 8.0f * (f32)work->counter / (f32)work->lifetime;
+#else
+    {
+        s32 v = (s32)(16.0f * (f32)work->frame / (f32)work->frameMax);
+        s32 u = (s32)(16.0f * (f32)++work->frame / (f32)work->frameMax);
+        if (u > 15) {
+            u = 15;
+        }
+        if (v > 15) {
+            v = 15;
+        }
+        work->texU = v;
+        work->texV = u;
+    }
+#endif
     work->counter++;
     work->timer--;
     if (work->timer < 0) {
@@ -111,6 +144,9 @@ void effKemuri9Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri9Disp, effect);
 }
 
+#if VERSION == VERSION_DEMO
+// The demo draws the smoke as N64 quads, blending two frames of one texture strip; the later versions use a
+// 16-cell GX texture and draw the quads directly.
 void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri9N64Work* work = effect->userdata;
@@ -191,117 +227,6 @@ void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 #else
-typedef struct EffKemuri9N64Work {
-    u16 type;        // 0x0
-    u8 pad_2[2];     // 0x2
-    Vec position;    // 0x4
-    f32 dirX;        // 0x10
-    f32 velY;        // 0x14
-    f32 dirZ;        // 0x18
-    f32 radius;      // 0x1C
-    f32 radiusEnd;   // 0x20
-    s32 timer;       // 0x24
-    s32 counter;     // 0x28
-    s32 pad_2c;      // 0x2C
-    s32 texU;        // 0x30
-    s32 texV;        // 0x34
-    s32 frame;       // 0x38
-    s32 frameMax;    // 0x3C
-} EffKemuri9N64Work;
-
-void effKemuri9Main(EffectEntry* effect);
-void effKemuri9Disp(CameraId cameraId, EffectEntry* effect);
-
-EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle) {
-    EffectEntry* effect;
-    EffKemuri9N64Work* work;
-    EffKemuri9N64Work* p;
-    s32 i;
-    s32 ir;
-    f32 twoPi;
-    f32 zero;
-    f32 ang;
-
-    effect = effEntry();
-    effect->type = "Kemuri9N64";
-    effect->count = count + 1;
-    work = __memAlloc(HEAP_EFFECT, (count + 1) * sizeof(EffKemuri9N64Work));
-    effect->userdata = work;
-    effect->callback = effKemuri9Main;
-    zero = 0.0f;
-    twoPi = 6.2831855f;
-    work->timer = life;
-    work->counter = 0;
-    work->pad_2c = life;
-    work->texU = 0;
-    work->type = type;
-    work->position.x = x;
-    work->position.y = y;
-    work->position.z = z;
-    work->radius = 10.0f;
-    work->radiusEnd = radiusEnd;
-    work->texU = 0;
-    work->texV = 0;
-    work->frameMax = life;
-    work->frame = 0;
-    zero = 0.0f;
-    twoPi = 6.2831855f;
-    p = work + 1;
-    for (i = 1; i < count + 1; i++, p++) {
-        p->position.x = zero;
-        p->position.y = zero;
-        p->position.z = zero;
-        ang = twoPi * (angle + (f32)((i - 1) * 360 / count)) / 360.0f;
-        p->dirX = sin(ang);
-        p->velY = zero;
-        p->dirZ = cos(ang);
-    }
-    return effect;
-}
-
-void effKemuri9Main(EffectEntry* effect) {
-    EffKemuri9N64Work* work = effect->userdata;
-    s32 i;
-    s32 ir;
-
-    Vec position;
-    Vec tmp = {0.0f, 0.0f, 0.0f};
-
-    tmp.x = work->position.x;
-    tmp.y = work->position.y;
-    tmp.z = work->position.z;
-    position = tmp;
-    {
-        s32 v = (s32)(16.0f * (f32)work->frame / (f32)work->frameMax);
-        s32 u = (s32)(16.0f * (f32)++work->frame / (f32)work->frameMax);
-        if (u > 15) {
-            u = 15;
-        }
-        if (v > 15) {
-            v = 15;
-        }
-        work->texU = v;
-        work->texV = u;
-    }
-    work->counter++;
-    work->timer--;
-    if (work->timer < 0) {
-        effDelete(effect);
-        return;
-    }
-    work->radius += 0.1f * (work->radiusEnd - work->radius);
-    ir = (s32)work->radius;
-    work++;
-    for (i = 1; i < effect->count; i++, work++) {
-        work->velY += 0.04f;
-        work->velY *= 0.9f;
-        work->position.x = (f32)ir * work->dirX;
-        work->position.y += work->velY;
-        work->position.z = (f32)ir * work->dirZ;
-    }
-    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri9Disp, effect);
-}
-
 void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri9N64Work* work = effect->userdata;

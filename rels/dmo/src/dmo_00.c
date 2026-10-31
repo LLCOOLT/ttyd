@@ -1,3 +1,5 @@
+// dmo_00 (オープニングデモ, opening demo): the storybook prologue that seq_logo.c starts after the boot logos. A book
+// on a desk opens and its pages zoom into pictures while text windows narrate; A or Start skips to the title.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -17,6 +19,7 @@
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 #include "dolphin/os.h"
+#include "dolphin/pad.h"
 #include "string.h"
 #include "stdio.h"
 #include "evt/evt_cam.h"
@@ -26,87 +29,56 @@
 #include "evt/evt_paper.h"
 #include "evt/evt_party.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_bg.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_urouro.h"
+#include "party/party_motion.h"
+#include "dmo.h"
 #include "statuswindow.h"
+#include "eff/n64/eff_crystal_n64.h"
+#include "eff/n64/eff_radiation_n64.h"
+#include "version.h"
+#include "driver/mapdrv.h"
+#include "driver/seqdrv.h"
 
-typedef struct DemoWork { s32 flags; f32 bookRot; s32 page; s32 captured; f32 fade; f32 scale; f32 x; f32 y; void** capBuf; FileEntry* tpl; s32 winOn; s32 winAlpha; } DemoWork; /* flags: never accessed */
+// State of the opening demo, cleared by demo_init.
+typedef struct DemoWork {
+    s32 reserved_00; // 0x00, never accessed
+    f32 bookRot;     // 0x04, book cover angle (book_r)
+    s32 page;        // 0x08, current picture (next), -1 before the first
+    s32 captured;    // 0x0C, demo_cap has copied the screen
+    f32 fade;        // 0x10, 0..1 zoom from the book into the picture (adjust)
+    f32 scale;       // 0x14
+    f32 x;           // 0x18
+    f32 y;           // 0x1C
+    void** capBuf;   // 0x20, screen copy buffer of demo_cap
+    FileEntry* tpl;  // 0x24, demo.tpl
+    s32 winOn;       // 0x28, text window fading in (demo_winonoff)
+    s32 winAlpha;    // 0x2C
+} DemoWork;
+
 static DemoWork work;
-char buf[0x200];
+char buf[0x200]; // the text window's message tags (make_msg)
 static DemoWork* wp;
-double sin(double x);
-void demo_img(CameraId cameraId, void* param);
-void demo_book(CameraId cameraId, void* param);
-void demo_desk(CameraId cameraId, void* param);
-void demo_window(CameraId cameraId, void* param);
 
-USER_FUNC(N_evt_img_set_z);
-USER_FUNC(adjust);
-USER_FUNC(book_r);
-USER_FUNC(demo_scale);
-USER_FUNC(demo_winonoff);
-USER_FUNC(eff_cam);
-USER_FUNC(eff_cam1);
-USER_FUNC(evt_bg_disp_onoff);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mobj_flag_onoff);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_camid);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_seq_set_seq);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfxon_);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(make_msg);
-static USER_FUNC(next);
-USER_FUNC(urouro_init_func);
-USER_FUNC(urouro_main_func);
-USER_FUNC(demo_draw);
-void demo_window(CameraId cameraId, void* param);
-void demo_book(CameraId cameraId, void* param);
-void demo_img(CameraId cameraId, void* param);
-void demo_desk(CameraId cameraId, void* param);
 void demo_cap(void);
-void demo_exit(void);
-USER_FUNC(demo_init);
+void demo_desk(CameraId cameraId, void* param);
+void demo_img(CameraId cameraId, void* param);
+void demo_book(CameraId cameraId, void* param);
+void demo_window(CameraId cameraId, void* param);
+static USER_FUNC(next);
 
 extern EvtWord buttonCheck[];
 extern EvtWord demo_evt[];
 extern EvtWord roten_move[];
 extern EvtWord kuribo_move[];
 extern EvtWord chusan_move[];
-extern EvtWord dmo_00_init_evt[];
 
 USER_FUNC(demo_init) {
     if (isFirstCall) {
@@ -119,11 +91,11 @@ USER_FUNC(demo_init) {
         wp->x = 0.0f;
         wp->y = 0.0f;
         statusWinDispOff();
-        psndSetFlag(4);
+        psndSetFlag(PSND_FLAG_SFX_OFF);
     }
-    if (fileAsyncf(4, NULL, "%s/demo.tpl", getMarioStDvdRoot()) != 0U) {
+    if (fileAsyncf(4, NULL, "%s/demo.tpl", getMarioStDvdRoot()) != NULL) {
         wp->tpl = fileAllocf(4, "%s/demo.tpl", getMarioStDvdRoot());
-        gp->areaFadeOutType = 9;
+        gp->areaFadeOutType = FADE_IN_BLACK;
         gp->areaFadeOutDuration = 500;
         return EVT_RETURN_DONE;
     }
@@ -131,13 +103,13 @@ USER_FUNC(demo_init) {
 }
 
 void demo_exit(void) {
-    CameraEntry* cam = camGetPtr(8);
+    CameraEntry* cam = camGetPtr(CAMERA_2D);
 
     if (wp->tpl != NULL) {
         fileFree(wp->tpl);
     }
-    psndClearFlag(4);
-    cam = camGetPtr(4);
+    psndClearFlag(PSND_FLAG_SFX_OFF);
+    cam = camGetPtr(CAMERA_3D);
     cam->viewport[0] = 0.0f;
     cam->viewport[1] = 0.0f;
     cam->viewport[2] = 608.0f;
@@ -163,7 +135,7 @@ void demo_cap(void) {
 }
 
 void demo_desk(CameraId cameraId, void* param) {
-    CameraEntry* cam = camGetPtr(8);
+    CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXTexObj obj;
     Mtx mtx;
     Mtx scale;
@@ -214,7 +186,7 @@ void demo_desk(CameraId cameraId, void* param) {
 }
 
 void demo_img(CameraId cameraId, void* param) {
-    CameraEntry* cam = camGetPtr(8);
+    CameraEntry* cam = camGetPtr(CAMERA_2D);
     CameraEntry* cam2;
     Mtx mtx;
     Mtx scale;
@@ -267,12 +239,12 @@ void demo_img(CameraId cameraId, void* param) {
         GXProject(w / 2, h / 2 + 35.0f, 0.0f, mtx, proj, vp, &p1.x, &p1.y, &p1.z);
         GXProject(w / 2, -h / 2 + 35.0f, 0.0f, mtx, proj, vp, &p2.x, &p2.y, &p2.z);
         GXProject(-w / 2, -h / 2 + 35.0f, 0.0f, mtx, proj, vp, &p3.x, &p3.y, &p3.z);
-        cam2 = camGetPtr(4);
+        cam2 = camGetPtr(CAMERA_3D);
         cam2->viewport[0] = p0.x;
         cam2->viewport[1] = p0.y;
         cam2->viewport[2] = p2.x - p0.x;
         cam2->viewport[3] = p2.y - p0.y;
-        cam2 = camGetPtr(6);
+        cam2 = camGetPtr(CAMERA_3D_IMAGE);
         cam2->viewport[0] = 0.0f;
         cam2->viewport[1] = 0.0f;
         cam2->viewport[2] = 608.0f;
@@ -291,7 +263,7 @@ void demo_img(CameraId cameraId, void* param) {
 }
 
 void demo_book(CameraId cameraId, void* param) {
-    CameraEntry* cam = camGetPtr(8);
+    CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXTexObj obj;
     Mtx mtx;
     Mtx scale;
@@ -474,12 +446,12 @@ void demo_window(CameraId cameraId, void* param) {
 }
 
 USER_FUNC(demo_draw) {
-    dispEntry(4, 9.0f, 7, demo_desk, NULL);
-    dispEntry(4, 8.0f, 7, demo_book, NULL);
+    dispEntry(CAMERA_3D, 9.0f, 7, demo_desk, NULL);
+    dispEntry(CAMERA_3D, 8.0f, 7, demo_book, NULL);
     if (wp->fade != 0.0f) {
-        dispEntry(7, 0.0f, 7, demo_img, NULL);
+        dispEntry(CAMERA_3D_EFFECTB, 0.0f, 7, demo_img, NULL);
     }
-    dispEntry(8, 0.0f, 3, demo_window, NULL);
+    dispEntry(CAMERA_2D, 0.0f, 3, demo_window, NULL);
     return EVT_RETURN_BLOCK;
 }
 
@@ -539,14 +511,16 @@ USER_FUNC(adjust) {
     return EVT_RETURN_DONE;
 }
 
+// Moves the two crystal effects to the CAMERA_3D_EFFECTA camera.
 USER_FUNC(eff_cam) {
-    ((s32*)effNameToPtr("eff0")->userdata)[0x38 / 4] = 5;
-    ((s32*)effNameToPtr("eff1")->userdata)[0x38 / 4] = 5;
+    ((EffCrystalN64Work*)effNameToPtr("eff0")->userdata)->camera = CAMERA_3D_EFFECTA;
+    ((EffCrystalN64Work*)effNameToPtr("eff1")->userdata)->camera = CAMERA_3D_EFFECTA;
     return EVT_RETURN_DONE;
 }
 
+// The same for the radiation effect.
 USER_FUNC(eff_cam1) {
-    ((s32*)effNameToPtr("eff2")->userdata)[0x98 / 4] = 5;
+    ((EffRadiationN64Work*)effNameToPtr("eff2")->userdata)->camera = CAMERA_3D_EFFECTA;
     return EVT_RETURN_DONE;
 }
 
@@ -566,10 +540,10 @@ EVT_BEGIN(buttonCheck)
     CALL(evt_fade_end_wait)
     LOOP(0)
         CALL(evt_key_get_buttontrg, 0, LW(0))
-        IF_BITS_SET(LW(0), 4352)
+        IF_BITS_SET(LW(0), PAD_BUTTON_A | PAD_BUTTON_START)
             SET_VALUE(GF(10), 1)
-            CALL(evt_fade_set_mapchange_type, 1, 17, 500, -1, -1)
-            CALL(evt_seq_set_seq, 3, STRING("title"), 0)
+            CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 500, -1, -1)
+            CALL(evt_seq_set_seq, SEQ_MAP_CHANGE, STRING("title"), 0)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
@@ -580,7 +554,7 @@ EVT_BEGIN(demo_evt)
     CALL(evt_seq_wait, 2)
     SET_VALUE(GF(10), 0)
     SPAWN_EVENT_GET_ID(PTR(buttonCheck), GW(10))
-    CALL(evt_snd_bgmon, 513, STRING("BGM_DEMO1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_DEMO1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     BEGIN_INLINE_EVENT_GET_ID(LW(9))
         WAIT_MS(4000)
@@ -748,22 +722,22 @@ EVT_BEGIN(demo_evt)
     CALL(evt_msg_print_add, 0, STRING("op_book_24"))
     CALL(demo_winonoff, 0)
     CALL(evt_bg_disp_onoff, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ie_01_naka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ie_02_f1_naka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ie_02_f2_naka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ie_03_naka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ie_04_naka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_gai_kabe_k"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_gai_kabe_k_01"), 1)
-    CALL(evt_npc_flag_onoff, 0, STRING("peach"), 128)
-    CALL(evt_npc_flag_onoff, 0, STRING("nazo"), 128)
-    CALL(evt_npc_flag_onoff, 0, STRING("hako"), 128)
-    CALL(evt_npc_flag_onoff, 0, STRING("ロテン１"), 128)
-    CALL(evt_npc_flag_onoff, 0, STRING("クリボー１"), 128)
-    CALL(evt_npc_flag_onoff, 0, STRING("チューさん１"), 128)
-    CALL(evt_mobj_flag_onoff, 0, STRING("hako"), 16384)
-    CALL(evt_snd_bgmoff_f, 513, 6000)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ie_01_naka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ie_02_f1_naka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ie_02_f2_naka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ie_03_naka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ie_04_naka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_gai_kabe_k"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_gai_kabe_k_01"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_npc_flag_onoff, 0, STRING("peach"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 0, STRING("nazo"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 0, STRING("hako"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 0, STRING("ロテン１"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 0, STRING("クリボー１"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 0, STRING("チューさん１"), NPC_FLAG_HIDDEN)
+    CALL(evt_mobj_flag_onoff, 0, STRING("hako"), MOBJ_FLAG_INVISIBLE)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 6000)
     CALL(evt_sub_intpl_msec_init, 0, 0, 1000, 3000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -780,7 +754,7 @@ EVT_BEGIN(demo_evt)
     CALL(evt_paper_delete, STRING("OFF_d_meku_right"))
     LABEL(100)
     WAIT_MS(1000)
-    CALL(evt_snd_bgmon, 513, STRING("BGM_DEMO2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_DEMO2"))
     CALL(evt_npc_move_position, STRING("peach"), 0, 450, 0, FLOAT(60.0f), 1)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("op_00"), 0, 0)
@@ -858,11 +832,11 @@ EVT_BEGIN(demo_evt)
     CALL(evt_msg_print, 0, STRING("op_09"), 0, STRING("peach"))
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -450, 250, 1030, -135, 100, 482, 0, 11)
-    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 32768)
-    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("peach"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_tribe, STRING("peach"), STRING("デモピーチ標準2"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_gai_kabe_k"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_gai_kabe_k_01"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_gai_kabe_k"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_gai_kabe_k_01"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("op_10"), 0, STRING("nazo"))
     WAIT_MS(300)
@@ -965,8 +939,8 @@ EVT_BEGIN(demo_evt)
         WAIT_FRAMES(1)
     END_LOOP
     DELETE_EVENT(GW(10))
-    CALL(evt_fade_set_mapchange_type, 1, 17, 2000, -1, -1)
-    CALL(evt_seq_set_seq, 3, STRING("title"), 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 2000, -1, -1)
+    CALL(evt_seq_set_seq, SEQ_MAP_CHANGE, STRING("title"), 0)
     RETURN
 EVT_END()
 
@@ -1022,7 +996,6 @@ EVT_BEGIN(chusan_move)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
 EVT_BEGIN(dmo_00_init_evt)
     CALL(demo_init)
     CALL(evt_npc_entry, STRING("peach"), STRING("c_peach"))
@@ -1030,34 +1003,34 @@ EVT_BEGIN(dmo_00_init_evt)
     CALL(evt_npc_set_ry, STRING("peach"), 90)
     CALL(evt_npc_set_position, STRING("peach"), -2, 0, 550)
     CALL(evt_npc_status_onoff, 1, STRING("peach"), 2)
-    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 1074267648)
+    CALL(evt_npc_flag_onoff, 1, STRING("peach"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_entry, STRING("nazo"), STRING("c_nazo"))
     CALL(evt_npc_set_tribe, STRING("nazo"), STRING("謎の人"))
     CALL(evt_npc_set_ry, STRING("nazo"), 90)
     CALL(evt_npc_set_position, STRING("nazo"), -145, 0, 450)
     CALL(evt_npc_status_onoff, 1, STRING("nazo"), 2)
-    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 1074266112)
+    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_SHADOW_NO_COLLISION)
     CALL(evt_npc_set_height, STRING("nazo"), 40)
     CALL(evt_npc_entry, STRING("hako"), STRING("MOBJ_GoldenTreasureBox"))
     CALL(evt_npc_set_anim, STRING("hako"), STRING("S_1"))
     CALL(evt_npc_set_position, STRING("hako"), -125, 0, 450)
-    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 1073741824)
+    CALL(evt_npc_flag_onoff, 1, STRING("hako"), NPC_FLAG_NO_WALL_HIT)
     CALL(evt_npc_pera_onoff, STRING("hako"), 0)
     CALL(evt_mobj_itembox, STRING("hako"), 340, 110, -20, 1, 0, 0, 0)
-    CALL(evt_mobj_flag_onoff, 1, STRING("hako"), 16384)
+    CALL(evt_mobj_flag_onoff, 1, STRING("hako"), MOBJ_FLAG_INVISIBLE)
     CALL(evt_npc_entry, STRING("ロテン１"), STRING("c_roten"))
     CALL(evt_npc_set_tribe, STRING("ロテン１"), STRING("ロテン"))
-    CALL(evt_npc_flag_onoff, 1, STRING("ロテン１"), 1074267648)
+    CALL(evt_npc_flag_onoff, 1, STRING("ロテン１"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_status_onoff, 1, STRING("ロテン１"), 2)
     CALL(evt_npc_change_interrupt, STRING("ロテン１"), 1, PTR(roten_move))
     CALL(evt_npc_entry, STRING("クリボー１"), STRING("c_kuribo_n"))
     CALL(evt_npc_set_tribe, STRING("クリボー１"), STRING("NPCクリボー"))
-    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), 1074267648)
+    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_status_onoff, 1, STRING("クリボー１"), 2)
     CALL(evt_npc_change_interrupt, STRING("クリボー１"), 1, PTR(kuribo_move))
     CALL(evt_npc_entry, STRING("チューさん１"), STRING("c_tyusan"))
     CALL(evt_npc_set_tribe, STRING("チューさん１"), STRING("チューさん"))
-    CALL(evt_npc_flag_onoff, 1, STRING("チューさん１"), 1074267648)
+    CALL(evt_npc_flag_onoff, 1, STRING("チューさん１"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_status_onoff, 1, STRING("チューさん１"), 2)
     CALL(evt_npc_change_interrupt, STRING("チューさん１"), 1, PTR(chusan_move))
     CALL(evt_mario_cont_onoff, 0)
@@ -1067,14 +1040,14 @@ EVT_BEGIN(dmo_00_init_evt)
     CALL(evt_paper_entry, STRING("OFF_d_meku_right"))
     CALL(evt_cam3d_evt_set, 0, 385, 1473, 0, 100, 0, 0, 11)
     CALL(evt_cam_letter_box_onoff, 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S"), MAPOBJ_FLAG_HIDE)
     CALL(evt_bg_disp_onoff, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING("ロテン１"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING("チューさん１"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("peach"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING("hako"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING("ロテン１"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING("クリボー１"), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING("チューさん１"), NPC_FLAG_HIDDEN)
     BEGIN_INLINE_EVENT_GET_ID(GW(0))
         SET_TYPE(0)
         CALL(demo_draw)
@@ -1084,72 +1057,12 @@ EVT_BEGIN(dmo_00_init_evt)
     BEGIN_INLINE_EVENT
         CALL(evt_sub_animgroup_async, STRING("OFF_d_maku_center"))
     END_INLINE_EVENT
+#if VERSION >= VERSION_US
     CALL(evt_fade_set_mapchange_type, 1, -1, -1, -1, 900)
+#endif
     RETURN
+#if VERSION >= VERSION_US
 EVT_END()
 #else
-EVT_BEGIN(dmo_00_init_evt)
-    CALL(demo_init)
-    CALL(evt_npc_entry, STRING("peach"), STRING("c_peach"))
-    CALL(evt_npc_set_tribe, STRING("peach"), STRING(/*"デモピーチ標準2"*/"\x83\x66\x83\x82\x83\x73\x81\x5B\x83\x60\x95\x57\x8F\x80\x32"))
-    CALL(evt_npc_set_ry, STRING("peach"), 90)
-    CALL(evt_npc_set_position, STRING("peach"), -2, 0, 550)
-    CALL(evt_npc_status_onoff, 1, STRING("peach"), 2)
-    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 1074267648)
-    CALL(evt_npc_entry, STRING("nazo"), STRING("c_nazo"))
-    CALL(evt_npc_set_tribe, STRING("nazo"), STRING(/*"謎の人"*/"\x93\xE4\x82\xCC\x90\x6C"))
-    CALL(evt_npc_set_ry, STRING("nazo"), 90)
-    CALL(evt_npc_set_position, STRING("nazo"), -145, 0, 450)
-    CALL(evt_npc_status_onoff, 1, STRING("nazo"), 2)
-    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 1074266112)
-    CALL(evt_npc_set_height, STRING("nazo"), 40)
-    CALL(evt_npc_entry, STRING("hako"), STRING("MOBJ_GoldenTreasureBox"))
-    CALL(evt_npc_set_anim, STRING("hako"), STRING("S_1"))
-    CALL(evt_npc_set_position, STRING("hako"), -125, 0, 450)
-    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 1073741824)
-    CALL(evt_npc_pera_onoff, STRING("hako"), 0)
-    CALL(evt_mobj_itembox, STRING("hako"), 340, 110, -20, 1, 0, 0, 0)
-    CALL(evt_mobj_flag_onoff, 1, STRING("hako"), 16384)
-    CALL(evt_npc_entry, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), STRING("c_roten"))
-    CALL(evt_npc_set_tribe, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), STRING(/*"ロテン"*/"\x83\x8D\x83\x65\x83\x93"))
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 1074267648)
-    CALL(evt_npc_status_onoff, 1, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 2)
-    CALL(evt_npc_change_interrupt, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 1, PTR(roten_move))
-    CALL(evt_npc_entry, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), STRING("c_kuribo_n"))
-    CALL(evt_npc_set_tribe, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), STRING(/*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B"))
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 1074267648)
-    CALL(evt_npc_status_onoff, 1, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 2)
-    CALL(evt_npc_change_interrupt, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 1, PTR(kuribo_move))
-    CALL(evt_npc_entry, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), STRING("c_tyusan"))
-    CALL(evt_npc_set_tribe, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), STRING(/*"チューさん"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1"))
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 1074267648)
-    CALL(evt_npc_status_onoff, 1, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 2)
-    CALL(evt_npc_change_interrupt, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 1, PTR(chusan_move))
-    CALL(evt_mario_cont_onoff, 0)
-    CALL(evt_party_cont_onoff, 0, 0)
-    CALL(evt_mario_set_pos, 0, -1000, 0)
-    CALL(evt_party_set_pos, 0, 0, -1000, 0)
-    CALL(evt_paper_entry, STRING("OFF_d_meku_right"))
-    CALL(evt_cam3d_evt_set, 0, 385, 1473, 0, 100, 0, 0, 11)
-    CALL(evt_cam_letter_box_onoff, 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 1)
-    CALL(evt_bg_disp_onoff, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("peach"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING("nazo"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING("hako"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50"), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50"), 128)
-    BEGIN_INLINE_EVENT_GET_ID(GW(0))
-        SET_TYPE(0)
-        CALL(demo_draw)
-    END_INLINE_EVENT
-    SPAWN_EVENT(demo_evt)
-    SPAWN_EVENT(koushukei_dai)
-    BEGIN_INLINE_EVENT
-        CALL(evt_sub_animgroup_async, STRING("OFF_d_maku_center"))
-    END_INLINE_EVENT
-    RETURN
-EVT_END_PAD()
+EVT_END_PAD() // JP: one zero word after the script
 #endif
-

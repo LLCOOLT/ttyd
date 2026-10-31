@@ -1,3 +1,5 @@
+// Nozzle effect (nozle): a nozzle model drawn from display-list data, placed and rotated by the caller for a set life.
+#include "eff/eff_nozle.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -6,31 +8,33 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/eff_kemu_test.h"
+#include "version.h"
 
 typedef struct EffNozleWork {
-    s32 type;       // 0x0
-    Vec position;   // 0x4
-    f32 sx;         // 0x10
-    f32 sy;         // 0x14
-    f32 u0;         // 0x18
-    f32 v0;         // 0x1C
-    f32 u1;         // 0x20
-    f32 v1;         // 0x24
-    f32 scale;      // 0x28
-    s32 life;       // 0x2C
-    s32 timer;      // 0x30
-    s32 alpha;      // 0x34
-    s32 flag;       // 0x38
-    f32 rotX;       // 0x3C
-    f32 rotY;       // 0x40
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    f32 sx;       // 0x10
+    f32 sy;       // 0x14
+    f32 u0;       // 0x18
+    f32 v0;       // 0x1C
+    f32 u1;       // 0x20
+    f32 v1;       // 0x24
+    f32 scale;    // 0x28
+    s32 life;     // 0x2C
+    s32 timer;    // 0x30
+    s32 alpha;    // 0x34
+    s32 flag;     // 0x38
+    f32 rotX;     // 0x3C
+    f32 rotY;     // 0x40
 } EffNozleWork;
 
-EffectEntry* effKemuTestEntry(s32, f32, f32, f32, f32);
 void effNozleMain(EffectEntry* effect);
 void effNozleDisp(CameraId cameraId, EffectEntry* effect);
 
-
-
+// Model data in the exporter's layout: indexed vertex arrays (positions, normals, colours, texture coordinates),
+// display lists of GX commands (each padded to 32 bytes with GX_NOP) and, per list table, the list sizes in
+// 32-byte units for GXCallDisplayList.
 static s16 nozle_1_vertex_tbl[] __attribute__((aligned(32))) = {
     -796, 0, 0, 796, 0, 0,
     -1741, 2132, 0, 1741, 2132, 0,
@@ -103,7 +107,7 @@ static s16 nozle_1_texcoord1_tbl[] __attribute__((aligned(32))) = {
     16384, -5461, 16384, -8192, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 static s8 nozle_1_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64};
 #else
 static s8 nozle_1_normal_tbl[] __attribute__((aligned(32))) = {
@@ -337,7 +341,7 @@ static s16 nozle_4_texcoord1_tbl[] __attribute__((aligned(32))) = {
     8192, 12288, 8192, 16384, 8192, 20480, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 static s8 nozle_4_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64, 0};
 #else
 static s8 nozle_4_normal_tbl[] __attribute__((aligned(32))) = {
@@ -360,7 +364,7 @@ static u32 nozle_4_dl_0_7[] __attribute__((aligned(32))) = {0x98000619, 0x000119
 static void* nozle_4_dl_0_tbl[] = {nozle_4_dl_0_0, nozle_4_dl_0_1, nozle_4_dl_0_2, nozle_4_dl_0_3, nozle_4_dl_0_4, nozle_4_dl_0_5, nozle_4_dl_0_6, nozle_4_dl_0_7};
 static u8 nozle_4_dl_0_size_tbl[] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
 static u8 scale_dt[][2] = {{0, 0}, {11, 13}, {22, 27}, {34, 41}, {46, 55}, {57, 69}, {68, 82}, {79, 94}, {87, 105}, {94, 113}, {100, 120}, {102, 123}, {103, 124}, {101, 123}, {98, 120}, {95, 116}, {90, 111}, {86, 107}, {83, 103}, {81, 101}, {80, 100}, {0, 0}
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     // the demo keeps a fade-out half after the grow-in half
     , {80, 100}, {79, 99}, {77, 97}, {75, 94}, {73, 91}, {70, 87}, {66, 83}, {62, 78}, {58, 73}, {54, 67}, {49, 61}, {44, 55}, {39, 49}, {34, 42}, {29, 36}, {24, 29}, {19, 23}, {14, 17}, {9, 11}, {5, 6}, {0, 0}, {0, 0}
 #endif
@@ -393,7 +397,7 @@ EffectEntry* effNozleEntry(s32 type, f32 x, f32 y, f32 z, f32 rx, f32 ry, s32 li
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffNozleWork));
     effect->userdata = work;
     effect->callback = effNozleMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -437,8 +441,8 @@ void effNozleMain(EffectEntry* effect) {
     v.z = work->position.z;
     position = v;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 32;
     }
     switch (type) {
@@ -484,7 +488,7 @@ void effNozleMain(EffectEntry* effect) {
     work->timer++;
     if (work->life < 0) {
         effDelete(effect);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     } else if (type == 3) {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 8, (DispCallback)effNozleDisp, effect);
 #endif
@@ -511,7 +515,12 @@ void effNozleMain(EffectEntry* effect) {
     GXSetVtxAttrFmt(0, 14, 1, 3, tf);           \
     GXSetArray(14, t1, 4)
 
-#define CALLDL(n, tbl, sz_, S, D) { for (k = 0, S = sz_, D = tbl; k < n; k++, S++, D++) { GXCallDisplayList(*D, *S * 32); } }
+#define CALLDL(n, tbl, sz_, S, D)                             \
+    {                                                         \
+        for (k = 0, S = sz_, D = tbl; k < n; k++, S++, D++) { \
+            GXCallDisplayList(*D, *S * 32);                   \
+        }                                                     \
+    }
 
 void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     void** dl5;
@@ -537,7 +546,7 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     cam = camGetPtr(cameraId);
     alpha = work->alpha;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     GXSetBlendMode(1, 4, 5, 0);
     GXSetZCompLoc(1);
     GXSetAlphaCompare(7, 0, 0, 7, 0);
@@ -595,9 +604,17 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     switch (work->type) {
         case 0:
             SETUP(2, 7, 14, nozle_1_vertex_tbl, nozle_1_normal_tbl, nozle_1_color0_tbl, nozle_1_texcoord0_tbl, nozle_1_texcoord1_tbl);
-            { for (k = 0, sz = nozle_1_dl_0_size_tbl, dl = nozle_1_dl_0_tbl; k < 10; k++, sz++, dl++) { GXCallDisplayList(*dl, *sz * 32); } }
+            {
+                for (k = 0, sz = nozle_1_dl_0_size_tbl, dl = nozle_1_dl_0_tbl; k < 10; k++, sz++, dl++) {
+                    GXCallDisplayList(*dl, *sz * 32);
+                }
+            }
             SETUP(2, 7, 14, nozle_1_vertex_tbl, nozle_1_normal_tbl, nozle_1_color0_tbl, nozle_1_texcoord0_tbl, nozle_1_texcoord1_tbl);
-            { for (k = 0, sz2 = nozle_1_dl_1_size_tbl, dl2 = nozle_1_dl_1_tbl; k < 10; k++, sz2++, dl2++) { GXCallDisplayList(*dl2, *sz2 * 32); } }
+            {
+                for (k = 0, sz2 = nozle_1_dl_1_size_tbl, dl2 = nozle_1_dl_1_tbl; k < 10; k++, sz2++, dl2++) {
+                    GXCallDisplayList(*dl2, *sz2 * 32);
+                }
+            }
             break;
         case 2:
             SETUP(3, 7, 14, nozle_3_vertex_tbl, nozle_3_normal_tbl, nozle_3_color0_tbl, nozle_3_texcoord0_tbl, nozle_3_texcoord1_tbl);

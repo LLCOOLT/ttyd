@@ -1,3 +1,4 @@
+// eff_cloud_n64.c: Paper Mario 64 Cloud effect entry (effCloudN64Entry) and its work data (EffCloudN64Work).
 #pragma once
 
 #include "driver/effdrv.h"
@@ -27,6 +28,5 @@ typedef struct EffCloudN64Work {
     s32 head;       // 0x2A8
     f32 len[30];    // 0x2AC
 } EffCloudN64Work;
-
 
 EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale);

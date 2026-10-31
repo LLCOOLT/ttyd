@@ -1,18 +1,17 @@
+// gon_10 (ゴンババ, Hooktail Castle): room between gon_05 and Hooktail's lair (gon_11).
+// Has a save block and a recovery block.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_envon);
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "party/party_motion.h"
+#include "gon.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static BeroEntry bero_entry_data[3];
-extern EvtWord gon_10_init_evt[];
 
 static EVT_BEGIN(door02_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -51,8 +50,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         13, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -69,8 +68,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         12, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -90,14 +89,13 @@ EVT_BEGIN(gon_10_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON3"))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON3"))
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -460, 1010, -145, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 6, -400, 1010, -146, 0, 0)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 55)
-        CALL(evt_mapobj_flag_onoff, 0, 1, STRING("en"), 1)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_16_HOOKTAIL)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("en"), MAPOBJ_FLAG_HIDE)
     END_IF
     RETURN
 EVT_END()
-

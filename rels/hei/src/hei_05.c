@@ -1,49 +1,30 @@
+// hei_05 (平原, Petal Meadows): second gate room (hei_04 to hei_06).
+// Two Shinemon enemies guard a gate (mon) that opens (story 30).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "npc_event.h"
 #include "evt/evt_npc.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_set_at);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_del_case_evt);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_link);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "hei.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[3];
-extern EvtWord hei_05_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -58,8 +39,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -75,15 +56,15 @@ static BeroEntry bero_entry_data[] = {
 };
 
 static EVT_BEGIN(dead_evt1)
-    SET_VALUE(GSWF(1792), 1)
-    SET_VALUE(GSWF(1793), 1)
+    SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_A_DEFEATED), 1)
+    SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_B_DEFEATED), 1)
     CALL_CHILD(PTR(enemy_common_dead_event))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(dead_evt2)
-    SET_VALUE(GSWF(1793), 1)
-    SET_VALUE(GSWF(1792), 1)
+    SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_B_DEFEATED), 1)
+    SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_A_DEFEATED), 1)
     CALL_CHILD(PTR(enemy_common_dead_event))
     RETURN
 EVT_END()
@@ -131,7 +112,7 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 static EVT_BEGIN(door_open)
-    IF_INT_LESS(GSW(0), 30)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_05_BRISTLE)
         CALL(evt_mario_key_onoff, 0)
         WAIT_MS(800)
         BEGIN_INLINE_EVENT
@@ -157,7 +138,7 @@ static EVT_BEGIN(door_open)
         CALL(evt_cam3d_evt_off, 1000, 11)
         WAIT_MS(1000)
         CALL(evt_hitobj_onoff, STRING("a_mon"), 0, 0)
-        SET_VALUE(GSW(0), 30)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_05_BRISTLE)
         CALL(evt_mario_key_onoff, 1)
     END_IF
     RETURN
@@ -179,12 +160,12 @@ static EVT_BEGIN(shake_evt)
 EVT_END()
 
 static EVT_BEGIN(hashira_evt_sub)
-    CALL(evt_npc_flag_onoff, 0, LW(0), 32768)
+    CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_get_position, LW(0), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_TOGEDA_JUMP1"), LW(10), LW(11), LW(12), 0)
     IF_INT_LESS(LW(10), 0)
         ADD(LW(10), 50)
-        ELSE
+    ELSE
         SUBTRACT(LW(10), 50)
     END_IF
     CALL(evt_npc_jump_position_nohit, LW(0), LW(10), 0, 100, 700, 30)
@@ -209,12 +190,13 @@ static EVT_BEGIN(hashira_evt)
     SET_VALUE(LW(0), LW(0))
     SPAWN_EVENT_GET_ID(PTR(hashira_evt_sub), LW(15))
     IF_INT_EQUAL(LW(2), 0)
-        IF_INT_EQUAL(GSWF(1789), 0)
+        // BUG: tests hei_03's pillar-enemy flags, not this map's GSWF_HEI05_PILLAR_ENEMY_A/B_DEFEATED (original game)
+        IF_INT_EQUAL(GSWF(GSWF_HEI03_PILLAR_ENEMY_B_DEFEATED), 0)
             SET_VALUE(LW(0), LW(1))
             SPAWN_EVENT(PTR(hashira_evt_sub))
         END_IF
-        ELSE
-        IF_INT_EQUAL(GSWF(1788), 0)
+    ELSE
+        IF_INT_EQUAL(GSWF(GSWF_HEI03_PILLAR_ENEMY_A_DEFEATED), 0)
             SET_VALUE(LW(0), LW(1))
             SPAWN_EVENT(PTR(hashira_evt_sub))
         END_IF
@@ -233,7 +215,7 @@ static EVT_BEGIN(hashira_evt)
         IF_INT_EQUAL(GF(1), 1)
             CALL(evt_del_case_evt, 0, GW(1))
         END_IF
-        ELSE
+    ELSE
         IF_INT_EQUAL(GF(0), 1)
             CALL(evt_del_case_evt, 0, GW(0))
         END_IF
@@ -246,50 +228,49 @@ EVT_BEGIN(hei_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-    CALL(evt_snd_bgmoff, 6144)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI4"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI4"))
     CALL(evt_snd_set_rev_mode, 1)
     CALL(evt_map_playanim, STRING("anm_hokori"), 1, 0)
-    IF_INT_LESS(GSW(0), 30)
-        IF_INT_EQUAL(GSWF(1792), 0)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_05_BRISTLE)
+        IF_INT_EQUAL(GSWF(GSWF_HEI05_PILLAR_ENEMY_A_DEFEATED), 0)
             CALL(evt_npc_set_anim, STRING("シンエモン1"), STRING("KUR_Z_1"))
             CALL(evt_npc_set_position, STRING("シンエモン1"), -119, 65, -77)
             CALL(evt_npc_set_ry, STRING("シンエモン1"), 90)
-            CALL(evt_npc_flag_onoff, 1, STRING("シンエモン1"), 32768)
+            CALL(evt_npc_flag_onoff, 1, STRING("シンエモン1"), NPC_FLAG_INSTANT_TURN)
             SET_RAW_VALUE(LW(0), STRING("シンエモン1"))
             SET_RAW_VALUE(LW(1), STRING("シンエモン2"))
             SET_VALUE(LW(2), 0)
-            CALL(evt_run_case_evt, 9, 1, STRING("a_hasira_1"), 0, PTR(hashira_evt), GW(0))
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_hasira_1"), 0, PTR(hashira_evt), GW(0))
             SET_VALUE(GF(0), 1)
         END_IF
-        IF_INT_EQUAL(GSWF(1793), 0)
+        IF_INT_EQUAL(GSWF(GSWF_HEI05_PILLAR_ENEMY_B_DEFEATED), 0)
             CALL(evt_npc_set_anim, STRING("シンエモン2"), STRING("KUR_Z_1"))
             CALL(evt_npc_set_position, STRING("シンエモン2"), 120, 62, -77)
             CALL(evt_npc_set_ry, STRING("シンエモン2"), 270)
-            CALL(evt_npc_flag_onoff, 1, STRING("シンエモン2"), 32768)
+            CALL(evt_npc_flag_onoff, 1, STRING("シンエモン2"), NPC_FLAG_INSTANT_TURN)
             SET_RAW_VALUE(LW(0), STRING("シンエモン2"))
             SET_RAW_VALUE(LW(1), STRING("シンエモン1"))
             SET_VALUE(LW(2), 1)
-            CALL(evt_run_case_evt, 9, 1, STRING("a_hasira_2"), 0, PTR(hashira_evt), GW(1))
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_hasira_2"), 0, PTR(hashira_evt), GW(1))
             SET_VALUE(GF(1), 1)
         END_IF
         BEGIN_INLINE_EVENT
             LABEL(0)
-            IF_INT_EQUAL(GSWF(1792), 0)
+            IF_INT_EQUAL(GSWF(GSWF_HEI05_PILLAR_ENEMY_A_DEFEATED), 0)
                 WAIT_FRAMES(1)
                 GOTO(0)
             END_IF
-            IF_INT_EQUAL(GSWF(1793), 0)
+            IF_INT_EQUAL(GSWF(GSWF_HEI05_PILLAR_ENEMY_B_DEFEATED), 0)
                 WAIT_FRAMES(1)
                 GOTO(0)
             END_IF
             CALL_CHILD(PTR(door_open))
         END_INLINE_EVENT
-        ELSE
+    ELSE
         CALL(evt_hitobj_onoff, STRING("a_mon"), 0, 0)
         CALL(evt_map_playanim, STRING("anm_mon"), 2, 0)
     END_IF
     RETURN
 EVT_END()
-

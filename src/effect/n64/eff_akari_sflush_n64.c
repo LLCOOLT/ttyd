@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: akari (light) flash, a yellow flare of the given size that fades over its lifetime.
+#include "eff/n64/eff_akari_sflush_n64.h"
 #include "driver/effdrv.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -5,8 +7,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffAkariSflushN64Work {
     s32 type;     // 0x0
@@ -46,7 +47,7 @@ EffectEntry* effAkariSflushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
     work = __memAlloc(HEAP_EFFECT, sizeof(EffAkariSflushN64Work));
     effect->userdata = work;
     effect->callback = effAkariSflushMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -78,8 +79,8 @@ void effAkariSflushMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -150,7 +151,9 @@ void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     effSetVtxDescN64(size16x16_tex32x32_vtx);
     for (i = 0; i < work->count + 1; i++) {
-        s = (f32)cos(6.2831855f * (f32)(frame * 8 + (i * 180) / (work->count + 1)) / 360.0f); s = 0.1f * s + (f32)(i + 1); s *= work->scale;
+        s = (f32)cos(6.2831855f * (f32)(frame * 8 + (i * 180) / (work->count + 1)) / 360.0f);
+        s = 0.1f * s + (f32)(i + 1);
+        s *= work->scale;
         PSMTXRotRad(rot, 'z', 0.017453292f * (f32)(i * 36));
         PSMTXScale(scale, s, s, s);
         PSMTXConcat(rot, scale, m44);
@@ -172,4 +175,3 @@ void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-

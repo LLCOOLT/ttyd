@@ -1,45 +1,31 @@
+// moo_05 (月, the Moon): a crater field between moo_01 and moo_02.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "moo.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_shadow);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_offscreen_get_boundingbox2);
-#endif
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
 
 static BeroEntry bero_entry_data[3];
-extern EvtWord moo_05_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -54,8 +40,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -70,7 +56,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
 static EVT_BEGIN(rock_main)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -79,7 +65,7 @@ static EVT_BEGIN(rock_main)
     END_INLINE_EVENT
     CALL(evt_offscreen_entry, STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 0, LW(10), STRING("offscreen"))
-    CALL(evt_mapobj_flag_onoff, 0, 1, LW(10), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, LW(10), MAPOBJ_FLAG_HIDE)
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_bom_ver2"))
     CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
@@ -96,16 +82,16 @@ EVT_END()
 #endif
 
 static EVT_BEGIN(rock_evt0)
-#ifdef VERSION_G8ME01
-    SET_VALUE(GSWF(4031), 1)
+#if VERSION >= VERSION_US
+    SET_VALUE(GSWF(GSWF_MOO05_ROCK_BOMBED), 1)
 #else
     CALL(evt_mario_key_onoff, 0)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_07"))
     SET_VALUE(LW(11), STRING("A_iwa_07"))
     CALL_CHILD(PTR(rock_main))
-#ifndef VERSION_G8ME01
-    SET_VALUE(GSWF(4031), 1)
+#if VERSION <= VERSION_JP
+    SET_VALUE(GSWF(GSWF_MOO05_ROCK_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
 #endif
     CALL(evt_exit_case_evt)
@@ -116,18 +102,17 @@ EVT_BEGIN(moo_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_MON1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_MOO1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_MON1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_MOO1"))
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_02"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_03"), 1, 0)
     CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
-    IF_INT_EQUAL(GSWF(4031), 0)
-        CALL(evt_run_case_evt, 15, 1, STRING("A_iwa_07"), 0, PTR(rock_evt0), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_iwa_07"), 1)
+    IF_INT_EQUAL(GSWF(GSWF_MOO05_ROCK_BOMBED), 0)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_iwa_07"), 0, PTR(rock_evt0), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_iwa_07"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_iwa_07"), 1, 0)
     END_IF
     RETURN
 EVT_END()
-

@@ -1,3 +1,4 @@
+// Star Points: star icons launched up and outward from a point one after another, then falling and fading.
 #include "eff/eff_starpoint.h"
 #include "driver/dispdrv.h"
 #include "driver/icondrv.h"
@@ -10,17 +11,17 @@
 #define HALF_PI 1.5707964f
 
 typedef struct EffStarPointWork {
-    s32 type;                // 0x0
-    s32 timer;               // 0x4
-    s32 frame;               // 0x8
-    Vec position;            // 0xC
-    f32 velX;                // 0x18
-    f32 velZ;                // 0x1C
-    f32 velY;                // 0x20
-    f32 gravity;             // 0x24
-    u8 pad_28[4];            // 0x28
-    s32 alpha;               // 0x2C
-    s32 delay;               // 0x30
+    s32 type;     // 0x0
+    s32 timer;    // 0x4
+    s32 frame;    // 0x8
+    Vec position; // 0xC
+    f32 velX;     // 0x18
+    f32 velZ;     // 0x1C
+    f32 velY;     // 0x20
+    f32 gravity;  // 0x24
+    u8 pad_28[4]; // 0x28
+    s32 alpha;    // 0x2C
+    s32 delay;    // 0x30
 } EffStarPointWork;
 
 // cheap polynomial approximations, valid for x in [0, 2pi]
@@ -36,24 +37,21 @@ static inline f32 _sinf(f32 x) {
             a = a * x2 - b;
             a = a * x2 + c;
             a = a * x;
-        }
-        else {
+        } else {
             x = HALF_PI - (x - HALF_PI);
             x2 = x * x;
             a = a * x2 - b;
             a = a * x2 + c;
             a = a * x;
         }
-    }
-    else if (x < 4.712389f) {
+    } else if (x < 4.712389f) {
         x = x - PI;
         x2 = x * x;
         a = a * x2 - b;
         a = a * x2 + c;
         a = a * x;
         a = -a;
-    }
-    else {
+    } else {
         x = HALF_PI - (x - 4.712389f);
         x2 = x * x;
         a = a * x2 - b;
@@ -71,28 +69,30 @@ static inline f32 _cosf(f32 x) {
     f32 x2;
 
     if (x <= PI) {
-        { s32 gz = 0; if (gz != 0) { a = (a / x) / (x / a); } } // FAKE: dead guard, no code (COLOURING W); its float temps keep the hoisted 2.0 deferred (f31)
+        {
+            s32 gz = 0;
+            if (gz != 0) {
+                a = (a / x) / (x / a);
+            }
+        } // FAKE: dead guard, no code (COLOURING W); its float temps keep the hoisted 2.0 deferred (f31)
         if (x <= HALF_PI) {
             x2 = x * x;
             a = a * x2 - b;
             a = a * x2 + c;
-        }
-        else {
+        } else {
             x = HALF_PI - (x - HALF_PI);
             x2 = x * x;
             a = a * x2 - b;
             a = a * x2 + c;
             a = -a;
         }
-    }
-    else if (x < 4.712389f) {
+    } else if (x < 4.712389f) {
         x = x - PI;
         x2 = x * x;
         a = a * x2 - b;
         a = a * x2 + c;
         a = -a;
-    }
-    else {
+    } else {
         x = HALF_PI - (x - 4.712389f);
         x2 = x * x;
         a = a * x2 - b;
@@ -101,7 +101,9 @@ static inline f32 _cosf(f32 x) {
     return a;
 }
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+// lifetimes optimisation off for effStarPointEntry: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     s32 delay;
@@ -147,7 +149,7 @@ void effStarPointMain(EffectEntry* effect) {
     Vec position;
     s32 i;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
     work->timer--;
     work->frame++;
     if (work->timer < 0) {
@@ -158,8 +160,7 @@ void effStarPointMain(EffectEntry* effect) {
         if (work->delay) {
             work->delay--;
             work->alpha = 0;
-        }
-        else {
+        } else {
             work->velY -= work->gravity;
             work->position.x += work->velX;
             work->position.y += work->velY;
@@ -169,8 +170,7 @@ void effStarPointMain(EffectEntry* effect) {
                 if (work->alpha < 0) {
                     work->alpha = 0;
                 }
-            }
-            else {
+            } else {
                 work->alpha = 255;
             }
         }
@@ -196,4 +196,3 @@ void effStarPointDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-

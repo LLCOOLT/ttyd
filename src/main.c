@@ -1,3 +1,4 @@
+// Program entry: initialises the game and runs the main loop (game update, draw, frame timing).
 #include "main.h"
 
 #include "mario/mariost.h"
@@ -13,9 +14,9 @@ int main(void) {
         DEMOBeforeRender();
         marioStDisp();
         marioStMain();
-        gp->mDeltaGame = OSGetTick() - base_tick;
+        gp->deltaGame = OSGetTick() - base_tick;
         DEMODoneRender();
-        gp->mDeltaRender = OSGetTick() - base_tick;
+        gp->deltaRender = OSGetTick() - base_tick;
     }
 
     return 0;

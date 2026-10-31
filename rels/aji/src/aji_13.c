@@ -1,3 +1,5 @@
+// aji_13 (敵のアジト, X-Naut Fortress): the conveyor-belt room (move_left_right, move_up_down) with clockwork
+// switches and the card key (evt_key_get).
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -14,75 +16,39 @@
 #include "evt/evt_bero.h"
 #include "aji.h"
 #include "mario/mario_pouch.h"
-#ifdef VERSION_G8MP01
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "mario/mario_cam.h"
+#include "party/party_motion.h"
+#include "memory.h"
+#include "libc_decls.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#if VERSION == VERSION_EU
 #include "mario/mariost.h"
 #endif
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
-BOOL hitIsGroup(HitEntry* target, HitEntry* group);
-#ifndef VERSION_G8ME01
-void* _mapAlloc(u32 size);
-#else
-#include "memory.h"
-#endif
-double sin(double x);
-double cos(double x);
-typedef struct { Vec pos; Vec delta; } BeltWork;
-void camFollowYOn(void);
+typedef struct {
+    Vec pos;
+    Vec delta;
+} BeltWork;
 
 USER_FUNC(bg_cam_chk);
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_set_scale);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cam_keep_off);
-USER_FUNC(evt_mario_cam_y_on);
-USER_FUNC(evt_mario_get_name_hitobj_head);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_offscreen_get_boundingbox);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
-USER_FUNC(evt_win_item_select);
 static USER_FUNC(mario_chk);
 USER_FUNC(hit_group_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
@@ -96,18 +62,32 @@ extern EvtWord move_left_right[];
 extern EvtWord move_up_down[];
 extern EvtWord move_r[];
 /* moving-floor gimmick read by shikake_init: hit, mapobj, two motion params, time; a NULL mapobj ends the table */
-typedef struct ShikakeMove { const char* hit; const char* mapobj; s32 param0; s32 param1; s32 time; } ShikakeMove;
-typedef struct ShikakeMoveTbl7 { ShikakeMove rows[7]; const char* end[2]; } ShikakeMoveTbl7;
+typedef struct ShikakeMove {
+    const char* hit;
+    const char* mapobj;
+    s32 param0;
+    s32 param1;
+    s32 time;
+} ShikakeMove;
+typedef struct ShikakeMoveTbl7 {
+    ShikakeMove rows[7];
+    const char* end[2];
+} ShikakeMoveTbl7;
 ShikakeMoveTbl7 left_right_tbl;
-typedef struct ShikakeMoveTbl6 { ShikakeMove rows[6]; const char* end[2]; } ShikakeMoveTbl6;
+typedef struct ShikakeMoveTbl6 {
+    ShikakeMove rows[6];
+    const char* end[2];
+} ShikakeMoveTbl6;
 ShikakeMoveTbl6 up_down_tbl;
-typedef struct ShikakeMoveTbl15 { ShikakeMove rows[15]; const char* end[2]; } ShikakeMoveTbl15;
+typedef struct ShikakeMoveTbl15 {
+    ShikakeMove rows[15];
+    const char* end[2];
+} ShikakeMoveTbl15;
 ShikakeMoveTbl15 r_tbl;
 extern EvtWord shikake_init[];
 extern EvtWord evt_bcv_sw[];
 extern EvtWord evt_key_get[];
 static s32 key_tbl[2];
-extern EvtWord aji_13_init_evt[];
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
@@ -160,7 +140,7 @@ static EVT_BEGIN(e_door_open)
 EVT_END()
 
 EVT_BEGIN(evt_snd_stop)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 370)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_17_CONVEYOR_BELT)
         CALL(evt_snd_sfxoff, GW(11))
     END_IF
     SET_VALUE(LW(0), 0)
@@ -183,8 +163,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -201,8 +181,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -219,8 +199,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -235,8 +215,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -251,8 +231,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_3", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -267,8 +247,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_4", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -283,8 +263,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_5", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -299,8 +279,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_6", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)evt_haikei_in, // enterEvent
@@ -315,8 +295,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_7", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)evt_haikei_in, // enterEvent
@@ -331,8 +311,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_8", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)evt_haikei_in, // enterEvent
@@ -347,8 +327,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_9", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)evt_haikei_in, // enterEvent
@@ -363,8 +343,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_10", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)evt_haikei_in, // enterEvent
@@ -379,8 +359,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_c", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -395,8 +375,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_d", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -480,18 +460,18 @@ static USER_FUNC(mario_chk) {
             break;
         }
     }
-    if (evtGetValue(event, GSW(0)) >= 370) {
+    if (evtGetValue(event, GSW(GSW_STORY_PROGRESS)) >= STORY_STG7_17_CONVEYOR_BELT) {
         MarioWork* mario = marioGetPtr();
         PartyEntry* party = partyGetPtr(0);
         if (mario != NULL && mario->hitobjStandOn != NULL && hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_bel"))) {
             mario->floorMove.x = 0.6f;
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
             mario->floorMove.x *= 60.0f / gp->framerate; // PAL: the push per frame is scaled to the frame rate
 #endif
         }
         if (party != NULL && party->hitobjUnder != NULL && hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_bel"))) {
             party->floorMoveX = 0.6f;
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
             party->floorMoveX *= 60.0f / gp->framerate;
 #endif
         }
@@ -584,7 +564,7 @@ EVT_BEGIN(move_left_right)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(move_up_down)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(6), LW(1))
@@ -613,7 +593,7 @@ EVT_BEGIN(move_up_down)
                 WAIT_FRAMES(1)
             END_LOOP
         END_SIBLING_EVENT
-        ELSE
+    ELSE
         SET_VALUE(LW(3), 0)
     END_IF
     LOOP(0)
@@ -638,7 +618,7 @@ EVT_BEGIN(move_up_down)
         IF_INT_NOT_EQUAL(LW(3), 0)
             IF_INT_EQUAL(GF(1), 0)
                 SET_VALUE(LW(8), LW(4))
-                ELSE
+            ELSE
                 MULTIPLY_FLOAT(LW(0), FLOAT(100.0f))
                 SET_VALUE(LW(8), LW(0))
             END_IF
@@ -650,7 +630,7 @@ EVT_BEGIN(move_up_down)
                 SET_VALUE(GF(1), 0)
                 WAIT_MS(1000)
             END_LOOP
-            ELSE
+        ELSE
             WAIT_MS(300)
         END_IF
         LOOP(0)
@@ -711,7 +691,7 @@ EVT_BEGIN(move_up_down)
                 WAIT_FRAMES(1)
             END_LOOP
         END_SIBLING_EVENT
-        ELSE
+    ELSE
         SET_VALUE(LW(3), 0)
     END_IF
     LOOP(0)
@@ -737,7 +717,7 @@ EVT_BEGIN(move_up_down)
         IF_INT_NOT_EQUAL(LW(3), 0)
             IF_INT_EQUAL(GF(1), 0)
                 SET_VALUE(LW(8), LW(4))
-                ELSE
+            ELSE
                 SET_VALUE(LW(8), LW(0))
             END_IF
             WAIT_MS(300)
@@ -748,7 +728,7 @@ EVT_BEGIN(move_up_down)
                 SET_VALUE(GF(1), 0)
                 WAIT_MS(1000)
             END_LOOP
-            ELSE
+        ELSE
             WAIT_MS(300)
         END_IF
         LOOP(0)
@@ -920,7 +900,7 @@ static EVT_BEGIN(evt_sw)
     CALL(evt_img_onoff, STRING("img"), 1)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_OFF7_KAIDAN_APPEAR1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kaidan"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kaidan"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_kaidan"), 1, 1)
     WAIT_MS(1800)
     CALL(evt_img_wait_animend, STRING("img"))
@@ -928,7 +908,7 @@ static EVT_BEGIN(evt_sw)
     CALL(evt_img_release, STRING("img"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_kaidan"))
     CALL(evt_offscreen_delete, STRING("ofs"))
-    SET_VALUE(GSW(0), 371)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_18_OFF_SCREEN_STAIRS)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_off, 1000, 11)
     WAIT_MS(500)
@@ -947,7 +927,7 @@ static EVT_BEGIN(evt_hari)
         IF_INT_EQUAL(LF(0), 0)
             MULTIPLY(LW(3), -1)
             SET_VALUE(LF(0), 1)
-            ELSE
+        ELSE
             SET_VALUE(LF(0), 0)
         END_IF
         CALL(evt_sub_random, 1500, LW(9))
@@ -969,7 +949,7 @@ EVT_END()
 static EVT_BEGIN(evt_ramp)
     CALL(evt_mapobj_get_position, STRING("S_bel"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_CONVEYER_MOVE1"), LW(0), LW(1), LW(2), GW(11))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_pato1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_pato1"), MAPOBJ_FLAG_HIDE)
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
         LOOP(0)
@@ -993,21 +973,21 @@ static EVT_BEGIN(evt_ramp)
 EVT_END()
 
 EVT_BEGIN(evt_bcv_sw)
-    SET_VALUE(GSW(0), 370)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_17_CONVEYOR_BELT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, -575, 152, 578, -575, 57, 37, 1000, 11)
     WAIT_MS(1000)
     WAIT_MS(1000)
     CALL(evt_mapobj_get_position, STRING("S_bel"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_CONVEYER_ACTIVE1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_1_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_2_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_3_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_4_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_1_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_2_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_3_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_4_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_1_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_3_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_4_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_1_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_2_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_3_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_4_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("kon"), 1, 0)
     SPAWN_EVENT(PTR(evt_ramp))
     WAIT_MS(3000)
@@ -1017,7 +997,7 @@ EVT_BEGIN(evt_bcv_sw)
 EVT_END()
 
 EVT_BEGIN(evt_key_get)
-    SET_VALUE(GSWF(4181), 1)
+    SET_VALUE(GSWF(GSWF_AJI13_CARD_KEY_TAKEN), 1)
     RETURN
 EVT_END()
 
@@ -1027,7 +1007,7 @@ static s32 key_tbl[] = {
 
 static EVT_BEGIN(evt_door_msg)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_pouch_check_item, 32, LW(0))
+    CALL(evt_pouch_check_item, ITEM_CARD_KEY_0x20, LW(0))
     IF_INT_LESS(LW(0), 1)
         CALL(evt_msg_print, 0, STRING("stg7_aji_67"), 0, 0)
         CALL(evt_mario_key_onoff, 1)
@@ -1038,11 +1018,11 @@ static EVT_BEGIN(evt_door_msg)
         CALL(evt_pouch_remove_item, LW(0), LW(1))
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_on))
-        SET_VALUE(GSW(0), 372)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kagi1_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kagi1_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_lights1_m"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights1_r"), 1)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kagi1_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kagi1_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_DOOR_UNLOCK1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_exit_case_evt)
@@ -1052,63 +1032,63 @@ static EVT_BEGIN(evt_door_msg)
 EVT_END()
 
 EVT_BEGIN(aji_13_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI7"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI7"))
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(shikake_init))
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou1"), STRING("A_hikou1"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ami2"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_dai5"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_dai3"), 2)
-    IF_INT_LESS(GSW(0), 370)
-        CALL(evt_mobj_switch_blue, 0, STRING("bcv_sw"), -150, 0, 100, PTR(evt_bcv_sw), GSWF(4185))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_pato1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_1_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_2_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_3_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_4_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_1_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_2_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_3_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_4_2"), 1)
-        ELSE
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ami2"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_dai5"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_dai3"), MAPOBJ_FLAG_BBOX_CULL)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_17_CONVEYOR_BELT)
+        CALL(evt_mobj_switch_blue, 0, STRING("bcv_sw"), -150, 0, 100, PTR(evt_bcv_sw), GSWF(GSWF_AJI13_CONVEYOR_SWITCH_PRESSED))
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_pato1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_1_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_2_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_3_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_4_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_1_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_3_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_4_2"), MAPOBJ_FLAG_HIDE)
+    ELSE
         CALL(evt_map_playanim, STRING("kon"), 1, 0)
         CALL_CHILD(PTR(evt_ramp))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_1_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_2_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_3_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("meta_4_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_1_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_2_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_3_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("meta_4_2"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_1_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_3_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_4_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_1_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_2_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_3_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("meta_4_2"), MAPOBJ_FLAG_HIDE)
     END_IF
-    IF_INT_EQUAL(GSWF(4181), 0)
-        CALL(evt_item_entry, STRING("key"), 32, -50, 100, 100, 16, -1, PTR(evt_key_get))
+    IF_INT_EQUAL(GSWF(GSWF_AJI13_CARD_KEY_TAKEN), 0)
+        CALL(evt_item_entry, STRING("key"), ITEM_CARD_KEY_0x20, -50, 100, 100, 16, -1, PTR(evt_key_get))
     END_IF
-    IF_INT_LESS(GSW(0), 371)
-        CALL(evt_mobj_switch_blue, 0, STRING("sw"), 650, 200, 100, PTR(evt_sw), GSWF(4184))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kaidan"), 1)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_18_OFF_SCREEN_STAIRS)
+        CALL(evt_mobj_switch_blue, 0, STRING("sw"), 650, 200, 100, PTR(evt_sw), GSWF(GSWF_AJI13_STAIRS_SWITCH_PRESSED))
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kaidan"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_kaidan"), 1, 0)
     END_IF
-    IF_INT_LESS(GSW(0), 372)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP)
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_kagi1"), 0, PTR(evt_door_msg), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kagi1_mid"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights1_m"), 1)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kagi1_aka"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_lights1_r"), 1)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kagi1"), 0, PTR(evt_door_msg), 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kagi1_mid"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kagi1_aka"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 200, 60, 100, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 10, 300, 60, 100, 0, 0)
-    CALL(evt_item_entry, STRING("item00"), 150, -670, 320, -450, 16, GSWF(4215), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_ULTRA_SHROOM, -670, 320, -450, 16, GSWF(GSWF_AJI13_ULTRA_SHROOM), 0)
     CALL(evt_item_set_scale, STRING("item00"), FLOAT(0.5996094f))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 373)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
         CALL(evt_npc_check_delete, STRING("バリアーンＺ"))
     END_IF
@@ -1135,11 +1115,10 @@ USER_FUNC(hit_group_chk) {
 }
 
 USER_FUNC(bg_cam_chk) {
-    CameraEntry* camera = camGetPtr(4);
+    CameraEntry* camera = camGetPtr(CAMERA_3D);
 
-    if (marioBgmodeChk() && (camera->flags & 0x10) && marioGetPtr()->airTimer == 0) {
+    if (marioBgmodeChk() && (camera->flags & CAM_FLAG_FOLLOW_Y_OFF) && marioGetPtr()->airTimer == 0) {
         camFollowYOn();
     }
     return EVT_RETURN_BLOCK;
 }
-

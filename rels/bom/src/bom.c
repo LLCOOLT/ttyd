@@ -1,3 +1,5 @@
+// bom.rel (ボム村, Fahr Outpost): registers bom_00..bom_04 and the battle database; puffs of breath in the cold.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -11,18 +13,8 @@
 #include "string.h"
 #include "system.h"
 #include "bom.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-void* effMistEntry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 angle);
-
-USER_FUNC(bress);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
-
-extern EvtWord evt_bress[];
+#include "eff/eff_mist.h"
+#include "rel_module.h"
 
 void _unresolved(void) {
 }
@@ -97,7 +89,7 @@ USER_FUNC(bress) {
         event->userdata[2] = irand(60) + 60;
     }
     for (i = 0, npc = npcWork->entries; i < npcWork->total; i++, npc++) {
-        if ((npc->flags & 1) && timers[i] == 0) {
+        if ((npc->flags & NPC_FLAG_USED) && timers[i] == 0) {
             AnimationPose* pose = animPoseGetAnimPosePtr(npc->poseId);
             effMistEntry(4, 30, npc->position.x, npc->height / 2 + npc->position.y, npc->position.z,
                          270.0f - pose->peraTargetRotY);
@@ -111,4 +103,3 @@ EVT_BEGIN(evt_bress)
     CALL(bress)
     RETURN
 EVT_END()
-

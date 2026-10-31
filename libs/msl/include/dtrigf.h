@@ -4,14 +4,14 @@
 /* Constants of MSL's paired-single sine/cosine helpers (dtrigf.h). In the original, the helpers are inline
  * assembly whose const locals get storage in every unit built with the MSL precompiled header, even though no
  * game code calls them: one set of constants for each of the two helpers, each constant stored twice (its
- * initial value, then the named object). The names are the original's (JP demo maps). The main.dol link keeps
- * the 8-byte constants with their initial values and strips the floats; the REL links keep only the named objects.
- *
- * FAKE: this repository has no assembly, so the helpers are not reproduced. Instead their constants are written
- * here as plain static data with the same values, alignment and order (see docs/FAKES.md):
- * - main.dol units (msl_main.pch defines DTRIGF_WITH_INITIAL_VALUES): what that link keeps, the two 8-byte
- *   constants of each helper with their initial values.
- * - REL units: the named constants only, as static locals of empty inline functions (below). */
+ * initial value, then the named object). The names are the original's (map files of the Japanese July 2004 demo). The main.dol link keeps
+ * the 8-byte constants with their initial values and strips the floats; the REL links keep only the named objects. */
+
+// FAKE: this repository has no assembly, so the helpers are not reproduced. Instead their constants are written
+// here as plain static data with the same values, alignment and order (see docs/FAKES.md):
+// - main.dol units (msl_main.pch defines DTRIGF_WITH_INITIAL_VALUES): what that link keeps, the two 8-byte
+//   constants of each helper with their initial values.
+// - REL units: the named constants only, as static locals of empty inline functions (below).
 
 #ifdef DTRIGF_WITH_INITIAL_VALUES
 

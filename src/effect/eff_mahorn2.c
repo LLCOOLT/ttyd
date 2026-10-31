@@ -8,25 +8,24 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-double sin(double);
-double cos(double);
-#include <string.h>
+#include <string.h>
+
 #include "version.h"
+#include "libc_decls.h"
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
-
-void effMahorn2Main(EffectEntry *effect);
-void effMahorn2Disp(CameraId cameraId, EffectEntry *effect);
+void effMahorn2Main(EffectEntry* effect);
+void effMahorn2Disp(CameraId cameraId, EffectEntry* effect);
 
 #define TWO_PI 6.283184f
 
-EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX, f32 dstY, f32 dstZ, f32 scale, f32 radius) {
-    EffectEntry *effect;
-    effMahorn2Data *data;
+EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX, f32 dstY, f32 dstZ, f32 scale, f32 radius) {
+    EffectEntry* effect;
+    effMahorn2Data* data;
     f32 temp;
     int i;
-    
+
     effect = effEntry();
     effect->type = "Mahorn2";
     effect->count = 14;
@@ -48,9 +47,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     data->type = 0;
     data->hasHit = FALSE;
     data++;
-    
+
     for (i = 1; i < 4; i++, data++) {
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 1;
@@ -61,9 +60,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
         data->alpha = 0;
         data->counter = 15 * (i - 1);
     }
-    
+
     for (i = 4; i < 5; i++, data++) {
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 2;
@@ -74,9 +73,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
         data->alpha = 153;
         data->counter = 15;
     }
-    
+
     for (i = 5; i < 6; i++, data++) {
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 3;
@@ -87,9 +86,9 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
         data->alpha = 153;
         data->counter = 60;
     }
-    
+
     for (i = 6; i < effect->count; i++, data++) {
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 4;
@@ -104,12 +103,12 @@ EffectEntry *effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
         data->alpha = 255;
         data->counter = 0;
     }
-    
+
     return effect;
 }
 
-void effMahorn2Main(EffectEntry *effect) {
-    effMahorn2Data *data = effect->userdata;
+void effMahorn2Main(EffectEntry* effect) {
+    effMahorn2Data* data = effect->userdata;
     Vec position;
     Vec target;
     s32 i;
@@ -117,8 +116,8 @@ void effMahorn2Main(EffectEntry *effect) {
     f32 scale;
     f32 rad;
 
-    position = (Vec){ data->position.x, data->position.y, data->position.z };
-    target = (Vec){ data->target.x, data->target.y, data->target.z };
+    position = (Vec){data->position.x, data->position.y, data->position.z};
+    target = (Vec){data->target.x, data->target.y, data->target.z};
     hitDistance = data->hitDistance;
     scale = data->scale;
 
@@ -139,27 +138,27 @@ void effMahorn2Main(EffectEntry *effect) {
                 break;
             case 2:
                 if (data->intplStep < 90) {
-                    data->scale = intplGetValue(11, ++data->intplStep, 45, 0.0f, 3.0f);
+                    data->scale = intplGetValue(11, 0.0f, 3.0f, ++data->intplStep, 45);
                 }
                 break;
             case 3:
-                if (PSVECDistance(&target, &(Vec){ position.x + data->position.x, position.y + data->position.y, position.z + data->position.z }) > hitDistance) {
+                if (PSVECDistance(&target, &(Vec){position.x + data->position.x, position.y + data->position.y, position.z + data->position.z}) > hitDistance) {
                     rad = (6.2831855f * angleABf(position.x + data->position.x, position.y + data->position.y,
-                                             target.x, target.y)) / 360.0f;
+                                                 target.x, target.y)) /
+                          360.0f;
                     data->position.x += hitDistance * (f32)sin(rad);
                     data->position.y += hitDistance * (f32)cos(rad);
                     data->scale += (4.0f - data->scale) / 8.0f;
-                }
-                else {
+                } else {
                     data->scale += -data->scale / 8.0f;
-                    if (!((effMahorn2Data *)effect->userdata)->hasHit) {
-                        ((effMahorn2Data *)effect->userdata)->hasHit = TRUE;
+                    if (!((effMahorn2Data*)effect->userdata)->hasHit) {
+                        ((effMahorn2Data*)effect->userdata)->hasHit = TRUE;
                         effHitEntry(0, 4, target.x, target.y, target.z, scale);
                     }
                 }
                 break;
             case 4:
-                if (((effMahorn2Data *)effect->userdata)->hasHit) {
+                if (((effMahorn2Data*)effect->userdata)->hasHit) {
                     data->position.x += data->target.x;
                     data->position.y += data->target.y;
                     data->position.z += data->target.z;
@@ -180,14 +179,14 @@ void effMahorn2Main(EffectEntry *effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMahorn2Disp, effect);
 }
 
-void effMahorn2Disp(CameraId cameraId, EffectEntry *effect) {
-    effMahorn2Data *data = effect->userdata;
+void effMahorn2Disp(CameraId cameraId, EffectEntry* effect) {
+    effMahorn2Data* data = effect->userdata;
     Mtx mtx;
     Mtx rot;
     Mtx scaleMtx;
     Mtx base;
     GXTexObj texObj;
-    CameraEntry *cam;
+    CameraEntry* cam;
     s32 alpha;
     f32 scale;
     f32 w, h, u, v;
@@ -233,7 +232,7 @@ void effMahorn2Disp(CameraId cameraId, EffectEntry *effect) {
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 break;
         }
-        GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0x00, 0xDA, 0x00, data->alpha * alpha / 255 });
+        GXSetChanMatColor(GX_COLOR0A0, (GXColor){0x00, 0xDA, 0x00, data->alpha * alpha / 255});
         PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
         PSMTXScale(scaleMtx, data->scale * scale, data->scale * scale, data->scale * scale);
         PSMTXConcat(mtx, scaleMtx, mtx);
@@ -275,31 +274,43 @@ void effMahorn2Disp(CameraId cameraId, EffectEntry *effect) {
             GXTexCoord2f32(u, v);
             GXPosition3f32(-w / 2.0f, -h / 2.0f, 0.0f);
             GXTexCoord2f32(0.0f, v);
-        }
-        else {
-#ifdef VERSION_G8ME01_DEMO
-            // The demo counts the three segments with the outer loop counter i.
-#define j i
+        } else {
+#if VERSION == VERSION_DEMO
+            // The demo counts the three segments with the outer loop counter i, so after a type 3 entry the
+            // outer loop goes on at i = 4; the later versions use their own counter.
+            for (i = 0; i < 3; i++) {
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                {
+                    f32 xs[3][2] = {{0.0f, 2.0f}, {2.0f, 12.0f}, {12.0f, 14.0f}};
+                    f32 us[3][2] = {{0.0f, 0.5f}, {0.5f, 0.5f}, {0.5f, 1.0f}};
+                    GXPosition3f32(xs[i][0], h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[i][0], 0.0f);
+                    GXPosition3f32(xs[i][1], h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[i][1], 0.0f);
+                    GXPosition3f32(xs[i][1], -h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[i][1], v);
+                    GXPosition3f32(xs[i][0], -h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[i][0], v);
+                }
+            }
 #else
             s32 j;
-#endif
+
             for (j = 0; j < 3; j++) {
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 {
-                f32 xs[3][2] = { { 0.0f, 2.0f }, { 2.0f, 12.0f }, { 12.0f, 14.0f } };
-                f32 us[3][2] = { { 0.0f, 0.5f }, { 0.5f, 0.5f }, { 0.5f, 1.0f } };
-                GXPosition3f32(xs[j][0], h / 2.0f, 0.0f);
-                GXTexCoord2f32(2.0f * us[j][0], 0.0f);
-                GXPosition3f32(xs[j][1], h / 2.0f, 0.0f);
-                GXTexCoord2f32(2.0f * us[j][1], 0.0f);
-                GXPosition3f32(xs[j][1], -h / 2.0f, 0.0f);
-                GXTexCoord2f32(2.0f * us[j][1], v);
-                GXPosition3f32(xs[j][0], -h / 2.0f, 0.0f);
-                GXTexCoord2f32(2.0f * us[j][0], v);
+                    f32 xs[3][2] = {{0.0f, 2.0f}, {2.0f, 12.0f}, {12.0f, 14.0f}};
+                    f32 us[3][2] = {{0.0f, 0.5f}, {0.5f, 0.5f}, {0.5f, 1.0f}};
+                    GXPosition3f32(xs[j][0], h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[j][0], 0.0f);
+                    GXPosition3f32(xs[j][1], h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[j][1], 0.0f);
+                    GXPosition3f32(xs[j][1], -h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[j][1], v);
+                    GXPosition3f32(xs[j][0], -h / 2.0f, 0.0f);
+                    GXTexCoord2f32(2.0f * us[j][0], v);
                 }
             }
-#ifdef VERSION_G8ME01_DEMO
-#undef j
 #endif
         }
     }

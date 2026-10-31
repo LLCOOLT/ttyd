@@ -1,9 +1,10 @@
+// Shared battle drop tables: item drops and heart and flower point drops used by enemy units.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "driver/npcdrv.h"
 #include "mario/mario_pouch.h"
 #include "battle/battle_database_common.h"
-
+#include "version.h"
 
 ItemDropData battle_item_gundan_zako[10];
 ItemDropData battle_item_gundan_zako_magician[10];
@@ -125,7 +126,7 @@ ItemDropData battle_item_champion[1];
 ItemDropData battle_item_kanbu1[1];
 ItemDropData battle_item_zonbaba[1];
 ItemDropData battle_item_default_param_list[1];
-#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO)
+#if VERSION == VERSION_DEMO || VERSION == VERSION_EU
 ItemDropData battle_item_test_killer_cannon[1];
 ItemDropData battle_item_test_yami_pata[1];
 ItemDropData battle_item_test_yami_noko[1];
@@ -445,7 +446,7 @@ ItemDropData battle_item_met[] = {
     {ITEM_POWER_PUNCH, 5, 5},
     {ITEM_MINI_MR_MINI, 5, 5},
     {ITEM_POWER_JUMP, 0, 2},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {ITEM_POWER_JUMP, 0, 2},
 #else
     {ITEM_POWER_SMASH, 0, 2},
@@ -462,7 +463,7 @@ ItemDropData battle_item_togemet[] = {
     {ITEM_POWER_PUNCH, 5, 5},
     {ITEM_REPEL_CAPE, 5, 5},
     {ITEM_POWER_JUMP, 0, 2},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {ITEM_POWER_JUMP, 0, 2},
 #else
     {ITEM_POWER_SMASH, 0, 2},
@@ -1497,7 +1498,7 @@ PointDropData battle_flower_drop_param_default5[] = {
     {100, 30, 6, 40},
 };
 
-#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO)
+#if VERSION == VERSION_DEMO || VERSION == VERSION_EU
 // PAL and the demo: empty drop tables of the tst.rel test battles (BTLNO_TEST_*); killer_cannon is shared by both cannons
 ItemDropData battle_item_test_killer_cannon[] = {
     {0},
@@ -1539,4 +1540,3 @@ ItemDropData battle_item_test_kuriboo[] = {
     {0},
 };
 #endif
-

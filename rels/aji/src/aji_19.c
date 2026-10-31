@@ -1,3 +1,6 @@
+// aji_19 (敵のアジト, X-Naut Fortress): the room reached from the Moon (moo_02), with the first-visit scene
+// (evt_hajimete).
+#include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,34 +10,29 @@
 #include "driver/hitdrv.h"
 #include "string.h"
 #include "evt/evt_bero.h"
-#ifdef VERSION_G8MP01
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
+#include "aji.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#if VERSION == VERSION_EU
 #include "mario/mariost.h"
 #endif
 
-BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_telop_entry);
 static USER_FUNC(mario_chk);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
 static BeroEntry bero_entry_data[3];
 extern EvtWord evt_hajimete[];
-extern EvtWord aji_19_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -73,8 +71,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -91,8 +89,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -117,15 +115,15 @@ EVT_BEGIN(evt_hajimete)
     WAIT_MS(200)
     CALL(evt_msg_print_party, STRING("stg7_aji_00_00_01"))
     CALL(evt_party_run, 0)
-    SET_VALUE(GSW(0), 360)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_01_INSIDE_THE_BUILDING)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_telop_entry, 15)
     RETURN
 EVT_END()
 
 EVT_BEGIN(aji_19_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -137,19 +135,21 @@ EVT_BEGIN(aji_19_init_evt)
     BEGIN_INLINE_EVENT
         CALL(mario_chk)
     END_INLINE_EVENT
-    IF_INT_LESS(GSW(0), 360)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_01_INSIDE_THE_BUILDING)
         SPAWN_EVENT(PTR(evt_hajimete))
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kanaami2"), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kanaami2"), MAPOBJ_FLAG_BBOX_CULL)
     RETURN
 EVT_END()
 
 // Conveyor push per frame: PAL scales the 60 Hz speed to the frame rate
-#ifdef VERSION_G8MP01
-#define BELT_SPEED (60.0f / gp->framerate)
+static inline f32 beltSpeed(void) {
+#if VERSION == VERSION_EU
+    return 60.0f / gp->framerate;
 #else
-#define BELT_SPEED 1.0f
+    return 1.0f;
 #endif
+}
 
 static USER_FUNC(mario_chk) {
     MarioWork* mario = marioGetPtr();
@@ -157,27 +157,27 @@ static USER_FUNC(mario_chk) {
 
     if (mario != NULL && mario->hitobjStandOn != NULL) {
         if (hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_b_ue"))) {
-            mario->floorMove.x = BELT_SPEED;
+            mario->floorMove.x = beltSpeed();
         } else if (hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_b_shita"))) {
-            mario->floorMove.x = -BELT_SPEED;
+            mario->floorMove.x = -beltSpeed();
         }
     }
     party = partyGetPtr(marioGetPartyId());
     if (party != NULL && party->hitobjStandOn != NULL) {
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_ue"))) {
-            party->floorMoveX = BELT_SPEED;
+            party->floorMoveX = beltSpeed();
         }
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_shita"))) {
-            party->floorMoveX = -BELT_SPEED;
+            party->floorMoveX = -beltSpeed();
         }
     }
     party = partyGetPtr(marioGetExtraPartyId());
     if (party != NULL && party->hitobjStandOn != NULL) {
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_ue"))) {
-            party->floorMoveX = BELT_SPEED;
+            party->floorMoveX = beltSpeed();
         }
         if (hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_b_shita"))) {
-            party->floorMoveX = -BELT_SPEED;
+            party->floorMoveX = -beltSpeed();
         }
     }
     return EVT_RETURN_BLOCK;
@@ -200,4 +200,3 @@ static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) 
     }
     return FALSE;
 }
-

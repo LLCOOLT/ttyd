@@ -1,3 +1,4 @@
+// Koops effect (nokotarou: Koops) using the MOBJ_EFF_nokotarou3 animation, stretched from a start point to the current point.
 #include "eff/eff_nokotarou.h"
 #include "driver/animdrv.h"
 #include "driver/dispdrv.h"
@@ -15,7 +16,7 @@ EffectEntry* effNokotarouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffNokotarouWork));
     effect->userdata = work;
     effect->callback = effNokotarouMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->start.x = x;
     work->start.y = y;
@@ -28,8 +29,7 @@ EffectEntry* effNokotarouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 
     work->alpha = 255;
     if (duration <= 0) {
         work->timer = 1000;
-    }
-    else {
+    } else {
         work->timer = duration;
     }
     work->poseId = -1;
@@ -42,7 +42,7 @@ void effNokotarouMain(EffectEntry* effect) {
     Vec position;
     BOOL inBattle;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
     inBattle = gp->inBattle != 0;
 
     if (!animGroupBaseAsync("MOBJ_EFF_nokotarou3", inBattle, NULL)) {
@@ -56,8 +56,8 @@ void effNokotarouMain(EffectEntry* effect) {
     }
 
     // soft delete: start fading out
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 32;
     }
     if (work->timer < 1000) {
@@ -76,8 +76,7 @@ void effNokotarouMain(EffectEntry* effect) {
     if (work->timer < 32) {
         work->alpha = work->timer * 8;
         work->scale += -work->scale / 32.0f;
-    }
-    else {
+    } else {
         work->scale += (1.0f - work->scale) / 32.0f;
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effNokotarouDisp, effect);
@@ -98,8 +97,8 @@ void effNokotarouDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
         PSMTXConcat(mtx, rot, mtx);
         PSMTXConcat(mtx, scale, mtx);
-        animPoseSetMaterialFlagOn(work->poseId, 0x40);
-        animPoseSetMaterialEvtColor(work->poseId, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha });
+        animPoseSetMaterialFlagOn(work->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
+        animPoseSetMaterialEvtColor(work->poseId, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
         animPoseMain(work->poseId);
         animPoseDrawMtx(work->poseId, mtx, 1, 0.0f, 2.0f);
         animPoseDrawMtx(work->poseId, mtx, 2, 0.0f, 2.0f);
@@ -117,8 +116,8 @@ void effNokotarouDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
             PSMTXConcat(mtx, rot, mtx);
             PSMTXConcat(mtx, scale, mtx);
-            animPoseSetMaterialFlagOn(work->poseId2, 0x40);
-            animPoseSetMaterialEvtColor(work->poseId2, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha });
+            animPoseSetMaterialFlagOn(work->poseId2, ANIM_MATERIAL_FLAG_EVT_COLOR);
+            animPoseSetMaterialEvtColor(work->poseId2, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
             animPoseMain(work->poseId2);
             animPoseDrawMtx(work->poseId2, mtx, 1, 0.0f, 2.0f);
             animPoseDrawMtx(work->poseId2, mtx, 2, 0.0f, 2.0f);

@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: broken barrier, 60 pieces of a shattering barrier that scatter and fade.
+#include "eff/n64/eff_broken_barrier_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,32 +9,31 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 #include <math.h>
 
 typedef struct EffBrokenBarrierN64Work {
-    s32 type;       // 0x0
-    Vec position;   // 0x4
-    f32 width;      // 0x10
-    f32 height;     // 0x14
-    Vec velocity;   // 0x18
-    Vec targetVel;  // 0x24
-    s32 timer;      // 0x30
-    f32 rot;        // 0x34
-    s32 lifetime;   // 0x38
-    s32 frame;      // 0x3C
-    s32 r;          // 0x40
-    s32 g;          // 0x44
-    s32 b;          // 0x48
-    s32 alpha;      // 0x4C
-    s32 r2;         // 0x50
-    s32 g2;         // 0x54
-    s32 b2;         // 0x58
-    s32 alpha2;     // 0x5C
-    f32 scale;      // 0x60
-    f32 rotVelA;    // 0x64
-    f32 rotVelB;    // 0x68
+    s32 type;      // 0x0
+    Vec position;  // 0x4
+    f32 width;     // 0x10
+    f32 height;    // 0x14
+    Vec velocity;  // 0x18
+    Vec targetVel; // 0x24
+    s32 timer;     // 0x30
+    f32 rot;       // 0x34
+    s32 lifetime;  // 0x38
+    s32 frame;     // 0x3C
+    s32 r;         // 0x40
+    s32 g;         // 0x44
+    s32 b;         // 0x48
+    s32 alpha;     // 0x4C
+    s32 r2;        // 0x50
+    s32 g2;        // 0x54
+    s32 b2;        // 0x58
+    s32 alpha2;    // 0x5C
+    f32 scale;     // 0x60
+    f32 rotVelA;   // 0x64
+    f32 rotVelB;   // 0x68
 } EffBrokenBarrierN64Work;
 
 void effBrokenBarrierMain(EffectEntry* effect);
@@ -77,7 +78,6 @@ static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, 8, 0, 4928, 704, 0, 0, 0, 255},
 };
 
-
 EffectEntry* effBrokenBarrierN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffBrokenBarrierN64Work* work;
@@ -91,7 +91,7 @@ EffectEntry* effBrokenBarrierN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f
     work = __memAlloc(HEAP_EFFECT, sizeof(EffBrokenBarrierN64Work) * 61);
     effect->userdata = work;
     effect->callback = effBrokenBarrierMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (life <= 0) {
@@ -147,8 +147,8 @@ void effBrokenBarrierMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -165,11 +165,11 @@ void effBrokenBarrierMain(EffectEntry* effect) {
     width = work->width;
     height = work->height;
     switch (type) {
-    case 2:
-    case 3:
-        width *= 4.0f;
-        height *= 4.0f;
-        break;
+        case 2:
+        case 3:
+            width *= 4.0f;
+            height *= 4.0f;
+            break;
     }
     w = (s32)width;
     halfW = 0.5f * width;
@@ -188,9 +188,8 @@ void effBrokenBarrierMain(EffectEntry* effect) {
             a = (f32)(rand() % 360);
             t = (f32)(rand() % 360);
             switch (type) {
-            case 0:
-            case 2:
-                {
+                case 0:
+                case 2: {
                     f32 lat = 6.2831855f * t / 360.0f;
                     f32 lon;
                     f32 c;
@@ -198,24 +197,24 @@ void effBrokenBarrierMain(EffectEntry* effect) {
                     work->position.y = height * (f32)cos(lon) * (c = (f32)cos(lat));
                     work->position.z = width * (f32)sin(lat);
                 }
-                work->velocity.x = 0.4f * work->position.x;
-                work->velocity.y = 0.4f * work->position.y;
-                work->velocity.z = 0.4f * work->position.z;
-                work->targetVel.x = 0.1f * work->velocity.x;
-                work->targetVel.y = 0.1f * work->velocity.y;
-                work->targetVel.z = 0.1f * work->velocity.z;
-                break;
-            case 1:
-            default:
-                work->position.x = (f32)(rand() % w) - halfW;
-                work->position.y = (f32)(rand() % h) - halfH;
-                work->position.z = (f32)(rand() % w) - halfW;
-                work->velocity.x = 0.3f * work->position.x;
-                work->velocity.y = 0.3f * work->position.y;
-                work->velocity.z = 0.3f * work->position.z;
-                work->targetVel.x = 0.02f * work->velocity.x;
-                work->targetVel.y = 0.02f * work->velocity.y;
-                work->targetVel.z = 0.02f * work->velocity.z;
+                    work->velocity.x = 0.4f * work->position.x;
+                    work->velocity.y = 0.4f * work->position.y;
+                    work->velocity.z = 0.4f * work->position.z;
+                    work->targetVel.x = 0.1f * work->velocity.x;
+                    work->targetVel.y = 0.1f * work->velocity.y;
+                    work->targetVel.z = 0.1f * work->velocity.z;
+                    break;
+                case 1:
+                default:
+                    work->position.x = (f32)(rand() % w) - halfW;
+                    work->position.y = (f32)(rand() % h) - halfH;
+                    work->position.z = (f32)(rand() % w) - halfW;
+                    work->velocity.x = 0.3f * work->position.x;
+                    work->velocity.y = 0.3f * work->position.y;
+                    work->velocity.z = 0.3f * work->position.z;
+                    work->targetVel.x = 0.02f * work->velocity.x;
+                    work->targetVel.y = 0.02f * work->velocity.y;
+                    work->targetVel.z = 0.02f * work->velocity.z;
             }
             work->rotVelA = (f32)(rand() % 15);
             work->rotVelB = (f32)(rand() % 15);
@@ -225,21 +224,21 @@ void effBrokenBarrierMain(EffectEntry* effect) {
         work->scale = scale_data[work->timer];
         work->rot += 4.0f;
         switch (type) {
-        case 2:
-        case 3:
-            work->velocity.x = 0.05f * -work->position.x;
-            work->velocity.y = 0.05f * -work->position.y;
-            work->velocity.z = 0.05f * -work->position.z;
-            if (sqrtf(work->velocity.x * work->velocity.x + work->velocity.y * work->velocity.y +
-                      work->velocity.z * work->velocity.z) < 1.0f) {
-                a = (f32)(rand() % 360);
-                t = (f32)(rand() % 360);
-                b = 6.2831855f * t / 360.0f;
-                work->position.x = width * (f32)sin(a = 6.2831855f * a / 360.0f) * (ca = (f32)cos(b));
-                work->position.y = height * (f32)cos(a) * (ca = (f32)cos(b));
-                work->position.z = width * (f32)sin(b);
-            }
-            break;
+            case 2:
+            case 3:
+                work->velocity.x = 0.05f * -work->position.x;
+                work->velocity.y = 0.05f * -work->position.y;
+                work->velocity.z = 0.05f * -work->position.z;
+                if (sqrtf(work->velocity.x * work->velocity.x + work->velocity.y * work->velocity.y +
+                          work->velocity.z * work->velocity.z) < 1.0f) {
+                    a = (f32)(rand() % 360);
+                    t = (f32)(rand() % 360);
+                    b = 6.2831855f * t / 360.0f;
+                    work->position.x = width * (f32)sin(a = 6.2831855f * a / 360.0f) * (ca = (f32)cos(b));
+                    work->position.y = height * (f32)cos(a) * (ca = (f32)cos(b));
+                    work->position.z = width * (f32)sin(b);
+                }
+                break;
         }
         work->position.x += work->velocity.x;
         work->position.y += work->velocity.y;
@@ -252,7 +251,6 @@ void effBrokenBarrierMain(EffectEntry* effect) {
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBrokenBarrierDisp, effect);
 }
-
 
 void effBrokenBarrierDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
@@ -287,15 +285,15 @@ void effBrokenBarrierDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(camera->view, mtx, mtx2);
     main_dl(effect, mtx2);
     {
-    Vec axis = {0.4f, 0.0f, 0.8f};
-    PSMTXRotAxisRad(rotMtx, &axis, 2.0943952f);
-    PSMTXConcat(mtx, rotMtx, mtx2);
-    PSMTXConcat(camera->view, mtx2, mtx2);
-    main_dl(effect, mtx2);
-    PSMTXRotAxisRad(rotMtx, &axis, -2.0943952f);
-    PSMTXConcat(mtx, rotMtx, mtx2);
-    PSMTXConcat(camera->view, mtx2, mtx2);
-    main_dl(effect, mtx2);
+        Vec axis = {0.4f, 0.0f, 0.8f};
+        PSMTXRotAxisRad(rotMtx, &axis, 2.0943952f);
+        PSMTXConcat(mtx, rotMtx, mtx2);
+        PSMTXConcat(camera->view, mtx2, mtx2);
+        main_dl(effect, mtx2);
+        PSMTXRotAxisRad(rotMtx, &axis, -2.0943952f);
+        PSMTXConcat(mtx, rotMtx, mtx2);
+        PSMTXConcat(camera->view, mtx2, mtx2);
+        main_dl(effect, mtx2);
     }
 }
 
@@ -327,14 +325,30 @@ static void main_dl(EffectEntry* effect, Mtx viewMtx) {
         GXSetCurrentMtx(GX_PNMTX0);
         GXSetTevColor(GX_TEVREG0, (GXColor){r, g, b, (s32)((f32)work->alpha * alpha)});
         switch (i & 7) {
-            case 0: vtx = &size8x8_tex22x22_vtx[12]; break;
-            case 1: vtx = &size8x8_tex22x22_vtx[16]; break;
-            case 2: vtx = &size8x8_tex22x22_vtx[20]; break;
-            case 3: vtx = &size8x8_tex22x22_vtx[24]; break;
-            case 4: vtx = &size8x8_tex22x22_vtx[28]; break;
-            case 5: vtx = &size8x8_tex22x22_vtx[0]; break;
-            case 6: vtx = &size8x8_tex22x22_vtx[4]; break;
-            case 7: vtx = &size8x8_tex22x22_vtx[8]; break;
+            case 0:
+                vtx = &size8x8_tex22x22_vtx[12];
+                break;
+            case 1:
+                vtx = &size8x8_tex22x22_vtx[16];
+                break;
+            case 2:
+                vtx = &size8x8_tex22x22_vtx[20];
+                break;
+            case 3:
+                vtx = &size8x8_tex22x22_vtx[24];
+                break;
+            case 4:
+                vtx = &size8x8_tex22x22_vtx[28];
+                break;
+            case 5:
+                vtx = &size8x8_tex22x22_vtx[0];
+                break;
+            case 6:
+                vtx = &size8x8_tex22x22_vtx[4];
+                break;
+            case 7:
+                vtx = &size8x8_tex22x22_vtx[8];
+                break;
         }
         effSetVtxDescN64(vtx);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);

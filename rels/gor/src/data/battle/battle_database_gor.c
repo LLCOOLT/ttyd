@@ -1,3 +1,6 @@
+// battle_database_gor: Rogueport battle data: stage layouts (bti_01), the Crump and Gus fights and the
+// action-command and special-action-command tutorial battles, plus field battle selection tables.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -6,9 +9,6 @@
 #include "battle/battle_stage.h"
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
-
-extern BattleUnitKind unit_boss_kanbu1;
-extern BattleUnitKind unit_lecture_christine;
 
 BattleStageObjectData gor_btlobject_data[6];
 BattleStageData gor_btlstage_data[2];
@@ -40,20 +40,20 @@ BattleStageObjectData gor_btlobject_data[] = {
 
 BattleStageData gor_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_0", // mSpecificStageDataDir
-        4, // mNumObjects
-        gor_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_0", // specificStageDataDir
+        4, // numObjects
+        gor_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100070, 0x10000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_4", // mSpecificStageDataDir
-        2, // mNumObjects
-        &gor_btlobject_data[4], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_4", // specificStageDataDir
+        2, // numObjects
+        &gor_btlobject_data[4], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -63,10 +63,10 @@ BattleStageData gor_btlstage_data[] = {
 
 BattleUnitSetup btlparty_gor_gor_00_01_off_1[] = {
     {
-        &unit_boss_kanbu1, // mUnitKindParams
+        &unit_boss_kanbu1, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -86,10 +86,10 @@ BattleGroupSetup btlgrp_gor_gor_00_01_off_1 = {
 
 BattleUnitSetup btlparty_gor_gor_02_ac_lecture[] = {
     {
-        &unit_lecture_christine, // mUnitKindParams
+        &unit_lecture_christine, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -109,10 +109,10 @@ BattleGroupSetup btlgrp_gor_gor_02_ac_lecture = {
 
 BattleUnitSetup btlparty_gor_gor_02_sac_lecture[] = {
     {
-        &unit_lecture_frankli_sac, // mUnitKindParams
+        &unit_lecture_frankli_sac, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -132,10 +132,10 @@ BattleGroupSetup btlgrp_gor_gor_02_sac_lecture = {
 
 BattleUnitSetup btlparty_gor_gor_02_01_off_1[] = {
     {
-        &unit_monban, // mUnitKindParams
+        &unit_monban, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -211,7 +211,7 @@ NpcSetupBattleInfo btlsetup_gor_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_gor_btlno_gor_00_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_NO_ESCAPE | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{0}, {5, 5}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_CHUBOSS_BATTLE1", // bgmName
@@ -245,7 +245,7 @@ NpcSetupBattleInfo btlsetup_gor_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_gor_btlno_gor_02_01_off, // select
-        0x20000000, // battleFlags
+        NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_KOBOSS_BATTLE1", // bgmName
@@ -262,4 +262,3 @@ NpcTerritoryInfo btl_gor_setup_no_tbl[] = {
     {"BTLNO_GOR_02_01", 5},
     {0},
 };
-

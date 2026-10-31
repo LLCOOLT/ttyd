@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: cool leaf, four leaves tumbling and spinning; types 0-2 pick the spin.
+#include "eff/n64/eff_cool_leaf_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,24 +9,22 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffCoolLeafN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    f32 vx;        // 0x10
-    f32 vy;        // 0x14
-    f32 angleZ;    // 0x18
-    f32 spin;      // 0x1C
-    f32 angleY;    // 0x20
-    s32 alpha;     // 0x24
-    s32 lifetime;  // 0x28
-    s32 frame;     // 0x2C
-    f32 ax;        // 0x30
-    f32 ay;        // 0x34
-    f32 az;        // 0x38
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    f32 vx;       // 0x10
+    f32 vy;       // 0x14
+    f32 angleZ;   // 0x18
+    f32 spin;     // 0x1C
+    f32 angleY;   // 0x20
+    s32 alpha;    // 0x24
+    s32 lifetime; // 0x28
+    s32 frame;    // 0x2C
+    f32 ax;       // 0x30
+    f32 ay;       // 0x34
+    f32 az;       // 0x38
 } EffCoolLeafN64Work;
 
 static effN64Vtx size12x12_tex64x64_brown_vtx[] = {
@@ -247,8 +247,10 @@ void effCoolLeafMain(EffectEntry* effect) {
         case 2:
             for (i = 1; i < effect->count; i++, work++) {
                 work->spin += (f32)((s32)effTblRandN64(50, frame + i * 20) - 25);
-                s = (f32)sin(6.2831855f * work->spin / 360.0f); work->angleZ += 10.0f * s;
-                c = (f32)cos(6.2831855f * (0.5f * work->spin) / 360.0f); work->angleY += 10.0f * c;
+                s = (f32)sin(6.2831855f * work->spin / 360.0f);
+                work->angleZ += 10.0f * s;
+                c = (f32)cos(6.2831855f * (0.5f * work->spin) / 360.0f);
+                work->angleY += 10.0f * c;
                 work->position.x += work->vx;
                 work->position.y += work->vy;
             }

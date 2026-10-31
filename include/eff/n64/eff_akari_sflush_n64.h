@@ -1,3 +1,4 @@
+// eff_akari_sflush_n64.c: Paper Mario 64 AkariSflush effect entry (effAkariSflushN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

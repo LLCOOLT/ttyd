@@ -1,3 +1,5 @@
+// Paper Mario 64 smoke effect 11 (kemuri: smoke) at a point; types 0-5 pick the smoke pattern.
+#include "eff/n64/eff_kemuri11_n64.h"
 #include "eff/n64/eff_kemuri1_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -6,30 +8,27 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double x);
-double cos(double x);
+#include "libc_decls.h"
 
 typedef struct EffKemuri11N64Work {
-    u16 type;         // 0x0
-    Vec position;     // 0x4
-    Vec velocity;     // 0x10
-    Vec scale;        // 0x1C
-    s32 timer;        // 0x28
-    s32 counter;      // 0x2C
-    f32 rotY;         // 0x30
-    f32 rotZ;         // 0x34
-    s32 alpha;        // 0x38
-    f32 texS;         // 0x3C
-    f32 texSVel;      // 0x40
-    f32 texT;         // 0x44
-    f32 texTVel;      // 0x48
-    s32 delay;        // 0x4C
-    u8 r1, g1, b1;    // 0x50
-    u8 r2, g2, b2;    // 0x53
-    u8 pad[2];        // 0x56
+    u16 type;      // 0x0
+    Vec position;  // 0x4
+    Vec velocity;  // 0x10
+    Vec scale;     // 0x1C
+    s32 timer;     // 0x28
+    s32 counter;   // 0x2C
+    f32 rotY;      // 0x30
+    f32 rotZ;      // 0x34
+    s32 alpha;     // 0x38
+    f32 texS;      // 0x3C
+    f32 texSVel;   // 0x40
+    f32 texT;      // 0x44
+    f32 texTVel;   // 0x48
+    s32 delay;     // 0x4C
+    u8 r1, g1, b1; // 0x50
+    u8 r2, g2, b2; // 0x53
+    u8 pad[2];     // 0x56
 } EffKemuri11N64Work;
-
 
 static effN64Vtx stg_thruhammer_v[] = {
     {-34, -2, 20, 4267, 1024, 255, 255, 255, 255},
@@ -67,39 +66,39 @@ EffectEntry* effKemuri11N64Entry(s32 type, f32 x, f32 y, f32 z) {
 
     effect = effEntry();
     switch (type) {
-    case 0:
-        type = 3;
-        break;
-    case 1:
-        type = 2;
-        break;
-    case 2:
-        type = 4;
-        break;
-    case 4:
-        type = 6;
-        break;
-    case 5:
-        type = 7;
-        break;
-    default:
-        type = 5;
-        break;
+        case 0:
+            type = 3;
+            break;
+        case 1:
+            type = 2;
+            break;
+        case 2:
+            type = 4;
+            break;
+        case 4:
+            type = 6;
+            break;
+        case 5:
+            type = 7;
+            break;
+        default:
+            type = 5;
+            break;
     }
     switch (type) {
-    case 0:
-        n = 3;
-        break;
-    case 1:
-        n = 1;
-        break;
-    case 2:
-    case 5:
-        n = 3;
-        break;
-    default:
-        n = 2;
-        break;
+        case 0:
+            n = 3;
+            break;
+        case 1:
+            n = 1;
+            break;
+        case 2:
+        case 5:
+            n = 3;
+            break;
+        default:
+            n = 2;
+            break;
     }
     effect->type = "Kemuri11N64";
     effect->count = n + 1;
@@ -114,77 +113,77 @@ EffectEntry* effKemuri11N64Entry(s32 type, f32 x, f32 y, f32 z) {
     work->position.z = z;
     work->alpha = 255;
     switch (type) {
-    case 0:
-    case 1:
-        work->r1 = 0;
-        work->g1 = 255;
-        work->b1 = 122;
-        work->r2 = 240;
-        work->g2 = 255;
-        work->b2 = 250;
-        break;
-    case 2:
-        work->r1 = 125;
-        work->g1 = 120;
-        work->b1 = 100;
-        work->r2 = 255;
-        work->g2 = 255;
-        work->b2 = 240;
-        break;
-    case 3:
-        work->r1 = 220;
-        work->g1 = 210;
-        work->b1 = 200;
-        work->r2 = 255;
-        work->g2 = 255;
-        work->b2 = 250;
-        break;
-    case 5:
-        work->r1 = 225;
-        work->g1 = 204;
-        work->b1 = 93;
-        work->r2 = 232;
-        work->g2 = 231;
-        work->b2 = 171;
-        break;
-    case 6:
-        work->timer = 50;
-        work->r1 = 212;
-        work->g1 = 183;
-        work->b1 = 5;
-        work->r2 = 193;
-        work->g2 = 163;
-        work->b2 = 9;
-        break;
-    case 7:
-        work->timer = 50;
-        work->r1 = 33;
-        work->g1 = 140;
-        work->b1 = 141;
-        work->r2 = 24;
-        work->g2 = 165;
-        work->b2 = 163;
-        break;
-    default:
-        work->timer = 50;
-        work->r1 = 208;
-        work->g1 = 136;
-        work->b1 = 40;
-        work->r2 = 216;
-        work->g2 = 169;
-        work->b2 = 65;
-        break;
+        case 0:
+        case 1:
+            work->r1 = 0;
+            work->g1 = 255;
+            work->b1 = 122;
+            work->r2 = 240;
+            work->g2 = 255;
+            work->b2 = 250;
+            break;
+        case 2:
+            work->r1 = 125;
+            work->g1 = 120;
+            work->b1 = 100;
+            work->r2 = 255;
+            work->g2 = 255;
+            work->b2 = 240;
+            break;
+        case 3:
+            work->r1 = 220;
+            work->g1 = 210;
+            work->b1 = 200;
+            work->r2 = 255;
+            work->g2 = 255;
+            work->b2 = 250;
+            break;
+        case 5:
+            work->r1 = 225;
+            work->g1 = 204;
+            work->b1 = 93;
+            work->r2 = 232;
+            work->g2 = 231;
+            work->b2 = 171;
+            break;
+        case 6:
+            work->timer = 50;
+            work->r1 = 212;
+            work->g1 = 183;
+            work->b1 = 5;
+            work->r2 = 193;
+            work->g2 = 163;
+            work->b2 = 9;
+            break;
+        case 7:
+            work->timer = 50;
+            work->r1 = 33;
+            work->g1 = 140;
+            work->b1 = 141;
+            work->r2 = 24;
+            work->g2 = 165;
+            work->b2 = 163;
+            break;
+        default:
+            work->timer = 50;
+            work->r1 = 208;
+            work->g1 = 136;
+            work->b1 = 40;
+            work->r2 = 216;
+            work->g2 = 169;
+            work->b2 = 65;
+            break;
     }
     work++;
     for (i = 1, ang = 30; i < n + 1; i++, work++) {
         switch (type) {
-        case 0:
-        case 1:
-            work->delay = -1 - (i - 1) * 2;
-            break;
-        default:
-            work->delay = -1 - (i - 1) * 3;
-            break;
+            case 0:
+            case 1:
+                work->delay = -1 - (i - 1) * 2;
+                break;
+            default:
+                work->delay = -1 - (i - 1) * 3;
+                break;
         }
         work->rotZ = 0.0f;
         work->rotY = (f32)ang;
@@ -220,17 +219,17 @@ void effKemuri11Main(EffectEntry* effect) {
     type = work->type;
     cnt = work->counter;
     switch (type) {
-    case 0:
-    case 1:
-        if (cnt >= 8) {
-            work->alpha *= 0.8f;
-        }
-        break;
-    default:
-        if (cnt >= 8) {
-            work->alpha *= 0.94f;
-        }
-        break;
+        case 0:
+        case 1:
+            if (cnt >= 8) {
+                work->alpha *= 0.8f;
+            }
+            break;
+        default:
+            if (cnt >= 8) {
+                work->alpha *= 0.94f;
+            }
+            break;
     }
     for (i = 1, work++; i < effect->count; i++, work++) {
         work->delay++;
@@ -251,62 +250,62 @@ void effKemuri11Main(EffectEntry* effect) {
             work->texTVel = 32.0f;
             work->scale.y = 8.0f - (f32)i;
             switch (type) {
-            case 0:
-            case 1:
-                sv = 0.5f + (f32)i;
-                work->scale.x = sv;
-                work->scale.z = 0.5f * sv;
-                break;
-            case 2:
-            case 5:
-                work->scale.x = (f32)(i + 2);
-                work->scale.z = 0.5f * (f32)(i + 2);
-                break;
-            case 3:
-                work->scale.x = (f32)(i + 3);
-                work->scale.z = 0.5f * (f32)(i + 3);
-                work->texS = 16.0f;
-                work->texSVel = 16.0f;
-                work->texTVel = 16.0f;
-                break;
-            default:
-                sv = 0.5f * (f32)(i + 3);
-                work->scale.x = sv;
-                work->scale.z = 0.5f * sv;
-                work->scale.y *= 0.8f;
-                work->texS = 16.0f;
-                if (type == 6 || type == 7) {
-                    work->texSVel = 8.0f;
-                    work->texTVel = 8.0f;
-                } else {
+                case 0:
+                case 1:
+                    sv = 0.5f + (f32)i;
+                    work->scale.x = sv;
+                    work->scale.z = 0.5f * sv;
+                    break;
+                case 2:
+                case 5:
+                    work->scale.x = (f32)(i + 2);
+                    work->scale.z = 0.5f * (f32)(i + 2);
+                    break;
+                case 3:
+                    work->scale.x = (f32)(i + 3);
+                    work->scale.z = 0.5f * (f32)(i + 3);
+                    work->texS = 16.0f;
                     work->texSVel = 16.0f;
                     work->texTVel = 16.0f;
-                }
-                break;
+                    break;
+                default:
+                    sv = 0.5f * (f32)(i + 3);
+                    work->scale.x = sv;
+                    work->scale.z = 0.5f * sv;
+                    work->scale.y *= 0.8f;
+                    work->texS = 16.0f;
+                    if (type == 6 || type == 7) {
+                        work->texSVel = 8.0f;
+                        work->texTVel = 8.0f;
+                    } else {
+                        work->texSVel = 16.0f;
+                        work->texTVel = 16.0f;
+                    }
+                    break;
             }
             work->texT = 32.0f;
         }
         work->texS += work->texSVel;
         work->texT += work->texTVel;
         switch (type) {
-        case 0:
-        case 1:
-            work->texSVel *= 0.9f;
-            break;
-        case 2:
-        case 5:
-            work->texSVel *= 0.75f;
-            work->texTVel *= 0.99f;
-            break;
-        default:
-            if (type == 6 || type == 7) {
-                work->texSVel *= 0.88f;
-                work->texTVel *= 0.98f;
-            } else {
+            case 0:
+            case 1:
+                work->texSVel *= 0.9f;
+                break;
+            case 2:
+            case 5:
                 work->texSVel *= 0.75f;
-                work->texTVel *= 0.95f;
-            }
-            break;
+                work->texTVel *= 0.99f;
+                break;
+            default:
+                if (type == 6 || type == 7) {
+                    work->texSVel *= 0.88f;
+                    work->texTVel *= 0.98f;
+                } else {
+                    work->texSVel *= 0.75f;
+                    work->texTVel *= 0.95f;
+                }
+                break;
         }
         work->scale.x *= 1.002f;
         work->scale.z *= 1.002f;
@@ -357,46 +356,46 @@ void effKemuri11Disp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
     switch (type) {
-    case 0:
-    case 1:
-        GXSetNumTevStages(2);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
-        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_C1, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-        effGetTexObjN64(0x23, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        effGetTexObjN64(0x24, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP1);
-        break;
-    default:
-        GXSetNumTevStages(3);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
-        GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_C0, GX_CC_C1, GX_CC_CPREV, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-        effGetTexObjN64(0x25, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        effGetTexObjN64(0x24, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP1);
-        break;
+        case 0:
+        case 1:
+            GXSetNumTevStages(2);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+            GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_C1, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            effGetTexObjN64(0x23, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            effGetTexObjN64(0x24, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP1);
+            break;
+        default:
+            GXSetNumTevStages(3);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+            GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
+            GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_C0, GX_CC_C1, GX_CC_CPREV, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            effGetTexObjN64(0x25, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            effGetTexObjN64(0x24, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP1);
+            break;
     }
     effSetVtxDescN64(stg_thruhammer_v);
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);

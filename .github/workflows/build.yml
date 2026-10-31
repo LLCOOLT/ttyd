@@ -1,20 +1,51 @@
 name: Build
 
-# Manual runs only, on main, by the repository owner, on the owner's self-hosted runner. The game
-# files never leave that machine: the runner's .env sets TTYD_ORIG to a folder holding G8MJ01/ and
-# G8ME01/, each with that version's extracted sys/main.dol and files/rel/.
+# The lint job checks the sources on every push and pull request; it needs no game files.
+#
+# The build job runs only when started by hand, on main, by the repository owner, on the owner's
+# self-hosted runner. The game files never leave that machine: the runner's .env sets TTYD_ORIG to a
+# folder holding G8MJ01/, G8ME01/, G8MP01/ and G8ME01_DEMO/, each with that version's extracted
+# sys/main.dol and files/rel/ (for the demo: the contents of zz_PaperMario2_game.tgc, i.e. its
+# main.dol and its six RELs).
 on:
   workflow_dispatch:
+  push:
+  pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Version conditions in the game code use include/version.h
+      - name: Check version conditions
+        run: python tools/check_versions.py -v
+
+      # The same function has the same name in every version's symbols.txt
+      - name: Check symbol names across versions
+        run: python tools/check_symbols.py
+
+      # Formatting (skipped with a message when the runner has no clang-format 23)
+      - name: Check formatting
+        run: |
+          python tools/format_check.py --self-test
+          python tools/format_check.py
+
   build:
-    if: github.ref == 'refs/heads/main' && github.actor == github.repository_owner
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.actor == github.repository_owner
     runs-on: [self-hosted, Windows, ttyd]
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
-        version: [G8MJ01, G8ME01]
+        version: [G8MJ01, G8ME01, G8MP01, G8ME01_DEMO]
     defaults:
       run:
         shell: powershell

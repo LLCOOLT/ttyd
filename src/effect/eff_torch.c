@@ -1,3 +1,4 @@
+// Torch flame: a camera-facing flame made of six overlapping scrolling flame textures; `scale` sets its size.
 #include "eff/eff_torch.h"
 #include "driver/dispdrv.h"
 #include "mario/mariost.h"
@@ -6,13 +7,13 @@
 #include <dolphin/mtx.h>
 
 typedef struct EffTorchWork {
-    s32 type;          // 0x0
-    Vec position;      // 0x4
-    f32 scale;         // 0x10
-    f32 scaleX;        // 0x14
-    f32 scaleY;        // 0x18
-    u8 state;          // 0x1C, only cleared at entry
-    u8 pad_1D[3];      // 0x1D
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    f32 scale;    // 0x10
+    f32 scaleX;   // 0x14
+    f32 scaleY;   // 0x18
+    u8 state;     // 0x1C, only cleared at entry
+    u8 pad_1D[3]; // 0x1D
 } EffTorchWork;
 
 u8 torch_obj2_texture[] ATTRIBUTE_ALIGN(32) = {
@@ -160,7 +161,7 @@ EffectEntry* effTorchEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     effect->callback = effTorchMain;
     work->type = type;
     work->state = 0;
-    work->position = (Vec){ x, y, z };
+    work->position = (Vec){x, y, z};
     work->scale = 0.5f * scale;
     work->scaleX = 1.0f;
     work->scaleY = 1.0f;
@@ -203,7 +204,7 @@ void effTorchDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    GXSetTevColor(GX_TEVREG0, (GXColor){ 0xFF, 0x00, 0x00, 0x00 });
+    GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0x00, 0x00, 0x00});
     GXSetNumTevStages(2);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);

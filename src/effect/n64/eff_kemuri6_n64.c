@@ -1,3 +1,4 @@
+// Paper Mario 64 smoke effect 6 (kemuri: smoke) at a point.
 #include "eff/n64/eff_kemuri6_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -8,9 +9,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-double sin(double x);
-double cos(double x);
+#include "libc_decls.h"
 
 typedef struct EffKemuri6N64Work {
     BOOL active;     // 0x0

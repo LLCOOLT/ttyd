@@ -1,74 +1,29 @@
+// gra_05 (ウスグラの道, Twilight Trail): the woods with the breaking floor, between gra_04 and gra_06.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "cam_road.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_cloud.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "gra.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(camera_curve_off);
 USER_FUNC(camera_curve_on);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set_now);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_cam_shift_reset);
-USER_FUNC(evt_cloud_ent);
-USER_FUNC(evt_cloud_init);
-USER_FUNC(evt_cloud_set_cap_size);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_iwamove_ent);
-USER_FUNC(evt_iwamove_init);
-USER_FUNC(evt_kagemario_init);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_bgmode_off);
-USER_FUNC(evt_mario_bgmode_on);
-USER_FUNC(evt_mario_cam_y_off);
-USER_FUNC(evt_mario_cam_y_on);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_set_prev_party);
-USER_FUNC(evt_mobj_breaking_floor);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_party_force_reset_outofscreen);
-USER_FUNC(evt_party_jump_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 
-extern EvtWord gra_05_in_01[];
-extern EvtWord gra_05_out_01[];
-extern EvtWord gra_05_in_02[];
-extern EvtWord gra_05_out_02[];
 static BeroEntry bero_entry_data[7];
-extern EvtWord gra_05_futa_open_evt[];
-extern EvtWord evt_gra_05iwa_move_init[];
-extern EvtWord evt_gra_05iwa_move_evt[];
-extern EvtWord evt_break_floor[];
 static const char* fukitobashi_tbl[4];
-extern EvtWord gra_05_init_evt[];
 
 EVT_BEGIN(gra_05_in_01)
     SET_VALUE(LW(0), 1)
@@ -263,8 +218,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -279,8 +234,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -296,8 +251,8 @@ static BeroEntry bero_entry_data[] = {
         "ana_1", // hitName
         3840, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)in_evt, // enterEvent
@@ -313,8 +268,8 @@ static BeroEntry bero_entry_data[] = {
         "ana_2", // hitName
         7936, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)in_evt, // enterEvent
@@ -330,8 +285,8 @@ static BeroEntry bero_entry_data[] = {
         "A_ana_1", // hitName
         3840, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)gra_05_in_01, // enterEvent
@@ -346,8 +301,8 @@ static BeroEntry bero_entry_data[] = {
         "A_ana_2", // hitName
         3840, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)gra_05_in_01, // enterEvent
@@ -363,23 +318,23 @@ static BeroEntry bero_entry_data[] = {
 
 EVT_BEGIN(gra_05_futa_open_evt)
     BEGIN_INLINE_EVENT
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
         WAIT_MS(1000)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     CALL(evt_hitobj_onoff, STRING("A_futa"), 0, 0)
-    SET_VALUE(GSW(0), 190)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_06_01_BLOW_THE_FLOOR)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_gra_05iwa_move_init)
     CALL(evt_hit_bind_mapobj, STRING("A_iwa"), STRING("S_iwa"))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 192)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_07_TRICK_ROCK)
         CALL(evt_mapobj_trans, 0, STRING("S_iwa"), FLOAT(120.0f), 0, 0)
         CALL(evt_hit_bind_update, STRING("A_iwa"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_futa"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_futa"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_futa"), 0, 0)
     END_IF
     RETURN
@@ -431,14 +386,14 @@ EVT_BEGIN(evt_gra_05iwa_move_evt)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_hit_bind_update, STRING("A_iwa"))
     CALL(evt_snd_sfxoff, LW(9))
-    SET_VALUE(GSW(0), 192)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_07_TRICK_ROCK)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_break_floor)
-    SET_VALUE(GSW(0), 191)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_06_02_THROUGH_THE_HOLE)
     CALL(camera_curve_on)
     RETURN
 EVT_END()
@@ -451,32 +406,32 @@ static const char* fukitobashi_tbl[] = {
 };
 
 EVT_BEGIN(gra_05_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_GRA1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_GRA1"))
-    CALL(evt_mobj_brick, STRING("blk00"), -475, 60, 25, 0, 13, 0, GSWF(2085))
-    CALL(evt_mobj_powerupblk, STRING("blk01"), 630, 60, 40, 0, GSWF(5548), 0)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_GRA1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
+    CALL(evt_mobj_brick, STRING("blk00"), -475, 60, 25, 0, 13, 0, GSWF(GSWF_GRA05_HIDDEN_COIN_BLOCK_EMPTIED))
+    CALL(evt_mobj_powerupblk, STRING("blk01"), 630, 60, 40, 0, GSWF(GSWF_GRA05_SHINE_SPRITE), 0)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
-    IF_INT_LESS(GSW(0), 190)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_06_01_BLOW_THE_FLOOR)
         CALL(evt_cloud_init)
         CALL(evt_cloud_ent, 1, PTR(&fukitobashi_tbl), STRING("A_futa"), PTR(gra_05_futa_open_evt))
         CALL(evt_cloud_set_cap_size, 256, 256)
         CALL(evt_hit_bind_mapobj, STRING("A_futa"), STRING("S_futa"))
         CALL(evt_mapobj_trans, 1, STRING("S_futa"), 0, FLOAT(0.099609375f), 0)
         CALL(evt_hit_bind_update, STRING("A_futa"))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_futa"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_futa"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_futa"), 0, 0)
     END_IF
-    IF_INT_LESS(GSW(0), 191)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_06_02_THROUGH_THE_HOLE)
         CALL(camera_curve_off)
-        CALL(evt_mobj_breaking_floor, STRING("breaking_floor"), -250, -7, 0, 0, PTR(evt_break_floor), GSWF(2080))
+        CALL(evt_mobj_breaking_floor, STRING("breaking_floor"), -250, -7, 0, 0, PTR(evt_break_floor), GSWF(GSWF_GRA05_BREAKING_FLOOR_BROKEN))
     END_IF
     SPAWN_EVENT(PTR(evt_gra_05iwa_move_init))
-    IF_INT_LESS(GSW(0), 192)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_07_TRICK_ROCK)
         CALL(evt_iwamove_init)
         CALL(evt_iwamove_ent, PTR(evt_gra_05iwa_move_evt))
     END_IF
@@ -490,10 +445,7 @@ USER_FUNC(camera_curve_off) {
     return EVT_RETURN_DONE;
 }
 
-void camRoadCurveOn(const char* name);
-
 USER_FUNC(camera_curve_on) {
     camRoadCurveOn("|MarioSt_CameraRoad|curve2");
     return EVT_RETURN_DONE;
 }
-

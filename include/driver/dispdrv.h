@@ -1,3 +1,4 @@
+// dispdrv.c: the display driver (DispEntry, dispEntry/dispDraw): per-camera draw callbacks sorted by depth.
 #pragma once
 
 #include <dolphin/types.h>
@@ -6,7 +7,7 @@
 typedef void (*DispCallback)(CameraId cameraId, void* param);
 
 typedef struct DispEntry {
-    u8 cameraId;              // 0x0, CameraId
+    u8 cameraId;           // 0x0, CameraId
     u8 renderMode;         // 0x1
     f32 order;             // 0x4
     DispCallback callback; // 0x8

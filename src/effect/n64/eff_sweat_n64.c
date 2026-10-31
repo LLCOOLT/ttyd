@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: sweat drops flung out in a fan (six for type 0, four for type 1); used by the Yoshi partner.
 #include "eff/n64/eff_sweat_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -7,7 +8,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+// FAKE: local prototype: sin takes a float (libc: double); this file was compiled with it and the header prototype changes the code.
 double sin(float);
+// FAKE: local prototype: cos takes a float (libc: double); this file was compiled with it and the header prototype changes the code.
 double cos(float);
 
 void effSweatMain(EffectEntry* effect);
@@ -27,12 +30,12 @@ EffectEntry* effSweatN64Entry(s32 type, f32 x, f32 y, f32 z, f32 base, f32 angle
     effect = effEntry();
     count = 1;
     switch (type) {
-    case 0:
-        count = 7;
-        break;
-    case 1:
-        count = 5;
-        break;
+        case 0:
+            count = 7;
+            break;
+        case 1:
+            count = 5;
+            break;
     }
     effect->type = "SweatN64";
     effect->count = count;
@@ -52,12 +55,12 @@ EffectEntry* effSweatN64Entry(s32 type, f32 x, f32 y, f32 z, f32 base, f32 angle
         dir.z = -(f32)cos(0.0f);
         axis = dir;
         switch (type) {
-        case 0:
-            spread = (i - 1) % 3 * 14;
-            break;
-        case 1:
-            spread = (i - 1) % 4 * 16;
-            break;
+            case 0:
+                spread = (i - 1) % 3 * 14;
+                break;
+            case 1:
+                spread = (i - 1) % 4 * 16;
+                break;
         }
         if (angle > 0.0f) {
             spread *= -1.0f;
@@ -133,6 +136,7 @@ void effSweatMain(EffectEntry* effect) {
     }
 }
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_loop_invariants off
 void effSweatDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;

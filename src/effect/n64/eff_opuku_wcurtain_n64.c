@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: curtain of water (wcurtain) at a point with a scale and lifetime.
+#include "eff/n64/eff_opuku_wcurtain_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -6,17 +8,7 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSFastCast.h>
 #include <stdlib.h>
-
-
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
 
 typedef struct EffOpukuWcurtainN64Work {
     s32 type;       // 0x0
@@ -46,7 +38,7 @@ EffectEntry* effOpukuWcurtainN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuWcurtainN64Work));
     effect->userdata = work;
     effect->callback = effOpukuWcurtainMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -80,8 +72,8 @@ void effOpukuWcurtainMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -196,5 +188,3 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
         tri2(frame, frame + 2, frame + 1, frame, frame + 1, frame + 2, frame + 3, frame);
     }
 }
-
-

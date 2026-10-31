@@ -1,3 +1,6 @@
+// Paper Mario 64 effect: horao spell, two wavy 16-segment glow ribbons at fixed angles that sway, scroll their texture
+// and cycle through a 17-step green colour table; fades in over 16 frames and out over the last 16.
+#include "eff/n64/eff_horao_spell_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -6,18 +9,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSFastCast.h>
 #include <string.h>
-
-double sin(double);
-
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffHoraoSpellN64Work {
     s32 type;     // 0x0
@@ -87,7 +80,7 @@ EffectEntry* effHoraoSpellN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffHoraoSpellN64Work));
     effect->userdata = work;
     effect->callback = effHoraoSpellMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -119,8 +112,8 @@ void effHoraoSpellMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -132,14 +125,14 @@ void effHoraoSpellMain(EffectEntry* effect) {
         return;
     }
     {
-    int frame;
-    frame = work->frame;
-    if (work->lifetime < 16) {
-        work->alpha = work->lifetime * 16;
-    }
-    if (frame < 16) {
-        work->alpha = frame * 16 + 15;
-    }
+        int frame;
+        frame = work->frame;
+        if (work->lifetime < 16) {
+            work->alpha = work->lifetime * 16;
+        }
+        if (frame < 16) {
+            work->alpha = frame * 16 + 15;
+        }
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHoraoSpellDisp, effect);
 }
@@ -163,7 +156,6 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     s32 j;
     effN64Vtx* vtx;
     CameraEntry* camera;
-
 
     GXColor white;
     f32 s;
@@ -263,7 +255,5 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(k, k + 2, k + 1, k, k + 1, k + 2, k + 3, k);
         }
-
     }
 }
-

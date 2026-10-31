@@ -1,3 +1,5 @@
+// Pit of 100 Trials (jon, "dungeon"): battle database: the enemy groups (BattleSetup) and stages of the Pit floors.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -382,40 +384,40 @@ BattleStageObjectData jon_btlobject_data[] = {
 
 BattleStageData jon_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_3", // mSpecificStageDataDir
-        2, // mNumObjects
-        jon_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_3", // specificStageDataDir
+        2, // numObjects
+        jon_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_3", // mSpecificStageDataDir
-        2, // mNumObjects
-        &jon_btlobject_data[2], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_3", // specificStageDataDir
+        2, // numObjects
+        &jon_btlobject_data[2], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_3", // mSpecificStageDataDir
-        2, // mNumObjects
-        &jon_btlobject_data[4], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_3", // specificStageDataDir
+        2, // numObjects
+        &jon_btlobject_data[4], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_00_3", // mSpecificStageDataDir
-        2, // mNumObjects
-        &jon_btlobject_data[6], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_00_3", // specificStageDataDir
+        2, // numObjects
+        &jon_btlobject_data[6], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -425,10 +427,10 @@ BattleStageData jon_btlstage_data[] = {
 
 BattleUnitSetup btlparty_jon_jon_100_01_off_1[] = {
     {
-        &unit_boss_zonbaba, // mUnitKindParams
+        &unit_boss_zonbaba, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {365.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -448,10 +450,10 @@ BattleGroupSetup btlgrp_jon_jon_100_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_01_01_off_1[] = {
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -472,20 +474,20 @@ BattleGroupSetup btlgrp_jon_jon_01_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_01_01_off_2[] = {
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_kuriboo, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -506,20 +508,20 @@ BattleGroupSetup btlgrp_jon_jon_01_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_01_01_off_3[] = {
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_kuriboo, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -540,50 +542,50 @@ BattleGroupSetup btlgrp_jon_jon_01_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_01_02_off_1[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -604,20 +606,20 @@ BattleGroupSetup btlgrp_jon_jon_01_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_01_02_off_2[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -638,50 +640,50 @@ BattleGroupSetup btlgrp_jon_jon_01_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_01_02_off_3[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -702,40 +704,40 @@ BattleGroupSetup btlgrp_jon_jon_01_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_01_03_off_1[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -756,20 +758,20 @@ BattleGroupSetup btlgrp_jon_jon_01_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_01_03_off_2[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -790,40 +792,40 @@ BattleGroupSetup btlgrp_jon_jon_01_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_01_03_off_3[] = {
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hannya, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -844,40 +846,40 @@ BattleGroupSetup btlgrp_jon_jon_01_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_01_04_off_1[] = {
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_honenoko, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_honenoko, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_honenoko, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -898,20 +900,20 @@ BattleGroupSetup btlgrp_jon_jon_01_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_01_04_off_2[] = {
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_honenoko, // itemDropTable
     },
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -932,30 +934,30 @@ BattleGroupSetup btlgrp_jon_jon_01_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_01_04_off_3[] = {
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_honenoko, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hinnya, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -976,50 +978,50 @@ BattleGroupSetup btlgrp_jon_jon_01_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_01_05_off_1[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1040,30 +1042,30 @@ BattleGroupSetup btlgrp_jon_jon_01_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_01_05_off_2[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_kuriboo, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1084,40 +1086,40 @@ BattleGroupSetup btlgrp_jon_jon_01_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_01_05_off_3[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_honenoko, // itemDropTable
     },
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_chorobon, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1138,20 +1140,20 @@ BattleGroupSetup btlgrp_jon_jon_01_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_11_01_off_1[] = {
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1172,30 +1174,30 @@ BattleGroupSetup btlgrp_jon_jon_11_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_11_01_off_2[] = {
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1216,30 +1218,30 @@ BattleGroupSetup btlgrp_jon_jon_11_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_11_01_off_3[] = {
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1260,40 +1262,40 @@ BattleGroupSetup btlgrp_jon_jon_11_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_11_02_off_1[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1314,30 +1316,30 @@ BattleGroupSetup btlgrp_jon_jon_11_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_11_02_off_2[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1358,30 +1360,30 @@ BattleGroupSetup btlgrp_jon_jon_11_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_11_02_off_3[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1402,40 +1404,40 @@ BattleGroupSetup btlgrp_jon_jon_11_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_11_03_off_1[] = {
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1456,20 +1458,20 @@ BattleGroupSetup btlgrp_jon_jon_11_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_11_03_off_2[] = {
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1490,40 +1492,40 @@ BattleGroupSetup btlgrp_jon_jon_11_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_11_03_off_3[] = {
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1544,30 +1546,30 @@ BattleGroupSetup btlgrp_jon_jon_11_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_11_04_off_1[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1588,30 +1590,30 @@ BattleGroupSetup btlgrp_jon_jon_11_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_11_04_off_2[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1632,20 +1634,20 @@ BattleGroupSetup btlgrp_jon_jon_11_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_11_04_off_3[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1666,40 +1668,40 @@ BattleGroupSetup btlgrp_jon_jon_11_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_11_05_off_1[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1720,20 +1722,20 @@ BattleGroupSetup btlgrp_jon_jon_11_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_11_05_off_2[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1754,40 +1756,40 @@ BattleGroupSetup btlgrp_jon_jon_11_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_11_05_off_3[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_piders, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1808,30 +1810,30 @@ BattleGroupSetup btlgrp_jon_jon_11_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_21_01_off_1[] = {
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_togekuri, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_togekuri, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1852,40 +1854,40 @@ BattleGroupSetup btlgrp_jon_jon_21_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_21_01_off_2[] = {
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_togekuri, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_togekuri, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1906,40 +1908,40 @@ BattleGroupSetup btlgrp_jon_jon_21_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_21_01_off_3[] = {
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_togekuri, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_togekuri, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1960,50 +1962,50 @@ BattleGroupSetup btlgrp_jon_jon_21_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_21_02_off_1[] = {
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2024,20 +2026,20 @@ BattleGroupSetup btlgrp_jon_jon_21_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_21_02_off_2[] = {
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2058,50 +2060,50 @@ BattleGroupSetup btlgrp_jon_jon_21_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_21_02_off_3[] = {
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2122,40 +2124,40 @@ BattleGroupSetup btlgrp_jon_jon_21_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_21_03_off_1[] = {
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_jyugem, // itemDropTable
     },
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_jyugem, // itemDropTable
     },
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_jyugem, // itemDropTable
     },
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2176,20 +2178,20 @@ BattleGroupSetup btlgrp_jon_jon_21_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_21_03_off_2[] = {
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_jyugem, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2210,40 +2212,40 @@ BattleGroupSetup btlgrp_jon_jon_21_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_21_03_off_3[] = {
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_jyugem, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2264,40 +2266,40 @@ BattleGroupSetup btlgrp_jon_jon_21_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_21_04_off_1[] = {
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2318,30 +2320,30 @@ BattleGroupSetup btlgrp_jon_jon_21_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_21_04_off_2[] = {
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_togekuri, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2362,40 +2364,40 @@ BattleGroupSetup btlgrp_jon_jon_21_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_21_04_off_3[] = {
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2416,40 +2418,40 @@ BattleGroupSetup btlgrp_jon_jon_21_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_21_05_off_1[] = {
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2470,30 +2472,30 @@ BattleGroupSetup btlgrp_jon_jon_21_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_21_05_off_2[] = {
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2514,40 +2516,40 @@ BattleGroupSetup btlgrp_jon_jon_21_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_21_05_off_3[] = {
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_teresa, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2568,20 +2570,20 @@ BattleGroupSetup btlgrp_jon_jon_21_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_31_01_off_1[] = {
     {
-        &unit_yami_noko, // mUnitKindParams
+        &unit_yami_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_noko, // itemDropTable
     },
     {
-        &unit_yami_noko, // mUnitKindParams
+        &unit_yami_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2602,30 +2604,30 @@ BattleGroupSetup btlgrp_jon_jon_31_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_31_01_off_2[] = {
     {
-        &unit_yami_noko, // mUnitKindParams
+        &unit_yami_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_noko, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patamet, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2646,30 +2648,30 @@ BattleGroupSetup btlgrp_jon_jon_31_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_31_01_off_3[] = {
     {
-        &unit_yami_noko, // mUnitKindParams
+        &unit_yami_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_noko, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2690,30 +2692,30 @@ BattleGroupSetup btlgrp_jon_jon_31_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_31_02_off_1[] = {
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_sinemon, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_sinemon, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2734,30 +2736,30 @@ BattleGroupSetup btlgrp_jon_jon_31_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_31_02_off_2[] = {
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_sinemon, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2778,30 +2780,30 @@ BattleGroupSetup btlgrp_jon_jon_31_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_31_02_off_3[] = {
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_sinemon, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_sinemon, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2822,40 +2824,40 @@ BattleGroupSetup btlgrp_jon_jon_31_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_31_03_off_1[] = {
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patamet, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patamet, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patamet, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2876,40 +2878,40 @@ BattleGroupSetup btlgrp_jon_jon_31_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_31_03_off_2[] = {
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patamet, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patamet, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2930,20 +2932,20 @@ BattleGroupSetup btlgrp_jon_jon_31_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_31_03_off_3[] = {
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patamet, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -2964,40 +2966,40 @@ BattleGroupSetup btlgrp_jon_jon_31_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_31_04_off_1[] = {
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3018,30 +3020,30 @@ BattleGroupSetup btlgrp_jon_jon_31_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_31_04_off_2[] = {
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_yami_noko, // mUnitKindParams
+        &unit_yami_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_noko, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3062,30 +3064,30 @@ BattleGroupSetup btlgrp_jon_jon_31_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_31_04_off_3[] = {
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3106,50 +3108,50 @@ BattleGroupSetup btlgrp_jon_jon_31_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_31_05_off_1[] = {
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3170,30 +3172,30 @@ BattleGroupSetup btlgrp_jon_jon_31_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_31_05_off_2[] = {
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_yami_noko, // mUnitKindParams
+        &unit_yami_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3214,20 +3216,20 @@ BattleGroupSetup btlgrp_jon_jon_31_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_31_05_off_3[] = {
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_flower_chorobon, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3248,40 +3250,40 @@ BattleGroupSetup btlgrp_jon_jon_31_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_41_01_off_1[] = {
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3302,30 +3304,30 @@ BattleGroupSetup btlgrp_jon_jon_41_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_41_01_off_2[] = {
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3346,30 +3348,30 @@ BattleGroupSetup btlgrp_jon_jon_41_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_41_01_off_3[] = {
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yami_patakuri, // itemDropTable
     },
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3390,40 +3392,40 @@ BattleGroupSetup btlgrp_jon_jon_41_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_41_02_off_1[] = {
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_heavy_bom, // itemDropTable
     },
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_heavy_bom, // itemDropTable
     },
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_heavy_bom, // itemDropTable
     },
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3444,20 +3446,20 @@ BattleGroupSetup btlgrp_jon_jon_41_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_41_02_off_2[] = {
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_heavy_bom, // itemDropTable
     },
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3478,30 +3480,30 @@ BattleGroupSetup btlgrp_jon_jon_41_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_41_02_off_3[] = {
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_heavy_bom, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3522,30 +3524,30 @@ BattleGroupSetup btlgrp_jon_jon_41_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_41_03_off_1[] = {
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bubble, // itemDropTable
     },
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bubble, // itemDropTable
     },
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3566,30 +3568,30 @@ BattleGroupSetup btlgrp_jon_jon_41_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_41_03_off_2[] = {
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bubble, // itemDropTable
     },
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bubble, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3610,40 +3612,40 @@ BattleGroupSetup btlgrp_jon_jon_41_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_41_03_off_3[] = {
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bubble, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bubble, // itemDropTable
     },
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3664,40 +3666,40 @@ BattleGroupSetup btlgrp_jon_jon_41_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_41_04_off_1[] = {
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3718,40 +3720,40 @@ BattleGroupSetup btlgrp_jon_jon_41_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_41_04_off_2[] = {
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patatogemet, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3772,20 +3774,20 @@ BattleGroupSetup btlgrp_jon_jon_41_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_41_04_off_3[] = {
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo_mummy, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3806,20 +3808,20 @@ BattleGroupSetup btlgrp_jon_jon_41_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_41_05_off_1[] = {
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patatogemet, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3840,40 +3842,40 @@ BattleGroupSetup btlgrp_jon_jon_41_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_41_05_off_2[] = {
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patatogemet, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patatogemet, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patatogemet, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3894,40 +3896,40 @@ BattleGroupSetup btlgrp_jon_jon_41_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_41_05_off_3[] = {
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patatogemet, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_patatogemet, // itemDropTable
     },
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bubble, // itemDropTable
     },
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3948,30 +3950,30 @@ BattleGroupSetup btlgrp_jon_jon_41_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_51_01_off_1[] = {
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_badge_borodo, // itemDropTable
     },
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_badge_borodo, // itemDropTable
     },
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -3992,30 +3994,30 @@ BattleGroupSetup btlgrp_jon_jon_51_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_51_01_off_2[] = {
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_badge_borodo, // itemDropTable
     },
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_badge_borodo, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4036,30 +4038,30 @@ BattleGroupSetup btlgrp_jon_jon_51_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_51_01_off_3[] = {
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_badge_borodo, // itemDropTable
     },
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_badge_borodo, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4080,40 +4082,40 @@ BattleGroupSetup btlgrp_jon_jon_51_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_51_02_off_1[] = {
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4134,30 +4136,30 @@ BattleGroupSetup btlgrp_jon_jon_51_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_51_02_off_2[] = {
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4178,20 +4180,20 @@ BattleGroupSetup btlgrp_jon_jon_51_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_51_02_off_3[] = {
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4212,40 +4214,40 @@ BattleGroupSetup btlgrp_jon_jon_51_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_51_03_off_1[] = {
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4266,30 +4268,30 @@ BattleGroupSetup btlgrp_jon_jon_51_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_51_03_off_2[] = {
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_badge_borodo, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4310,30 +4312,30 @@ BattleGroupSetup btlgrp_jon_jon_51_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_51_03_off_3[] = {
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4354,30 +4356,30 @@ BattleGroupSetup btlgrp_jon_jon_51_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_51_04_off_1[] = {
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_burst_wanwan, // itemDropTable
     },
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_burst_wanwan, // itemDropTable
     },
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4398,30 +4400,30 @@ BattleGroupSetup btlgrp_jon_jon_51_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_51_04_off_2[] = {
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_burst_wanwan, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4442,30 +4444,30 @@ BattleGroupSetup btlgrp_jon_jon_51_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_51_04_off_3[] = {
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_burst_wanwan, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4486,40 +4488,40 @@ BattleGroupSetup btlgrp_jon_jon_51_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_51_05_off_1[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4540,30 +4542,30 @@ BattleGroupSetup btlgrp_jon_jon_51_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_51_05_off_2[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4584,30 +4586,30 @@ BattleGroupSetup btlgrp_jon_jon_51_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_51_05_off_3[] = {
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sinemon, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_purple_teresa, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4628,30 +4630,30 @@ BattleGroupSetup btlgrp_jon_jon_51_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_61_01_off_1[] = {
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_jyugem, // itemDropTable
     },
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_jyugem, // itemDropTable
     },
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4672,30 +4674,30 @@ BattleGroupSetup btlgrp_jon_jon_61_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_61_01_off_2[] = {
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_jyugem, // itemDropTable
     },
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_jyugem, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4716,20 +4718,20 @@ BattleGroupSetup btlgrp_jon_jon_61_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_61_01_off_3[] = {
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_jyugem, // itemDropTable
     },
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4750,40 +4752,40 @@ BattleGroupSetup btlgrp_jon_jon_61_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_61_02_off_1[] = {
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_karon, // itemDropTable
     },
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_karon, // itemDropTable
     },
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_karon, // itemDropTable
     },
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4804,20 +4806,20 @@ BattleGroupSetup btlgrp_jon_jon_61_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_61_02_off_2[] = {
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_karon, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4838,30 +4840,30 @@ BattleGroupSetup btlgrp_jon_jon_61_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_61_02_off_3[] = {
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_karon, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4882,30 +4884,30 @@ BattleGroupSetup btlgrp_jon_jon_61_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_61_03_off_1[] = {
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_super_mahorn, // itemDropTable
     },
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_super_mahorn, // itemDropTable
     },
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4926,30 +4928,30 @@ BattleGroupSetup btlgrp_jon_jon_61_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_61_03_off_2[] = {
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_super_mahorn, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dark_keeper, // itemDropTable
     },
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -4970,30 +4972,30 @@ BattleGroupSetup btlgrp_jon_jon_61_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_61_03_off_3[] = {
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_super_mahorn, // itemDropTable
     },
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_karon, // itemDropTable
     },
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5014,40 +5016,40 @@ BattleGroupSetup btlgrp_jon_jon_61_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_61_04_off_1[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5068,30 +5070,30 @@ BattleGroupSetup btlgrp_jon_jon_61_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_61_04_off_2[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_jyugem, // itemDropTable
     },
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5112,20 +5114,20 @@ BattleGroupSetup btlgrp_jon_jon_61_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_61_04_off_3[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5146,30 +5148,30 @@ BattleGroupSetup btlgrp_jon_jon_61_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_61_05_off_1[] = {
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dark_keeper, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dark_keeper, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5190,20 +5192,20 @@ BattleGroupSetup btlgrp_jon_jon_61_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_61_05_off_2[] = {
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dark_keeper, // itemDropTable
     },
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5224,20 +5226,20 @@ BattleGroupSetup btlgrp_jon_jon_61_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_61_05_off_3[] = {
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dark_keeper, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5258,30 +5260,30 @@ BattleGroupSetup btlgrp_jon_jon_61_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_71_01_off_1[] = {
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5302,30 +5304,30 @@ BattleGroupSetup btlgrp_jon_jon_71_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_71_01_off_2[] = {
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5346,30 +5348,30 @@ BattleGroupSetup btlgrp_jon_jon_71_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_71_01_off_3[] = {
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5390,30 +5392,30 @@ BattleGroupSetup btlgrp_jon_jon_71_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_71_02_off_1[] = {
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5434,30 +5436,30 @@ BattleGroupSetup btlgrp_jon_jon_71_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_71_02_off_2[] = {
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5478,30 +5480,30 @@ BattleGroupSetup btlgrp_jon_jon_71_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_71_02_off_3[] = {
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5522,50 +5524,50 @@ BattleGroupSetup btlgrp_jon_jon_71_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_71_03_off_1[] = {
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5586,40 +5588,40 @@ BattleGroupSetup btlgrp_jon_jon_71_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_71_03_off_2[] = {
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5640,40 +5642,40 @@ BattleGroupSetup btlgrp_jon_jon_71_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_71_03_off_3[] = {
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_phantom, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 130.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5694,40 +5696,40 @@ BattleGroupSetup btlgrp_jon_jon_71_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_71_04_off_1[] = {
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 130.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 130.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 130.0f, 20.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -5748,40 +5750,40 @@ BattleGroupSetup btlgrp_jon_jon_71_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_71_04_off_2[] = {
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 130.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5802,40 +5804,40 @@ BattleGroupSetup btlgrp_jon_jon_71_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_71_04_off_3[] = {
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 130.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_chururu, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5856,40 +5858,40 @@ BattleGroupSetup btlgrp_jon_jon_71_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_71_05_off_1[] = {
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5910,30 +5912,30 @@ BattleGroupSetup btlgrp_jon_jon_71_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_71_05_off_2[] = {
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togenoko_ace, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5954,30 +5956,30 @@ BattleGroupSetup btlgrp_jon_jon_71_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_71_05_off_3[] = {
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_wanwan, // itemDropTable
     },
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -5998,40 +6000,40 @@ BattleGroupSetup btlgrp_jon_jon_71_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_81_01_off_1[] = {
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6052,40 +6054,40 @@ BattleGroupSetup btlgrp_jon_jon_81_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_81_01_off_2[] = {
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6106,30 +6108,30 @@ BattleGroupSetup btlgrp_jon_jon_81_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_81_01_off_3[] = {
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_pakkun_flower, // itemDropTable
     },
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6150,20 +6152,20 @@ BattleGroupSetup btlgrp_jon_jon_81_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_81_02_off_1[] = {
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yamitogedaruma, // itemDropTable
     },
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6184,40 +6186,40 @@ BattleGroupSetup btlgrp_jon_jon_81_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_81_02_off_2[] = {
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yamitogedaruma, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6238,30 +6240,30 @@ BattleGroupSetup btlgrp_jon_jon_81_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_81_02_off_3[] = {
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yamitogedaruma, // itemDropTable
     },
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yamitogedaruma, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6282,40 +6284,40 @@ BattleGroupSetup btlgrp_jon_jon_81_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_81_03_off_1[] = {
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6336,30 +6338,30 @@ BattleGroupSetup btlgrp_jon_jon_81_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_81_03_off_2[] = {
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_pakkun_flower, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6380,30 +6382,30 @@ BattleGroupSetup btlgrp_jon_jon_81_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_81_03_off_3[] = {
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_churantalar, // itemDropTable
     },
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6424,40 +6426,40 @@ BattleGroupSetup btlgrp_jon_jon_81_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_81_04_off_1[] = {
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_pakkun_flower, // itemDropTable
     },
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_pakkun_flower, // itemDropTable
     },
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_pakkun_flower, // itemDropTable
     },
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6478,30 +6480,30 @@ BattleGroupSetup btlgrp_jon_jon_81_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_81_04_off_2[] = {
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_pakkun_flower, // itemDropTable
     },
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_yamitogedaruma, // itemDropTable
     },
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6522,40 +6524,40 @@ BattleGroupSetup btlgrp_jon_jon_81_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_81_04_off_3[] = {
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_pakkun_flower, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6576,40 +6578,40 @@ BattleGroupSetup btlgrp_jon_jon_81_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_81_05_off_1[] = {
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6630,30 +6632,30 @@ BattleGroupSetup btlgrp_jon_jon_81_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_81_05_off_2[] = {
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6674,50 +6676,50 @@ BattleGroupSetup btlgrp_jon_jon_81_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_81_05_off_3[] = {
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hennya, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6738,50 +6740,50 @@ BattleGroupSetup btlgrp_jon_jon_81_05_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_91_01_off_1[] = {
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6802,30 +6804,30 @@ BattleGroupSetup btlgrp_jon_jon_91_01_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_91_01_off_2[] = {
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6846,30 +6848,30 @@ BattleGroupSetup btlgrp_jon_jon_91_01_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_91_01_off_3[] = {
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 130.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -6890,40 +6892,40 @@ BattleGroupSetup btlgrp_jon_jon_91_01_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_91_02_off_1[] = {
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6944,40 +6946,40 @@ BattleGroupSetup btlgrp_jon_jon_91_02_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_91_02_off_2[] = {
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -6998,40 +7000,40 @@ BattleGroupSetup btlgrp_jon_jon_91_02_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_91_02_off_3[] = {
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 130.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_green, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7052,40 +7054,40 @@ BattleGroupSetup btlgrp_jon_jon_91_02_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_91_03_off_1[] = {
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7106,30 +7108,30 @@ BattleGroupSetup btlgrp_jon_jon_91_03_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_91_03_off_2[] = {
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7150,40 +7152,40 @@ BattleGroupSetup btlgrp_jon_jon_91_03_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_91_03_off_3[] = {
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_giant_bomb, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7204,50 +7206,50 @@ BattleGroupSetup btlgrp_jon_jon_91_03_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_91_04_off_1[] = {
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 130.0f, -20.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_green, // itemDropTable
     },
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_green, // itemDropTable
     },
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 130.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_green, // itemDropTable
     },
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 130.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_green, // itemDropTable
     },
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 130.0f, 20.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -7268,30 +7270,30 @@ BattleGroupSetup btlgrp_jon_jon_91_04_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_91_04_off_2[] = {
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_green, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7312,40 +7314,40 @@ BattleGroupSetup btlgrp_jon_jon_91_04_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_91_04_off_3[] = {
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa_green, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_mahorn_custom, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7366,50 +7368,50 @@ BattleGroupSetup btlgrp_jon_jon_91_04_off_3 = {
 
 BattleUnitSetup btlparty_jon_jon_91_05_off_1[] = {
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7430,50 +7432,50 @@ BattleGroupSetup btlgrp_jon_jon_91_05_off_1 = {
 
 BattleUnitSetup btlparty_jon_jon_91_05_off_2[] = {
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7494,50 +7496,50 @@ BattleGroupSetup btlgrp_jon_jon_91_05_off_2 = {
 
 BattleUnitSetup btlparty_jon_jon_91_05_off_3[] = {
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_twinkling_pansy, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -7923,7 +7925,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_test1_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -7934,7 +7936,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_01_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {10, 10}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -7945,7 +7947,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_02_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -7956,7 +7958,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_03_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -7967,7 +7969,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_04_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {10, 10}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -7978,7 +7980,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_05_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -7989,7 +7991,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_11_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {10, 10}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8000,7 +8002,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_12_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8011,7 +8013,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_13_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8022,7 +8024,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_14_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8033,7 +8035,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_15_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8044,7 +8046,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_21_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {10, 10}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8055,7 +8057,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_22_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8066,7 +8068,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_23_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8077,7 +8079,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_24_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8088,7 +8090,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_25_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{5, 5}, {5, 5}, {10, 10}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8099,7 +8101,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_31_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {10, 10}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8110,7 +8112,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_32_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8121,7 +8123,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_33_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8132,7 +8134,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_34_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {10, 10}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8143,7 +8145,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_35_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8154,7 +8156,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_41_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {10, 10}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8165,7 +8167,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_42_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {10, 10}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8176,7 +8178,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_43_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8187,7 +8189,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_44_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8198,7 +8200,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_45_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8209,7 +8211,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_51_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8220,7 +8222,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_52_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8231,7 +8233,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_53_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8242,7 +8244,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_54_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8253,7 +8255,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_55_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8264,7 +8266,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_61_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8275,7 +8277,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_62_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8286,7 +8288,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_63_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8297,7 +8299,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_64_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8308,7 +8310,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_65_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8319,7 +8321,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_71_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8330,7 +8332,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_72_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8341,7 +8343,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_73_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8352,7 +8354,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_74_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8363,7 +8365,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_75_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8374,7 +8376,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_81_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8385,7 +8387,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_82_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8396,7 +8398,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_83_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8407,7 +8409,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_84_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8418,7 +8420,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_85_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8429,7 +8431,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_91_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8440,7 +8442,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_92_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8451,7 +8453,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_93_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8462,7 +8464,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_94_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8473,7 +8475,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_95_off, // select
-        0x10000000, // battleFlags
+        NPC_BATTLE_NO_BUMP_ATTACK, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -8485,7 +8487,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_100_zonbaba_off, // select
-        0x20100010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_NO_PLAYER_ENTRY | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG1_GONBABA1", // bgmName
@@ -8548,4 +8550,3 @@ NpcTerritoryInfo btl_jon_setup_no_tbl[] = {
     {"BTLNO_JON_100_ZONBABA", 51},
     {0},
 };
-

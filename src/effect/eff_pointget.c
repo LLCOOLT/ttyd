@@ -1,3 +1,4 @@
+// Point-gain display (PointGet): shows a number in 2D at a point for a set duration; types 0-2.
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -6,24 +7,26 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/eff_pointget.h"
 #include <stdio.h>
 #include <string.h>
+#include "eff/eff_pointget.h"
+#include "version.h"
 
 typedef struct EffPointGetWork {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    s32 number;    // 0x10
-    f32 scale;     // 0x14
-    s32 duration;  // 0x18
-    s32 timer;     // 0x1C
-    s32 state;     // 0x20
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    s32 number;   // 0x10
+    f32 scale;    // 0x14
+    s32 duration; // 0x18
+    s32 timer;    // 0x1C
+    s32 state;    // 0x20
 } EffPointGetWork;
 
-EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 duration);
 void effPointGetMain(EffectEntry* effect);
 void effPointGetDisp(CameraId cameraId, EffectEntry* effect);
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 typedef struct PointGetTex {
     s32 kind;
     s32 id;
@@ -35,29 +38,29 @@ typedef struct PointGetTexSet {
     s32 count;
 } PointGetTexSet;
 
-static PointGetTex tex_jp[3] = { { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x7C, 0x7D } };
-static PointGetTex tex_us[5] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
-static PointGetTex tex_shadow_us[5] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x82, 0x83 } };
-static PointGetTex tex_lang3[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x7E, 0x7F } };
-static PointGetTex tex_shadow_lang3[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
-static PointGetTex tex_lang4[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x7E, 0x7F } };
-static PointGetTex tex_shadow_lang4[3] = { { 0, 0x7C, 0x7D }, { -1, -1, -1 }, { 1, 0x80, 0x81 } };
-#ifdef VERSION_G8MP01
-static PointGetTex tex_lang5[6] = { { 1, 0x7C, 0x7D }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x80, 0x81 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
-static PointGetTex tex_shadow_lang5[6] = { { 1, 0x7C, 0x7D }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x82, 0x83 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
+static PointGetTex tex_jp[3] = {{0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x7C, 0x7D}};
+static PointGetTex tex_us[5] = {{1, 0x7C, 0x7D}, {-1, -1, -1}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x80, 0x81}};
+static PointGetTex tex_shadow_us[5] = {{1, 0x7C, 0x7D}, {-1, -1, -1}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x82, 0x83}};
+static PointGetTex tex_lang3[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x7E, 0x7F}};
+static PointGetTex tex_shadow_lang3[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x80, 0x81}};
+static PointGetTex tex_lang4[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x7E, 0x7F}};
+static PointGetTex tex_shadow_lang4[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x80, 0x81}};
+#if VERSION == VERSION_EU
+static PointGetTex tex_lang5[6] = {{1, 0x7C, 0x7D}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x80, 0x81}, {-1, -1, -1}, {1, 0x84, 0x85}};
+static PointGetTex tex_shadow_lang5[6] = {{1, 0x7C, 0x7D}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x82, 0x83}, {-1, -1, -1}, {1, 0x84, 0x85}};
 #else
-static PointGetTex tex_lang5[7] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x80, 0x81 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
-static PointGetTex tex_shadow_lang5[7] = { { 1, 0x7C, 0x7D }, { -1, -1, -1 }, { 0, 0x7E, 0x7F }, { -1, -1, -1 }, { 1, 0x82, 0x83 }, { -1, -1, -1 }, { 1, 0x84, 0x85 } };
+static PointGetTex tex_lang5[7] = {{1, 0x7C, 0x7D}, {-1, -1, -1}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x80, 0x81}, {-1, -1, -1}, {1, 0x84, 0x85}};
+static PointGetTex tex_shadow_lang5[7] = {{1, 0x7C, 0x7D}, {-1, -1, -1}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x82, 0x83}, {-1, -1, -1}, {1, 0x84, 0x85}};
 #endif
-static PointGetTex tex_lang6[2] = { { 0, 0x7E, 0x7F }, { 1, 0x7C, 0x7D } };
-static PointGetTex tex_shadow_lang6[2] = { { 0, 0x7E, 0x7F }, { 1, 0x80, 0x81 } };
+static PointGetTex tex_lang6[2] = {{0, 0x7E, 0x7F}, {1, 0x7C, 0x7D}};
+static PointGetTex tex_shadow_lang6[2] = {{0, 0x7E, 0x7F}, {1, 0x80, 0x81}};
 
 static PointGetTexSet texid_tbl[6] = {
     { { tex_jp, tex_jp }, 3 },
     { { tex_us, tex_shadow_us }, 5 },
     { { tex_lang3, tex_shadow_lang3 }, 3 },
     { { tex_lang4, tex_shadow_lang4 }, 3 },
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     { { tex_lang5, tex_shadow_lang5 }, 6 },
 #else
     { { tex_lang5, tex_shadow_lang5 }, 7 },
@@ -65,7 +68,7 @@ static PointGetTexSet texid_tbl[6] = {
     { { tex_lang6, tex_shadow_lang6 }, 2 },
 };
 #else
-static s32 texid_tbl[2][4] = { { 0x98, 0x99, 0x9A, 0x9B }, { 0x98, 0x99, 0x9A, 0x9B } };
+static s32 texid_tbl[2][4] = {{0x98, 0x99, 0x9A, 0x9B}, {0x98, 0x99, 0x9A, 0x9B}};
 #endif
 
 EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 duration) {
@@ -78,10 +81,10 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPointGetWork) * effect->count);
     effect->userdata = work;
     effect->callback = effPointGetMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x - 2000.0f;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     work->position.y = y - 30.0f;
 #else
     work->position.y = y;
@@ -98,7 +101,7 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
 void effPointGetMain(EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     Vec position;
-    Vec tmp = { 0.0f, 0.0f, 0.0f };
+    Vec tmp = {0.0f, 0.0f, 0.0f};
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -107,10 +110,10 @@ void effPointGetMain(EffectEntry* effect) {
     work->timer++;
     switch (work->state) {
         case 0:
-#ifdef VERSION_G8ME01_DEMO
-            work->position.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-1000.0f, 50.0f * work->scale, 11, work->timer, 45);
+#if VERSION == VERSION_DEMO
+            work->position.x = intplGetValue(11, -1000.0f, 50.0f * work->scale, work->timer, 45);
 #else
-            work->position.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-1000.0f, 0.0f, 11, work->timer, 45);
+            work->position.x = intplGetValue(11, -1000.0f, 0.0f, work->timer, 45);
 #endif
             if (work->timer >= 45) {
                 work->timer = 0;
@@ -119,8 +122,8 @@ void effPointGetMain(EffectEntry* effect) {
             break;
         case 1:
             if (work->duration == 0) {
-                if (effect->flags & 4) {
-                    effect->flags &= ~4;
+                if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+                    effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
                     work->timer = 0;
                     work->state++;
                 }
@@ -130,10 +133,10 @@ void effPointGetMain(EffectEntry* effect) {
             }
             break;
         case 2:
-#ifdef VERSION_G8ME01_DEMO
-            work->position.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(50.0f * work->scale, 1000.0f, 11, work->timer, 60);
+#if VERSION == VERSION_DEMO
+            work->position.x = intplGetValue(11, 50.0f * work->scale, 1000.0f, work->timer, 60);
 #else
-            work->position.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 1000.0f, 11, work->timer, 60);
+            work->position.x = intplGetValue(11, 0.0f, 1000.0f, work->timer, 60);
 #endif
             if (work->timer >= 60) {
                 effDelete(effect);
@@ -144,7 +147,7 @@ void effPointGetMain(EffectEntry* effect) {
     dispEntry(CAMERA_2D, dispCalcZ(&position), 2, (DispCallback)effPointGetDisp, effect);
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo draws the point count as three fixed digit cells (leading zeros skipped) after the header.
 void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
@@ -192,11 +195,11 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
         if (pass != 0) {
             effGetTexObj(texid_tbl[gp->language != 0][1], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, 0x80 });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0x80});
         } else {
             effGetTexObj(texid_tbl[gp->language != 0][0], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         PSMTXIdentity(mtx);
         GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
@@ -216,11 +219,11 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
         if (pass != 0) {
             effGetTexObj(texid_tbl[gp->language != 0][3], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, 0x80 });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0x80});
         } else {
             effGetTexObj(texid_tbl[gp->language != 0][2], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         n = work->number;
         digits[0] = n / 100;
@@ -253,7 +256,7 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-#elif defined(VERSION_G8ME01)
+#elif VERSION >= VERSION_US
 void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     f32 w;
     f32 w1;
@@ -328,7 +331,7 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     for (pass = 1; pass >= 0; pass--) {
         ox = (f32)(pass * 4);
         oy = (f32)(-pass * 4);
-        color = pass != 0 ? (GXColor){ 0, 0, 0, 0x80 } : (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
+        color = pass != 0 ? (GXColor){0, 0, 0, 0x80} : (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
         pos = 0.0f;
         for (i = 0; i < count; i++) {
             kind = tbl[i].kind;
@@ -450,11 +453,11 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
         if (pass != 0) {
             effGetTexObj(texid_tbl[gp->language != 0][3], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, 0x80 });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0x80});
         } else {
             effGetTexObj(texid_tbl[gp->language != 0][2], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         for (i = 0; i < strlen(buf); i++) {
             PSMTXTrans(mtx, ox + (32.0f * (f32)i + base / 2.0f), oy, 0.0f);
@@ -478,11 +481,11 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
         if (pass != 0) {
             effGetTexObj(texid_tbl[gp->language != 0][1], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, 0x80 });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0x80});
         } else {
             effGetTexObj(texid_tbl[gp->language != 0][0], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         }
         PSMTXTrans(mtx, 10.0f + (ox + (32.0f * (f32)strlen(buf) + base / 2.0f)), oy, 0.0f);
         PSMTXConcat(baseMtx, mtx, mtx);

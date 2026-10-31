@@ -1,3 +1,5 @@
+// muj_03 (無人島, Keelhaul Key): the jungle path where the nervous sailor runs off
+// (nigeru_suifu01), with the bespectacled sailor and hidden blocks.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
@@ -7,30 +9,27 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_party.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_item.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "muj.h"
 #include "data_tables.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
+#include "version.h"
+#include "evt/evt_story.h"
 
 extern EvtWord muj_03_event_01[];
 static BeroEntry bero_entry_data[3];
 extern EvtWord nigeru_suifu01[];
 static TreeAccess tree_tbl[5];
 static KusaAccess kusa_tbl[9];
-extern EvtWord muj_03_init_evt[];
 
 EVT_BEGIN(muj_03_event_01)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 234)
-        IF_INT_EQUAL(GSWF(3131), 0)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_13_BOBBERY_AND_THE_BRIDGE)
+        IF_INT_EQUAL(GSWF(GSWF_MUJ03_RUNAWAY_SAILOR_SEEN), 0)
             SPAWN_EVENT(PTR(nigeru_suifu01))
-            SET_VALUE(GSWF(3131), 1)
+            SET_VALUE(GSWF(GSWF_MUJ03_RUNAWAY_SAILOR_SEEN), 1)
             SET_VALUE(LW(0), 1)
             RETURN
         END_IF
@@ -43,8 +42,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -59,8 +58,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)muj_03_event_01, // enterEvent
@@ -78,11 +77,11 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(nigeru_suifu01)
     CALL(evt_npc_set_position, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 570, 150, -50)
     CALL(evt_npc_set_ry, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 1073776160)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INSTANT_TURN | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_position, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 530, 150, -50)
     CALL(evt_npc_set_ry, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 1073776160)
-    CALL(evt_npc_sound_data_set, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1L"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1R"), -250000000, -250000000, -250000000)
+    CALL(evt_npc_flag_onoff, 1, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INSTANT_TURN | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_sound_data_set, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1L"), STRING("SFX_STG5_KANBU_GLASSES_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
@@ -91,8 +90,8 @@ EVT_BEGIN(nigeru_suifu01)
     CALL(evt_party_set_pos, 0, 630, 150, 25)
     CALL(evt_party_set_dir, 0, 270, 0)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 32768)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_msg_print, 0, STRING("stg5_muj_90_22"), 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"))
     SET_VALUE(GF(0), 1)
     BEGIN_INLINE_EVENT
@@ -148,7 +147,7 @@ EVT_END()
 static EVT_BEGIN(evt_kusa_5)
     CALL(evt_item_delete_check, STRING("item_kusa_5"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_5"), 146, -250, 10, 95, 4, GSWF(3155), 0)
+        CALL(evt_item_entry, STRING("item_kusa_5"), ITEM_MINI_MR_MINI, -250, 10, 95, 4, GSWF(GSWF_MUJ03_BUSH_MINI_MR_MINI_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -156,7 +155,7 @@ EVT_END()
 static EVT_BEGIN(evt_kusa_7)
     CALL(evt_item_delete_check, STRING("item_kusa_7"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_7"), 121, 175, 210, -50, 4, GSWF(3156), 0)
+        CALL(evt_item_entry, STRING("item_kusa_7"), ITEM_COIN, 175, 210, -50, 4, GSWF(GSWF_MUJ03_BUSH_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -182,22 +181,22 @@ static KusaAccess kusa_tbl[] = {
 };
 
 EVT_BEGIN(muj_03_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_MUJ1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ5"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ5"))
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_mobj_badgeblk, STRING("mobj01"), -50, 9, 0, 121, 0, GSWF(3133), 0)
-    CALL(evt_mobj_brick, STRING("mobj02"), -50, 94, 0, 0, 13, 0, GSWF(3134))
-#ifdef VERSION_G8ME01
+    CALL(evt_mobj_badgeblk, STRING("mobj01"), -50, 9, 0, ITEM_COIN, 0, GSWF(GSWF_MUJ03_COIN_BLOCK_HIT), 0)
+    CALL(evt_mobj_brick, STRING("mobj02"), -50, 94, 0, 0, 13, 0, GSWF(GSWF_MUJ03_HIDDEN_COIN_BLOCK_EMPTIED))
+#if VERSION >= VERSION_US
     CALL(evt_mobj_brick, STRING("bblk00"), -470, 155, -50, 0, 0, 0, LSWF(3))
 #else
-    CALL(evt_mobj_brick, STRING("bblk00"), -470, 155, -50, 0, 0, 0, GSWF(3145))
+    CALL(evt_mobj_brick, STRING("bblk00"), -470, 155, -50, 0, 0, 0, GSWF(GSWF_MUJ03_BRICK_BROKEN))
 #endif
-    CALL(evt_mobj_powerupblk, STRING("pblk01"), -470, 240, -50, 0, GSWF(5552), 0)
-    CALL(evt_mobj_badgeblk, STRING("mobj03"), -50, 270, -100, 129, 0, GSWF(3147), 0)
-    CALL(evt_mobj_brick, STRING("mobj_hidden2"), -50, 209, 0, 156, 11, 0, GSWF(3153))
-    CALL(evt_item_entry, STRING("item_00"), 125, 275, 10, 100, 16, GSWF(5642), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk01"), -470, 240, -50, 0, GSWF(GSWF_MUJ03_SHINE_SPRITE), 0)
+    CALL(evt_mobj_badgeblk, STRING("mobj03"), -50, 270, -100, ITEM_THUNDER_RAGE, 0, GSWF(GSWF_MUJ03_THUNDER_RAGE_BLOCK_HIT), 0)
+    CALL(evt_mobj_brick, STRING("mobj_hidden2"), -50, 209, 0, ITEM_JAMMIN_JELLY, 11, 0, GSWF(GSWF_MUJ03_HIDDEN_JAMMIN_JELLY_BLOCK_HIT))
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 275, 10, 100, 16, GSWF(GSWF_MUJ03_STAR_PIECE), 0)
     CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
@@ -205,4 +204,3 @@ EVT_BEGIN(muj_03_init_evt)
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
     RETURN
 EVT_END()
-

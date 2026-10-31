@@ -1,8 +1,10 @@
+// Declarations for the Petal Meadows (hei) module: map init scripts, battle setup tables and the area's battle units.
 #pragma once
 
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"
+#include "evt/evt_cmd.h"
 
 extern EvtWord all_party_lecture[];
 extern NpcTerritoryInfo btl_hei_setup_no_tbl[];
@@ -30,3 +32,10 @@ extern BattleUnitKind unit_patakuri;
 extern BattleUnitKind unit_sinnosuke;
 extern BattleUnitKind unit_togedaruma;
 extern BattleUnitKind unit_togekuri;
+
+// User functions defined in the area's files (global symbols in the original REL).
+// hei_00.c
+USER_FUNC(make_gonbaba_projection_evt);
+USER_FUNC(shake);
+USER_FUNC(shake_reset);
+USER_FUNC(cam_test2);

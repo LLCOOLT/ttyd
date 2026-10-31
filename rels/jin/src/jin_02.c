@@ -1,34 +1,24 @@
+// jin_02 (ダイム寺院, Creepy Steeple): side room with a red switch and a camera shake event; doors to jin_00 and jin_03.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "jin.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_kagemario_init);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mobj_switch_red);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_get_value);
-USER_FUNC(evt_sub_intpl_init);
-USER_FUNC(evt_sub_random);
+#include "evt/evt_story.h"
+#include "driver/camdrv.h"
 
 extern EvtWord n1_close[];
 extern EvtWord n1_open[];
 static BeroEntry bero_entry_data[3];
 extern EvtWord evt_kaidan_temae[];
-extern EvtWord jin_02_init_evt[];
 
 static EVT_BEGIN(n2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -59,8 +49,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero_2", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -77,8 +67,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero_1", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -100,7 +90,7 @@ static EVT_BEGIN(cam_shake)
     LABEL(0)
     CALL(evt_sub_intpl_get_value)
     DIVIDE_FLOAT(LW(0), FLOAT(1000.0f))
-    CALL(evt_cam_shake, 4, LW(0), FLOAT(0.0f), 100)
+    CALL(evt_cam_shake, CAMERA_3D, LW(0), FLOAT(0.0f), 100)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
@@ -108,7 +98,7 @@ static EVT_BEGIN(cam_shake)
     LABEL(1)
     CALL(evt_sub_intpl_get_value)
     DIVIDE_FLOAT(LW(0), FLOAT(1000.0f))
-    CALL(evt_cam_shake, 4, LW(0), FLOAT(0.0f), 100)
+    CALL(evt_cam_shake, CAMERA_3D, LW(0), FLOAT(0.0f), 100)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(1)
     END_IF
@@ -121,7 +111,7 @@ EVT_BEGIN(evt_kaidan_temae)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_normalize)
         CALL(evt_party_stop, 0)
-        IF_INT_EQUAL(GSWF(2234), 0)
+        IF_INT_EQUAL(GSWF(GSWF_JIN_ENDLESS_STAIRS_REACTION_SEEN), 0)
             BEGIN_INLINE_EVENT_GET_ID(LW(3))
                 WAIT_MS(500)
                 CALL(evt_eff_fukidashi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -154,11 +144,11 @@ EVT_BEGIN(evt_kaidan_temae)
             END_INLINE_EVENT
         END_IF
         CALL_CHILD(PTR(cam_shake))
-        IF_INT_EQUAL(GSWF(2234), 0)
+        IF_INT_EQUAL(GSWF(GSWF_JIN_ENDLESS_STAIRS_REACTION_SEEN), 0)
             WAIT_MS(500)
             DELETE_EVENT(LW(3))
             DELETE_EVENT(LW(4))
-            SET_VALUE(GSWF(2234), 1)
+            SET_VALUE(GSWF(GSWF_JIN_ENDLESS_STAIRS_REACTION_SEEN), 1)
         END_IF
         ADD(LSW(1), 1)
         CALL(evt_mario_key_onoff, 1)
@@ -168,8 +158,8 @@ EVT_BEGIN(evt_kaidan_temae)
 EVT_END()
 
 EVT_BEGIN(jin_02_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN2"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -179,4 +169,3 @@ EVT_BEGIN(jin_02_init_evt)
     CALL(evt_mobj_switch_red, 0, STRING("mobj_switch1"), 485, 30, -10, PTR(evt_kaidan_temae), 0)
     RETURN
 EVT_END()
-

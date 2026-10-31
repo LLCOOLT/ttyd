@@ -1,41 +1,19 @@
+// tou_20 (闘技場, Glitz Pit): the chapter title scene (balloon and spline camera), then sys_01 or tou_00.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
-
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bg_auto_scroll_onoff);
-USER_FUNC(evt_bg_set_scrl_offset);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_random);
-USER_FUNC(evt_sub_spline_get_value);
-USER_FUNC(evt_sub_spline_init);
-
-extern EvtWord evt_anim[];
-static f32 spline_dt[9];
-extern EvtWord evt_anim2[];
-extern EvtWord tou_20_init_evt[];
+#include "evt/evt_bero.h"
+#include "evt/evt_bg.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "tou.h"
+#include "driver/mapdrv.h"
 
 static EVT_BEGIN(evt_tou_balloon)
     CALL(evt_mapobj_get_position, STRING("tou_enkei1"), LW(13), LW(14), LW(15))
@@ -64,7 +42,7 @@ static EVT_BEGIN(evt_tou_balloon)
 EVT_END()
 
 EVT_BEGIN(evt_anim)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("tou_enkei1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tou_enkei1"), MAPOBJ_FLAG_HIDE)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 0)
         LOOP(0)
@@ -93,11 +71,11 @@ static f32 spline_dt[] = {
 
 EVT_BEGIN(evt_anim2)
     CALL(evt_mario_dispflag_onoff, 1, 1)
-    CALL(evt_party_dispflg_onoff, 0, 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Hikousen"), 1)
+    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("Hikousen"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING("Hikousen"), FLOAT(-808.0f), FLOAT(971.0f), FLOAT(4897.0f))
     WAIT_MS(2000)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Hikousen"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Hikousen"), MAPOBJ_FLAG_HIDE)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(2), FLOAT(0.0f))
@@ -116,7 +94,7 @@ EVT_BEGIN(evt_anim2)
             MODULO(LW(0), 360)
             IF_INT_EQUAL(GF(0), 0)
                 MULTIPLY_FLOAT(LW(1), FLOAT(50.0f))
-                ELSE
+            ELSE
                 MULTIPLY_FLOAT(LW(1), FLOAT(40.0f))
             END_IF
             SET_FLOAT_VALUE(GW(3), LW(1))
@@ -128,7 +106,7 @@ EVT_BEGIN(evt_anim2)
     LOOP(0)
         IF_INT_EQUAL(LW(3), 1)
             CALL(evt_sub_spline_get_value, GW(0), GW(1), GW(2), LW(3))
-            ELSE
+        ELSE
         END_IF
         SET_FLOAT_VALUE(LW(4), GW(1))
         ADD_FLOAT(LW(4), GW(3))
@@ -141,7 +119,7 @@ EVT_BEGIN(evt_anim2)
 EVT_END()
 
 EVT_BEGIN(tou_20_init_evt)
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -182,7 +160,7 @@ EVT_BEGIN(tou_20_init_evt)
     IF_STR_EQUAL(LW(0), STRING("start"))
         CALL(evt_cam3d_evt_set, -3020, 129, -6, -212, 722, 807, 0, 11)
         SPAWN_EVENT(PTR(evt_anim))
-        ELSE
+    ELSE
         CALL(evt_cam3d_evt_set, -700, 866, 4657, -700, 38, -60, 0, 11)
         SPAWN_EVENT(PTR(evt_anim2))
     END_IF
@@ -212,4 +190,3 @@ EVT_BEGIN(tou_20_init_evt)
     END_INLINE_EVENT
     RETURN
 EVT_END()
-

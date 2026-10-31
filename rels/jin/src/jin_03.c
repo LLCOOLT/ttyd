@@ -1,17 +1,16 @@
+// jin_03 (ダイム寺院, Creepy Steeple): staircase room joining jin_00, jin_01 and jin_02,
+// with a spinning (kururin) floor tile.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "jin.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_kagemario_init);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mobj_kururing_floor);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 extern EvtWord w3_close[];
 extern EvtWord w3_open[];
@@ -19,7 +18,6 @@ static BeroEntry bero_entry_data[6];
 extern EvtWord jin_03_kaidan_temae_kesu[];
 extern EvtWord jin_03_kaidan_naka_kesu[];
 extern EvtWord jin_03_kaidan_oku_kesu[];
-extern EvtWord jin_03_init_evt[];
 
 static EVT_BEGIN(n_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -86,8 +84,8 @@ static BeroEntry bero_entry_data[] = {
         "n_bero", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -104,8 +102,8 @@ static BeroEntry bero_entry_data[] = {
         "s_bero", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -122,8 +120,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero3", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -140,8 +138,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero1", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -158,8 +156,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero2", // hitName
         1, // type
         2, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -176,26 +174,26 @@ static BeroEntry bero_entry_data[] = {
 };
 
 EVT_BEGIN(jin_03_kaidan_temae_kesu)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kaidan01"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kaidan01"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_kaidan01"), 1, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(jin_03_kaidan_naka_kesu)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kaidan02"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kaidan02"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_kaidan02"), 1, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(jin_03_kaidan_oku_kesu)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kaidan03"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kaidan03"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_kaidan03"), 1, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(jin_03_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG4_JIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG4_JIN1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -205,16 +203,15 @@ EVT_BEGIN(jin_03_init_evt)
     IF_INT_EQUAL(LSW(1), 0)
         SPAWN_EVENT(PTR(jin_03_kaidan_temae_kesu))
         SPAWN_EVENT(PTR(jin_03_kaidan_oku_kesu))
-        ELSE
+    ELSE
         IF_INT_EQUAL(LSW(1), 1)
             SPAWN_EVENT(PTR(jin_03_kaidan_naka_kesu))
             SPAWN_EVENT(PTR(jin_03_kaidan_oku_kesu))
-            ELSE
+        ELSE
             SPAWN_EVENT(PTR(jin_03_kaidan_temae_kesu))
             SPAWN_EVENT(PTR(jin_03_kaidan_naka_kesu))
         END_IF
     END_IF
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 125, 0, 0, STRING("S_yuka"), 125, GSWF(5634))
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 125, 0, 0, STRING("S_yuka"), 125, GSWF(GSWF_JIN03_STAR_PIECE_PANEL))
     RETURN
 EVT_END()
-

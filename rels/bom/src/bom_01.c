@@ -1,3 +1,6 @@
+// bom_01 (ボム村, Fahr Outpost): the village square with the mayor and the Bob-omb soldiers, and the cannon launch to
+// the Moon with the crowd of Bob-ombs.
+
 #include "version.h"
 #include "eff/eff_starstone.h"
 #include "battle/battle_unit.h"
@@ -6,6 +9,7 @@
 #include "memory.h"
 #include "string.h"
 #include "stdlib.h"
+#include "math.h"
 #include "system.h"
 #include "manager/filemgr.h"
 #include "manager/evtmgr_cmd.h"
@@ -31,16 +35,48 @@
 #include "bom.h"
 #include "data_tables.h"
 #include "evt/evt_npc.h"
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_msg_pri);
-#endif
+#include "eff/eff_kemu_test.h"
+#include "evt/evt_bg.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
+#include "driver/envdrv.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
-
-typedef struct SightWork { FileEntry* tpl; s32 level[5]; f32 rot; s32 dir; s32 count1; s32 count2; } SightWork;
+typedef struct SightWork {
+    FileEntry* tpl;
+    s32 level[5];
+    f32 rot;
+    s32 dir;
+    s32 count1;
+    s32 count2;
+} SightWork;
 SightWork* sight_wp;
 // make_name's sprintf buffer; file scope so .bss keeps the target order lp, name, sight_wp (a function static is emitted first)
 static char name[64];
-typedef struct BomSoundWork { u8 pad_0[0x330]; u16 sampleBank; u8 pad_332[0x5C0 - 0x332]; s16 samples[2][0x400]; u32 sampleIndex; } BomSoundWork;
+// The part of SoundWork (sound.h) bom_01 reads for the microphone level; sound.h does not compile in this unit\'s include set.
+typedef struct BomSoundWork {
+    u8 pad_0[0x330];
+    u16 sampleBank;
+    u8 pad_332[0x5C0 - 0x332];
+    s16 samples[2][0x400];
+    u32 sampleIndex;
+} BomSoundWork;
 extern BomSoundWork sound;
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
@@ -48,47 +84,137 @@ void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void disp_sight(CameraId camera, void* param);
 void disp_sight(CameraId camera, void* param);
-typedef struct ExtAnimDef { const char* file; const char* name; f32 time; } ExtAnimDef;
-typedef struct BomAnim { char name[8]; f32 time; s32 start; s32 count; } BomAnim;
-typedef struct Bom { u8 state; u8 next; u8 pad_2[2]; Vec target; f32 speed; f32 gravity; s16 timer; u8 pad_1a[2]; f32 vy; s32 anim; u8 pad_24[4]; OSTime time; } Bom;
-typedef struct BomWork { u16 flags; u8 pad_2[2]; s32 count; BomAnim anims[8]; s32 animCount; u8 pad_ac[4]; Bom bom[1000]; } BomWork;
+typedef struct ExtAnimDef {
+    const char* file;
+    const char* name;
+    f32 time;
+} ExtAnimDef;
+typedef struct BomAnim {
+    char name[8];
+    f32 time;
+    s32 start;
+    s32 count;
+} BomAnim;
+typedef struct Bom {
+    u8 state;
+    u8 next;
+    u8 pad_2[2];
+    Vec target;
+    f32 speed;
+    f32 gravity;
+    s16 timer;
+    u8 pad_1a[2];
+    f32 vy;
+    s32 anim;
+    u8 pad_24[4];
+    OSTime time;
+} Bom;
+typedef struct BomWork {
+    u16 flags;
+    u8 pad_2[2];
+    s32 count;
+    BomAnim anims[8];
+    s32 animCount;
+    u8 pad_ac[4];
+    Bom bom[1000];
+} BomWork;
 smartEntry* lp;
 #define EXT_DATA ((ExtAnimDef*)ext_data)
-s32 extGetPoseNum(void);
-static void pose_change(s32 i, const char* name);
 static void pose_change(s32 i, const char* name);
 static ExtTexInfo ext_data[31];
-static inline f32 chb_sin(f32 x) { f32 y; f32 x2; f32 r; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; r = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; r = a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; r = a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; r = a; } return r; }
-static inline f32 chb_cos(f32 x) { f32 y; f32 x2; f32 r; f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; r = a; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; r = a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; r = a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; r = a; } return r; }
+static inline f32 chb_sin(f32 x) {
+    f32 y;
+    f32 x2;
+    f32 r;
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
+            r = a;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * y;
+            r = a;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
+        r = a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
+        r = a;
+    }
+    return r;
+}
+static inline f32 chb_cos(f32 x) {
+    f32 y;
+    f32 x2;
+    f32 r;
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            r = a;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = -a;
+            r = a;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = -a;
+        r = a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        r = a;
+    }
+    return r;
+}
 static void pose_init(void);
 static void pose_init(void);
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
-double sin(double x);
 void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void pose_main(void);
 static void pose_main(void);
 static void ext_disp(CameraId camera, void* param);
 static void ext_disp(CameraId camera, void* param);
-double cos(double x);
-void effKemuTestSetRxRz(EffectEntry* effect, f32 rx, f32 rz);
 static void depthDisp(CameraId camera, void* param);
 static void depthDisp(CameraId camera, void* param);
-typedef struct YamiParam { s32 mapObj; f32 (*mtx)[4]; s32 drawMode; s32 numTevStages; s32 texCoord; s32 numTexGens; s32 numIndStages; } YamiParam;
-void envSetYami(YamiParam* param);
-void extPoseDraw(s32 i);
 void ext_disp_minnnanokoe(CameraId camera, void* param);
 void ext_disp_minnnanokoe(CameraId camera, void* param);
 void jump_minnnanokoe(s32 i, f32 h);
 void jump_minnnanokoe(s32 i, f32 h);
 
-s32 L_evt_party_vivian_tail(EventEntry* event, BOOL isFirstCall);
-s32 N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos(EventEntry* event, BOOL isFirstCall);
 static s32 anim_tevcallback(EventEntry* event, BOOL isFirstCall);
 static USER_FUNC(anim_tevcallback);
 s32 bom1000_jump(EventEntry* event, BOOL isFirstCall);
@@ -101,87 +227,6 @@ s32 bom_flag(EventEntry* event, BOOL isFirstCall);
 s32 bom_flag(EventEntry* event, BOOL isFirstCall);
 static s32 depth(EventEntry* event, BOOL isFirstCall);
 static USER_FUNC(depth);
-s32 evt_bero_get_entername(EventEntry* event, BOOL isFirstCall);
-s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
-s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall);
-s32 evt_bg_set_color(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_evt_off(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_evt_set(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam_letter_box_disable(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam_letter_box_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
-s32 evt_eff(EventEntry* event, BOOL isFirstCall);
-s32 evt_eff64(EventEntry* event, BOOL isFirstCall);
-s32 evt_eff_delete(EventEntry* event, BOOL isFirstCall);
-s32 evt_ext_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_ext_reset(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_set_mapchange_type(EventEntry* event, BOOL isFirstCall);
-s32 evt_hitobj_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_item_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_blend_off(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_playanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_set_blend(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_set_tevcallback(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_rotate(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_scale(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_trans(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_cont_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_dispflag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_key_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_mov_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_mov_pos2(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_normalize(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_dir(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_pose(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_print(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_print_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_toge(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_change_interrupt(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_jump_position_nohit(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_move_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_reverse_ry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_ry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_tribe(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_setup(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_status_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_wait_pera(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_cont_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_get_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_move_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_run(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_set_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_set_pose(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_stop(EventEntry* event, BOOL isFirstCall);
-s32 evt_pouch_remove_item(EventEntry* event, BOOL isFirstCall);
-s32 evt_run_case_evt(EventEntry* event, BOOL isFirstCall);
-s32 evt_seq_wait(EventEntry* event, BOOL isFirstCall);
-s32 evt_set_dir_to_target(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgm_scope(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmoff_f(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_env_lpf(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfx_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_intpl_msec_get_value(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_intpl_msec_init(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_random(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_spline_get_value(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_spline_init(EventEntry* event, BOOL isFirstCall);
-s32 evt_telop_entry(EventEntry* event, BOOL isFirstCall);
 s32 make_ext_table(EventEntry* event, BOOL isFirstCall);
 s32 make_ext_table(EventEntry* event, BOOL isFirstCall);
 s32 make_ext_table_minnnanokoe(EventEntry* event, BOOL isFirstCall);
@@ -224,37 +269,13 @@ void disp_sight(CameraId camera, void* param);
 void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
 
-extern EvtWord evt_door_1[];
 const char* door_npc[4];
 DoorParam door;
 static BeroEntry bero_entry_data[3];
-extern EvtWord evt_bom_01_karakara[];
 static ExtTexInfo ext_data[31];
-extern EvtWord evt_bom1000[];
-extern EvtWord gamen_shake[];
-extern EvtWord gamen_shake2[];
-extern EvtWord mario_tobideru[];
-extern EvtWord mario_shot[];
-extern EvtWord effect_delete[];
-extern EvtWord evt_depth[];
-extern EvtWord cam_outside[];
-extern EvtWord cam_inside[];
-extern EvtWord cam_inside2[];
-extern EvtWord effect_1[];
-extern EvtWord open_hatch[];
 static f32 spline_dt[9];
 const char* oh_data[8];
-extern EvtWord init_nitoro[];
-extern EvtWord talk_nitoro[];
-extern EvtWord init_pentrit[];
-extern EvtWord talk_pentrit[];
-extern EvtWord init_surary[];
-extern EvtWord talk_surary[];
-extern EvtWord init_murabito_d[];
-extern EvtWord talk_murabito_d[];
 static NpcSetupInfo npcEnt[7];
-extern EvtWord bom1000_minnnanokoe[];
-extern EvtWord bom_01_init_evt[];
 
 void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
@@ -331,7 +352,8 @@ void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale) {
 }
 
 /* sight texture ids: the direction arrow, lit and unlit */
-enum { SIGHT_TEX_ARROW_ON = 6, SIGHT_TEX_ARROW_OFF = 7 };
+enum { SIGHT_TEX_ARROW_ON = 6,
+       SIGHT_TEX_ARROW_OFF = 7 };
 
 void disp_sight(CameraId camera, void* param) {
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -462,7 +484,7 @@ s32 sight(EventEntry* event, BOOL isFirstCall) {
         sight_wp->dir = 5;
     }
     if (sight_wp->tpl == NULL) {
-        if (fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "taihou.tpl") == 0U) {
+        if (fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "taihou.tpl") == NULL) {
             return EVT_RETURN_BLOCK;
         }
         sight_wp->tpl = fileAllocf(4, "%s/%s", getMarioStDvdRoot(), "taihou.tpl");
@@ -513,7 +535,29 @@ s32 bom_fall(EventEntry* event, BOOL isFirstCall) {
 }
 
 static void pose_init(void) {
-    BomWork* wp; ExtAnimDef* def; char buf[32]; s32 i; s32 start; i = 0; wp = lp->address; def = EXT_DATA; strcpy(buf, ""); wp->animCount = -1; do { if (strcmp(def->name, buf) != 0) { strcpy(buf, def->name); wp->animCount++; start = i; } strcpy(wp->anims[wp->animCount].name, buf); wp->anims[wp->animCount].start = start; wp->anims[wp->animCount].count = i - start + 1; i++; wp->anims[wp->animCount].time = def->time; } while ((++def)->file != NULL); wp->animCount++;
+    BomWork* wp;
+    ExtAnimDef* def;
+    char buf[32];
+    s32 i;
+    s32 start;
+    i = 0;
+    wp = lp->address;
+    def = EXT_DATA;
+    strcpy(buf, "");
+    wp->animCount = -1;
+    do {
+        if (strcmp(def->name, buf) != 0) {
+            strcpy(buf, def->name);
+            wp->animCount++;
+            start = i;
+        }
+        strcpy(wp->anims[wp->animCount].name, buf);
+        wp->anims[wp->animCount].start = start;
+        wp->anims[wp->animCount].count = i - start + 1;
+        i++;
+        wp->anims[wp->animCount].time = def->time;
+    } while ((++def)->file != NULL);
+    wp->animCount++;
 }
 
 static void pose_main(void) {
@@ -537,7 +581,18 @@ static void pose_main(void) {
 }
 
 static void pose_change(s32 i, const char* name) {
-    BomWork* wp = lp->address; s32 j = 0; BomAnim* a; for (a = wp->anims; j < wp->animCount; j++, a++) { if (strcmp(a->name, name) == 0) { break; } } if (j < wp->animCount && wp->bom[i].anim != j) { wp->bom[i].anim = (s16)j; wp->bom[i].time = gp->renderTime + rand(); }
+    BomWork* wp = lp->address;
+    s32 j = 0;
+    BomAnim* a;
+    for (a = wp->anims; j < wp->animCount; j++, a++) {
+        if (strcmp(a->name, name) == 0) {
+            break;
+        }
+    }
+    if (j < wp->animCount && wp->bom[i].anim != j) {
+        wp->bom[i].anim = (s16)j;
+        wp->bom[i].time = gp->renderTime + rand();
+    }
 }
 
 s32 make_ext_table(EventEntry* event, BOOL isFirstCall) {
@@ -584,13 +639,13 @@ const char* door_npc[] = {
 };
 
 static EVT_BEGIN(door_open)
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(door_close)
-    CALL(evt_snd_envon, 160, 0)
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_env_lpf, 0, 0)
     RETURN
 EVT_END()
@@ -620,8 +675,8 @@ static BeroEntry bero_entry_data[] = {
     {
         ("w_bero"), // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -636,8 +691,8 @@ static BeroEntry bero_entry_data[] = {
     {
         ("e_bero"), // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -676,9 +731,9 @@ static EVT_BEGIN(first_evt)
     CALL(evt_mario_set_dir, 270, 300, 0)
     CALL(evt_party_stop, 0)
     WAIT_MS(200)
-    IF_INT_EQUAL(GSWF(3885), 1)
+    IF_INT_EQUAL(GSWF(GSWF_BOM01_VISITED_BEFORE_STG7), 1)
         CALL(evt_msg_print_party, STRING(("stg7_bom_01__2_00")))
-        ELSE
+    ELSE
         CALL(evt_msg_print_party, STRING(("stg7_bom_01__2")))
     END_IF
     CALL(evt_party_run, 0)
@@ -687,7 +742,7 @@ static EVT_BEGIN(first_evt)
     CALL(evt_mario_set_pose, STRING(("M_N_2")))
     WAIT_MS(500)
     CALL(evt_cam3d_evt_off, 500, 11)
-    SET_VALUE(GSW(0), 353)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_01_FAHR_OUTPOST_1ST_VISIT)
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
     SET_VALUE(LW(0), STRING(("w_bero")))
     CALL_CHILD(PTR(bero_case_switch_on))
@@ -744,6 +799,8 @@ EVT_BEGIN(evt_bom_01_karakara)
     RETURN
 EVT_END()
 
+// ext_init, ext_main and depthDisp are built with copy propagation and lifetime analysis off;
+// without either pragma the register use and load order change.
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static void ext_init(void) {
@@ -813,7 +870,7 @@ void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static void ext_main(void) {
-    
+
     s32 i;
     BomWork* wp = lp->address;
     ExtdrvPose* pose = extGetPosePtr();
@@ -836,7 +893,8 @@ static void ext_main(void) {
 
         switch ((s8)wp->bom[i].state) {
             case 0:
-                val = PSVECDistance(&center, &pos) ; if (val > 280.0f) {
+                val = PSVECDistance(&center, &pos);
+                if (val > 280.0f) {
                     PSVECSubtract(&center, &pos, &dir);
                     PSVECNormalize(&dir, &dir);
                     PSVECScale(&dir, &move, 3.0f);
@@ -850,33 +908,33 @@ static void ext_main(void) {
                 }
                 break;
             case 1:
-                angle = ( 6.2831855f * rand() ) / 32767.0f;
-                dist = 150.0f + (( 30.0f * rand() ) / 32767.0f) ;
-                gravity = 0.1f + (( 0.1f * rand() ) / 32767.0f) ;
-                speed = 3.0f + ( rand() / 32767.0f) ;
-                z = dist * ( -chb_cos(angle) );
+                angle = (6.2831855f * rand()) / 32767.0f;
+                dist = 150.0f + ((30.0f * rand()) / 32767.0f);
+                gravity = 0.1f + ((0.1f * rand()) / 32767.0f);
+                speed = 3.0f + (rand() / 32767.0f);
+                z = dist * (-chb_cos(angle));
                 jump(i, 2, dist * chb_sin(angle), 150.0f, z, speed, gravity);
                 break;
             case 2:
-                angle = ( 6.2831855f * rand() ) / 32767.0f;
-                dist = 50.0f + (( 30.0f * rand() ) / 32767.0f) ;
-                z = 0.1f + (( 0.1f * rand() ) / 32767.0f);
-                speed = 3.0f + ( rand() / 32767.0f) ;
-                gravity = dist * ( -chb_cos(angle) );
+                angle = (6.2831855f * rand()) / 32767.0f;
+                dist = 50.0f + ((30.0f * rand()) / 32767.0f);
+                z = 0.1f + ((0.1f * rand()) / 32767.0f);
+                speed = 3.0f + (rand() / 32767.0f);
+                gravity = dist * (-chb_cos(angle));
                 dist = dist * chb_sin(angle);
                 jump(i, 3, dist, 400.0f, gravity, speed, z);
                 break;
             case 3:
-                angle = ( 6.2831855f * rand() ) / 32767.0f;
-                dist = ( 70.0f * rand() ) / 32767.0f;
+                angle = (6.2831855f * rand()) / 32767.0f;
+                dist = (70.0f * rand()) / 32767.0f;
                 // correctness: target keeps z = 0.1f (+196) and speed = 3.0f; both rand() results unused
                 rand();
                 z = 0.1f;
                 rand();
                 speed = 3.0f;
-                gravity = dist * ( -chb_cos(angle)) ;
-                dist = ( dist * chb_sin(angle) ) + (100.0f + ( i % 100) );
-                jump(i, 4, dist, 350.0f + ( i % 150) , gravity, speed, z);
+                gravity = dist * (-chb_cos(angle));
+                dist = (dist * chb_sin(angle)) + (100.0f + (i % 100));
+                jump(i, 4, dist, 350.0f + (i % 150), gravity, speed, z);
                 break;
             case 4:
                 wp->bom[i].state++;
@@ -886,10 +944,10 @@ static void ext_main(void) {
             case 100:
                 (*pose->mtx)[1][3] += wp->bom[i].vy;
                 wp->bom[i].vy -= wp->bom[i].gravity;
-                rad = ( 3.1415927f * angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
+                rad = (3.1415927f * angleABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], wp->bom[i].target.x, wp->bom[i].target.z)) / 180.0f;
                 (*pose->mtx)[0][3] += wp->bom[i].speed * chb_sin(rad);
-                (*pose->mtx)[2][3] += wp->bom[i].speed * ( -chb_cos(rad)) ;
-                if ( (--wp->bom[i].timer ) < 0) {
+                (*pose->mtx)[2][3] += wp->bom[i].speed * (-chb_cos(rad));
+                if ((--wp->bom[i].timer) < 0) {
                     (*pose->mtx)[0][3] = wp->bom[i].target.x;
                     (*pose->mtx)[1][3] = wp->bom[i].target.y;
                     (*pose->mtx)[2][3] = wp->bom[i].target.z;
@@ -897,11 +955,12 @@ static void ext_main(void) {
                 }
                 break;
             case 127:
-                if ((*pose->mtx)[1][3] > ( -1000.0f) ) { // correctness: target tests y (lfs f2,0x1c), not z
+                if ((*pose->mtx)[1][3] > (-1000.0f)) { // correctness: target tests y (lfs f2,0x1c), not z
                     (*pose->mtx)[1][3] = (*pose->mtx)[1][3] - 2.0f;
                     pose->flags &= ~2;
                     PSMTXTrans(m1, 0.0f, -20.0f, 0.0f);
-                    val = (f32)sin((i + gp->retraceCount) / 100.0f); PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * val));
+                    val = (f32)sin((i + gp->retraceCount) / 100.0f);
+                    PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * val));
                     PSMTXTrans(m3, 0.0f, 20.0f, 0.0f);
                     PSMTXConcat(m1, m2, m2);
                     PSMTXConcat(m2, m3, m3);
@@ -1065,8 +1124,8 @@ EVT_BEGIN(cam_outside)
     CALL(evt_map_blend_off, 1)
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_door")), 0, 0, 0)
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_kai")), 0, 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_ie_naka")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("s_ie_kai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_ie_naka")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("s_ie_kai")), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
@@ -1076,8 +1135,8 @@ EVT_BEGIN(cam_inside)
     CALL(evt_map_set_blend, 1, 0, 0, 0, 0)
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_door")), 90, 0, 0)
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_kai")), 0, -90, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_ie_naka")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("s_ie_kai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_ie_naka")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("s_ie_kai")), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
@@ -1087,8 +1146,8 @@ EVT_BEGIN(cam_inside2)
     CALL(evt_map_set_blend, 1, 0, 0, 0, 0)
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_door")), 90, 0, 0)
     CALL(evt_mapobj_rotate, 1, STRING(("s_ie_kai")), 0, -90, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_ie_naka")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("s_ie_kai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_ie_naka")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("s_ie_kai")), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
@@ -1143,7 +1202,7 @@ EVT_BEGIN(open_hatch)
         CALL(evt_mapobj_trans, 1, LW(9), 0, 0, LW(0))
         MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
         CALL(evt_mapobj_trans, 1, LW(8), 0, 0, LW(0))
-        ELSE
+    ELSE
         CALL(evt_mapobj_trans, 1, LW(9), LW(0), 0, 0)
         MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
         CALL(evt_mapobj_trans, 1, LW(8), LW(0), 0, 0)
@@ -1170,20 +1229,20 @@ const char* oh_data[] = {
 
 static EVT_BEGIN(evt_taihou)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_63")), 0, STRING(("me")))
     WAIT_MS(300)
-    CALL(evt_npc_flag_onoff, 1, STRING(("me")), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING(("me")), NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos, 0, 10, 0, 500)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos, 0, 10, 500)
     CALL(evt_cam3d_evt_set, 0, 152, 555, 0, 57, 13, 1000, 11)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("chika_off")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("jime_ugo")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_yuka1")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_yuka2")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("chika_off")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("jime_ugo")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_yuka1")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_yuka2")), MAPOBJ_FLAG_HIDE)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_dispflag_onoff, 1, 2)
     WAIT_FRAMES(1)
@@ -1251,7 +1310,7 @@ static EVT_BEGIN(evt_taihou)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(300)
-    CALL(evt_npc_flag_onoff, 1, STRING(("me")), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(("me")), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_ry, STRING(("me")), 90)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_64")), 0, STRING(("me")))
     CALL(evt_msg_print, 0, STRING(("stg7_bom_64_01")), 0, STRING(("ホワイト")))
@@ -1271,9 +1330,9 @@ static EVT_BEGIN(evt_taihou)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_66")), 0, STRING(("me")))
     SET_VALUE(GF(0), 0)
-    CALL(evt_npc_flag_onoff, 0, STRING(("ホワイト")), 512)
-    CALL(evt_npc_flag_onoff, 0, STRING(("ペントリット")), 512)
-    CALL(evt_npc_flag_onoff, 0, STRING(("スラリー")), 512)
+    CALL(evt_npc_flag_onoff, 0, STRING(("ホワイト")), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 0, STRING(("ペントリット")), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 0, STRING(("スラリー")), NPC_FLAG_TALK_ANIM)
     BEGIN_INLINE_EVENT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_67")), 0, STRING(("ホワイト")))
     END_INLINE_EVENT
@@ -1336,9 +1395,9 @@ static EVT_BEGIN(evt_taihou)
         WAIT_FRAMES(1)
         GOTO(2)
     END_IF
-    CALL(evt_npc_flag_onoff, 1, STRING(("ホワイト")), 512)
-    CALL(evt_npc_flag_onoff, 1, STRING(("ペントリット")), 512)
-    CALL(evt_npc_flag_onoff, 1, STRING(("スラリー")), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホワイト")), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ペントリット")), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING(("スラリー")), NPC_FLAG_TALK_ANIM)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_move_position, STRING(("ホワイト")), -50, -200, 0, FLOAT(80.0f), 1)
         CALL(evt_npc_move_position, STRING(("ホワイト")), -35, -260, 0, FLOAT(80.0f), 1)
@@ -1441,7 +1500,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_74")), 0, STRING(("ホワイト")))
     WAIT_MS(300)
     CALL(evt_snd_sfxoff, LW(10))
-    CALL(evt_snd_bgmon, 512, STRING(("BGM_EVT_STG7_HUGE_GUN1")))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(("BGM_EVT_STG7_HUGE_GUN1")))
     CALL(evt_cam3d_evt_set, 0, 350, 1224, 0, 125, 250, 0, 11)
     CALL_CHILD(PTR(cam_outside))
     WAIT_MS(300)
@@ -1454,10 +1513,10 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_snd_sfxon, STRING(("SFX_STG7_FLOOR_QUAKE2")), 0)
     SPAWN_EVENT(PTR(gamen_shake2))
     WAIT_MS(300)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_yuka2")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_yuka3")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("chika_off")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_hikari")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_yuka2")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_yuka3")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("chika_off")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_hikari")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING(("chika_off")), 0, FLOAT(0.0f), 0)
     CALL(evt_snd_sfxon, STRING(("SFX_STG7_FLOOR_DOWN1")), LW(8))
     CALL(evt_sub_intpl_msec_init, 0, 0, -20, 1000)
@@ -1540,7 +1599,7 @@ static EVT_BEGIN(evt_taihou)
     LOOP(36)
         ADD(LW(0), 1)
         CALL(make_name, LW(0), LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
         WAIT_MS(100)
     END_LOOP
     BEGIN_INLINE_EVENT
@@ -1565,7 +1624,7 @@ static EVT_BEGIN(evt_taihou)
     DELETE_EVENT(LW(9))
     SPAWN_EVENT(PTR(gamen_shake2))
     WAIT_MS(2000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_hikari")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_hikari")), MAPOBJ_FLAG_HIDE)
     CALL(evt_cam3d_evt_set, 1500, 100, 2539, 0, 650, 0, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_cam3d_evt_set, -1500, 100, 2539, 0, 650, 0, 5000, 11)
@@ -1618,7 +1677,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_78")), 0, 0)
     WAIT_MS(300)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_moon")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_moon")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING(("S_moon")), 400, -738, -676)
     CALL(evt_mapobj_scale, 1, STRING(("S_moon")), FLOAT(0.7998047f), FLOAT(0.7998047f), FLOAT(0.7998047f))
     CALL(sight_dir, 0)
@@ -1636,7 +1695,7 @@ static EVT_BEGIN(evt_taihou)
     DELETE_EVENT(LW(9))
     WAIT_MS(2000)
     CALL(sight_dir, 6)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_moon")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_moon")), MAPOBJ_FLAG_HIDE)
     CALL_CHILD(PTR(cam_inside))
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_79")), 0, STRING(("ホワイト")))
@@ -1754,7 +1813,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_mario_set_pos, 200, 0, -650)
     CALL(evt_party_set_pos, 0, 200, 0, -650)
     CALL(evt_cam3d_evt_set, 370, 245, -173, 370, 62, -1205, 0, 11)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("HAIKEI")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("HAIKEI")), MAPOBJ_FLAG_HIDE)
     WAIT_FRAMES(1)
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_MARIO_DAMAGED2")), 200, 0, -650, 0)
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_MARIO_AC3_4")), 200, 0, -650, LW(4))
@@ -1798,31 +1857,31 @@ static EVT_BEGIN(evt_taihou)
     WAIT_MS(6000)
     CALL(evt_ext_reset)
     CALL(evt_npc_set_ry, STRING(("村長")), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING(("村長")), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING(("村長")), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, -60, 26, 493, 22, 33, 257, 0, 11)
     WAIT_MS(2000)
     CALL(evt_msg_print, 0, STRING(("stg7_bom_91")), 0, STRING(("村長")))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     WAIT_MS(300)
     WAIT_MS(2000)
-    CALL(evt_pouch_remove_item, 82, LW(0))
+    CALL(evt_pouch_remove_item, ITEM_GOLDBOB_GUIDE, LW(0))
     CALL(evt_bero_mapchange, STRING(("moo_03")), 0)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(init_soncho)
-    SWITCH(GSW(0))
-        CASE_GREATER_OR_EQUAL(356)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_GREATER_OR_EQUAL(STORY_STG7_04_BACK_ONLINE)
         CALL(evt_npc_set_position, STRING(("me")), -15, 0, -35)
     END_SWITCH
     RETURN
 EVT_END()
 
 static EVT_BEGIN(talk_soncho)
-    SWITCH(GSW(0))
-        CASE_LESS(357)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL_CHILD(PTR(evt_taihou))
-        CASE_LESS_OR_EQUAL(402)
+        CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_59_04_1")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_59_04_2")), 0, STRING(("me")))
@@ -1836,14 +1895,14 @@ EVT_BEGIN(init_nitoro)
 EVT_END()
 
 EVT_BEGIN(talk_nitoro)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_02_00")), 0, STRING(("me")))
-        CASE_LESS(356)
+        CASE_LESS(STORY_STG7_04_BACK_ONLINE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_02")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_02_1")), 0, STRING(("me")))
-        CASE_LESS_OR_EQUAL(402)
+        CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_03")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_03_1")), 0, STRING(("me")))
@@ -1857,14 +1916,14 @@ EVT_BEGIN(init_pentrit)
 EVT_END()
 
 EVT_BEGIN(talk_pentrit)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_04_00")), 0, STRING(("me")))
-        CASE_LESS(356)
+        CASE_LESS(STORY_STG7_04_BACK_ONLINE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_04")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_04_1")), 0, STRING(("me")))
-        CASE_LESS_OR_EQUAL(402)
+        CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_05")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_05_1")), 0, STRING(("me")))
@@ -1878,14 +1937,14 @@ EVT_BEGIN(init_surary)
 EVT_END()
 
 EVT_BEGIN(talk_surary)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_06_00")), 0, STRING(("me")))
-        CASE_LESS(356)
+        CASE_LESS(STORY_STG7_04_BACK_ONLINE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_06")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_06_1")), 0, STRING(("me")))
-        CASE_LESS_OR_EQUAL(402)
+        CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_07")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_07_1")), 0, STRING(("me")))
@@ -1899,14 +1958,14 @@ EVT_BEGIN(init_murabito_d)
 EVT_END()
 
 EVT_BEGIN(talk_murabito_d)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_08_00")), 0, STRING(("me")))
-        CASE_LESS(356)
+        CASE_LESS(STORY_STG7_04_BACK_ONLINE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_08")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_08_1")), 0, STRING(("me")))
-        CASE_LESS_OR_EQUAL(402)
+        CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09_1")), 0, STRING(("me")))
@@ -1920,10 +1979,10 @@ static EVT_BEGIN(init_murabito_e)
 EVT_END()
 
 static EVT_BEGIN(talk_murabito_e)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_10_00")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_10")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_11")), 0, STRING(("me")))
@@ -1937,10 +1996,10 @@ static EVT_BEGIN(init_murabito_f)
 EVT_END()
 
 static EVT_BEGIN(talk_murabito_f)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_12_00")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_12")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_13")), 0, STRING(("me")))
@@ -1954,10 +2013,10 @@ static EVT_BEGIN(init_murabito_g)
 EVT_END()
 
 static EVT_BEGIN(talk_murabito_g)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_14_00")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_14")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_15")), 0, STRING(("me")))
@@ -1971,10 +2030,10 @@ static EVT_BEGIN(init_murabito_h)
 EVT_END()
 
 static EVT_BEGIN(talk_murabito_h)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_16_00")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_16")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_17")), 0, STRING(("me")))
@@ -1988,10 +2047,10 @@ static EVT_BEGIN(init_murabito_i)
 EVT_END()
 
 static EVT_BEGIN(talk_murabito_i)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_18_00")), 0, STRING(("me")))
-        CASE_LESS(357)
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_18")), 0, STRING(("me")))
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_19")), 0, STRING(("me")))
@@ -2000,27 +2059,27 @@ static EVT_BEGIN(talk_murabito_i)
 EVT_END()
 
 static EVT_BEGIN(init_white)
-    IF_INT_EQUAL(GSW(1420), 25)
-        IF_INT_EQUAL(GSWF(5411), 0)
+    IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
+        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_6), 0)
             RETURN
         END_IF
     END_IF
-END_IF
-IF_INT_EQUAL(GSWF(3876), 1)
-    CALL(evt_npc_set_position, STRING(("me")), 50, 0, -100)
-END_IF
-RETURN
+    END_IF // stray END_IF with no IF in the original script; END_IF is a no-op when run
+    IF_INT_EQUAL(GSWF(GSWF_BOM02_GENERAL_WHITE_WOKEN), 1)
+        CALL(evt_npc_set_position, STRING(("me")), 50, 0, -100)
+    END_IF
+    RETURN
 EVT_END()
 
 static EVT_BEGIN(talk_white)
-    SWITCH(GSW(0))
-        CASE_LESS(357)
-        IF_INT_EQUAL(GSWF(3874), 0)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG7_05_THE_CANNON)
+        IF_INT_EQUAL(GSWF(GSWF_PIK00_GOLDBOB_CANNON_APPROVAL), 0)
             CALL(evt_msg_print, 0, STRING(("stg7_bom_59_02")), 0, 0)
-            ELSE
+        ELSE
             CALL(evt_msg_print, 0, STRING(("stg7_bom_59_03")), 0, 0)
         END_IF
-        CASE_LESS_OR_EQUAL(402)
+        CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_59_04")), 0, 0)
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING(("stg7_bom_59_05")), 0, 0)
@@ -2029,12 +2088,12 @@ static EVT_BEGIN(talk_white)
 EVT_END()
 
 static EVT_BEGIN(musume_talk)
-    SWITCH(GSW(0))
-        CASE_LESS(354)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG7_02_MAYOR_BOB)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09_01_01")), 0, STRING(("３人娘Ａ")))
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09_01_02")), 0, STRING(("３人娘Ｂ")))
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09_01_03")), 0, STRING(("３人娘Ｃ")))
-        CASE_LESS(356)
+        CASE_LESS(STORY_STG7_04_BACK_ONLINE)
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09_01_04")), 0, STRING(("３人娘Ａ")))
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09_01_05")), 0, STRING(("３人娘Ｂ")))
         CALL(evt_msg_print, 0, STRING(("stg7_bom_09_01_06")), 0, STRING(("３人娘Ｃ")))
@@ -2050,7 +2109,7 @@ static EVT_BEGIN(musume_a_entry)
     CALL(evt_npc_entry, STRING(("３人娘Ａ")), STRING(("c_dance_r")))
     CALL(evt_npc_set_tribe, STRING(("３人娘Ａ")), STRING(("踊り子")))
     CALL(evt_npc_set_position, STRING(("３人娘Ａ")), 370, 5, -120)
-    CALL(evt_npc_flag_onoff, 1, STRING(("３人娘Ａ")), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING(("３人娘Ａ")), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_change_interrupt, STRING(("３人娘Ａ")), 6, PTR(musume_talk))
     RETURN
 EVT_END()
@@ -2059,7 +2118,7 @@ static EVT_BEGIN(musume_b_entry)
     CALL(evt_npc_entry, STRING(("３人娘Ｂ")), STRING(("c_dance_p")))
     CALL(evt_npc_set_tribe, STRING(("３人娘Ｂ")), STRING(("踊り子ピンク")))
     CALL(evt_npc_set_position, STRING(("３人娘Ｂ")), 400, 5, -150)
-    CALL(evt_npc_flag_onoff, 1, STRING(("３人娘Ｂ")), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING(("３人娘Ｂ")), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_change_interrupt, STRING(("３人娘Ｂ")), 6, PTR(musume_talk))
     RETURN
 EVT_END()
@@ -2068,7 +2127,7 @@ static EVT_BEGIN(musume_c_entry)
     CALL(evt_npc_entry, STRING(("３人娘Ｃ")), STRING(("c_dance_k")))
     CALL(evt_npc_set_tribe, STRING(("３人娘Ｃ")), STRING(("踊り子黄緑")))
     CALL(evt_npc_set_position, STRING(("３人娘Ｃ")), 430, 5, -100)
-    CALL(evt_npc_flag_onoff, 1, STRING(("３人娘Ｃ")), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING(("３人娘Ｃ")), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_change_interrupt, STRING(("３人娘Ｃ")), 6, PTR(musume_talk))
     RETURN
 EVT_END()
@@ -2076,7 +2135,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         "村長", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_soncho, // initEvent
         NULL, // regularEvent
@@ -2088,7 +2147,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         "ニトロ", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_nitoro, // initEvent
         NULL, // regularEvent
@@ -2100,7 +2159,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ペントリット"*/("ペントリット"), // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_pentrit, // initEvent
         NULL, // regularEvent
@@ -2112,7 +2171,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"スラリー"*/("スラリー"), // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_surary, // initEvent
         NULL, // regularEvent
@@ -2124,7 +2183,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         "ボムヘイD", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_murabito_d, // initEvent
         NULL, // regularEvent
@@ -2136,7 +2195,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ホワイト"*/("ホワイト"), // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_white, // initEvent
         NULL, // regularEvent
@@ -2174,14 +2233,31 @@ static inline f32 dd_sin(f32 x) {
     f32 x2;
     if (x <= 3.1415927f) {
         if (x <= 1.5707964f) {
-            x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x;
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
         } else {
-            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y;
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * y;
         }
     } else if (x < 4.712389f) {
-        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
     } else {
-        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
     }
     return a;
 }
@@ -2194,14 +2270,27 @@ static inline f32 dd_cos(f32 x) {
     f32 x2;
     if (x <= 3.1415927f) {
         if (x <= 1.5707964f) {
-            x2 = x * x; a = a * x2 - b; a = a * x2 + c;
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
         } else {
-            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = -a;
         }
     } else if (x < 4.712389f) {
-        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = -a;
     } else {
-        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c;
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
     }
     return a;
 }
@@ -2349,15 +2438,15 @@ void jump_minnnanokoe(s32 i, f32 h) {
     wp->bom[i].vy = wp->bom[i].gravity * wp->bom[i].timer / 2 + h / wp->bom[i].timer;
     wp->bom[i].next = 5;
     wp->bom[i].state = 100;
-    if (evtGetValue(NULL, GSW(0)) != 401 && i % 5 == 0) {
+    if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) != STORY_STG8_16_SHADOW_QUEEN && i % 5 == 0) {
         Vec pos = (Vec){(*pose->mtx)[0][3], (*pose->mtx)[1][3], (*pose->mtx)[2][3]};
         psndSFXOn_3D("SFX_STG7_BOMB_TOGETHER2", &pos);
     }
 }
 
 void ext_disp_minnnanokoe(CameraId camera, void* param) {
-    YamiParam yp;
-    YamiParam* p = &yp;
+    MapTevCallbackInfo yp;
+    MapTevCallbackInfo* p = &yp;
     ExtdrvPose* pose = extGetPosePtr();
     s32 i;
 
@@ -2366,15 +2455,15 @@ void ext_disp_minnnanokoe(CameraId camera, void* param) {
     extLoadTexture();
     extLoadTev();
     for (i = 0; i < extGetPoseNum(); i++, pose++) {
-        yp.numTevStages = 1;
+        yp.tevStage = 1;
         yp.texCoord = 1;
-        yp.numTexGens = 1;
-        yp.numIndStages = 0;
+        yp.texMap = 1;
+        yp.indStage = 0;
         yp.mtx = *pose->mtx;
         envSetYami(p);
-        GXSetNumTexGens(yp.numTexGens);
-        GXSetNumTevStages(yp.numTevStages);
-        GXSetNumIndStages(yp.numIndStages);
+        GXSetNumTexGens(yp.texMap);
+        GXSetNumTevStages(yp.tevStage);
+        GXSetNumIndStages(yp.indStage);
         extPoseDraw(i);
     }
     extLoadTextureExit();
@@ -2425,8 +2514,6 @@ s32 bom1000_jump(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
-void envSetYamiView(Mtx mtx);
-
 static s32 yami_view(EventEntry* event, BOOL isFirstCall) {
     f32 z = evtGetFloat(event, event->args[0]);
     Mtx mtx;
@@ -2445,11 +2532,9 @@ static s32 anim_tevcallback(EventEntry* event, BOOL isFirstCall) {
     if (npc == NULL) {
         return EVT_RETURN_DONE;
     }
-    animPoseSetMaterialFlagOn(npc->poseId, (flag & 0xF) << 24);
+    animPoseSetMaterialFlagOn(npc->poseId, ANIM_MATERIAL_TEV_CALLBACK(flag & 0xF));
     return EVT_RETURN_DONE;
 }
-
-EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
 static s32 starstone_entry(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
@@ -2493,13 +2578,13 @@ EVT_BEGIN(bom1000_minnnanokoe)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 static EVT_BEGIN(minnnanokoe_evt)
     SPAWN_EVENT(PTR(bom1000_minnnanokoe))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_yuka1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_yuka1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("村長"), 520, 0, 0)
@@ -2517,8 +2602,8 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_npc_set_position, STRING("ホワイト"), 0, 0, -230)
     CALL(evt_npc_set_ry, STRING("ホワイト"), 270)
     CALL(evt_map_set_tevcallback, 1, PTR(envSetYami))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_bom01"), 16777216)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_bom01"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_bom01"), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_bom01"), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(anim_tevcallback, STRING("村長"), 1)
     CALL(anim_tevcallback, STRING("ニトロ"), 1)
     CALL(anim_tevcallback, STRING("ペントリット"), 1)
@@ -2589,7 +2674,7 @@ static EVT_BEGIN(minnnanokoe_evt)
             WAIT_MS(100)
         END_LOOP
     END_SIBLING_EVENT
-#ifndef VERSION_G8MP01
+#if VERSION != VERSION_EU
     SET_VALUE(GW(6), 0)
 #endif
     BEGIN_SIBLING_EVENT
@@ -2617,7 +2702,7 @@ static EVT_BEGIN(minnnanokoe_evt)
                 SET_VALUE(LW(3), STRING("stg8_las_148_70"))
             END_SWITCH
             BEGIN_INLINE_EVENT
-#ifndef VERSION_G8MP01
+#if VERSION != VERSION_EU
                 CALL(evt_msg_pri, GW(6))
                 ADD(GW(6), 1)
                 IF_INT_EQUAL(GW(6), 10)
@@ -2639,7 +2724,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_npc_wait_pera, STRING("ボムヘイD"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_71"), 0, STRING("村長"))
     WAIT_MS(2000)
-    CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING("las_29"), STRING("minnnanokoe"))
     RETURN
 EVT_END()
@@ -2649,7 +2734,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_yuka1")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_yuka1")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_npc_set_position, STRING(("村長")), 520, 0, 0)
@@ -2667,8 +2752,8 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_npc_set_position, STRING(("ホワイト")), 0, 0, -230)
     CALL(evt_npc_set_ry, STRING(("ホワイト")), 270)
     CALL(evt_map_set_tevcallback, 1, PTR(envSetYami))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_bom01")), 16777216)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_bom01")), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_bom01")), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_bom01")), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(anim_tevcallback, STRING(("村長")), 1)
     CALL(anim_tevcallback, STRING(("ニトロ")), 1)
     CALL(anim_tevcallback, STRING(("ペントリット")), 1)
@@ -2779,7 +2864,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_npc_wait_pera, STRING(("ボムヘイD")))
     CALL(evt_msg_print, 0, STRING(("stg8_las_148_71")), 0, STRING(("村長")))
     WAIT_MS(2000)
-    CALL(evt_fade_set_mapchange_type, 1, 10, 300, 9, 300)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING(("las_29")), STRING(("minnnanokoe")))
     RETURN
 EVT_END()
@@ -2795,26 +2880,26 @@ EVT_END()
 EVT_BEGIN(bom_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
         CALL_CHILD(PTR(evt_bero_info_run))
-        CASE_LESS(353)
+        CASE_LESS(STORY_STG7_01_FAHR_OUTPOST_1ST_VISIT)
         CALL_CHILD(PTR(bero_case_entry))
         CASE_DEFAULT
         CALL_CHILD(PTR(evt_bero_info_run))
     END_SWITCH
-    IF_INT_EQUAL(GSW(0), 400)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         SET_VALUE(LF(0), 0)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING(("minnnanokoe")))
-            CALL(evt_snd_bgmon, 512, STRING(("BGM_EVT_STG8_VOICE1")))
-            CALL(evt_snd_envoff, 512)
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(("BGM_EVT_STG8_VOICE1")))
+            CALL(evt_snd_envoff, PSND_FADE_OUT)
             SET_VALUE(LF(0), 1)
         END_IF
     END_IF
     IF_INT_EQUAL(LF(0), 0)
-        CALL(evt_snd_bgmon, 512, STRING(("BGM_STG7_BOM1")))
-        CALL(evt_snd_envon, 272, STRING(("ENV_STG7_BOM2")))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(("BGM_STG7_BOM1")))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_BOM2")))
     END_IF
     SET_VALUE(LW(0), STRING(("group10")))
     SPAWN_EVENT(PTR(evt_bom_01_karakara))
@@ -2828,29 +2913,29 @@ EVT_BEGIN(bom_01_init_evt)
     SPAWN_EVENT(PTR(evt_bom_01_karakara))
     SET_VALUE(LW(0), STRING(("group15")))
     SPAWN_EVENT(PTR(evt_bom_01_karakara))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("chika_off")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("chika_off")), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING(("A_chika")), 1, 0)
     CALL_CHILD(PTR(evt_bom_snowfall))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_moon")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_yuka2")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_yuka3")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_moon")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_yuka2")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_yuka3")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING(("chika_off")), 0, FLOAT(-1.0f), 0)
     CALL(evt_npc_setup, PTR(npcEnt))
-    SWITCH(GSW(0))
-        CASE_BETWEEN(352, 357)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG7_00_START, STORY_STG7_05_THE_CANNON)
         CALL_CHILD(PTR(musume_a_entry))
         CALL_CHILD(PTR(musume_b_entry))
         CALL_CHILD(PTR(musume_c_entry))
     END_SWITCH
-    CALL(evt_run_case_evt, 9, 1, STRING(("A_ie_door")), 0, PTR(evt_door), 0)
-    CALL(evt_item_entry, STRING(("item_00")), 125, -180, 5, 450, 16, GSWF(5659), 0)
-    SWITCH(GSW(0))
-        CASE_LESS(349)
-        SET_VALUE(GSWF(3885), 1)
-        CASE_LESS(353)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(("A_ie_door")), 0, PTR(evt_door), 0)
+    CALL(evt_item_entry, STRING(("item_00")), ITEM_STAR_PIECE, -180, 5, 450, 16, GSWF(GSWF_BOM01_STAR_PIECE), 0)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG6_71_01)
+        SET_VALUE(GSWF(GSWF_BOM01_VISITED_BEFORE_STG7), 1)
+        CASE_LESS(STORY_STG7_01_FAHR_OUTPOST_1ST_VISIT)
         SPAWN_EVENT(PTR(first_evt))
     END_SWITCH
-    IF_INT_EQUAL(GSW(0), 400)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING(("minnnanokoe")))
             SPAWN_EVENT(PTR(minnnanokoe_evt))
@@ -2862,4 +2947,3 @@ EVT_BEGIN(bom_01_init_evt)
     END_INLINE_EVENT
     RETURN
 EVT_END()
-

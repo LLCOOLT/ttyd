@@ -1,3 +1,4 @@
+// Declares the shared star-power special move helpers.
 #pragma once
 
 #include "evt/evt_cmd.h"

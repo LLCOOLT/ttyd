@@ -1,54 +1,25 @@
+// tik_03 (埋没した都市, Rogueport Sewers): where Mario meets the guide Puni (puni_soguu_3), who joins him (puni_nakama), and
+// the switch that opens the way to Boggly Woods (win_06).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
-
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_party_use_check);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dir_npc);
-USER_FUNC(evt_mario_set_party_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_kururing_floor);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_dir_npc);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "tik.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
 
 extern EvtWord bero_05_custom_in[];
 extern EvtWord bero_05_custom_out[];
@@ -61,18 +32,17 @@ extern EvtWord anm_rapa_snd[];
 extern EvtWord puni_switch[];
 extern EvtWord puni_nakama[];
 extern EvtWord tik03_switch_evt[];
-extern EvtWord tik_03_init_evt[];
 
 EVT_BEGIN(bero_05_custom_in)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 112)
-        IF_INT_EQUAL(GSWF(2884), 0)
-            SET_VALUE(GSWF(2884), 1)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
+        IF_INT_EQUAL(GSWF(GSWF_MRI_LEFT_TREE_AFTER_STG2), 0)
+            SET_VALUE(GSWF(GSWF_MRI_LEFT_TREE_AFTER_STG2), 1)
         END_IF
-        IF_INT_EQUAL(GSWF(2840), 1)
-            SET_VALUE(GSWF(2840), 0)
+        IF_INT_EQUAL(GSWF(GSWF_MRI04_JABBI_MUSHROOM_GIVEN), 1)
+            SET_VALUE(GSWF(GSWF_MRI04_JABBI_MUSHROOM_GIVEN), 0)
         END_IF
-        IF_INT_EQUAL(GSWF(2827), 1)
-            SET_VALUE(GSWF(2827), 0)
+        IF_INT_EQUAL(GSWF(GSWF_MRI01_PETUNI_QUIZ_EGG_GIVEN), 1)
+            SET_VALUE(GSWF(GSWF_MRI01_PETUNI_QUIZ_EGG_GIVEN), 0)
         END_IF
     END_IF
     SET_VALUE(LW(0), 0)
@@ -80,8 +50,8 @@ EVT_BEGIN(bero_05_custom_in)
 EVT_END()
 
 EVT_BEGIN(bero_05_custom_out)
-    IF_INT_EQUAL(GSW(0), 69)
-        SET_VALUE(GSW(0), 70)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_35_PUNI_JOINS)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_END_TO_STAGE_2)
     END_IF
     SET_VALUE(LW(0), 0)
     RETURN
@@ -91,8 +61,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "s_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -108,8 +78,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan", // hitName
         2, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)bero_05_custom_in, // enterEvent
@@ -129,8 +99,8 @@ static BeroEntry bero_entry_data2[] = {
         "dokan", // hitName
         2, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -146,14 +116,14 @@ static BeroEntry bero_entry_data2[] = {
 };
 
 static EVT_BEGIN(guide_init)
-    SWITCH(GSW(0))
-        CASE_EQUAL(66)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG1_32_PUNI_ENCOUNTER_2)
         CALL(evt_npc_set_position, STRING("me"), -80, -149, 50)
         CALL(evt_npc_set_ry, STRING("me"), 90)
-        CASE_EQUAL(67)
+        CASE_EQUAL(STORY_STG1_33_A_PUNI_PLEA_FOR_HELP)
         CALL(evt_npc_set_position, STRING("me"), 100, -150, 50)
         CALL(evt_npc_set_ry, STRING("me"), 270)
-        CASE_EQUAL(68)
+        CASE_EQUAL(STORY_STG1_34_PUNIS_SECRET_PASSAGE)
         CALL(evt_npc_set_position, STRING("me"), 230, -50, 80)
         CALL(evt_npc_set_ry, STRING("me"), 270)
         CASE_DEFAULT
@@ -163,8 +133,8 @@ static EVT_BEGIN(guide_init)
 EVT_END()
 
 static EVT_BEGIN(guide_talk)
-    SWITCH(GSW(0))
-        CASE_EQUAL(67)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG1_33_A_PUNI_PLEA_FOR_HELP)
         WAIT_MS(1000)
         CALL_CHILD(PTR(puni_switch))
     END_SWITCH
@@ -174,7 +144,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         guide_init, // initEvent
         NULL, // regularEvent
@@ -254,13 +224,13 @@ EVT_BEGIN(puni_soguu_3)
         CALL(evt_mario_mov_pos2, LW(0), 10, FLOAT(120.0f))
     END_IF
     CALL(evt_mario_set_dir_npc, STRING("ガイド"))
-    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_ry, STRING("ガイド"), 90)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("ガイド"), 0, 0, 0, 0, 0, 0, 0, 30)
     CALL(evt_npc_set_anim, STRING("ガイド"), STRING("S_1"))
     WAIT_MS(500)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG2_PUNI1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG2_PUNI1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_msg_print, 0, STRING("mac_1_012"), 0, STRING("ガイド"))
     CALL(evt_cam3d_evt_set, -400, -35, 432, -418, -105, 24, 500, 11)
     WAIT_MS(500)
@@ -275,7 +245,7 @@ EVT_BEGIN(puni_soguu_3)
     CALL(evt_msg_select, 0, STRING("mac_1_014_yesno"))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("mac_1_019"))
-        ELSE
+    ELSE
         CALL(evt_msg_print_add, 0, STRING("mac_1_015"))
         CALL(evt_mario_set_dir, 90, 300, 0)
         CALL(evt_msg_print_party, STRING("mac_1_016"))
@@ -350,14 +320,14 @@ EVT_BEGIN(puni_soguu_3)
     CALL(evt_npc_set_ry, STRING("ガイド"), 270)
     WAIT_MS(200)
     CALL(evt_msg_print, 0, STRING("mac_1_029_00"), 0, STRING("ガイド"))
-    CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), 1073741856)
+    CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     WAIT_MS(800)
     CALL(evt_cam3d_evt_off, 0, 11)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
-    SET_VALUE(GSW(0), 67)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_33_A_PUNI_PLEA_FOR_HELP)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -404,7 +374,7 @@ EVT_BEGIN(puni_switch)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_msg_print, 0, STRING("mac_1_029_01"), 0, STRING("me"))
     CALL(evt_npc_set_ry, STRING("me"), 90)
     SPAWN_EVENT_GET_ID(PTR(puni_walk_se), LW(10))
@@ -413,31 +383,31 @@ EVT_BEGIN(puni_switch)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("mac_1_030"), 0, STRING("me"))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_BIKKURI_SWITCH_ON1"), 220, 50, 0, 0)
-    CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 100)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
-    SET_VALUE(GSWF(1334), 1)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.01953125f), FLOAT(0.0f), 100)
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
+    SET_VALUE(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 1)
     CALL(evt_map_playanim, STRING("anm_para"), 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kabe_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kabe_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kabe_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kabe_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_para_d"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("a_para_d1"), 1, 0)
     CALL_CHILD(PTR(anm_para_snd))
     CALL(evt_npc_set_position, STRING("me"), 230, -50, 80)
-    CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), 1073741856)
+    CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_party_run, 0)
-    SET_VALUE(GSW(0), 68)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_34_PUNIS_SECRET_PASSAGE)
     CALL(evt_mario_key_onoff, 1)
     WAIT_MS(1500)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("para"), 1)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("para"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(puni_nakama)
     LOOP(0)
-        IF_INT_EQUAL(GSW(0), 68)
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_34_PUNIS_SECRET_PASSAGE)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             IF_INT_GREATER_OR_EQUAL(LW(2), -90)
                 IF_INT_GREATER_OR_EQUAL(LW(0), 300)
@@ -460,26 +430,26 @@ EVT_BEGIN(puni_nakama)
     CALL(evt_party_move_pos2, 1, LW(0), LW(2), FLOAT(120.0f))
     CALL(evt_msg_print, 0, STRING("mac_1_031"), 0, STRING("extparty"))
     WAIT_MS(200)
-    SET_VALUE(GSW(0), 69)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_35_PUNI_JOINS)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(tik03_switch_evt)
-    IF_INT_EQUAL(GSWF(1334), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 0)
         CALL(evt_map_playanim, STRING("anm_para"), 0, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kabe_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kabe_2"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kabe_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kabe_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_para_d"), 1, 0)
-        SET_VALUE(GSWF(1334), 1)
+        SET_VALUE(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 1)
         CALL_CHILD(PTR(anm_para_snd))
         WAIT_MS(800)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("para"), 1)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("para"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("para"), MAPOBJ_FLAG_HIDE)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("para"), MAPOBJ_FLAG_HIDE)
         CALL(evt_map_playanim, STRING("anm_rapa"), 0, 0)
-        SET_VALUE(GSWF(1334), 0)
+        SET_VALUE(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 0)
         CALL_CHILD(PTR(anm_rapa_snd))
         WAIT_MS(800)
         CALL(evt_hitobj_onoff, STRING("a_para_d"), 0, 1)
@@ -489,34 +459,34 @@ EVT_BEGIN(tik03_switch_evt)
 EVT_END()
 
 EVT_BEGIN(tik_03_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_npc_setup, PTR(npcEnt))
-    IF_INT_EQUAL(GSW(0), 66)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_32_PUNI_ENCOUNTER_2)
         SPAWN_EVENT(PTR(puni_soguu_3))
     END_IF
-    IF_INT_LESS_OR_EQUAL(GSW(0), 67)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kabe_2"), 1)
+    IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_33_A_PUNI_PLEA_FOR_HELP)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kabe_2"), MAPOBJ_FLAG_HIDE)
+    ELSE
+        IF_INT_EQUAL(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 0)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kabe_1"), MAPOBJ_FLAG_HIDE)
         ELSE
-        IF_INT_EQUAL(GSWF(1334), 0)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kabe_1"), 1)
-            ELSE
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kabe_1"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("para"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kabe_1"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("para"), MAPOBJ_FLAG_HIDE)
             CALL(evt_hitobj_onoff, STRING("a_para_d"), 1, 0)
             CALL(evt_hitobj_onoff, STRING("a_para_d1"), 1, 0)
         END_IF
     END_IF
-    IF_INT_LESS_OR_EQUAL(GSW(0), 68)
+    IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_34_PUNIS_SECRET_PASSAGE)
         SPAWN_EVENT(PTR(puni_nakama))
     END_IF
-    CALL(evt_item_entry, STRING("item_00"), 276, -450, -50, -50, 16, GSWF(1356), 0)
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 325, -50, 0, STRING("kakoi"), 125, GSWF(5590))
-    IF_INT_LESS(GSW(0), 71)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_DAMAGE_DODGE, -450, -50, -50, 16, GSWF(GSWF_TIK03_DAMAGE_DODGE_TAKEN), 0)
+    CALL(evt_mobj_kururing_floor, STRING("kururin1"), 325, -50, 0, STRING("kakoi"), 125, GSWF(GSWF_TIK03_STAR_PIECE_PANEL))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_00_BOGGLY_WOODS)
         SET_VALUE(LW(0), STRING("dokan"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_bero_overwrite, STRING("dokan"), PTR(bero_entry_data2))
@@ -525,4 +495,3 @@ EVT_BEGIN(tik_03_init_evt)
     END_IF
     RETURN
 EVT_END()
-

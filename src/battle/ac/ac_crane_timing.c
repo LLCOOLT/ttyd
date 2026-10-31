@@ -1,31 +1,31 @@
+// Action command: crane timing (ac_crane_timing); press A when the crane marker reaches the target.
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
 #include "battle/battle_unit.h"
+#include "battle/battle_sub.h"
 #include "system.h"
 #include <string.h>
 
-f32 sinfd(f32 degrees);
-
 typedef struct CraneTimingParams {
-    u8 header[0x3C - 0x0];     // 0x0, BattleActions header up to params[1]
-    s32 unitId;               // 0x3C
-    s32 partsId;              // 0x40
-    s32 startDelay;           // 0x44
-    s32 randomRange;          // 0x48
-    u8 pad_4C[0x50 - 0x4C];   // 0x4C, params[5], unused here
-    s32 maxFrames;            // 0x50
+    u8 header[0x3C - 0x0];       // 0x0, BattleActions header up to params[1]
+    s32 unitId;                  // 0x3C
+    s32 partsId;                 // 0x40
+    s32 startDelay;              // 0x44
+    s32 randomRange;             // 0x48
+    u8 reserved_4C[0x50 - 0x4C]; // 0x4C, never accessed (params[5], unused here)
+    s32 maxFrames;               // 0x50
 } CraneTimingParams;
 
 typedef struct CraneTimingWork {
-    s32 button;     // 0x0
-    s32 frame;      // 0x4
-    Vec basePos;    // 0x8
-    Vec pos;        // 0x14
-    f32 speed;      // 0x20
-    s32 delay;      // 0x24
-    f32 range;      // 0x28
-    s32 endTimer;   // 0x2C
+    s32 button;   // 0x0
+    s32 frame;    // 0x4
+    Vec basePos;  // 0x8
+    Vec pos;      // 0x14
+    f32 speed;    // 0x20
+    s32 delay;    // 0x24
+    f32 range;    // 0x28
+    s32 endTimer; // 0x2C
 } CraneTimingWork;
 
 #define AC_PARAMS(work) ((CraneTimingParams*)&(work)->actionCommands)
@@ -42,13 +42,13 @@ s32 battleAcMain_CraneTiming(BattleWork* work) {
     autoCommand = FALSE;
     cw = (CraneTimingWork*)ac->work;
     disp = (BattleACDispParams*)&ac->disp;
-    if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
+    if (work->actionCommands.acUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
     unit = BattleGetUnitPtr(work, AC_PARAMS(work)->unitId);
     BtlUnit_GetPartsPtr(unit, AC_PARAMS(work)->partsId);
 
-    switch (work->actionCommands.mAcState) {
+    switch (work->actionCommands.acState) {
         case 0:
             memset(disp, 0, sizeof(BattleACDispParams));
             disp->iconX = -300.0f;
@@ -59,7 +59,7 @@ s32 battleAcMain_CraneTiming(BattleWork* work) {
             cw->range = irand(AC_PARAMS(work)->randomRange);
             cw->button = 0x100;
             work->actionCommands.outputParams[0] = 0;
-            work->actionCommands.mAcState = 99;
+            work->actionCommands.acState = 99;
             work->actionCommands.result = 1;
             break;
         case 100:
@@ -69,7 +69,7 @@ s32 battleAcMain_CraneTiming(BattleWork* work) {
             cw->basePos = cw->pos;
             cw->frame = 0;
             cw->speed = 1.5f;
-            work->actionCommands.mAcState = 1000;
+            work->actionCommands.acState = 1000;
         case 1000:
             if (cw->delay != 0) {
                 cw->delay--;
@@ -102,25 +102,25 @@ s32 battleAcMain_CraneTiming(BattleWork* work) {
                     work->actionCommands.result = 0;
                 } else {
                     work->actionCommands.result = 2;
-                    work->actionCommands.mResultCount++;
+                    work->actionCommands.resultCount++;
                 }
-                work->actionCommands.mAcState = 1002;
+                work->actionCommands.acState = 1002;
                 break;
             }
             if (cw->frame >= AC_PARAMS(work)->maxFrames) {
                 work->actionCommands.result = 0;
-                work->actionCommands.mAcState = 1002;
+                work->actionCommands.acState = 1002;
             }
             break;
         case 1002:
             cw->endTimer = 60;
-            work->actionCommands.mAcState = 1003;
+            work->actionCommands.acState = 1003;
         case 1003:
             cw->endTimer--;
             if (cw->endTimer > 0) {
                 break;
             }
-            work->actionCommands.mAcState = 1004;
+            work->actionCommands.acState = 1004;
             break;
         case 1004:
             work->actionCommands.maincb = NULL;
@@ -140,5 +140,5 @@ void battleAcDisp_CraneTiming(CameraId cameraId, void* param) {
 }
 
 void battleAcDelete_CraneTiming(BattleWork* work) {
-    work->actionCommands.mAcState = 1002;
+    work->actionCommands.acState = 1002;
 }

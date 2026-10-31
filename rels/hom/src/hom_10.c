@@ -1,3 +1,6 @@
+// hom_10 (途中駅ホーム, Excess Express platform): the train running between stations; the scene between the days of the
+// journey.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -5,47 +8,27 @@
 #include "mario/mariost.h"
 #include "driver/mapdrv.h"
 #include "evt/evt_sub.h"
+#include "driver/envdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "hom.h"
 #include "data_tables.h"
-typedef struct SharinData { const char* name; s32 wheelType; s32 speedSource; EvtFloat speed; } SharinData;
-typedef struct ClankData { const char* name; s32 wheelType; s32 speedSource; EvtFloat x; EvtFloat y; } ClankData;
+#include "map/sharin.h"
+#include "evt/evt_story.h"
 
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_mapname);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_get_stopwatch);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(ramp_r);
 static void resha_tev(MapTevCallbackInfo* info);
 
 static SharinData sharinDt[29];
 static ClankData clankDt[9];
-extern EvtWord hom_10_evt_resha_start[];
-extern EvtWord hom_10_evt_resha_start2[];
-extern EvtWord hom_10_evt_resha_start3[];
-extern EvtWord hom_10_evt_resha_start4[];
-extern EvtWord hom_10_evt_resha_stop[];
 static const char* pika_tbl[15];
 static const char* pika_tbl_rsh_06[10];
-extern EvtWord hom_10_evt_resha_right[];
-extern EvtWord hom_10_evt_resha_left[];
-extern EvtWord hom_10_init_evt[];
 
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},
@@ -110,7 +93,7 @@ static EVT_BEGIN(evt_sharin_main)
         CALL(evt_mapobj_rotate, 1, LW(0), 0, 0, LW(12))
         WAIT_FRAMES(1)
         LOOP(0)
-            IF_INT_EQUAL(GSWF(3583), 1)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_MOVING), 1)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
@@ -179,7 +162,7 @@ static EVT_BEGIN(evt_clank_main)
         CALL(evt_mapobj_trans, 1, LW(0), LW(14), LW(13), FLOAT(0.0f))
         WAIT_FRAMES(1)
         LOOP(0)
-            IF_INT_EQUAL(GSWF(3583), 1)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_MOVING), 1)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
@@ -225,7 +208,7 @@ static EVT_BEGIN(evt_bg)
         CALL(evt_mapobj_trans, 1, STRING("iwayama"), LW(11), 0, 0)
         WAIT_FRAMES(1)
         LOOP(0)
-            IF_INT_EQUAL(GSWF(3583), 1)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_MOVING), 1)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
@@ -255,7 +238,7 @@ static EVT_BEGIN(evt_hoshi)
         CALL(evt_mapobj_rotate, 0, STRING("hosi_center_c"), LW(10), 0, 0)
         WAIT_FRAMES(1)
         LOOP(0)
-            IF_INT_EQUAL(GSWF(3583), 1)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_MOVING), 1)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
@@ -265,10 +248,10 @@ static EVT_BEGIN(evt_hoshi)
 EVT_END()
 
 EVT_BEGIN(hom_10_evt_resha_start)
-    SET_VALUE(GSWF(3583), 1)
-    SET_VALUE(GSWF(3579), 0)
-    SET_VALUE(GSWF(3580), 0)
-    SET_VALUE(GSWF(3581), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
+    SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
     CALL(evt_mapobj_get_position, STRING("ranpu"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
@@ -278,9 +261,9 @@ EVT_BEGIN(hom_10_evt_resha_start)
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
     END_IF
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
-        IF_INT_LESS(GSW(0), 339)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_54_WELCOME_BACK)
             CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_2"), 0)
-            ELSE
+        ELSE
             CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_2_2"), 0)
         END_IF
     END_IF
@@ -363,10 +346,10 @@ EVT_BEGIN(hom_10_evt_resha_start)
 EVT_END()
 
 EVT_BEGIN(hom_10_evt_resha_start2)
-    SET_VALUE(GSWF(3583), 1)
-    SET_VALUE(GSWF(3579), 0)
-    SET_VALUE(GSWF(3580), 0)
-    SET_VALUE(GSWF(3581), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
+    SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
     CALL(evt_mapobj_get_position, STRING("ranpu"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
@@ -467,21 +450,21 @@ EVT_BEGIN(hom_10_evt_resha_start2)
 EVT_END()
 
 EVT_BEGIN(hom_10_evt_resha_start3)
-    SET_VALUE(GSWF(3583), 1)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(-15.0f))
     RETURN
 EVT_END()
 
 EVT_BEGIN(hom_10_evt_resha_start4)
-    SET_VALUE(GSWF(3583), 1)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(stop_1)
-    SET_VALUE(GSWF(3583), 1)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(2), FLOAT(3000.0f))
@@ -510,12 +493,12 @@ static EVT_BEGIN(stop_1)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    SET_VALUE(GSWF(3583), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 0)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(stop_2)
-    SET_VALUE(GSWF(3583), 1)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(2), FLOAT(-3000.0f))
@@ -544,7 +527,7 @@ static EVT_BEGIN(stop_2)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    SET_VALUE(GSWF(3583), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 0)
     RETURN
 EVT_END()
 
@@ -559,9 +542,9 @@ EVT_BEGIN(hom_10_evt_resha_stop)
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
-        IF_INT_EQUAL(GSWF(3578), 0)
+        IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
             SPAWN_EVENT(PTR(stop_1))
-            ELSE
+        ELSE
             SPAWN_EVENT(PTR(stop_2))
         END_IF
     END_IF
@@ -575,7 +558,7 @@ static EVT_BEGIN(evt_ramp)
         CALL(evt_mapobj_rotate, 1, STRING("ranpu_c"), 0, 0, LW(10))
         WAIT_FRAMES(1)
         LOOP(0)
-            IF_INT_EQUAL(GSWF(3583), 1)
+            IF_INT_EQUAL(GSWF(GSWF_TRAIN_MOVING), 1)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
@@ -616,7 +599,7 @@ static const char* pika_tbl_rsh_06[] = {
 };
 
 static EVT_BEGIN(hom_10_evt_resha_sub)
-    SET_VALUE(GSWF(3583), 0)
+    SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 0)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SPAWN_EVENT(PTR(evt_sharin))
@@ -651,9 +634,9 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
         IF_INT_EQUAL(LW(0), 0)
             BREAK_LOOP
         END_IF
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 16777216)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 256)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 268435456)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_TEV_CALLBACK(1))
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_DISPLAY_LIST)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_NO_COLOR_STAGE)
     END_LOOP
     RETURN
 EVT_END()
@@ -662,44 +645,44 @@ EVT_BEGIN(hom_10_evt_resha_right)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_NOT_EQUAL(LW(0), STRING("rsh_06_a"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_7"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_8"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_6"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_7"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_7"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_8"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu_6"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu_7"), MAPOBJ_FLAG_HIDE)
     END_IF
     RETURN
 EVT_END()
 
 EVT_BEGIN(hom_10_evt_resha_left)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_6"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_5"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_6"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu_5"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
 EVT_BEGIN(hom_10_init_evt)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH2"))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH2"))
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
     CALL(evt_party_cont_onoff, 1, 0)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
-    IF_INT_EQUAL(GSWF(3578), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
         CALL_CHILD(PTR(hom_10_evt_resha_right))
         CALL_CHILD(PTR(hom_10_evt_resha_start3))
         SET_VALUE(LW(0), 500)
         SET_VALUE(LW(1), -500)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_3"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_4"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_5"), 1)
-        ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_1"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_2"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_3"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_4"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_5"), MAPOBJ_FLAG_HIDE)
+    ELSE
         CALL_CHILD(PTR(hom_10_evt_resha_left))
         CALL_CHILD(PTR(hom_10_evt_resha_start4))
         SET_VALUE(LW(0), 0)
@@ -726,8 +709,6 @@ static USER_FUNC(ramp_r) {
     evtSetFloat(event, LW(10), 1.8f * amp * wave);
     return EVT_RETURN_DONE;
 }
-
-void envAddTev(s32 type, MapTevCallbackInfo* info);
 
 static void resha_tev(MapTevCallbackInfo* info) {
     envAddTev(7, info);

@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: pokopi charge (pcharge) at a point with a scale and lifetime; types 0-9.
 #include "eff/n64/eff_pokopi_pcharge_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -7,8 +8,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-#include "eff/eff_magic1_n64.h"
-
+#include "libc_decls.h"
 
 u8 n_data[13] = {11, 11, 11, 11, 17, 11, 11, 21, 21, 21, 21, 21, 21};
 static u8 vx_data[13] = {20, 5, 20, 20, 10, 20, 20, 8, 8, 8, 1, 1, 1};
@@ -106,7 +106,7 @@ EffectEntry* effPokopiPchargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffPokopiPchargeN64Elem));
     effect->userdata = work;
     effect->callback = effPokopiPchargeMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -148,13 +148,13 @@ EffectEntry* effPokopiPchargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
                 p->rotVel = 0.0f;
                 break;
             case 6:
-                p->speed = (f32)-(rand() % 10 + 4);
+                p->speed = (f32) - (rand() % 10 + 4);
                 p->lifetime = 10;
                 p->scale = 1.0f - 0.3f * (f32)(i % 3);
                 p->rotVel = 0.0f;
                 break;
             case 7:
-                p->speed = (f32)-(rand() % 10 + 4);
+                p->speed = (f32) - (rand() % 10 + 4);
                 p->lifetime = 10;
                 p->scale = 1.0f - 0.3f * (f32)(i % 3);
                 p->rotVel = 0.0f;
@@ -223,8 +223,8 @@ void effPokopiPchargeMain(EffectEntry* effect) {
     tmp.y = p->position.y;
     tmp.z = p->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         p->lifetime = 16;
     }
     if (p->lifetime < 1000) {

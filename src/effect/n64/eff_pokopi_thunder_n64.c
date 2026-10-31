@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: a jagged yellow lightning bolt between two points, wobbling from frame to frame.
 #include "eff/n64/eff_pokopi_thunder_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,17 +8,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "dolphin/os.h"
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 #include <math.h>
-typedef struct effN64Vtx {
-    s16 x, y, z;
-    s16 s, t;
-    u8 r, g, b, a;
-} effN64Vtx;
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
 
 u8 yuragi_data[11][24] = {
 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 9, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -48,8 +41,6 @@ u8 yuragi_data2[11][24] = {
 
 static u8 (*yuragi_data_table[2])[24] = {yuragi_data, yuragi_data2};
 
-
-
 void effPokopiThunderMain(EffectEntry* effect);
 void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -74,7 +65,7 @@ EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPokopiThunderN64Work));
     effect->userdata = work;
     effect->callback = effPokopiThunderMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (duration <= 0) {
@@ -115,7 +106,9 @@ EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 
     return effect;
 }
 
-inline float inline_fn(s32 i, float step) { return ((f32)i) * step; }
+inline float inline_fn(s32 i, float step) {
+    return ((f32)i) * step;
+}
 
 void effPokopiThunderMain(EffectEntry* effect) {
     EffPokopiThunderN64Work* work = effect->userdata;
@@ -129,8 +122,8 @@ void effPokopiThunderMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timeLeft = 16;
     }
     if (work->timeLeft < 1000) {
@@ -152,7 +145,9 @@ void effPokopiThunderMain(EffectEntry* effect) {
     dispEntry(work->cameraId, dispCalcZ(&position), 2, (DispCallback)effPokopiThunderDisp, effect);
 }
 
-inline float pt_dy(EffPokopiThunderN64Work* a, EffPokopiThunderN64Work* b) { return a->end.y - b->start.y; }
+inline float pt_dy(EffPokopiThunderN64Work* a, EffPokopiThunderN64Work* b) {
+    return a->end.y - b->start.y;
+}
 
 void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
@@ -316,4 +311,3 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
     }
 }
-

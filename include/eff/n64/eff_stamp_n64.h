@@ -1,3 +1,4 @@
+// eff_stamp_n64.c: stamp effect entry (effStampN64Entry) and its work data (EffStampN64Work).
 #pragma once
 
 #include <dolphin/types.h>

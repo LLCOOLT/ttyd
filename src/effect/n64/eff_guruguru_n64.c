@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: guruguru (spinning), num sprites circling a point at a given radius.
 #include "eff/n64/eff_guruguru_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,6 +7,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
@@ -13,9 +15,6 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {8, 8, 0, 64, 32, 0, 0, 0, 255},
     {-8, 8, 0, 0, 32, 0, 0, 0, 255},
 };
-
-double sin(double);
-double cos(double);
 
 void effGuruguruMain(EffectEntry* effect);
 void effGuruguruDisp(CameraId cameraId, EffectEntry* effect);
@@ -136,4 +135,3 @@ void effGuruguruDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-

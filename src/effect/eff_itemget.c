@@ -1,3 +1,5 @@
+// Item get / use sparkle (ItemGet): sparkles spread around the item position, spawned when Mario obtains or uses an
+// item. Element 0 is the header: types 0, 3 and 9 draw seven sparkles, type 10 (item use in battle) five.
 #include "driver/camdrv.h"
 #include "eff/eff_itemget.h"
 #include "driver/dispdrv.h"
@@ -7,26 +9,24 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "version.h"
+#include "libc_decls.h"
 
-double sin(double);
-double cos(double);
-
-EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z);
 void effItemGetMain(EffectEntry* effect);
 void effItemGetDisp(CameraId cameraId, EffectEntry* effect);
 void effItemUseDisp(CameraId cameraId, EffectEntry* effect);
 
-static u8 scale_data[12] = { 0x00, 0x12, 0x26, 0x3B, 0x4E, 0x60, 0x6E, 0x78, 0x79, 0x72, 0x69, 0x64 };
-GXColor white = { 0xE1, 0xE1, 0xE1, 0xFF };
+static u8 scale_data[12] = {0x00, 0x12, 0x26, 0x3B, 0x4E, 0x60, 0x6E, 0x78, 0x79, 0x72, 0x69, 0x64};
+GXColor white = {0xE1, 0xE1, 0xE1, 0xFF};
 static GXColor color_tbl[10] = {
     { 0xC8, 0xB2, 0x25, 0xFF }, { 0x26, 0xA3, 0x52, 0xFF }, { 0x5C, 0xCA, 0x10, 0xFF }, { 0xCB, 0x4C, 0x4D, 0xFF },
     { 0x7E, 0xC2, 0x1E, 0xFF }, { 0x30, 0x9C, 0xBF, 0xFF }, { 0xEB, 0x7D, 0x06, 0xFF }, { 0xE8, 0x5B, 0xD0, 0xFF },
     { 0x51, 0x75, 0x9D, 0xFF }, { 0xC8, 0xB2, 0x25, 0xFF },
 };
-#ifdef VERSION_G8ME01_DEMO
-u8 size_tbl[10] = { 0x32, 0x32, 0x32, 0x28, 0x14, 0x14, 0x14, 0x0A, 0x0A, 0x0F};
+#if VERSION == VERSION_DEMO
+u8 size_tbl[10] = {0x32, 0x32, 0x32, 0x28, 0x14, 0x14, 0x14, 0x0A, 0x0A, 0x0F};
 #else
-u8 size_tbl[10] = { 0x32, 0x32, 0x32, 0x28, 0x0C, 0x0C, 0x0C, 0x0A, 0x0A, 0x0F};
+u8 size_tbl[10] = {0x32, 0x32, 0x32, 0x28, 0x0C, 0x0C, 0x0C, 0x0A, 0x0A, 0x0F};
 #endif
 
 EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z) {
@@ -49,7 +49,7 @@ EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(ItemGetWork));
     effect->userdata = work;
     effect->callback = effItemGetMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -87,7 +87,7 @@ EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z) {
 void effItemGetMain(EffectEntry* effect) {
     ItemGetWork* work = effect->userdata;
     Vec tmp;
-    Vec position = { 0.0f, 0.0f, 0.0f };
+    Vec position = {0.0f, 0.0f, 0.0f};
     s32 type;
     s32 camera;
     s32 done;
@@ -100,8 +100,8 @@ void effItemGetMain(EffectEntry* effect) {
     tmp = position;
     camera = work->camera;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -122,16 +122,16 @@ void effItemGetMain(EffectEntry* effect) {
         work->timer = 1000;
     }
     switch (work->state) {
-    case 0:
-        break;
-    case 1:
-        if (work->scale < 100.0f) {
-            work->scale *= 1.1f;
-        }
-        break;
-    case 2:
-        work->scale *= 0.9f;
-        break;
+        case 0:
+            break;
+        case 1:
+            if (work->scale < 100.0f) {
+                work->scale *= 1.1f;
+            }
+            break;
+        case 2:
+            work->scale *= 0.9f;
+            break;
     }
     work++;
     for (i = 1; i < effect->count; i++, work++) {
@@ -185,9 +185,9 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mac;
     Mtx m7c;
     GXTexObj texObj;
-    Vec eye = { 0.0f, 0.0f, 1000.0f };
-    Vec up = { 0.0f, 1.0f, 0.0f };
-    Vec target = { 0.0f, 0.0f, 0.0f };
+    Vec eye = {0.0f, 0.0f, 1000.0f};
+    Vec up = {0.0f, 1.0f, 0.0f};
+    Vec target = {0.0f, 0.0f, 0.0f};
     f32 scale;
     f32 d;
     f32 h;
@@ -253,16 +253,15 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     sh = alpha * 0x80 / 0xFF;
     al = alpha * 0xFF / 0xFF;
 
-
     for (i = 0; i < 2; i++) {
         if (i == 0) {
             PSMTXConcat(camera->view, m7c, m19c);
             PSMTXTrans(m13c, 2.0f, -2.0f, 0.0f);
             PSMTXConcat(m19c, m13c, m19c);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, sh });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, sh});
         } else {
             PSMTXConcat(camera->view, m7c, m19c);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, al });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, al});
         }
         GXLoadPosMtxImm(m19c, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
@@ -283,8 +282,6 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     d = 10.666667f;
     h = 42.666668f;
 
-
-
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         for (pass = 0; pass < 2; pass++) {
@@ -302,13 +299,13 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
                 PSMTXConcat(m10c, m19c, m10c);
                 PSMTXRotRad(m13c, 'z', work->angle);
                 PSMTXConcat(m10c, m13c, m10c);
-                GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, al });
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, al});
             } else {
                 PSMTXTrans(m19c, work->position.x, work->position.y, work->position.z);
                 PSMTXConcat(m7c, m19c, m10c);
                 PSMTXRotRad(m13c, 'z', work->angle);
                 PSMTXConcat(m10c, m13c, m10c);
-                GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha * 0xFF / 0xFF });
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, work->alpha * 0xFF / 0xFF});
             }
             PSMTXConcat(camera->view, m10c, m19c);
             GXLoadPosMtxImm(m19c, GX_PNMTX0);
@@ -371,8 +368,6 @@ void effItemUseDisp(CameraId cameraId, EffectEntry* effect) {
     w = 21.333334f;
     h = 42.666668f;
 
-
-
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         for (pass = 0; pass < 2; pass++) {
@@ -381,13 +376,13 @@ void effItemUseDisp(CameraId cameraId, EffectEntry* effect) {
                 PSMTXRotRad(m68, 'z', work->angle);
                 PSMTXConcat(mc8, m68, mc8);
                 PSMTXConcat(m38, mc8, mc8);
-                GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, work->alpha * 0x40 / 0xFF });
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, work->alpha * 0x40 / 0xFF});
             } else {
                 PSMTXTrans(mc8, work->position.x, work->position.y, work->position.z);
                 PSMTXRotRad(m68, 'z', work->angle);
                 PSMTXConcat(mc8, m68, mc8);
                 PSMTXConcat(m38, mc8, mc8);
-                GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha * 0x80 / 0xFF });
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, work->alpha * 0x80 / 0xFF});
             }
             GXLoadPosMtxImm(mc8, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);

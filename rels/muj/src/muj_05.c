@@ -1,3 +1,5 @@
+// muj_05 (無人島, Keelhaul Key): the skull rock: Admiral Bobbery joins (sanders_nakama), the gem
+// eyes and the skull rock's opening into Pirate's Grotto (dou_00).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -12,112 +14,28 @@
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "driver/itemdrv.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_window.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
 
 s32* command_work;
-
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_del_case_evt);
-USER_FUNC(evt_dokuroiwa_command_check);
-USER_FUNC(evt_dokuroiwa_command_clear);
-USER_FUNC(evt_dokuroiwa_command_init);
-USER_FUNC(evt_dokuroiwa_command_set);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_item_get_position);
-USER_FUNC(evt_item_set_bound_limit);
-USER_FUNC(evt_item_set_bound_next_speed);
-USER_FUNC(evt_item_set_bound_rate);
-USER_FUNC(evt_item_set_gravity);
-USER_FUNC(evt_item_set_jump_power);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_scale);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_chk_hipbump);
-USER_FUNC(evt_mario_clear_party);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_dump_item);
-USER_FUNC(evt_mario_get_motion);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_party_use_check);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_close);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_battle_start);
-USER_FUNC(evt_npc_change_interrupt);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_glide_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_reaction_flag_onoff);
-USER_FUNC(evt_npc_return_interrupt);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_battle_info);
-USER_FUNC(evt_npc_set_link);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_rotate);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_wait_battle_end);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_offscreen_get_boundingbox2);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_behind_mario);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgm_freq);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_get_value);
-USER_FUNC(evt_sub_intpl_init);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
-USER_FUNC(evt_win_item_select);
-USER_FUNC(muj_npc_guruguru);
 
 extern EvtWord sanders_rotate[];
 extern EvtWord sanders_nakama_sub[];
@@ -160,9 +78,8 @@ extern EvtWord yure_yashi_ha1[];
 extern EvtWord yure_yashi[];
 static TreeAccess tree_tbl[6];
 static KusaAccess kusa_tbl[8];
-extern EvtWord muj_05_init_evt[];
 
-USER_FUNC(evt_dokuroiwa_command_check) {
+static USER_FUNC(evt_dokuroiwa_command_check) {
     s32 result;
     s32 i;
     EvtWord* args = event->args;
@@ -185,7 +102,7 @@ USER_FUNC(evt_dokuroiwa_command_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_dokuroiwa_command_set) {
+static USER_FUNC(evt_dokuroiwa_command_set) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
@@ -195,12 +112,12 @@ USER_FUNC(evt_dokuroiwa_command_set) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_dokuroiwa_command_clear) {
+static USER_FUNC(evt_dokuroiwa_command_clear) {
     memset(command_work, 0, 7 * sizeof(s32));
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_dokuroiwa_command_init) {
+static USER_FUNC(evt_dokuroiwa_command_init) {
     command_work = _mapAlloc(7 * sizeof(s32));
     memset(command_work, 0, 7 * sizeof(s32));
     return EVT_RETURN_DONE;
@@ -233,7 +150,7 @@ EVT_BEGIN(sanders_nakama)
     CALL(evt_npc_set_tribe, STRING("me"), STRING("サンダース"))
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_THUNDERS_HIT1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_TALK_ANIM)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("stg5_muj_55"), 0, STRING("me"))
     CALL(evt_cam3d_evt_set, -117, 125, 357, -117, 63, 6, 500, 11)
@@ -271,28 +188,28 @@ EVT_BEGIN(sanders_nakama)
     CALL(evt_party_run, 0)
     CALL(evt_msg_print, 0, STRING("stg5_muj_69"), 0, STRING("me"))
     CALL_CHILD(PTR(sanders_nakama_sub))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_MUJ1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 239)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_18_01_BOBBERY_JOINS)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_npc_return_interrupt, STRING("me"))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(sanders_init)
-    SWITCH(GSW(0))
-        CASE_LESS(235)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG5_15_RUNAWAY_SAILORS)
         CALL(evt_npc_set_tribe, STRING("me"), STRING("サンダースへろへろ"))
-        CASE_BETWEEN(235, 237)
+        CASE_BETWEEN(STORY_STG5_15_RUNAWAY_SAILORS, STORY_STG5_17_WINE_OBTAINED)
         CALL(evt_npc_set_position, STRING("me"), -114, 22, 22)
         CALL(evt_npc_set_tribe, STRING("me"), STRING("サンダースへろへろ"))
-        CASE_EQUAL(238)
+        CASE_EQUAL(STORY_STG5_18_BOBBERY_RESCUE_2)
         CALL(evt_npc_reaction_flag_onoff, 1, STRING("me"), 2)
         CALL(evt_npc_change_interrupt, STRING("me"), 8, PTR(sanders_nakama))
         CALL(evt_npc_set_position, STRING("me"), -114, 22, 22)
         CALL(evt_npc_set_tribe, STRING("me"), STRING("サンダースねむる"))
-        CALL(evt_npc_flag_onoff, 0, STRING("サンダース"), 512)
+        CALL(evt_npc_flag_onoff, 0, STRING("サンダース"), NPC_FLAG_TALK_ANIM)
     END_SWITCH
     RETURN
 EVT_END()
@@ -302,10 +219,10 @@ static s32 itemsel_table01[] = {
 };
 
 EVT_BEGIN(sanders_talk_sub)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg5_muj_45"), 0, STRING("me"))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_ORGEL1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_ORGEL1"))
     CALL(evt_cam3d_evt_set, -117, 125, 357, -117, 63, 6, 500, 11)
     WAIT_MS(600)
     CALL(evt_msg_print, 0, STRING("stg5_muj_46"), 0, STRING("me"))
@@ -313,30 +230,30 @@ EVT_BEGIN(sanders_talk_sub)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING("サンダース"), 512)
+    CALL(evt_npc_flag_onoff, 0, STRING("サンダース"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_reaction_flag_onoff, 1, STRING("me"), 2)
     CALL(evt_npc_change_interrupt, STRING("me"), 8, PTR(sanders_nakama))
-    SET_VALUE(GSW(0), 238)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_18_BOBBERY_RESCUE_2)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(sanders_talk)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(235, 237)
-        CALL(evt_pouch_check_item, 70, LW(0))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG5_15_RUNAWAY_SAILORS, STORY_STG5_17_WINE_OBTAINED)
+        CALL(evt_pouch_check_item, ITEM_CHUCKOLA_COLA, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print, 0, STRING("stg5_muj_34_03"), 0, STRING("me"))
-            ELSE
+        ELSE
             CALL(evt_win_item_select, 0, PTR(itemsel_table01), LW(0), 0)
             IF_INT_EQUAL(LW(0), -1)
                 RETURN
             END_IF
-            CALL(evt_pouch_remove_item, 70, LW(0))
+            CALL(evt_pouch_remove_item, ITEM_CHUCKOLA_COLA, LW(0))
             SPAWN_EVENT(PTR(sanders_talk_sub))
         END_IF
-        CASE_EQUAL(238)
-        IF_INT_EQUAL(GSWF(3138), 0)
+        CASE_EQUAL(STORY_STG5_18_BOBBERY_RESCUE_2)
+        IF_INT_EQUAL(GSWF(GSWF_MUJ05_BOBBERY_FIRST_TALK_238), 0)
             CALL(evt_msg_print, 0, STRING("stg5_muj_47"), 0, STRING("me"))
             BEGIN_INLINE_EVENT
                 CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -345,12 +262,12 @@ static EVT_BEGIN(sanders_talk)
             CALL(evt_eff_fukidashi, 0, STRING(""), 0, 1, 0, 0, 0, 0, 0, 0, 60)
             CALL(evt_eff_fukidashi, 3, STRING(""), 0, 1, 0, 0, 0, 0, 0, 0, 60)
             WAIT_MS(1000)
-            SET_VALUE(GSWF(3138), 1)
-            ELSE
+            SET_VALUE(GSWF(GSWF_MUJ05_BOBBERY_FIRST_TALK_238), 1)
+        ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_48"), 0, STRING("me"))
             BEGIN_INLINE_EVENT
                 SET_VALUE(LW(0), 32000)
-                CALL(evt_snd_bgmoff_f, 512, 3000)
+                CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
                 LOOP(100)
                     SUBTRACT(LW(0), 300)
                     CALL(evt_snd_bgm_freq, 0, LW(0))
@@ -373,11 +290,11 @@ static EVT_BEGIN(sanders_talk)
 EVT_END()
 
 static EVT_BEGIN(marco_init)
-    SWITCH(GSW(0))
-        CASE_EQUAL(241)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG5_18_03_MARCOS_JEWEL)
         CALL(evt_npc_set_position, STRING("me"), 279, 0, -67)
         CALL(evt_npc_set_ry, STRING("me"), 90)
-        IF_INT_EQUAL(GSWF(3141), 0)
+        IF_INT_EQUAL(GSWF(GSWF_MUJ05_FLAVIO_HUMMING_STOPPED), 0)
             SPAWN_EVENT_GET_ID(PTR(marco_hanauta), GW(2))
         END_IF
     END_SWITCH
@@ -385,19 +302,19 @@ static EVT_BEGIN(marco_init)
 EVT_END()
 
 static EVT_BEGIN(marco_talk)
-    SWITCH(GSW(0))
-        CASE_EQUAL(241)
-        IF_INT_EQUAL(GSWF(3141), 0)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG5_18_03_MARCOS_JEWEL)
+        IF_INT_EQUAL(GSWF(GSWF_MUJ05_FLAVIO_HUMMING_STOPPED), 0)
             DELETE_EVENT(GW(2))
             CALL(evt_msg_close, STRING("stg5_muj_93_02_00"))
         END_IF
-        SET_VALUE(GSWF(3141), 1)
-        IF_INT_EQUAL(GSWF(3139), 0)
-            CALL(evt_pouch_check_item, 71, LW(0))
+        SET_VALUE(GSWF(GSWF_MUJ05_FLAVIO_HUMMING_STOPPED), 1)
+        IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
+            CALL(evt_pouch_check_item, ITEM_SKULL_GEM, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-                IF_INT_EQUAL(GSWF(3142), 0)
+                IF_INT_EQUAL(GSWF(GSWF_MUJ05_FLAVIO_SKULL_ROCK_HINT), 0)
                     CALL(evt_msg_print, 0, STRING("stg5_muj_93_02"), 0, STRING("マルコ"))
-                    IF_INT_EQUAL(GSWF(3140), 0)
+                    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_ROCK_EXAMINED), 0)
                         RETURN
                     END_IF
                     CALL(evt_mario_dispflag_onoff, 1, 2)
@@ -405,7 +322,7 @@ static EVT_BEGIN(marco_talk)
                     WAIT_MS(1000)
                     CALL(evt_mario_dispflag_onoff, 0, 2)
                 END_IF
-                SET_VALUE(GSWF(3142), 1)
+                SET_VALUE(GSWF(GSWF_MUJ05_FLAVIO_SKULL_ROCK_HINT), 1)
                 CALL(evt_msg_print, 0, STRING("stg5_muj_93_03"), 0, STRING("マルコ"))
                 CALL(evt_msg_select, 0, STRING("stg5_muj_93_03_select"))
                 SWITCH(LW(0))
@@ -415,22 +332,22 @@ static EVT_BEGIN(marco_talk)
                     CALL(evt_msg_print_add, 0, STRING("stg5_muj_93_03_02"))
                     CASE_EQUAL(2)
                     CALL(evt_msg_print_add, 0, STRING("stg5_muj_93_03_03"))
-                    CALL(evt_item_entry, STRING("jewel"), 71, 0, -1000, 0, 16, -1, 0)
-                    CALL(evt_item_flag_on, STRING("jewel"), 2)
+                    CALL(evt_item_entry, STRING("jewel"), ITEM_SKULL_GEM, 0, -1000, 0, 16, -1, 0)
+                    CALL(evt_item_flag_on, STRING("jewel"), ITEM_FLAG_NO_TOUCH)
                     CALL(evt_item_get_item, STRING("jewel"))
                 END_SWITCH
-                ELSE
+            ELSE
                 CALL(evt_msg_print, 0, STRING("stg5_muj_93_05"), 0, STRING("マルコ"))
             END_IF
-            ELSE
+        ELSE
             IF_INT_EQUAL(GW(12), 0)
                 CALL(evt_msg_print, 0, STRING("stg5_muj_93_06"), 0, STRING("マルコ"))
-                ELSE
+            ELSE
                 CALL(evt_msg_print, 0, STRING("stg5_muj_93_07"), 0, STRING("マルコ"))
                 SET_VALUE(GW(12), 0)
             END_IF
         END_IF
-        CASE_EQUAL(242)
+        CASE_EQUAL(STORY_STG5_19_SKULL_ROCK)
         CALL(evt_msg_print, 0, STRING("stg5_muj_93_09"), 0, STRING("マルコ"))
     END_SWITCH
     RETURN
@@ -442,11 +359,11 @@ static EVT_BEGIN(erumosu_regl)
 EVT_END()
 
 EVT_BEGIN(erumosu_a_dead)
-    SET_VALUE(GSWF(3137), 1)
+    SET_VALUE(GSWF(GSWF_MUJ05_EMBERS_DEFEATED), 1)
     DELETE_EVENT(GW(0))
     DELETE_EVENT(GW(2))
     CALL(evt_npc_set_position, STRING("エルモス１"), 0, -1000, 0)
-    CALL(evt_run_case_evt, 13, 1, STRING("A_ki_02_01"), 0, PTR(sanders_kyushutsu_sub), 0)
+    CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, STRING("A_ki_02_01"), 0, PTR(sanders_kyushutsu_sub), 0)
     RETURN
 EVT_END()
 
@@ -460,7 +377,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         sanders_init, // initEvent
         NULL, // regularEvent
@@ -472,7 +389,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         marco_init, // initEvent
         NULL, // regularEvent
@@ -484,7 +401,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"エルモス１"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x82\x50", // name
-        0x608, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_ENEMY, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
         erumosu_regl, // regularEvent
@@ -501,7 +418,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"エルモス２"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x82\x51", // name
-        0x608, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_ENEMY, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
         erumosu_regl, // regularEvent
@@ -522,7 +439,7 @@ static NpcSetupInfo npcEnt[] = {
 NpcSetupInfo npcEnt_after[] = {
     {
         /*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         sanders_init, // initEvent
         NULL, // regularEvent
@@ -534,7 +451,7 @@ NpcSetupInfo npcEnt_after[] = {
     },
     {
         /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         marco_init, // initEvent
         NULL, // regularEvent
@@ -551,8 +468,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -567,8 +484,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -592,16 +509,16 @@ EVT_BEGIN(hammer_sub)
 EVT_END()
 
 EVT_BEGIN(hammer_event)
-    CALL(evt_run_case_evt, 13, 1, STRING("A_ki_02_01"), 0, PTR(hammer_sub), 0)
+    CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, STRING("A_ki_02_01"), 0, PTR(hammer_sub), 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(sanders_kyushutsu_sub)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
-    SET_VALUE(GSW(0), 235)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_15_RUNAWAY_SAILORS)
     CALL(evt_msg_print, 0, STRING("stg5_muj_33_01"), 0, STRING("サンダース"))
-    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     IF_INT_LESS_OR_EQUAL(LW(0), -110)
         CALL(evt_npc_set_ry, STRING("サンダース"), 270)
@@ -615,7 +532,7 @@ EVT_BEGIN(sanders_kyushutsu_sub)
             WAIT_MS(500)
             CALL(evt_mario_set_dir, 90, 200, 0)
         END_INLINE_EVENT
-        ELSE
+    ELSE
         CALL(evt_npc_set_ry, STRING("サンダース"), 90)
         CALL(evt_npc_set_position, STRING("サンダース"), -150, 200, 23)
         BEGIN_INLINE_EVENT
@@ -629,8 +546,8 @@ EVT_BEGIN(sanders_kyushutsu_sub)
         END_INLINE_EVENT
     END_IF
     CALL(evt_hitobj_onoff, STRING("A_ki_02_02"), 0, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("サンダース"), 131088)
-    CALL(evt_npc_flag_onoff, 0, STRING("サンダース"), 1024)
+    CALL(evt_npc_flag_onoff, 1, STRING("サンダース"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
+    CALL(evt_npc_flag_onoff, 0, STRING("サンダース"), NPC_FLAG_MOVE_ANIM)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_THUNDERS_FALL1"), 85, 40, 23, LW(10))
         LOOP(0)
@@ -654,8 +571,8 @@ EVT_BEGIN(sanders_kyushutsu_sub)
     WAIT_MS(1500)
     CALL(evt_npc_set_anim, STRING("サンダース"), STRING("S_1"))
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 1, STRING("サンダース"), 1024)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_ORGEL1"))
+    CALL(evt_npc_flag_onoff, 1, STRING("サンダース"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_ORGEL1"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_34"), 0, STRING("サンダース"))
     CALL(evt_cam3d_evt_set, -105, 120, 324, -105, 62, 3, 500, 11)
     WAIT_MS(500)
@@ -669,7 +586,7 @@ EVT_BEGIN(sanders_kyushutsu_sub)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_MUJ1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
     SPAWN_EVENT(PTR(hammer_event))
     CALL(evt_exit_case_evt)
     RETURN
@@ -692,7 +609,7 @@ EVT_END()
 
 EVT_BEGIN(sanders_kyushutsu)
     CALL(evt_npc_set_position, STRING("サンダース"), -88, 200, -34)
-    IF_INT_EQUAL(GSWF(3137), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_EMBERS_DEFEATED), 0)
         CALL(evt_npc_set_position, STRING("エルモス１"), -158, 23, 0)
         CALL(evt_npc_set_position, STRING("エルモス２"), -68, 23, 0)
         CALL(evt_npc_set_link, STRING("エルモス１"), STRING("エルモス２"))
@@ -704,8 +621,8 @@ EVT_BEGIN(sanders_kyushutsu)
         SET_VALUE(LW(0), STRING("エルモス２"))
         SPAWN_EVENT_GET_ID(PTR(erumosu_guruguru), GW(1))
         SPAWN_EVENT_GET_ID(PTR(erumosu_guruguru_dir), GW(3))
-        ELSE
-        CALL(evt_run_case_evt, 13, 1, STRING("A_ki_02_01"), 0, PTR(sanders_kyushutsu_sub), 0)
+    ELSE
+        CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, STRING("A_ki_02_01"), 0, PTR(sanders_kyushutsu_sub), 0)
     END_IF
     RETURN
 EVT_END()
@@ -736,7 +653,7 @@ EVT_BEGIN(marco_and_jewel)
     CALL(evt_npc_set_ry, STRING("マルコ"), 90)
     SPAWN_EVENT_GET_ID(PTR(marco_hanauta), GW(2))
     CALL(evt_mario_clear_party, 1)
-    SET_VALUE(GSW(0), 241)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_18_03_MARCOS_JEWEL)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -795,26 +712,26 @@ static s32 itemsel_table[] = {
 };
 
 EVT_BEGIN(dokuroiwa_touch)
-    CALL(evt_pouch_check_item, 71, LW(0))
+    CALL(evt_pouch_check_item, ITEM_SKULL_GEM, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg5_muj_93_01"), 0, 0)
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 240)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_18_02_FLAVIOS_FAVOR_2)
             CALL(evt_party_stop, 0)
             CALL(evt_msg_print_party, STRING("stg5_muj_93_01_01"))
             CALL(evt_party_run, 0)
-            SET_VALUE(GSWF(3140), 1)
+            SET_VALUE(GSWF(GSWF_MUJ05_SKULL_ROCK_EXAMINED), 1)
         END_IF
         CALL(evt_mario_key_onoff, 1)
-        ELSE
+    ELSE
         CALL(evt_win_item_select, 0, PTR(itemsel_table), LW(0), 0)
         IF_INT_EQUAL(LW(0), -1)
             RETURN
         END_IF
         CALL(evt_mapobj_get_position, STRING("S_jel"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_JUWEL_SET1"), LW(0), LW(1), LW(2), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_jel"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_jel"), MAPOBJ_FLAG_HIDE)
         BEGIN_INLINE_EVENT
             WAIT_MS(400)
             SPAWN_EVENT(PTR(blueeye_flush))
@@ -832,8 +749,8 @@ EVT_BEGIN(dokuroiwa_touch)
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
-        CALL(evt_mario_dump_item, 71)
-        SET_VALUE(GSWF(3139), 1)
+        CALL(evt_mario_dump_item, ITEM_SKULL_GEM)
+        SET_VALUE(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 1)
         CALL(evt_exit_case_evt)
     END_IF
     RETURN
@@ -841,11 +758,11 @@ EVT_END()
 
 EVT_BEGIN(case_event_entry)
     SET_VALUE(GF(10), 0)
-    CALL(evt_run_case_evt, 13, 1, STRING("A_iwa01"), 0, PTR(iwa01_hammer), GW(5))
-    CALL(evt_run_case_evt, 4, 1, STRING("A_iwa01"), 0, PTR(iwa01_ride_a), GW(6))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_ride), GW(7))
-    CALL(evt_run_case_evt, 13, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_hammer), GW(8))
-    CALL(evt_run_case_evt, 4, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_ride_a), GW(9))
+    CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, STRING("A_iwa01"), 0, PTR(iwa01_hammer), GW(5))
+    CALL(evt_run_case_evt, CASE_COND_JUMP_FROM_A, 1, STRING("A_iwa01"), 0, PTR(iwa01_ride_a), GW(6))
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_ride), GW(7))
+    CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_hammer), GW(8))
+    CALL(evt_run_case_evt, CASE_COND_JUMP_FROM_A, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_ride_a), GW(9))
     RETURN
 EVT_END()
 
@@ -872,9 +789,9 @@ EVT_BEGIN(penalty_event)
     CALL(evt_mario_key_onoff, 0)
     DELETE_EVENT(GW(2))
     CALL(evt_msg_close, STRING("stg5_muj_93_02_00"))
-    CALL(evt_npc_flag_onoff, 1, STRING("エルモスA"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("エルモスB"), 1073741856)
-    CALL(evt_npc_flag_onoff, 1, STRING("エルモスC"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("エルモスA"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("エルモスB"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("エルモスC"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
         ADD(LW(0), -23)
         ADD(LW(2), -20)
@@ -925,11 +842,11 @@ static EVT_BEGIN(cam_shake)
     LABEL(0)
     CALL(evt_sub_intpl_get_value)
     DIVIDE_FLOAT(LW(0), FLOAT(1000.0f))
-    CALL(evt_cam_shake, 4, LW(0), FLOAT(0.0f), 100)
+    CALL(evt_cam_shake, CAMERA_3D, LW(0), FLOAT(0.0f), 100)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 0)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 0)
     RETURN
 EVT_END()
 
@@ -938,7 +855,7 @@ static EVT_BEGIN(cam_shake2)
     LABEL(0)
     CALL(evt_sub_intpl_get_value)
     DIVIDE_FLOAT(LW(0), FLOAT(1000.0f))
-    CALL(evt_cam_shake, 4, LW(0), FLOAT(0.0f), 100)
+    CALL(evt_cam_shake, CAMERA_3D, LW(0), FLOAT(0.0f), 100)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
@@ -977,7 +894,7 @@ EVT_BEGIN(answer_event)
     CALL(evt_map_checkanim, STRING("S-dkr_iwa"), LW(0), LW(1))
     WAIT_MS(LW(1))
     WAIT_MS(1000)
-    SET_VALUE(GSWF(3149), 1)
+    SET_VALUE(GSWF(GSWF_MUJ05_SKULL_ROCK_OPENED), 1)
     CALL_CHILD(PTR(case_event_delete))
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
@@ -988,7 +905,7 @@ EVT_BEGIN(iwa01_hammer)
     IF_INT_EQUAL(GF(10), 1)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3139), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
         RETURN
     END_IF
     CALL(evt_mapobj_get_position, STRING("S_hige_iwa03_me"), LW(0), LW(1), LW(2))
@@ -1015,7 +932,7 @@ EVT_BEGIN(iwa01_hammer)
 EVT_END()
 
 EVT_BEGIN(iwa01_ride_a)
-    IF_INT_EQUAL(GSWF(3139), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
         RETURN
     END_IF
     CALL(evt_mapobj_get_position, STRING("S_hige_iwa03_me"), LW(0), LW(1), LW(2))
@@ -1032,7 +949,7 @@ EVT_BEGIN(iwa02_ride)
         RETURN
     END_IF
     SET_VALUE(GW(13), 1)
-    IF_INT_EQUAL(GSWF(3139), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
         RETURN
     END_IF
     SPAWN_EVENT(PTR(redeye_flush))
@@ -1055,7 +972,7 @@ EVT_BEGIN(iwa02_ride)
 EVT_END()
 
 EVT_BEGIN(iwa02_hammer)
-    IF_INT_EQUAL(GSWF(3139), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
         RETURN
     END_IF
     CALL(evt_mapobj_get_position, STRING("S_hige_iwa02_me"), LW(0), LW(1), LW(2))
@@ -1068,7 +985,7 @@ EVT_BEGIN(iwa02_ride_a)
     IF_INT_EQUAL(LW(0), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(3139), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
         RETURN
     END_IF
     CALL(evt_mapobj_get_position, STRING("S_hige_iwa02_me"), LW(0), LW(1), LW(2))
@@ -1103,11 +1020,11 @@ static EVT_BEGIN(bombwall_bomb)
         CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, LW(10), LW(11), LW(12), LW(13))
         CALL(evt_img_clear_virtual_point, STRING("capture_img"))
         CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dokuro_iwa"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dokuro_iwa"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_dokuro_iwa"), 1, 0)
         CALL(evt_img_wait_animend, STRING("capture_img"))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dokuro_iwa"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dokuro_iwa"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_dokuro_iwa"), 1, 0)
     END_IF
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_dokuro_iwa"))
@@ -1133,32 +1050,32 @@ EVT_BEGIN(dokuroiwa_bomb)
     CALL(evt_mapobj_get_position, STRING("S_dokuro_iwa"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_OBJ_ROCK_BREAK1"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
         WAIT_MS(2000)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.029296875f), FLOAT(0.0f), 1000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.029296875f), FLOAT(0.0f), 1000)
     END_INLINE_EVENT
     CALL_CHILD(PTR(bombwall_bomb))
     CALL(evt_hitobj_onoff, STRING("A_dkr_iwa_futa02"), 1, 0)
-    IF_INT_EQUAL(GSWF(3141), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_FLAVIO_HUMMING_STOPPED), 0)
         DELETE_EVENT(GW(2))
         CALL(evt_msg_close, STRING("stg5_muj_93_02_00"))
     END_IF
     CALL(evt_npc_set_ry, STRING("マルコ"), 90)
     CALL(evt_cam3d_evt_set, 280, 115, 333, 280, 55, -11, 500, 11)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 1, STRING("マルコ"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("マルコ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_get_position, STRING("マルコ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_jump_position_nohit, STRING("マルコ"), LW(0), LW(1), LW(2), 225, 30)
     CALL(evt_npc_jump_position_nohit, STRING("マルコ"), LW(0), LW(1), LW(2), 225, 30)
     CALL(evt_msg_print, 0, STRING("stg5_muj_93_08"), 0, STRING("マルコ"))
-    CALL(evt_item_entry, STRING("jewel00"), 71, 225, 200, -25, 13, -1, 0)
+    CALL(evt_item_entry, STRING("jewel00"), ITEM_SKULL_GEM, 225, 200, -25, 13, -1, 0)
     SET_VALUE(LW(8), STRING("jewel00"))
-    CALL(evt_item_flag_on, LW(8), 16)
+    CALL(evt_item_flag_on, LW(8), ITEM_FLAG_CUSTOM_BOUNCE)
     CALL(evt_item_set_gravity, LW(8), FLOAT(1.0f))
     CALL(evt_item_set_bound_rate, LW(8), FLOAT(0.69921875f))
     CALL(evt_item_set_jump_power, LW(8), FLOAT(0.0f))
@@ -1202,53 +1119,53 @@ EVT_BEGIN(dokuroiwa_bomb)
     CALL(evt_npc_set_position, STRING("マルコ"), 0, -1000, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSW(0), 242)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_SKULL_ROCK)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(dokuroiwa_init)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_jel"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_jel"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_dkr_iwa_futa02"), 1, 0)
     CALL(evt_dokuroiwa_command_init)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 242)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dokuro_iwa"), 1)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_SKULL_ROCK)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dokuro_iwa"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_dokuro_iwa"), 1, 0)
         RETURN
     END_IF
     CALL(evt_hitobj_onoff, STRING("e_bero"), 1, 0)
-    IF_INT_EQUAL(GSWF(3139), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
         CALL(evt_mapobj_scale, 1, STRING("S_hige_iwa02_me"), 1, 0, 1)
         CALL(evt_mapobj_scale, 1, STRING("S_hige_iwa03_me"), 1, 0, 1)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_jel"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_jel"), MAPOBJ_FLAG_HIDE)
     END_IF
     SET_VALUE(GW(10), 0)
     SET_VALUE(GW(12), 0)
     SET_VALUE(GW(13), 0)
-    IF_INT_EQUAL(GSWF(3139), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_dkr_iwa_01"), 0, PTR(dokuroiwa_touch), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_GEM_PLACED), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_dkr_iwa_01"), 0, PTR(dokuroiwa_touch), 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3149), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_SKULL_ROCK_OPENED), 0)
         CALL_CHILD(PTR(case_event_entry))
-        CALL(evt_run_case_evt, 1, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_nonride_a), 0)
-        ELSE
+        CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_iwa_atari"), 0, PTR(iwa02_nonride_a), 0)
+    ELSE
         CALL(evt_map_playanim, STRING("S-dkr_iwa"), 2, 0)
         CALL(evt_hitobj_onoff, STRING("A_dkr_iwa_futa"), 1, 0)
         CALL(evt_hitobj_onoff, STRING("A_dkr_iwa_futa02"), 1, 1)
     END_IF
     CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
-    CALL(evt_run_case_evt, 15, 1, STRING("A_dkr_iwa_02_oku_01"), 0, PTR(dokuroiwa_bomb), 0)
+    CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_dkr_iwa_02_oku_01"), 0, PTR(dokuroiwa_bomb), 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(muj_05_first)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_normalize)
     CALL(evt_msg_print, 0, STRING("stg5_muj_33"), 0, STRING("サンダース"))
-    SET_VALUE(GSWF(3136), 1)
+    SET_VALUE(GSWF(GSWF_MUJ05_FIRST_VISIT_SCENE), 1)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -1273,7 +1190,7 @@ EVT_BEGIN(yure_yashi_ha1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 235)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_15_RUNAWAY_SAILORS)
             RETURN
         END_IF
     END_LOOP
@@ -1296,7 +1213,7 @@ EVT_BEGIN(yure_yashi_ha1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 235)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_15_RUNAWAY_SAILORS)
             RETURN
         END_IF
     END_LOOP
@@ -1317,7 +1234,7 @@ EVT_BEGIN(yure_yashi)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
-            IF_INT_GREATER_OR_EQUAL(GSW(0), 235)
+            IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_15_RUNAWAY_SAILORS)
                 RETURN
             END_IF
         END_LOOP
@@ -1329,7 +1246,7 @@ EVT_BEGIN(yure_yashi)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
-            IF_INT_GREATER_OR_EQUAL(GSW(0), 235)
+            IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_15_RUNAWAY_SAILORS)
                 RETURN
             END_IF
         END_LOOP
@@ -1341,7 +1258,7 @@ EVT_END()
 static EVT_BEGIN(evt_kusa_1)
     CALL(evt_item_delete_check, STRING("item_kusa_1"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_1"), 177, 235, 0, 90, 4, GSWF(3157), 0)
+        CALL(evt_item_entry, STRING("item_kusa_1"), ITEM_SPITE_POUCH, 235, 0, 90, 4, GSWF(GSWF_MUJ05_BUSH_SPITE_POUCH_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -1367,49 +1284,48 @@ static KusaAccess kusa_tbl[] = {
 };
 
 EVT_BEGIN(muj_05_init_evt)
-    SWITCH(GSW(0))
-        CASE_EQUAL(234)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ7"))
-        CASE_EQUAL(238)
-        CALL(evt_snd_bgmoff, 512)
-        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ7"))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ7"))
+        CASE_EQUAL(STORY_STG5_18_BOBBERY_RESCUE_2)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ7"))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_MUJ1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG5_MUJ7"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ7"))
     END_SWITCH
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
-    IF_INT_EQUAL(GSWF(3137), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MUJ05_EMBERS_DEFEATED), 0)
         CALL(evt_npc_setup, PTR(npcEnt))
     ELSE
         CALL(evt_npc_setup, PTR(npcEnt_after))
     END_IF
-    CALL(evt_npc_sound_data_set, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), -250000000, -250000000, -250000000)
+    CALL(evt_npc_sound_data_set, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     CALL(evt_map_playanim, STRING("S_mizu"), 1, 0)
     SPAWN_EVENT(hammer_event)
-    SWITCH(GSW(0))
-        CASE_EQUAL(234)
-        IF_INT_EQUAL(GSWF(3136), 0)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE)
+        IF_INT_EQUAL(GSWF(GSWF_MUJ05_FIRST_VISIT_SCENE), 0)
             SPAWN_EVENT(muj_05_first)
         END_IF
         SPAWN_EVENT(sanders_kyushutsu)
         SPAWN_EVENT(yure_yashi)
-        CASE_EQUAL(240)
+        CASE_EQUAL(STORY_STG5_18_02_FLAVIOS_FAVOR_2)
         SPAWN_EVENT(marco_and_jewel)
     END_SWITCH
     SPAWN_EVENT(dokuroiwa_init)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 274)
-        CALL(evt_item_entry, STRING("item00"), 73, -250, 0, -110, 0, GSWF(3143), 0)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_63_KEELHAUL_ANYTIME)
+        CALL(evt_item_entry, STRING("item00"), ITEM_WEDDING_RING, -250, 0, -110, 0, GSWF(GSWF_MUJ05_WEDDING_RING_TAKEN), 0)
     END_IF
     CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 12, 125, 60, -90, 0, 0)
-    CALL(evt_item_entry, STRING("item_01"), 125, 395, -15, 120, 16, GSWF(5643), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 395, -15, 120, 16, GSWF(GSWF_MUJ05_STAR_PIECE), 0)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(evt_sub_tree_access_entry)
     SET_VALUE(LW(0), PTR(kusa_tbl))
     CALL_CHILD(evt_sub_kusa_access_entry)
     RETURN
 EVT_END()
-

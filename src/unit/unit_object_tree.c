@@ -1,3 +1,4 @@
+// Battle unit data for the tree stage object (unit_object_tree).
 #include "battle/battle.h"
 #include "battle/battle_stage_object.h"
 #include "battle/battle_sub.h"
@@ -5,20 +6,16 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
+#include "battle/battle_event_cmd.h"
+#include "version.h"
 
 USER_FUNC(_rumble_tree);
 USER_FUNC(_turn_tree);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetMaxMoveCount);
-USER_FUNC(btlevtcmd_StartWaitEvent);
 
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[25];
 static EvtWord damage_event[14];
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 static s32 _data[34];
 #else
 static s32 _data[35];
@@ -89,7 +86,7 @@ BattleUnitKind unit_object_tree = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x12003001,
+    UNIT_ATTR_TARGET_SORT_OFFSET | UNIT_ATTR_NO_GRAVITY_BOB | UNIT_ATTR_ACTS_IN_ZERO_GRAVITY | UNIT_ATTR_NO_HP_GAUGE | UNIT_ATTR_IGNORE_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -107,7 +104,7 @@ static PoseTableEntry pose_table[] = {
     {28, "M_S_1"},
     {31, "M_S_1"},
     {39, "M_O_1"},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {67, "M_S_1"},
 #else
     {69, "M_S_1"},
@@ -119,29 +116,29 @@ static BattleDataEntry data_table[] = {
 };
 
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_tree", "b_mario", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3000009, 0, pose_table},
+    {1, "btl_un_tree", "b_mario", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, 0, pose_table},
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetMaxMoveCount, -2, 0)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(_rumble_tree, -2)
+    CALL(_rumble_tree, BTL_UNIT_SELF)
     CALL(_turn_tree, -2)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -150,7 +147,7 @@ static s32 _data[] = {
     -13, 0, 12, 0, -11, 0, 10, 0,
     -9, 0, 8, 0, -7, 0, 6, 0,
     -6, 0, 5, 0, -4, 0, 2, 0,
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     -2, 0,
 #else
     -2, 0, 0,
@@ -176,7 +173,7 @@ USER_FUNC(_rumble_tree) {
     if (isFirstCall) {
         event->userdata[0] = 0;
     }
-    object->mPosition.y += _data[event->userdata[0]];
+    object->position.y += _data[event->userdata[0]];
     event->userdata[0]++;
     if ((u32)event->userdata[0] >= 34) {
         return EVT_RETURN_DONE;
@@ -197,9 +194,9 @@ USER_FUNC(_turn_tree) {
     }
     event->userdata[0] += 3;
     if (event->userdata[0] > 90) {
-        object->mRotation.x = 0.0f;
+        object->rotation.x = 0.0f;
         return EVT_RETURN_DONE;
     }
-    object->mRotation.x = event->userdata[0];
+    object->rotation.x = event->userdata[0];
     return EVT_RETURN_BLOCK;
 }

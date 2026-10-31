@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: hagetaka flash, a 10-frame green twinkle that grows and then shrinks over its last 4
+// frames; itemdrv spawns it at random around coins and Pianta tokens.
 #include "eff/n64/eff_hagetaka_flush_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -5,6 +7,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "version.h"
 
 typedef struct EffHagetakaFlushN64Work {
     s32 type;      // 0x0
@@ -19,7 +22,7 @@ typedef struct EffHagetakaFlushN64Work {
     f32 scale;     // 0x2C
 } EffHagetakaFlushN64Work;
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo defines the colours first
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
@@ -35,7 +38,7 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, 8, 0, 0, 3072, 0, 0, 0, 255},
 };
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
     0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,
@@ -46,7 +49,7 @@ static u8 color_rotation_data[] = {
 void effHagetakaFlushMain(EffectEntry* effect);
 void effHagetakaFlushDisp(CameraId cameraId, EffectEntry* effect);
 
-EffectEntry* effHagetakaFlushN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
+EffectEntry* effHagetakaFlushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffHagetakaFlushN64Work* work;
 
@@ -56,7 +59,7 @@ EffectEntry* effHagetakaFlushN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffHagetakaFlushN64Work));
     effect->userdata = work;
     effect->callback = effHagetakaFlushMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     work->timer = 10;
@@ -82,8 +85,8 @@ void effHagetakaFlushMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 10;
     }
     if (work->timer < 1000) {

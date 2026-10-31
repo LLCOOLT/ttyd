@@ -1,3 +1,5 @@
+// Paper Mario 64 smoke effect 2 (kemuri: smoke) drifting along a direction (dirX, dirZ); types 0-2.
+#include "eff/n64/eff_kemuri2_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -8,19 +10,19 @@
 #include <dolphin/mtx.h>
 
 typedef struct EffKemuri2N64Work {
-    s32 active;     // 0x0
-    u16 type;       // 0x4
-    u8 pad_6[2];    // 0x6
-    Vec position;   // 0x8
+    s32 active;   // 0x0
+    u16 type;     // 0x4
+    u8 pad_6[2];  // 0x6
+    Vec position; // 0x8
     u8 pad_14[0x44 - 0x14];
-    f32 speed;      // 0x44, sideways speed along (dirX, dirZ)
-    f32 velY;       // 0x48
-    f32 accelY;     // 0x4C
-    f32 dirX;       // 0x50
-    f32 dirZ;       // 0x54
-    s32 kind;       // 0x58
-    s32 counter;    // 0x5C
-    s32 frame;      // 0x60
+    f32 speed;   // 0x44, sideways speed along (dirX, dirZ)
+    f32 velY;    // 0x48
+    f32 accelY;  // 0x4C
+    f32 dirX;    // 0x50
+    f32 dirZ;    // 0x54
+    s32 kind;    // 0x58
+    s32 counter; // 0x5C
+    s32 frame;   // 0x60
 } EffKemuri2N64Work;
 
 static s8 anim_data_0[] = {0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, -1};

@@ -1,3 +1,5 @@
+// aji_17 (敵のアジト, X-Naut Fortress): TEC's room: Peach's talks with TEC, the e-mails to Mario, the dance
+// (peach_evt_dance), and TEC's shutdown (evt_emergency, evt_last).
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -22,15 +24,43 @@
 #include "evt/evt_memcard.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "evt/evt_shuryolight.h"
+#include "pmario_sound.h"
 #include "aji.h"
-#ifdef VERSION_G8ME01
-USER_FUNC(N_evt_sub_status_gauge_force_update);
-#endif
+#include "libc_decls.h"
+#include "evt/evt_story.h"
+#include <dolphin/pad.h>
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
-typedef struct DanceData { u16 flags; u8 step; u8 movePos; f32 cx; f32 cy; f32 rot; } DanceData;
-double sin(double x);
-double cos(double x);
-typedef struct HorogramWork { void* buf0; void* buf1; GXTexObj tex0; GXTexObj tex1; u16 ready; u16 flags; } HorogramWork;
+typedef struct DanceData {
+    u16 flags;
+    u8 step;
+    u8 movePos;
+    f32 cx;
+    f32 cy;
+    f32 rot;
+} DanceData;
+typedef struct HorogramWork {
+    void* buf0;
+    void* buf1;
+    GXTexObj tex0;
+    GXTexObj tex1;
+    u16 ready;
+    u16 flags;
+} HorogramWork;
 HorogramWork* horogram_wp;
 DanceData dance_dt;
 void peach_capture(CameraId cameraId, void* param);
@@ -39,11 +69,10 @@ void disp_horogram(CameraId cameraId, void* param);
 void disp_horogram(CameraId cameraId, void* param);
 void noiseDisp(CameraId cameraId, void* param);
 void noiseDisp(CameraId cameraId, void* param);
-int rand(void);
 
 static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall);
 static USER_FUNC(bgm_start_wait);
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 static USER_FUNC(wait_move_end_50hz);
 #endif
 s32 btn_check(EventEntry* event, BOOL isFirstCall);
@@ -66,101 +95,10 @@ s32 dance_reverse(EventEntry* event, BOOL isFirstCall);
 s32 dance_reverse(EventEntry* event, BOOL isFirstCall);
 s32 disp_horogram_evt(EventEntry* event, BOOL isFirstCall);
 s32 disp_horogram_evt(EventEntry* event, BOOL isFirstCall);
-s32 evt_bero_exec_wait(EventEntry* event, BOOL isFirstCall);
-s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
-s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_evt_off(EventEntry* event, BOOL isFirstCall);
-s32 evt_cam3d_evt_set(EventEntry* event, BOOL isFirstCall);
-s32 evt_eff_fukidashi(EventEntry* event, BOOL isFirstCall);
-s32 evt_eff_softdelete(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_end_wait(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_in(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_out(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_set_mapchange_type(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_softfocus_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_fade_tec_onoff(EventEntry* event, BOOL isFirstCall);
 s32 evt_fuki_btn(EventEntry* event, BOOL isFirstCall);
 s32 evt_fuki_btn(EventEntry* event, BOOL isFirstCall);
 s32 evt_fuki_btn_set_batu(EventEntry* event, BOOL isFirstCall);
 s32 evt_fuki_btn_set_batu(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_checkanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_pauseanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_playanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_replayanim(EventEntry* event, BOOL isFirstCall);
-s32 evt_map_set_blend(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_rotate(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_scale(EventEntry* event, BOOL isFirstCall);
-s32 evt_mapobj_trans(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_adjust_dir(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_dispflag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_dispdir(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_mode(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_get_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_jump_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_key_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_kill_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_mov_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_mov_pos2(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_dir(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_dispdir(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_mode(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_pose(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_set_reardir(EventEntry* event, BOOL isFirstCall);
-s32 evt_mario_wait_move_end(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_continue(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_print(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_print_party(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_select(EventEntry* event, BOOL isFirstCall);
-s32 evt_msg_toge(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_entry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_flag_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_get_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_move_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_pera_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_anim(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_autotalkpose(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_color(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_height(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_position(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_ry(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_tribe(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_set_width(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_setup(EventEntry* event, BOOL isFirstCall);
-s32 evt_npc_status_onoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_move_pos2(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_run(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_set_dir(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_set_pos(EventEntry* event, BOOL isFirstCall);
-s32 evt_party_stop(EventEntry* event, BOOL isFirstCall);
-s32 evt_peach_set_condition(EventEntry* event, BOOL isFirstCall);
-s32 evt_pouch_all_party_recovery(EventEntry* event, BOOL isFirstCall);
-s32 evt_pouch_mario_recovery(EventEntry* event, BOOL isFirstCall);
-s32 evt_run_case_evt(EventEntry* event, BOOL isFirstCall);
-s32 evt_seq_wait(EventEntry* event, BOOL isFirstCall);
-s32 evt_shuryolight_init(EventEntry* event, BOOL isFirstCall);
-s32 evt_shuryolight_run_evt(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmoff_f(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_bgmon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envoff_f(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_envon_f(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_set_rev_mode(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfx_all_stop(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfx_vol(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxoff(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxon(EventEntry* event, BOOL isFirstCall);
-s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_get_stopwatch(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_intpl_msec_get_value(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_intpl_msec_init(EventEntry* event, BOOL isFirstCall);
-s32 evt_sub_random(EventEntry* event, BOOL isFirstCall);
 s32 get_center(EventEntry* event, BOOL isFirstCall);
 s32 get_center(EventEntry* event, BOOL isFirstCall);
 s32 get_local_rotate(EventEntry* event, BOOL isFirstCall);
@@ -200,7 +138,7 @@ void disp_horogram(CameraId cameraId, void* param);
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 s, f32 t);
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 s, f32 t);
 void noiseDisp(CameraId cameraId, void* param);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 // US: map save blocks call the US save wrapper script
 #define SAVE_EVT evt_memcard_save_wrapper
 #else
@@ -208,7 +146,6 @@ void noiseDisp(CameraId cameraId, void* param);
 #endif
 
 static BeroEntry bero_entry_data[2];
-extern EvtWord evt_emergency[];
 extern EvtWord evt_last[];
 extern EvtWord evt_last2[];
 extern EvtWord evt_camera[];
@@ -233,8 +170,8 @@ extern EvtWord peach_evt_dance[];
 EvtWord peach_evt_stg4_quiz_data[5][4];
 static NpcSetupInfo npcEnt[4];
 extern EvtWord tec_talk[];
-extern EvtWord aji_17_init_evt[];
 
+// This function is generated in source order, not deferred like the rest of the REL (removal tested).
 #pragma defer_codegen off
 s32 peach_evt_stg4_read_quiz_data(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
@@ -247,12 +184,10 @@ s32 peach_evt_stg4_read_quiz_data(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
-BOOL psndBGMStartCheck(s32 id);
-
 static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 // PAL: at 50 Hz the next dance move waits for the previous one to end (dance_dt flag 4)
 static s32 wait_move_end_50hz(EventEntry* event, BOOL isFirstCall) {
     if (gp->framerate != 50) {
@@ -284,8 +219,8 @@ static BeroEntry bero_entry_data[] = {
         ("w_bero"), // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -341,7 +276,11 @@ void noiseDisp(CameraId cameraId, void* param) {
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
     for (y = 0; y < 64; y++) {
         for (x = 0; x < 64; x++) {
-            by = y / 4; ry = y % 4; off = x / 8; w = x % 8; buf[((off << 5) + (by << 8)) + (w + ry * 8)] = (y & 1) ? 0xFF : 0;
+            by = y / 4;
+            ry = y % 4;
+            off = x / 8;
+            w = x % 8;
+            buf[((off << 5) + (by << 8)) + (w + ry * 8)] = (y & 1) ? 0xFF : 0;
         }
         n = rand() % 100 + 100;
         for (i = 0; i < n; i++) {
@@ -349,7 +288,11 @@ void noiseDisp(CameraId cameraId, void* param) {
             start = rand() % (65 - len);
             col = rand() % 255;
             for (x = start; x < start + len; x++) {
-                by = y / 4; ry = y % 4; off = x / 8; w = x % 8; buf[((off << 5) + (by << 8)) + (w + ry * 8)] = col;
+                by = y / 4;
+                ry = y % 4;
+                off = x / 8;
+                w = x % 8;
+                buf[((off << 5) + (by << 8)) + (w + ry * 8)] = col;
             }
         }
     }
@@ -393,9 +336,9 @@ void noiseDisp(CameraId cameraId, void* param) {
 }
 
 EVT_BEGIN(evt_emergency)
-    IF_INT_NOT_EQUAL(GSW(0), 376)
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_THE_LAST_MAIL)
         LOOP(0)
-            IF_INT_EQUAL(GSW(0), 376)
+            IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_THE_LAST_MAIL)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
@@ -415,7 +358,7 @@ EVT_END()
 
 EVT_BEGIN(evt_last)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_party_stop, 0)
@@ -423,13 +366,13 @@ EVT_BEGIN(evt_last)
     CALL(evt_msg_print_party, STRING(("stg7_aji_46")))
     WAIT_MS(300)
     LOOP(3)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
         WAIT_MS(100)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kurai")), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
         WAIT_MS(100)
     END_LOOP
     WAIT_MS(300)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
     WAIT_MS(300)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_MARIO_FIND1")), LW(0), LW(1), LW(2), 0)
@@ -453,7 +396,7 @@ EVT_BEGIN(evt_last)
     CALL(evt_map_playanim, STRING(("moni_1")), 0, 0)
     CALL(evt_map_checkanim, STRING(("moni_1")), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai_0")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai_0")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("moza")), 1, 0)
     CALL(evt_msg_print, 0, STRING(("stg7_aji_47")), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -631,7 +574,7 @@ EVT_END()
 
 EVT_BEGIN(evt_last2)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_set_pos, 20, 0, 20)
     CALL(evt_party_set_pos, 0, -20, 0, 20)
     CALL(evt_cam3d_evt_set, 0, 100, -170, 0, 40, 21, 0, 11)
@@ -647,7 +590,7 @@ EVT_BEGIN(evt_last2)
     WAIT_MS(300)
     CALL(evt_msg_print_party, STRING(("stg7_aji_59")))
     WAIT_MS(300)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai_0")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai_0")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("moza")), 1, 0)
     CALL(evt_msg_print, 0, STRING(("stg7_aji_60")), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -690,7 +633,7 @@ EVT_BEGIN(evt_last2)
     CALL(viewport, 0, 0, 1, 1)
     CALL(evt_fade_tec_onoff, 0, 0)
     WAIT_MS(2000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai_0")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai_0")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_set_pos, 20, 0, 35)
     CALL(evt_party_set_pos, 0, -30, 0, 35)
     CALL(evt_mario_set_dir, 270, 0, 0)
@@ -703,7 +646,7 @@ EVT_BEGIN(evt_last2)
     SPAWN_EVENT(PTR(evt_emergency))
     CALL(evt_msg_print, 0, STRING(("stg7_aji_61")), 0, 0)
     WAIT_MS(300)
-    SET_VALUE(GSW(0), 376)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_THE_LAST_MAIL)
     CALL(evt_cam3d_evt_set, 0, 92, 320, 0, 40, 24, 500, 11)
     WAIT_MS(500)
     CALL(evt_msg_print_party, STRING(("stg7_aji_62")))
@@ -772,8 +715,8 @@ EVT_END()
 
 static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -230, 0, 0)
     CALL(evt_seq_wait, 2)
@@ -806,13 +749,13 @@ static EVT_BEGIN(peach_evt_stg1)
     WAIT_MS(300)
     WAIT_MS(500)
     LOOP(3)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
         WAIT_MS(100)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kurai")), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
         WAIT_MS(100)
     END_LOOP
     WAIT_MS(300)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
     WAIT_MS(300)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(("SFX_VOICE_PEACH_SURPRISED1_3")), LW(0), LW(1), LW(2), 0)
@@ -834,7 +777,7 @@ static EVT_BEGIN(peach_evt_stg1)
     END_INLINE_EVENT
     CALL(evt_map_playanim, STRING(("moni_1")), 0, 0)
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("moza")), 1, 0)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING(("peach_aji_42")), 0, 0)
@@ -990,11 +933,11 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_msg_print, 0, STRING(("peach_aji_69")), 0, STRING(("mario")))
     WAIT_MS(500)
     SPAWN_EVENT(PTR(mail_sousin_se))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("mel")), 0, 0)
     CALL(evt_map_checkanim, STRING(("mel")), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_replayanim, 0, STRING(("moza")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_70")), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -1040,22 +983,22 @@ static EVT_BEGIN(peach_evt_stg1)
         END_IF
     END_LOOP
     WAIT_MS(2000)
-    SET_VALUE(GSW(0), 59)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 15, 300, 0, 0, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_19_PEACH_TEC)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_BLACK_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_aji_17")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_aji_17")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 2)
     CALL_CHILD(PTR(SAVE_EVT))
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfx_all_stop)
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_PEACH_A1, 0, FADE_STORY_PEACH_A3, 0)
     CALL(evt_bero_mapchange, STRING(("kpa_00")), STRING(""))
     RETURN
 EVT_END()
@@ -1332,7 +1275,7 @@ EVT_BEGIN(peach_dance_light)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(peach_evt_dance)
     CALL(evt_npc_pera_onoff, STRING("ホログラム"), 0)
     CALL(evt_npc_set_ry, STRING("ホログラム"), 180)
@@ -1354,8 +1297,8 @@ EVT_BEGIN(peach_evt_dance)
     CALL(peach_set_pose, STRING("P_O_S_1"))
     CALL(horogram_set_pose, STRING("P_O_S_2"))
     WAIT_MS(1000)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_PEACH_WALTZ1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_PEACH_WALTZ1"))
     CALL(bgm_start_wait)
     WAIT_MS(4000)
     SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(13))
@@ -1375,7 +1318,7 @@ EVT_BEGIN(peach_evt_dance)
         END_IF
         SET_VALUE(LW(1), 0)
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(12))
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         CALL(wait_move_end_50hz)
 #endif
         SPAWN_EVENT(PTR(peach_dance_move))
@@ -1396,7 +1339,7 @@ EVT_BEGIN(peach_evt_dance)
             SET_RAW_VALUE(LW(2), 2)
         END_SWITCH
         CALL_CHILD(PTR(dance_btn_disp))
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         CALL(wait_move_end_50hz)
 #endif
         SPAWN_EVENT(PTR(peach_dance_move))
@@ -1429,7 +1372,7 @@ EVT_BEGIN(peach_evt_dance)
             WAIT_FRAMES(1)
         END_LOOP
         ADD(LW(11), 2000)
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         CALL(wait_move_end_50hz)
 #endif
         SPAWN_EVENT(PTR(peach_dance_move))
@@ -1453,7 +1396,7 @@ EVT_BEGIN(peach_evt_dance)
                 SPAWN_EVENT(PTR(peach_dance_action_fail))
             END_SWITCH
         END_IF
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         CALL_CHILD(PTR(dance_btn_clear_all)) // PAL clears the buttons at once, as JP does
 #else
         BEGIN_INLINE_EVENT
@@ -1475,9 +1418,9 @@ EVT_BEGIN(peach_evt_dance)
         DELETE_EVENT(LW(12))
     END_LOOP
     DELETE_EVENT(LW(13))
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-    CALL(evt_snd_envon_f, 272, STRING("ENV_STG7_AJI4"), 2000)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_snd_envon_f, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"), 2000)
     WAIT_MS(400)
     CALL(horogram_flag_onoff, 1, 4)
     CALL(peach_set_pose, STRING("P_S_1"))
@@ -1494,7 +1437,7 @@ EVT_BEGIN(peach_evt_dance)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    CALL(evt_npc_flag_onoff, 1, STRING("ホログラム"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("ホログラム"), NPC_FLAG_HIDDEN)
     CALL_CHILD(PTR(peach_dance_light))
     SET_VALUE(LW(15), LW(10))
     CALL(evt_cam3d_evt_set, 0, 105, 243, 0, 55, -53, 1500, 11)
@@ -1552,8 +1495,8 @@ EVT_BEGIN(peach_evt_dance)
     CALL(peach_set_pose, STRING(("P_O_S_1")))
     CALL(horogram_set_pose, STRING(("P_O_S_2")))
     WAIT_MS(1000)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING(("BGM_EVT_PEACH_WALTZ1")))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING(("BGM_EVT_PEACH_WALTZ1")))
     CALL(bgm_start_wait)
     WAIT_MS(4000)
     SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(13))
@@ -1653,9 +1596,9 @@ EVT_BEGIN(peach_evt_dance)
         DELETE_EVENT(LW(12))
     END_LOOP
     DELETE_EVENT(LW(13))
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-    CALL(evt_snd_envon_f, 272, STRING(("ENV_STG7_AJI4")), 2000)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_snd_envon_f, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")), 2000)
     WAIT_MS(400)
     CALL(horogram_flag_onoff, 1, 4)
     CALL(peach_set_pose, STRING(("P_S_1")))
@@ -1672,7 +1615,7 @@ EVT_BEGIN(peach_evt_dance)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), NPC_FLAG_HIDDEN)
     CALL_CHILD(PTR(peach_dance_light))
     SET_VALUE(LW(15), LW(10))
     CALL(evt_cam3d_evt_set, 0, 105, 243, 0, 55, -53, 1500, 11)
@@ -1713,26 +1656,26 @@ EVT_END()
 static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_mode, 1)
     CALL(evt_npc_entry, STRING(("ダミー")), STRING(("c_peach")))
-    CALL(evt_npc_flag_onoff, 1, STRING(("ダミー")), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(("ダミー")), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ダミー")), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ダミー")), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_width, STRING(("ダミー")), FLOAT(20.0f))
     CALL(evt_npc_set_height, STRING(("ダミー")), FLOAT(47.0f))
     CALL(evt_npc_entry, STRING(("ホログラム")), STRING(("c_peach")))
     CALL(evt_npc_set_tribe, STRING(("ホログラム")), STRING(("ピーチ姫")))
-    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム")), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_color, STRING(("ホログラム")), 255, 255, 255, 255)
     CALL(evt_npc_set_width, STRING(("ホログラム")), FLOAT(20.0f))
     CALL(evt_npc_set_height, STRING(("ホログラム")), FLOAT(47.0f))
     CALL(evt_npc_entry, STRING(("ホログラム2")), STRING(("c_peach_r")))
     CALL(evt_npc_set_tribe, STRING(("ホログラム2")), STRING(("ピーチ姫")))
-    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム2")), 128)
-    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム2")), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム2")), NPC_FLAG_HIDDEN)
+    CALL(evt_npc_flag_onoff, 1, STRING(("ホログラム2")), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_color, STRING(("ホログラム2")), 255, 255, 255, 255)
     CALL(evt_npc_set_width, STRING(("ホログラム2")), FLOAT(20.0f))
     CALL(evt_npc_set_height, STRING(("ホログラム2")), FLOAT(47.0f))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
@@ -1740,8 +1683,8 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_map_playanim, STRING(("moza")), 1, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(horogram_init)
     WAIT_FRAMES(1)
     CALL(evt_npc_set_color, STRING(("ホログラム")), 255, 255, 255, 0)
@@ -1811,7 +1754,7 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(300)
-    CALL(evt_snd_envoff_f, 512, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
     CALL_CHILD(PTR(peach_dance_dark))
     LABEL(100)
     CALL(evt_npc_set_position, STRING(("ホログラム")), 30, 0, -68)
@@ -1869,11 +1812,11 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_msg_print, 0, STRING(("peach_aji_99")), 0, STRING(("mario")))
     WAIT_MS(500)
     SPAWN_EVENT(PTR(mail_sousin_se))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("mel")), 0, 0)
     CALL(evt_map_checkanim, STRING(("mel")), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_set_dir, 270, 200, 0)
     WAIT_MS(300)
     CALL(evt_map_replayanim, 0, STRING(("moza")))
@@ -1922,33 +1865,33 @@ static EVT_BEGIN(peach_evt_stg2)
     END_LOOP
     WAIT_MS(2000)
     CALL(evt_peach_set_condition, 0)
-    SET_VALUE(GSW(0), 114)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 15, 300, 0, 0, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_02_PEACH_SHALL_WE_DANCE)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_BLACK_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_aji_17")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_aji_17")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 5)
     CALL_CHILD(PTR(SAVE_EVT))
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfx_all_stop)
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_PEACH_A1, 0, FADE_STORY_PEACH_A3, 0)
     CALL(evt_bero_mapchange, STRING(("hei_00")), STRING(""))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
@@ -2023,18 +1966,18 @@ static EVT_BEGIN(peach_evt_stg3)
     WAIT_FRAMES(1)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING(("peach_aji_125")), 0, 0)
-    CALL(evt_fade_set_mapchange_type, 0, 10, 600, 9, 300)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_BLACK, 600, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING(("aji_01")), STRING(("e_bero_5")))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg3_1)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
@@ -2095,7 +2038,7 @@ static EVT_BEGIN(peach_evt_stg3_1)
     CALL(peach_set_pose, STRING(("P_S_4")))
     CALL(evt_cam3d_evt_set, -30, 67, -220, -30, 37, 21, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 1, 0)
     CALL(evt_mario_dispflag_onoff, 1, 512)
     CALL(evt_mario_set_dispdir, 0)
@@ -2107,7 +2050,7 @@ static EVT_BEGIN(peach_evt_stg3_1)
     CALL(evt_msg_print, 0, STRING(("peach_aji_157_04")), 0, 0)
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 0, 0)
     CALL(evt_mario_set_dispdir, 180)
     WAIT_MS(300)
@@ -2139,11 +2082,11 @@ static EVT_BEGIN(peach_evt_stg3_1)
     CALL(evt_msg_print, 0, STRING(("peach_aji_163")), 0, STRING(("mario")))
     WAIT_MS(500)
     SPAWN_EVENT(PTR(mail_sousin_se))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("mel")), 0, 0)
     CALL(evt_map_checkanim, STRING(("mel")), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_replayanim, 0, STRING(("moza")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_164")), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -2186,22 +2129,22 @@ static EVT_BEGIN(peach_evt_stg3_1)
         END_IF
     END_LOOP
     WAIT_MS(2000)
-    SET_VALUE(GSW(0), 169)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 15, 300, 0, 0, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_04_PEACH_BACK_TO_TEC)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_BLACK_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_aji_17")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_aji_17")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 8)
     CALL_CHILD(PTR(SAVE_EVT))
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfx_all_stop)
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_PEACH_A1, 0, FADE_STORY_PEACH_A3, 0)
     CALL(evt_bero_mapchange, STRING(("mri_01")), STRING(""))
     RETURN
 EVT_END()
@@ -2214,12 +2157,12 @@ EvtWord peach_evt_stg4_quiz_data[5][4] = {
 
 static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(evt_mario_set_mode, 1)
     CALL(evt_mario_kill_party, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
@@ -2300,7 +2243,7 @@ static EVT_BEGIN(peach_evt_stg4)
     CALL(peach_set_pose, STRING(("P_S_4")))
     CALL(evt_cam3d_evt_set, -30, 67, -220, -30, 37, 21, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 1, 0)
     CALL(evt_mario_dispflag_onoff, 1, 512)
     CALL(evt_mario_set_dispdir, 0)
@@ -2313,7 +2256,7 @@ static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_msg_print, 0, STRING(("peach_aji_168")), 0, 0)
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 0, 0)
     CALL(evt_mario_set_dispdir, 180)
     WAIT_MS(300)
@@ -2342,7 +2285,7 @@ static EVT_BEGIN(peach_evt_stg4)
         END_IF
         IF_INT_EQUAL(LF(0), 0)
             CALL(evt_msg_print, 0, LW(3), 0, 0)
-            ELSE
+        ELSE
             CALL(evt_msg_print, 0, STRING(("peach_aji_181_01")), 0, 0)
         END_IF
         CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -2378,7 +2321,7 @@ static EVT_BEGIN(peach_evt_stg4)
                 BREAK_LOOP
             END_IF
             ADD(LW(15), 1)
-            ELSE
+        ELSE
             CALL(evt_map_replayanim, 0, STRING(("moza")))
             CALL(evt_msg_print, 0, STRING(("peach_aji_188")), 0, 0)
             CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -2408,11 +2351,11 @@ static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_msg_print, 0, STRING(("peach_aji_192")), 0, STRING(("mario")))
     WAIT_MS(500)
     SPAWN_EVENT(PTR(mail_sousin_se))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("mel")), 0, 0)
     CALL(evt_map_checkanim, STRING(("mel")), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_replayanim, 0, STRING(("moza")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_193")), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -2462,33 +2405,33 @@ static EVT_BEGIN(peach_evt_stg4)
     END_LOOP
     WAIT_MS(2000)
     CALL(evt_peach_set_condition, 0)
-    SET_VALUE(GSW(0), 215)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 15, 300, 0, 0, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_BLACK_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_aji_17")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_aji_17")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 11)
     CALL_CHILD(PTR(SAVE_EVT))
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfx_all_stop)
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_PEACH_A1, 0, FADE_STORY_PEACH_A3, 0)
     CALL(evt_bero_mapchange, STRING(("gor_04")), 0)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
@@ -2556,7 +2499,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_msg_print, 0, STRING(("peach_aji_212")), 0, STRING(("mario")))
     CALL(evt_cam3d_evt_set, -30, 67, -220, -30, 37, 21, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 1, 0)
     CALL(evt_mario_dispflag_onoff, 1, 512)
     CALL(evt_mario_set_dispdir, 0)
@@ -2568,7 +2511,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_msg_print, 0, STRING(("peach_aji_215")), 0, 0)
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 0, 0)
     CALL(evt_mario_set_dispdir, 180)
     WAIT_MS(300)
@@ -2578,18 +2521,18 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_msg_print, 0, STRING(("peach_aji_217")), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
     CALL(evt_cam3d_evt_off, 1000, 11)
-    SET_VALUE(GSW(0), 262)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai_0")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai_0")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
@@ -2664,11 +2607,11 @@ static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_msg_print, 0, STRING(("peach_aji_265")), 0, STRING(("mario")))
     WAIT_MS(500)
     SPAWN_EVENT(PTR(mail_sousin_se))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("mel")), 0, 0)
     CALL(evt_map_checkanim, STRING(("mel")), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_meil")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_replayanim, 0, STRING(("moza")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_266")), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -2717,34 +2660,34 @@ static EVT_BEGIN(peach_evt_stg5_1)
         END_IF
     END_LOOP
     WAIT_MS(2000)
-    SET_VALUE(GSW(0), 265)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_47_PEACH_TEC_TALK)
     CALL(evt_peach_set_condition, 0)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 15, 300, 0, 0, 0)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_BLACK_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_aji_17")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_aji_17")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 14)
     CALL_CHILD(PTR(SAVE_EVT))
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfx_all_stop)
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_PEACH_A1, 0, FADE_STORY_PEACH_A3, 0)
     CALL(evt_bero_mapchange, STRING(("usu_00")), STRING(""))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
     CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
@@ -2785,7 +2728,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
     CALL(evt_cam3d_evt_set, -30, 67, -220, -30, 37, 21, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 1, 0)
     CALL(evt_mario_dispflag_onoff, 1, 512)
     CALL(evt_mario_set_dispdir, 0)
@@ -2799,7 +2742,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_msg_print, 0, STRING(("peach_aji_284")), 0, STRING(("mario")))
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 0, 0)
     CALL(evt_mario_set_dispdir, 180)
     WAIT_MS(300)
@@ -2846,7 +2789,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
     CALL(evt_cam3d_evt_set, -30, 67, -220, -30, 37, 21, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 1, 0)
     CALL(evt_mario_set_dispdir, 0)
     WAIT_MS(300)
@@ -2866,7 +2809,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_msg_print, 0, STRING(("peach_aji_298")), 0, 0)
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 0, 0)
     CALL(evt_mario_set_dispdir, 180)
     CALL(peach_set_pose, STRING(("P_S_4")))
@@ -2936,7 +2879,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_msg_print, 0, STRING(("peach_aji_304")), 0, STRING(("mario")))
     CALL(evt_cam3d_evt_set, -130, 121, 344, -130, 65, 66, 1500, 11)
     WAIT_MS(1500)
-    CALL(evt_snd_bgmon, 512, STRING(("BGM_EVT_STG8_3RDHEAD1")))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(("BGM_EVT_STG8_3RDHEAD1")))
     WAIT_MS(2000)
     CALL(evt_msg_print, 0, STRING(("peach_aji_305")), 0, STRING(("シュリョー")))
     CALL(evt_cam3d_evt_set, 0, 80, 44, 0, 130, -150, 0, 11)
@@ -2947,7 +2890,7 @@ static EVT_BEGIN(peach_evt_stg6)
         CALL(evt_npc_set_ry, STRING(("手下１")), 270)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING(("シュリョー")), 32)
+        CALL(evt_npc_flag_onoff, 1, STRING(("シュリョー")), NPC_FLAG_INTANGIBLE)
         CALL(evt_npc_move_position, STRING(("シュリョー")), -30, -70, 0, FLOAT(60.0f), 0)
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
@@ -2990,7 +2933,7 @@ static EVT_BEGIN(peach_evt_stg6)
     WAIT_MS(1400)
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING(("手下１")), 1073741824)
+        CALL(evt_npc_flag_onoff, 1, STRING(("手下１")), NPC_FLAG_NO_WALL_HIT)
         CALL(evt_npc_status_onoff, 0, STRING(("手下１")), 2)
         WAIT_FRAMES(1)
         CALL(evt_npc_move_position, STRING(("手下１")), 105, -100, 100, 0, 0)
@@ -2998,10 +2941,10 @@ static EVT_BEGIN(peach_evt_stg6)
         CALL(evt_npc_move_position, STRING(("手下１")), 105, -95, 100, 0, 0)
         WAIT_MS(100)
         CALL(evt_npc_status_onoff, 1, STRING(("手下１")), 2)
-        CALL(evt_npc_flag_onoff, 0, STRING(("手下１")), 1073741824)
+        CALL(evt_npc_flag_onoff, 0, STRING(("手下１")), NPC_FLAG_NO_WALL_HIT)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING(("手下２")), 1073741824)
+        CALL(evt_npc_flag_onoff, 1, STRING(("手下２")), NPC_FLAG_NO_WALL_HIT)
         CALL(evt_npc_status_onoff, 0, STRING(("手下２")), 2)
         WAIT_FRAMES(1)
         CALL(evt_npc_move_position, STRING(("手下２")), -105, -100, 100, 0, 0)
@@ -3009,7 +2952,7 @@ static EVT_BEGIN(peach_evt_stg6)
         CALL(evt_npc_move_position, STRING(("手下２")), -105, -95, 100, 0, 0)
         WAIT_MS(100)
         CALL(evt_npc_status_onoff, 1, STRING(("手下２")), 2)
-        CALL(evt_npc_flag_onoff, 0, STRING(("手下２")), 1073741824)
+        CALL(evt_npc_flag_onoff, 0, STRING(("手下２")), NPC_FLAG_NO_WALL_HIT)
     END_INLINE_EVENT
     CALL(evt_mapobj_get_position, STRING(("S_sui2")), LW(0), LW(1), LW(2))
     CALL(evt_mapobj_get_position, STRING(("S_sui3")), LW(3), LW(4), LW(5))
@@ -3025,7 +2968,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_msg_print, 0, STRING(("peach_aji_313")), 0, STRING(("mario")))
     CALL(evt_cam3d_evt_set, 0, 80, -249, 0, 25, 21, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 1, 0)
     CALL(evt_mario_set_dispdir, 0)
     CALL(peach_set_pose, STRING(("P_C_1")))
@@ -3035,7 +2978,7 @@ static EVT_BEGIN(peach_evt_stg6)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 0, 75, 387, 0, 75, -13, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
     CALL(evt_fade_tec_onoff, 0, 0)
     CALL(peach_set_pose, STRING(("P_S_1")))
     CALL(evt_mario_set_dispdir, 180)
@@ -3044,15 +2987,15 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_dispflag_onoff, 0, 512)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING(("peach_aji_315")), 0, 0)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_map_pauseanim, 0, STRING(("kika_3")))
     WAIT_MS(500)
     CALL(evt_map_pauseanim, 0, STRING(("kika_2")))
     WAIT_MS(500)
     CALL(evt_map_pauseanim, 0, STRING(("kika_1")))
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai_0")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("monihiraku")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai_0")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("monihiraku")), MAPOBJ_FLAG_HIDE)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING(("mario")), STRING(("P_S_1")), STRING(("P_T_1")))
     CALL(evt_msg_print, 0, STRING(("peach_aji_316")), 0, STRING(("mario")))
@@ -3073,23 +3016,23 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_cam3d_evt_set, -35, 100, 184, -35, 65, -13, 800, 11)
     WAIT_MS(800)
     CALL(evt_msg_print, 0, STRING(("peach_aji_321")), 0, STRING(("シュリョー")))
-    SET_VALUE(GSW(0), 341)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_01_PEACH_TEC_DELETED)
     WAIT_MS(2000)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
-    CALL(evt_snd_envoff_f, 512, 1000)
-    CALL(evt_fade_entry, 15, 300, 0, 0, 0)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
+    CALL(evt_fade_entry, FADE_OUT_BLACK_3D, 300, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_aji_17")), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_aji_17")), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 17)
     CALL_CHILD(PTR(SAVE_EVT))
     CALL(evt_mario_set_mode, 2)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfx_all_stop)
-    CALL(evt_fade_set_mapchange_type, 1, 57, 0, 56, 0)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_PEACH_A1, 0, FADE_STORY_PEACH_A3, 0)
     CALL(evt_bero_mapchange, STRING(("gor_01")), STRING(""))
     RETURN
 EVT_END()
@@ -3146,10 +3089,10 @@ static NpcSetupInfo npcEnt[] = {
 EVT_BEGIN(tec_talk)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_map_replayanim, 0, STRING(("moza")))
-    IF_INT_EQUAL(GSWF(4219), 0)
+    IF_INT_EQUAL(GSWF(GSWF_AJI17_TEC_TERMINAL_FIRST_TALK), 0)
         CALL(evt_msg_print, 0, STRING(("stg7_aji_tec_00")), 0, 0)
-        SET_VALUE(GSWF(4219), 1)
-        ELSE
+        SET_VALUE(GSWF(GSWF_AJI17_TEC_TERMINAL_FIRST_TALK), 1)
+    ELSE
         CALL(evt_msg_print, 0, STRING(("stg7_aji_tec_01")), 0, 0)
     END_IF
     CALL(evt_map_pauseanim, 0, STRING(("moza")))
@@ -3157,7 +3100,7 @@ EVT_BEGIN(tec_talk)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(aji_17_init_evt)
     SET_VALUE(LW(0), STRING("S_camera_1"))
     SET_VALUE(LW(1), -30)
@@ -3167,41 +3110,41 @@ EVT_BEGIN(aji_17_init_evt)
     SET_VALUE(LW(1), -60)
     SET_VALUE(LW(2), 30)
     SPAWN_EVENT(PTR(evt_camera))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_meil"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kikai_0"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("polySurface1161_q00063"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("polySurface1168_q00065"), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_meil"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kikai_0"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("polySurface1161_q00063"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("polySurface1168_q00065"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_scale, 0, STRING("ren2"), 5, 5, 1)
-    IF_INT_EQUAL(GSW(0), 58)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
         SPAWN_EVENT(PTR(peach_evt_stg1))
     END_IF
-    IF_INT_EQUAL(GSW(0), 113)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_01_PEACH_CRUMP_AND_X_NAUTS)
         SPAWN_EVENT(PTR(peach_evt_stg2))
     END_IF
-    IF_INT_EQUAL(GSW(0), 165)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         SPAWN_EVENT(PTR(peach_evt_stg3))
     END_IF
-    IF_INT_EQUAL(GSW(0), 168)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_03_PEACH_GRODUS)
         SPAWN_EVENT(PTR(peach_evt_stg3_1))
         CALL(evt_mario_kill_party, 0)
     END_IF
-    IF_INT_EQUAL(GSW(0), 214)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_04_SHADOW_SIRENS_AND_DOOPLISS)
         SPAWN_EVENT(PTR(peach_evt_stg4))
     END_IF
-    IF_INT_EQUAL(GSW(0), 261)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_43_X_NAUTS_RETREAT)
         SPAWN_EVENT(PTR(peach_evt_stg5))
     END_IF
-    IF_INT_EQUAL(GSW(0), 264)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
         SPAWN_EVENT(PTR(peach_evt_stg5_1))
     END_IF
-    IF_INT_EQUAL(GSW(0), 340)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_PEACH_GRODUS_AND_X_NAUT)
         CALL(evt_npc_setup, PTR(npcEnt))
         CALL(evt_shuryolight_init, STRING("シュリョー"))
         CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
         SPAWN_EVENT(PTR(peach_evt_stg6))
     END_IF
-    IF_INT_EQUAL(GSW(0), 375)
-        IF_INT_EQUAL(GSWF(4186), 0)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
+        IF_INT_EQUAL(GSWF(GSWF_AJI17_POST_BOSS_SCENE_STARTED), 0)
             CALL(evt_mario_get_party, LW(15))
             IF_INT_EQUAL(LW(15), 0)
                 CALL(evt_mario_set_party, 0, 1)
@@ -3210,9 +3153,9 @@ EVT_BEGIN(aji_17_init_evt)
             CALL(evt_pouch_mario_recovery)
             CALL(evt_pouch_all_party_recovery)
             CALL(N_evt_sub_status_gauge_force_update)
-            SET_VALUE(GSWF(4186), 1)
+            SET_VALUE(GSWF(GSWF_AJI17_POST_BOSS_SCENE_STARTED), 1)
             SPAWN_EVENT(PTR(evt_last))
-            ELSE
+        ELSE
             SPAWN_EVENT(PTR(evt_last2))
             SET_VALUE(LW(0), PTR(bero_entry_data))
             CALL(evt_bero_get_info)
@@ -3223,30 +3166,30 @@ EVT_BEGIN(aji_17_init_evt)
     SPAWN_EVENT(PTR(evt_emergency))
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    SWITCH(GSW(0))
-        CASE_EQUAL(58)
-        CASE_EQUAL(168)
-        CASE_EQUAL(214)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
+        CASE_EQUAL(STORY_STG3_33_03_PEACH_GRODUS)
+        CASE_EQUAL(STORY_STG4_15_04_SHADOW_SIRENS_AND_DOOPLISS)
         CASE_DEFAULT
         CALL_CHILD(evt_bero_info_run)
     END_SWITCH
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_kill_party, 0)
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI4"))
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     END_IF
-    IF_INT_GREATER(GSW(0), 402)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_kurai"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_kikai"), 1)
+    IF_INT_GREATER(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kurai"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kikai"), MAPOBJ_FLAG_HIDE)
         CALL(evt_map_playanim, STRING("kika_1"), 1, 0)
         CALL(evt_map_playanim, STRING("kika_2"), 1, 0)
         CALL(evt_map_playanim, STRING("kika_3"), 1, 0)
         CALL(evt_map_playanim, STRING("moni_1"), 2, 0)
         CALL(evt_map_playanim, STRING("moza"), 1, 0)
         CALL(evt_map_pauseanim, 0, STRING("moza"))
-        CALL(evt_run_case_evt, 9, 1, STRING("keyboard"), 0, PTR(tec_talk), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("keyboard"), 0, PTR(tec_talk), 0)
     END_IF
     CALL(evt_snd_set_rev_mode, 1)
     RETURN
@@ -3261,41 +3204,41 @@ EVT_BEGIN(aji_17_init_evt)
     SET_VALUE(LW(1), -60)
     SET_VALUE(LW(2), 30)
     SPAWN_EVENT(PTR(evt_camera))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_meil")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kikai_0")), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("polySurface1161_q00063")), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("polySurface1168_q00065")), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_meil")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kikai_0")), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("polySurface1161_q00063")), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("polySurface1168_q00065")), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_scale, 0, STRING(("ren2")), 5, 5, 1)
-    IF_INT_EQUAL(GSW(0), 58)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
         SPAWN_EVENT(PTR(peach_evt_stg1))
     END_IF
-    IF_INT_EQUAL(GSW(0), 113)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_01_PEACH_CRUMP_AND_X_NAUTS)
         SPAWN_EVENT(PTR(peach_evt_stg2))
     END_IF
-    IF_INT_EQUAL(GSW(0), 165)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         SPAWN_EVENT(PTR(peach_evt_stg3))
     END_IF
-    IF_INT_EQUAL(GSW(0), 168)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_03_PEACH_GRODUS)
         SPAWN_EVENT(PTR(peach_evt_stg3_1))
         CALL(evt_mario_kill_party, 0)
     END_IF
-    IF_INT_EQUAL(GSW(0), 214)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_04_SHADOW_SIRENS_AND_DOOPLISS)
         SPAWN_EVENT(PTR(peach_evt_stg4))
     END_IF
-    IF_INT_EQUAL(GSW(0), 261)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_43_X_NAUTS_RETREAT)
         SPAWN_EVENT(PTR(peach_evt_stg5))
     END_IF
-    IF_INT_EQUAL(GSW(0), 264)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
         SPAWN_EVENT(PTR(peach_evt_stg5_1))
     END_IF
-    IF_INT_EQUAL(GSW(0), 340)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_PEACH_GRODUS_AND_X_NAUT)
         CALL(evt_npc_setup, PTR(npcEnt))
         CALL(evt_shuryolight_init, STRING(("シュリョー")))
         CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
         SPAWN_EVENT(PTR(peach_evt_stg6))
     END_IF
-    IF_INT_EQUAL(GSW(0), 375)
-        IF_INT_EQUAL(GSWF(4186), 0)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
+        IF_INT_EQUAL(GSWF(GSWF_AJI17_POST_BOSS_SCENE_STARTED), 0)
             CALL(evt_mario_get_party, LW(15))
             IF_INT_EQUAL(LW(15), 0)
                 CALL(evt_mario_set_party, 0, 1)
@@ -3303,9 +3246,9 @@ EVT_BEGIN(aji_17_init_evt)
                 CALL(evt_pouch_mario_recovery)
                 CALL(evt_pouch_all_party_recovery)
             END_IF
-            SET_VALUE(GSWF(4186), 1)
+            SET_VALUE(GSWF(GSWF_AJI17_POST_BOSS_SCENE_STARTED), 1)
             SPAWN_EVENT(PTR(evt_last))
-            ELSE
+        ELSE
             SPAWN_EVENT(PTR(evt_last2))
             SET_VALUE(LW(0), PTR(bero_entry_data))
             CALL(evt_bero_get_info)
@@ -3316,30 +3259,30 @@ EVT_BEGIN(aji_17_init_evt)
     SPAWN_EVENT(PTR(evt_emergency))
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    SWITCH(GSW(0))
-        CASE_EQUAL(58)
-        CASE_EQUAL(168)
-        CASE_EQUAL(214)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
+        CASE_EQUAL(STORY_STG3_33_03_PEACH_GRODUS)
+        CASE_EQUAL(STORY_STG4_15_04_SHADOW_SIRENS_AND_DOOPLISS)
         CASE_DEFAULT
         CALL_CHILD(PTR(evt_bero_info_run))
     END_SWITCH
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_kill_party, 0)
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING(("BGM_STG7_DUN2")))
-        CALL(evt_snd_envon, 272, STRING(("ENV_STG7_AJI4")))
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(("BGM_STG7_DUN2")))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(("ENV_STG7_AJI4")))
     END_IF
-    IF_INT_GREATER(GSW(0), 402)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(("S_kurai")), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(("S_kikai")), 1)
+    IF_INT_GREATER(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(("S_kurai")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(("S_kikai")), MAPOBJ_FLAG_HIDE)
         CALL(evt_map_playanim, STRING(("kika_1")), 1, 0)
         CALL(evt_map_playanim, STRING(("kika_2")), 1, 0)
         CALL(evt_map_playanim, STRING(("kika_3")), 1, 0)
         CALL(evt_map_playanim, STRING(("moni_1")), 2, 0)
         CALL(evt_map_playanim, STRING(("moza")), 1, 0)
         CALL(evt_map_pauseanim, 0, STRING(("moza")))
-        CALL(evt_run_case_evt, 9, 1, STRING(("keyboard")), 0, PTR(tec_talk), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(("keyboard")), 0, PTR(tec_talk), 0)
     END_IF
     CALL(evt_snd_set_rev_mode, 1)
     RETURN
@@ -3491,7 +3434,7 @@ void peach_capture(CameraId cameraId, void* param) {
     }
     PSMTXCopy(lookAt, camGetCurPtr()->view);
     PSMTXIdentity(ident);
-    animPoseSetMaterialFlagOff(npc->poseId, 0x40);
+    animPoseSetMaterialFlagOff(npc->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
     animPoseMain(npc->poseId);
     animPoseDrawMtx(npc->poseId, ident, 1, 0.0f, 1.0f);
     animPoseDrawMtx(npc->poseId, ident, 2, 0.0f, 1.0f);
@@ -3520,7 +3463,7 @@ s32 horogram_init(EventEntry* event, BOOL isFirstCall) {
 
     horogram_wp = _mapAlloc(sizeof(HorogramWork));
     horogram_wp->buf0 = _mapAlloc(size);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     size = GXGetTexBufferSize(0x260, 0x1E0, GX_TF_Z8, GX_FALSE, 0);
     horogram_wp->buf1 = _mapAlloc(size);
 #else
@@ -3638,8 +3581,8 @@ s32 move_center(EventEntry* event, BOOL isFirstCall) {
     }
     elapsed = OSTicksToMilliseconds((u64)(s32)((u32)now - event->userdata[1]));
     if (elapsed < frames) {
-        dance_dt.cx = intplGetValue(11, elapsed, frames, x0, x1);
-        dance_dt.cy = intplGetValue(11, elapsed, frames, z0, z1);
+        dance_dt.cx = intplGetValue(11, x0, x1, elapsed, frames);
+        dance_dt.cy = intplGetValue(11, z0, z1, elapsed, frames);
         return EVT_RETURN_BLOCK;
     }
     dance_dt.cx = x1;
@@ -3706,38 +3649,38 @@ s32 btn_check(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 dir = evtGetValue(event, args[0]);
     u32 btn = keyGetButtonTrg(0);
-    s32 a = btn & 0x100;
-    s32 b = btn & 0x200;
-    s32 x = btn & 0x400;
+    s32 a = btn & PAD_BUTTON_A;
+    s32 b = btn & PAD_BUTTON_B;
+    s32 x = btn & PAD_BUTTON_X;
     s32 ret = 0;
 
     switch (dir) {
-    case 1:
-        if (a && !(b | x)) {
-            ret = 1;
-        } else if (!a && (b | x)) {
-            ret = 2;
-        }
-        break;
-    case 2:
-        if (b && !(a | x)) {
-            ret = 1;
-        } else if (!b && (a | x)) {
-            ret = 2;
-        }
-        break;
-    case 0:
-        if (x && !(a | b)) {
-            ret = 1;
-        } else if (!x && (a | b)) {
-            ret = 2;
-        }
-        break;
-    default:
-        if (a | b | x) {
-            ret = 2;
-        }
-        break;
+        case 1:
+            if (a && !(b | x)) {
+                ret = 1;
+            } else if (!a && (b | x)) {
+                ret = 2;
+            }
+            break;
+        case 2:
+            if (b && !(a | x)) {
+                ret = 1;
+            } else if (!b && (a | x)) {
+                ret = 2;
+            }
+            break;
+        case 0:
+            if (x && !(a | b)) {
+                ret = 1;
+            } else if (!x && (a | b)) {
+                ret = 2;
+            }
+            break;
+        default:
+            if (a | b | x) {
+                ret = 2;
+            }
+            break;
     }
     evtSetValue(event, args[1], ret);
     return EVT_RETURN_DONE;
@@ -3807,4 +3750,3 @@ s32 horogram_set_pose(EventEntry* event, BOOL isFirstCall) {
     animPoseSetAnim(npc2->poseId, name, TRUE);
     return EVT_RETURN_DONE;
 }
-

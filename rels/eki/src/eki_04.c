@@ -1,21 +1,19 @@
+// eki_04 (駅, Riverside Station): room with a red jump stand and two doors; Dried Shroom and P-Up, D-Down items; doors to eki_03 and eki_05.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_jump_jumpstand);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_jumpstand_red);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_envon);
+#include "evt/evt_cam.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "party/party_motion.h"
+#include "eki.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static BeroEntry bero_data[3];
 extern EvtWord evt_jump[];
-extern EvtWord eki_04_init_evt[];
 
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -46,8 +44,8 @@ static BeroEntry bero_data[] = {
         "e_bero", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -64,8 +62,8 @@ static BeroEntry bero_data[] = {
         "s_bero", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -93,16 +91,15 @@ EVT_BEGIN(eki_04_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_cam_road_reset)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI2"))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2"))
     CALL(evt_mobj_jumpstand_red, 0, STRING("mobj_jump"), 360, -900, 70, PTR(evt_jump), 0)
-    CALL(evt_item_entry, STRING("item01"), 152, -250, -815, 70, 16, GSWF(3744), 0)
-    CALL(evt_item_entry, STRING("item02"), 262, -250, 230, 40, 16, GSWF(3747), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("futi_"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hasira"), 2)
-    IF_INT_LESS(GSW(0), 316)
-        SET_VALUE(GSW(0), 316)
+    CALL(evt_item_entry, STRING("item01"), ITEM_DRIED_SHROOM, -250, -815, 70, 16, GSWF(GSWF_EKI04_DRIED_SHROOM), 0)
+    CALL(evt_item_entry, STRING("item02"), ITEM_P_UP_D_DOWN, -250, 230, 40, 16, GSWF(GSWF_EKI04_P_UP_D_DOWN), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("futi_"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hasira"), MAPOBJ_FLAG_BBOX_CULL)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_33_BLOW_THE_POSTER)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_33_BLOW_THE_POSTER)
     END_IF
     RETURN
 EVT_END()
-

@@ -8,21 +8,75 @@ Paper Mario: The Thousand-Year Door
 [Data Progress]: https://img.shields.io/badge/Data-100.00%25-blue
 [Linked Progress]: https://img.shields.io/badge/Linked-100.00%25-blue
 
-A matching decompilation of Paper Mario: The Thousand-Year Door. The Japanese (G8MJ01), US (G8ME01) and European (G8MP01) releases are complete: every function is matched from C and each build reproduces its original game byte for byte. A fourth version, the June 2004 US demo (G8ME01_DEMO), is in progress: it builds byte for byte too, with the units that don't match yet built from the original code.
+A matching decompilation of Paper Mario: The Thousand-Year Door for the GameCube. One C source tree builds four versions of the game, and each build reproduces its original files byte for byte: the main executable and every area module (REL).
 
-## Origins and credit
+This repository does **not** contain any game assets or disassembled game code. You need your own copy of the game to build it.
 
-This project started as a fork of [doldecomp/ttyd](https://github.com/doldecomp/ttyd), which grew out of [NWPlayer123](https://github.com/NWPlayer123)'s original G8MJ01 decomp-toolkit setup. The project structure, build system, splits, symbols and the early decompilation work come from them and their contributors. Many thanks to everyone who worked on it. The US version also draws on [Silver136](https://github.com/Silver-136/ttyd_dtk_Silver136)'s US decompilation. The project stays under the MIT licence: [LICENSE](LICENSE) keeps the original copyright notice and adds one for the work since the fork.
+## Status
 
-It is now an **independent project and is not affiliated with doldecomp**. All of the code added since the fork was written with the help of AI tools (Anthropic's Claude), so it is kept separate from the upstream project. Please don't take questions about this repository to the doldecomp community; use this repository's issues instead.
+| Version | Release | Units linked from C | Build check |
+|---|---|---|---|
+| `G8MJ01` | Japan (the default) | 1234 / 1234 | `32 files OK` |
+| `G8ME01` | North America | 1226 / 1226 | `30 files OK` |
+| `G8MP01` | Europe (English, German, French, Spanish, Italian), with the developer test REL `tst.rel` | 1378 / 1378 | `33 files OK` |
+| `G8ME01_DEMO` | June 2004 demo from the Interactive Multi-Game Demo Disc Version 17 (USA) | 746 / 746 | `7 files OK` |
 
-Some functions use small behaviour-identical tricks to reach a byte-identical build; each is marked in the code with a `FAKE` comment and listed in [docs/FAKES.md](docs/FAKES.md).
+All four builds are byte-identical to the originals, and every unit of every version is compiled from C. All source is C; the only assembly is what the original sources had in assembly (a few SDK, runtime and debugger routines, the hardware helpers in `include/hwaccess.h` and the word copy `memcpy_as4` in `src/system.c`).
 
-Beyond matching, the code has been cleaned up for reading: struct fields instead of raw pointer math, named fields instead of placeholders, typed data instead of raw integer tables, and declarations in headers. The [cleanup table in docs/PROGRESS.md](docs/PROGRESS.md#code-quality-cleanup-since-2026-10-23) shows the before and after counts.
+Some functions use small behaviour-identical tricks to reach a byte-identical build. Each is marked in the code with a `FAKE` comment and listed in [docs/FAKES.md](docs/FAKES.md).
 
 ![Progress treemap: one cell per file, sized by code bytes, colored by match percent](docs/progress.svg)
 
 Live progress maps (interactive versions of the treemap above): [JP (G8MJ01)](https://claude.ai/artifact/74tZKbcCQ7WUWFM577oqmY), [US (G8ME01)](https://claude.ai/artifact/1Hdacn3R1wrwjtwDQRuwKJ), [PAL (G8MP01)](https://claude.ai/artifact/ASn2MeDwtzWvpJa2MidDyv) and [Demo (G8ME01_DEMO)](https://claude.ai/artifact/6ZkmJBXFMxFc4m8i5M5YhA)
+
+## Quick build
+
+You need Python 3 and [ninja](https://github.com/ninja-build/ninja/releases) (`pip install ninja` works). On macOS, and on Linux outside x86, you also need Wine; see [docs/BUILDING.md](docs/BUILDING.md#dependencies).
+
+```sh
+git clone https://github.com/LLCOOLT/ttyd.git
+cd ttyd
+# copy your Japanese disc image into orig/G8MJ01/
+python configure.py
+ninja
+```
+
+A matching build ends with `32 files OK`. For another version, run `python configure.py --version G8ME01` (or `G8MP01`, `G8ME01_DEMO`) with that disc in `orig/<version>/`. [docs/BUILDING.md](docs/BUILDING.md) has the details: which file goes where for each version (including the demo's `zz_PaperMario2_game.tgc`), building all four, running a build in Dolphin, objdiff and troubleshooting.
+
+## Documentation
+
+| Document | What it covers |
+|---|---|
+| [docs/BUILDING.md](docs/BUILDING.md) | Dependencies, disc files per version, building and checking all four versions, running a build, objdiff, troubleshooting |
+| [docs/VERSIONS.md](docs/VERSIONS.md) | What differs between JP, US, PAL and the demo, and how the sources express it (`VERSION_*` macros, `VERSION_PICK`, `FPS_FRAMES`, small-data thresholds, REL sets) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the game is put together: boot, frame loop, sequences, the event script system, maps and RELs, drivers, battle, memory, sound, and where each lives |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Code standards, the four-version check, fakes, adding a version difference, commit style |
+| [docs/GLOSSARY.md](docs/GLOSSARY.md) | Romanised Japanese names used in the code, every REL area code, common abbreviations |
+| [docs/KNOWN_GAME_BUGS.md](docs/KNOWN_GAME_BUGS.md) | Bugs of the original game that the code reproduces, with file and line |
+| [docs/FAKES.md](docs/FAKES.md) | Every behaviour-identical matching trick, per function |
+| [docs/NAME_PROVENANCE.md](docs/NAME_PROVENANCE.md) | Names that were invented here rather than taken from a symbol map |
+| [docs/PROGRESS.md](docs/PROGRESS.md) | Progress history and the code-quality cleanup figures |
+| [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md) | Third-party code in `libs/` and `rels/tst/`, origins and licences, and the build-time tools |
+| [tools/README.md](tools/README.md) | The scripts in `tools/` and the `configure.py` options |
+
+## Project layout
+
+- `src/`: the main executable (`MarioSt.dol`), by system: `battle/`, `driver/`, `effect/`, `event/`, `manager/`, `mario/`, `motion/`, `party/`, `sequence/`, `unit/`, `window/`, `data/`, and core files such as `src/main.c`, `src/system.c` and `src/memory.c`.
+- `rels/<area>/`: one folder per area REL, each with its own `src/` and `include/`. Battle units and area data live under the area that loads them.
+- `include/`: headers for the main executable, mirroring `src/`.
+- `libs/`: the libraries linked into the game: the Dolphin SDK, MSL, MusyX, the Metrowerks runtime and TRK.
+- `config/<version>/`: decomp-toolkit configuration per version (`config.yml`, `splits.txt`, `symbols.txt`, `build.sha1`).
+- `docs/`, `tools/`: documentation and scripts.
+
+## Origins and credit
+
+This project started as a fork of [doldecomp/ttyd](https://github.com/doldecomp/ttyd), which grew out of [NWPlayer123](https://github.com/NWPlayer123)'s original G8MJ01 decomp-toolkit setup. The project structure, build system, splits, symbols and the early decompilation work come from them and their contributors. Many thanks to everyone who worked on it. The US version also draws on [Silver136](https://github.com/Silver-136/ttyd_dtk_Silver136)'s US decompilation. The project stays under the MIT licence: [LICENSE](LICENSE) keeps the original copyright notice and adds one for the work since the fork. Third-party code keeps its own licence; see [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md).
+
+It is now an **independent project and is not affiliated with doldecomp**. All of the code added since the fork was written with the help of AI tools (Anthropic's Claude), so it is kept separate from the upstream project. Please don't take questions about this repository to the doldecomp community; use this repository's issues instead.
+
+## Detailed progress
+
+Generated by `tools/update_readme.py` from each version's `build/<version>/report.json`.
 
 <!-- progress-start -->
 **Progress** (all source is C; units whose C does not match yet are built from the original code, so the build stays byte-identical):
@@ -68,162 +122,16 @@ Per category, JP (G8MJ01) (generated by `tools/update_readme.py`):
 | SDK Code | 100.00% | 100.00% | 182 / 182 | 1130 / 1130 |
 | MusyX Code | 100.00% | 100.00% | 31 / 31 | 367 / 367 |
 
-**Demo (G8ME01_DEMO, in progress)**, data matched 90.51%:
+**Demo (G8ME01_DEMO)**, data matched 90.54%:
 
 | Category | Matched code | Linked code | Linked files | Matched functions |
 |---|---|---|---|---|
-| All | 99.10% | 93.75% | 739 / 757 | 7469 / 7478 |
-| DOL | 99.05% | 93.36% | 626 / 644 | 6899 / 6908 |
+| All | 100.00% | 100.00% | 746 / 746 | 7478 / 7478 |
+| DOL | 100.00% | 100.00% | 633 / 633 | 6908 / 6908 |
 | Modules | 100.00% | 100.00% | 113 / 113 | 570 / 570 |
-| Game Code | 98.95% | 92.69% | 526 / 533 | 5972 / 5981 |
+| Game Code | 100.00% | 100.00% | 533 / 533 | 5981 / 5981 |
 | SDK Code | 100.00% | 100.00% | 182 / 182 | 1130 / 1130 |
 | MusyX Code | 100.00% | 100.00% | 31 / 31 | 367 / 367 |
+
+objdiff compares data symbol by symbol, and data it cannot pair with a symbol of the version's config counts as unmatched, so this figure can stay below 100% while the build check above confirms that every file is byte-identical.
 <!-- progress-end -->
-
-This repository does **not** contain any game assets or disassembled game code. An existing copy of the game is required. The only assembly is what the original sources had in assembly: a few SDK, runtime and debugger routines, and the hardware helpers described below.
-
-Supported versions:
-
-- `G8MJ01`: Rev 0 (JP), the default
-- `G8ME01`: Rev 0 (US)
-- `G8MP01`: Rev 0 (Europe), including the developer test REL `tst.rel` that only this release ships
-- `G8ME01_DEMO`: the US demo from June 2004 (in progress)
-
-Dependencies
-============
-
-Windows
---------
-
-On Windows, it's **highly recommended** to use native tooling. WSL or msys2 are **not** required.  
-When running under WSL, [objdiff](#diffing) is unable to get filesystem notifications for automatic rebuilds.
-
-- Install [Python](https://www.python.org/downloads/) and add it to `%PATH%`.
-  - Also available from the [Windows Store](https://apps.microsoft.com/store/detail/python-311/9NRWMJP3717K).
-- Download [ninja](https://github.com/ninja-build/ninja/releases) and add it to `%PATH%`.
-  - Quick install via pip: `pip install ninja`
-
-macOS
-------
-
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages):
-
-  ```sh
-  brew install ninja
-  ```
-
-- Install [wine-crossover](https://github.com/Gcenx/homebrew-wine):
-
-  ```sh
-  brew install --cask --no-quarantine gcenx/wine/wine-crossover
-  ```
-
-After OS upgrades, if macOS complains about `Wine Crossover.app` being unverified, you can unquarantine it using:
-
-```sh
-sudo xattr -rd com.apple.quarantine '/Applications/Wine Crossover.app'
-```
-
-Linux
-------
-
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
-- For non-x86(_64) platforms: Install wine from your package manager.
-  - For x86(_64), [wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
-
-Building
-========
-
-- Clone the repository:
-
-  ```sh
-  git clone https://github.com/LLCOOLT/ttyd.git
-  ```
-
-- Copy your game's disc image to `orig/G8MJ01` (JP), `orig/G8ME01` (US), `orig/G8MP01` (Europe) or `orig/G8ME01_DEMO` (demo).
-  - Supported formats: ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ, TGC
-  - The demo ships inside the Interactive Multi-Game Demo Disc Version 17 (USA). Extract its `zz_PaperMario2_game.tgc` from that disc (for example with Dolphin's **Extract File**) and copy it to `orig/G8ME01_DEMO`.
-  - After the initial build, the disc image can be deleted to save space.
-
-- Configure:
-
-  ```sh
-  python configure.py
-  ```
-
-  To build another version, specify it with `--version`, for example `python configure.py --version G8ME01` for the US release.
-
-  The first build needs an internet connection: it downloads [decomp-toolkit](https://github.com/encounter/decomp-toolkit), objdiff-cli, sjiswrap, the Metrowerks compilers, binutils and, on Linux, wibo into `build/`. Later builds reuse them.
-
-- Build:
-
-  ```sh
-  ninja
-  ```
-
-Output and checking
-===================
-
-Each version builds into its own folder (`build/G8MJ01/`, `build/G8ME01/`, `build/G8MP01/` or `build/G8ME01_DEMO/`), so they can sit side by side. Run `configure.py` with the version you want before running `ninja`.
-
-- `build/<version>/MarioSt.dol`: the main executable (`sys/main.dol` on the disc).
-- `build/<version>/<area>/<area>.rel`: one REL per area (`aaa.rel`, `aji.rel`, ...), the files in `files/rel/` on the disc.
-
-`ninja` ends by checking every output against the SHA-1 hashes in `config/<version>/build.sha1`. A matching build reports `32 files OK` for JP, `30 files OK` for US, `33 files OK` for Europe and `7 files OK` for the demo. To run only the check again:
-
-```sh
-ninja build/G8MJ01/ok
-```
-
-Running
-=======
-
-An unmodified build is byte-identical to the original files, so it plays exactly like your disc. To try a modified build, give an extracted copy of the game your built files and boot that copy in [Dolphin](https://dolphin-emu.org/).
-
-1. In Dolphin, right-click the game, choose **Properties → Filesystem**, right-click the disc and choose **Extract Entire Disc** into an empty folder. This gives a `sys/` folder and a `files/` folder.
-2. Replace `sys/main.dol` with `build/<version>/MarioSt.dol`.
-3. Replace each `files/rel/<area>.rel` you changed with `build/<version>/<area>/<area>.rel`.
-4. In Dolphin, choose **File → Open** and select `sys/main.dol` in that folder. Dolphin boots the extracted folder as a disc.
-
-Keep your original disc image unchanged and work on the extracted copy.
-
-### Android
-
-The compilers are Windows programs, so build on a computer (Windows, macOS or Linux as above), then play on Android with [Dolphin for Android](https://dolphin-emu.org/download/):
-
-1. On the computer, prepare the extracted folder as in steps 1 to 3 above.
-2. Copy the whole folder (with its `sys/` and `files/` folders) to the device's storage, for example over USB.
-3. In Dolphin, open the game list's folder settings and add the folder that contains it, or use the file picker to open `sys/main.dol` directly. Dolphin boots the extracted folder as a disc.
-
-These Android steps have not been tested yet.
-
-Project layout
-==============
-
-- `src/`: the main executable, by system: `battle/`, `driver/` (actors, maps, effects, messages and other runtime drivers), `effect/`, `event/` (script commands), `manager/`, `mario/`, `motion/`, `party/`, `sequence/`, `unit/`, `window/`, and core files such as `main.c`, `system.c` and `memory.c`.
-- `rels/<area>/`: one folder per area REL (`aji`, `gor`, `tik`, ...), each with its own `src/` and `include/`. Battle units and area data live under the area that loads them.
-- `include/`: headers for the main executable, mirroring `src/`. Shared types such as the script word (`evt/evt_word.h`) and the address word (`addr_word.h`) are here.
-- `libs/`: the libraries linked into the game: the Dolphin SDK (`dolsdk2004`), MSL, MusyX, the runtime and TRK.
-- `config/<version>/`: decomp-toolkit configuration per version: `config.yml`, `splits.txt` (which file owns which address range), `symbols.txt` and `build.sha1` (the hashes the build is checked against).
-- `docs/`: progress, the cleanup summary and the list of fakes.
-- `tools/`: build and report scripts.
-
-Working on the code
-===================
-
-- Keep the hash check passing for every version. Rebuild JP, US, Europe and the demo (`configure.py --version ...` and `ninja` for each) before committing.
-- Use struct fields, never pointer arithmetic on raw offsets. Where a release changed a struct, its own members sit inside `#ifdef VERSION_...` in the struct (for example `VERSION_G8ME01`), so field accesses are right for every version.
-- Script values and anything that may hold an address use the named types instead of `s32`: `EvtWord` for script words, `AddrWord` for address arithmetic, `SfxNameWord` for sound parameters that take a name or an id.
-- If a function needs a behaviour-identical trick to match, mark it with a `// FAKE:` comment that says what it does, and add a row to [docs/FAKES.md](docs/FAKES.md).
-- In the game code, inline asm appears only where the original source had it: the hardware helpers in `include/hwaccess.h` and the word copy `memcpy_as4` in `src/system.c`.
-
-Diffing
-=======
-
-Once the initial build succeeds, an `objdiff.json` should exist in the project root.
-
-Download the latest release from [encounter/objdiff](https://github.com/encounter/objdiff). Under project settings, set `Project directory`. The configuration should be loaded automatically.
-
-Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, `configure.py`, `splits.txt` or `symbols.txt`.
-
-![](assets/objdiff.png)

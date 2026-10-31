@@ -1,3 +1,5 @@
+// las_08 (ラストダンジョン, Palace of Shadow): the looping corridor (mugen kairou) with the torches.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -6,32 +8,23 @@
 #include "driver/effdrv.h"
 #include "evt/evt_bero.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_map.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "las.h"
+#include "evt/evt_story.h"
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_scale);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_get_sincos);
 USER_FUNC(hi_onoff);
 USER_FUNC(mugen_kairou_get_list);
 
-extern EvtWord door_seikai_evt[];
 static BeroEntry bero_entry_data[5];
 BeroEntry e_bero_1_matigai[1];
 BeroEntry e_bero_1_seikai[1];
 BeroEntry e_bero_2_seikai[1];
 const char* taimatu_data[16];
-extern EvtWord hikari_anim[];
-extern EvtWord taimatu_evt[];
 s32 mugen_kairou_list[7];
-extern EvtWord mugen_kairou_init[];
-extern EvtWord las_08_init_evt[];
 
 static EVT_BEGIN(w1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -98,19 +91,19 @@ static EVT_BEGIN(e2_door_open)
 EVT_END()
 
 static EVT_BEGIN(door_matigai_evt)
-    IF_INT_EQUAL(GSW(0), 385)
-        SET_VALUE(GSW(1121), 0)
-        SET_VALUE(GSWF(4325), 1)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_02_LOCK)
+        SET_VALUE(GSW(GSW_LAS08_CORRIDOR_STREAK), 0)
+        SET_VALUE(GSWF(GSWF_LAS_WRONG_DOOR_TAKEN), 1)
     END_IF
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(door_seikai_evt)
-    IF_INT_EQUAL(GSW(0), 385)
-        ADD(GSW(1121), 1)
-        IF_INT_GREATER_OR_EQUAL(GSW(1121), 7)
-            SET_VALUE(GSW(0), 386)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_02_LOCK)
+        ADD(GSW(GSW_LAS08_CORRIDOR_STREAK), 1)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_LAS08_CORRIDOR_STREAK), 7)
+            SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_02_FOLLOW_THE_LIT_TORCHES)
         END_IF
     END_IF
     SET_VALUE(LW(0), 0)
@@ -122,8 +115,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_1", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -140,8 +133,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_1", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -158,8 +151,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero_2", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -176,8 +169,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_2", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -198,8 +191,8 @@ BeroEntry e_bero_1_matigai[] = {
         "e_bero_1", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -219,8 +212,8 @@ BeroEntry e_bero_1_seikai[] = {
         "e_bero_1", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -240,8 +233,8 @@ BeroEntry e_bero_2_seikai[] = {
         "e_bero_2", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -301,7 +294,7 @@ EVT_BEGIN(taimatu_evt)
     SET_INT_READ_ADDR(PTR(&taimatu_data))
     LOOP(8)
         READ_INT2(LW(0), LW(1))
-        CALL(evt_mapobj_flag_onoff, 0, 1, LW(0), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, LW(0), MAPOBJ_FLAG_HIDE)
     END_LOOP
     SPAWN_EVENT(PTR(hikari_anim))
     RETURN
@@ -313,15 +306,15 @@ s32 mugen_kairou_list[] = {
 
 EVT_BEGIN(mugen_kairou_init)
     CALL_CHILD(PTR(taimatu_evt))
-    IF_INT_EQUAL(GSW(0), 385)
-        CALL(mugen_kairou_get_list, GSW(1121), LW(0))
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_02_LOCK)
+        CALL(mugen_kairou_get_list, GSW(GSW_LAS08_CORRIDOR_STREAK), LW(0))
         CALL(hi_onoff, LW(0), 1)
         CALL(evt_seq_wait, 2)
         CALL(evt_bero_exec_wait, 65536)
-        CALL(mugen_kairou_get_list, GSW(1121), LW(0))
+        CALL(mugen_kairou_get_list, GSW(GSW_LAS08_CORRIDOR_STREAK), LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(7)
-            IF_INT_LESS(GSW(1121), 6)
+            IF_INT_LESS(GSW(GSW_LAS08_CORRIDOR_STREAK), 6)
                 SET_VALUE(LW(0), STRING("e_bero_1"))
                 CALL_CHILD(PTR(bero_case_switch_off))
                 CALL(evt_bero_overwrite, STRING("e_bero_1"), PTR(e_bero_1_seikai))
@@ -340,7 +333,7 @@ EVT_BEGIN(mugen_kairou_init)
             SET_VALUE(LW(0), STRING("e_bero_1"))
             CALL_CHILD(PTR(bero_case_switch_on))
         END_SWITCH
-        ELSE
+    ELSE
         CALL(hi_onoff, 4, 1)
         CALL(hi_onoff, 5, 1)
         CALL(hi_onoff, 6, 1)
@@ -350,8 +343,8 @@ EVT_BEGIN(mugen_kairou_init)
 EVT_END()
 
 EVT_BEGIN(las_08_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

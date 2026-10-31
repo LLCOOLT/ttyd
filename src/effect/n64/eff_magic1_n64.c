@@ -1,3 +1,4 @@
+// Paper Mario 64 magic effect 1: pulsing colour glow moving from a point toward a target.
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,8 +8,9 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include "eff/eff_magic1_n64.h"
+#include "eff/n64/eff_magic1_n64.h"
 #include "libc_decls.h"
+#include "version.h"
 
 static u8 anime_data[12] = {0x00, 0xFF, 0xD0, 0x1A, 0x78, 0x4D, 0xD0, 0xFE, 0xF0, 0xFE, 0x4C, 0x6E};
 
@@ -25,7 +27,7 @@ EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, 
     w = __memAlloc(HEAP_EFFECT, sizeof(EffMagic1N64Work));
     effect->userdata = w;
     effect->callback = effMagic1Main;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     w->age = 0;
     w->type = type;
     w->alpha = 255;
@@ -34,27 +36,27 @@ EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, 
     w->position.z = z;
     w->scale = 1.0f;
     switch (type) {
-    case 0: {
-        f32 inv;
-        inv = 1.0f / (f32)life;
-        w->offset.x = 0.0f;
-        w->offset.y = 0.0f;
-        w->offset.z = 0.0f;
-        w->velocity.x = inv * (tx - x);
-        w->velocity.y = inv * (ty - y);
-        w->velocity.z = inv * (tz - z);
-        w->life = life;
-        break;
-    }
-    default:
-        w->offset.x = 29.0f;
-        w->offset.y = 0.0f;
-        w->offset.z = 0.0f;
-        w->velocity.x = 6.2f;
-        w->velocity.y = 0.0f;
-        w->velocity.z = 0.0f;
-        w->life = 24;
-        break;
+        case 0: {
+            f32 inv;
+            inv = 1.0f / (f32)life;
+            w->offset.x = 0.0f;
+            w->offset.y = 0.0f;
+            w->offset.z = 0.0f;
+            w->velocity.x = inv * (tx - x);
+            w->velocity.y = inv * (ty - y);
+            w->velocity.z = inv * (tz - z);
+            w->life = life;
+            break;
+        }
+        default:
+            w->offset.x = 29.0f;
+            w->offset.y = 0.0f;
+            w->offset.z = 0.0f;
+            w->velocity.x = 6.2f;
+            w->velocity.y = 0.0f;
+            w->velocity.z = 0.0f;
+            w->life = 24;
+            break;
     }
     return effect;
 }
@@ -69,14 +71,14 @@ void effMagic1Main(EffectEntry* effect) {
     tmp.y = work->offset.y;
     tmp.z = work->offset.z;
     position = tmp;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     if ((u32)marioStGetSystemLevel() != 0) {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic1Disp, effect);
         return;
     }
 #endif
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 0;
     }
     work->life--;
@@ -89,7 +91,9 @@ void effMagic1Main(EffectEntry* effect) {
     if (type == 0 && work->life == 0) {
         EffectEntry* e = effMagic1N64Entry(1, 0x30, work->position.x + work->offset.x, work->position.y + work->offset.y,
                                            work->position.z + work->offset.z, 0.0f, 0.0f, 0.0f);
-        ((EffMagic1N64Work*)e->userdata)->scale = work->scale;
+        EffMagic1N64Work* sparkle = e->userdata;
+
+        sparkle->scale = work->scale;
     }
     if (type == 1) {
         work->velocity.x *= 0.83f;
@@ -162,15 +166,15 @@ static void main_dl(EffectEntry* effect, Mtx base) {
         if (i > 0) {
             switch (type) {
                 case 0:
-                ang -= 70.0f;
-                ox -= 2.0f * w->velocity.x;
-                oy -= 2.0f * w->velocity.y;
-                oz -= 2.0f * w->velocity.z;
-                break;
+                    ang -= 70.0f;
+                    ox -= 2.0f * w->velocity.x;
+                    oy -= 2.0f * w->velocity.y;
+                    oz -= 2.0f * w->velocity.z;
+                    break;
                 default:
-                ang -= 50.0f;
-                ox -= 2.0f * (1.2048193f * w->velocity.x);
-                break;
+                    ang -= 50.0f;
+                    ox -= 2.0f * (1.2048193f * w->velocity.x);
+                    break;
             }
             alpha = (s32)(100.0f * (f32)w->alpha / 255.0f);
         }
@@ -197,7 +201,10 @@ static void main_dl(EffectEntry* effect, Mtx base) {
             GXSetTevColor(GX_TEVREG1, (GXColor){(u8)(s32)effMagic1Blend(a[1], 255, (f32)(s32)((gp->retraceCount << 5) + a[0])),
                                                 (u8)(s32)effMagic1Blend(a[2], 255, (f32)(s32)((gp->retraceCount << 5) + a[0])),
                                                 (u8)(s32)effMagic1Blend(a[3], 255, (f32)(s32)((gp->retraceCount << 5) + a[0])), 255});
-            if (type == 0) sz = 15; else sz = 10;
+            if (type == 0)
+                sz = 15;
+            else
+                sz = 10;
             PSMTXScale(m98, 2.0f, 0.25f, 1.0f);
             PSMTXTrans(mf8, 0.0f, (f32)(3 - j) * 64.0f / 256.0f, 0.0f);
             PSMTXConcat(mf8, m98, mf8);

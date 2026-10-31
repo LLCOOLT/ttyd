@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: stamp: seven sprites spread out from a point over 30 frames, tinted by type.
 #include "eff/n64/eff_stamp_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -5,9 +6,7 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 static effN64Vtx size16x16_tex64x32_vtx[] = {
     {-8, 0, 0, 0, 0, 0, 0, 0, 0},

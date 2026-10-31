@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: expanding water ripple rings on a surface; base of eff_ripple.c.
 #pragma defer_codegen off
 #include "eff/n64/eff_ripple_n64.h"
 #include "eff/eff_n64.h"
@@ -7,8 +8,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-
 
 effN64Vtx size16x16_tex32x32_0_vtx[] = {
     {-8, 0, -8, 0, 0, 0, 0, 0, 255},
@@ -20,7 +19,7 @@ effN64Vtx size16x16_tex32x32_0_vtx[] = {
 void effRippleMain(EffectEntry* effect);
 void effRippleDisp(CameraId cameraId, EffectEntry* effect);
 
-__declspec(section ".rodata") static Vec vec3_802fb520 = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") static Vec rippleZeroVec = {0.0f, 0.0f, 0.0f};
 void effRippleN64SetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
     EffRippleN64Work* work = effect->userdata;
     work->rx = rx;
@@ -98,7 +97,7 @@ void effRippleMain(EffectEntry* effect) {
     Vec tmp;
 
     work = effect->userdata;
-    tmp = vec3_802fb520;
+    tmp = rippleZeroVec;
     tmp.x = work->position.x;
     tmp.y = work->position.y;
     tmp.z = work->position.z;

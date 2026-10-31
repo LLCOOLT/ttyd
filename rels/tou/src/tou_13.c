@@ -1,45 +1,30 @@
+// tou_13 (闘技場, Glitz Pit): the small passage between tou_05 and tou_07.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-
-static BeroEntry bero_data[3];
-extern EvtWord evt_nusumi[];
-extern EvtWord tou_13_init_evt[];
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "tou.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
 
 static BeroEntry bero_data[] = {
     {
         "e_bero_", // hitName
         0, 0, // type..sfxId
-        6, // directionId
-        100000, // centerPosition
+        BERO_DIR_W, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -52,8 +37,8 @@ static BeroEntry bero_data[] = {
     {
         "w_bero_", // hitName
         0, 0, // type..sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -67,16 +52,16 @@ static BeroEntry bero_data[] = {
 };
 
 static EVT_BEGIN(evt_dakuto)
-    CALL(evt_cam_shake, 4, FLOAT(0.049804688f), FLOAT(0.0f), 500)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.049804688f), FLOAT(0.0f), 500)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_DUCT_KOUSHI_HIT1"), 188, 0, 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_deguti"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_deguti"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("deguti"), 1, 0)
     SET_VALUE(LW(0), 1)
     CALL_CHILD(PTR(bero_case_switch_on))
-    IF_INT_LESS(GSW(0), 162)
-        SET_VALUE(GSW(0), 162)
-        ELSE
-        SET_VALUE(GSWF(2501), 1)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_04_AIR_DUCT_EXIT)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_04_AIR_DUCT_EXIT)
+    ELSE
+        SET_VALUE(GSWF(GSWF_TOU13_DUCT_EXIT_OPEN_REVISIT), 1)
     END_IF
     CALL(evt_exit_case_evt)
     RETURN
@@ -123,7 +108,7 @@ EVT_BEGIN(evt_nusumi)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
-    SET_VALUE(GSW(0), 161)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_03_EAVESDROPPING)
     RETURN
 EVT_END()
 
@@ -142,54 +127,53 @@ static EVT_BEGIN(evt_first)
     CALL(evt_msg_print_party, STRING("stg3_tou_455"))
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
-    SET_VALUE(GSW(0), 160)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_02_AIR_DUCT_1ST_TIME)
     RETURN
 EVT_END()
 
 EVT_BEGIN(tou_13_init_evt)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(127, 137)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU7"))
-        CALL(evt_snd_bgmoff, 26624)
-        CASE_GREATER_OR_EQUAL(165)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU7"))
-        CALL(evt_snd_bgmoff, 26624)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU7"))
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
+        CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU7"))
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU7"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU7"))
         CALL(evt_snd_set_rev_mode, 2)
     END_SWITCH
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    SWITCH(GSW(0))
-        CASE_LESS(162)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG3_30_04_AIR_DUCT_EXIT)
         SET_VALUE(LF(0), 0)
-        CASE_LESS(172)
+        CASE_LESS(STORY_STG3_34_RETURN_TO_ROGUEPORT)
         SET_VALUE(LF(0), 1)
         CASE_DEFAULT
-        IF_INT_EQUAL(GSWF(2501), 0)
+        IF_INT_EQUAL(GSWF(GSWF_TOU13_DUCT_EXIT_OPEN_REVISIT), 0)
             SET_VALUE(LF(0), 0)
-            ELSE
+        ELSE
             SET_VALUE(LF(0), 1)
         END_IF
     END_SWITCH
     IF_INT_EQUAL(LF(0), 0)
-        CALL(evt_run_case_evt, 14, 1, STRING("deguti"), 0, PTR(evt_dakuto), 0)
+        CALL(evt_run_case_evt, CASE_COND_HAMMER_2, 1, STRING("deguti"), 0, PTR(evt_dakuto), 0)
         SET_VALUE(LW(0), 1)
         CALL_CHILD(PTR(bero_case_switch_off))
-        ELSE
+    ELSE
         CALL(evt_hitobj_onoff, STRING("deguti"), 1, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_deguti"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_deguti"), MAPOBJ_FLAG_HIDE)
     END_IF
-    IF_INT_LESS(GSW(0), 161)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_03_EAVESDROPPING)
         SPAWN_EVENT(PTR(evt_nusumi))
     END_IF
-    IF_INT_LESS(GSW(0), 160)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_02_AIR_DUCT_1ST_TIME)
         SPAWN_EVENT(PTR(evt_first))
     END_IF
     RETURN
 EVT_END()
-

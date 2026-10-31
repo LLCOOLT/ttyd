@@ -1,3 +1,5 @@
+// Flame (Fire): a flickering flame with smoke puffs; types 0-8 pick the look, types 5-7 also throw sparks.
+// Used for burning units and fire attacks.
 #include "eff/eff_fire.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,19 +9,21 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/n64/eff_fire_spark_n64.h"
 #include "libc_decls.h"
+#include "version.h"
 
 typedef struct EffFireSmokeWork {
-    s32 type;       // 0x0, always 0
-    Vec position;   // 0x4
-    Vec velocity;   // 0x10
-    s32 pad1c[3];   // 0x1C
-    f32 rotation;   // 0x28
-    f32 rotSpeed;   // 0x2C
-    u8 color[4];    // 0x30
-    s32 life;       // 0x34
-    s32 age;        // 0x38
-    f32 scale;      // 0x3C
+    s32 type;     // 0x0, always 0
+    Vec position; // 0x4
+    Vec velocity; // 0x10
+    s32 pad1c[3]; // 0x1C
+    f32 rotation; // 0x28
+    f32 rotSpeed; // 0x2C
+    u8 color[4];  // 0x30
+    s32 life;     // 0x34
+    s32 age;      // 0x38
+    f32 scale;    // 0x3C
 } EffFireSmokeWork;
 
 typedef struct FireScaleKey {
@@ -32,7 +36,7 @@ FireScaleKey scale1[] = {
     { 70, 1.05f },   { 80, 1.025f },  { 100, 1.1f },   { 120, 1.0f },   { 130, 1.025f },
     { 160, 0.95f },  { 180, 1.025f }, { 200, 1.0f },
 };
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // the demo defines scale2 here, right after scale1 (.data order)
 FireScaleKey scale2[] = {
     { 0, 1.0f },
@@ -57,7 +61,9 @@ static u8 scale_dt[] = {
 void effFireMain(EffectEntry* effect);
 static inline void effFireQuad(s32 iw, s32 ih) {
     f32 w, h;
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4); w = iw; h = ih;
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    w = iw;
+    h = ih;
     GXPosition3f32(-w / 2.0f, h, 0.0f);
     GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
     GXTexCoord2f32(0.0f, 0.0f);
@@ -74,10 +80,8 @@ static inline void effFireQuad(s32 iw, s32 ih) {
 void effFireDisp(CameraId cameraId, EffectEntry* effect);
 void effFireDisp2(CameraId cameraId, EffectEntry* effect);
 void effFireDisp3(CameraId cameraId, EffectEntry* effect);
-EffectEntry* effFireSparkN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y, f32 z, f32 rangeX,
-                                  f32 rangeY, f32 a, f32 b, f32 c);
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 FireScaleKey scale2[] = {
     { 0, 1.0f },
     { 100, 1.2f },
@@ -88,7 +92,6 @@ FireScaleKey scale2[] = {
 
 void effFireSmokeDisp(CameraId cameraId, EffectEntry* effect);
 void effFireSmokeMain(EffectEntry* effect);
-
 
 static void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale);
 
@@ -102,14 +105,14 @@ EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFireWork));
     effect->userdata = work;
     effect->callback = effFireMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     if (duration <= 0) {
         duration = 1000;
     }
     work->type = type;
     work->alpha = 0xFF;
     {
-        Vec pos = { 0.0f, 0.0f, 0.0f };
+        Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = x;
         pos.y = y;
         pos.z = z;
@@ -164,7 +167,7 @@ EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale
     work->pulseScale = 0.0f;
     work->reserved_80 = 0;
     work->reserved_84 = 0;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     work->useMapBlend = 0;
 #endif
     return effect;
@@ -177,8 +180,8 @@ void effFireMain(EffectEntry* effect) {
     s32 count;
     s32 idx;
 
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->duration = 16;
     }
     if (work->duration < 1000) {
@@ -231,7 +234,8 @@ void effFireMain(EffectEntry* effect) {
                     break;
             }
             while (1) {
-                kf = work->keyFrame; idx = work->keyIdx;
+                kf = work->keyFrame;
+                idx = work->keyIdx;
                 if (kf < tbl[idx].frame) {
                     break;
                 }
@@ -264,7 +268,7 @@ void effFireMain(EffectEntry* effect) {
         default:
             work->sparkTimer++;
             if (work->sparkTimer > work->range) {
-                u8 offs[4] = { 5, 10, 10, 10 };
+                u8 offs[4] = {5, 10, 10, 10};
                 f32 px, py, pz, sc;
                 pz = work->position.z - 5.0f;
                 py = work->position.y + (f32)offs[type];
@@ -346,7 +350,8 @@ void effFireDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
     {
-        f32 s = 20.0f * work->scale; s *= 0.03125f;
+        f32 s = 20.0f * work->scale;
+        s *= 0.03125f;
         PSMTXScale(scaleMtx, s * work->scaleX, s * work->scaleY, s);
     }
     PSMTXConcat(trans, rot, m6c);
@@ -371,8 +376,8 @@ void effFireDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, 4, 1, 6, 7);
     GXSetTevKColorSel(GX_TEVSTAGE0, 12);
     GXSetTevKAlphaSel(GX_TEVSTAGE0, 28);
-    GXSetTevKColor(GX_KCOLOR0, (GXColor){ 0xFF, 0x00, 0x00, 0xFF });
-    GXSetTevColor(GX_TEVREG0, (GXColor){ 0x00, 0x00, 0x00, 0x64 });
+    GXSetTevKColor(GX_KCOLOR0, (GXColor){0xFF, 0x00, 0x00, 0xFF});
+    GXSetTevColor(GX_TEVREG0, (GXColor){0x00, 0x00, 0x00, 0x64});
     effFireQuad(w, h);
     GXLoadPosMtxImm(m6c, GX_PNMTX0);
     GXSetNumTevStages(4);
@@ -382,21 +387,21 @@ void effFireDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColorIn(GX_TEVSTAGE0, 12, 14, 10, 15);
     GXSetTevAlphaIn(GX_TEVSTAGE0, 7, 7, 7, 7);
     GXSetTevKColorSel(GX_TEVSTAGE0, 12);
-    GXSetTevKColor(GX_KCOLOR0, (GXColor){ 0xF8, 0x99, 0x28, 0xFF });
+    GXSetTevKColor(GX_KCOLOR0, (GXColor){0xF8, 0x99, 0x28, 0xFF});
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG1);
     GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG1);
     GXSetTevColorIn(GX_TEVSTAGE1, 12, 14, 10, 15);
     GXSetTevAlphaIn(GX_TEVSTAGE1, 7, 7, 7, 7);
     GXSetTevKColorSel(GX_TEVSTAGE1, 13);
-    GXSetTevKColor(GX_KCOLOR1, (GXColor){ 0xF1, 0x9E, 0x8F, 0xFF });
+    GXSetTevKColor(GX_KCOLOR1, (GXColor){0xF1, 0x9E, 0x8F, 0xFF});
     GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE2, 14, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE2, 15, 15, 15, 2);
     GXSetTevAlphaIn(GX_TEVSTAGE2, 4, 3, 6, 7);
     GXSetTevKAlphaSel(GX_TEVSTAGE2, 0);
-    GXSetTevColor(GX_TEVREG2, (GXColor){ 0x00, 0x00, 0x00, 0x64 });
+    GXSetTevColor(GX_TEVREG2, (GXColor){0x00, 0x00, 0x00, 0x64});
     GXSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE3, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE3, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -454,12 +459,12 @@ void effFireDisp2(CameraId cameraId, EffectEntry* effect) {
     switch (type) {
         case 3:
         case 4:
-            GXSetTevColor(GX_TEVREG0, (GXColor){ 0xFF, 0xCD, 0x15, 0xFF });
-            GXSetTevColor(GX_TEVREG1, (GXColor){ 0xFF, 0x51, 0x00, 0xFF });
+            GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xCD, 0x15, 0xFF});
+            GXSetTevColor(GX_TEVREG1, (GXColor){0xFF, 0x51, 0x00, 0xFF});
             break;
         case 8:
-            GXSetTevColor(GX_TEVREG0, (GXColor){ 0x59, 0x33, 0x59, 0xFF });
-            GXSetTevColor(GX_TEVREG1, (GXColor){ 0x00, 0x00, 0x00, 0xFF });
+            GXSetTevColor(GX_TEVREG0, (GXColor){0x59, 0x33, 0x59, 0xFF});
+            GXSetTevColor(GX_TEVREG1, (GXColor){0x00, 0x00, 0x00, 0xFF});
             break;
     }
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR_NULL);
@@ -467,14 +472,14 @@ void effFireDisp2(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, 15, 15, 15, 0);
     GXSetTevAlphaIn(GX_TEVSTAGE1, 0, 4, 3, 7);
-    GXSetTevColor(GX_TEVREG2, (GXColor){ work->glowAlpha, work->glowAlpha, work->glowAlpha, work->glowAlpha });
+    GXSetTevColor(GX_TEVREG2, (GXColor){work->glowAlpha, work->glowAlpha, work->glowAlpha, work->glowAlpha});
     GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE2, 15, 15, 15, 0);
     GXSetTevAlphaIn(GX_TEVSTAGE2, 7, 0, 6, 7);
     GXSetTevKAlphaSel(GX_TEVSTAGE2, 28);
-    GXSetTevKColor(GX_KCOLOR0, (GXColor){ 0, 0, 0, work->alpha });
+    GXSetTevKColor(GX_KCOLOR0, (GXColor){0, 0, 0, work->alpha});
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     {
         f32 w = 24.0f;
@@ -514,13 +519,13 @@ void effFireDisp2(CameraId cameraId, EffectEntry* effect) {
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     switch (type) {
         case 3:
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xEA, 0x5D, 0x4C });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xEA, 0x5D, 0x4C});
             break;
         case 4:
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xEA, 0x5D, 0x26 });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xEA, 0x5D, 0x26});
             break;
         case 8:
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0x00, 0x00, 0x00, 0x4C });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0x00, 0x00, 0x00, 0x4C});
             break;
     }
     GXSetNumTexGens(1);
@@ -552,8 +557,7 @@ void effFireDisp2(CameraId cameraId, EffectEntry* effect) {
         if (type == 3 || type == 8) {
             u = 2.0f;
             v = 1.0f;
-        }
-        else {
+        } else {
             u = 2.0f;
             v = 2.0f;
         }
@@ -606,7 +610,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
     PSMTXScale(scaleMtx, work->scale * work->scaleX, work->scale * work->scaleY, work->scale);
     PSMTXConcat(trans, rot, mb0);
     PSMTXConcat(mb0, scaleMtx, mb0);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     GXSetNumTevStages(2);
 #else
     GXSetNumTevStages(3);
@@ -621,7 +625,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_DIVIDE_2, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, 15, 15, 15, 10);
     GXSetTevAlphaIn(GX_TEVSTAGE1, 0, 7, 7, 4);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -638,7 +642,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
         GXSetTevAlphaIn(GX_TEVSTAGE3, 7, 0, 2, 7);
         GXSetTevColor(GX_TEVREG1, blend);
     }
-    GXSetTevColor(GX_TEVREG0, (GXColor){ 0, 0, 0, work->alpha });
+    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, work->alpha});
 #endif
     GXSetCullMode(GX_CULL_NONE);
     GXClearVtxDesc();
@@ -685,7 +689,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
             GXTexCoord2f32(0.0f, (1.0f / 3.0f) * (3 - i));
         }
         {
-            Vec t = { 0.0f, 0.0f, 0.0f };
+            Vec t = {0.0f, 0.0f, 0.0f};
             t.x = -w / 2.0f;
             t.y = 40.0f;
             p = t;
@@ -705,7 +709,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
             work->scrMinY = scr.y;
         }
         {
-            Vec t = { 0.0f, 0.0f, 0.0f };
+            Vec t = {0.0f, 0.0f, 0.0f};
             t.x = w * 0.5f;
             t.y = 40.0f;
             p = t;
@@ -725,7 +729,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
             work->scrMinY = scr.y;
         }
         {
-            Vec t = { 0.0f, 0.0f, 0.0f };
+            Vec t = {0.0f, 0.0f, 0.0f};
             t.x = w * 0.5f;
             p = t;
         }
@@ -744,7 +748,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
             work->scrMinY = scr.y;
         }
         {
-            Vec t = { 0.0f, 0.0f, 0.0f };
+            Vec t = {0.0f, 0.0f, 0.0f};
             t.x = -w / 2.0f;
             p = t;
         }
@@ -783,12 +787,6 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
     work->bboxValid = 1;
 }
 
-
-
-
-
-
-
 static void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* smoke = effEntry();
     EffFireSmokeWork* sw;
@@ -797,10 +795,10 @@ static void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale) {
     sw = __memAlloc(HEAP_EFFECT, 0x40);
     smoke->userdata = sw;
     smoke->callback = effFireSmokeMain;
-    smoke->flags |= 2;
+    smoke->flags |= EFFECT_FLAG_SOFT_DELETE;
     sw->type = 0;
     sw->color[3] = 0x80;
-    sw->position = (Vec){ x, y, z };
+    sw->position = (Vec){x, y, z};
     sw->scale = scale;
     sw->life = 60;
     sw->age = 0;
@@ -816,8 +814,8 @@ static void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale) {
 void effFireSmokeMain(EffectEntry* effect) {
     EffFireSmokeWork* work = effect->userdata;
 
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 16;
     }
     if (work->life < 1000) {
@@ -858,8 +856,7 @@ void effFireSmokeDisp(CameraId cameraId, EffectEntry* effect) {
     if (idx < 60) {
         sx = scale_dt[idx] / 128.0f;
         sy = scale_dt[idx + 1] / 128.0f;
-    }
-    else {
+    } else {
         sx = 1.5f;
         sy = 0.8f;
     }
@@ -868,7 +865,7 @@ void effFireSmokeDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE,
                   GX_AF_NONE);
-    GXSetChanMatColor(GX_COLOR0A0, (GXColor){ work->color[0], work->color[1], work->color[2], work->color[3] });
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){work->color[0], work->color[1], work->color[2], work->color[3]});
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);

@@ -1,3 +1,5 @@
+// hei_07 (平原, Petal Meadows): Shhwonk Fortress quiz room between hei_06 and hei_10 (stone statue, sekizou).
+// Questions with right/wrong answer animations; finishing sets story 31 and opens a pipe to hei_10. Has a save block.
 #include "data_tables.h"
 #include "version.h"
 #include "battle/battle_unit.h"
@@ -11,70 +13,26 @@
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "hei.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_battle_start);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_battle_info);
-USER_FUNC(evt_npc_set_link);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_wait_battle_end);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_get_value);
-USER_FUNC(evt_sub_intpl_init);
-USER_FUNC(evt_sub_random);
 USER_FUNC(mario_set_dir);
 static void callback(s32 type, void** work);
 
@@ -90,14 +48,13 @@ extern EvtWord fuseikai_anime_stop[];
 extern EvtWord offscreen_to_quiz[];
 QuizEntry quiz_data[8];
 extern EvtWord a_sekizou_1[];
-extern EvtWord hei_07_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -113,8 +70,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -241,31 +198,31 @@ EVT_BEGIN(seikai_anime)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 150)
     CALL(evt_eff, STRING(""), STRING("confetti"), 3, LW(0), LW(1), LW(2), 160, 0, 0, 0, 0, 0, 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("dennshoku"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dennshoku_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dennshoku"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dennshoku_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("anm_seikai"), 1, 0)
     WAIT_MS(1800)
     RETURN
 EVT_END()
 
 EVT_BEGIN(seikai_anime_stop)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("dennshoku"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dennshoku_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dennshoku"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dennshoku_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("anm_seikai"), 0, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(fuseikai_anime)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dennshoku"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("dennshoku_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dennshoku"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dennshoku_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("anm_fuseikai"), 1, 0)
     WAIT_MS(1500)
     RETURN
 EVT_END()
 
 EVT_BEGIN(fuseikai_anime_stop)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("dennshoku"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dennshoku_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dennshoku"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dennshoku_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("anm_fuseikai"), 0, 0)
     RETURN
 EVT_END()
@@ -372,10 +329,10 @@ EVT_BEGIN(offscreen_to_quiz)
     CALL(evt_img_alloc_capture, STRING("capture_img"), 0, 0, 1, 0, 0, 608, 480)
     CALL(evt_img_clear_virtual_point, STRING("capture_img"))
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hei_07"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hei_07_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("dennshoku"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dennshoku_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hei_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hei_07_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dennshoku"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dennshoku_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_set_pos, -85, 20, 0)
     CALL(mario_set_dir, 90, 0)
@@ -409,8 +366,8 @@ static EVT_BEGIN(offscreen_to_normal)
     CALL(evt_img_release, STRING("capture_img"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("hei_07"))
     CALL(evt_offscreen_delete, STRING("offscreen"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hei_07"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hei_07_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hei_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hei_07_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_set_pos, LW(0), 0, LW(2))
     CALL(evt_mario_cont_onoff, 1)
@@ -434,7 +391,7 @@ QuizEntry quiz_data[] = {
 
 EVT_BEGIN(a_sekizou_1)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     WAIT_FRAMES(1)
     IF_INT_EQUAL(GW(0), 0)
         BEGIN_INLINE_EVENT
@@ -468,7 +425,7 @@ EVT_BEGIN(a_sekizou_1)
         END_IF
         CALL(evt_mario_set_pose, STRING("M_S_1"))
         CALL(evt_snd_sfxoff, GW(10))
-        ELSE
+    ELSE
         CALL(evt_cam3d_evt_set, -189, 72, 207, 219, 69, -80, 1000, 11)
         BEGIN_INLINE_EVENT
             WAIT_MS(200)
@@ -484,7 +441,7 @@ EVT_BEGIN(a_sekizou_1)
     CALL(evt_msg_toge, 2, 95, 65, 0)
     IF_INT_EQUAL(GW(0), 0)
         CALL(evt_msg_print, 0, STRING("stg1_hei_20"), PTR(callback), 0)
-        ELSE
+    ELSE
         CALL(evt_msg_print, 0, STRING("stg1_hei_20_01"), PTR(callback), 0)
     END_IF
     SET_VALUE(GW(0), 1)
@@ -497,11 +454,11 @@ EVT_BEGIN(a_sekizou_1)
         CALL_CHILD(PTR(animation_wait))
         CALL(evt_cam3d_evt_off, 500, 11)
         CALL(evt_mario_key_onoff, 1)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-#ifdef VERSION_G8ME01_DEMO
-        CALL(evt_snd_bgmoff, 6144)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+#if VERSION == VERSION_DEMO
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20))
 #else
-        CALL(evt_snd_bgmoff, 6208)
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20) | PSND_FADE_DIP_FAST)
 #endif
         RETURN
     END_IF
@@ -510,13 +467,13 @@ EVT_BEGIN(a_sekizou_1)
     CALL(evt_msg_print_add, 0, STRING("stg1_hei_22"))
     CALL(evt_map_playanim, STRING("anm_denshoku"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_mamekyuu"), 1, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_QUIZ1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_QUIZ1"))
     CALL_CHILD(PTR(offscreen_to_quiz))
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 0, 83, 591, 0, 100, 91, 1500, 11)
     WAIT_MS(1500)
     WAIT_MS(500)
-    CALL(evt_snd_bgmoff, 18432)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(12), 0)
     SET_VALUE(LW(13), 0)
@@ -540,8 +497,8 @@ EVT_BEGIN(a_sekizou_1)
         END_IF
         CALL(evt_msg_toge, 2, 95, 65, 0)
         CALL(evt_msg_print, 0, LW(6), PTR(callback), 0)
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_QUIZ2"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_QUIZ2"))
         BEGIN_INLINE_EVENT
             IF_INT_EQUAL(LW(11), 0)
                 SET_VALUE(LW(0), STRING("anm_kaiten1"))
@@ -571,15 +528,15 @@ EVT_BEGIN(a_sekizou_1)
                 GOTO(100)
             END_IF
         END_IF
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
-        CALL(evt_snd_bgmoff, 18432)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
         CALL(evt_msg_continue)
         CALL(evt_msg_toge, 2, 95, 65, 0)
         IF_INT_EQUAL(LF(1), 1)
             IF_INT_EQUAL(LW(12), 4)
                 CALL(evt_snd_sfxon, STRING("SFX_GOOD_SOUND2"), 0)
-                ELSE
+            ELSE
                 CALL(evt_snd_sfxon, STRING("SFX_GOOD_SOUND1"), 0)
             END_IF
             CALL_CHILD(PTR(seikai_anime))
@@ -605,7 +562,7 @@ EVT_BEGIN(a_sekizou_1)
                 CALL_CHILD(PTR(animation_wait))
                 CALL(evt_msg_print, 0, STRING("stg1_hei_35"), PTR(callback), 0)
                 CALL_CHILD(PTR(offscreen_to_normal))
-                CALL(evt_snd_bgmoff, 512)
+                CALL(evt_snd_bgmoff, PSND_FADE_OUT)
                 WAIT_MS(1000)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 CALL(evt_msg_print, 0, STRING("stg1_hei_35_01"), PTR(callback), 0)
@@ -618,21 +575,21 @@ EVT_BEGIN(a_sekizou_1)
                 CALL_CHILD(PTR(animation_wait))
                 CALL(evt_cam3d_evt_off, 500, 11)
                 CALL(evt_mario_key_onoff, 1)
-                CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-#ifdef VERSION_G8ME01_DEMO
-                CALL(evt_snd_bgmoff, 6144)
+                CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+#if VERSION == VERSION_DEMO
+                CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20))
 #else
-                CALL(evt_snd_bgmoff, 6208)
+                CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20) | PSND_FADE_DIP_FAST)
 #endif
-                SET_VALUE(GSW(0), 31)
+                SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_06_QUIZ)
                 CALL(evt_exit_case_evt)
                 RETURN
             END_SWITCH
             CALL_CHILD(PTR(seikai_anime_stop))
-            ELSE
+        ELSE
             IF_INT_EQUAL(LW(13), 2)
                 CALL(evt_snd_sfxon, STRING("SFX_BAD_SOUND2"), 0)
-                ELSE
+            ELSE
                 CALL(evt_snd_sfxon, STRING("SFX_BAD_SOUND1"), 0)
             END_IF
             CALL_CHILD(PTR(fuseikai_anime))
@@ -660,7 +617,7 @@ EVT_BEGIN(a_sekizou_1)
                     CALL_CHILD(PTR(animation_wait))
                 END_INLINE_EVENT
                 CALL_CHILD(PTR(offscreen_to_normal))
-                CALL(evt_snd_bgmoff, 512)
+                CALL(evt_snd_bgmoff, PSND_FADE_OUT)
                 WAIT_MS(1000)
                 SET_VALUE(LW(14), 0)
                 SET_VALUE(LW(15), 0)
@@ -739,9 +696,9 @@ EVT_BEGIN(a_sekizou_1)
                 CALL_CHILD(PTR(animation_wait))
                 CALL(evt_cam3d_evt_off, 800, 11)
                 CALL(evt_mario_key_onoff, 1)
-                CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-                CALL(evt_snd_bgmoff, 6208)
-                SET_VALUE(GSW(0), 31)
+                CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+                CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20) | PSND_FADE_DIP_FAST)
+                SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_06_QUIZ)
                 CALL(evt_exit_case_evt)
                 RETURN
             END_SWITCH
@@ -760,23 +717,23 @@ EVT_BEGIN(hei_07_init_evt)
     CALL_CHILD(PTR(evt_bero_info_run))
     SET_VALUE(LW(0), STRING("dokan"))
     CALL_CHILD(PTR(bero_case_switch_off))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("dokan"))
-        CALL(evt_snd_bgmoff, 6208)
-        ELSE
-        CALL(evt_snd_bgmoff, 6144)
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20) | PSND_FADE_DIP_FAST)
+    ELSE
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20))
     END_IF
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI4"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI4"))
     CALL(evt_snd_set_rev_mode, 1)
     CALL(evt_map_playanim, STRING("anm_hokori"), 1, 0)
     CALL(evt_mapobj_trans, 1, STRING("hei_07_2"), 0, -1000, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hei_07_2"), 1)
-    IF_INT_LESS(GSW(0), 31)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hei_07_2"), MAPOBJ_FLAG_HIDE)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_06_QUIZ)
         CALL(evt_hitobj_onoff, STRING("a_sekizou_2"), 0, 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("a_sekizou_1_a"), 0, PTR(a_sekizou_1), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_sekizou_1_a"), 0, PTR(a_sekizou_1), 0)
         SET_VALUE(GW(0), 0)
-        ELSE
+    ELSE
         CALL(evt_hitobj_onoff, STRING("a_sekizou_2"), 0, 1)
         CALL(evt_hitobj_onoff, STRING("a_sekizou_1_a"), 0, 0)
         CALL(evt_hitobj_onoff, STRING("a_sekizou_1_b"), 0, 0)
@@ -872,4 +829,3 @@ USER_FUNC(mario_set_dir) {
     mario->moveDirection = reviseAngle(mario->moveDirection + event->userdataf[2]);
     return EVT_RETURN_DONE;
 }
-

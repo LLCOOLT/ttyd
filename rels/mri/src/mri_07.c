@@ -1,3 +1,5 @@
+// mri_07 (巨木の中, The Great Tree): the Puni shop and the Puni information seller, with the little Jabbi
+// (chibitoge) and a recovery block.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
@@ -6,38 +8,16 @@
 #include "evt/evt_shop.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_ry_lr);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_puni_flag_onoff);
-USER_FUNC(evt_puni_init_puni);
-USER_FUNC(evt_puni_mem_init);
-USER_FUNC(evt_puni_set_hamari);
-USER_FUNC(evt_puni_set_mode);
-USER_FUNC(evt_puni_set_yuka);
-USER_FUNC(evt_shop_setup);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
+#include "evt/evt_cam.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "mri_puni.h"
+#include "version.h"
+#include "evt/evt_story.h"
 
 static ShopObj obj_list[6];
 static ShopItem goods_list[6];
@@ -50,7 +30,6 @@ extern EvtWord puniinfo_init[];
 extern EvtWord puniinfo_talk[];
 static NpcSetupInfo npcEnt[4];
 static BeroEntry bero_entry_data[2];
-extern EvtWord mri_07_init_evt[];
 
 static ShopObj obj_list[] = {
     {"S_item_01", "A_item_01"},
@@ -71,7 +50,7 @@ static ShopItem goods_list[] = {
 };
 
 static ShopDb trade_list[] = {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {ITEM_HP_DRAIN_BADGE, 5, 0},
 #else
     {ITEM_HP_DRAIN_ITEM, 5, 0},
@@ -101,7 +80,7 @@ EVT_BEGIN(chibitoge_nakama)
     CALL(evt_npc_jump_position_nohit, STRING("me"), -167, 44, 41, 400, 50)
     CALL_CHILD(PTR(mri_guide_goryu))
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
-    CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_msg_print, 0, STRING("stg2_mri_f01_00"), 0, STRING("ガイドsp"))
     CALL(evt_cam3d_evt_set, 211, 151, 548, 211, 56, 7, 0, 11)
     CALL(evt_npc_set_ry_lr, STRING("プニ店員"), 0)
@@ -109,7 +88,7 @@ EVT_BEGIN(chibitoge_nakama)
     CALL(evt_msg_print, 0, STRING("stg2_mri_f01_01"), 0, STRING("プニ店員"))
     CALL(evt_cam3d_evt_off, 0, 11)
     WAIT_FRAMES(1)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_msg_print_party, STRING("stg2_mri_f01_02"))
@@ -120,7 +99,7 @@ EVT_BEGIN(chibitoge_nakama)
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_TOGETTI_JUMP1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_npc_jump_position_nohit, STRING("ちびトゲ"), -138, 0, 72, 300, 30)
         WAIT_MS(200)
-        CALL(evt_npc_flag_onoff, 1, STRING("me"), 1073741856)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_TOGETTI_MOVE1"), LW(0), LW(1), LW(2), LW(9))
         ADD(LW(0), 200)
@@ -133,12 +112,12 @@ EVT_BEGIN(chibitoge_nakama)
         CALL(evt_msg_print, 0, STRING("stg2_mri_f01_04"), 0, STRING("プニ店員"))
         CALL(evt_cam3d_evt_off, 0, 11)
         WAIT_FRAMES(1)
-        ELSE
+    ELSE
         CALL(evt_msg_print_party, STRING("stg2_mri_f01_05"))
-        CALL(evt_npc_flag_onoff, 0, STRING("me"), 512)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_TALK_ANIM)
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg2_mri_f01_06"), 0, 0)
-        CALL(evt_npc_flag_onoff, 1, STRING("me"), 512)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_TALK_ANIM)
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_TOGETTI_JUMP1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_npc_jump_position_nohit, STRING("me"), -138, 0, 72, 300, 30)
@@ -150,24 +129,24 @@ EVT_BEGIN(chibitoge_nakama)
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
         CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
         CALL(evt_puni_init_puni, 3, 1, LW(0), LW(1), LW(2), 0)
-        SET_VALUE(GSWF(2878), 1)
+        SET_VALUE(GSWF(GSWF_MRI_JABBI_IN_PUNI_GROUP), 1)
     END_IF
     CALL(evt_puni_flag_onoff, 1, 1, 262144)
-    CALL(evt_puni_set_mode, 1, 1)
-    CALL(evt_npc_flag_onoff, 0, STRING("ガイドsp"), 1536)
-#ifndef VERSION_G8ME01_DEMO
+    CALL(evt_puni_set_mode, 1, PUNI_MODE_JOIN)
+    CALL(evt_npc_flag_onoff, 0, STRING("ガイドsp"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
+#if VERSION != VERSION_DEMO
     CALL(evt_party_run, 0)
 #endif
     RETURN
 EVT_END()
 
 static EVT_BEGIN(chibitoge_init)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(102, 105)
-        CASE_GREATER_OR_EQUAL(118)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG2_21_PUNIES_VS_JABBIES_2, STORY_STG2_21_03_SUPER_BOOTS)
+        CASE_GREATER_OR_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
         CASE_DEFAULT
-        IF_INT_EQUAL(GSWF(2836), 0)
-            IF_INT_EQUAL(GSWF(2878), 0)
+        IF_INT_EQUAL(GSWF(GSWF_MRI03_PUNIO_WAITING_AT_CELL), 0)
+            IF_INT_EQUAL(GSWF(GSWF_MRI_JABBI_IN_PUNI_GROUP), 0)
                 CALL(evt_npc_set_position, STRING("me"), -170, 0, 0)
                 CALL(evt_npc_set_ry, STRING("me"), 90)
             END_IF
@@ -198,8 +177,8 @@ EVT_BEGIN(puniinfo_init)
 EVT_END()
 
 EVT_BEGIN(puniinfo_talk)
-    SWITCH(GSW(0))
-        CASE_LESS(112)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
         SWITCH(LSW(714))
             CASE_EQUAL(0)
             CALL(evt_msg_print, 0, STRING("stg2_mri_f00_00"), 0, STRING("me"))
@@ -211,7 +190,7 @@ EVT_BEGIN(puniinfo_talk)
             CALL(evt_msg_print, 0, STRING("stg2_mri_f00_02"), 0, STRING("me"))
             SET_VALUE(LSW(714), 0)
         END_SWITCH
-        CASE_LESS(401)
+        CASE_LESS(STORY_STG8_16_SHADOW_QUEEN)
         SWITCH(LSW(714))
             CASE_EQUAL(0)
             CALL(evt_msg_print, 0, STRING("stg2_mri_f00_02_01"), 0, STRING("me"))
@@ -242,7 +221,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         chibitoge_init, // initEvent
         NULL, // regularEvent
@@ -254,7 +233,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"プニ店員"*/"\x83\x76\x83\x6A\x93\x58\x88\xF5", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         punishop_init, // initEvent
         NULL, // regularEvent
@@ -266,7 +245,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"プニ情報屋"*/"\x83\x76\x83\x6A\x8F\xEE\x95\xF1\x89\xAE", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puniinfo_init, // initEvent
         NULL, // regularEvent
@@ -283,8 +262,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -317,17 +296,16 @@ EVT_BEGIN(mri_07_init_evt)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(109, 110)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI1"))
     END_SWITCH
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 8, 290, 82, 120, 0, 0)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     RETURN
 EVT_END()
-

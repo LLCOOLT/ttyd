@@ -1,3 +1,4 @@
+// src/sequence/seq_game.c: the game sequence (seq_: game sequence) that runs while Mario is in the field.
 #pragma once
 
 #include <dolphin/os.h>

@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: fire breath, a stream of flames from a start point toward an end point; types 0-2.
 #include "eff/n64/eff_breath_fire_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"

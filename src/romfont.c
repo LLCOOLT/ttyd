@@ -1,11 +1,14 @@
+// ROM font: draws text with the console's built-in (IPL) font, for messages shown before the game font is loaded.
 #include "romfont.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
 #include "memory.h"
-#if defined(VERSION_G8ME01) || defined(VERSION_G8ME01_DEMO)
+#include "version.h"
+#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
 #include "mario/mariost.h"
 #endif
 #include <dolphin/os.h>
+#include "libc_decls.h"
 
 //.sbss
 static RomFontWork work;
@@ -14,7 +17,7 @@ static RomFontWork work;
 static RomFontWork* wp = &work;
 
 //.rodata string, .sdata table
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 const char* msg_jp[21] = {
     "\203v\203\215\203O\203\214\203b\203V\203u\203\202\201[\203h\202\305\225\\\216\246\202\265\202\334\202\267\202\251\201H",
     "\202\315\201@\202\242\201@\201@\201@\201@\201@\201@\202\242\202\242\202\246",
@@ -40,19 +43,19 @@ const char* msg_jp[21] = {
 };
 
 const char* msg_us[21] = {
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "Would you like to display\nin progressive scan mode?",
 #else
     "Would you like to display\nin Progressive Mode?",
 #endif
     "Yes              N o",
     "[    ]",
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "Progressive scan mode\nhas been turned on.",
 #else
     "Progressive Mode\nhas been turned on.",
 #endif
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "Progressive scan mode\nhas been turned off.",
 #else
     "Progressive Mode\nhas been turned off.",
@@ -63,7 +66,7 @@ const char* msg_us[21] = {
     "Screen display has been set to\n60Hz mode.",
     "Screen display has been set to\n50Hz mode.",
     "The Disc Cover is open.\nIf you want to continue the game,\nplease close the Disc Cover.",
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "Please insert\nthe \"Paper Mario\" Game Disc.",
 #else
     "Please insert\nthe \"Paper Mario: The\nThousand-Year Door\"\nGame Disc.",
@@ -85,7 +88,7 @@ const char* msg_ge[21] = {
     "",
     "",
     "",
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "Dieses Spiel unterst\374tzt den 60Hz-Modus.\nBitte Modus ausw\344hlen.\n\nSollte das TV-Ger\344t im 60Hz-Modus kein\neinwandfreies Bild darstellen,\nbitte den 50Hz-Modus ausw\344hlen.",
 #else
     "Dieses Spiel unterst\374tzt den 60Hz-Modus.\nBitte Modus auswahlen.\n\nSollte das TV-Gerat im 60Hz-Modus kein\neinwandfreies Bild darstellen,\nbitte den 50Hz-Modus auswahlen.",
@@ -95,7 +98,7 @@ const char* msg_ge[21] = {
     "Die Bildschirmdarstellung erfolgt im\n60Hz-Modus.",
     "Die Bildschirmdarstellung erfolgt im\n50Hz-Modus.",
     "Der Disc-Deckel ist ge\366ffnet.\nBitte den Disc-Deckel schlie\337en,\num mit dem Spiel fortzufahren.",
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "Bitte legen Sie die \"Paper Mario\"-Disc ein.",
 #else
     "Bitte legen Sie die \"Paper Mario\" Disc ein.",
@@ -117,7 +120,7 @@ const char* msg_fr[21] = {
     "",
     "",
     "",
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "Ce jeu est compatible\navec le mode 60 Hz.\nVeuillez choisir un mode.\n\nSi votre t\351l\351viseur n'affiche pas\ncorrectement le mode 60 Hz,\nchoisissez le mode 50 Hz.",
 #else
     "Ce jeu est compatible\navec le mode 60 Hz.\nVeuillez choisir un mode.\n\nSi votre televiseur n'affiche pas\ncorrectement le mode 60 Hz,\nchoisissez le mode 50 Hz.",
@@ -128,7 +131,7 @@ const char* msg_fr[21] = {
     "L'affichage est en mode 50 Hz.",
     "Le couvercle est ouvert.\nPour continuer \340 jouer,\nveuillez fermer le couvercle.",
     "Veuillez ins\351rer le disque \"Paper Mario\".",
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     "La lecture du disque a \351chou\351.\nVeuillez vous r\351f\351rer\nau manuel d'instructions\nNintendo GameCube pour\nde plus amples informations.",
 #else
     "La lecture du disque a echoue.\nVeuillez vous r\351f\351rer\nau manuel d'instructions\nNintendo GameCube pour\nde plus amples informations.",
@@ -191,9 +194,9 @@ const char* msg_it[21] = {
     NULL,
 };
 
-static const char** msg_tbl[6] = { msg_jp, msg_us, msg_ge, msg_fr, msg_sp, msg_it };
+static const char** msg_tbl[6] = {msg_jp, msg_us, msg_ge, msg_fr, msg_sp, msg_it};
 #else
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 const char* msg_jp[9] = {
 #else
 const char* msg_jp[10] = {
@@ -206,7 +209,7 @@ const char* msg_jp[10] = {
     "ディスクカバーが開いています。\n\nゲームを続ける場合は、\nディスクカバーを閉めてください。",
     "ペーパーマリオＲＰＧの\nディスクをセットしてください。",
     "ディスクを読めませんでした。\n\nくわしくは、本体の取扱説明書を\nお読みください。",
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     "エラーが発生しました。\n\n本体のパワーボタンを押して電源をOFFにし、\n本体の取扱説明書の指示に従ってください。",
 #endif
     NULL
@@ -231,7 +234,7 @@ static const char** msg_tbl[2] = { msg_jp, msg_us };
 void romFontMake(void);
 
 const char* romFontGetMessage(s32 msg) {
-#if defined(VERSION_G8ME01) || defined(VERSION_G8ME01_DEMO)
+#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
     if (wp->language != 0 && (u32)gp->language == 0) {
         return msg_tbl[1][msg];
     }
@@ -266,7 +269,7 @@ void romFontMake(void) {
     u16 prev;
     s32 t;
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     chars = __memAlloc(HEAP_DEFAULT, 0x2000);
 #else
     chars = __memAlloc(HEAP_DEFAULT, 0x800);
@@ -274,7 +277,7 @@ void romFontMake(void) {
     numChars = 0;
 
     /* 1. Collect every printable code from the system message strings. */
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     for (t = 0; t < 6; t++) {
 #else
     for (t = 0; t < 2; t++) {
@@ -283,10 +286,10 @@ void romFontMake(void) {
             /* ASCII mode (language != 0): only scan the English table (t != 0). */
             s32 k = 0;
             if (wp->language == 0 || t != 0) {
-                for (k;;) {
+                for (;;) {
                     u32 b = str[k];
                     u16 w = *(u16*)(str + k);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                     if (wp->language != 0) {
                         if (b == 0) {
                             break;
@@ -326,13 +329,9 @@ void romFontMake(void) {
         }
     }
 
-    /* 3. Deduplicate the sorted list; wp->unk4 = unique count. */
+    /* 3. Deduplicate the sorted list; wp->uniqueChars = unique count. */
     wp->uniqueChars = 0;
-#ifdef VERSION_G8ME01
-    uniqueChars = __memAlloc(HEAP_DEFAULT, 0x2000);
-#else
-    uniqueChars = __memAlloc(HEAP_DEFAULT, 0x800);
-#endif
+    uniqueChars = __memAlloc(HEAP_DEFAULT, VERSION_PICK(0x800, 0x2000));
     prev = 0xFFFF;
     for (i = 0; i < numChars; i++) {
         if (chars[i] != prev) {
@@ -377,7 +376,6 @@ void romFontMake(void) {
     __memFree(HEAP_DEFAULT, chars);
 }
 
-double tan(double);
 
 static inline RomFontChar* romFontFindChar(u16 code) {
     RomFontWork* w = wp;
@@ -447,11 +445,11 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
     GXSetCurrentMtx(GX_PNMTX0);
 
     // --- walk the formatted string, one 24x24 quad per glyph ---
-    for (i;;) {
+    for (;;) {
         u32 c = buf[i];
         u16 c16 = *(u16*)&buf[i]; // big-endian lead<<8 | trail, for double-byte
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         if (wp->language != 0) {
             if (c == 0x0A) {
                 curX = 0;
@@ -505,7 +503,7 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
 }
 
 s32 romFontGetWidth(const char* message) {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     s32 width = 0;
     s32 i = 0;
     s32 max = 0;
@@ -524,7 +522,7 @@ s32 romFontGetWidth(const char* message) {
     for (;;) {
         c = message[i];
         c16 = *(u16*)&message[i];
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         if (wp->language != 0) {
             if (c == 0x00) {
                 if (max < width) {

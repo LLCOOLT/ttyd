@@ -1,6 +1,8 @@
+// seq_demo.c: the movie sequence (seq_: game sequence) and the THPSimple* movie player it uses.
 #pragma once
 
 #include "dolphin/gx/GXStruct.h"
+#include "version.h"
 
 BOOL THPSimpleInit(s32 audioSystem);
 void THPSimpleQuit(void);
@@ -17,7 +19,7 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* rmode, u32 x, u32 y, u32 polygonW
 u32 THPSimpleGetTotalFrame(void);
 BOOL THPSimpleSetVolume(s32 vol, s32 time);
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 #include "driver/seqdrv.h"
 
 // the demo's movie sequence (seq_data[7]), at the end of its seq_demo.c

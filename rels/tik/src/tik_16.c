@@ -1,39 +1,29 @@
+// tik_16 (埋没した都市, Rogueport Sewers): the room with the pipes to The Great Tree (mri_00) and Petalburg (nok_01).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "evt/evt_movefloor.h"
 #include "driver/hitdrv.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mobj_flag_onoff);
-USER_FUNC(evt_mobj_lv_blk);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_mobj_tornadoswitch_blue);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "tik.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static BeroEntry bero_entry_data[7];
 static HitDamageReturn hitDmgRetPoints[9];
-extern EvtWord tik_16_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -48,8 +38,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -64,8 +54,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -80,8 +70,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -97,8 +87,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -114,8 +104,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -144,16 +134,16 @@ static HitDamageReturn hitDmgRetPoints[] = {
 
 static EVT_BEGIN(evt_switch_00_init)
     CALL(evt_hit_bind_mapobj, STRING("a_dokan_1"), STRING("S_dakan_1"))
-    IF_INT_EQUAL(GSWF(1345), 1)
+    IF_INT_EQUAL(GSWF(GSWF_TIK16_PIPE_MRI_OPEN), 1)
         CALL(evt_mapobj_trans, 1, STRING("S_dakan_1"), 0, 30, 0)
         CALL(evt_hit_bind_update, STRING("a_dokan_1"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dokan_1_k"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_1_k"), MAPOBJ_FLAG_HIDE)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_switch_00_after)
-    IF_INT_EQUAL(GSWF(1345), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TIK16_PIPE_MRI_OPEN), 0)
         SET_VALUE(LW(0), STRING("dokan_1"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
@@ -173,7 +163,7 @@ static EVT_BEGIN(evt_switch_00)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dokan_1_k"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_1_k"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LW(0), STRING("dokan_1"))
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
@@ -181,16 +171,16 @@ EVT_END()
 
 static EVT_BEGIN(evt_switch_01_init)
     CALL(evt_hit_bind_mapobj, STRING("a_dokan_2"), STRING("S_dakan_2"))
-    IF_INT_EQUAL(GSWF(1346), 1)
+    IF_INT_EQUAL(GSWF(GSWF_TIK16_PIPE_NOK_OPEN), 1)
         CALL(evt_mapobj_trans, 1, STRING("S_dakan_2"), 0, 30, 0)
         CALL(evt_hit_bind_update, STRING("a_dokan_2"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dokan_2_k"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_2_k"), MAPOBJ_FLAG_HIDE)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_switch_01_after)
-    IF_INT_EQUAL(GSWF(1346), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TIK16_PIPE_NOK_OPEN), 0)
         SET_VALUE(LW(0), STRING("dokan_2"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
@@ -210,15 +200,15 @@ static EVT_BEGIN(evt_switch_01)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dokan_2_k"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_2_k"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LW(0), STRING("dokan_2"))
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
 EVT_END()
 
 EVT_BEGIN(tik_16_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK7"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK7"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL_CHILD(PTR(evt_switch_00_init))
     CALL_CHILD(PTR(evt_switch_01_init))
@@ -230,9 +220,9 @@ EVT_BEGIN(tik_16_init_evt)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
     CALL(evt_map_playanim, STRING("anm_mizu"), 1, 0)
-    CALL(evt_mobj_lv_blk, STRING("block"), 0, 0, 0, 0, GSWF(1347), STRING("MOBJ_Lv1BigBigBlock"))
-    IF_INT_EQUAL(GSWF(1347), 0)
-        CALL(evt_mobj_flag_onoff, 1, STRING("block"), 128)
+    CALL(evt_mobj_lv_blk, STRING("block"), 0, 0, 0, 0, GSWF(GSWF_TIK16_BIG_BLOCK_BROKEN), STRING("MOBJ_Lv1BigBigBlock"))
+    IF_INT_EQUAL(GSWF(GSWF_TIK16_BIG_BLOCK_BROKEN), 0)
+        CALL(evt_mobj_flag_onoff, 1, STRING("block"), MOBJ_FLAG_NO_CULL)
     END_IF
     SET_VALUE(LW(0), STRING("dai_3"))
     SET_VALUE(LW(1), STRING("a_dai_3"))
@@ -245,9 +235,8 @@ EVT_BEGIN(tik_16_init_evt)
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(12), 0)
     SPAWN_EVENT(PTR(moving_floor))
-    CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch00"), -125, 0, 0, PTR(evt_switch_00), GSWF(1345))
-    CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch01"), 125, 0, 0, PTR(evt_switch_01), GSWF(1346))
-    CALL(evt_mobj_powerupblk, STRING("pblk1"), 125, 160, -100, 0, GSWF(5534), 0)
+    CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch00"), -125, 0, 0, PTR(evt_switch_00), GSWF(GSWF_TIK16_PIPE_MRI_OPEN))
+    CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch01"), 125, 0, 0, PTR(evt_switch_01), GSWF(GSWF_TIK16_PIPE_NOK_OPEN))
+    CALL(evt_mobj_powerupblk, STRING("pblk1"), 125, 160, -100, 0, GSWF(GSWF_TIK16_SHINE_SPRITE), 0)
     RETURN
 EVT_END()
-

@@ -1,38 +1,32 @@
+// dou_00 (洞窟, Pirate's Grotto): entrance cave reached from Keelhaul Key (muj_05).
+// Arrival cutscene (story 242 to 243), a save block and Ruin Powder; the door leads to dou_01.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/animdrv.h"
 
 #include "driver/mapdrv.h"
 #include "driver/envdrv.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
+#include "dou.h"
+#include "evt/evt_story.h"
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_blend_off);
-USER_FUNC(evt_map_blend_set_flag);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_blend);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_telop_entry);
 void water_tev(MapTevCallbackInfo* info);
 
 static BeroEntry bero_entry_data[3];
 extern EvtWord totsunyu_event[];
-extern EvtWord dou_00_init_evt[];
 
 static EVT_BEGIN(bero_in_event)
-    IF_INT_EQUAL(GSW(0), 242)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_SKULL_ROCK)
         CALL_CHILD(PTR(totsunyu_event))
     END_IF
     SET_VALUE(LW(0), 0)
@@ -43,8 +37,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)bero_in_event, // enterEvent
@@ -59,8 +53,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -85,7 +79,7 @@ static EVT_BEGIN(back_light)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(evt_map_blend_set_flag, 0, STRING("mario"), 2048)
+    CALL(evt_map_blend_set_flag, 0, STRING("mario"), ANIM_MATERIAL_FLAG_NO_BLEND)
     CALL(evt_map_blend_off, 0)
     RETURN
 EVT_END()
@@ -100,7 +94,7 @@ EVT_BEGIN(totsunyu_event)
     CALL(evt_msg_print, 0, STRING("stg5_dou_00"), 0, 0)
     SPAWN_EVENT(PTR(back_light))
     WAIT_MS(200)
-    SET_VALUE(GSW(0), 243)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_01_ENTERING_THE_GROTTO)
     CALL(evt_mario_key_onoff, 1)
     BEGIN_INLINE_EVENT
         CALL(evt_telop_entry, 10)
@@ -109,8 +103,8 @@ EVT_BEGIN(totsunyu_event)
 EVT_END()
 
 EVT_BEGIN(dou_00_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -118,10 +112,10 @@ EVT_BEGIN(dou_00_init_evt)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 30, 85, -75, 0, 0)
-    CALL(evt_item_entry, STRING("item_01"), 137, -245, 0, 85, 16, GSWF(2990), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_RUIN_POWDER, -245, 0, 85, 16, GSWF(GSWF_DOU00_RUIN_POWDER_TAKEN), 0)
     CALL(evt_map_set_tevcallback, 1, PTR(water_tev))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s00_suimen"), 16777216)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s00_suimen"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s00_suimen"), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s00_suimen"), MAPOBJ_FLAG_DISPLAY_LIST)
     RETURN
 EVT_END()
 

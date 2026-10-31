@@ -1,17 +1,10 @@
+// aaa.rel (マリオの家, Mario Bros.' house): registers aaa_00 and frees the map's texture on unload.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
 #include "aaa.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-void mapdelete(void);
-
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
+#include "rel_module.h"
 
 void _prolog(void) {
     voidfunctionptr* ctor;

@@ -1,3 +1,4 @@
+// eff_starpoint.c: Star Points effect entry (effStarPointEntry) with its main and draw callbacks.
 #pragma once
 
 #include "driver/camdrv.h"

@@ -1,3 +1,4 @@
+// romfont.c: the ROM font (the console's built-in font): glyph work (RomFontWork) and romFontPrintGX.
 #pragma once
 
 #include <dolphin/gx.h>
@@ -11,8 +12,8 @@ typedef struct RomFontChar {
 
 typedef struct RomFontWork {
     RomFontChar* glyphs; // 0x0
-    s32 uniqueChars;   // 0x4
-    s32 language;      // 0x8, 0 = SJIS, 1 = ASCII
+    s32 uniqueChars;     // 0x4
+    s32 language;        // 0x8, 0 = SJIS, 1 = ASCII
 } RomFontWork;
 
 const char* romFontGetMessage(s32 msg);

@@ -1,3 +1,4 @@
+// rsh: Excess Express (ressha, train), shared code for the whole area: car door open/close, window scenery, random passenger NPCs and their talk events, REL prolog/epilog.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -15,80 +16,50 @@
 #include "driver/imgdrv.h"
 #include "data/mapdata.h"
 #include "driver/swdrv.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "npc_event.h"
 #include "rsh.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "rel_module.h"
+#include "driver/casedrv.h"
+#include "libc_decls.h"
 
-typedef struct RshRndNpc { const char* name; const char* model; EvtWord* talkEvt; } RshRndNpc;
-double tan(double x);
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
+typedef struct RshRndNpc {
+    const char* name;
+    const char* model;
+    EvtWord* talkEvt;
+} RshRndNpc;
 
 USER_FUNC(debug_print_func);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_hitobj_attr_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos);
-USER_FUNC(evt_mario_party_door_move);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_check);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_set_offscreen);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_stop);
 USER_FUNC(evt_rsh_get_rnd_npc);
 USER_FUNC(evt_rsh_get_rnd_npc_data);
 USER_FUNC(evt_rsh_get_rnd_npc_talk_evt);
 USER_FUNC(evt_rsh_set_rnd_npc);
 USER_FUNC(evt_rsh_set_rnd_npc_talk_evt);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_mapname);
-USER_FUNC(evt_sub_random);
 BOOL img_wait(void);
 RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index);
 void rsh_window_tev(MapTevCallbackInfo* info);
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
 
 extern EvtWord simi_check[];
 extern EvtWord simi_offscreen_check[];
 extern EvtWord kami_check[];
 extern EvtWord kami_offscreen_check[];
-extern EvtWord evt_rsh_door_init[];
-extern EvtWord evt_rsh_door_entry[];
 extern EvtWord evt_rsh_door_open[];
 extern EvtWord evt_rsh_door_close[];
-extern EvtWord evt_rsh_window[];
 RshRndNpc rsh_01_rnd_npc_1[5];
 RshRndNpc rsh_01_rnd_npc_2[3];
 RshRndNpc rsh_01_rnd_npc_3[2];
@@ -148,12 +119,8 @@ const char* rsh_04_rnd_npc_2_list[2];
 const char* rsh_04_rnd_npc_3_list[2];
 const char* rsh_04_rnd_npc_4_list[4];
 extern EvtWord debug_print_rnd_npc[];
-extern EvtWord evt_rsh_rnd_npc_init[];
-extern EvtWord evt_rsh_01_rnd_npc_entry[];
 NpcSetupInfo rsh_03_rnd_npc_2_ent[2];
-extern EvtWord evt_rsh_03_rnd_npc_entry[];
 NpcSetupInfo rsh_04_rnd_npc_3_ent[2];
-extern EvtWord evt_rsh_04_rnd_npc_entry[];
 
 EVT_BEGIN(simi_check)
     SET_VALUE(LF(0), 0)
@@ -165,13 +132,13 @@ EVT_BEGIN(simi_check)
         SET_VALUE(LF(0), 1)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
-        SWITCH(GSW(0))
-            CASE_BETWEEN(283, 302)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_yuka"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_yuka_simi"), 1)
+        SWITCH(GSW(GSW_STORY_PROGRESS))
+            CASE_BETWEEN(STORY_STG6_01_THE_CONDUCTOR, STORY_STG6_20_END_OF_DAY_1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_yuka"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_yuka_simi"), MAPOBJ_FLAG_HIDE)
             CASE_DEFAULT
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_yuka"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_yuka_simi"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_yuka"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_yuka_simi"), MAPOBJ_FLAG_HIDE)
         END_SWITCH
     END_IF
     RETURN
@@ -187,8 +154,8 @@ EVT_BEGIN(simi_offscreen_check)
         SET_VALUE(LF(0), 1)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
-        SWITCH(GSW(0))
-            CASE_BETWEEN(283, 302)
+        SWITCH(GSW(GSW_STORY_PROGRESS))
+            CASE_BETWEEN(STORY_STG6_01_THE_CONDUCTOR, STORY_STG6_20_END_OF_DAY_1)
             CALL(evt_mapobj_clear_offscreen, 0, STRING("s_yuka"))
             CASE_DEFAULT
             CALL(evt_mapobj_clear_offscreen, 0, STRING("s_yuka_simi"))
@@ -200,24 +167,24 @@ EVT_END()
 EVT_BEGIN(kami_check)
     CALL(evt_sub_get_mapname, LW(10))
     IF_STR_EQUAL(LW(10), STRING("rsh_01_a"))
-        IF_INT_EQUAL(GSW(0), 304)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_3_kami"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_3"), 1)
-            ELSE
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_3_kami"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_3"), 1)
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_22_DOCUMENT)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yuka_3_kami"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yuka_3"), MAPOBJ_FLAG_HIDE)
+        ELSE
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yuka_3_kami"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yuka_3"), MAPOBJ_FLAG_HIDE)
         END_IF
     END_IF
     IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
-        SWITCH(GSW(0))
-            CASE_BETWEEN(306, 307)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_5_kami"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5_kami_2"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5"), 1)
+        SWITCH(GSW(GSW_STORY_PROGRESS))
+            CASE_BETWEEN(STORY_STG6_24_A_VITAL_CLUE, STORY_STG6_24_02_ANOTHER_CLUE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yuka_5_kami"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yuka_5_kami_2"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yuka_5"), MAPOBJ_FLAG_HIDE)
             CASE_DEFAULT
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5_kami"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5_kami_2"), 1)
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_5"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yuka_5_kami"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yuka_5_kami_2"), MAPOBJ_FLAG_HIDE)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yuka_5"), MAPOBJ_FLAG_HIDE)
         END_SWITCH
     END_IF
     RETURN
@@ -226,15 +193,15 @@ EVT_END()
 EVT_BEGIN(kami_offscreen_check)
     CALL(evt_sub_get_mapname, LW(10))
     IF_STR_EQUAL(LW(10), STRING("rsh_01_a"))
-        IF_INT_EQUAL(GSW(0), 304)
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_22_DOCUMENT)
             CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_3"))
-            ELSE
+        ELSE
             CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_3_kami"))
         END_IF
     END_IF
     IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
-        SWITCH(GSW(0))
-            CASE_BETWEEN(306, 307)
+        SWITCH(GSW(GSW_STORY_PROGRESS))
+            CASE_BETWEEN(STORY_STG6_24_A_VITAL_CLUE, STORY_STG6_24_02_ANOTHER_CLUE)
             CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_5"))
             CASE_DEFAULT
             CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_5_kami"))
@@ -262,10 +229,10 @@ EVT_BEGIN(evt_rsh_door_entry)
     READ_INT(LW(5))
     READ_INT(LW(6))
     READ_INT(LW(7))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(2), 1)
-    CALL(evt_run_case_evt, 9, 1, LW(4), 0, PTR(evt_rsh_door_open), 0)
-    CALL(evt_run_case_evt, 9, 1, LW(6), 0, PTR(evt_rsh_door_close), 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(2), MAPOBJ_FLAG_HIDE)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(4), 0, PTR(evt_rsh_door_open), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(6), 0, PTR(evt_rsh_door_close), 0)
     RETURN
 EVT_END()
 
@@ -283,15 +250,15 @@ EVT_BEGIN(evt_rsh_door_open)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(img_wait)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(2), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(2), MAPOBJ_FLAG_HIDE)
     CALL_CHILD(PTR(kami_check))
     CALL(evt_hit_get_position, LW(4), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_SLIDE1"), LW(10), LW(11), LW(12), 0)
     CALL(evt_map_playanim, LW(5), 0, 0)
     CALL(evt_map_checkanim, LW(5), LW(10), LW(11))
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(3), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(3), MAPOBJ_FLAG_HIDE)
     CALL(evt_hit_get_position, LW(4), LW(10), LW(11), LW(12))
     SUBTRACT(LW(12), 50)
     CALL(evt_mario_party_door_move, LW(10), LW(12), FLOAT(80.0f))
@@ -303,11 +270,11 @@ EVT_BEGIN(evt_rsh_door_open)
     CALL_CHILD(PTR(simi_offscreen_check))
     CALL(evt_mapobj_set_offscreen, 1, STRING("w_tobira"), STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 1, STRING("e_tobira"), STRING("offscreen"))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("rouka"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("rouka"), MAPOBJ_FLAG_HIDE)
     CALL(evt_npc_check, STRING("車掌"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_npc_set_offscreen, STRING("車掌"), STRING("offscreen"))
-        CALL(evt_npc_flag_onoff, 1, STRING("車掌"), 128)
+        CALL(evt_npc_flag_onoff, 1, STRING("車掌"), NPC_FLAG_HIDDEN)
     END_IF
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
@@ -344,8 +311,8 @@ EVT_BEGIN(evt_rsh_door_open)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
         IF_STR_EQUAL(LW(1), STRING("heya_5"))
-            SWITCH(GSW(0))
-                CASE_EQUAL(301)
+            SWITCH(GSW(GSW_STORY_PROGRESS))
+                CASE_EQUAL(STORY_STG6_19_GIVE_BLANKET)
                 CALL(evt_mario_key_onoff, 0)
                 CALL(evt_img_wait_animend, STRING("capture_img"))
                 CALL(evt_party_stop, 0)
@@ -369,9 +336,9 @@ EVT_BEGIN(evt_rsh_door_open)
                 END_SWITCH
                 CALL(evt_party_run, 0)
                 CALL(evt_mario_key_onoff, 1)
-                CASE_BETWEEN(306, 307)
-                CALL(evt_snd_bgmoff, 18432)
-                CASE_EQUAL(326)
+                CASE_BETWEEN(STORY_STG6_24_A_VITAL_CLUE, STORY_STG6_24_02_ANOTHER_CLUE)
+                CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+                CASE_EQUAL(STORY_STG6_43_CONDUCTOR_APPEARS)
                 CALL(evt_mario_key_onoff, 0)
                 CALL(evt_img_wait_animend, STRING("capture_img"))
                 CALL(evt_party_stop, 0)
@@ -400,11 +367,11 @@ EVT_BEGIN(evt_rsh_door_open)
                 CALL(evt_img_wait_animend, STRING("capture_img"))
                 CALL(evt_mario_key_onoff, 1)
             END_SWITCH
-#ifdef VERSION_G8MP01
-            IF_INT_EQUAL(GSW(0), 308)
+#if VERSION == VERSION_EU
+            IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_25_ZIP_TOAD_APPEARS)
                 CALL(evt_npc_check, STRING("トロン"), LW(10))
                 IF_INT_EQUAL(LW(10), 1)
-                    CALL(evt_npc_flag_onoff, 0, STRING("トロン"), 32)
+                    CALL(evt_npc_flag_onoff, 0, STRING("トロン"), NPC_FLAG_INTANGIBLE)
                 END_IF
             END_IF
 #endif
@@ -423,21 +390,21 @@ EVT_BEGIN(evt_rsh_door_open)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
         IF_STR_EQUAL(LW(1), STRING("heya_4"))
-            IF_INT_EQUAL(GSWF(3434), 1)
-                SET_VALUE(GSWF(3435), 1)
+            IF_INT_EQUAL(GSWF(GSWF_RSH02_GOURMET_CABIN_TALK), 1)
+                SET_VALUE(GSWF(GSWF_RSH02_CABIN4_ENTERED_AFTER_GOURMET), 1)
             END_IF
-            IF_INT_EQUAL(GSWF(3445), 1)
-                CALL(evt_snd_bgmoff, 2048)
+            IF_INT_EQUAL(GSWF(GSWF_RSH02_GHOST_APPEARED), 1)
+                CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(10))
             END_IF
-#ifdef VERSION_G8MP01
-            IF_INT_EQUAL(GSW(0), 308)
+#if VERSION == VERSION_EU
+            IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_25_ZIP_TOAD_APPEARS)
                 CALL(evt_npc_check, STRING("トロン"), LW(10))
                 IF_INT_EQUAL(LW(10), 1)
-                    CALL(evt_npc_flag_onoff, 1, STRING("トロン"), 32)
+                    CALL(evt_npc_flag_onoff, 1, STRING("トロン"), NPC_FLAG_INTANGIBLE)
                 END_IF
             END_IF
 #endif
-            SET_VALUE(GSWF(3459), 1)
+            SET_VALUE(GSWF(GSWF_RSH02_INSIDE_CABIN4), 1)
         END_IF
     END_IF
     SET_VALUE(LF(0), 0)
@@ -453,10 +420,10 @@ EVT_BEGIN(evt_rsh_door_open)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
         IF_STR_EQUAL(LW(1), STRING("heya_5"))
-            SET_VALUE(GSWF(3446), 1)
+            SET_VALUE(GSWF(GSWF_RSH04_INSIDE_CABIN5), 1)
         END_IF
         IF_STR_EQUAL(LW(1), STRING("heya_3"))
-            SET_VALUE(GSWF(3447), 1)
+            SET_VALUE(GSWF(GSWF_RSH04_INSIDE_CABIN3), 1)
         END_IF
     END_IF
     RETURN
@@ -477,30 +444,30 @@ EVT_BEGIN(evt_rsh_door_close)
     CALL(evt_hitobj_attr_onoff, 0, 1, LW(6), 8388608)
     CALL(img_wait)
     BEGIN_INLINE_EVENT
-        IF_INT_EQUAL(GSW(0), 288)
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_06_PENNINGTONS_ASSISTANT)
             CALL(evt_sub_get_mapname, LW(0))
             IF_STR_EQUAL(LW(0), STRING("rsh_04_a"))
                 WAIT_MS(1000)
-                SET_VALUE(GSWF(3444), 1)
+                SET_VALUE(GSWF(GSWF_RSH_SCRIPTED_ENTRY_PENDING), 1)
                 CALL(evt_bero_mapchange, STRING("rsh_04_b"), STRING("e_bero"))
             END_IF
         END_IF
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        IF_INT_EQUAL(GSW(0), 294)
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_12_GIVE_AUTOGRAPH)
             CALL(evt_sub_get_mapname, LW(0))
             IF_STR_EQUAL(LW(0), STRING("rsh_04_b"))
                 WAIT_MS(1000)
-                SET_VALUE(GSWF(3444), 1)
+                SET_VALUE(GSWF(GSWF_RSH_SCRIPTED_ENTRY_PENDING), 1)
                 CALL(evt_bero_mapchange, STRING("rsh_04_c"), STRING("e_bero"))
             END_IF
         END_IF
     END_INLINE_EVENT
-    IF_INT_EQUAL(GSW(0), 297)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_15_GHOST_REQUEST)
         CALL(evt_sub_get_mapname, LW(10))
         IF_STR_EQUAL(LW(10), STRING("rsh_02_c"))
-            IF_INT_EQUAL(GSWF(3439), 0)
-                SET_VALUE(GSWF(3439), 1)
+            IF_INT_EQUAL(GSWF(GSWF_RSH02_GHOST_VOICE_HEARD), 0)
+                SET_VALUE(GSWF(GSWF_RSH02_GHOST_VOICE_HEARD), 1)
                 CALL(evt_msg_print, 0, STRING("stg6_rsh_123"), 0, STRING("ゆうれい"))
             END_IF
         END_IF
@@ -509,9 +476,9 @@ EVT_BEGIN(evt_rsh_door_close)
         CALL(evt_sub_get_mapname, LW(10))
         IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
             IF_STR_EQUAL(LW(1), STRING("heya_5"))
-                SWITCH(GSW(0))
-                    CASE_BETWEEN(306, 307)
-                    CALL(evt_snd_bgmon, 160, 0)
+                SWITCH(GSW(GSW_STORY_PROGRESS))
+                    CASE_BETWEEN(STORY_STG6_24_A_VITAL_CLUE, STORY_STG6_24_02_ANOTHER_CLUE)
+                    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
                 END_SWITCH
             END_IF
         END_IF
@@ -530,15 +497,15 @@ EVT_BEGIN(evt_rsh_door_close)
         END_IF
         IF_INT_EQUAL(LF(0), 1)
             IF_STR_EQUAL(LW(1), STRING("heya_4"))
-                IF_INT_EQUAL(GSWF(3445), 1)
-                    CALL(evt_snd_bgmon, 160, 0)
+                IF_INT_EQUAL(GSWF(GSWF_RSH02_GHOST_APPEARED), 1)
+                    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
                 END_IF
             END_IF
         END_IF
     END_INLINE_EVENT
-    SET_VALUE(GSWF(3446), 0)
-    SET_VALUE(GSWF(3447), 0)
-    SET_VALUE(GSWF(3459), 0)
+    SET_VALUE(GSWF(GSWF_RSH04_INSIDE_CABIN5), 0)
+    SET_VALUE(GSWF(GSWF_RSH04_INSIDE_CABIN3), 0)
+    SET_VALUE(GSWF(GSWF_RSH02_INSIDE_CABIN4), 0)
     CALL(evt_map_playanim, LW(5), 2, 0)
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
     CALL(evt_img_free_capture, STRING("capture_img"), 1)
@@ -569,7 +536,7 @@ EVT_BEGIN(evt_rsh_door_close)
         CALL(evt_mapobj_clear_offscreen, 1, LW(2))
         CALL(evt_npc_check, STRING("車掌"), LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL(evt_npc_flag_onoff, 0, STRING("車掌"), 128)
+            CALL(evt_npc_flag_onoff, 0, STRING("車掌"), NPC_FLAG_HIDDEN)
         END_IF
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_npc_set_offscreen, STRING("車掌"), 0)
@@ -577,7 +544,7 @@ EVT_BEGIN(evt_rsh_door_close)
     END_INLINE_EVENT
     CALL(evt_img_wait_animend, STRING("capture_img"))
     CALL(evt_img_onoff, STRING("capture_img"), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("rouka"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("rouka"), MAPOBJ_FLAG_HIDE)
     CALL_CHILD(PTR(simi_check))
     BEGIN_INLINE_EVENT
         CALL(evt_hit_get_position, LW(6), LW(10), LW(11), LW(12))
@@ -586,12 +553,12 @@ EVT_BEGIN(evt_rsh_door_close)
     END_INLINE_EVENT
     CALL(evt_hit_get_position, LW(4), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_SLIDE1_2"), LW(10), LW(11), LW(12), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(3), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(3), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, LW(7), 0, 0)
     CALL(evt_map_checkanim, LW(7), LW(10), LW(11))
     WAIT_MS(LW(11))
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, LW(2), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(2), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_attr_onoff, 0, 0, LW(4), 8388608)
     CALL(evt_hitobj_attr_onoff, 0, 0, LW(6), 8388608)
     CALL(evt_mario_key_onoff, 1)
@@ -607,8 +574,8 @@ EVT_BEGIN(evt_rsh_window)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
-        CALL(evt_mapobj_flag_onoff, 0, 1, LW(1), 16777216)
-        CALL(evt_mapobj_flag_onoff, 0, 0, LW(1), 256)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, LW(1), MAPOBJ_TEV_CALLBACK(1))
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, LW(1), MAPOBJ_FLAG_DISPLAY_LIST)
     END_LOOP
     RETURN
 EVT_END()
@@ -763,7 +730,7 @@ EVT_BEGIN(evt_rsh_rnd_npc_3_5_talk)
     CALL(evt_msg_select, 0, STRING("stg6_rsh_c_29_sel"))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_29_01"))
-        ELSE
+    ELSE
         CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_29_02"))
     END_IF
     RETURN
@@ -832,16 +799,16 @@ EVT_BEGIN(evt_rsh_rnd_npc_4_7_talk)
 EVT_END()
 
 EVT_BEGIN(evt_rsh_rnd_npc_4_8_talk)
-    IF_INT_EQUAL(GSWF(3457), 0)
+    IF_INT_EQUAL(GSWF(GSWF_RSH_PASSENGER_4_8_ANSWERED), 0)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_42"), 0, STRING("me"))
         CALL(evt_msg_select, 0, STRING("stg6_rsh_c_42_sel"))
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_42_01"))
-            SET_VALUE(GSWF(3457), 1)
-            ELSE
+            SET_VALUE(GSWF(GSWF_RSH_PASSENGER_4_8_ANSWERED), 1)
+        ELSE
             CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_42_02"))
         END_IF
-        ELSE
+    ELSE
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_42_03"), 0, STRING("me"))
     END_IF
     RETURN
@@ -868,7 +835,7 @@ EVT_BEGIN(evt_rsh_rnd_npc_5_2_talk)
 EVT_END()
 
 EVT_BEGIN(evt_rsh_rnd_npc_5_3_talk)
-    IF_INT_EQUAL(GSWF(3458), 0)
+    IF_INT_EQUAL(GSWF(GSWF_RSH_PASSENGER_5_3_ANSWERED), 0)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_47"), 0, STRING("me"))
         CALL(evt_msg_select, 0, STRING("stg6_rsh_c_47_sel"))
         SWITCH(LW(0))
@@ -879,8 +846,8 @@ EVT_BEGIN(evt_rsh_rnd_npc_5_3_talk)
             CASE_EQUAL(2)
             CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_47_03"))
         END_SWITCH
-        SET_VALUE(GSWF(3458), 1)
-        ELSE
+        SET_VALUE(GSWF(GSWF_RSH_PASSENGER_5_3_ANSWERED), 1)
+    ELSE
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_47_04"), 0, STRING("me"))
     END_IF
     RETURN
@@ -1019,9 +986,9 @@ typedef struct RshDebugStr {
 static const RshDebugStr rsh_debug_str_init = {0};
 
 EVT_BEGIN(evt_rsh_rnd_npc_init)
-    SET_VALUE(GSW(821), 0)
-    SET_VALUE(GSW(822), 0)
-    SET_VALUE(GSW(823), 0)
+    SET_VALUE(GSW(GSW_RSH_RANDOM_NPC_STATE_A), 0)
+    SET_VALUE(GSW(GSW_RSH_RANDOM_NPC_STATE_B), 0)
+    SET_VALUE(GSW(GSW_RSH_RANDOM_NPC_STATE_C), 0)
     CALL(evt_sub_random, 4, LW(0))
     CALL(evt_rsh_set_rnd_npc, 0, 0, LW(0))
     CALL(evt_sub_random, 2, LW(0))
@@ -1052,7 +1019,7 @@ EVT_BEGIN(evt_rsh_01_rnd_npc_entry)
     CALL(evt_npc_set_tribe, STRING("乗客１"), LW(2))
     CALL(evt_npc_set_position, STRING("乗客１"), -275, 0, -225)
     CALL(evt_npc_set_ry, STRING("乗客１"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客１"), LW(3))
     CALL(evt_rsh_get_rnd_npc, 0, 1, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 0, 1, LW(0), LW(1), LW(2))
@@ -1061,7 +1028,7 @@ EVT_BEGIN(evt_rsh_01_rnd_npc_entry)
     CALL(evt_npc_set_tribe, STRING("乗客２"), LW(2))
     CALL(evt_npc_set_position, STRING("乗客２"), -45, 0, -175)
     CALL(evt_npc_set_ry, STRING("乗客２"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客２"), LW(3))
     CALL(evt_rsh_get_rnd_npc, 0, 2, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 0, 2, LW(0), LW(1), LW(2))
@@ -1070,7 +1037,7 @@ EVT_BEGIN(evt_rsh_01_rnd_npc_entry)
     CALL(evt_npc_set_tribe, STRING("乗客３"), LW(2))
     CALL(evt_npc_set_position, STRING("乗客３"), 85, 16, -255)
     CALL(evt_npc_set_ry, STRING("乗客３"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客３"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客３"), NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客３"), LW(3))
     RETURN
 EVT_END()
@@ -1101,7 +1068,7 @@ EVT_BEGIN(evt_rsh_03_rnd_npc_entry)
     CALL(evt_npc_set_tribe, STRING("乗客１"), LW(2))
     CALL(evt_npc_set_position, STRING("乗客１"), 460, 0, -60)
     CALL(evt_npc_set_ry, STRING("乗客１"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客１"), LW(3))
     CALL(evt_rsh_get_rnd_npc, 1, 1, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 1, 1, LW(0), LW(1), LW(2))
@@ -1111,7 +1078,7 @@ EVT_BEGIN(evt_rsh_03_rnd_npc_entry)
     CALL(evt_npc_setup, PTR(rsh_03_rnd_npc_2_ent))
     CALL(evt_npc_set_position, STRING("乗客２"), -360, 0, -10)
     CALL(evt_npc_set_ry, STRING("乗客２"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客２"), LW(3))
     RETURN
 EVT_END()
@@ -1142,7 +1109,7 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     CALL(evt_npc_set_tribe, STRING("乗客１"), LW(2))
     CALL(evt_npc_set_position, STRING("乗客１"), 265, 0, -150)
     CALL(evt_npc_set_ry, STRING("乗客１"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客１"), LW(3))
     CALL(evt_rsh_get_rnd_npc, 2, 1, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 2, 1, LW(0), LW(1), LW(2))
@@ -1151,7 +1118,7 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     CALL(evt_npc_set_tribe, STRING("乗客２"), LW(2))
     CALL(evt_npc_set_position, STRING("乗客２"), -230, 0, -215)
     CALL(evt_npc_set_ry, STRING("乗客２"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客２"), LW(3))
     CALL(evt_rsh_get_rnd_npc, 2, 2, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 2, 2, LW(0), LW(1), LW(2))
@@ -1161,7 +1128,7 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     CALL(evt_npc_setup, PTR(rsh_04_rnd_npc_3_ent))
     CALL(evt_npc_set_position, STRING("乗客３"), -180, 0, -145)
     CALL(evt_npc_set_ry, STRING("乗客３"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客３"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客３"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客３"), LW(3))
     CALL(evt_rsh_get_rnd_npc, 2, 3, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 2, 3, LW(0), LW(1), LW(2))
@@ -1170,7 +1137,7 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     CALL(evt_npc_set_tribe, STRING("乗客４"), LW(2))
     CALL(evt_npc_set_position, STRING("乗客４"), -85, 16, -255)
     CALL(evt_npc_set_ry, STRING("乗客４"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("乗客４"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客４"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客４"), LW(3))
     RETURN
 EVT_END()
@@ -1188,48 +1155,48 @@ USER_FUNC(debug_print_func) {
     *(RshDebugStr*)header = rsh_debug_str_init;
 
     switch (room) {
-    case 0:
-        strcpy(header, "RSH_01:");
-        switch (group) {
         case 0:
-            list = (const char**)rsh_01_rnd_npc_1_list;
+            strcpy(header, "RSH_01:");
+            switch (group) {
+                case 0:
+                    list = (const char**)rsh_01_rnd_npc_1_list;
+                    break;
+                case 1:
+                    list = (const char**)rsh_01_rnd_npc_2_list;
+                    break;
+                case 2:
+                    list = (const char**)rsh_01_rnd_npc_3_list;
+                    break;
+            }
             break;
         case 1:
-            list = (const char**)rsh_01_rnd_npc_2_list;
+            strcpy(header, "RSH_03:");
+            switch (group) {
+                case 0:
+                    list = (const char**)rsh_03_rnd_npc_1_list;
+                    break;
+                case 1:
+                    list = (const char**)rsh_03_rnd_npc_2_list;
+                    break;
+            }
             break;
         case 2:
-            list = (const char**)rsh_01_rnd_npc_3_list;
+            strcpy(header, "RSH_04:");
+            switch (group) {
+                case 0:
+                    list = (const char**)rsh_04_rnd_npc_1_list;
+                    break;
+                case 1:
+                    list = (const char**)rsh_04_rnd_npc_2_list;
+                    break;
+                case 2:
+                    list = (const char**)rsh_04_rnd_npc_3_list;
+                    break;
+                case 3:
+                    list = (const char**)rsh_04_rnd_npc_4_list;
+                    break;
+            }
             break;
-        }
-        break;
-    case 1:
-        strcpy(header, "RSH_03:");
-        switch (group) {
-        case 0:
-            list = (const char**)rsh_03_rnd_npc_1_list;
-            break;
-        case 1:
-            list = (const char**)rsh_03_rnd_npc_2_list;
-            break;
-        }
-        break;
-    case 2:
-        strcpy(header, "RSH_04:");
-        switch (group) {
-        case 0:
-            list = (const char**)rsh_04_rnd_npc_1_list;
-            break;
-        case 1:
-            list = (const char**)rsh_04_rnd_npc_2_list;
-            break;
-        case 2:
-            list = (const char**)rsh_04_rnd_npc_3_list;
-            break;
-        case 3:
-            list = (const char**)rsh_04_rnd_npc_4_list;
-            break;
-        }
-        break;
     }
     sprintf(buf, "%s%d(%s, %s)\n", header, group, list[index], value);
     return EVT_RETURN_DONE;
@@ -1270,45 +1237,45 @@ RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
     RshRndNpc* data = NULL;
 
     switch (room) {
-    case 0:
-        switch (group) {
         case 0:
-            data = rsh_01_rnd_npc_1;
+            switch (group) {
+                case 0:
+                    data = rsh_01_rnd_npc_1;
+                    break;
+                case 1:
+                    data = rsh_01_rnd_npc_2;
+                    break;
+                case 2:
+                    data = rsh_01_rnd_npc_3;
+                    break;
+            }
             break;
         case 1:
-            data = rsh_01_rnd_npc_2;
+            switch (group) {
+                case 0:
+                    data = rsh_03_rnd_npc_1;
+                    break;
+                case 1:
+                    data = rsh_03_rnd_npc_2;
+                    break;
+            }
             break;
         case 2:
-            data = rsh_01_rnd_npc_3;
+            switch (group) {
+                case 0:
+                    data = rsh_04_rnd_npc_1;
+                    break;
+                case 1:
+                    data = rsh_04_rnd_npc_2;
+                    break;
+                case 2:
+                    data = rsh_04_rnd_npc_3;
+                    break;
+                case 3:
+                    data = rsh_04_rnd_npc_4;
+                    break;
+            }
             break;
-        }
-        break;
-    case 1:
-        switch (group) {
-        case 0:
-            data = rsh_03_rnd_npc_1;
-            break;
-        case 1:
-            data = rsh_03_rnd_npc_2;
-            break;
-        }
-        break;
-    case 2:
-        switch (group) {
-        case 0:
-            data = rsh_04_rnd_npc_1;
-            break;
-        case 1:
-            data = rsh_04_rnd_npc_2;
-            break;
-        case 2:
-            data = rsh_04_rnd_npc_3;
-            break;
-        case 3:
-            data = rsh_04_rnd_npc_4;
-            break;
-        }
-        break;
     }
     if (data == NULL) {
         data = rsh_01_rnd_npc_1;
@@ -1325,51 +1292,51 @@ USER_FUNC(evt_rsh_set_rnd_npc) {
     s32 value;
 
     switch (room) {
-    case 0:
-        value = evtGetValue(NULL, GSW(821));
-        switch (group) {
         case 0:
-            value |= index & 7;
+            value = evtGetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_A));
+            switch (group) {
+                case 0:
+                    value |= index & 7;
+                    break;
+                case 1:
+                    value |= (index & 3) << 3;
+                    break;
+                case 2:
+                    value |= (index & 1) << 5;
+                    break;
+            }
+            evtSetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_A), value);
             break;
         case 1:
-            value |= (index & 3) << 3;
+            value = evtGetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_B));
+            switch (group) {
+                case 0:
+                    value |= index & 0xF;
+                    break;
+                case 1:
+                    value |= (index & 7) << 4;
+                    break;
+            }
+            evtSetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_B), value);
             break;
         case 2:
-            value |= (index & 1) << 5;
+            value = evtGetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_C));
+            switch (group) {
+                case 0:
+                    value |= index & 1;
+                    break;
+                case 1:
+                    value |= (index & 1) << 1;
+                    break;
+                case 2:
+                    value |= (index & 1) << 2;
+                    break;
+                case 3:
+                    value |= (index & 3) << 3;
+                    break;
+            }
+            evtSetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_C), value);
             break;
-        }
-        evtSetValue(NULL, GSW(821), value);
-        break;
-    case 1:
-        value = evtGetValue(NULL, GSW(822));
-        switch (group) {
-        case 0:
-            value |= index & 0xF;
-            break;
-        case 1:
-            value |= (index & 7) << 4;
-            break;
-        }
-        evtSetValue(NULL, GSW(822), value);
-        break;
-    case 2:
-        value = evtGetValue(NULL, GSW(823));
-        switch (group) {
-        case 0:
-            value |= index & 1;
-            break;
-        case 1:
-            value |= (index & 1) << 1;
-            break;
-        case 2:
-            value |= (index & 1) << 2;
-            break;
-        case 3:
-            value |= (index & 3) << 3;
-            break;
-        }
-        evtSetValue(NULL, GSW(823), value);
-        break;
     }
     return EVT_RETURN_DONE;
 }
@@ -1382,57 +1349,57 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
     s32 index;
 
     switch (room) {
-    case 0:
-        value = evtGetValue(NULL, GSW(821));
-        switch (group) {
         case 0:
-            index = value & 7;
+            value = evtGetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_A));
+            switch (group) {
+                case 0:
+                    index = value & 7;
+                    break;
+                case 1:
+                    index = (value >> 3) & 3;
+                    break;
+                case 2:
+                    index = (value >> 5) & 1;
+                    break;
+                default:
+                    index = 0;
+                    break;
+            }
             break;
         case 1:
-            index = (value >> 3) & 3;
+            value = evtGetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_B));
+            switch (group) {
+                case 0:
+                    index = value & 0xF;
+                    break;
+                case 1:
+                    index = (value >> 4) & 7;
+                    break;
+                default:
+                    index = 0;
+                    break;
+            }
             break;
         case 2:
-            index = (value >> 5) & 1;
+            value = evtGetValue(NULL, GSW(GSW_RSH_RANDOM_NPC_STATE_C));
+            switch (group) {
+                case 0:
+                    index = value & 1;
+                    break;
+                case 1:
+                    index = (value >> 1) & 1;
+                    break;
+                case 2:
+                    index = (value >> 2) & 1;
+                    break;
+                case 3:
+                    index = (value >> 3) & 3;
+                    break;
+                default:
+                    index = 0;
+                    break;
+            }
             break;
-        default:
-            index = 0;
-            break;
-        }
-        break;
-    case 1:
-        value = evtGetValue(NULL, GSW(822));
-        switch (group) {
-        case 0:
-            index = value & 0xF;
-            break;
-        case 1:
-            index = (value >> 4) & 7;
-            break;
-        default:
-            index = 0;
-            break;
-        }
-        break;
-    case 2:
-        value = evtGetValue(NULL, GSW(823));
-        switch (group) {
-        case 0:
-            index = value & 1;
-            break;
-        case 1:
-            index = (value >> 1) & 1;
-            break;
-        case 2:
-            index = (value >> 2) & 1;
-            break;
-        case 3:
-            index = (value >> 3) & 3;
-            break;
-        default:
-            index = 0;
-            break;
-        }
-        break;
     }
     evtSetValue(event, args[2], index);
     return EVT_RETURN_DONE;
@@ -1459,12 +1426,12 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     texCoord = info->texMap;
     indStage = info->indStage;
     flags = p->flags;
-    if (flags & 0x20) {
+    if (flags & MAPOBJ_FLAG_IN_GROUP) {
         while ((p = p->parent) != NULL) {
             u32 f = p->flags;
-            if (f & 0x10) {
-                if (!(f & 0x20000000)) {
-                    p->flags = f | 0x20000000;
+            if (f & MAPOBJ_FLAG_GROUP) {
+                if (!(f & MAPOBJ_FLAG_BBOX)) {
+                    p->flags = f | MAPOBJ_FLAG_BBOX;
                     return;
                 }
                 x0 = p->screenRect[0];
@@ -1475,8 +1442,8 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
             }
         }
     } else {
-        if (!(flags & 0x20000000)) {
-            p->flags = flags | 0x20000000;
+        if (!(flags & MAPOBJ_FLAG_BBOX)) {
+            p->flags = flags | MAPOBJ_FLAG_BBOX;
             return;
         }
         x0 = p->screenRect[0];
@@ -1484,6 +1451,8 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
         x1 = p->screenRect[2];
         y1 = p->screenRect[3];
     }
+    // BUG: when no parent is a group (MAPOBJ_FLAG_GROUP) the loop above ends with x0..y1 never set,
+    // and they are read uninitialised here.
     if (x0 == 0x3FF || y0 == 0x3FF || x1 == 0x3FF || y1 == 0x3FF) {
         return;
     }
@@ -1513,7 +1482,7 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXTexModeSync();
     GXInitTexObj(&tex, buf, halfWidth, halfHeight, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&tex, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    t = tan(6.2831855f * (camGetPtr(4)->fovY / 2.0f) / 360.0f);
+    t = tan(6.2831855f * (camGetPtr(CAMERA_3D)->fovY / 2.0f) / 360.0f);
     C_MTXLightFrustum(mtx, gp->efbHeight / 2 - y1, gp->efbHeight / 2 - y0, x0 - gp->fbWidth / 2,
                       x1 - gp->fbWidth / 2, gp->efbHeight / 2.0f / t, 0.5f, 0.5f, 0.4f, 0.6f);
     PSMTXConcat(mtx, camGetCurPtr()->view, mtx);
@@ -1563,7 +1532,7 @@ void _prolog(void) {
     for (ctor = _ctors; *ctor != NULL; ctor++) {
         (*ctor)();
     }
-    if (swByteGet(0) < 0x153) {
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG6_54_WELCOME_BACK) {
         relSetEvtAddr("rsh_00_a", rsh_00_a_init_evt);
         relSetEvtAddr("rsh_00_b", rsh_00_b_init_evt);
         relSetEvtAddr("rsh_00_c", rsh_00_c_init_evt);
@@ -1610,4 +1579,3 @@ void _prolog(void) {
     }
     relSetBtlAddr("rsh", btlsetup_rsh_tbl, btl_rsh_setup_no_tbl);
 }
-

@@ -1,3 +1,4 @@
+// Declares the Power Lift (sac_muki) special move event.
 #pragma once
 
 #include "dolphin/types.h"

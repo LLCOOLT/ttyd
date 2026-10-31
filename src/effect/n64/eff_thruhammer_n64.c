@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: green-white scrolling rings at a given angle, staggered in time (4 for type 0, else 1).
 #include "eff/n64/eff_thruhammer_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -6,30 +7,27 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double x);
-double cos(double x);
+#include "libc_decls.h"
 
 typedef struct EffThruHammerN64Work {
-    s16 type;         // 0x0
-    Vec position;     // 0x4
-    Vec velocity;     // 0x10
-    Vec scale;        // 0x1C
-    s32 timer;        // 0x28
-    s32 counter;      // 0x2C
-    f32 rotY;         // 0x30
-    f32 rotZ;         // 0x34
-    s32 alpha;        // 0x38
-    f32 texS;         // 0x3C
-    f32 texSVel;      // 0x40
-    f32 texT;         // 0x44
-    f32 texTVel;      // 0x48
-    s32 delay;        // 0x4C
-    u8 r1, g1, b1;    // 0x50
-    u8 r2, g2, b2;    // 0x53
-    u8 pad[2];        // 0x56
+    s16 type;      // 0x0
+    Vec position;  // 0x4
+    Vec velocity;  // 0x10
+    Vec scale;     // 0x1C
+    s32 timer;     // 0x28
+    s32 counter;   // 0x2C
+    f32 rotY;      // 0x30
+    f32 rotZ;      // 0x34
+    s32 alpha;     // 0x38
+    f32 texS;      // 0x3C
+    f32 texSVel;   // 0x40
+    f32 texT;      // 0x44
+    f32 texTVel;   // 0x48
+    s32 delay;     // 0x4C
+    u8 r1, g1, b1; // 0x50
+    u8 r2, g2, b2; // 0x53
+    u8 pad[2];     // 0x56
 } EffThruHammerN64Work;
-
 
 static effN64Vtx stg_thruhammer_v[] = {
     {-34, -2, 20, 4267, 1024, 255, 255, 255, 255},
@@ -66,13 +64,13 @@ EffectEntry* effThruHammerN64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
 
     effect = effEntry();
     switch (type) {
-    case 0:
-        n = 4;
-        break;
-    case 1:
-    default:
-        n = 1;
-        break;
+        case 0:
+            n = 4;
+            break;
+        case 1:
+        default:
+            n = 1;
+            break;
     }
     effect->type = "ThruHammerN64";
     effect->count = n + 1;

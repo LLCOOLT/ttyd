@@ -1,3 +1,6 @@
+// evt_yuunpc: Pianta Parlor NPC contestants and crowd: poses, movement, goal and fall checks for each minigame.
+
+// defer_codegen: the original emits this unit's functions in deferred order (checked by removing it).
 #pragma defer_codegen on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -14,73 +17,69 @@
 #include "dolphin/mtx.h"
 #include "memory.h"
 #include "driver/dispdrv.h"
+#include "evt/evt_ext.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_seq.h"
 #include "pmario_sound.h"
 #include "yuu.h"
 #include "data_tables.h"
 #include <math.h>
 
-typedef struct YuuNpcPose { char name[16]; char anim[8]; u16 loop; f32 frames; f32 jump; s32 start; s32 count; u16 flags; f32 speed; } YuuNpcPose;
-typedef struct YuuNpc { u16 id; u16 flags; s16 state; f32 errorRate; Vec goal; Vec dest; Vec pos; Vec dir; f32 speed; f32 vy; f32 turnBaseDir; f32 zofs; s32 moveMode; s32 turnTimer; s16 poseId; s16 poses[4]; u8 pad_5e[2]; NpcEntry* npc; f32 animSpeed; u64 time; } YuuNpc;
-typedef struct YuuNpcWork { u16 flags; s32 numNpc; s32 slot[3]; YuuNpc* npcs; s32 basePoseNum; s32 numPoses; s32 chusanPose; s16 hit[6 * 72]; s16 hitY[72]; YuuNpcPose pose[32]; } YuuNpcWork;
+typedef struct YuuNpcPose {
+    char name[16];
+    char anim[8];
+    u16 loop;
+    f32 frames;
+    f32 jump;
+    s32 start;
+    s32 count;
+    u16 flags;
+    f32 speed;
+} YuuNpcPose;
+typedef struct YuuNpc {
+    u16 id;
+    u16 flags;
+    s16 state;
+    f32 errorRate;
+    Vec goal;
+    Vec dest;
+    Vec pos;
+    Vec dir;
+    f32 speed;
+    f32 vy;
+    f32 turnBaseDir;
+    f32 zofs;
+    s32 moveMode;
+    s32 turnTimer;
+    s16 poseId;
+    s16 poses[4];
+    u8 pad_5e[2];
+    NpcEntry* npc;
+    f32 animSpeed;
+    u64 time;
+} YuuNpc;
+typedef struct YuuNpcWork {
+    u16 flags;
+    s32 numNpc;
+    s32 slot[3];
+    YuuNpc* npcs;
+    s32 basePoseNum;
+    s32 numPoses;
+    s32 chusanPose;
+    s16 hit[6 * 72];
+    s16 hitY[72];
+    YuuNpcPose pose[32];
+} YuuNpcWork;
 static YuuNpcWork* yuunpc_wp;
-typedef struct YuuNpcData { const char* name; const char* anim; f32 frames; } YuuNpcData;
-s32 yuunpc_pose_check(const char* name, const char* anim);
-void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame);
+typedef struct YuuNpcData {
+    const char* name;
+    const char* anim;
+    f32 frames;
+} YuuNpcData;
 f32 yuusintbl[450];
 s32 chusan_mov_tbl[28];
 s32 chusan_act_tbl[8];
-f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc);
-void ext_yuunpc_minigame4_init_sub(void);
-s32 extGetPoseNum(void);
 MiniGameWork* yuunpc_yuuminigame4_ptr;
-void extLoadRenderMode(void);
-void extLoadVertex(void);
-void extLoadTexture(void);
-void extLoadTev(void);
-void extDraw(void);
-void extLoadTextureExit(void);
-void yuunpc_disp(CameraId camera, void* param);
-void yuunpc_pose_minigame1_main(void);
-void yuunpc_pose_minigame2_main(void);
-void yuunpc_pose_minigame3_main(void);
-void yuunpc_pose_minigame4_main(void);
-
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_npc_delete);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_seq_wait);
-void ext_yuunpc_minigame4_main(void);
-void ext_yuunpc_minigame3_main(void);
-void ext_yuunpc_minigame2_main(void);
-void ext_yuunpc_minigame1_main(void);
-void ext_yuunpc_dispent(void);
-void yuunpc_disp(CameraId camera, void* param);
-void yuunpc_pose_minigame4_main(void);
-void ext_yuunpc_minigame4_init(void);
-void ext_yuunpc_minigame4_init_sub(void);
-s32 yuunpc_juni(Vec* pos);
-u16 yuunpc_wp_flag_check(u16 flag);
-void yuunpc_wp_flag_off(u16 flag);
-void yuunpc_wp_flag_on(u16 flag);
-void errper_set_rtn(YuuNpc* npc);
-s32 goalincheck(YuuNpc* npc);
-s32 fallcheck(YuuNpc* npc);
-s32 hitcheck(YuuNpc* npc);
-void yuunpc_pose_minigame3_main(void);
-void ext_yuunpc_minigame3_init(void);
-void yuunpc_pose_minigame2_main(void);
-void ext_yuunpc_minigame2_init(void);
-void yuunpc_pose_minigame1_main(void);
-void ext_yuunpc_minigame1_init(void);
-f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc);
-void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump);
-void yuunpc_pose_change2(YuuNpc* npc, const char* name, const char* anim, f32 speed);
-void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame);
-s32 yuunpc_pose_check(const char* name, const char* anim);
-void yuunpc_pose_init(YuuNpcData* data);
-void yuunpc_maphit_init(void);
 
 ExtTexInfo ext_yuunpc_minigame1_data[6];
 ExtTexInfo ext_yuunpc_minigame2_data[6];
@@ -88,10 +87,6 @@ ExtTexInfo ext_yuunpc_minigame3_data[6];
 ExtTexInfo ext_yuunpc_minigame4_data[78];
 s32 chusan_mov_tbl[28];
 s32 chusan_act_tbl[8];
-extern EvtWord evt_yuunpc_minigame1[];
-extern EvtWord evt_yuunpc_minigame2[];
-extern EvtWord evt_yuunpc_minigame3[];
-extern EvtWord evt_yuunpc_minigame4[];
 
 f32 yuusintbl[] = {
     0.0f, 0.0174519997f, 0.0348990001f, 0.0523359999f, 0.0697560012f, 0.0871559978f, 0.104528002f, 0.121868998f,
@@ -475,7 +470,8 @@ f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc) {
 
     if (!(ext->flags & 2)) {
         f32 c, s;
-        a = ext->dir; a = 450.0f - a;
+        a = ext->dir;
+        a = 450.0f - a;
         if (a >= 360.0f) {
             a -= 360.0f;
         }
@@ -579,7 +575,7 @@ void yuunpc_pose_minigame1_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
-    f32 camX = camGetPtr(4)->cameraAt.x;
+    f32 camX = camGetPtr(CAMERA_3D)->cameraAt.x;
     YuuNpc* npc;
     f32 x, y, z;
 
@@ -592,13 +588,15 @@ void yuunpc_pose_minigame1_main(void) {
             x = (*ext->mtx)[0][3];
             if (x > camX) {
                 while (TRUE) {
-                    if (!(x > right)) break;
+                    if (!(x > right))
+                        break;
                     x -= 1000.0f;
                     (*ext->mtx)[0][3] = x;
                 }
             } else {
                 while (TRUE) {
-                    if (!(x < camX - 500.0f)) break;
+                    if (!(x < camX - 500.0f))
+                        break;
                     x += 1000.0f;
                     (*ext->mtx)[0][3] = x;
                 }
@@ -688,7 +686,7 @@ void yuunpc_pose_minigame2_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
-    f32 camX = camGetPtr(4)->cameraAt.x;
+    f32 camX = camGetPtr(CAMERA_3D)->cameraAt.x;
     YuuNpc* npc;
     f32 x, y, z;
 
@@ -701,13 +699,15 @@ void yuunpc_pose_minigame2_main(void) {
             x = (*ext->mtx)[0][3];
             if (x > camX) {
                 while (TRUE) {
-                    if (!(x > right)) break;
+                    if (!(x > right))
+                        break;
                     x -= 1000.0f;
                     (*ext->mtx)[0][3] = x;
                 }
             } else {
                 while (TRUE) {
-                    if (!(x < camX - 500.0f)) break;
+                    if (!(x < camX - 500.0f))
+                        break;
                     x += 1000.0f;
                     (*ext->mtx)[0][3] = x;
                 }
@@ -805,7 +805,7 @@ void yuunpc_pose_minigame3_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
-    f32 camX = camGetPtr(4)->cameraAt.x;
+    f32 camX = camGetPtr(CAMERA_3D)->cameraAt.x;
     YuuNpc* npc;
     f32 x, y, z;
 
@@ -818,13 +818,15 @@ void yuunpc_pose_minigame3_main(void) {
             x = (*ext->mtx)[0][3];
             if (x > camX) {
                 while (TRUE) {
-                    if (!(x > right)) break;
+                    if (!(x > right))
+                        break;
                     x -= 1200.0f;
                     (*ext->mtx)[0][3] = x;
                 }
             } else {
                 while (TRUE) {
-                    if (!(x < camX - 600.0f)) break;
+                    if (!(x < camX - 600.0f))
+                        break;
                     x += 1200.0f;
                     (*ext->mtx)[0][3] = x;
                 }
@@ -935,6 +937,7 @@ s32 hitcheck(YuuNpc* npc) {
     return 0;
 }
 
+// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 s32 fallcheck(YuuNpc* npc) {
     s32 out = 0;
@@ -1298,53 +1301,53 @@ static inline f32 yuunpc_rnd10(YuuNpc* npc) /* */ {
     return 10.0f * ((npc->id % 101 - 50) / 50.0f);
 }
 
-#define YUU_STOP(npc)                                                              \
-    do {                                                                           \
-        (npc)->moveMode = 0;                                                     \
-        yuunpc_pose_change((npc), (npc)->poses[0], 1.0f, rand() / 32767.0f);       \
-        (npc)->speed = 0.0f;                                                       \
+#define YUU_STOP(npc)                                                        \
+    do {                                                                     \
+        (npc)->moveMode = 0;                                                 \
+        yuunpc_pose_change((npc), (npc)->poses[0], 1.0f, rand() / 32767.0f); \
+        (npc)->speed = 0.0f;                                                 \
     } while (0)
 
-#define YUU_JUMP(npc)                                                                                                    \
-    do {                                                                                                                 \
-        (npc)->moveMode = 4;                                                                                           \
+#define YUU_JUMP(npc)                                                                                                                      \
+    do {                                                                                                                                   \
+        (npc)->moveMode = 4;                                                                                                               \
         yuunpc_pose_change((npc), (npc)->poses[3], 0.0f, yuunpc_wp->pose[(npc)->poses[3]].jump / yuunpc_wp->pose[(npc)->poses[3]].frames); \
-        (npc)->vy = 6.5f;                                                                                                \
-        (npc)->dir.x = 1.0f;                                                                                             \
-        (npc)->dir.z = 0.0f;                                                                                             \
-        if (!(c26 & 0x1f)) {                                                                                             \
-            psndSFXOn_3D((const char*)0x8e0, &(npc)->pos);                                                               \
-        }                                                                                                                \
-        c26++;                                                                                                           \
+        (npc)->vy = 6.5f;                                                                                                                  \
+        (npc)->dir.x = 1.0f;                                                                                                               \
+        (npc)->dir.z = 0.0f;                                                                                                               \
+        if (!(c26 & 0x1f)) {                                                                                                               \
+            psndSFXOn_3D((const char*)0x8e0, &(npc)->pos);                                                                                 \
+        }                                                                                                                                  \
+        c26++;                                                                                                                             \
     } while (0)
 
-#define YUU_RUN(npc)                                                               \
-    do {                                                                           \
-        (npc)->moveMode = 2;                                                     \
-        yuunpc_pose_change((npc), (npc)->poses[2], 1.0f, rand() / 32767.0f);       \
-        if ((npc)->flags & 0x18) {                                                 \
-            (npc)->speed = 1.0f;                                                   \
-        } else {                                                                   \
-            (npc)->speed = 2.25f;                                                  \
-        }                                                                          \
+#define YUU_RUN(npc)                                                         \
+    do {                                                                     \
+        (npc)->moveMode = 2;                                                 \
+        yuunpc_pose_change((npc), (npc)->poses[2], 1.0f, rand() / 32767.0f); \
+        if ((npc)->flags & 0x18) {                                           \
+            (npc)->speed = 1.0f;                                             \
+        } else {                                                             \
+            (npc)->speed = 2.25f;                                            \
+        }                                                                    \
     } while (0)
 
-#define YUU_WALK(npc)                                                                                         \
-    do {                                                                                                      \
-        (npc)->moveMode = 1;                                                                                \
+#define YUU_WALK(npc)                                                                                          \
+    do {                                                                                                       \
+        (npc)->moveMode = 1;                                                                                   \
         yuunpc_pose_change((npc), (npc)->poses[1], yuunpc_wp->pose[(npc)->poses[1]].speed, rand() / 32767.0f); \
-        if ((npc)->flags & 0x18) {                                                                            \
-            (npc)->speed = 0.5f;                                                                              \
-        } else {                                                                                              \
-            (npc)->speed = 1.0f;                                                                              \
-        }                                                                                                     \
+        if ((npc)->flags & 0x18) {                                                                             \
+            (npc)->speed = 0.5f;                                                                               \
+        } else {                                                                                               \
+            (npc)->speed = 1.0f;                                                                               \
+        }                                                                                                      \
     } while (0)
 
 void yuunpc_pose_minigame4_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
-    f32 camX = camGetPtr(4)->cameraAt.x;
+    f32 camX = camGetPtr(CAMERA_3D)->cameraAt.x;
     f32 y, z, x;
     YuuNpc* npc;
     s32 c28;
@@ -1377,13 +1380,15 @@ void yuunpc_pose_minigame4_main(void) {
             x = (*ext->mtx)[0][3];
             if (x > camX) {
                 while (TRUE) {
-                    if (!(x > right)) break;
+                    if (!(x > right))
+                        break;
                     x -= 1000.0f;
                     (*ext->mtx)[0][3] = x;
                 }
             } else {
                 while (TRUE) {
-                    if (!(x < camX - 500.0f)) break;
+                    if (!(x < camX - 500.0f))
+                        break;
                     x += 1000.0f;
                     (*ext->mtx)[0][3] = x;
                 }
@@ -1417,43 +1422,43 @@ void yuunpc_pose_minigame4_main(void) {
             }
             mg = yuunpc_yuuminigame4_ptr->data;
             switch (npc->flags & 0x18) {
-            case 0:
-                break;
-            case 8:
-                if (npc->turnTimer == 0) {
-                    npc->flags |= 0x18;
-                }
-                break;
-            case 0x10:
-                if (npc->turnTimer == 0) {
-                    npc->flags &= ~0x18;
-                    npc->turnBaseDir = 0.0f;
-                    npc->moveMode = 0;
-                    yuunpc_pose_change(npc, npc->poses[0], 1.0f, rand() / 32767.0f);
-                    npc->speed = 0.0f;
-                }
-                break;
-            case 0x18:
-                break;
+                case 0:
+                    break;
+                case 8:
+                    if (npc->turnTimer == 0) {
+                        npc->flags |= 0x18;
+                    }
+                    break;
+                case 0x10:
+                    if (npc->turnTimer == 0) {
+                        npc->flags &= ~0x18;
+                        npc->turnBaseDir = 0.0f;
+                        npc->moveMode = 0;
+                        yuunpc_pose_change(npc, npc->poses[0], 1.0f, rand() / 32767.0f);
+                        npc->speed = 0.0f;
+                    }
+                    break;
+                case 0x18:
+                    break;
             }
             switch (npc->moveMode) {
-            case 0:
-            case 1:
-            case 2:
-                if (!(npc->flags & 0x20)) {
-                    npc->moveMode = 3;
-                    yuunpc_pose_change(npc, npc->poses[3], 0.0f, yuunpc_wp->pose[npc->poses[3]].jump / yuunpc_wp->pose[npc->poses[3]].frames);
-                    npc->vy = 0.0f;
-                }
-                break;
-            case 3:
-            case 4:
-                if (npc->flags & 0x20) {
-                    npc->moveMode = 0;
-                    yuunpc_pose_change(npc, npc->poses[0], 1.0f, rand() / 32767.0f);
-                    npc->speed = 0.0f;
-                }
-                break;
+                case 0:
+                case 1:
+                case 2:
+                    if (!(npc->flags & 0x20)) {
+                        npc->moveMode = 3;
+                        yuunpc_pose_change(npc, npc->poses[3], 0.0f, yuunpc_wp->pose[npc->poses[3]].jump / yuunpc_wp->pose[npc->poses[3]].frames);
+                        npc->vy = 0.0f;
+                    }
+                    break;
+                case 3:
+                case 4:
+                    if (npc->flags & 0x20) {
+                        npc->moveMode = 0;
+                        yuunpc_pose_change(npc, npc->poses[0], 1.0f, rand() / 32767.0f);
+                        npc->speed = 0.0f;
+                    }
+                    break;
             }
             if (npc->moveMode != 3 && npc->moveMode != 4) {
                 px = npc->pos.x;
@@ -1461,103 +1466,106 @@ void yuunpc_pose_minigame4_main(void) {
                 h = yuunpc_hitY_get(px);
                 k = h;
                 switch (h) {
-                case 0:
-                case 1:
-                    npc->dest = npc->goal;
-                    if (npc->pos.x < 1500.0f) {
-                        f32 dd = npc->pos.z - npc->dest.z;
-                        if (dd < 0.0f) {
-                            dd = -dd;
+                    case 0:
+                    case 1:
+                        npc->dest = npc->goal;
+                        if (npc->pos.x < 1500.0f) {
+                            f32 dd = npc->pos.z - npc->dest.z;
+                            if (dd < 0.0f) {
+                                dd = -dd;
+                            }
+                            if (dd > 16.666666f) {
+                                dd = 300.0f * (1.0f - dd / 300.0f);
+                                npc->dest.x = npc->pos.x + dd / 2.0f;
+                            }
                         }
-                        if (dd > 16.666666f) {
-                            dd = 300.0f * (1.0f - dd / 300.0f);
-                            npc->dest.x = npc->pos.x + dd / 2.0f;
+                        break;
+                    case 24:
+                    case 25:
+                    case 26:
+                    case 27:
+                    case 28:
+                        kind = 2;
+                        k -= 22;
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        if (k == 6) {
+                            off = 0.0f;
+                        } else {
+                            off = (3 - (k - 2)) * 50.0f;
                         }
-                    }
-                    break;
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                    kind = 2;
-                    k -= 22;
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                    if (k == 6) {
-                        off = 0.0f;
-                    } else {
-                        off = (3 - (k - 2)) * 50.0f;
-                    }
-                    npc->dest.x = yuunpc_snap(px + off);
-                    {
-                        f32 sp = ((npc->id % 101 - 50) / 50.0f) * (50.0f * (kind - 1) / 2.0f + 10.0f);
-                        npc->dest.z = npc->pos.z >= 0.0f ? 150.0f - 50.0f * kind / 2.0f + sp : -150.0f + 50.0f * kind / 2.0f + sp;
-                    }
-                    npc->dest.y = npc->pos.y;
-                    break;
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                    off = (3 - (h - 7)) * 50.0f;
-                    npc->dest.x = yuunpc_snap(px + off);
-                    npc->dest.z = 0.65f * npc->goal.z;
-                    npc->dest.y = npc->pos.y;
-                    break;
-                case 11:
-                    npc->dest.x = yuunpc_snap(50.0f + px);
-                    npc->dest.z = npc->pos.z;
-                    npc->dest.y = npc->pos.y;
-                    break;
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                    if ((u16)npc->id & 3) {
-                        off = (3 - (h - 12)) * 50.0f; px += off;
-                        npc->dest.x = yuunpc_snap(px);
-                        npc->dest.z = -(75.0f + yuunpc_rnd10(npc));
+                        npc->dest.x = yuunpc_snap(px + off);
+                        {
+                            f32 sp = ((npc->id % 101 - 50) / 50.0f) * (50.0f * (kind - 1) / 2.0f + 10.0f);
+                            npc->dest.z = npc->pos.z >= 0.0f ? 150.0f - 50.0f * kind / 2.0f + sp : -150.0f + 50.0f * kind / 2.0f + sp;
+                        }
                         npc->dest.y = npc->pos.y;
-                    } else {
+                        break;
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 10:
+                        off = (3 - (h - 7)) * 50.0f;
+                        npc->dest.x = yuunpc_snap(px + off);
+                        npc->dest.z = 0.65f * npc->goal.z;
+                        npc->dest.y = npc->pos.y;
+                        break;
+                    case 11:
                         npc->dest.x = yuunpc_snap(50.0f + px);
                         npc->dest.z = npc->pos.z;
                         npc->dest.y = npc->pos.y;
-                    }
-                    break;
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                    if ((u16)npc->id & 3) {
-                        off = (3 - (h - 16)) * 50.0f; px += off;
-                        npc->dest.x = yuunpc_snap(px);
-                        npc->dest.z = -25.0f + yuunpc_rnd10(npc);
-                        npc->dest.y = npc->pos.y;
-                    } else {
-                        npc->dest.x = yuunpc_snap(50.0f + px);
-                        npc->dest.z = npc->pos.z;
-                        npc->dest.y = npc->pos.y;
-                    }
-                    break;
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                    if ((u16)npc->id & 3) {
-                        off = (3 - (h - 20)) * 50.0f; px += off;
-                        npc->dest.x = yuunpc_snap(px);
-                        npc->dest.z = 75.0f + yuunpc_rnd10(npc);
-                        npc->dest.y = npc->pos.y;
-                    } else {
-                        npc->dest.x = yuunpc_snap(50.0f + px);
-                        npc->dest.z = npc->pos.z;
-                        npc->dest.y = npc->pos.y;
-                    }
-                    break;
+                        break;
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                        if ((u16)npc->id & 3) {
+                            off = (3 - (h - 12)) * 50.0f;
+                            px += off;
+                            npc->dest.x = yuunpc_snap(px);
+                            npc->dest.z = -(75.0f + yuunpc_rnd10(npc));
+                            npc->dest.y = npc->pos.y;
+                        } else {
+                            npc->dest.x = yuunpc_snap(50.0f + px);
+                            npc->dest.z = npc->pos.z;
+                            npc->dest.y = npc->pos.y;
+                        }
+                        break;
+                    case 16:
+                    case 17:
+                    case 18:
+                    case 19:
+                        if ((u16)npc->id & 3) {
+                            off = (3 - (h - 16)) * 50.0f;
+                            px += off;
+                            npc->dest.x = yuunpc_snap(px);
+                            npc->dest.z = -25.0f + yuunpc_rnd10(npc);
+                            npc->dest.y = npc->pos.y;
+                        } else {
+                            npc->dest.x = yuunpc_snap(50.0f + px);
+                            npc->dest.z = npc->pos.z;
+                            npc->dest.y = npc->pos.y;
+                        }
+                        break;
+                    case 20:
+                    case 21:
+                    case 22:
+                    case 23:
+                        if ((u16)npc->id & 3) {
+                            off = (3 - (h - 20)) * 50.0f;
+                            px += off;
+                            npc->dest.x = yuunpc_snap(px);
+                            npc->dest.z = 75.0f + yuunpc_rnd10(npc);
+                            npc->dest.y = npc->pos.y;
+                        } else {
+                            npc->dest.x = yuunpc_snap(50.0f + px);
+                            npc->dest.z = npc->pos.z;
+                            npc->dest.y = npc->pos.y;
+                        }
+                        break;
                 }
                 PSVECSubtract(&npc->dest, &npc->pos, &npc->dir);
                 npc->dir.y = 0.0f;
@@ -1565,119 +1573,117 @@ void yuunpc_pose_minigame4_main(void) {
                 w = 150.0f * npc->errorRate;
                 mode = mg->state;
                 switch (mode) {
-                default:
-                    d = 0.0f;
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                    switch (h) {
-                    case 0:
+                    default:
+                        d = 0.0f;
+                        break;
+                    case 1:
                     case 2:
                     case 3:
                     case 4:
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 16:
-                    case 17:
-                    case 18:
-                    case 20:
-                    case 21:
-                    case 22:
-                    case 24:
-                    case 25:
-                    case 26:
-                        if (npc->pos.z >= -150.0f && npc->pos.z < 150.0f + w) {
-                            d = 150.0f + w - npc->pos.z;
-                        } else {
-                            d = 0.0f;
+                        switch (h) {
+                            case 0:
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 7:
+                            case 8:
+                            case 9:
+                            case 12:
+                            case 13:
+                            case 14:
+                            case 16:
+                            case 17:
+                            case 18:
+                            case 20:
+                            case 21:
+                            case 22:
+                            case 24:
+                            case 25:
+                            case 26:
+                                if (npc->pos.z >= -150.0f && npc->pos.z < 150.0f + w) {
+                                    d = 150.0f + w - npc->pos.z;
+                                } else {
+                                    d = 0.0f;
+                                }
+                                break;
+                            case 1:
+                            case 10:
+                                d = 0.0f;
+                                break;
+                            case 5:
+                            case 6:
+                            case 27:
+                            case 28:
+                                z = npc->pos.z;
+                                if (z >= -150.0f && z < 150.0f) {
+                                    f32 tt = 50.0f * kind;
+                                    f32 a = -150.0f + tt + w;
+                                    if (z >= a && z < 150.0f - tt) {
+                                        d = 0.0f;
+                                    } else if (z > 0.0f) {
+                                        d = 150.0f + w - z;
+                                    } else {
+                                        d = a - z;
+                                    }
+                                } else {
+                                    d = 0.0f;
+                                }
+                                break;
                         }
-                        break;
-                    case 1:
-                    case 10:
-                        d = 0.0f;
                         break;
                     case 5:
                     case 6:
-                    case 27:
-                    case 28:
-                        z = npc->pos.z;
-                        if (z >= -150.0f && z < 150.0f) {
-                            f32 tt = 50.0f * kind;
-                            f32 a = -150.0f + tt + w;
-                            if (z >= a && z < 150.0f - tt) {
-                                d = 0.0f;
-                            } else if (z > 0.0f) {
-                                d = 150.0f + w - z;
-                            } else {
-                                d = a - z;
-                            }
-                        } else {
-                            d = 0.0f;
-                        }
-                        break;
-                    }
-                    break;
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                    switch (h) {
-                    case 0:
-                    case 2:
-                    case 3:
-                    case 4:
                     case 7:
                     case 8:
-                    case 9:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 16:
-                    case 17:
-                    case 18:
-                    case 20:
-                    case 21:
-                    case 22:
-                    case 24:
-                    case 25:
-                    case 26:
-                        if (npc->pos.z >= -150.0f + w && npc->pos.z < 150.0f) {
-                            d = -(-150.0f + w) + npc->pos.z;
-                        } else {
-                            d = 0.0f;
-                        }
-                        break;
-                    case 1:
-                    case 10:
-                        d = 0.0f;
-                        break;
-                    case 5:
-                    case 6:
-                    case 27:
-                    case 28:
-                        {
-                                                if (npc->pos.z >= -150.0f + w && npc->pos.z < 150.0f) {
-                            f32 tt = 50.0f * kind;
-                            if (npc->pos.z >= -150.0f + tt && npc->pos.z < 150.0f - tt + w) {
+                        switch (h) {
+                            case 0:
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 7:
+                            case 8:
+                            case 9:
+                            case 12:
+                            case 13:
+                            case 14:
+                            case 16:
+                            case 17:
+                            case 18:
+                            case 20:
+                            case 21:
+                            case 22:
+                            case 24:
+                            case 25:
+                            case 26:
+                                if (npc->pos.z >= -150.0f + w && npc->pos.z < 150.0f) {
+                                    d = -(-150.0f + w) + npc->pos.z;
+                                } else {
+                                    d = 0.0f;
+                                }
+                                break;
+                            case 1:
+                            case 10:
                                 d = 0.0f;
-                            } else if (npc->pos.z > 0.0f) {
-                                d = npc->pos.z - (150.0f - tt + w);
-                            } else {
-                                d = -(-150.0f + w) + npc->pos.z;
-                            }
-                        } else {
-                            d = 0.0f;
-                        }
+                                break;
+                            case 5:
+                            case 6:
+                            case 27:
+                            case 28: {
+                                if (npc->pos.z >= -150.0f + w && npc->pos.z < 150.0f) {
+                                    f32 tt = 50.0f * kind;
+                                    if (npc->pos.z >= -150.0f + tt && npc->pos.z < 150.0f - tt + w) {
+                                        d = 0.0f;
+                                    } else if (npc->pos.z > 0.0f) {
+                                        d = npc->pos.z - (150.0f - tt + w);
+                                    } else {
+                                        d = -(-150.0f + w) + npc->pos.z;
+                                    }
+                                } else {
+                                    d = 0.0f;
+                                }
+                            } break;
                         }
                         break;
-                    }
-                    break;
                 }
                 d -= 17.0f;
                 if (d < 0.0f) {
@@ -1685,316 +1691,316 @@ void yuunpc_pose_minigame4_main(void) {
                 }
                 cnt = d / 0.0f;
                 switch (npc->flags & 0x18) {
-                case 0:
-                    if (mg->state == 0) {
-                        n = 1;
-                    } else {
-                        switch (mode) {
-                        case 1:
-                        case 5:
-                            if (cnt >= 60) {
-                                cnt += 60;
-                            } else {
-                                cnt += cnt;
+                    case 0:
+                        if (mg->state == 0) {
+                            n = 1;
+                        } else {
+                            switch (mode) {
+                                case 1:
+                                case 5:
+                                    if (cnt >= 60) {
+                                        cnt += 60;
+                                    } else {
+                                        cnt += cnt;
+                                    }
+                                    break;
+                                case 2:
+                                case 6:
+                                    if (cnt >= mg->timer) {
+                                        cnt += mg->timer;
+                                    } else {
+                                        cnt += cnt;
+                                    }
+                                    break;
                             }
-                            break;
-                        case 2:
-                        case 6:
-                            if (cnt >= mg->timer) {
-                                cnt += mg->timer;
+                            if (cnt < 30) {
+                                n = 0;
                             } else {
-                                cnt += cnt;
+                                n = d / 2.9166667f;
                             }
-                            break;
                         }
+                        if (!(yuunpc_wp->flags & 1) && npc->goal.x > npc->pos.x && n <= 0) {
+                            npc->flags |= 8;
+                            npc->turnTimer = 30;
+                            npc->turnBaseDir = ext->dir;
+                            npc->moveMode = 0;
+                            yuunpc_pose_change(npc, npc->poses[0], 1.0f, rand() / 32767.0f);
+                            npc->speed = 0.0f;
+                            errper_set_rtn(npc);
+                        }
+                        break;
+                    case 8:
+                    case 0x10:
+                        break;
+                    case 0x18:
                         if (cnt < 30) {
                             n = 0;
                         } else {
+                            cnt = 30;
                             n = d / 2.9166667f;
                         }
-                    }
-                    if (!(yuunpc_wp->flags & 1) && npc->goal.x > npc->pos.x && n <= 0) {
-                        npc->flags |= 8;
-                        npc->turnTimer = 30;
-                        npc->turnBaseDir = ext->dir;
-                        npc->moveMode = 0;
-                        yuunpc_pose_change(npc, npc->poses[0], 1.0f, rand() / 32767.0f);
-                        npc->speed = 0.0f;
-                        errper_set_rtn(npc);
-                    }
-                    break;
-                case 8:
-                case 0x10:
-                    break;
-                case 0x18:
-                    if (cnt < 30) {
-                        n = 0;
-                    } else {
-                        cnt = 30;
-                        n = d / 2.9166667f;
-                    }
-                    if (npc->goal.x == npc->pos.x || mg->state == 0 || ((mg->state == 4 || mg->state == 8) && cnt + n >= mg->timer)) {
-                        npc->flags &= ~8;
-                        npc->turnTimer = 30;
-                        errper_set_rtn(npc);
-                    }
-                    break;
+                        if (npc->goal.x == npc->pos.x || mg->state == 0 || ((mg->state == 4 || mg->state == 8) && cnt + n >= mg->timer)) {
+                            npc->flags &= ~8;
+                            npc->turnTimer = 30;
+                            errper_set_rtn(npc);
+                        }
+                        break;
                 }
             }
             switch (npc->flags & 0x18) {
-            case 0:
-                break;
-            case 8:
-                npc->turnTimer--;
-                ext->dir = npc->turnBaseDir + -450.0f * (1.0f - npc->turnTimer / 30.0f);
-                ext->dir = (3600.0f + ext->dir) - (s32)((3600.0f + ext->dir) / 360.0f) * 360;
-                break;
-            case 0x18:
-                t = gp->retraceCount + (u16)npc->id;
-                if (t & 0x20) {
-                    n = 15 - (t & 0x1f);
-                } else {
-                    n = (t & 0x1f) - 15;
-                }
-                ext->dir = -450.0f + npc->turnBaseDir + 2.0f * n;
-                ext->dir = (3600.0f + ext->dir) - (s32)((3600.0f + ext->dir) / 360.0f) * 360;
-                break;
-            case 0x10:
-                npc->turnTimer--;
-                ext->dir = -180.0f + (-450.0f + npc->turnBaseDir) + -450.0f * (1.0f - npc->turnTimer / 30.0f);
-                ext->dir = (3600.0f + ext->dir) - (s32)((3600.0f + ext->dir) / 360.0f) * 360;
-                break;
+                case 0:
+                    break;
+                case 8:
+                    npc->turnTimer--;
+                    ext->dir = npc->turnBaseDir + -450.0f * (1.0f - npc->turnTimer / 30.0f);
+                    ext->dir = (3600.0f + ext->dir) - (s32)((3600.0f + ext->dir) / 360.0f) * 360;
+                    break;
+                case 0x18:
+                    t = gp->retraceCount + (u16)npc->id;
+                    if (t & 0x20) {
+                        n = 15 - (t & 0x1f);
+                    } else {
+                        n = (t & 0x1f) - 15;
+                    }
+                    ext->dir = -450.0f + npc->turnBaseDir + 2.0f * n;
+                    ext->dir = (3600.0f + ext->dir) - (s32)((3600.0f + ext->dir) / 360.0f) * 360;
+                    break;
+                case 0x10:
+                    npc->turnTimer--;
+                    ext->dir = -180.0f + (-450.0f + npc->turnBaseDir) + -450.0f * (1.0f - npc->turnTimer / 30.0f);
+                    ext->dir = (3600.0f + ext->dir) - (s32)((3600.0f + ext->dir) / 360.0f) * 360;
+                    break;
             }
             npc->zofs = 0.0f;
             if (npc->pos.x < 1500.0f) {
                 dz = 0.0f;
                 mode = mg->state;
                 switch (mode) {
-                case 2:
-                case 3:
-                case 4:
-                    switch (npc->flags & 0x18) {
-                    case 0x18:
-                        dz = 0.0f;
+                    case 2:
+                    case 3:
+                    case 4:
+                        switch (npc->flags & 0x18) {
+                            case 0x18:
+                                dz = 0.0f;
+                                break;
+                            case 8:
+                            case 0x10:
+                                dz = 0.0f;
+                                break;
+                            case 0:
+                                dz = 2.9166667f;
+                                break;
+                        }
                         break;
+                    case 6:
+                    case 7:
                     case 8:
-                    case 0x10:
-                        dz = 0.0f;
+                        switch (npc->flags & 0x18) {
+                            case 0x18:
+                                dz = -0.0f;
+                                break;
+                            case 8:
+                            case 0x10:
+                                dz = -0.0f;
+                                break;
+                            case 0:
+                                dz = -2.9166667f;
+                                break;
+                        }
                         break;
-                    case 0:
-                        dz = 2.9166667f;
-                        break;
-                    }
-                    break;
-                case 6:
-                case 7:
-                case 8:
-                    switch (npc->flags & 0x18) {
-                    case 0x18:
-                        dz = -0.0f;
-                        break;
-                    case 8:
-                    case 0x10:
-                        dz = -0.0f;
-                        break;
-                    case 0:
-                        dz = -2.9166667f;
-                        break;
-                    }
-                    break;
                 }
                 switch (mode) {
-                case 2:
-                case 6:
-                    dz = dz * (60 - mg->timer) / 60.0f;
-                    break;
+                    case 2:
+                    case 6:
+                        dz = dz * (60 - mg->timer) / 60.0f;
+                        break;
                 }
                 npc->zofs += dz;
             }
             do {
                 kind = 0;
                 switch (npc->moveMode) {
-                case 0:
-                    if (goalincheck(npc) == -1) {
-                        break;
-                    }
-                    if (yuunpc_wp->flags & 1) {
-                        break;
-                    }
-                    if (npc->state >= 2 || (npc->state <= 1 && irand(36) == 0)) {
-                        px = npc->pos.x;
-                        hb = HG(25.0f + px, &npc->pos.z);
-                        ha = HG(75.0f + px, &npc->pos.z);
-                        if (npc->state <= 3 && irand(2)) {
-                            if (hb >= npc->pos.y) {
-                                YUU_WALK(npc);
+                    case 0:
+                        if (goalincheck(npc) == -1) {
+                            break;
+                        }
+                        if (yuunpc_wp->flags & 1) {
+                            break;
+                        }
+                        if (npc->state >= 2 || (npc->state <= 1 && irand(36) == 0)) {
+                            px = npc->pos.x;
+                            hb = HG(25.0f + px, &npc->pos.z);
+                            ha = HG(75.0f + px, &npc->pos.z);
+                            if (npc->state <= 3 && irand(2)) {
+                                if (hb >= npc->pos.y) {
+                                    YUU_WALK(npc);
+                                    kind = 1;
+                                }
+                            } else if (!(npc->flags & 0x18) || ((npc->flags & 0x18) && (hb >= npc->pos.y || (hb < npc->pos.y && ha < npc->pos.y)))) {
+                                YUU_RUN(npc);
                                 kind = 1;
                             }
-                        } else if (!(npc->flags & 0x18) || ((npc->flags & 0x18) && (hb >= npc->pos.y || (hb < npc->pos.y && ha < npc->pos.y)))) {
-                            YUU_RUN(npc);
-                            kind = 1;
                         }
-                    }
-                    break;
-                case 1:
-                    if (goalincheck(npc) == -1) {
-                        YUU_STOP(npc);
                         break;
-                    }
-                    if (npc->flags & 0x18) {
-                        Vec v1, s1;
-
-                        PSVECSubtract(&npc->dest, &npc->pos, &v1);
-                        PSVECNormalize(&v1, &v1);
-                        PSVECScale(&v1, &s1, 10.0f);
-                        ha = yuunpc_hit_ofs(npc, &s1);
-                        PSVECScale(&v1, &s1, 25.0f);
-                        hb = yuunpc_hit_ofs(npc, &s1);
-                        PSVECScale(&v1, &s1, 75.0f);
-                        hc = yuunpc_hit_ofs(npc, &s1);
-                        if (ha > npc->pos.y) {
-                            YUU_JUMP(npc);
-                        } else if (hb < npc->pos.y && hc == npc->pos.y) {
+                    case 1:
+                        if (goalincheck(npc) == -1) {
                             YUU_STOP(npc);
-                        } else if (irand(60) == 0) {
-                            if (npc->state <= 1 && irand(3) == 0) {
-                                YUU_STOP(npc);
-                            } else if (hb >= npc->pos.y) {
-                                YUU_RUN(npc);
-                            }
+                            break;
                         }
-                    } else {
-                        Vec v2, s2;
+                        if (npc->flags & 0x18) {
+                            Vec v1, s1;
 
-                        PSVECSubtract(&npc->dest, &npc->pos, &v2);
-                        PSVECNormalize(&v2, &v2);
-                        PSVECScale(&v2, &s2, 20.0f);
-                        ha = yuunpc_hit_ofs(npc, &s2);
-                        PSVECScale(&v2, &s2, 25.0f);
-                        hb = yuunpc_hit_ofs(npc, &s2);
-                        PSVECScale(&v2, &s2, 75.0f);
-                        hc = yuunpc_hit_ofs(npc, &s2);
-                        if (ha > npc->pos.y) {
-                            if (mg->state == 0) {
+                            PSVECSubtract(&npc->dest, &npc->pos, &v1);
+                            PSVECNormalize(&v1, &v1);
+                            PSVECScale(&v1, &s1, 10.0f);
+                            ha = yuunpc_hit_ofs(npc, &s1);
+                            PSVECScale(&v1, &s1, 25.0f);
+                            hb = yuunpc_hit_ofs(npc, &s1);
+                            PSVECScale(&v1, &s1, 75.0f);
+                            hc = yuunpc_hit_ofs(npc, &s1);
+                            if (ha > npc->pos.y) {
                                 YUU_JUMP(npc);
-                            } else {
+                            } else if (hb < npc->pos.y && hc == npc->pos.y) {
                                 YUU_STOP(npc);
+                            } else if (irand(60) == 0) {
+                                if (npc->state <= 1 && irand(3) == 0) {
+                                    YUU_STOP(npc);
+                                } else if (hb >= npc->pos.y) {
+                                    YUU_RUN(npc);
+                                }
                             }
-                        } else if ((hb < npc->pos.y && hc == npc->pos.y) || (npc->state <= 3 && irand(60) == 0)) {
-                            if (npc->state <= 1 && irand(3) == 0) {
-                                YUU_STOP(npc);
-                            } else {
-                                YUU_RUN(npc);
+                        } else {
+                            Vec v2, s2;
+
+                            PSVECSubtract(&npc->dest, &npc->pos, &v2);
+                            PSVECNormalize(&v2, &v2);
+                            PSVECScale(&v2, &s2, 20.0f);
+                            ha = yuunpc_hit_ofs(npc, &s2);
+                            PSVECScale(&v2, &s2, 25.0f);
+                            hb = yuunpc_hit_ofs(npc, &s2);
+                            PSVECScale(&v2, &s2, 75.0f);
+                            hc = yuunpc_hit_ofs(npc, &s2);
+                            if (ha > npc->pos.y) {
+                                if (mg->state == 0) {
+                                    YUU_JUMP(npc);
+                                } else {
+                                    YUU_STOP(npc);
+                                }
+                            } else if ((hb < npc->pos.y && hc == npc->pos.y) || (npc->state <= 3 && irand(60) == 0)) {
+                                if (npc->state <= 1 && irand(3) == 0) {
+                                    YUU_STOP(npc);
+                                } else {
+                                    YUU_RUN(npc);
+                                }
                             }
                         }
-                    }
-                    if (!(c28 & 0x3f)) {
-                        t = gp->retraceCount + i;
-                        if (!(t & 0xf)) {
-                            if (t & 0x10) {
-                                psndSFXOn_3D((const char*)0x8de, &npc->pos);
-                            } else {
-                                psndSFXOn_3D((const char*)0x8df, &npc->pos);
+                        if (!(c28 & 0x3f)) {
+                            t = gp->retraceCount + i;
+                            if (!(t & 0xf)) {
+                                if (t & 0x10) {
+                                    psndSFXOn_3D((const char*)0x8de, &npc->pos);
+                                } else {
+                                    psndSFXOn_3D((const char*)0x8df, &npc->pos);
+                                }
                             }
                         }
-                    }
-                    c28++;
-                    break;
-                case 2:
-                    if (goalincheck(npc) == -1) {
-                        YUU_STOP(npc);
+                        c28++;
                         break;
-                    }
-                    if (npc->flags & 0x18) {
-                        Vec v3, s3;
-
-                        PSVECSubtract(&npc->dest, &npc->pos, &v3);
-                        PSVECNormalize(&v3, &v3);
-                        PSVECScale(&v3, &s3, 20.0f);
-                        ha = yuunpc_hit_ofs(npc, &s3);
-                        PSVECScale(&v3, &s3, 25.0f);
-                        hb = yuunpc_hit_ofs(npc, &s3);
-                        PSVECScale(&v3, &s3, 75.0f);
-                        hc = yuunpc_hit_ofs(npc, &s3);
-                        if (ha > npc->pos.y) {
-                            YUU_JUMP(npc);
-                        } else if (hb < npc->pos.y && hc == npc->pos.y) {
+                    case 2:
+                        if (goalincheck(npc) == -1) {
                             YUU_STOP(npc);
-                        } else if (npc->state <= 3 && irand(60) == 0) {
-                            if (npc->state <= 1 && irand(3) == 0) {
-                                YUU_STOP(npc);
-                            } else if (hb >= npc->pos.y) {
-                                YUU_WALK(npc);
-                            }
+                            break;
                         }
-                    } else {
-                        Vec v4, s4;
+                        if (npc->flags & 0x18) {
+                            Vec v3, s3;
 
-                        PSVECSubtract(&npc->dest, &npc->pos, &v4);
-                        PSVECNormalize(&v4, &v4);
-                        PSVECScale(&v4, &s4, 5.0f);
-                        ha = yuunpc_hit_ofs(npc, &s4);
-                        PSVECScale(&v4, &s4, 45.0f);
-                        hb = yuunpc_hit_ofs(npc, &s4);
-                        PSVECScale(&v4, &s4, 55.0f);
-                        hc = yuunpc_hit_ofs(npc, &s4);
-                        if ((ha < npc->pos.y && hc == npc->pos.y) || hb > npc->pos.y) {
-                            if (mg->state == 0) {
+                            PSVECSubtract(&npc->dest, &npc->pos, &v3);
+                            PSVECNormalize(&v3, &v3);
+                            PSVECScale(&v3, &s3, 20.0f);
+                            ha = yuunpc_hit_ofs(npc, &s3);
+                            PSVECScale(&v3, &s3, 25.0f);
+                            hb = yuunpc_hit_ofs(npc, &s3);
+                            PSVECScale(&v3, &s3, 75.0f);
+                            hc = yuunpc_hit_ofs(npc, &s3);
+                            if (ha > npc->pos.y) {
                                 YUU_JUMP(npc);
-                            } else {
+                            } else if (hb < npc->pos.y && hc == npc->pos.y) {
                                 YUU_STOP(npc);
+                            } else if (npc->state <= 3 && irand(60) == 0) {
+                                if (npc->state <= 1 && irand(3) == 0) {
+                                    YUU_STOP(npc);
+                                } else if (hb >= npc->pos.y) {
+                                    YUU_WALK(npc);
+                                }
                             }
-                        } else if (npc->state <= 3 && irand(60) == 0) {
-                            if (npc->state <= 1 && irand(3) == 0) {
-                                YUU_STOP(npc);
-                            } else if (yuunpc_hit_get(25.0f + npc->pos.x, &npc->pos.z) >= npc->pos.y) {
-                                YUU_WALK(npc);
+                        } else {
+                            Vec v4, s4;
+
+                            PSVECSubtract(&npc->dest, &npc->pos, &v4);
+                            PSVECNormalize(&v4, &v4);
+                            PSVECScale(&v4, &s4, 5.0f);
+                            ha = yuunpc_hit_ofs(npc, &s4);
+                            PSVECScale(&v4, &s4, 45.0f);
+                            hb = yuunpc_hit_ofs(npc, &s4);
+                            PSVECScale(&v4, &s4, 55.0f);
+                            hc = yuunpc_hit_ofs(npc, &s4);
+                            if ((ha < npc->pos.y && hc == npc->pos.y) || hb > npc->pos.y) {
+                                if (mg->state == 0) {
+                                    YUU_JUMP(npc);
+                                } else {
+                                    YUU_STOP(npc);
+                                }
+                            } else if (npc->state <= 3 && irand(60) == 0) {
+                                if (npc->state <= 1 && irand(3) == 0) {
+                                    YUU_STOP(npc);
+                                } else if (yuunpc_hit_get(25.0f + npc->pos.x, &npc->pos.z) >= npc->pos.y) {
+                                    YUU_WALK(npc);
+                                }
                             }
                         }
-                    }
-                    if (!(c27 & 0x3f)) {
-                        t = gp->retraceCount + i;
-                        if (!(t & 7)) {
-                            if (t & 8) {
-                                psndSFXOn_3D((const char*)0x8de, &npc->pos);
-                            } else {
-                                psndSFXOn_3D((const char*)0x8df, &npc->pos);
+                        if (!(c27 & 0x3f)) {
+                            t = gp->retraceCount + i;
+                            if (!(t & 7)) {
+                                if (t & 8) {
+                                    psndSFXOn_3D((const char*)0x8de, &npc->pos);
+                                } else {
+                                    psndSFXOn_3D((const char*)0x8df, &npc->pos);
+                                }
                             }
                         }
-                    }
-                    c27++;
-                    break;
-                case 3:
-                case 4:
-                    break;
+                        c27++;
+                        break;
+                    case 3:
+                    case 4:
+                        break;
                 }
             } while (kind);
             switch (npc->moveMode) {
-            case 0:
-            case 1:
-            case 2:
-                if (hitcheck(npc) == -1) {
-                    npc->flags &= ~0x20;
-                } else {
-                    npc->flags |= 0x20;
-                }
-                break;
-            case 3:
-            case 4:
-                hitcheck(npc);
-                if (fallcheck(npc) == -1) {
-                    npc->flags |= 0x20;
-                } else {
-                    npc->flags &= ~0x20;
-                }
-                if (npc->pos.y <= -100.0f) {
-                    npc->flags |= 0x40;
-                }
-                if (npc->pos.y <= -500.0f) {
-                    npc->flags |= 0x80;
-                    ext->flags &= ~1;
-                }
-                break;
+                case 0:
+                case 1:
+                case 2:
+                    if (hitcheck(npc) == -1) {
+                        npc->flags &= ~0x20;
+                    } else {
+                        npc->flags |= 0x20;
+                    }
+                    break;
+                case 3:
+                case 4:
+                    hitcheck(npc);
+                    if (fallcheck(npc) == -1) {
+                        npc->flags |= 0x20;
+                    } else {
+                        npc->flags &= ~0x20;
+                    }
+                    if (npc->pos.y <= -100.0f) {
+                        npc->flags |= 0x40;
+                    }
+                    if (npc->pos.y <= -500.0f) {
+                        npc->flags |= 0x80;
+                        ext->flags &= ~1;
+                    }
+                    break;
             }
             (*ext->mtx)[0][3] = npc->pos.x;
             (*ext->mtx)[1][3] = npc->pos.y;
@@ -2042,10 +2048,10 @@ EVT_BEGIN(evt_yuunpc_minigame1)
     CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), NPC_FLAG_INTANGIBLE)
     CALL(evt_ext_entry, 300, PTR(ext_yuunpc_minigame1_data), PTR(ext_yuunpc_minigame1_init), PTR(ext_yuunpc_minigame1_main), PTR(ext_yuunpc_dispent))
     RETURN
 EVT_END()
@@ -2059,10 +2065,10 @@ EVT_BEGIN(evt_yuunpc_minigame2)
     CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), NPC_FLAG_INTANGIBLE)
     CALL(evt_ext_entry, 300, PTR(ext_yuunpc_minigame2_data), PTR(ext_yuunpc_minigame2_init), PTR(ext_yuunpc_minigame2_main), PTR(ext_yuunpc_dispent))
     RETURN
 EVT_END()
@@ -2076,10 +2082,10 @@ EVT_BEGIN(evt_yuunpc_minigame3)
     CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), NPC_FLAG_INTANGIBLE)
     CALL(evt_ext_entry, 360, PTR(ext_yuunpc_minigame3_data), PTR(ext_yuunpc_minigame3_init), PTR(ext_yuunpc_minigame3_main), PTR(ext_yuunpc_dispent))
     RETURN
 EVT_END()
@@ -2103,15 +2109,15 @@ EVT_BEGIN(evt_yuunpc_minigame4)
     CALL(evt_npc_set_position, STRING("yuusp0"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuusp1"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("yuusp2"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc4"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc5"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuusp0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuusp1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuusp2"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc4"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc5"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuusp0"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuusp1"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuusp2"), NPC_FLAG_INTANGIBLE)
     CALL(evt_ext_entry, 900, PTR(ext_yuunpc_minigame4_data), PTR(ext_yuunpc_minigame4_init), PTR(ext_yuunpc_minigame4_main), PTR(ext_yuunpc_dispent))
     BEGIN_INLINE_EVENT
         CALL(evt_seq_wait, 2)

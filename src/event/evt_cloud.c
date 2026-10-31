@@ -1,3 +1,6 @@
+// Script commands for animated cloud overlays: an image drawn through an offscreen target over a
+// map group, with its own hit object and end event.
+#include "evt/evt_cloud.h"
 #include "driver/camdrv.h"
 #include "driver/animdrv.h"
 #include "driver/hitdrv.h"
@@ -15,33 +18,28 @@
 #include "stdio.h"
 #include "string.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_img.h"
+#include "driver/mapdrv.h"
+#include "version.h"
 
 typedef struct CloudWork {
-    u16 flags; // 0x0
-    s32 state; // 0x4
-    char animName[0x20]; // 0x8
-    char imgName[0x20]; // 0x28
+    u16 flags;                // 0x0
+    s32 state;                // 0x4
+    char animName[0x20];      // 0x8
+    char imgName[0x20];       // 0x28
     char offscreenName[0x20]; // 0x48
-    char groupName[0x20]; // 0x68
-    char hitName[0x20]; // 0x88
-    s32 limit; // 0xA8
-    s32 counter; // 0xAC
-    EventEntry* evt; // 0xB0
-    void* endEvt; // 0xB4
-    s32 timer; // 0xB8
-    char** groupNames; // 0xBC
-    u16 w; // 0xC0
-    u16 h; // 0xC2
-    f32 lastFrame; // 0xC4
+    char groupName[0x20];     // 0x68
+    char hitName[0x20];       // 0x88
+    s32 limit;                // 0xA8
+    s32 counter;              // 0xAC
+    EventEntry* evt;          // 0xB0
+    void* endEvt;             // 0xB4
+    s32 timer;                // 0xB8
+    char** groupNames;        // 0xBC
+    u16 w;                    // 0xC0
+    u16 h;                    // 0xC2
+    f32 lastFrame;            // 0xC4
 } CloudWork;
-
-USER_FUNC(evt_img_alloc_capture);
-void mapGrpSetOffScreen(const char* name, const char* offscreen);
-void mapGrpClearOffScreen(const char* name);
-void mapGrpFlagOn(const char* name, u32 flags);
-void mapGrpFlagOff(const char* name, u32 flags);
-void hitObjFlagOn(const char* name, u32 flags);
-void mapObjGetPos(const char* name, Vec* pos);
 
 static CloudWork cloud[16];
 static u8 cloud_once_flag;
@@ -71,7 +69,7 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     if (party->currentMemberId != PARTY_MEMBER_FLURRIE) {
         return EVT_RETURN_BLOCK;
     }
@@ -124,8 +122,8 @@ static USER_FUNC(evt_cloud_main) {
 
             if (wp->w != 0 && wp->h != 0) {
                 mapObjGetPos(wp->groupName, &pos);
-                PSMTXMultVec(camGetPtr(4)->view, &pos, &pos);
-                PSMTX44MultVec(camGetPtr(4)->projection, &pos, &pos);
+                PSMTXMultVec(camGetPtr(CAMERA_3D)->view, &pos, &pos);
+                PSMTX44MultVec(camGetPtr(CAMERA_3D)->projection, &pos, &pos);
                 pos.x = (1.0f + pos.x) * (f32)gp->fbWidth / 2.0f;
                 pos.y = (1.0f - pos.y) * (f32)gp->efbHeight / 2.0f;
                 uw = wp->w;
@@ -140,7 +138,7 @@ static USER_FUNC(evt_cloud_main) {
                 if (y < 0) {
                     y = 0;
                 }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
                 if (w > gp->fbWidth) {
                     w = gp->fbWidth;
                 }
@@ -197,7 +195,7 @@ static USER_FUNC(evt_cloud_main) {
                 psndSFXOn_3D("SFX_OFF_CLAUD_WIND2", &mario->position);
                 wp->lastFrame = img->loopTimes;
             }
-            if (mario->currMotionId != 27) {
+            if (mario->currMotionId != MARIO_MOTION_CLOUD) {
                 wp->state = 10;
                 break;
             }

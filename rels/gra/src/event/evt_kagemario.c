@@ -1,3 +1,6 @@
+// Shadow Mario (kagemario) on Twilight Trail: while Doopliss has Mario's name, Mario is drawn as a dark silhouette by
+// a map TEV callback (usu.rel and jin.rel have the same code).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,24 +10,15 @@
 #include "driver/animdrv.h"
 #include "party.h"
 #include "driver/swdrv.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_party.h"
+#include "gra.h"
+#include "evt/evt_story.h"
 
 static void callback(MapTevCallbackInfo* info);
 static s32 color_change_evt(s32 on);
-
-static USER_FUNC(check);
-USER_FUNC(evt_mario_clear_party);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-static USER_FUNC(test);
-static USER_FUNC(evt_kagemario_change);
-USER_FUNC(evt_kagemario_init);
-static s32 color_change_evt(s32 on);
-static void callback(MapTevCallbackInfo* info);
 
 static EvtWord evt_check[4];
-extern EvtWord evt_usu_kagemario_party_kill[];
 
 static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
@@ -32,7 +26,7 @@ static void callback(MapTevCallbackInfo* info) {
     s32 texMap = info->texMap;
     s32 indStage = info->indStage;
 
-    if (marioGetPtr()->flags & 0x2000000) {
+    if (marioGetPtr()->flags & MARIO_FLAG_BG_MODE) {
         GXColor color = {0, 0, 0, 255};
         GXSetTevColor(GX_TEVREG0, color);
     } else {
@@ -56,28 +50,28 @@ static s32 color_change_evt(s32 on) {
 
     if (on == 0) {
         for (i = 0; i < 3; i++) {
-            animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[i], 0x0A000000);
+            animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[i], ANIM_MATERIAL_TEV_CALLBACK(10));
         }
-        marioGetPtr()->flags &= ~0x40000000;
+        marioGetPtr()->flags &= ~MARIO_FLAG_IS_SHADOW_MARIO;
     } else {
         mapSetTevCallback(10, callback);
         for (i = 0; i < 3; i++) {
-            animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[i], 0x0A000000);
+            animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[i], ANIM_MATERIAL_TEV_CALLBACK(10));
         }
-        marioGetPtr()->flags |= 0x40000000;
+        marioGetPtr()->flags |= MARIO_FLAG_IS_SHADOW_MARIO;
     }
     return 0;
 }
 
 static USER_FUNC(check) {
     if (partyGetPtr(0) != NULL) {
-        animPoseSetMaterialFlagOff(partyGetPtr(0)->paperAnimGroup, 0x0A000000);
+        animPoseSetMaterialFlagOff(partyGetPtr(0)->paperAnimGroup, ANIM_MATERIAL_TEV_CALLBACK(10));
     }
     return EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(evt_kagemario_init) {
-    s32 sequence = swByteGet(0);
+    s32 sequence = swByteGet(GSW_STORY_PROGRESS);
 
     if (sequence >= 201 && sequence < 212) {
         color_change_evt(1);
@@ -105,8 +99,8 @@ static EVT_BEGIN(evt_check)
 EVT_END()
 
 EVT_BEGIN(evt_usu_kagemario_party_kill)
-    SWITCH(GSW(0))
-        CASE_BETWEEN(201, 205)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG4_10_02_TRADING_PLACES, STORY_STG4_12_01_SUPERBOMBBOMB_FOUND)
         CALL(evt_party_stop, 0)
         CALL(evt_party_set_pos, 0, 0, -1000, 0)
         CALL(evt_party_cont_onoff, 0, 0)
@@ -119,4 +113,3 @@ EVT_BEGIN(evt_usu_kagemario_party_kill)
     END_SWITCH
     RETURN
 EVT_END()
-

@@ -1,3 +1,5 @@
+// sys.rel (システム, System): sys_00, an empty map, and sys_01, the chapter title card ("Prologue", "Chapter 1" ...)
+// that plays between chapters: the title's letters fly in over a rainbow light, followed by the chapter subtitle.
 #include "battle/battle_unit.h"
 #include "eff/eff_itemget.h"
 #include "evt/evt_cmd.h"
@@ -17,67 +19,70 @@
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
+#include "eff/n64/eff_stardust_n64.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
 #include "system.h"
+#include "libc_decls.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "rel_module.h"
 
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-double tan(double x);
-#ifdef VERSION_G8ME01
-double sin(double x);
-double cos(double x);
-#endif
-double fmod(double x, double y);
-EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 size);
-void effStardustN64SetDrawCam(EffectEntry* eff, s32 camera);
-void display_func(CameraId cameraId, void* param);
-EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z);
-typedef struct SysChar { f32 x; f32 y; f32 z; f32 rot; s32 timer; s32 state; s32 texid; } SysChar;
-#ifdef VERSION_G8ME01
-// US: room for 64 letters, plus the chapter subtitle rendered once into a texture
+// One letter of the chapter title, flying in and settling.
+typedef struct SysChar {
+    f32 x;     // 0x00
+    f32 y;     // 0x04
+    f32 z;     // 0x08
+    f32 rot;   // 0x0C
+    s32 timer; // 0x10
+    s32 state; // 0x14
+    s32 texid; // 0x18, letter texture in the title's .tpl
+} SysChar;
+
 typedef struct SysWork {
-    s32 state; FileEntry* file; f32 rot; s32 frame; s32 scroll; s32 type; s32 alpha; f32 angle; s32 count;
-    SysChar chars[64];
+    s32 state;       // 0x00
+    FileEntry* file; // 0x04
+    f32 rot;         // 0x08
+    s32 frame;       // 0x0C
+    s32 scroll;      // 0x10
+    s32 type;        // 0x14
+    s32 alpha;       // 0x18
+    f32 angle;       // 0x1C
+    s32 count;       // 0x20
+#if VERSION >= VERSION_US
+    // US and PAL: room for 64 letters, plus the chapter subtitle rendered once into a texture
+    SysChar chars[64];  // 0x24
     smartEntry* msgTex; // 0x724
     u16 msgTexW;        // 0x728
     u16 msgTexH;        // 0x72A
-} SysWork;
 #else
-typedef struct SysWork { s32 state; FileEntry* file; f32 rot; s32 frame; s32 scroll; s32 type; s32 alpha; f32 angle; s32 count; SysChar chars[8]; } SysWork;
+    SysChar chars[8]; // 0x24
 #endif
+} SysWork;
+
 SysWork* g_wp;
 
 USER_FUNC(bg);
 USER_FUNC(display);
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_snd_bgmon);
 USER_FUNC(init);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 USER_FUNC(sys_01_start_end_wait);
 #endif
 USER_FUNC(start);
 void display_func(CameraId cameraId, void* param);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 void sys_01_msg_tex_capture_func(CameraId cameraId, void* param);
 #endif
 s32 getLightColor(f32 angle);
 void sys_01_release(void);
-static void _unresolved(void);
-static void _epilog(void);
-void _prolog(void);
 
 extern EvtWord dummy_evt[];
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 static u32 niji_tbl[6];
 #else
 static u32 niji_tbl[2];
@@ -93,7 +98,7 @@ s8 stage6_jp_tbl[6];
 s8 stage7_jp_tbl[6];
 s8 stage8_jp_tbl[6];
 s8* texid_jp_tbl[9];
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 s8 prologue_us_tbl[9];
 s8 stage1_us_tbl[10];
 s8 stage2_us_tbl[10];
@@ -171,20 +176,20 @@ void _prolog(void) {
     }
     relSetEvtAddr("sys_00", dummy_evt);
     relSetEvtAddr("sys_01", sys_01_init_evt);
-    if (evtGetValue(NULL, GSW(0)) != 2 && evtGetValue(NULL, GSW(0)) != 125 && evtGetValue(NULL, GSW(0)) != 229 &&
-        evtGetValue(NULL, GSW(0)) != 280) {
+    if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) != STORY_STG0_02_MARIOS_HOUSE && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) != STORY_STG2_47_AFTER_GETTING_THE_TICKET && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) != STORY_STG4_END_OFF_TO_THE_KEYS &&
+        evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) != STORY_STG5_66_BELDAM_FINDS_OUT) {
         psndStopAllFadeOut();
     }
-    camGetPtr(CAMERA_2D)->flags |= 0x200;
-    camGetPtr(CAMERA_2D)->flags &= ~0x100;
-    camGetPtr(CAMERA_2D)->flags |= 0x400;
+    camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_DISABLE;
+    camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX;
+    camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_SNAP;
 }
 
 EVT_BEGIN(dummy_evt)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 static u32 niji_tbl[] = {
     19, 26, 24, 27, 22, 22,
 };
@@ -199,19 +204,21 @@ static const char* msg_tbl[] = {
     "msg_stg_seq_stg8",
 };
 
-static void _epilog(void) {
+// JP and the demo list _epilog and _unresolved as file-local in their symbol maps (US and PAL: global). The
+// binding does not reach the REL, so they follow rel_module.h, which declares the hooks for every module.
+void _epilog(void) {
     voidfunctionptr* dtor;
 
     if (strcmp(gp->currentMapName, "sys_01") == 0) {
         sys_01_release();
     }
-    camGetPtr(CAMERA_2D)->flags &= ~0x200;
+    camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
     for (dtor = _dtors; *dtor != NULL; dtor++) {
         (*dtor)();
     }
 }
 
-static void _unresolved(void) {
+void _unresolved(void) {
 }
 
 void sys_01_release(void) {
@@ -252,8 +259,7 @@ static inline void setChanMatColor(GXColor init, s32 c) {
     GXSetChanMatColor(GX_COLOR0A0, color);
 }
 
-#ifdef VERSION_G8ME01
-void FontDrawMessageMtx(Mtx mtx, const char* msg);
+#if VERSION >= VERSION_US
 
 // US: draws the chapter subtitle once, flat, and copies it into a texture that display_func bends
 void sys_01_msg_tex_capture_func(CameraId cameraId, void* param) {
@@ -370,7 +376,7 @@ void display_func(CameraId cameraId, void* param) {
     Vec eye;
     Vec up;
     Vec target;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     f32 h;
     f32 size;
     s32 full;
@@ -395,7 +401,7 @@ void display_func(CameraId cameraId, void* param) {
 
     scroll = wp->scroll;
     wp->scroll++;
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
     if (scroll > 0x500) {
         scroll -= 0x500;
     }
@@ -474,7 +480,7 @@ void display_func(CameraId cameraId, void* param) {
     GXTexCoord2f32(0.0f, 1.0f);
     GXEnd();
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     // US: the subtitle texture from sys_01_msg_tex_capture_func is bent into a ring strip and faded in along it
     PSMTXTrans(mtx, 0.0f, -40.0f, 0.0f);
     PSMTXRotRad(rot, 'z', 0.017453292f * wp->angle);
@@ -618,7 +624,7 @@ void display_func(CameraId cameraId, void* param) {
         if (chr->state == 0) {
             break;
         }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         if (chr->texid == -2) {
             continue;
         }
@@ -727,7 +733,7 @@ s8* texid_jp_tbl[] = {
     prologue_jp_tbl, stage1_jp_tbl, stage2_jp_tbl, stage3_jp_tbl, stage4_jp_tbl, stage5_jp_tbl, stage6_jp_tbl, stage7_jp_tbl, stage8_jp_tbl,
 };
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 // US: one title texture set per language; -2 marks a word gap
 s8 prologue_us_tbl[] = {
     19, 20, 21, 22, 21, 23, 24, 25, -1,
@@ -996,11 +1002,7 @@ EVT_BEGIN(sys_01_init_evt)
     CALL(evt_party_set_pos, 0, 0, 0, 0)
     CALL(evt_cam3d_evt_set, 0, 0, 500, 0, 0, 0, 0, 11)
     CALL(bg)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_entry, 30, 0, 0, 0, 0)
-#else
-    CALL(evt_fade_entry, 32, 0, 0, 0, 0)
-#endif
+    CALL(evt_fade_entry, FADE_CURTAIN_CENTER_Z1_3D, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 0)
@@ -1035,13 +1037,8 @@ EVT_BEGIN(sys_01_init_evt)
         CALL(display, LW(0))
     END_INLINE_EVENT
     WAIT_MS(3000)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_set_mapchange_type, 0, 15, 1800, 14, 1800)
-    CALL(evt_fade_set_mapchange_type, 1, 15, 1800, 14, 1800)
-#else
-    CALL(evt_fade_set_mapchange_type, 0, 17, 1800, 16, 1800)
-    CALL(evt_fade_set_mapchange_type, 1, 17, 1800, 16, 1800)
-#endif
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_WHITE, 1800, FADE_IN_WHITE, 1800)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 1800, FADE_IN_WHITE, 1800)
     SPAWN_EVENT(PTR(evt_start))
     RETURN
 EVT_END()
@@ -1053,18 +1050,14 @@ EVT_BEGIN(evt_start)
     IF_STR_NOT_EQUAL(LW(1), STRING("stg_3"))
         IF_STR_NOT_EQUAL(LW(1), STRING("stg_5"))
             IF_STR_NOT_EQUAL(LW(1), STRING("stg_6"))
-                CALL(evt_snd_bgmon, 512, STRING("BGM_FF_STG_START1"))
+                CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_FF_STG_START1"))
             END_IF
         END_IF
     END_IF
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_entry, 33, 0, 0, 0, 0)
-#else
-    CALL(evt_fade_entry, 35, 0, 0, 0, 0)
-#endif
+    CALL(evt_fade_entry, FADE_CURTAIN_CENTER_A1, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(start)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(sys_01_start_end_wait)
     WAIT_MS(3000)
 #else
@@ -1077,13 +1070,8 @@ EVT_BEGIN(evt_start)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_set_mapchange_type, 0, 17, 500, 16, 500)
-    CALL(evt_fade_set_mapchange_type, 1, 17, 500, 16, 500)
-#else
-    CALL(evt_fade_set_mapchange_type, 0, 19, 500, 18, 500)
-    CALL(evt_fade_set_mapchange_type, 1, 19, 500, 18, 500)
-#endif
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_WHITE_2D, 500, FADE_IN_WHITE_2D, 500)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE_2D, 500, FADE_IN_WHITE_2D, 500)
     CALL(evt_bero_get_entername, LW(1))
     IF_STR_EQUAL(LW(1), STRING("prologue"))
         SET_VALUE(LW(0), 0)
@@ -1137,7 +1125,7 @@ EVT_END()
 
 USER_FUNC(display) {
     SysWork* wp;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     s32 type = evtGetValue(event, event->args[0]);
     s32 i;
     SysChar* chr;
@@ -1158,7 +1146,7 @@ USER_FUNC(display) {
             wp->count++;
         }
         for (i = 0; i < wp->count; i++) {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             // US: letters are laid out by width (gaps marked -2 are half width), centred on the title
             f32 left = 0.0f;
             f32 total = left;
@@ -1204,11 +1192,11 @@ USER_FUNC(display) {
     g_wp = wp;
     switch (wp->state) {
         case 0:
-#ifdef VERSION_G8ME01_DEMO
-            if (fileAsyncf(4, NULL, "%s/eff/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != 0U) {
+#if VERSION == VERSION_DEMO
+            if (fileAsyncf(4, NULL, "%s/eff/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != NULL) {
                 wp->file = fileAllocf(4, "%s/eff/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]);
 #else
-            if (fileAsyncf(4, NULL, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != 0U) {
+            if (fileAsyncf(4, NULL, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != NULL) {
                 wp->file = fileAllocf(4, "%s/e/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]);
 #endif
                 wp->state++;
@@ -1227,7 +1215,7 @@ USER_FUNC(display) {
                         }
                         break;
                     case 1:
-                        chr->rot = intplGetValue(5, chr->timer, 90, 90.0f, 1800.0f);
+                        chr->rot = intplGetValue(5, 90.0f, 1800.0f, chr->timer, 90);
                         chr->timer++;
                         if (chr->timer > 90) {
                             chr->state++;
@@ -1240,7 +1228,7 @@ USER_FUNC(display) {
                                 wp->angle -= 360.0f;
                             }
                             wp->alpha += 0x30;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
                             if (wp->alpha > 0x4000) {
                                 wp->alpha = 0x4000;
                             }
@@ -1258,8 +1246,8 @@ USER_FUNC(display) {
             break;
     }
     if (wp->state != 0) {
-#ifdef VERSION_G8ME01
-        dispEntry((CameraId)4, 0.0f, 2, sys_01_msg_tex_capture_func, wp);
+#if VERSION >= VERSION_US
+        dispEntry(CAMERA_3D, 0.0f, 2, sys_01_msg_tex_capture_func, wp);
 #endif
         dispEntry(CAMERA_3D_EFFECTA, 0.0f, 2, display_func, wp);
     }
@@ -1269,7 +1257,7 @@ USER_FUNC(display) {
 USER_FUNC(start) {
     SysWork* wp = g_wp;
 
-    gp->flags |= 0x10;
+    gp->flags |= GLOBAL_FLAG_CURTAIN_OPEN;
     if (wp->state < 1) {
         return EVT_RETURN_BLOCK;
     }
@@ -1281,7 +1269,7 @@ USER_FUNC(bg) {
     EffectEntry* eff = effItemGetEntry(0, 0.0f, 0.0f, 0.0f);
 
     ((ItemGetWork*)eff->userdata)->state = 1;
-    ((ItemGetWork*)eff->userdata)->camera = 5;
+    ((ItemGetWork*)eff->userdata)->camera = CAMERA_3D_EFFECTA;
     return EVT_RETURN_DONE;
 }
 
@@ -1289,7 +1277,7 @@ USER_FUNC(init) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 // US: waits until every title letter has finished spinning in
 USER_FUNC(sys_01_start_end_wait) {
     SysWork* wp = g_wp;
@@ -1303,4 +1291,3 @@ USER_FUNC(sys_01_start_end_wait) {
     return EVT_RETURN_DONE;
 }
 #endif
-

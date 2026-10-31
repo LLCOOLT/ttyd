@@ -1,3 +1,4 @@
+// Battle weapon data for usable items (mushrooms, cooked dishes and so on) and their effects.
 #include "version.h"
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
@@ -21,91 +22,24 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_audience.h"
 #include "evt/evt_mobj.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_env.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "statuswindow.h"
 
-// stand pose after using an item; the demo's pose types from 58 up are 2 lower
-#ifdef VERSION_G8ME01_DEMO
-#define POSE_TYPE_ITEM_STAND 67
-#else
-#define POSE_TYPE_ITEM_STAND 69
-#endif
-
-extern ItemData itemDataTable[];
-void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s8 direction);
-void BattleStatusWindowSystemOn(void);
-void N_statusClearBlink(void);
-void statusMarioHPBlink(s32 frames);
-void statusPartyHPBlink(s32 frames);
-void statusFPBlink(s32 frames);
+#include "battle/battle_detect.h"
 EffectEntry* effNanigaEntry(s32 type, s32* table, s32 item, f32 x, f32 y, f32 z);
-void btlMovePos(f32 speed, f32 angle, f32* x, f32* z);
 void _nancy_disp(CameraId cameraId, void* param);
 void _disp_item_icon(CameraId cameraId, void* param);
 extern s32 R_mystery_item_table[];
 
 USER_FUNC(_cam_rot);
-USER_FUNC(_full_ap_recover);
 USER_FUNC(_get_throw_first_pos);
 USER_FUNC(_nancy_mirage);
 USER_FUNC(_naniga_okorukana_check);
 USER_FUNC(_throw_item_icon);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
-USER_FUNC(btlevtcmd_CheckCommandUnit);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_CheckWeaponPluralTarget);
-USER_FUNC(btlevtcmd_ChoiceSamplingEnemy);
-USER_FUNC(btlevtcmd_CommandFlyItem);
-USER_FUNC(btlevtcmd_CommandGetWeaponAddress);
-USER_FUNC(btlevtcmd_CommandGetWeaponItemId);
-USER_FUNC(btlevtcmd_ConsumeItem);
-USER_FUNC(btlevtcmd_FaceDirectionAdd);
-USER_FUNC(btlevtcmd_GetBodyId);
-USER_FUNC(btlevtcmd_GetConsumeItem);
-USER_FUNC(btlevtcmd_GetDamage);
-USER_FUNC(btlevtcmd_GetEnemyBelong);
-USER_FUNC(btlevtcmd_GetFaceDirection);
-USER_FUNC(btlevtcmd_GetFriendBelong);
-USER_FUNC(btlevtcmd_GetHeight);
-USER_FUNC(btlevtcmd_GetHitPos);
-USER_FUNC(btlevtcmd_GetHomePos);
-USER_FUNC(btlevtcmd_GetItemRecoverParam);
-USER_FUNC(btlevtcmd_GetPartsPos);
-USER_FUNC(btlevtcmd_GetPos);
-USER_FUNC(btlevtcmd_GetSelectEnemy);
-USER_FUNC(btlevtcmd_GetSelectNextEnemy);
-USER_FUNC(btlevtcmd_GetStatusMg);
-USER_FUNC(btlevtcmd_GetUnitKind);
-USER_FUNC(btlevtcmd_GetWidth);
-USER_FUNC(btlevtcmd_MovePosition);
-USER_FUNC(btlevtcmd_PreCheckDamage);
-USER_FUNC(btlevtcmd_RecoverFp);
-USER_FUNC(btlevtcmd_RecoverHp);
-USER_FUNC(btlevtcmd_SamplingEnemy);
-USER_FUNC(btlevtcmd_SetFp);
-USER_FUNC(btlevtcmd_SetHp);
-USER_FUNC(btlevtcmd_SetMoveSpeed);
-USER_FUNC(btlevtcmd_StageDispellFog);
-USER_FUNC(btlevtcmd_StartAvoid);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StatusWindowOnOff);
-USER_FUNC(btlevtcmd_TransStageFloorPosition);
-USER_FUNC(btlevtcmd_WeaponAftereffect);
-USER_FUNC(btlevtcmd_check_battleflag);
-USER_FUNC(evt_audience_ap_recovery);
-USER_FUNC(evt_btl_camera_noshake);
-USER_FUNC(evt_btl_camera_set_homing_unit);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_btl_camera_set_moveSpeedLv);
-USER_FUNC(evt_btl_camera_set_zoom);
-USER_FUNC(evt_btl_camera_shake_h);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_env_blur_on);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_random);
-USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(_hpfp_change_declare_2);
 USER_FUNC(_hpfp_change_declare_1);
 USER_FUNC(_rank_up);
@@ -227,39 +161,37 @@ extern EvtWord ItemEvent_Sukkiri_Drink[];
 extern EvtWord ItemEvent_Shikaeshino_Kona[];
 extern EvtWord ItemEvent_Kameno_Noroi[];
 
-
-
 EVT_BEGIN(_return_home_event)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     LABEL(95)
-    CALL(btlevtcmd_GetPos, -2, LW(3), LW(4), LW(5))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
     IF_INT_NOT_EQUAL(LW(0), LW(3))
         BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_GetBodyId, -2, LW(0))
-            CALL(btlevtcmd_AnimeChangePoseType, -2, LW(0), 42)
+            CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), 42)
         END_SIBLING_EVENT
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(5.0f))
-        CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     END_IF
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Automatic_Target)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(8))
+        CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(8))
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
-        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(8))
+    ELSE
+        CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(8))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(8), LW(10), LW(11))
     END_IF
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Recovery_Core_Effect)
-    CALL(evt_btl_camera_set_homing_unit, 0, LW(10), -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, LW(10), BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_GetItemRecoverParam, LW(9), LW(5), LW(6), LW(7))
@@ -297,39 +229,39 @@ EVT_BEGIN(ItemEvent_Recovery_Core)
     WAIT_FRAMES(60)
     CALL_CHILD(PTR(_return_home_event))
     CALL(btlevtcmd_StartWaitEvent, LW(10))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Recovery)
-    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(8))
+    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(8))
     CALL(btlevtcmd_WeaponAftereffect, LW(8))
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
-        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(8))
+    ELSE
+        CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(8))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(8), LW(10), LW(11))
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 60)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 60)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(btlevtcmd_CommandGetWeaponItemId, LW(9), LW(8))
     IF_INT_EQUAL(LW(9), 0)
         CALL(btlevtcmd_GetConsumeItem, LW(9))
@@ -340,46 +272,46 @@ EVT_END()
 
 EVT_BEGIN(ItemEvent_Support_Sub_UseDeclere)
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(600)
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_GetTarget)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-            ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
@@ -392,7 +324,7 @@ EVT_BEGIN(ItemEvent_Support_Sub_Effect)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -401,12 +333,12 @@ EVT_BEGIN(ItemEvent_Support_Sub_Effect)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -422,7 +354,7 @@ EVT_BEGIN(ItemEvent_Support_NoEffect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -435,7 +367,7 @@ EVT_BEGIN(ItemEvent_Support_RefreshEffect)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -446,12 +378,12 @@ EVT_BEGIN(ItemEvent_Support_RefreshEffect)
         CASE_EQUAL(1)
         CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_REST_CONDITION1"), LW(0), LW(1), LW(2), 0)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -459,7 +391,7 @@ EVT_BEGIN(ItemEvent_Support_RefreshEffect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -473,15 +405,15 @@ BattleWeapon ItemWeaponData_CookingItem = {
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30008, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -489,7 +421,7 @@ BattleWeapon ItemWeaponData_CookingItem = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -501,23 +433,23 @@ BattleWeapon ItemWeaponData_Kinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x1110, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_OWN_ALLIANCE | TARGET_WEIGHT_PREFER_LOW_HP_RATIO | TARGET_WEIGHT_PREFER_IN_PERIL, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -525,7 +457,7 @@ BattleWeapon ItemWeaponData_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -537,23 +469,23 @@ BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x1110, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_OWN_ALLIANCE | TARGET_WEIGHT_PREFER_LOW_HP_RATIO | TARGET_WEIGHT_PREFER_IN_PERIL, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -561,7 +493,7 @@ BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -573,23 +505,23 @@ BattleWeapon ItemWeaponData_Super_Kinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x1110, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_OWN_ALLIANCE | TARGET_WEIGHT_PREFER_LOW_HP_RATIO | TARGET_WEIGHT_PREFER_IN_PERIL, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -597,7 +529,7 @@ BattleWeapon ItemWeaponData_Super_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -609,23 +541,23 @@ BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x1110, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_OWN_ALLIANCE | TARGET_WEIGHT_PREFER_LOW_HP_RATIO | TARGET_WEIGHT_PREFER_IN_PERIL, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -633,7 +565,7 @@ BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -645,23 +577,23 @@ BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x1110, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_OWN_ALLIANCE | TARGET_WEIGHT_PREFER_LOW_HP_RATIO | TARGET_WEIGHT_PREFER_IN_PERIL, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -669,7 +601,7 @@ BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -681,23 +613,23 @@ BattleWeapon ItemWeaponData_Honey_Syrup = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x80000002, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_PARTNER | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -705,7 +637,7 @@ BattleWeapon ItemWeaponData_Honey_Syrup = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -717,23 +649,23 @@ BattleWeapon ItemWeaponData_Maple_Syrup = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x80000002, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_PARTNER | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -741,7 +673,7 @@ BattleWeapon ItemWeaponData_Maple_Syrup = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -753,23 +685,23 @@ BattleWeapon ItemWeaponData_Royal_Jelly = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x80000002, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_PARTNER | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -777,7 +709,7 @@ BattleWeapon ItemWeaponData_Royal_Jelly = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -789,23 +721,23 @@ BattleWeapon ItemWeaponData_Tankobu = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30148, // special
-    0x7FF, // counterResistFlags
-    0x80000002, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_PARTNER | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -813,39 +745,39 @@ BattleWeapon ItemWeaponData_Tankobu = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Recovery, // mAttackEvtScript
+    ItemEvent_Recovery, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Pow_Block)
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHeight, -2, LW(5))
-        CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 30)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(5))
+        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
         ADD(LW(1), 16)
         ADD(LW(1), LW(5))
     ELSE
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHeight, -2, LW(5))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(5))
         ADD(LW(1), 16)
         ADD(LW(1), LW(5))
     END_IF
@@ -862,33 +794,33 @@ EVT_BEGIN(ItemEvent_Pow_Block)
         WAIT_MS(2050)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
     WAIT_FRAMES(5)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 42)
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-    CALL(btlevtcmd_GetPos, -2, -250000000, LW(1), -250000000)
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 42)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 43)
     WAIT_FRAMES(30)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.7998047f))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 44)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 14, -1)
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 43)
+        CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.7998047f))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 44)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 14, -1)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 43)
         WAIT_FRAMES(60)
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 42)
-        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 42)
+        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 43)
     END_SIBLING_EVENT
     BEGIN_INLINE_EVENT
         WAIT_FRAMES(5)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_POW_BLOCK1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_mobj_set_anim, STRING("_BtCIPw"), STRING("A_1"))
         WAIT_FRAMES(3)
@@ -898,14 +830,14 @@ EVT_BEGIN(ItemEvent_Pow_Block)
     END_INLINE_EVENT
     CALL(evt_audience_reflesh_natural_all, 100)
     WAIT_FRAMES(7)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&ItemWeaponData_Pow_Block))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&ItemWeaponData_Pow_Block))
     CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Pow_Block), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), PTR(&ItemWeaponData_Pow_Block), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -914,7 +846,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Pow_Block), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), PTR(&ItemWeaponData_Pow_Block), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
     GOTO(10)
@@ -923,7 +855,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&ItemWeaponData_Pow_Block))
     WAIT_FRAMES(150)
     CALL_CHILD(_return_home_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -935,23 +867,23 @@ BattleWeapon ItemWeaponData_Pow_Block = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x33040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_FLIPS_SHELLED | SPECIAL_FLIPS_BOMB_FLIPPABLE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -959,7 +891,7 @@ BattleWeapon ItemWeaponData_Pow_Block = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Pow_Block, // mAttackEvtScript
+    ItemEvent_Pow_Block, // attackEvtScript
     {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
@@ -967,12 +899,12 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_MS(100)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 40)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
     SET_VALUE(LW(3), LW(0))
     SET_VALUE(LW(4), LW(1))
     SET_VALUE(LW(5), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(3), 240)
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(3), 240)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     IF_INT_LESS(LW(0), LW(3))
         CALL(evt_eff64, STRING(""), STRING("fireflower_n64"), 0, LW(0), LW(1), LW(2), 180, 0, 0, 0, 0, 0, 0, 0)
@@ -983,7 +915,7 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
                 WAIT_FRAMES(5)
             END_LOOP
         END_SIBLING_EVENT
-        ELSE
+    ELSE
         CALL(evt_eff64, STRING(""), STRING("fireflower_n64"), 1, LW(0), LW(1), LW(2), 180, 0, 0, 0, 0, 0, 0, 0)
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(45)
@@ -994,14 +926,14 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
         END_SIBLING_EVENT
     END_IF
     WAIT_MS(2800)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&ItemWeaponData_Fire_Flower))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&ItemWeaponData_Fire_Flower))
     CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Fire_Flower), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), PTR(&ItemWeaponData_Fire_Flower), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -1010,7 +942,7 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), PTR(&ItemWeaponData_Fire_Flower), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), PTR(&ItemWeaponData_Fire_Flower), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
     WAIT_MS(80)
@@ -1019,13 +951,13 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Fire_Flower)
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Fire_Flower))
@@ -1044,24 +976,24 @@ BattleWeapon ItemWeaponData_Fire_Flower = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     1, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -1069,7 +1001,7 @@ BattleWeapon ItemWeaponData_Fire_Flower = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Fire_Flower, // mAttackEvtScript
+    ItemEvent_Fire_Flower, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -1077,23 +1009,23 @@ EVT_BEGIN(ItemEvent_Kaminari_Core)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-            ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
@@ -1111,7 +1043,7 @@ EVT_BEGIN(ItemEvent_Kaminari_Core)
     CALL(evt_btl_camera_shake_h, 0, 3, 0, 25, 13)
     CALL(evt_sub_rumble_onoff, 0, 0)
     WAIT_MS(83)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -1120,7 +1052,7 @@ EVT_BEGIN(ItemEvent_Kaminari_Core)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     WAIT_MS(167)
     CALL(evt_sub_rumble_onoff, 1, 0)
@@ -1128,7 +1060,7 @@ EVT_BEGIN(ItemEvent_Kaminari_Core)
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -1136,30 +1068,30 @@ EVT_BEGIN(ItemEvent_Kaminari_Core)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(30)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Kaminari)
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL_CHILD(PTR(ItemEvent_Kaminari_Core))
     RETURN
 EVT_END()
@@ -1178,24 +1110,24 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     4, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -1203,7 +1135,7 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Kaminari_Dokkan, // mAttackEvtScript
+    ItemEvent_Kaminari_Dokkan, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
@@ -1221,24 +1153,24 @@ BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     4, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -1246,7 +1178,7 @@ BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Kaminari_Gorogoro, // mAttackEvtScript
+    ItemEvent_Kaminari_Gorogoro, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
@@ -1254,13 +1186,13 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(15), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             SET_VALUE(LW(15), 1)
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
@@ -1268,20 +1200,20 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(15), 1)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
         ELSE
             SET_VALUE(LW(15), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
     CALL(evt_snd_sfxon, STRING("SFX_ITEM_KIRAKIRA_FALL1"), 0)
     IF_INT_EQUAL(LW(15), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetStageSize, -250000000, LW(1), -250000000)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetStageSize, EVT_NULLPTR, LW(1), EVT_NULLPTR)
         CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(3), LW(4), LW(5))
         CALL(evt_eff64, STRING(""), STRING("sstar_n64"), 2, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), FLOAT(10.0f), 0, 0, 0, 0)
         CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_KIRAKIRA_FALL1"), LW(0), LW(1), LW(2), 0)
@@ -1300,7 +1232,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
                 CALL(evt_sub_random, 6, LW(0))
                 ADD(LW(0), 27)
                 WAIT_FRAMES(LW(0))
-                CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
+                CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
                 CALL(_sampling_random_target, LW(12), LW(10), LW(11), LW(0))
                 IF_INT_NOT_EQUAL(LW(10), -1)
                     CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(0), LW(1), LW(2))
@@ -1315,8 +1247,8 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
             END_LOOP
         END_SIBLING_EVENT
         LOOP(60)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_GetStageSize, -250000000, LW(1), -250000000)
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetStageSize, EVT_NULLPTR, LW(1), EVT_NULLPTR)
             CALL(evt_sub_random, 200, LW(0))
             CALL(evt_sub_random, 320, LW(3))
             CALL(btlevtcmd_GetFriendBelong, LW(10), LW(6))
@@ -1347,14 +1279,14 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
         END_LOOP
         WAIT_FRAMES(50)
         CALL(btlevtcmd_WaitEventEnd, LW(15))
-        CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+        CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
         ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
         END_IF
     END_IF
@@ -1362,7 +1294,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -1371,7 +1303,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1385,14 +1317,14 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(_return_home_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Kirakira_Otoshi)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kirakira_Otoshi))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -1409,23 +1341,23 @@ BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -1433,63 +1365,63 @@ BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Kirakira_Otoshi, // mAttackEvtScript
+    ItemEvent_Kirakira_Otoshi, // attackEvtScript
     {0, 10, 10, 100, 10, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Koorino_Ibuki))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-            ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_ICE_WIND1"), LW(0), LW(1), LW(2), LW(15))
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetFaceDirection, -2, LW(5))
+    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
     ADD(LW(1), 10)
     ADD(LW(2), 20)
     IF_INT_GREATER_OR_EQUAL(LW(5), 0)
         CALL(evt_eff, 0, STRING("ibuki"), 0, LW(0), LW(1), LW(2), 180, 0, 0, 0, 0, 0, 0, 0)
-        ELSE
+    ELSE
         CALL(evt_eff, 0, STRING("ibuki"), 1, LW(0), LW(1), LW(2), 180, 0, 0, 0, 0, 0, 0, 0)
     END_IF
     WAIT_MS(500)
@@ -1500,7 +1432,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -1509,12 +1441,12 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -1522,7 +1454,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1534,28 +1466,28 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     2, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     100, // freezeChance
 #else
     95, // freezeChance
@@ -1566,31 +1498,31 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Koorino_Ibuki, // mAttackEvtScript
+    ItemEvent_Koorino_Ibuki, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Yurayura_Jishin))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
@@ -1611,23 +1543,23 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 30, 13)
     WAIT_MS(333)
     CALL(evt_snd_sfxoff, LW(10))
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-            ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
@@ -1635,7 +1567,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -1644,12 +1576,12 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -1657,7 +1589,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1669,23 +1601,23 @@ BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000008, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_NO_FLOATING_2 | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -1693,51 +1625,51 @@ BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Yurayura_Jishin, // mAttackEvtScript
+    ItemEvent_Yurayura_Jishin, // attackEvtScript
     {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Teresano_Fuku)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Teresano_Fuku))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-            ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
@@ -1745,7 +1677,7 @@ EVT_BEGIN(ItemEvent_Teresano_Fuku)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -1754,12 +1686,12 @@ EVT_BEGIN(ItemEvent_Teresano_Fuku)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -1767,7 +1699,7 @@ EVT_BEGIN(ItemEvent_Teresano_Fuku)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1779,23 +1711,23 @@ BattleWeapon ItemWeaponData_Teresano_Fuku = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -1805,7 +1737,7 @@ BattleWeapon ItemWeaponData_Teresano_Fuku = {
     2, // invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Teresano_Fuku, // mAttackEvtScript
+    ItemEvent_Teresano_Fuku, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -1814,7 +1746,7 @@ EVT_BEGIN(ItemEvent_Biribiri_Kinoko_Core)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1835,23 +1767,23 @@ BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, // poisonStrength..confuseTime
     100, // electricChance
@@ -1862,7 +1794,7 @@ BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Biribiri_Kinoko, // mAttackEvtScript
+    ItemEvent_Biribiri_Kinoko, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -1871,7 +1803,7 @@ EVT_BEGIN(ItemEvent_Teki_Yokeeru_Core)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1892,23 +1824,23 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, // poisonStrength..electricTime
     100, // dodgyChance
@@ -1918,7 +1850,7 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Teki_Yokeeru, // mAttackEvtScript
+    ItemEvent_Teki_Yokeeru, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -1936,23 +1868,23 @@ BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30000, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, // poisonStrength
     100, // confuseChance
@@ -1963,11 +1895,11 @@ BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Madowaseno_Kona, // mAttackEvtScript
+    ItemEvent_Madowaseno_Kona, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Nemure_Yoikoyo))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -1976,10 +1908,10 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     CALL(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 256)
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), 0, 0, 0, 0, 0, 0, 0, 0, 0)
-        ELSE
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ELSE
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(2), 15)
         CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     END_IF
@@ -1989,7 +1921,7 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #else
@@ -1999,7 +1931,7 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     WAIT_FRAMES(300)
     CALL(evt_btl_camera_noshake, 0)
@@ -2007,7 +1939,7 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 #endif
@@ -2020,24 +1952,24 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30000, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
-#ifdef VERSION_G8ME01_DEMO
+    SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
+#if VERSION == VERSION_DEMO
     100, // sleepChance
 #else
     95, // sleepChance
@@ -2050,7 +1982,7 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Nemure_Yoikoyo, // mAttackEvtScript
+    ItemEvent_Nemure_Yoikoyo, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2061,25 +1993,25 @@ EVT_BEGIN(ItemEvent_Stop_Watch_Core)
     CALL(evt_snd_sfxon, STRING("SFX_ITEM_STOP_WATCH1"), 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 256)
     IF_INT_EQUAL(LW(0), 0)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
         CALL(evt_eff64, 0, STRING("timestamp_n64"), 0, 0, 0, 0, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
 #else
         CALL(evt_eff64, 0, STRING("timestamp_n64"), 0, 0, 0, 103, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
 #endif
-        ELSE
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    ELSE
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(2), 30)
         CALL(evt_eff64, 0, STRING("timestamp_n64"), 0, 0, 0, LW(2), FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
     END_IF
     WAIT_FRAMES(200)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -2088,38 +2020,38 @@ EVT_BEGIN(ItemEvent_Stop_Watch_Core)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
     GOTO(10)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Stop_Watch)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Stop_Watch))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL_CHILD(PTR(ItemEvent_Stop_Watch_Core))
     RETURN
 EVT_END()
@@ -2132,25 +2064,25 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30000, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, // sleepChance..sleepTime
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     100, // stopChance
 #else
     95, // stopChance
@@ -2163,7 +2095,7 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Stop_Watch, // mAttackEvtScript
+    ItemEvent_Stop_Watch, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2181,7 +2113,7 @@ EVT_BEGIN(ItemEvent_Guruguru_Memawashi)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -2193,23 +2125,23 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30000, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, // sleepChance..stopTime
     100, // dizzyChance
     3, // dizzyTime
@@ -2219,7 +2151,7 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Guruguru_Memawashi, // mAttackEvtScript
+    ItemEvent_Guruguru_Memawashi, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2237,23 +2169,23 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, // burnTime..freezeTime
@@ -2264,7 +2196,7 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Dekadeka_Drink, // mAttackEvtScript
+    ItemEvent_Dekadeka_Drink, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2282,23 +2214,23 @@ BattleWeapon ItemWeaponData_Katikati_Koura = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2310,51 +2242,51 @@ BattleWeapon ItemWeaponData_Katikati_Koura = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Katikati_Koura, // mAttackEvtScript
+    ItemEvent_Katikati_Koura, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Suitooru)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Suitooru))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-            ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
@@ -2362,7 +2294,7 @@ EVT_BEGIN(ItemEvent_Suitooru)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -2371,13 +2303,13 @@ EVT_BEGIN(ItemEvent_Suitooru)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_GetDamage, LW(10), LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_RecoverHp, -2, LW(9), LW(0))
-        CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
-        CALL(btlevtcmd_GetHeight, -2, LW(8))
+        CALL(btlevtcmd_RecoverHp, BTL_UNIT_SELF, LW(9), LW(0))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
+        CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(8))
         ADD(LW(6), LW(8))
         ADD(LW(7), 3)
         CALL(evt_eff, 0, STRING("recovery"), 0, LW(5), LW(6), LW(7), LW(0), 0, 0, 0, 0, 0, 0, 0)
@@ -2385,7 +2317,7 @@ EVT_BEGIN(ItemEvent_Suitooru)
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -2393,7 +2325,7 @@ EVT_BEGIN(ItemEvent_Suitooru)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(60)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -2405,23 +2337,23 @@ BattleWeapon ItemWeaponData_Suitooru = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30140, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2429,51 +2361,51 @@ BattleWeapon ItemWeaponData_Suitooru = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Suitooru, // mAttackEvtScript
+    ItemEvent_Suitooru, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_Teki_Kyouka)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Kyouka))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
     ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
         ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
@@ -2481,7 +2413,7 @@ EVT_BEGIN(ItemEvent_Teki_Kyouka)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ITEM_RANK_UP_ENEMY1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ITEM_RANK_UP_ENEMY1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
     ADD(LW(2), 5)
@@ -2498,7 +2430,7 @@ EVT_BEGIN(ItemEvent_Teki_Kyouka)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(_return_home_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -2510,23 +2442,23 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2534,7 +2466,7 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Teki_Kyouka, // mAttackEvtScript
+    ItemEvent_Teki_Kyouka, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2552,23 +2484,23 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30000, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, // burnTime..freezeTime
@@ -2579,7 +2511,7 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Minimini_Kun, // mAttackEvtScript
+    ItemEvent_Minimini_Kun, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2597,23 +2529,23 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30000, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2625,7 +2557,7 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Funyafunya_Kun, // mAttackEvtScript
+    ItemEvent_Funyafunya_Kun, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2643,23 +2575,23 @@ BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     100, // sleepChance
     0, // sleepTime
     100, // stopChance
@@ -2684,7 +2616,7 @@ BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Sukkiri_Drink, // mAttackEvtScript
+    ItemEvent_Sukkiri_Drink, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2693,7 +2625,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko_Core)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -2714,23 +2646,23 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x1110, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_OWN_ALLIANCE | TARGET_WEIGHT_PREFER_LOW_HP_RATIO | TARGET_WEIGHT_PREFER_IN_PERIL, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2741,7 +2673,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Jiwajiwa_Kinoko, // mAttackEvtScript
+    ItemEvent_Jiwajiwa_Kinoko, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2750,7 +2682,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup_Core)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -2771,23 +2703,23 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2797,7 +2729,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     10, // fpRegenTime
     2, // fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Jiwajiwa_Syrup, // mAttackEvtScript
+    ItemEvent_Jiwajiwa_Syrup, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2812,7 +2744,7 @@ EVT_BEGIN(ItemEvent_Irekaeeru)
     ADD(LW(1), 20)
     ADD(LW(2), 5)
     CALL(evt_eff, STRING(""), STRING("irekae"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ITEM_HP_FP_CHANGE1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_ITEM_HP_FP_CHANGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(120)
     CALL(btlevtcmd_CheckAttribute, LW(10), 1048576, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -2830,7 +2762,7 @@ EVT_BEGIN(ItemEvent_Irekaeeru)
         CALL(btlevtcmd_SetFp, LW(10), LW(6))
         CALL(_hpfp_change_declare_2, LW(10))
         IF_INT_EQUAL(LW(8), 0)
-            CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+            CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
             SWITCH(LW(5))
                 CASE_EQUAL(3)
                 CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -2839,14 +2771,14 @@ EVT_BEGIN(ItemEvent_Irekaeeru)
                 CASE_EQUAL(2)
                 CALL(btlevtcmd_StartAvoid, LW(10), 40)
                 CASE_EQUAL(1)
-                CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
             END_SWITCH
         END_IF
     END_IF
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(30)
     CALL_CHILD(_return_home_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -2858,24 +2790,24 @@ BattleWeapon ItemWeaponData_Irekaeeru = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, // element
     27, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2883,7 +2815,7 @@ BattleWeapon ItemWeaponData_Irekaeeru = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Irekaeeru, // mAttackEvtScript
+    ItemEvent_Irekaeeru, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2892,13 +2824,13 @@ EVT_BEGIN(ItemEvent_Attiike_Shisshi)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ITEM_HORROR1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ITEM_HORROR1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(60)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ITEM_HORROR2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ITEM_HORROR2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-#ifdef VERSION_G8ME01_DEMO
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+#if VERSION == VERSION_DEMO
     CALL(evt_eff64, STRING(""), STRING("holography_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 120, 0, 0, 0, 0, 0, 0)
     WAIT_FRAMES(120)
     CALL_CHILD(ItemEvent_Support_Sub_Effect)
@@ -2934,7 +2866,7 @@ EVT_BEGIN(ItemEvent_Attiike_Shisshi)
     WAIT_MS(2500)
 #endif
     CALL_CHILD(_return_home_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -2946,23 +2878,23 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30000, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -2972,7 +2904,7 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Attiike_Shisshi, // mAttackEvtScript
+    ItemEvent_Attiike_Shisshi, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -2980,7 +2912,7 @@ EVT_BEGIN(ItemEvent_Naniga_Okorukana)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Naniga_Okorukana))
     CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
     WAIT_FRAMES(30)
-    CALL(_naniga_okorukana_check, -2, LW(13))
+    CALL(_naniga_okorukana_check, BTL_UNIT_SELF, LW(13))
     SWITCH(LW(13))
         CASE_EQUAL(148)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Kinoko))
@@ -3058,10 +2990,10 @@ EVT_BEGIN(ItemEvent_Naniga_Okorukana)
         CALL_CHILD(PTR(ItemEvent_Automatic_Target))
         CALL_CHILD(PTR(ItemEvent_Stop_Watch_Core))
         CASE_DEFAULT
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_SWITCH
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -3073,23 +3005,23 @@ BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2100060, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3097,7 +3029,7 @@ BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Naniga_Okorukana, // mAttackEvtScript
+    ItemEvent_Naniga_Okorukana, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3120,23 +3052,23 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3145,7 +3077,7 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     3, // paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Shikaeshino_Kona, // mAttackEvtScript
+    ItemEvent_Shikaeshino_Kona, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3163,23 +3095,23 @@ BattleWeapon ItemWeaponData_Kameno_Noroi = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30008, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3190,39 +3122,39 @@ BattleWeapon ItemWeaponData_Kameno_Noroi = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Kameno_Noroi, // mAttackEvtScript
+    ItemEvent_Kameno_Noroi, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 EVT_BEGIN(ItemEvent_RecoveryAndStatus)
-    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(8))
+    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(8))
     CALL(btlevtcmd_WeaponAftereffect, LW(8))
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
-        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(8))
+    ELSE
+        CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(8))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(8), LW(10), LW(11))
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 60)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 60)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(btlevtcmd_CommandGetWeaponItemId, LW(9), LW(8))
     IF_INT_EQUAL(LW(9), 0)
         CALL(btlevtcmd_GetConsumeItem, LW(9))
@@ -3233,10 +3165,10 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
         CALL(evt_sub_random, 100, LW(0))
         IF_INT_LESS(LW(0), 40)
             SET_VALUE(LW(8), PTR(&ItemWeaponData_FirstLovePuddingBiribiri))
-            ELSE
+        ELSE
             IF_INT_LESS(LW(0), 80)
                 SET_VALUE(LW(8), PTR(&ItemWeaponData_FirstLovePuddingTrans))
-                ELSE
+            ELSE
                 SET_VALUE(LW(8), PTR(&ItemWeaponData_FirstLovePuddingSleep))
             END_IF
         END_IF
@@ -3244,10 +3176,10 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
         CALL(evt_sub_random, 100, LW(0))
         IF_INT_LESS(LW(0), 40)
             SET_VALUE(LW(8), PTR(&ItemWeaponData_PeachTaltBiribiri))
-            ELSE
+        ELSE
             IF_INT_LESS(LW(0), 80)
                 SET_VALUE(LW(8), PTR(&ItemWeaponData_PeachTaltDodge))
-                ELSE
+            ELSE
                 SET_VALUE(LW(8), PTR(&ItemWeaponData_PeachTaltSleep))
             END_IF
         END_IF
@@ -3258,7 +3190,7 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
         CASE_END
     END_SWITCH
     SET_VALUE(LW(12), LW(8))
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -3267,11 +3199,11 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL_CHILD(PTR(_return_home_event))
     CALL(btlevtcmd_StartWaitEvent, LW(10))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -3283,23 +3215,23 @@ BattleWeapon ItemWeaponData_SpaceFood = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3309,7 +3241,7 @@ BattleWeapon ItemWeaponData_SpaceFood = {
     0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3321,23 +3253,23 @@ BattleWeapon ItemWeaponData_IceCandy = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
@@ -3348,7 +3280,7 @@ BattleWeapon ItemWeaponData_IceCandy = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3360,23 +3292,23 @@ BattleWeapon ItemWeaponData_NancyFrappe = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
@@ -3387,7 +3319,7 @@ BattleWeapon ItemWeaponData_NancyFrappe = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3399,23 +3331,23 @@ BattleWeapon ItemWeaponData_SnowRabbit = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
@@ -3426,7 +3358,7 @@ BattleWeapon ItemWeaponData_SnowRabbit = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3438,23 +3370,23 @@ BattleWeapon ItemWeaponData_TeaKinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3468,7 +3400,7 @@ BattleWeapon ItemWeaponData_TeaKinoko = {
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3480,23 +3412,23 @@ BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, // poisonStrength..confuseTime
     100, // electricChance
@@ -3507,7 +3439,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3519,23 +3451,23 @@ BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3545,7 +3477,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     2, // invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3557,23 +3489,23 @@ BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     100, // sleepChance
     2, // sleepTime
     0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
@@ -3583,7 +3515,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3595,23 +3527,23 @@ BattleWeapon ItemWeaponData_StarryDinner = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3622,7 +3554,7 @@ BattleWeapon ItemWeaponData_StarryDinner = {
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3634,23 +3566,23 @@ BattleWeapon ItemWeaponData_KararinaPasta = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3659,7 +3591,7 @@ BattleWeapon ItemWeaponData_KararinaPasta = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3671,23 +3603,23 @@ BattleWeapon ItemWeaponData_MeromeroCake = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3699,7 +3631,7 @@ BattleWeapon ItemWeaponData_MeromeroCake = {
     0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3711,23 +3643,23 @@ BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, // poisonStrength..confuseTime
     100, // electricChance
@@ -3738,7 +3670,7 @@ BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3750,23 +3682,23 @@ BattleWeapon ItemWeaponData_PeachTaltDodge = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, // poisonStrength..electricTime
     100, // dodgyChance
@@ -3776,7 +3708,7 @@ BattleWeapon ItemWeaponData_PeachTaltDodge = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3788,23 +3720,23 @@ BattleWeapon ItemWeaponData_PeachTaltSleep = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     100, // sleepChance
     2, // sleepTime
     0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
@@ -3814,7 +3746,7 @@ BattleWeapon ItemWeaponData_PeachTaltSleep = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3826,23 +3758,23 @@ BattleWeapon ItemWeaponData_BiribiriCandy = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, // poisonStrength..confuseTime
     100, // electricChance
@@ -3853,7 +3785,7 @@ BattleWeapon ItemWeaponData_BiribiriCandy = {
     0, 0, 0, 0, 0, 0, 0, 0, // galeForceChance..fpRegenTime
     0, // fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3865,23 +3797,23 @@ BattleWeapon ItemWeaponData_HealthySalad = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     100, // sleepChance
     0, // sleepTime
     100, // stopChance
@@ -3906,7 +3838,7 @@ BattleWeapon ItemWeaponData_HealthySalad = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3918,23 +3850,23 @@ BattleWeapon ItemWeaponData_FreshJuice = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     100, // sleepChance
     0, // sleepTime
     100, // stopChance
@@ -3959,7 +3891,7 @@ BattleWeapon ItemWeaponData_FreshJuice = {
     0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -3971,23 +3903,23 @@ BattleWeapon ItemWeaponData_RedKararing = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -3996,7 +3928,7 @@ BattleWeapon ItemWeaponData_RedKararing = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -4008,23 +3940,23 @@ BattleWeapon ItemWeaponData_FutarideForever = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -4035,11 +3967,11 @@ BattleWeapon ItemWeaponData_FutarideForever = {
     2, // hpRegenStrength
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // demo only: Fire Candy (item 228) still had battle data
 BattleWeapon ItemWeaponData_FireCandy = {
     NULL, 0, // name..icon
@@ -4049,23 +3981,23 @@ BattleWeapon ItemWeaponData_FireCandy = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     1, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30048, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -4073,82 +4005,82 @@ BattleWeapon ItemWeaponData_FireCandy = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_RecoveryAndStatus, // mAttackEvtScript
+    ItemEvent_RecoveryAndStatus, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
 #endif
 EVT_BEGIN(ItemEvent_ThrowAttack)
-    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(12))
+    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
     CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, -1)
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetFriendBelong, -2, LW(0))
+    CALL(btlevtcmd_GetFriendBelong, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetBodyId, -2, LW(9))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 40)
-        CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-        CALL(btlevtcmd_MovePosition, -2, -60, LW(1), LW(2), 0, -1, 0)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 40)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
-    CALL(btlevtcmd_GetBodyId, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), 52)
-    CALL(btlevtcmd_CommandFlyItem, -2, 40)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, LW(9), POSE_TYPE_ITEM_STAND)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
+    CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_CommandGetWeaponItemId, LW(9), LW(12))
     IF_INT_EQUAL(LW(9), 0)
         CALL(btlevtcmd_GetConsumeItem, LW(9))
     END_IF
-    CALL(btlevtcmd_ConsumeItem, -2)
+    CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_CheckCommandUnit, -2, LW(0))
+    CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
         END_IF
         CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
-            ELSE
-            CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-            CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+        ELSE
+            CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
-    CALL(btlevtcmd_GetUnitKind, -2, LW(0))
+    CALL(btlevtcmd_GetUnitKind, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 222)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_C_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_C_1"))
         BEGIN_SIBLING_EVENT
             WAIT_MS(500)
-            CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+            CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
         END_SIBLING_EVENT
     END_IF
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(5), LW(6), LW(7))
-        ELSE
+    ELSE
         CALL(btlevtcmd_GetFriendBelong, LW(10), LW(0))
         IF_INT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
             SET_VALUE(LW(5), -120)
-            ELSE
-            CALL(btlevtcmd_GetPos, -2, LW(5), LW(6), LW(7))
+        ELSE
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
             SET_VALUE(LW(5), 100)
         END_IF
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     END_IF
-    CALL(_get_throw_first_pos, -2, LW(0), LW(1), LW(2))
+    CALL(_get_throw_first_pos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(_throw_item_icon, LW(9), LW(0), LW(1), LW(2), LW(5), LW(6), LW(7))
     SWITCH(LW(9))
         CASE_EQUAL(196)
@@ -4175,7 +4107,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(10), 38)
@@ -4184,12 +4116,12 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(10), 40)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(10), LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
-        ELSE
+    ELSE
         SET_VALUE(LW(10), -1)
     END_IF
     GOTO(10)
@@ -4197,7 +4129,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(30)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -4209,24 +4141,24 @@ BattleWeapon ItemWeaponData_NancyDynamite = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     3, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -4234,7 +4166,7 @@ BattleWeapon ItemWeaponData_NancyDynamite = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_ThrowAttack, // mAttackEvtScript
+    ItemEvent_ThrowAttack, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
@@ -4246,24 +4178,24 @@ BattleWeapon ItemWeaponData_CoconutsBomb = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     3, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -4271,7 +4203,7 @@ BattleWeapon ItemWeaponData_CoconutsBomb = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_ThrowAttack, // mAttackEvtScript
+    ItemEvent_ThrowAttack, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
@@ -4283,23 +4215,23 @@ BattleWeapon ItemWeaponData_KachikachiDish = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -4307,7 +4239,7 @@ BattleWeapon ItemWeaponData_KachikachiDish = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_ThrowAttack, // mAttackEvtScript
+    ItemEvent_ThrowAttack, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
@@ -4319,24 +4251,24 @@ BattleWeapon ItemWeaponData_BomberEgg = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     3, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30040, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -4344,7 +4276,7 @@ BattleWeapon ItemWeaponData_BomberEgg = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_ThrowAttack, // mAttackEvtScript
+    ItemEvent_ThrowAttack, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
@@ -4356,9 +4288,9 @@ EVT_BEGIN(ItemEvent_Poison_Kinoko)
     CALL(evt_sub_random, 100, LW(0))
     IF_INT_LESS(LW(0), 80)
         CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(ItemEvent_GetTarget))
-        CALL(evt_btl_camera_set_homing_unit, 0, LW(10), -1)
+        CALL(evt_btl_camera_set_homing_unit, 0, LW(10), BTL_UNIT_NONE)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
         CALL(evt_btl_camera_set_zoom, 0, 200)
         CALL(btlevtcmd_GetPartsPos, LW(10), LW(11), LW(0), LW(1), LW(2))
@@ -4369,11 +4301,12 @@ EVT_BEGIN(ItemEvent_Poison_Kinoko)
         WAIT_FRAMES(60)
         CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 999)
     END_IF
-END_IF
-CALL(evt_audience_ap_recovery)
-CALL_CHILD(PTR(_return_home_event))
-CALL(btlevtcmd_StartWaitEvent, -2)
-RETURN
+    // the original script has one END_IF too many; the interpreter ignores it
+    END_IF
+    CALL(evt_audience_ap_recovery)
+    CALL_CHILD(PTR(_return_home_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
+    RETURN
 EVT_END()
 
 BattleWeapon ItemWeaponData_PoisonKinoko = {
@@ -4384,23 +4317,23 @@ BattleWeapon ItemWeaponData_PoisonKinoko = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerHPHalf2, // hpDamageFn
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30048, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, // sleepChance..dizzyTime
     100, // poisonChance
     3, // poisonTime
@@ -4411,23 +4344,22 @@ BattleWeapon ItemWeaponData_PoisonKinoko = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_Poison_Kinoko, // mAttackEvtScript
+    ItemEvent_Poison_Kinoko, // attackEvtScript
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
-
 
 // _nancy_mirage keeps x/y/z as three s32 words from userdata3 on (over wInterpRelatedTime)
 #define EVT_XYZ(evt) ((s32*)&(evt)->userdata3)
 
 typedef struct ThrowWork {
-    Vec start;    // 0x0
-    Vec pos;      // 0xC
-    Vec target;   // 0x18
-    s32 frames;   // 0x24
-    f32 speed;    // 0x28
-    f32 gravity;  // 0x2C
-    f32 vy;       // 0x30
-    u8 pad[0x7C - 0x34];
+    Vec start;                   // 0x0
+    Vec pos;                     // 0xC
+    Vec target;                  // 0x18
+    s32 frames;                  // 0x24
+    f32 speed;                   // 0x28
+    f32 gravity;                 // 0x2C
+    f32 vy;                      // 0x30
+    u8 reserved_34[0x7C - 0x34]; // 0x34, never accessed (keeps the 0x7C-byte BattleAlloc)
 } ThrowWork;
 
 USER_FUNC(_sampling_random_target) {
@@ -4469,11 +4401,11 @@ USER_FUNC(_cam_rot) {
         event->userdata[0] = sysMsec2Frame(2000);
         event->userdata[1] = event->userdata[0];
     }
-    rot = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(720.0f, 0.0f, 4, event->userdata[0], event->userdata[1]);
-    camGetPtr(4)->rollAngle = rot;
+    rot = intplGetValue(4, 720.0f, 0.0f, event->userdata[0], event->userdata[1]);
+    camGetPtr(CAMERA_3D)->rollAngle = rot;
     event->userdata[0]--;
     if (event->userdata[0] <= 0) {
-        camGetPtr(4)->rollAngle = 0.0f;
+        camGetPtr(CAMERA_3D)->rollAngle = 0.0f;
         return EVT_RETURN_YIELD;
     }
     return EVT_RETURN_BLOCK;
@@ -4484,9 +4416,9 @@ USER_FUNC(_rank_up) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, id));
 
     if (unit) {
-        unit->mLevel += 5;
-        if (unit->mLevel > 99) {
-            unit->mLevel = 99;
+        unit->level += 5;
+        if (unit->level > 99) {
+            unit->level = 99;
         }
     }
     return EVT_RETURN_DONE;
@@ -4498,9 +4430,9 @@ USER_FUNC(_hpfp_change_declare_1) {
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
 
     if (unit) {
-        if (unit->currentKind == 0xDE) {
+        if (unit->currentKind == UNIT_MARIO) {
             BattleStatusWindowSystemOn();
-        } else if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
+        } else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
             BattleStatusWindowSystemOn();
         }
     }
@@ -4513,14 +4445,14 @@ USER_FUNC(_hpfp_change_declare_2) {
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
 
     if (unit) {
-        if (unit->currentKind == 0xDE) {
-#ifndef VERSION_G8ME01_DEMO
+        if (unit->currentKind == UNIT_MARIO) {
+#if VERSION != VERSION_DEMO
             N_statusClearBlink();
 #endif
             statusMarioHPBlink(120);
             statusFPBlink(120);
-        } else if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
-#ifndef VERSION_G8ME01_DEMO
+        } else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
+#if VERSION != VERSION_DEMO
             N_statusClearBlink();
 #endif
             statusPartyHPBlink(120);
@@ -4544,8 +4476,8 @@ USER_FUNC(_naniga_okorukana_check) {
 
     unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    if (!(unit->mAttributeFlags & 0x10)) {
-        if (unit->mAttributeFlags & 0x2) {
+    if (!(unit->attributeFlags & UNIT_ATTR_VEILED)) {
+        if (unit->attributeFlags & UNIT_ATTR_CEILING) {
             pos.y -= 5.0f;
         } else {
             pos.y += BtlUnit_GetHeight(unit) + 20;
@@ -4558,11 +4490,11 @@ USER_FUNC(_naniga_okorukana_check) {
         event->userdata[0] = (EvtWord)effNanigaEntry(0, R_mystery_item_table, item, pos.x, pos.y, pos.z);
         effSetName((EffectEntry*)event->userdata[0], "effNaniga");
         evtSetValue(event, out, item);
-#ifndef VERSION_G8ME01_DEMO
-        if (unit->currentKind == 0xDE) {
+#if VERSION != VERSION_DEMO
+        if (unit->currentKind == UNIT_MARIO) {
             a = &wp->actRecord.marioAttackItems;
             b = &wp->actRecord.marioSupportItems;
-        } else if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
+        } else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
             a = &wp->actRecord.partnerAttackItems;
             b = &wp->actRecord.partnerSupportItems;
         } else {
@@ -4582,7 +4514,7 @@ USER_FUNC(_naniga_okorukana_check) {
         }
 #endif
     }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 end:
 #endif
     if (effNameToPtr("effNaniga")) {
@@ -4604,11 +4536,11 @@ USER_FUNC(_get_throw_first_pos) {
     unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
     pos.y += 10.0f;
-    if (!(unit->mAttributeFlags & 0x10)) {
-        if (unit->mAttributeFlags & 0x2) {
+    if (!(unit->attributeFlags & UNIT_ATTR_VEILED)) {
+        if (unit->attributeFlags & UNIT_ATTR_CEILING) {
             pos.y -= 5.0f;
         } else {
-            pos.y += unit->mSizeMultiplier * BtlUnit_GetHeight(unit);
+            pos.y += unit->sizeMultiplier * BtlUnit_GetHeight(unit);
         }
     }
     evtSetFloat(event, ox, pos.x);
@@ -4630,8 +4562,8 @@ USER_FUNC(_throw_item_icon) {
 
     if (isFirstCall) {
         Vec v;
-        ((ThrowWork*)event->userdatap[0]) = BattleAlloc(sizeof(ThrowWork));
-        wk = ((ThrowWork*)event->userdatap[0]);
+        event->userdatap[0] = BattleAlloc(sizeof(ThrowWork));
+        wk = event->userdatap[0];
         wk->target.x = tx;
         wk->target.y = ty;
         wk->target.z = tz;
@@ -4648,7 +4580,7 @@ USER_FUNC(_throw_item_icon) {
         event->userdata[2] = 0;
         event->userdata3 = psndSFXOn_3D("SFX_ITEM_COOKING_THROW1", &v);
     }
-    wk = ((ThrowWork*)event->userdatap[0]);
+    wk = event->userdatap[0];
     if (event->userdata[2]) {
         psndSFXOff(event->userdata3);
         BattleFree(wk);
@@ -4684,9 +4616,12 @@ USER_FUNC(_nancy_mirage) {
         event->userdata[0] = 60;
         event->userdata[1] = animPoseEntry("c_cook", 1);
         event->userdata[2] = 0;
-        EVT_XYZ(event)[0] = x;
-        EVT_XYZ(event)[1] = y;
-        EVT_XYZ(event)[2] = z;
+        EVT_XYZ(event)
+        [0] = x;
+        EVT_XYZ(event)
+        [1] = y;
+        EVT_XYZ(event)
+        [2] = z;
         animPoseSetAnim(event->userdata[1], "A_2", 1);
         animPoseSetEffectAnim(event->userdata[1], "PM_Y_1A", 1);
     }
@@ -4724,7 +4659,7 @@ void _nancy_disp(CameraId cameraId, void* param) {
     PSMTXConcat(scale, mtx, mtx);
     PSMTXConcat(trans, mtx, mtx);
     animPoseSetMaterialEvtColor(event->userdata[1], (GXColor){0xFF, 0xFF, 0xFF, alpha});
-    animPoseSetMaterialFlagOn(event->userdata[1], 0x40);
+    animPoseSetMaterialFlagOn(event->userdata[1], ANIM_MATERIAL_FLAG_EVT_COLOR);
     animPoseDrawMtx(event->userdata[1], mtx, 1, 0.0f, 2.0f);
     animPoseDrawMtx(event->userdata[1], mtx, 2, 0.0f, 2.0f);
     animPoseDrawMtx(event->userdata[1], mtx, 3, 0.0f, 2.0f);
@@ -4764,7 +4699,7 @@ EVT_BEGIN(ItemEvent_LastDinner)
     CALL(btlevtcmd_SetFp, LW(10), 0)
     CALL(_full_ap_recover, LW(10))
     CALL(btlevtcmd_StatusWindowOnOff, 2)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
@@ -4791,7 +4726,7 @@ EVT_BEGIN(ItemEvent_LastDinner)
     WAIT_MS(1750)
     CALL(evt_audience_ap_recovery)
     CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -4803,23 +4738,23 @@ BattleWeapon ItemWeaponData_LastDinner = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     NULL, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1100160, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x30108, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -4827,17 +4762,6 @@ BattleWeapon ItemWeaponData_LastDinner = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    ItemEvent_LastDinner, // mAttackEvtScript
+    ItemEvent_LastDinner, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-
-
-
-
-
-
-
-
-
-
-

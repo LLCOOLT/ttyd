@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: water gun (wgun) shot from one point toward another.
+#include "eff/n64/eff_opuku_wgun_n64.h"
 #include "system.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,20 +9,12 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSFastCast.h>
 #include <stdlib.h>
+#include "eff/eff_n64.h"
+#include "libc_decls.h"
 
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
-double sin(double);
-double cos(double);
-
-static inline f32 dsin(f32 a) { return sin(6.2831855f * a / 360.0f); }
+static inline f32 dsin(f32 a) {
+    return sin(6.2831855f * a / 360.0f);
+}
 typedef struct EffOpukuWgunN64Work {
     s32 type;        // 0x0
     Vec position;    // 0x4
@@ -86,7 +80,7 @@ EffectEntry* effOpukuWgunN64Entry(s32 type, s32 lifetime, f32 x1, f32 y1, f32 z1
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuWgunN64Work));
     effect->userdata = work;
     effect->callback = effOpukuWgunMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -151,8 +145,8 @@ void effOpukuWgunMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -345,5 +339,3 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         n += 2;
     }
 }
-
-

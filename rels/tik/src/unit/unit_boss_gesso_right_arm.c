@@ -1,3 +1,5 @@
+// Rogueport Sewers (tik) battle unit: Blooper's right tentacle (gesso_right_arm): its parts, defence/status tables, and
+// attack events.
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -13,29 +15,9 @@
 #include "evt/evt_sub.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
+#include "tik.h"
 
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
-USER_FUNC(btlevtcmd_CheckDamageCode);
-USER_FUNC(btlevtcmd_CheckDamagePattern);
-USER_FUNC(btlevtcmd_GetUnitKind);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_OnAttribute);
-USER_FUNC(btlevtcmd_OnUnitFlag);
-USER_FUNC(btlevtcmd_ResetFaceDirection);
-USER_FUNC(btlevtcmd_RunDataEventChild);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StopWaitEvent);
-USER_FUNC(btlevtcmd_WaitAttackEnd);
 static USER_FUNC(_check_zenei_kouei);
-extern s32 R_defence_attr_turn[];
-extern s32 R_defence_turn[];
-extern s32 R_regist_turn[];
-extern PoseTableEntry gesso_pose_table_turn[];
 
 BattleUnitKind unit_boss_gesso_right_arm;
 static BattleUnitDefense defence;
@@ -52,9 +34,7 @@ BattleWeapon weapon_gesso_right_arm_front_attack;
 BattleWeapon weapon_gesso_right_arm_rear_attack;
 static EvtWord attack_event[273];
 static EvtWord wait_event[6];
-extern EvtWord gesso_arm_dead_event[];
 extern EvtWord gesso_fall_check[];
-extern EvtWord gesso_arm_damage_pose_event[];
 
 BattleUnitKind unit_boss_gesso_right_arm = {
     10,
@@ -162,12 +142,12 @@ static BattleUnitKindPart parts[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnAttribute, -2, 16777216)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -175,7 +155,7 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(PTR(btldefaultevt_Damage))
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
     IF_INT_NOT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_GetUnitWork, LW(3), 4, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 0)
@@ -212,7 +192,7 @@ EVT_BEGIN(gesso_right_arm_damage_event)
     CALL(btlevtcmd_ResetFaceDirection, LW(10))
     CALL(btlevtcmd_StartWaitEvent, LW(10))
     LABEL(99)
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
     IF_INT_NOT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_GetUnitWork, LW(3), 4, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 0)
@@ -234,23 +214,23 @@ BattleWeapon weapon_gesso_right_arm_front_attack = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x7FF, // counterResistFlags
-    4, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -258,7 +238,7 @@ BattleWeapon weapon_gesso_right_arm_front_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -270,23 +250,23 @@ BattleWeapon weapon_gesso_right_arm_rear_attack = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x7FF, // counterResistFlags
-    8, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_BACK, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -294,15 +274,15 @@ BattleWeapon weapon_gesso_right_arm_rear_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     CALL(evt_sub_random, 1, LW(0))
@@ -311,20 +291,20 @@ static EVT_BEGIN(attack_event)
     ELSE
         SET_VALUE(LW(12), PTR(&weapon_gesso_right_arm_rear_attack))
     END_IF
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(12))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(12))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
     SET_VALUE(LW(11), 0)
     CALL(btlevtcmd_GetUnitKind, LW(3), LW(0))
     IF_INT_EQUAL(LW(0), 222)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(9))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(9))
         CALL(btlevtcmd_GetUnitWork, LW(9), 5, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LW(11), 1)
@@ -333,7 +313,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     IF_INT_NOT_EQUAL(LW(11), 0)
         CALL(btlevtcmd_StatusWindowOnOff, 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(9))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(9))
         CALL(evt_msg_print, 2, STRING("tik_02_gs_04_1"), 0, LW(9))
         CALL(evt_msg_print, 2, STRING("tik_02_gs_04_2"), 0, LW(9))
         CALL(evt_msg_select, 0, STRING("tik_02_gs_04_3"))
@@ -353,25 +333,25 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(_check_zenei_kouei, LW(3), LW(13))
     IF_INT_EQUAL(LW(13), 0)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_A1_1"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GSO_A1_1"))
     ELSE
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_A1_3"))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GSO_A1_3"))
     END_IF
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_ftof, 32, LW(0))
         WAIT_FRAMES(LW(0))
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ARM_MOVE1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GESSO_ARM_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_ftof, 55, LW(0))
         WAIT_FRAMES(LW(0))
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ATTACK1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GESSO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SIBLING_EVENT
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(btlevtcmd_ftof, 97, LW(0))
 #else
     CALL(btlevtcmd_ftof, 94, LW(0))
 #endif
     WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 1)
         SWITCH(LW(5))
             CASE_EQUAL(3)
@@ -383,43 +363,43 @@ static EVT_BEGIN(attack_event)
         END_SWITCH
     ELSE
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
     END_IF
-    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     LABEL(99)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(gesso_arm_dead_event)
-    CALL(btlevtcmd_GetUnitKind, -2, LW(0))
+    CALL(btlevtcmd_GetUnitKind, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 10)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ARM_GOOUT1"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_F1_1"))
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GESSO_ARM_GOOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GSO_F1_1"))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 2, -1)
         END_IF
         WAIT_FRAMES(50)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 2, -1)
         END_IF
     ELSE
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_GESSO_ARM_GOOUT1"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GSO_F1_1"))
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GESSO_ARM_GOOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GSO_F1_1"))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 1, -1)
         END_IF
         WAIT_FRAMES(80)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 1, -1)
         END_IF
@@ -438,7 +418,7 @@ EVT_BEGIN(gesso_arm_dead_event)
     END_IF
     CALL_CHILD(gesso_fall_check)
     LABEL(99)
-    CALL(btlevtcmd_KillUnit, -2, 0)
+    CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN
 EVT_END()
 
@@ -471,13 +451,13 @@ EVT_BEGIN(gesso_fall_check)
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_AnimeWaitPlayComplete, LW(3), 1)
-    CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_FALL1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, LW(3), 1, STRING("GSO_F_2"))
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_ftof, 16, LW(0))
         WAIT_FRAMES(LW(0))
-        CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_FALL1"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_DOWN1"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_snd_se, LW(3), STRING("SFX_BOSS_GESSO_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SIBLING_EVENT
     CALL(btlevtcmd_AnimeWaitPlayComplete, LW(3), 1)
     CALL(btlevtcmd_OffAttribute, LW(3), 2)
@@ -489,7 +469,7 @@ EVT_BEGIN(gesso_fall_check)
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(3), 1, PTR(R_defence_attr_turn))
     CALL(btlevtcmd_SetRegistStatus, LW(3), PTR(R_regist_turn))
     CALL(btlevtcmd_SetHitOffset, LW(3), 1, -15, -90, 0)
-    CALL(btlevtcmd_SetStatusIconOffset, -2, 55, 113)
+    CALL(btlevtcmd_SetStatusIconOffset, BTL_UNIT_SELF, 55, 113)
     CALL(evt_btl_camera_shake_h, 0, 6, 0, 30, 4)
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, 1)
     CALL(btlevtcmd_SetHitOffset, LW(3), 1, 51, 38, 30)
@@ -500,13 +480,13 @@ EVT_BEGIN(gesso_fall_check)
 EVT_END()
 
 EVT_BEGIN(gesso_arm_damage_pose_event)
-    CALL(btlevtcmd_GetUnitKind, -2, LW(0))
+    CALL(btlevtcmd_GetUnitKind, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 10)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
-        ELSE
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+    ELSE
         IF_INT_EQUAL(LW(0), 9)
-            CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
-            ELSE
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+        ELSE
             RETURN
         END_IF
     END_IF

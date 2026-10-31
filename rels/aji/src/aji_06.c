@@ -1,3 +1,5 @@
+// aji_06 (敵のアジト, X-Naut Fortress): Peach's potion lab: she mixes the coloured medicines (kusuri) in the
+// machine, shrinks and grows, and turns invisible (peach_evt_kusuri_nomu).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,10 +11,41 @@
 #include "dolphin/gx.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
 #include "aji.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
-typedef struct YukaAnimData { u16 flags; u8 pad_2[6]; OSTime time; f32 frame; f32 speed; struct { u8 header[8]; f32 length; }* data; } YukaAnimData; /* header: MapAnimHeader name + pad */
-typedef struct YukaAnim { YukaAnimData* anim; u32 flags; } YukaAnim;
+typedef struct YukaAnimData {
+    u16 flags;
+    u8 pad_2[6];
+    OSTime time;
+    f32 frame;
+    f32 speed;
+    struct {
+        u8 header[8];
+        f32 length;
+    }* data;
+} YukaAnimData; /* header: MapAnimHeader name + pad */
+typedef struct YukaAnim {
+    YukaAnimData* anim;
+    u32 flags;
+} YukaAnim;
 #define YUKA_NOW() OSTicksToMilliseconds(gp->inBattle ? gp->renderTime : gp->renderFieldTime)
 #define KUSURI_COL (*(GXColor*)g_Kusuri_Col)
 #define KUSURI_SRC ((GXColor*)g_Kusuri_Src_Col)
@@ -25,79 +58,6 @@ s32 g_Kusuri_B;
 s32 g_Kusuri_G;
 s32 g_Kusuri_R;
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_cam3d_event_from_road);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_get_shift);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_del_case_evt);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_item_delete);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_item_get_item_end_wait);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_pauseanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_replayanim);
-USER_FUNC(evt_map_set_flush_color);
-USER_FUNC(evt_map_set_flush_onoff);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_scale);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_dir);
-USER_FUNC(evt_mario_get_dispdir);
-USER_FUNC(evt_mario_get_mode);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_peach_set_condition);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_set_case_wrk);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_dist);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_stopwatch);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
-USER_FUNC(evt_win_item_select);
 USER_FUNC(kusuri_color_get);
 USER_FUNC(kusuri_color_init);
 USER_FUNC(kusuri_color_set);
@@ -111,8 +71,6 @@ USER_FUNC(peach_evt_toumei_onoff);
 USER_FUNC(peach_set_scale);
 USER_FUNC(yuka_anim_reverse_end);
 USER_FUNC(yuka_anim_reverse_play);
-USER_FUNC(yuka_anim_reverse_pause);
-USER_FUNC(yuka_anim_reverse_replay);
 void kusuri_4_color_tev(MapTevCallbackInfo* info);
 void kusuri_3_color_tev(MapTevCallbackInfo* info);
 void kusuri_2_color_tev(MapTevCallbackInfo* info);
@@ -170,7 +128,6 @@ extern EvtWord peach_evt_door[];
 extern EvtWord kikai_init[];
 extern EvtWord evt_memo3[];
 extern EvtWord evt_memo4[];
-extern EvtWord aji_06_init_evt[];
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -193,8 +150,8 @@ static BeroEntry bero_entry_data[] = {
         "s_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -212,12 +169,12 @@ static BeroEntry bero_entry_data[] = {
 
 static EVT_BEGIN(bero_peach_evt)
     CALL(evt_mario_key_onoff, 0)
-    IF_INT_EQUAL(GSW(0), 262)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
         SET_VALUE(LSWF(11), 1)
         CALL(evt_msg_print, 0, STRING("peach_aji_226"), 0, 0)
         SET_VALUE(LSWF(11), 0)
         SET_VALUE(LW(0), 1)
-        ELSE
+    ELSE
         SET_VALUE(LW(0), 0)
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -229,8 +186,8 @@ static BeroEntry bero_peach_data[] = {
         "s_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -369,12 +326,12 @@ EVT_BEGIN(peach_evt_kusuri_select)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
         CALL(evt_win_item_select, 0, PTR(kusuri_list), LW(1), 0)
-        ELSE
+    ELSE
         SET_VALUE(LW(1), -1)
     END_IF
     IF_INT_NOT_EQUAL(LW(1), -1)
         CALL(kusuri_list_get_no, LW(1), LW(0))
-        ELSE
+    ELSE
         SET_VALUE(LW(0), 0)
     END_IF
     RETURN
@@ -420,10 +377,10 @@ EVT_BEGIN(peach_evt_check_all_kusuri_set)
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print_add, 0, STRING("peach_aji_229"))
             SET_VALUE(LSWF(5), 1)
-            CALL(evt_run_case_evt, 9, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
+            CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
             SET_VALUE(LW(0), STRING("S_pato1"))
             SPAWN_EVENT_GET_ID(PTR(peach_evt_pato_on), GW(0))
-            ELSE
+        ELSE
             CALL(evt_msg_print_add, 0, STRING("peach_aji_228"))
             SET_VALUE(LSWF(5), 0)
         END_IF
@@ -484,11 +441,11 @@ EVT_END()
 
 EVT_BEGIN(peach_evt_seikai_evt)
     LOOP(3)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(0), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         WAIT_MS(100)
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(0), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
         WAIT_MS(100)
     END_LOOP
     RETURN
@@ -532,12 +489,12 @@ EVT_BEGIN(peach_evt_kaihei1)
             CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
             CALL(evt_map_set_flush_onoff, 0, 1, STRING("S_mizu1"))
             CALL(evt_map_set_flush_color, 0, STRING("S_mizu1"), 255, 0, 0, 255)
-            ELSE
+        ELSE
             SET_VALUE(LW(0), LSW(1))
             CALL_CHILD(PTR(peach_evt_pick_kusuri))
             SET_VALUE(LSW(1), 0)
         END_IF
-        ELSE
+    ELSE
         SET_VALUE(LF(0), 0)
         IF_INT_EQUAL(GW(12), 0)
             IF_INT_EQUAL(LSWF(8), 1)
@@ -546,7 +503,7 @@ EVT_BEGIN(peach_evt_kaihei1)
                 IF_INT_EQUAL(LW(0), 1)
                     ADD(GW(13), 1)
                     SET_VALUE(LF(0), 1)
-                    ELSE
+                ELSE
                     SUBTRACT(GW(13), 1)
                 END_IF
             END_IF
@@ -601,12 +558,12 @@ EVT_BEGIN(peach_evt_kaihei2)
             SUBTRACT(LW(0), 1)
             POKE_INT(LW(0), PTR(g_Kusuri2_No))
             CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
-            ELSE
+        ELSE
             SET_VALUE(LW(0), LSW(2))
             CALL_CHILD(PTR(peach_evt_pick_kusuri))
             SET_VALUE(LSW(2), 0)
         END_IF
-        ELSE
+    ELSE
         SET_VALUE(LF(0), 0)
         IF_INT_EQUAL(GW(12), 1)
             IF_INT_EQUAL(LSWF(8), 1)
@@ -615,7 +572,7 @@ EVT_BEGIN(peach_evt_kaihei2)
                 IF_INT_EQUAL(LW(0), 1)
                     ADD(GW(13), 1)
                     SET_VALUE(LF(0), 1)
-                    ELSE
+                ELSE
                     SUBTRACT(GW(13), 1)
                 END_IF
             END_IF
@@ -670,12 +627,12 @@ EVT_BEGIN(peach_evt_kaihei3)
             SUBTRACT(LW(0), 1)
             POKE_INT(LW(0), PTR(g_Kusuri3_No))
             CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
-            ELSE
+        ELSE
             SET_VALUE(LW(0), LSW(3))
             CALL_CHILD(PTR(peach_evt_pick_kusuri))
             SET_VALUE(LSW(3), 0)
         END_IF
-        ELSE
+    ELSE
         SET_VALUE(LF(0), 0)
         IF_INT_EQUAL(GW(12), 2)
             IF_INT_EQUAL(LSWF(8), 1)
@@ -684,7 +641,7 @@ EVT_BEGIN(peach_evt_kaihei3)
                 IF_INT_EQUAL(LW(0), 1)
                     ADD(GW(13), 1)
                     SET_VALUE(LF(0), 1)
-                    ELSE
+                ELSE
                     SUBTRACT(GW(13), 1)
                 END_IF
             END_IF
@@ -739,12 +696,12 @@ EVT_BEGIN(peach_evt_kaihei4)
             SUBTRACT(LW(0), 1)
             POKE_INT(LW(0), PTR(g_Kusuri4_No))
             CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
-            ELSE
+        ELSE
             SET_VALUE(LW(0), LSW(4))
             CALL_CHILD(PTR(peach_evt_pick_kusuri))
             SET_VALUE(LSW(4), 0)
         END_IF
-        ELSE
+    ELSE
         SET_VALUE(LF(0), 0)
         IF_INT_EQUAL(GW(12), 3)
             IF_INT_EQUAL(LSWF(8), 1)
@@ -753,7 +710,7 @@ EVT_BEGIN(peach_evt_kaihei4)
                 IF_INT_EQUAL(LW(0), 1)
                     ADD(GW(13), 1)
                     SET_VALUE(LF(0), 1)
-                    ELSE
+                ELSE
                     SUBTRACT(GW(13), 1)
                 END_IF
             END_IF
@@ -786,7 +743,7 @@ EVT_BEGIN(peach_evt_pato_on)
     SET_VALUE(LW(15), LW(0))
     CALL(evt_mapobj_get_position, LW(15), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_MACHINE_SIREN1"), LW(0), LW(1), LW(2), GW(4))
-    CALL(evt_mapobj_flag_onoff, 0, 0, LW(15), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, LW(15), MAPOBJ_FLAG_HIDE)
     LOOP(0)
         CALL(evt_mapobj_rotate, 0, LW(15), 0, LW(0), 0)
         ADD(LW(0), 12)
@@ -799,7 +756,7 @@ EVT_BEGIN(peach_evt_pato_on)
 EVT_END()
 
 EVT_BEGIN(peach_evt_pato_off)
-    CALL(evt_mapobj_flag_onoff, 0, 1, LW(0), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, LW(0), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_rotate, 0, LW(0), 0, 0, 0)
     CALL(evt_snd_sfxoff, GW(4))
     RETURN
@@ -889,7 +846,7 @@ EVT_BEGIN(peach_evt_kusuri_nomu)
     CALL(evt_mario_adjust_dir)
     CALL(peach_chg_pose, STRING("P_M_1"))
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_bika"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_bika"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_DRINK_MEDICINE1"), LW(0), LW(1), LW(2), 0)
     CALL(peach_chg_pose, STRING("P_M_3"))
@@ -902,7 +859,7 @@ EVT_BEGIN(peach_evt_kusuri_nomu)
     WAIT_MS(100)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_PEACH_SURPRISED1_3"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_bika"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_bika"), MAPOBJ_FLAG_HIDE)
     IF_INT_EQUAL(LSWF(9), 0)
         WAIT_MS(200)
         CALL(evt_sub_random, 1, LW(0))
@@ -939,15 +896,15 @@ EVT_BEGIN(peach_evt_kusuri_nomu)
         CALL(evt_msg_print, 0, STRING("peach_aji_236"), 0, STRING("mario"))
         SPAWN_EVENT(PTR(peach_evt_sugata_modoru))
         CALL_CHILD(PTR(peach_evt_kaihei_open_all))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_sui2"), 0, PTR(peach_evt_kaihei1), GW(6))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_sui3"), 0, PTR(peach_evt_kaihei2), GW(7))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_sui4"), 0, PTR(peach_evt_kaihei3), GW(8))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_sui5"), 0, PTR(peach_evt_kaihei4), GW(9))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui2"), 0, PTR(peach_evt_kaihei1), GW(6))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui3"), 0, PTR(peach_evt_kaihei2), GW(7))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui4"), 0, PTR(peach_evt_kaihei3), GW(8))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui5"), 0, PTR(peach_evt_kaihei4), GW(9))
         SET_VALUE(LW(0), STRING("S_pato1"))
         SPAWN_EVENT_GET_ID(PTR(peach_evt_pato_on), GW(0))
-        ELSE
-        CALL(evt_snd_bgmoff, 512)
+    ELSE
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         WAIT_MS(300)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_TOUMEI1"), LW(0), LW(1), LW(2), 0)
@@ -980,7 +937,7 @@ EVT_BEGIN(peach_evt_kusuri_nomu)
         CALL(evt_msg_print, 0, STRING("peach_aji_241"), 0, STRING("mario"))
         CALL(evt_msg_print, 0, STRING("peach_aji_242"), 0, 0)
         CALL(evt_cam3d_evt_off, 500, 11)
-        SET_VALUE(GSW(0), 263)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
     END_IF
     DELETE_EVENT(GW(2))
     SET_VALUE(LSWF(10), 0)
@@ -1084,7 +1041,7 @@ EVT_BEGIN(peach_evt_tyogo_sub)
         END_INLINE_EVENT
         IF_INT_EQUAL(LW(5), 0)
             CALL(evt_map_replayanim, 0, STRING("yuka"))
-            ELSE
+        ELSE
             BEGIN_INLINE_EVENT
                 CALL(yuka_anim_reverse_play)
             END_INLINE_EVENT
@@ -1100,7 +1057,7 @@ EVT_BEGIN(peach_evt_tyogo_sub)
         END_IF
         IF_INT_EQUAL(LW(5), 0)
             CALL(evt_map_pauseanim, 0, STRING("yuka"))
-            ELSE
+        ELSE
             CALL(yuka_anim_reverse_end)
             WAIT_FRAMES(1)
         END_IF
@@ -1150,7 +1107,7 @@ EVT_BEGIN(peach_evt_tyogo_sub)
     CALL(evt_msg_print, 0, STRING("peach_aji_230_01"), 0, 0)
     SET_VALUE(LW(0), STRING("S_pato3"))
     SPAWN_EVENT_GET_ID(PTR(peach_evt_pato_on), GW(0))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui6"), 0, PTR(peach_evt_stop_renji), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui6"), 0, PTR(peach_evt_stop_renji), 0)
     SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_MACHINE_HOT1"), 104, 0, -100, LW(3))
     CALL(evt_map_playanim, STRING("ren1"), 0, 0)
@@ -1182,19 +1139,19 @@ EVT_BEGIN(peach_evt_tyogo_sub)
         IF_INT_LESS(LW(1), 35000)
             DEBUG_PUT_MSG(STRING("ほどよい　かねつじかん"))
             ADD(GW(13), 1)
-            ELSE
+        ELSE
             DEBUG_PUT_MSG(STRING("かねつしすぎ"))
             DIVIDE(LW(1), 1000)
             DEBUG_PUT_REG(LW(1))
         END_IF
-        ELSE
+    ELSE
         DEBUG_PUT_MSG(STRING("かねつぶそく"))
         DIVIDE(LW(1), 1000)
         DEBUG_PUT_REG(LW(1))
     END_IF
     IF_INT_GREATER_OR_EQUAL(GW(13), 9)
         SPAWN_EVENT_GET_ID(PTR(kusuri_color_seiko), GW(2))
-        ELSE
+    ELSE
         SPAWN_EVENT_GET_ID(PTR(kusuri_color_sippai), GW(2))
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -1347,7 +1304,7 @@ EVT_BEGIN(peach_evt_tyogo)
     SET_VALUE(LSWF(6), 0)
     IF_INT_EQUAL(GW(13), 9)
         SET_VALUE(LSWF(9), 1)
-        ELSE
+    ELSE
         SET_VALUE(LSWF(9), 0)
     END_IF
     CALL(evt_mario_key_onoff, 0)
@@ -1359,19 +1316,19 @@ EVT_BEGIN(peach_evt_tyogo)
         CALL(evt_msg_print, 0, STRING("peach_aji_232"), 0, STRING("mario"))
         CALL(evt_msg_print, 0, STRING("peach_aji_233"), 0, 0)
         SET_VALUE(LSWF(10), 1)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_bika1"), 0, PTR(peach_evt_kusuri_nomu), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_bika1"), 0, PTR(peach_evt_kusuri_nomu), 0)
         CALL(evt_del_case_evt, 0, GW(6))
         CALL(evt_del_case_evt, 0, GW(7))
         CALL(evt_del_case_evt, 0, GW(8))
         CALL(evt_del_case_evt, 0, GW(9))
-        ELSE
+    ELSE
         CALL(evt_msg_print_add, 0, STRING("peach_aji_231_01"))
         CALL(evt_mapobj_scale, 0, STRING("S_naka"), 0, 0, 0)
         CALL(evt_mapobj_trans, 0, STRING("S_bika"), 0, -100, 0)
         SET_VALUE(LSWF(10), 0)
         DELETE_EVENT(GW(2))
         CALL_CHILD(PTR(peach_evt_kaihei_open_all))
-        CALL(evt_run_case_evt, 9, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
         SET_VALUE(LW(0), STRING("S_pato1"))
         SPAWN_EVENT_GET_ID(PTR(peach_evt_pato_on), GW(0))
     END_IF
@@ -1476,49 +1433,49 @@ EVT_END()
 
 static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dami"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dami"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, STRING("S_dami1"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_aka"), 102, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_aka"), ITEM_RED_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mapobj_get_position, STRING("S_dami2"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_ao"), 101, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ao"), ITEM_BLUE_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mapobj_get_position, STRING("S_dami3"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_ki"), 103, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ki"), ITEM_ORANGE_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_mapobj_get_position, STRING("S_dami4"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_mid"), 104, LW(0), LW(1), LW(2), 17, -1, 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_kusuri1"), 0, PTR(peach_evt_kusuri_aka), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_kusuri2"), 0, PTR(peach_evt_kusuri_ao), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_kusuri3"), 0, PTR(peach_evt_kusuri_ki), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_kusuri4"), 0, PTR(peach_evt_kusuri_mid), 0)
+    CALL(evt_item_entry, STRING("kusuri_mid"), ITEM_GREEN_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kusuri1"), 0, PTR(peach_evt_kusuri_aka), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kusuri2"), 0, PTR(peach_evt_kusuri_ao), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kusuri3"), 0, PTR(peach_evt_kusuri_ki), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kusuri4"), 0, PTR(peach_evt_kusuri_mid), 0)
     CALL(evt_map_playanim, STRING("yuka"), 1, 0)
     CALL(evt_map_pauseanim, 0, STRING("yuka"))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui2"), 0, PTR(peach_evt_kaihei1), GW(6))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui3"), 0, PTR(peach_evt_kaihei2), GW(7))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui4"), 0, PTR(peach_evt_kaihei3), GW(8))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui5"), 0, PTR(peach_evt_kaihei4), GW(9))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui2"), 0, PTR(peach_evt_kaihei1), GW(6))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui3"), 0, PTR(peach_evt_kaihei2), GW(7))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui4"), 0, PTR(peach_evt_kaihei3), GW(8))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui5"), 0, PTR(peach_evt_kaihei4), GW(9))
     CALL(evt_map_set_tevcallback, 1, PTR(kusuri_naka_color_tev))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_naka"), 16777216)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_naka"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_naka"), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_naka"), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(evt_map_set_tevcallback, 2, PTR(kusuri_1_color_tev))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_mizu1"), 33554432)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_mizu1"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_mizu1"), MAPOBJ_TEV_CALLBACK(2))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_mizu1"), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(evt_map_set_tevcallback, 3, PTR(kusuri_2_color_tev))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_mizu2"), 50331648)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_mizu2"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_mizu2"), MAPOBJ_TEV_CALLBACK(3))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_mizu2"), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(evt_map_set_tevcallback, 4, PTR(kusuri_3_color_tev))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_mizu3"), 67108864)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_mizu3"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_mizu3"), MAPOBJ_TEV_CALLBACK(4))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_mizu3"), MAPOBJ_FLAG_DISPLAY_LIST)
     CALL(evt_map_set_tevcallback, 5, PTR(kusuri_4_color_tev))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_mizu4"), 83886080)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_mizu4"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_mizu4"), MAPOBJ_TEV_CALLBACK(5))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_mizu4"), MAPOBJ_FLAG_DISPLAY_LIST)
     SET_VALUE(LSWF(11), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_memo1"), 0, PTR(peach_evt_memo1), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_memo2"), 0, PTR(peach_evt_memo2), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_memo3"), 0, PTR(peach_evt_memo3), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_memo4"), 0, PTR(peach_evt_memo4), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo1"), 0, PTR(peach_evt_memo1), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo2"), 0, PTR(peach_evt_memo2), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo3"), 0, PTR(peach_evt_memo3), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo4"), 0, PTR(peach_evt_memo4), 0)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_adjust_dir)
@@ -1528,7 +1485,7 @@ static EVT_BEGIN(peach_evt_stg5)
     SET_VALUE(LW(0), STRING("s_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     WAIT_MS(1000)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_msg_print, 0, STRING("peach_aji_221"), 0, 0)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_222"), 0, STRING("mario"))
@@ -1540,7 +1497,7 @@ static EVT_BEGIN(peach_evt_stg5)
             WAIT_MS(300)
             CALL(evt_mario_set_dir, 90, 200, 0)
             WAIT_MS(300)
-            ELSE
+        ELSE
             CALL(evt_mario_set_dir, 90, 200, 0)
             WAIT_MS(300)
             CALL(evt_mario_set_dir, 270, 200, 0)
@@ -1551,7 +1508,7 @@ static EVT_BEGIN(peach_evt_stg5)
     WAIT_MS(600)
     CALL(evt_msg_print, 0, STRING("peach_aji_224"), 0, STRING("mario"))
     CALL(evt_msg_print, 0, STRING("peach_aji_225"), 0, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_COOKING1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_COOKING1"))
     CALL_CHILD(PTR(peach_evt_kaihei_open_all))
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1593,7 +1550,7 @@ EVT_BEGIN(peach_evt_tadashii_kusuri)
         WAIT_MS(300)
         CALL(evt_mario_set_dir, 90, 200, 0)
         WAIT_MS(300)
-        ELSE
+    ELSE
         CALL(evt_mario_set_dir, 90, 200, 0)
         WAIT_MS(300)
         CALL(evt_mario_set_dir, 270, 200, 0)
@@ -1602,7 +1559,7 @@ EVT_BEGIN(peach_evt_tadashii_kusuri)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
     CALL(evt_msg_print, 0, STRING("peach_aji_257"), 0, STRING("mario"))
     CALL(evt_msg_print, 0, STRING("peach_aji_258"), 0, 0)
-    SET_VALUE(GSWF(4210), 1)
+    SET_VALUE(GSWF(GSWF_AJI06_PEACH5_RIGHT_POTION), 1)
     CALL_CHILD(PTR(peach_evt_kaihei_close_all))
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_exit_case_evt)
@@ -1611,9 +1568,9 @@ EVT_END()
 
 EVT_BEGIN(peach_evt_door)
     CALL(evt_mario_key_onoff, 0)
-    IF_INT_EQUAL(GSWF(4210), 0)
+    IF_INT_EQUAL(GSWF(GSWF_AJI06_PEACH5_RIGHT_POTION), 0)
         CALL(evt_msg_print, 0, STRING("peach_aji_255_01"), 0, 0)
-        ELSE
+    ELSE
         SET_VALUE(LW(1), 0)
         SPAWN_EVENT(PTR(bero_open_door_play_se))
         CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
@@ -1628,10 +1585,10 @@ EVT_BEGIN(peach_evt_door)
             CALL(evt_mario_mov_pos2, 0, 300, FLOAT(150.0f))
         END_INLINE_EVENT
         WAIT_MS(150)
-        CALL(evt_fade_entry, 10, 300, 0, 0, 0)
+        CALL(evt_fade_entry, FADE_OUT_BLACK, 300, 0, 0, 0)
         CALL(evt_fade_end_wait)
         WAIT_MS(2000)
-        CALL(evt_fade_set_mapchange_type, 0, 10, 0, 9, 300)
+        CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_BLACK, 0, FADE_IN_BLACK, 300)
         CALL(evt_bero_mapchange, STRING("aji_17"), 0)
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -1640,15 +1597,15 @@ EVT_END()
 
 static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dami"), 1)
-    CALL(evt_item_entry, STRING("kusuri_aka"), 102, -110, 31, -107, 17, -1, 0)
-    CALL(evt_item_entry, STRING("kusuri_ao"), 101, -65, 31, -107, 17, -1, 0)
-    CALL(evt_item_entry, STRING("kusuri_ki"), 103, -10, 31, -107, 17, -1, 0)
-    CALL(evt_item_entry, STRING("kusuri_mid"), 104, 35, 31, -107, 17, -1, 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui2"), 0, PTR(peach_evt_matigai_kusuri), LW(0))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui3"), 0, PTR(peach_evt_matigai_kusuri), LW(1))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui4"), 0, PTR(peach_evt_matigai_kusuri), LW(2))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_sui5"), 0, PTR(peach_evt_tadashii_kusuri), LW(3))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dami"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_item_entry, STRING("kusuri_aka"), ITEM_RED_POTION, -110, 31, -107, 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ao"), ITEM_BLUE_POTION, -65, 31, -107, 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ki"), ITEM_ORANGE_POTION, -10, 31, -107, 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_mid"), ITEM_GREEN_POTION, 35, 31, -107, 17, -1, 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui2"), 0, PTR(peach_evt_matigai_kusuri), LW(0))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui3"), 0, PTR(peach_evt_matigai_kusuri), LW(1))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui4"), 0, PTR(peach_evt_matigai_kusuri), LW(2))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui5"), 0, PTR(peach_evt_tadashii_kusuri), LW(3))
     CALL(evt_set_case_wrk, LW(3), 0, LW(0))
     CALL(evt_set_case_wrk, LW(3), 1, LW(1))
     CALL(evt_set_case_wrk, LW(3), 2, LW(2))
@@ -1661,7 +1618,7 @@ static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_bero_exec_wait, 65536)
     SET_VALUE(LW(0), STRING("s_bero"))
     CALL_CHILD(PTR(bero_case_switch_off))
-    CALL(evt_run_case_evt, 9, 1, STRING("s_bero"), 0, PTR(peach_evt_door), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("s_bero"), 0, PTR(peach_evt_door), 0)
     CALL(evt_msg_print, 0, STRING("peach_aji_251"), 0, 0)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_3"), STRING("P_T_3"))
     CALL(evt_msg_print, 0, STRING("peach_aji_252"), 0, STRING("mario"))
@@ -1686,9 +1643,9 @@ static EVT_BEGIN(peach_evt_stg5_1)
 EVT_END()
 
 EVT_BEGIN(kikai_init)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_pato1"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_pato2"), 1)
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("S_pato3"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_pato1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_pato2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_pato3"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_scale, 0, STRING("S_mizu1"), 1, 0, 1)
     CALL(evt_mapobj_scale, 0, STRING("S_mizu2"), 1, 0, 1)
     CALL(evt_mapobj_scale, 0, STRING("S_mizu3"), 1, 0, 1)
@@ -1698,15 +1655,15 @@ EVT_BEGIN(kikai_init)
     CALL(evt_mapobj_trans, 1, STRING("S_bika"), 0, 2, 0)
     CALL(evt_mapobj_rotate, 1, STRING("S_kururi"), 0, 0, 180)
     CALL(evt_mapobj_rotate, 0, STRING("hari"), 0, 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dami"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kesu1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kesu2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika3"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kesu3"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika4"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kesu4"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dami"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hika1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kesu1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hika2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kesu2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hika3"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kesu3"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hika4"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kesu4"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
@@ -1739,12 +1696,12 @@ EVT_BEGIN(evt_memo4)
 EVT_END()
 
 EVT_BEGIN(aji_06_init_evt)
-    IF_INT_LESS(GSW(0), 352)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-        CALL(evt_snd_envoff, 512)
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI2"))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
     END_IF
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -1766,7 +1723,7 @@ EVT_BEGIN(aji_06_init_evt)
             CALL(evt_party_cont_onoff, 0, 1)
             CALL(evt_party_cont_onoff, 1, 1)
             CALL(evt_mario_wait_landon)
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
             LOOP(30)
                 CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
                 CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
@@ -1786,22 +1743,22 @@ EVT_BEGIN(aji_06_init_evt)
     END_IF
     SPAWN_EVENT(PTR(evt_emergency))
     SPAWN_EVENT(PTR(kikai_init))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 373)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
     END_IF
-    IF_INT_EQUAL(GSW(0), 262)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_mario_kill_party, 0)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
         SPAWN_EVENT(PTR(peach_evt_stg5))
     END_IF
-    IF_INT_EQUAL(GSW(0), 263)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_mario_kill_party, 0)
         CALL(peach_evt_toumei_onoff, 1)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
     END_IF
-    IF_INT_EQUAL(GSW(0), 264)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_mario_kill_party, 0)
         CALL(peach_evt_toumei_onoff, 1)
@@ -1810,17 +1767,17 @@ EVT_BEGIN(aji_06_init_evt)
     END_IF
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_memo1"), 0, PTR(evt_memo1), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_memo2"), 0, PTR(evt_memo2), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_memo3"), 0, PTR(evt_memo3), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("A_memo4"), 0, PTR(evt_memo4), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo1"), 0, PTR(evt_memo1), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo2"), 0, PTR(evt_memo2), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo3"), 0, PTR(evt_memo3), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_memo4"), 0, PTR(evt_memo4), 0)
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sui_1_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sui_2_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sui_3_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sui_4_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sui_5_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sui_6_2"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_1_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_2_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_3_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_4_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_5_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_6_2"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
@@ -1829,12 +1786,12 @@ USER_FUNC(yuka_anim_reverse_end) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuka_anim_reverse_pause) {
+static USER_FUNC(yuka_anim_reverse_pause) {
     yuka_anim.flags |= 1;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuka_anim_reverse_replay) {
+static USER_FUNC(yuka_anim_reverse_replay) {
     yuka_anim.flags &= ~1;
     return EVT_RETURN_DONE;
 }

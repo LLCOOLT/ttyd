@@ -1,5 +1,9 @@
+// win_04 (ウィンディん家周辺, Flurrie's house in Boggly Woods): the garden in front of Flurrie's house with its flowers, mirror
+// ball and clouds; the door leads into win_05.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/animdrv.h"
 
 #include "driver/dispdrv.h"
 #include "stdlib.h"
@@ -12,126 +16,62 @@
 #include "evt/evt_bero.h"
 #include "win.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "driver/envdrv.h"
+#include "driver/itemdrv.h"
+#include "mario/mario.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
 
-typedef struct Flower { s16 state; s16 timer; f32 x; f32 y; f32 scale; f32 targetScale; s32 alpha; } Flower;
-typedef struct FlowerWork { s32 count; Flower* flowers; } FlowerWork;
+typedef struct Flower {
+    s16 state;
+    s16 timer;
+    f32 x;
+    f32 y;
+    f32 scale;
+    f32 targetScale;
+    s32 alpha;
+} Flower;
+typedef struct FlowerWork {
+    s32 count;
+    Flower* flowers;
+} FlowerWork;
 void flower_disp(CameraId camera, void* param);
-void envAddTev(s32 type, void* param);
 static s32 ssf[3];
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_fade_set_mapchange_type);
 USER_FUNC(evt_flower);
 USER_FUNC(evt_flower_end);
 USER_FUNC(evt_flower_end_main);
 USER_FUNC(evt_flower_init);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_position);
-USER_FUNC(evt_item_move_3d_position);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_key_get_button);
-USER_FUNC(evt_map_blend_set_flag);
-USER_FUNC(evt_map_pauseanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_blend);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_check_key_item);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_dump_item);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_delete);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_force_reset_outofscreen);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_env_lpf);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_win_item_select);
-USER_FUNC(fade_alpha);
 USER_FUNC(flower_pos_report);
-USER_FUNC(ss_ch_check);
 USER_FUNC(ss_ch_set);
-static f32 randf(f32 min, f32 max);
-void flower_disp(CameraId camera, void* param);
-void mirror_ball(void* param);
+void mirror_ball(MapTevCallbackInfo* info);
 
-extern EvtWord win_04w_door_open[];
-extern EvtWord win_04w_door_close[];
-extern EvtWord win_04e_door_open[];
-extern EvtWord win_04e_door_close[];
 BeroEntry bero_witchtrio[1];
 static BeroEntry bero_entry_data[3];
-extern EvtWord meet_clouda[];
 extern EvtWord meet_clouda2[];
-extern EvtWord clouda_inai[];
-extern EvtWord clouda_irai[];
-extern EvtWord clouda_irai_ato[];
-extern EvtWord mirror_trans[];
-extern EvtWord mirror_rotate[];
-extern EvtWord mario_move_wait[];
-extern EvtWord dummy1_jump[];
-extern EvtWord dummy2_jump[];
 static s32 item_list[2];
-extern EvtWord clouda_nakama[];
-extern EvtWord touch_door[];
 extern EvtWord mirror_ball_event[];
 static u32 texture_0[1248];
 Vec rose_table_direct[55];
 f32 rose_table[120];
 extern EvtWord flower_event[];
-extern EvtWord flower_disp_pos[];
-extern EvtWord win_04_init_evt[];
-
-int rand(void);
 
 EVT_BEGIN(win_04w_door_open)
     SET_VALUE(LW(8), STRING("S_doa_w_l"))
@@ -162,7 +102,7 @@ EVT_BEGIN(win_04e_door_close)
 EVT_END()
 
 static EVT_BEGIN(out_w_bero)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -172,8 +112,8 @@ BeroEntry bero_witchtrio[] = {
         "w_bero", // hitName
         1, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -193,8 +133,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -211,8 +151,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -245,7 +185,7 @@ EVT_BEGIN(meet_clouda)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
     CALL(evt_mario_key_onoff, 1)
-    SET_VALUE(GSW(0), 81)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_05_A_SHY_FLURRIE)
     SPAWN_EVENT(PTR(meet_clouda2))
     RETURN
 EVT_END()
@@ -271,7 +211,7 @@ EVT_BEGIN(meet_clouda2)
         ADD(LW(0), 50)
         IF_INT_LESS(LW(2), 0)
             ADD(LW(2), 50)
-            ELSE
+        ELSE
             SUBTRACT(LW(2), 50)
         END_IF
         CALL(evt_party_move_pos2, 0, 130, LW(2), FLOAT(120.0f))
@@ -283,7 +223,7 @@ EVT_BEGIN(meet_clouda2)
     ADD(LW(0), 50)
     IF_INT_LESS(LW(2), 0)
         ADD(LW(2), 50)
-        ELSE
+    ELSE
         SUBTRACT(LW(2), 50)
     END_IF
     CALL(evt_party_move_pos2, 1, 160, LW(2), FLOAT(120.0f))
@@ -299,7 +239,7 @@ EVT_BEGIN(meet_clouda2)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
     CALL(evt_mario_key_onoff, 1)
-    SET_VALUE(GSW(0), 82)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_05_01_FLURRIE_LIVING_ROOM)
     RETURN
 EVT_END()
 
@@ -348,7 +288,7 @@ EVT_BEGIN(clouda_irai)
     CALL(evt_eff_fukidashi, 3, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
     CALL(evt_eff_fukidashi, 4, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
-    CALL(evt_mario_dispflag_onoff, 1, 256)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_DIR_LOCK)
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
         CALL(evt_cam3d_evt_set, 50, 90, 308, 248, 105, 20, 0, 11)
@@ -370,7 +310,7 @@ EVT_BEGIN(clouda_irai)
     CALL(evt_mario_mov_pos2, 240, 0, FLOAT(120.0f))
     WAIT_WHILE(GF(0))
     WAIT_WHILE(GF(1))
-    CALL(evt_mario_dispflag_onoff, 0, 256)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_msg_print, 0, STRING("stg2_win_e05_00_04"), 0, STRING("extparty"))
     WAIT_MS(1000)
     CALL(evt_msg_toge, 2, 350, 100, 0)
@@ -400,7 +340,7 @@ EVT_BEGIN(clouda_irai)
     CALL(evt_msg_continue)
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_msg_print, 0, STRING("stg2_win_e05_00_14"), 0, STRING("extparty"))
-        ELSE
+    ELSE
         BEGIN_INLINE_EVENT
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1"), LW(0), LW(1), LW(2), 0)
@@ -413,8 +353,8 @@ EVT_BEGIN(clouda_irai)
     WAIT_MS(300)
     CALL(evt_msg_toge, 2, 350, 100, 0)
     CALL(evt_msg_print, 0, STRING("stg2_win_e05_00_15"), 0, 0)
-    SET_VALUE(GSW(0), 83)
-    SET_VALUE(GSWF(2681), 1)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_05_02_FLURRIE_REQUEST)
+    SET_VALUE(GSWF(GSWF_WIN04_FLURRIE_REQUEST_HEARD), 1)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
     CALL(evt_mario_key_onoff, 1)
@@ -482,13 +422,13 @@ EVT_BEGIN(mario_move_wait)
                     IF_INT_GREATER_OR_EQUAL(LW(6), 2)
                         BREAK_LOOP
                     END_IF
-                    ELSE
+                ELSE
                     SET_VALUE(LW(6), 0)
                 END_IF
-                ELSE
+            ELSE
                 SET_VALUE(LW(6), 0)
             END_IF
-            ELSE
+        ELSE
             SET_VALUE(LW(6), 0)
         END_IF
     END_LOOP
@@ -515,7 +455,7 @@ EVT_BEGIN(dummy2_jump)
 EVT_END()
 
 USER_FUNC(ss_ch_check) {
-    u64 out; // FAKEMATCH (decomp-permuter): reorders the args[1] load
+    u64 out; // FAKE: a 64-bit local for the variable id reorders the args[1] load (docs/FAKES.md lists the forms tried)
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 
@@ -539,7 +479,7 @@ USER_FUNC(fade_alpha) {
     s32 b = evtGetValue(event, args[2]);
     s32 a = evtGetValue(event, args[3]);
 
-    fadeEntry(13, 0, (GXColor){r, g, b, a});
+    fadeEntry(FADE_COVER_BLACK_2D, 0, (GXColor){r, g, b, a});
     return EVT_RETURN_DONE;
 }
 
@@ -548,7 +488,7 @@ static s32 item_list[] = {
 };
 
 EVT_BEGIN(clouda_nakama)
-    CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_party_stop, 1)
@@ -572,14 +512,14 @@ EVT_BEGIN(clouda_nakama)
     END_INLINE_EVENT
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
-    CALL(evt_mario_dispflag_onoff, 1, 256)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_mov_pos2, 255, LW(2), FLOAT(120.0f))
-    CALL(evt_item_entry, STRING("necklace"), 63, 0, -1000, 0, 16, -1, 0)
-    CALL(evt_item_flag_on, STRING("necklace"), 2)
+    CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, 0, -1000, 0, 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("necklace"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_item_set_position, STRING("necklace"), 280, 50, 0)
-    CALL(evt_mario_dump_item, 63)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_mario_dump_item, ITEM_NECKLACE)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, 185, -20, FLOAT(120.0f))
@@ -589,7 +529,7 @@ EVT_BEGIN(clouda_nakama)
         CALL(evt_party_move_pos2, 1, 210, -25, FLOAT(120.0f))
         CALL(evt_party_set_dir, 1, 90, -1)
     END_INLINE_EVENT
-    CALL(evt_mario_dispflag_onoff, 0, 256)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_mario_mov_pos2, 150, 0, FLOAT(120.0f))
     CALL_CHILD(PTR(mario_move_wait))
     CALL(evt_mario_set_dir, 90, 200, 0)
@@ -654,14 +594,14 @@ EVT_BEGIN(clouda_nakama)
     SET_VALUE(GW(1), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S"), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hika_"), 2048)
-        CALL(evt_map_blend_set_flag, 1, STRING("mario"), 2048)
-        CALL(evt_map_blend_set_flag, 1, STRING("party"), 2048)
-        CALL(evt_map_blend_set_flag, 1, STRING("extparty"), 2048)
-        CALL(evt_map_blend_set_flag, 1, STRING("クラウダ"), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S"), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hika_"), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_map_blend_set_flag, 1, STRING("mario"), ANIM_MATERIAL_FLAG_NO_BLEND)
+        CALL(evt_map_blend_set_flag, 1, STRING("party"), ANIM_MATERIAL_FLAG_NO_BLEND)
+        CALL(evt_map_blend_set_flag, 1, STRING("extparty"), ANIM_MATERIAL_FLAG_NO_BLEND)
+        CALL(evt_map_blend_set_flag, 1, STRING("クラウダ"), ANIM_MATERIAL_FLAG_NO_BLEND)
         CALL(evt_map_set_blend, 0, 255, 255, 255, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("hika_"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hika_"), MAPOBJ_FLAG_HIDE)
         CALL(evt_map_playanim, STRING("kirakira"), 1, 0)
         CALL(evt_sub_intpl_msec_init, 0, 0, 255, 1000)
         LOOP(0)
@@ -683,7 +623,7 @@ EVT_BEGIN(clouda_nakama)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(1500)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_CLOUDA1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_CLOUDA1"))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 0, 0, 1000, 1500)
@@ -720,8 +660,8 @@ EVT_BEGIN(clouda_nakama)
     WAIT_MS(1500)
     CALL(evt_cam3d_evt_set, 272, 75, 175, 272, 75, -1, 0, 11)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), 1073741824)
-        CALL(evt_npc_flag_onoff, 0, STRING("クラウダ"), 1536)
+        CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), NPC_FLAG_NO_WALL_HIT)
+        CALL(evt_npc_flag_onoff, 0, STRING("クラウダ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
         CALL(evt_npc_move_position, STRING("クラウダ"), 270, 0, 0, FLOAT(30.0f), 0)
         SET_VALUE(LW(8), STRING("S_doa_e_l"))
         SET_VALUE(LW(9), STRING("S_doa_e_r"))
@@ -753,7 +693,7 @@ EVT_BEGIN(clouda_nakama)
     END_INLINE_EVENT
     WAIT_MS(1000)
     SET_VALUE(GW(0), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika_"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hika_"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_pauseanim, 0, STRING("kirakira"))
     CALL(evt_mapobj_trans, 1, STRING("S_mirre"), 0, 100, 0)
     DELETE_EVENT(GW(10))
@@ -761,23 +701,23 @@ EVT_BEGIN(clouda_nakama)
     CALL(evt_cam3d_evt_set, 225, 170, 391, 225, 100, -3, 0, 11)
     WAIT_MS(300)
     BEGIN_INLINE_EVENT
-        CALL(evt_party_dispflg_onoff, 0, 16, 1)
+        CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 1)
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(0), -15)
         CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
         CALL(evt_party_set_dir, 0, 90, -1)
-        CALL(evt_party_dispflg_onoff, 0, 16, 0)
+        CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 0)
     END_INLINE_EVENT
-    CALL(evt_party_dispflg_onoff, 1, 16, 1)
+    CALL(evt_party_dispflg_onoff, 1, PARTY_DISP_FLAG_DIR_LOCK, 1)
     CALL(evt_party_get_pos, 1, LW(0), LW(1), LW(2))
     ADD(LW(0), -25)
     CALL(evt_party_move_pos2, 1, LW(0), LW(2), FLOAT(80.0f))
     CALL(evt_party_set_dir, 1, 90, -1)
-    CALL(evt_party_dispflg_onoff, 1, 16, 0)
+    CALL(evt_party_dispflg_onoff, 1, PARTY_DISP_FLAG_DIR_LOCK, 0)
     WAIT_MS(700)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("クラウダ"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
-    CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_msg_print, 0, STRING("stg2_win_e09_02"), 0, STRING("クラウダ"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -809,8 +749,8 @@ EVT_BEGIN(clouda_nakama)
     CALL(evt_mario_set_pose, STRING("M_N_7"))
     BEGIN_INLINE_EVENT
         CALL(evt_npc_entry, STRING("dummy1"), STRING("c_pguide"))
-        CALL(evt_npc_flag_onoff, 1, STRING("dummy1"), 32)
-        CALL(evt_npc_flag_onoff, 1, STRING("dummy1"), 128)
+        CALL(evt_npc_flag_onoff, 1, STRING("dummy1"), NPC_FLAG_INTANGIBLE)
+        CALL(evt_npc_flag_onoff, 1, STRING("dummy1"), NPC_FLAG_HIDDEN)
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_npc_set_position, STRING("dummy1"), LW(0), LW(1), LW(2))
         CALL(evt_party_cont_onoff, 0, 0)
@@ -854,8 +794,8 @@ EVT_BEGIN(clouda_nakama)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_npc_entry, STRING("dummy2"), STRING("c_pguide"))
-        CALL(evt_npc_flag_onoff, 1, STRING("dummy2"), 32)
-        CALL(evt_npc_flag_onoff, 1, STRING("dummy2"), 128)
+        CALL(evt_npc_flag_onoff, 1, STRING("dummy2"), NPC_FLAG_INTANGIBLE)
+        CALL(evt_npc_flag_onoff, 1, STRING("dummy2"), NPC_FLAG_HIDDEN)
         CALL(evt_party_get_pos, 1, LW(0), LW(1), LW(2))
         CALL(evt_npc_set_position, STRING("dummy2"), LW(0), LW(1), LW(2))
         CALL(evt_party_cont_onoff, 1, 0)
@@ -917,7 +857,7 @@ EVT_BEGIN(clouda_nakama)
         CALL(ss_ch_set, 2, 1)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, FLOAT(165.19922f), FLOAT(143.0f), FLOAT(292.0f), FLOAT(165.19922f), FLOAT(90.0f), FLOAT(-3.0f), 500, 11)
-    CALL(evt_npc_flag_onoff, 0, STRING("クラウダ"), 1536)
+    CALL(evt_npc_flag_onoff, 0, STRING("クラウダ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_jump_position_nohit, STRING("クラウダ"), 205, 50, 0, 500, 1)
     CALL(evt_npc_set_anim, STRING("クラウダ"), STRING("PWD_S_1"))
     LOOP(0)
@@ -927,7 +867,7 @@ EVT_BEGIN(clouda_nakama)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_msg_print, 0, STRING("stg2_win_e09_06"), 0, STRING("クラウダ"))
     CALL(evt_mario_set_pose, STRING("M_U_3"))
     WAIT_MS(650)
@@ -964,32 +904,32 @@ EVT_BEGIN(clouda_nakama)
     CALL(evt_party_move_pos2, 1, 148, 30, FLOAT(120.0f))
     CALL(evt_msg_print, 0, STRING("stg2_win_e09_09"), 0, STRING("extparty"))
     CALL(evt_cam3d_evt_off, 300, 11)
-    SET_VALUE(GSWF(2682), 1)
-    SET_VALUE(GSW(0), 87)
+    SET_VALUE(GSWF(GSWF_WIN04_FLURRIE_JOINED), 1)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_09_FLURRIE_JOINS)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
-    CALL(evt_snd_bgmoff, 22528)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(60))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN2"))
     CALL(evt_snd_env_lpf, 0, 800)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(touch_door)
-    SWITCH(GSW(0))
-        CASE_LESS(82)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS(STORY_STG2_05_01_FLURRIE_LIVING_ROOM)
         CALL_CHILD(PTR(clouda_inai))
-        CASE_EQUAL(82)
+        CASE_EQUAL(STORY_STG2_05_01_FLURRIE_LIVING_ROOM)
         CALL_CHILD(PTR(clouda_irai))
-        CASE_BETWEEN(83, 85)
+        CASE_BETWEEN(STORY_STG2_05_02_FLURRIE_REQUEST, STORY_STG2_07_MARIO_VS_SHADOW_SIRENS)
         CALL_CHILD(PTR(clouda_irai_ato))
-        CASE_EQUAL(86)
-        CALL(evt_mario_check_key_item, 63, LW(0))
+        CASE_EQUAL(STORY_STG2_08_SHADOW_SIRENS_LOSE)
+        CALL(evt_mario_check_key_item, ITEM_NECKLACE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL_CHILD(PTR(clouda_irai_ato))
-            ELSE
+        ELSE
             CALL_CHILD(PTR(clouda_nakama))
             IF_INT_EQUAL(LW(0), 1)
                 CALL(evt_exit_case_evt)
@@ -1001,8 +941,8 @@ EVT_END()
 
 EVT_BEGIN(mirror_ball_event)
     CALL(evt_map_set_tevcallback, 1, PTR(mirror_ball))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_mirre"), 16777216)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_mirre"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mirre"), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mirre"), MAPOBJ_FLAG_DISPLAY_LIST)
     RETURN
 EVT_END()
 
@@ -1273,8 +1213,8 @@ EVT_BEGIN(flower_disp_pos)
     RETURN
 EVT_END()
 
-void mirror_ball(void* param) {
-    envAddTev(10, param);
+void mirror_ball(MapTevCallbackInfo* info) {
+    envAddTev(10, info);
 }
 
 void flower_disp(CameraId camera, void* param) {
@@ -1352,43 +1292,43 @@ static EVT_BEGIN(cloud_toujou)
     WAIT_MS(1000)
     CALL(evt_msg_toge, 2, 300, 80, 40)
     CALL(evt_msg_print, 0, STRING("stg2_win_e04_00_03"), 0, 0)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     CALL(evt_bero_mapchange, STRING("win_05"), STRING(""))
     RETURN
 EVT_END()
 
 EVT_BEGIN(win_04_init_evt)
-    SET_VALUE(GSWF(253), 1)
+    SET_VALUE(GSWF(GSWF_LOG_MAP_WIN_ROUTE_SHOWN), 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN2"))
-    CALL(evt_snd_bgmoff, 22528)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN2"))
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(60))
     CALL(evt_snd_env_lpf, 0, 800)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -125, 60, -95, 0, 0)
-    IF_INT_EQUAL(GSW(0), 80)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_04_PLANE_PANEL)
         SPAWN_EVENT(PTR(meet_clouda))
     END_IF
-    IF_INT_EQUAL(GSW(0), 81)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_05_A_SHY_FLURRIE)
         SPAWN_EVENT(PTR(meet_clouda2))
     END_IF
-    IF_INT_EQUAL(GSW(0), 83)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_05_02_FLURRIE_REQUEST)
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_bero_overwrite, STRING("w_bero"), PTR(bero_witchtrio))
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_on))
     END_IF
-    IF_INT_LESS_OR_EQUAL(GSW(0), 86)
+    IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_08_SHADOW_SIRENS_LOSE)
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(touch_door), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero"), 0, PTR(touch_door), 0)
     END_IF
-    IF_INT_EQUAL(GSW(0), 76)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_02_SEALED_ENTRANCE_2)
         SPAWN_EVENT(PTR(cloud_toujou))
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika_"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hika_"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 

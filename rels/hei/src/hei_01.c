@@ -1,3 +1,5 @@
+// hei_01 (平原, Petal Meadows): field linking hei_13 and Petalburg (nok_00).
+// Koops (nokotarou) is met here and joins as a partner; a blue switch lowers the bridge; Fire Flower block, Star Piece.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -10,100 +12,27 @@
 #include "driver/hitdrv.h"
 #include "data_tables.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "evt/evt_pouch.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_set_rel);
-USER_FUNC(evt_cam_shift_reset);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_exit_case_evt);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_paper_timerate);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_set_scale);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_balloon_bikkuri);
-USER_FUNC(evt_mario_balloon_off);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dir_npc);
-USER_FUNC(evt_mario_set_dispdir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_delete);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_pera_onoff);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_start_for_event);
-USER_FUNC(evt_npc_stop_for_event);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_dir_npc);
-USER_FUNC(evt_party_set_dispdir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_open_mail);
-USER_FUNC(evt_pouch_receive_mail);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_bgmon_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxchk);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_dist);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_rumble_onoff);
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_party_move_behind_mario);
-#endif
 static USER_FUNC(set_dir);
 
 extern EvtWord bero_out_event[];
@@ -123,7 +52,6 @@ extern EvtWord evt_nokorin[];
 static NpcSetupInfo npcEnt[3];
 static HitDamageReturn hitDmgRetPoints[3];
 extern EvtWord christine_hei_01[];
-extern EvtWord hei_01_init_evt[];
 
 EVT_BEGIN(bero_out_event)
     SET_VALUE(LW(0), 0)
@@ -134,8 +62,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -150,8 +78,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -167,8 +95,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_h", // hitName
         4098, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -183,8 +111,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -201,7 +129,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(evt_kusa_2)
     CALL(evt_item_delete_check, STRING("item_kusa_2"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_2"), 121, -200, 0, 120, 4, GSWF(1802), 0)
+        CALL(evt_item_entry, STRING("item_kusa_2"), ITEM_COIN, -200, 0, 120, 4, GSWF(GSWF_HEI01_BUSH_COIN_A_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -209,7 +137,7 @@ EVT_END()
 static EVT_BEGIN(evt_kusa_4)
     CALL(evt_item_delete_check, STRING("item_kusa_4"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_4"), 163, 190, 0, -70, 4, GSWF(1784), 0)
+        CALL(evt_item_entry, STRING("item_kusa_4"), ITEM_MYSTERY, 190, 0, -70, 4, GSWF(GSWF_HEI01_BUSH_MYSTERY_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -217,7 +145,7 @@ EVT_END()
 static EVT_BEGIN(evt_kusa_7)
     CALL(evt_item_delete_check, STRING("item_kusa_7"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_7"), 121, -285, 0, 85, 4, GSWF(1800), 0)
+        CALL(evt_item_entry, STRING("item_kusa_7"), ITEM_COIN, -285, 0, 85, 4, GSWF(GSWF_HEI01_BUSH_COIN_B_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -243,7 +171,7 @@ EVT_BEGIN(kusa_dokan)
     CALL(evt_map_playanim, STRING("anm_kusa_1"), 0, 0)
     CALL(evt_map_checkanim, STRING("anm_kusa_1"), LW(0), LW(1))
     WAIT_MS(LW(1))
-    SET_VALUE(GSWF(1783), 1)
+    SET_VALUE(GSWF(GSWF_HEI01_BUSH_PIPE_REVEALED), 1)
     CALL(evt_hitobj_onoff, STRING("a_kusa_1"), 0, 0)
     SET_VALUE(LW(0), STRING("dokan"))
     CALL_CHILD(PTR(bero_case_switch_on))
@@ -313,7 +241,7 @@ EVT_BEGIN(bridge_evt_02)
         END_SWITCH
         CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
         CALL(evt_img_wait_animend, STRING("capture_img"))
-        CALL(evt_mapobj_flag_onoff, 1, 0, LW(11), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(11), MAPOBJ_FLAG_HIDE)
         IF_INT_GREATER_OR_EQUAL(GW(0), 25)
             CALL(evt_img_free_capture, STRING("capture_img"), 0)
             CALL(evt_img_free_capture, STRING("capture_img"), 1)
@@ -325,11 +253,11 @@ EVT_BEGIN(bridge_evt_02)
     CALL(evt_img_release, STRING("capture_img"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S"))
     BEGIN_INLINE_EVENT
-        CALL(evt_snd_bgmoff, 1024)
-        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
         WAIT_MS(2000)
-        CALL(evt_snd_bgmoff, 513)
-        CALL(evt_snd_bgmon, 288, 0)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -347,20 +275,20 @@ EVT_BEGIN(bridge_evt)
     END_INLINE_EVENT
     CALL_CHILD(PTR(bridge_evt_02))
     CALL(evt_hitobj_onoff, STRING("a_hasi"), 1, 1)
-    SET_VALUE(GSW(0), 25)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_01_THE_FLIP_BRIDGE)
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_npc_start_for_event)
     RETURN
 EVT_END()
 
 EVT_BEGIN(nokotaro_get)
-    CALL(evt_npc_flag_onoff, 0, STRING("ノコタロウ"), 512)
+    CALL(evt_npc_flag_onoff, 0, STRING("ノコタロウ"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_set_anim, STRING("ノコタロウ"), STRING("PNK_Y_2"))
     CALL(evt_msg_print_add, 0, STRING("stg1_hei_07"))
     CALL(evt_npc_set_anim, STRING("ノコタロウ"), STRING("PNK_S_1"))
-    CALL(evt_npc_flag_onoff, 1, STRING("ノコタロウ"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("ノコタロウ"), NPC_FLAG_TALK_ANIM)
     WAIT_MS(500)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     BEGIN_INLINE_EVENT
         CALL(evt_mario_mov_pos2, 450, 0, FLOAT(80.0f))
         CALL(evt_mario_set_dir_npc, STRING("ノコタロウ"))
@@ -372,11 +300,11 @@ EVT_BEGIN(nokotaro_get)
     SET_VALUE(LW(8), STRING("ノコタロウ"))
     SET_VALUE(LW(9), 2)
     CALL_CHILD(PTR(all_party_lecture))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_party_set_dir, 0, 90, 200)
 #endif
     CALL(evt_msg_print, 0, STRING("stg1_hei_09"), 0, STRING("party"))
-    SET_VALUE(GSW(0), 33)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_07_KOOPS_JOINS)
     RETURN
 EVT_END()
 
@@ -385,13 +313,13 @@ EVT_BEGIN(nokotaro_kanyu)
     CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
     IF_INT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(nokotaro_get))
-        ELSE
+    ELSE
         CALL(evt_msg_print_add, 0, STRING("stg1_hei_10"))
         CALL(evt_msg_select, 0, STRING("stg1_hei_12_yesno2"))
         CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print_add, 0, STRING("stg1_hei_11"))
-            ELSE
+        ELSE
             CALL_CHILD(PTR(nokotaro_get))
         END_IF
     END_IF
@@ -399,16 +327,16 @@ EVT_BEGIN(nokotaro_kanyu)
 EVT_END()
 
 EVT_BEGIN(nokotaro_nakama)
-    IF_INT_EQUAL(GSWF(1774), 0)
+    IF_INT_EQUAL(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 0)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(1775), 0)
+    IF_INT_EQUAL(GSWF(GSWF_HEI_MOON_STONE_TAKEN), 0)
         RETURN
     END_IF
-    IF_INT_NOT_EQUAL(GSW(0), 32)
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_06_01_GOLD_FUZZY)
         RETURN
     END_IF
-    IF_INT_NOT_EQUAL(GSWF(1781), 0)
+    IF_INT_NOT_EQUAL(GSWF(GSWF_HEI01_KOOPS_ASKED_TO_JOIN), 0)
         CALL(evt_npc_set_position, STRING("ノコタロウ"), 400, 0, 0)
         CALL(evt_npc_set_ry, STRING("ノコタロウ"), 90)
         RETURN
@@ -421,7 +349,7 @@ EVT_BEGIN(nokotaro_nakama)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmoff_f, 512, 3000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
     CALL(evt_npc_set_position, STRING("ノコタロウ"), 300, 0, 0)
@@ -474,13 +402,13 @@ EVT_BEGIN(nokotaro_nakama)
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_npc_start_for_event)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmon_f, 768, STRING("BGM_STG1_HEI1"), 2000)
-    SET_VALUE(GSWF(1781), 1)
+    CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG1_HEI1"), 2000)
+    SET_VALUE(GSWF(GSWF_HEI01_KOOPS_ASKED_TO_JOIN), 1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(nokotarou_init)
-    CALL(evt_npc_flag_onoff, 1, STRING("me"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     RETURN
 EVT_END()
 
@@ -495,9 +423,9 @@ EVT_BEGIN(nokotarou_talk_2)
     CALL(evt_msg_print, 0, STRING("stg1_hei_12"), 0, STRING("ノコタロウ"))
     CALL_CHILD(PTR(nokotaro_kanyu))
     CALL(evt_npc_start_for_event)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 33)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_07_KOOPS_JOINS)
         CALL(evt_npc_change_fbat_mode, 1)
-        ELSE
+    ELSE
         CALL(evt_party_run, 0)
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -512,7 +440,7 @@ EVT_END()
 EVT_BEGIN(nokorin_pose)
     CALL(evt_npc_get_position, STRING("ノコリン"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_NOKORIN_MOVE1"), LW(0), LW(1), LW(2), LW(3))
-    CALL(evt_npc_flag_onoff, 0, STRING("ノコリン"), 1024)
+    CALL(evt_npc_flag_onoff, 0, STRING("ノコリン"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_pera_onoff, STRING("ノコリン"), 0)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 0)
@@ -532,12 +460,12 @@ EVT_BEGIN(nokorin_pose)
 EVT_END()
 
 EVT_BEGIN(evt_nokorin)
-    IF_INT_EQUAL(GSWF(1782), 1)
+    IF_INT_EQUAL(GSWF(GSWF_HEI01_KOOPIE_KOO_FAREWELL), 1)
         RETURN
     END_IF
     LABEL(0)
     WAIT_FRAMES(1)
-    IF_INT_LESS(GSW(0), 33)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_07_KOOPS_JOINS)
         GOTO(0)
     END_IF
     CALL(evt_mario_key_onoff, 0)
@@ -576,7 +504,7 @@ EVT_BEGIN(evt_nokorin)
     IF_INT_LESS(LW(0), LW(3))
         CALL(evt_mario_set_pos, 370, 0, 0)
         CALL(evt_party_set_pos, 0, 400, 0, 0)
-        ELSE
+    ELSE
         CALL(evt_mario_set_pos, 400, 0, 0)
         CALL(evt_party_set_pos, 0, 370, 0, 0)
     END_IF
@@ -762,7 +690,7 @@ EVT_BEGIN(evt_nokorin)
     IF_INT_LESS_OR_EQUAL(LW(3), LW(0))
         CALL(evt_mario_set_dir, 90, 300, 0)
         CALL(evt_party_set_dir, 0, 270, 300)
-        ELSE
+    ELSE
         CALL(evt_mario_set_dir, 270, 300, 0)
         CALL(evt_party_set_dir, 0, 90, 300)
     END_IF
@@ -774,7 +702,7 @@ EVT_BEGIN(evt_nokorin)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SET_VALUE(GSWF(1782), 1)
+    SET_VALUE(GSWF(GSWF_HEI01_KOOPIE_KOO_FAREWELL), 1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
     RETURN
@@ -798,7 +726,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93", // name
-        0x40000620, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -824,7 +752,7 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     CALL(evt_sub_get_dist, LW(0), LW(2), LW(3), LW(5), LW(10))
@@ -834,8 +762,8 @@ static EVT_BEGIN(peach_mail)
         CALL(evt_party_set_dir, 0, 270, 0)
     END_IF
 #endif
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_MAIL_RECEPTION1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_MAIL_RECEPTION1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 0, STRING("eff0"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -868,8 +796,8 @@ static EVT_BEGIN(peach_mail)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_mario_balloon_off)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAND_UP1_4"), LW(0), LW(1), LW(2), 0)
     DELETE_EVENT(LW(10))
@@ -899,7 +827,7 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_party_run, 0)
     CALL(evt_cam_shift_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
-    SET_VALUE(GSW(0), 63)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_21_A_MAIL_FROM_PEACH)
     CALL(evt_pouch_receive_mail, 0)
     CALL(evt_pouch_open_mail, 0)
     RETURN
@@ -907,11 +835,11 @@ EVT_END()
 
 EVT_BEGIN(christine_hei_01)
     CALL(evt_mario_key_onoff, 0)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_bero_exec_wait, 65536)
 #endif
     CALL(evt_party_stop, 0)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_bero_exec_wait, 65536)
 #endif
     CALL(evt_npc_stop_for_event)
@@ -923,7 +851,7 @@ EVT_BEGIN(christine_hei_01)
     CALL(evt_msg_print, 0, STRING("stg1_hei_02_02"), 0, STRING("party"))
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
-    SET_VALUE(GSWF(1805), 1)
+    SET_VALUE(GSWF(GSWF_HEI01_GOOMBELLA_TIP_GIVEN), 1)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_npc_start_for_event)
@@ -938,26 +866,26 @@ EVT_BEGIN(hei_01_init_evt)
     CALL_CHILD(PTR(bero_case_switch_off))
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_change_fbat_mode, 1)
-    CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), 315, 60, -75, 132, 0, GSWF(1785), 0)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, STRING("item_01"), 125, 450, 40, -447, 15, GSWF(5599), 0)
+    CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), 315, 60, -75, ITEM_FIRE_FLOWER, 0, GSWF(GSWF_HEI01_FIRE_FLOWER_BLOCK_HIT), 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 450, 40, -447, 15, GSWF(GSWF_HEI01_STAR_PIECE), 0)
 #else
-    CALL(evt_item_entry, STRING("item_01"), 125, 450, 40, -447, 16, GSWF(5599), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 450, 40, -447, 16, GSWF(GSWF_HEI01_STAR_PIECE), 0)
 #endif
     CALL(evt_item_set_scale, STRING("item_01"), FLOAT(0.5996094f))
     SET_VALUE(LW(0), PTR(kusa_data))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
-    IF_INT_EQUAL(GSWF(1783), 0)
-        CALL(evt_run_case_evt, 9, 1, STRING("a_kusa_1"), 0, PTR(kusa_dokan), 0)
-        ELSE
+    IF_INT_EQUAL(GSWF(GSWF_HEI01_BUSH_PIPE_REVEALED), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_kusa_1"), 0, PTR(kusa_dokan), 0)
+    ELSE
         CALL(evt_hitobj_onoff, STRING("a_kusa_1"), 0, 0)
         CALL(evt_map_playanim, STRING("anm_kusa_1"), 2, 0)
         SET_VALUE(LW(0), STRING("dokan"))
         CALL_CHILD(PTR(bero_case_switch_on))
     END_IF
     CALL(evt_map_playanim, STRING("anm_mizu"), 1, 0)
-    IF_INT_LESS(GSW(0), 25)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hasi"), 1)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_01_THE_FLIP_BRIDGE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hasi"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_hasi"), 1, 0)
         SET_VALUE(GW(0), 0)
         CALL(evt_mobj_switch_blue, 2, STRING("bg_switch"), -8, 40, -450, PTR(bridge_evt), 0)
@@ -966,15 +894,15 @@ EVT_BEGIN(hei_01_init_evt)
     SPAWN_EVENT(PTR(evt_nokorin))
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
-    IF_INT_EQUAL(GSW(0), 62)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_20_KOOPS_LEAVES)
         SPAWN_EVENT(PTR(peach_mail))
     END_IF
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI2"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("USIROKUSA"), 2)
-#ifndef VERSION_G8ME01_DEMO
-    IF_INT_LESS(GSW(0), 25)
-        IF_INT_EQUAL(GSWF(1805), 0)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI2"))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("USIROKUSA"), MAPOBJ_FLAG_BBOX_CULL)
+#if VERSION != VERSION_DEMO
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_01_THE_FLIP_BRIDGE)
+        IF_INT_EQUAL(GSWF(GSWF_HEI01_GOOMBELLA_TIP_GIVEN), 0)
             SPAWN_EVENT(PTR(christine_hei_01))
         END_IF
     END_IF

@@ -1,5 +1,8 @@
+// Palace of Shadow battle unit: the Grodus X, the satellites Sir Grodus summons (`boss_batten_satellite`): parts, stats, poses and AI scripts.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "las.h"
 
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_event_default.h"
@@ -9,27 +12,11 @@
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_sub.h"
+#include "system.h"
 
 s32 bts_x_flag_data;
-f32 intplGetValue(s32 mode, s32 currStep, f32 start, f32 end, s32 steps);
 
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_OnUnitFlag);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetHpGaugeOffset);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(bts_x_flag_wait);
-USER_FUNC(bts_x_flag_get);
-USER_FUNC(bts_x_flag_add);
-USER_FUNC(bts_x_flag_set);
-static USER_FUNC(bts_wariai_enzan_0f);
-static USER_FUNC(bts_wariai_enzan_0);
-USER_FUNC(bts_wariai_enzan_1f_intpl_w);
-static USER_FUNC(bts_wariai_enzan_1f_intpl);
-static USER_FUNC(bts_wariai_enzan_1f);
 static USER_FUNC(bts_wariai_enzan_1);
 
 BattleWeapon weapon_batten_satellite_attack;
@@ -56,23 +43,23 @@ BattleWeapon weapon_batten_satellite_attack = {
     0, 0, // baseFpCost..baseSpCost
     1, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    2, // counterResistFlags
-    0x80002004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_TOP_SPIKY, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -80,7 +67,7 @@ BattleWeapon weapon_batten_satellite_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -228,7 +215,7 @@ EVT_BEGIN(dmg_counter_event)
             RETURN
         END_IF
     END_IF
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SATELLITE_ATTACK2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SATELLITE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetHomePos, LW(10), LW(5), LW(6), LW(7))
     WAIT_MS(80)
     SET_VALUE(LW(8), 42)
@@ -236,7 +223,7 @@ EVT_BEGIN(dmg_counter_event)
         CALL(bts_wariai_enzan_1, LW(8), 42, LW(2), LW(5), LW(12))
         CALL(bts_wariai_enzan_1, LW(8), 42, LW(3), LW(6), LW(13))
         CALL(bts_wariai_enzan_1, LW(8), 42, LW(4), LW(7), LW(14))
-        CALL(btlevtcmd_SetPos, -2, LW(12), LW(13), LW(14))
+        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
         WAIT_FRAMES(1)
     END_LOOP
     RETURN
@@ -247,13 +234,13 @@ static BattleUnitKindPart parts[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetHpGaugeOffset, -2, -5, -13)
-    CALL(btlevtcmd_OnUnitFlag, -2, 3145728)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetHpGaugeOffset, BTL_UNIT_SELF, -5, -13)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 3145728)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -279,37 +266,37 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     SET_VALUE(LW(9), PTR(&weapon_batten_satellite_attack))
     CALL_CHILD(PTR(batten_satellite_attack_attack_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(batten_satellite_attack_attack_event)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("F_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("F_1"))
     WAIT_MS(400)
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 69)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SATELLITE_ATTACK1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SATELLITE_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(13), LW(6), LW(7))
     SET_VALUE(LW(8), 9)
     LOOP(LW(8))
         CALL(bts_wariai_enzan_1, LW(8), 9, LW(0), LW(13), LW(10))
         CALL(bts_wariai_enzan_1, LW(8), 9, LW(1), LW(6), LW(11))
         CALL(bts_wariai_enzan_1, LW(8), 9, LW(2), LW(7), LW(12))
-        CALL(btlevtcmd_SetPos, -2, LW(10), LW(11), LW(12))
+        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
         WAIT_FRAMES(1)
     END_LOOP
     SUBTRACT(LW(13), LW(0))
@@ -328,11 +315,11 @@ EVT_BEGIN(batten_satellite_attack_attack_event)
             CALL(bts_wariai_enzan_1, LW(8), 4, LW(0), LW(13), LW(10))
             CALL(bts_wariai_enzan_1, LW(8), 4, LW(1), LW(6), LW(11))
             CALL(bts_wariai_enzan_1, LW(8), 4, LW(2), LW(7), LW(12))
-            CALL(btlevtcmd_SetPos, -2, LW(10), LW(11), LW(12))
+            CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -358,24 +345,24 @@ EVT_BEGIN(batten_satellite_attack_attack_event)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     LABEL(98)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_SATELLITE_ATTACK2"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SATELLITE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     WAIT_MS(80)
     SET_VALUE(LW(8), 42)
     LOOP(LW(8))
         CALL(bts_wariai_enzan_1, LW(8), 42, LW(13), LW(0), LW(10))
         CALL(bts_wariai_enzan_1, LW(8), 42, LW(6), LW(1), LW(11))
         CALL(bts_wariai_enzan_1, LW(8), 42, LW(7), LW(2), LW(12))
-        CALL(btlevtcmd_SetPos, -2, LW(10), LW(11), LW(12))
+        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
         WAIT_FRAMES(1)
     END_LOOP
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
@@ -388,7 +375,7 @@ USER_FUNC(bts_x_flag_wait) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(bts_x_flag_get) {
+static USER_FUNC(bts_x_flag_get) {
     evtSetValue(event, event->args[0], bts_x_flag_data);
     return EVT_RETURN_DONE;
 }
@@ -425,7 +412,7 @@ static USER_FUNC(bts_wariai_enzan_0) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
+static USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);
@@ -444,9 +431,9 @@ USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
             evtSetFloat(event, out, c);
             return EVT_RETURN_DONE;
         }
-        r1 = 1.0f - intplGetValue(t1, b - a, 1.0f, 0.0f, b);
+        r1 = 1.0f - intplGetValue(t1, 1.0f, 0.0f, b - a, b);
     } else {
-        r1 = intplGetValue(t1, b - a, 0.0f, 1.0f, b);
+        r1 = intplGetValue(t1, 0.0f, 1.0f, b - a, b);
     }
     if (t2 >= 14.0f) {
         t2 = t1 - 14.0f;
@@ -454,9 +441,9 @@ USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
             evtSetFloat(event, out, c);
             return EVT_RETURN_DONE;
         }
-        r2 = 1.0f - intplGetValue(t2, b - a, 1.0f, 0.0f, b);
+        r2 = 1.0f - intplGetValue(t2, 1.0f, 0.0f, b - a, b);
     } else {
-        r2 = intplGetValue(t2, b - a, 0.0f, 1.0f, b);
+        r2 = intplGetValue(t2, 0.0f, 1.0f, b - a, b);
     }
     w = r1 * r2;
     evtSetFloat(event, out, c * (1.0f - w) + d * w);
@@ -479,9 +466,9 @@ static USER_FUNC(bts_wariai_enzan_1f_intpl) {
             evtSetFloat(event, out, c);
             return EVT_RETURN_DONE;
         }
-        r = 1.0f - intplGetValue(t, b - a, 1.0f, 0.0f, b);
+        r = 1.0f - intplGetValue(t, 1.0f, 0.0f, b - a, b);
     } else {
-        r = intplGetValue(t, b - a, 0.0f, 1.0f, b);
+        r = intplGetValue(t, 0.0f, 1.0f, b - a, b);
     }
     evtSetFloat(event, out, (1.0f - r) * c + r * d);
     return EVT_RETURN_DONE;

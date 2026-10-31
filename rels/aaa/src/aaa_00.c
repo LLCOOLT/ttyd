@@ -1,5 +1,8 @@
+// aaa_00 (マリオの家, Mario Bros.' house): the prologue, where Parakarry (パレッタ) delivers Peach's letter with the
+// treasure map before the title logo fades in, and the house scenes of the epilogue.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/animdrv.h"
 
 #include "driver/camdrv.h"
 #include "win/win_main.h"
@@ -15,78 +18,32 @@
 #include "evt/evt_npc.h"
 #include "data_tables.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_bg.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "aaa.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-static void draw(CameraId camera, void* param);
-typedef struct AaaWork { FileEntry* tpl; s32 alpha; } AaaWork;
+// The title logo (mariost.tpl) that fades in over the house at the end of the prologue (mapdraw).
+typedef struct AaaWork {
+    FileEntry* tpl; // 0x0
+    s32 alpha;      // 0x4
+} AaaWork;
+
 static AaaWork* wp;
 
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bg_set_color);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_letter_box_camid);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_fade_in);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_fade_set_spot_pos);
-USER_FUNC(evt_item_delete);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_set_scale);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_map_blend_set_flag);
-USER_FUNC(evt_map_set_blend);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_balloon_bikkuri);
-USER_FUNC(evt_mario_balloon_off);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_glide_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_npc_wait_pera);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_env_lpf);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envoff_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_rumble_onoff);
 USER_FUNC(mapdraw);
-void mapdelete(void);
 static void draw(CameraId camera, void* param);
 
 static NpcSetupInfo npcEnt[3];
@@ -96,12 +53,11 @@ extern EvtWord evt_prologue2[];
 static TreeAccess ki_data[2];
 static KusaAccess kusa_data[11];
 static BeroEntry bero_entry_data[2];
-extern EvtWord aaa_00_init_evt[];
 
 static NpcSetupInfo npcEnt[] = {
     {
         /*"パレッタ"*/"\x83\x70\x83\x8C\x83\x62\x83\x5E", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -110,7 +66,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", // name
-        0x40000600, // flags
+        NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
         {0}, // territoryBase
@@ -147,15 +103,15 @@ static const char* ie_npc[] = {
 };
 
 static EVT_BEGIN(door_1_open)
-    CALL(evt_snd_bgmoff, 18432)
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(door_1_close)
-    CALL(evt_snd_bgmon, 160, 0)
-    CALL(evt_snd_envon, 160, 0)
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_env_lpf, 0, 0)
     RETURN
 EVT_END()
@@ -183,9 +139,9 @@ static DoorParam door_1 = {
 static EVT_BEGIN(evt_prologue)
     BEGIN_INLINE_EVENT
         WAIT_MS(1500)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_MARIO_HOUSE1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MARIO_HOUSE1"))
     END_INLINE_EVENT
-    CALL(evt_snd_envon, 272, STRING("ENV_OPN_AAA1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_OPN_AAA1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_cam_letter_box_onoff, 1, 1)
     CALL(evt_cam_letter_box_camid, 6)
@@ -256,7 +212,7 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_npc_glide_position, STRING("パレッタ"), 0, 300, -100, 0, FLOAT(80.0f), FLOAT(-30.0f), 11, 0)
     CALL(evt_npc_set_position, STRING("ルイージ"), 20, 30, -150)
     CALL(evt_npc_set_ry, STRING("ルイージ"), 90)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_naka"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_naka"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, STRING("S_ie_door"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
@@ -280,7 +236,7 @@ static EVT_BEGIN(evt_prologue)
             END_IF
         END_LOOP
     END_INLINE_EVENT
-    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), 131088)
+    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     CALL(evt_npc_move_position, STRING("ルイージ"), 195, 0, 0, FLOAT(80.0f), 1)
     CALL(evt_npc_move_position, STRING("ルイージ"), 225, -75, 0, FLOAT(80.0f), 1)
     WAIT_MS(500)
@@ -295,11 +251,11 @@ static EVT_BEGIN(evt_prologue)
     WAIT_MS(340)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_5"))
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), 1024)
+    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_11"))
     CALL(evt_npc_move_position, STRING("ルイージ"), 195, 0, 0, FLOAT(80.0f), 1)
     CALL(evt_npc_move_position, STRING("ルイージ"), 63, -110, 0, FLOAT(80.0f), 1)
-    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), 131088)
+    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_5"))
     CALL(evt_mapobj_get_position, STRING("S_ie_door"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN1"), LW(0), LW(1), LW(2), 0)
@@ -319,13 +275,13 @@ static EVT_BEGIN(evt_prologue)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, -345, 154, 96, -32, 75, -217, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_aaa_00"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_naka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ie_door"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_aaa_00"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_naka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_door"), MAPOBJ_FLAG_HIDE)
     CALL(evt_bg_set_color, 0, 0, 0, 255)
     WAIT_FRAMES(1)
-    CALL(evt_snd_bgmoff, 18432)
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     CALL(evt_mapobj_get_position, STRING("S_ie_door"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT1"), LW(0), LW(1), LW(2), 0)
@@ -364,7 +320,7 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_msg_print, 0, STRING("pro_03"), 0, STRING("ルイージ"))
     WAIT_MS(300)
     CALL(evt_cam_letter_box_camid, 10)
-    CALL(evt_fade_set_mapchange_type, 1, 17, 800, 16, 800)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 800, FADE_IN_WHITE, 800)
     CALL(evt_bero_mapchange, STRING("gor_10"), 0)
     RETURN
 EVT_END()
@@ -390,28 +346,28 @@ static void draw(CameraId camera, void* param) {
 }
 
 EVT_BEGIN(evt_prologue2)
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_aaa_00"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_naka"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ie_door"), 1)
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_aaa_00"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_naka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_door"), MAPOBJ_FLAG_HIDE)
     CALL(evt_bg_set_color, 0, 0, 0, 255)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -85, 30, -310)
     CALL(evt_mario_set_dir, 90, 0, 0)
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
     CALL(evt_mario_adjust_dir)
 #endif
     CALL(evt_party_stop, 0)
-    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), 1024)
+    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_8"))
     CALL(evt_npc_set_autotalkpose, STRING("ルイージ"), STRING("L_8"), STRING("L_9"))
     CALL(evt_npc_set_position, STRING("ルイージ"), -52, 30, -275)
     CALL(evt_npc_set_ry, STRING("ルイージ"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, -376, 154, 65, -63, 75, -247, 0, 11)
     CALL(evt_seq_wait, 2)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mario_set_dir, 90, 0, 0)
 #endif
     CALL(evt_fade_end_wait)
@@ -423,7 +379,7 @@ EVT_BEGIN(evt_prologue2)
     ADD(LW(0), -25)
     ADD(LW(1), 15)
     ADD(LW(2), -3)
-    CALL(evt_item_entry, STRING("map"), 96, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("map"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), 17, -1, 0)
     CALL(evt_item_set_scale, STRING("map"), FLOAT(0.5498047f))
     WAIT_MS(1000)
     CALL(evt_item_delete, STRING("map"))
@@ -441,17 +397,17 @@ EVT_BEGIN(evt_prologue2)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(1000)
-    CALL(evt_snd_bgmoff_f, 512, 2000)
-    CALL(evt_snd_envoff, 512)
-    CALL(evt_fade_set_mapchange_type, 1, 49, 0, 50, 0)
-    SET_VALUE(GSW(0), 2)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_PAGE_FLIP_Z1, 0, FADE_PAGE_FLIP_A1, 0)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_02_MARIOS_HOUSE)
     CALL(evt_bero_mapchange, STRING("muj_20"), STRING("prologue"))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(epilogue_evt)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_END_AAA1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_END_AAA1"))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -126, 40, -224)
     CALL(evt_mario_set_dir, 90, 0, 0)
@@ -465,13 +421,13 @@ static EVT_BEGIN(epilogue_evt)
     WAIT_MS(3000)
     CALL(evt_msg_print, 0, STRING("ep_31"), 0, 0)
     WAIT_MS(500)
-    CALL(evt_fade_entry, 10, 1, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_OUT_BLACK, 1, 0, 0, 0)
     WAIT_FRAMES(1)
     SET_VALUE(LW(0), PTR(&door_1))
     CALL_CHILD(PTR(evt_door_open_quick))
     CALL(evt_cam3d_evt_set, -360, 154, 80, -46, 81, -232, 0, 11)
     CALL(evt_fade_in, 1000)
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("ルイージ"), STRING("S_2"), STRING("T_2"))
@@ -485,8 +441,8 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_balloon_bikkuri)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_MAIL_RECEPTION3"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_MAIL_RECEPTION3"))
     SPAWN_EVENT_GET_ID(PTR(evt_sub_mail_vibration), LW(10))
     WAIT_MS(500)
     LOOP(0)
@@ -497,8 +453,8 @@ static EVT_BEGIN(epilogue_evt)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_mario_balloon_off)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MAIL_RECEPTION1"), LW(0), LW(1), LW(2), 0)
     DELETE_EVENT(LW(10))
@@ -506,17 +462,17 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_sub_rumble_onoff, 1, 0)
     CALL(evt_msg_print, 0, STRING("ep_34"), 0, STRING("ルイージ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mario_set_dir, 90, 0, 0)
 #endif
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_jump_pos, -128, 30, -196, 400, 1, 20)
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_LANDING3"), LW(0), LW(1), LW(2), 0)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mario_set_dir, 90, 0, 0)
 #endif
     CALL(evt_cam3d_evt_set, -307, 117, 9, -58, 58, -244, 1200, 11)
-    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_jump_position_nohit, STRING("ルイージ"), -68, 30, -149, 400, 20)
     CALL(evt_npc_move_position, STRING("ルイージ"), -107, -166, 800, 0, 0)
     CALL(evt_mario_set_pose, STRING("M_N_9"))
@@ -526,9 +482,9 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_mario_set_pose, STRING("M_N_10"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("ep_35"), 0, 0)
-    CALL(evt_snd_bgmoff_f, 512, 3000)
-    CALL(evt_snd_envoff_f, 512, 3000)
-    CALL(evt_fade_set_mapchange_type, 1, 10, 900, 9, 900)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 3000)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 900, FADE_IN_BLACK, 900)
     CALL(evt_bero_mapchange, STRING("gor_02"), STRING(""))
     RETURN
 EVT_END()
@@ -538,22 +494,22 @@ static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_set_tribe, STRING("ピーチ姫"), STRING("ピーチ姫（普通）"))
     CALL(evt_npc_set_position, STRING("ピーチ姫"), 0, -1000, 0)
     CALL(evt_npc_set_ry, STRING("ピーチ姫"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), 1073743392)
-    CALL(evt_map_blend_set_flag, 1, STRING("ピーチ姫"), 2048)
-    CALL(evt_map_blend_set_flag, 1, STRING("ピーチ姫"), 4096)
+    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_map_blend_set_flag, 1, STRING("ピーチ姫"), ANIM_MATERIAL_FLAG_NO_BLEND)
+    CALL(evt_map_blend_set_flag, 1, STRING("ピーチ姫"), ANIM_MATERIAL_FLAG_NO_BLEND2)
     CALL(evt_npc_entry, STRING("キノじい"), STRING("c_kino_ji"))
     CALL(evt_npc_set_tribe, STRING("キノじい"), STRING("キノじい"))
     CALL(evt_npc_set_position, STRING("キノじい"), 0, -1000, 0)
     CALL(evt_npc_set_ry, STRING("キノじい"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("キノじい"), 1073743392)
-    CALL(evt_map_blend_set_flag, 1, STRING("キノじい"), 2048)
-    CALL(evt_map_blend_set_flag, 1, STRING("キノじい"), 4096)
+    CALL(evt_npc_flag_onoff, 1, STRING("キノじい"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_map_blend_set_flag, 1, STRING("キノじい"), ANIM_MATERIAL_FLAG_NO_BLEND)
+    CALL(evt_map_blend_set_flag, 1, STRING("キノじい"), ANIM_MATERIAL_FLAG_NO_BLEND2)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(epilogue_evt2)
-    CALL(evt_snd_envon, 272, STRING("ENV_END_AAA1"))
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_END_AAA1"))
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -128, 30, -196)
@@ -561,7 +517,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_mario_adjust_dir)
     CALL(evt_npc_set_position, STRING("ルイージ"), -107, 30, -166)
     CALL(evt_npc_set_ry, STRING("ルイージ"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_seq_wait, 2)
     CALL(evt_mario_set_pose, STRING("M_N_10"))
     SET_VALUE(LW(0), PTR(&door_1))
@@ -570,14 +526,14 @@ static EVT_BEGIN(epilogue_evt2)
     WAIT_FRAMES(1)
     CALL(evt_fade_end_wait)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_msg_print, 0, STRING("ep_47"), 0, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_MARIO_HOUSE2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MARIO_HOUSE2"))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_cam3d_evt_set, -375, 154, 66, -62, 81, -248, 800, 11)
     WAIT_MS(800)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_mario_set_dir, 90, 0, 0)
 #endif
     WAIT_MS(1000)
@@ -660,7 +616,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_npc_move_position, STRING("ピーチ姫"), 78, -89, 0, 60, 0)
     CALL(evt_npc_set_position, STRING("ピーチ姫"), 0, -1000, 0)
     WAIT_WHILE(GF(0))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_ENDING4"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_ENDING4"))
     CALL(evt_cam3d_evt_set, -260, 90, -62, -68, 42, -253, 800, 11)
     WAIT_MS(800)
     CALL(evt_mario_set_pose, STRING("M_I_N"))
@@ -668,11 +624,11 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 30)
     CALL(evt_fade_set_spot_pos, LW(0), LW(1), LW(2))
-    CALL(evt_fade_entry, 4, 3000, 0, 0, 0)
+    CALL(evt_fade_entry, FADE_OUT_SPOT, 3000, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(3000)
-    SET_VALUE(GSW(0), 403)
-    CALL(evt_fade_set_mapchange_type, 1, 10, 1, 9, 300)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG9_00_EPILOGUE)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 1, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING("end_00"), STRING(""))
     RETURN
 EVT_END()
@@ -701,8 +657,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -723,8 +679,8 @@ EVT_BEGIN(aaa_00_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
     SET_VALUE(LW(0), PTR(&door_1))
     CALL_CHILD(PTR(evt_door_entry))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("sai_ki1"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("sai_ki2"), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sai_ki1"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sai_ki2"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("prologue"))
         SPAWN_EVENT(PTR(evt_prologue))
@@ -736,13 +692,13 @@ EVT_BEGIN(aaa_00_init_evt)
         WAIT_FRAMES(1)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSW(0), 402)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("epilogue2"))
             CALL_CHILD(PTR(epilogue_npc_entry))
             SPAWN_EVENT(PTR(epilogue_evt2))
-            ELSE
+        ELSE
             SPAWN_EVENT(PTR(epilogue_evt))
         END_IF
     END_IF
@@ -774,4 +730,3 @@ void mapdelete(void) {
         fileFree(wp->tpl);
     }
 }
-

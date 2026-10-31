@@ -1,3 +1,4 @@
+// eff_hit.c: hit-flash effect: effHitEntry.
 #pragma once
 
 #include "driver/effdrv.h"

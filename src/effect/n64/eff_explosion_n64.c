@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: explosion sprite that scales over its duration; type 0 also spins.
+#include "eff/n64/eff_explosion_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"

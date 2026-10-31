@@ -1,16 +1,19 @@
+// Small GX helpers: queen_uv (texture offsets extdrv scrolls), and in the demo the 2D textured-quad
+// helpers seq_demo draws with.
 #include "gxsub.h"
-#ifdef VERSION_G8ME01_DEMO
+#include "version.h"
+#if VERSION == VERSION_DEMO
 #include "driver/camdrv.h"
 #endif
 
 //.sdata
 f32 queen_uv[4] = {0.0f, -0.0016000001f, 0.0f, -0.00080000004f};
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo still has the 2D textured-quad helpers seq_demo draws with (cut from retail).
 
 //.sdata
-static s32 gxsubMode ATTRIBUTE_ALIGN(32) = 8; // last GX setup applied by gxsubChgMode
+static s32 gxsubMode ATTRIBUTE_ALIGN(32) = 8;                              // last GX setup applied by gxsubChgMode
 static u8 gxsubWhiteTex[4] ATTRIBUTE_ALIGN(32) = {0xFF, 0xFF, 0x00, 0x00}; // 1x1 I4 texel used when no texture is set
 
 //.sbss

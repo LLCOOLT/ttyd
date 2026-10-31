@@ -1,54 +1,34 @@
+// dou_09 (洞窟, Pirate's Grotto): hub room linking dou_03, dou_10 and dou_13 with bobbing platforms.
+// A wall that can be bombed open and a hidden brick.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "dou.h"
 #include "driver/hitdrv.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_hitobj_attr_onoff);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_offscreen_get_boundingbox2);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_random);
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/casedrv.h"
 
 static BeroEntry bero_entry_data[5];
 static HitDamageReturn hitDmgRetPoints[5];
-extern EvtWord dou_09_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -63,8 +43,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -79,8 +59,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -95,8 +75,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "n_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -392,7 +372,7 @@ static EVT_BEGIN(bombwall_bomb)
     SET_VALUE(LW(0), STRING("w_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero"), 4)
-    SET_VALUE(GSWF(2981), 1)
+    SET_VALUE(GSWF(GSWF_DOU09_BOMB_WALL_BLOWN), 1)
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_bom_ver2"))
     CALL(evt_offscreen_entry, STRING("offscreen"))
@@ -408,11 +388,11 @@ static EVT_BEGIN(bombwall_bomb)
         CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, LW(10), LW(11), LW(12), LW(13))
         CALL(evt_img_clear_virtual_point, STRING("capture_img"))
         CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ki"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ki"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_ki1"), 1, 0)
         CALL(evt_img_wait_animend, STRING("capture_img"))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ki"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ki"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_ki1"), 1, 0)
     END_IF
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_ki"))
@@ -425,22 +405,22 @@ static EVT_BEGIN(bombwall_bomb)
 EVT_END()
 
 static EVT_BEGIN(bombwall_init)
-    IF_INT_EQUAL(GSWF(2981), 0)
+    IF_INT_EQUAL(GSWF(GSWF_DOU09_BOMB_WALL_BLOWN), 0)
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("w_bero"), 4)
         CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
-        CALL(evt_run_case_evt, 15, 1, STRING("A_ki1"), 0, PTR(bombwall_bomb), 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ki"), 1)
+        CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_ki1"), 0, PTR(bombwall_bomb), 0)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ki"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_ki1"), 1, 0)
     END_IF
     RETURN
 EVT_END()
 
 EVT_BEGIN(dou_09_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU11"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU11"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -448,10 +428,10 @@ EVT_BEGIN(dou_09_init_evt)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
-    IF_INT_LESS(GSW(0), 248)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("mon_b"), 1)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("mon_a"), 1)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_22_FLOODGATE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("mon_b"), MAPOBJ_FLAG_HIDE)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("mon_a"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
@@ -462,8 +442,8 @@ EVT_BEGIN(dou_09_init_evt)
     CALL_CHILD(PTR(dou_puka_event_init0))
     SPAWN_EVENT(PTR(dou_puka_event_main0))
     SPAWN_EVENT(PTR(dou_puka_event_sub0))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_taru01"), 0, PTR(dou_puka_event_0), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("A_taru01"), 0, PTR(dou_puka_event_rev_0), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru01"), 0, PTR(dou_puka_event_0), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru01"), 0, PTR(dou_puka_event_rev_0), 0)
     SET_VALUE(LW(0), STRING("S_taru02"))
     SET_VALUE(LW(1), STRING("A_taru02"))
     SET_VALUE(LW(2), STRING("A_taru02"))
@@ -471,8 +451,8 @@ EVT_BEGIN(dou_09_init_evt)
     CALL_CHILD(PTR(dou_puka_event_init1))
     SPAWN_EVENT(PTR(dou_puka_event_main1))
     SPAWN_EVENT(PTR(dou_puka_event_sub1))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_taru02"), 0, PTR(dou_puka_event_1), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("A_taru02"), 0, PTR(dou_puka_event_rev_1), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru02"), 0, PTR(dou_puka_event_1), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru02"), 0, PTR(dou_puka_event_rev_1), 0)
     SET_VALUE(LW(0), STRING("S_taru03"))
     SET_VALUE(LW(1), STRING("A_taru03"))
     SET_VALUE(LW(2), STRING("A_taru03"))
@@ -480,8 +460,8 @@ EVT_BEGIN(dou_09_init_evt)
     CALL_CHILD(PTR(dou_puka_event_init2))
     SPAWN_EVENT(PTR(dou_puka_event_main2))
     SPAWN_EVENT(PTR(dou_puka_event_sub2))
-    CALL(evt_run_case_evt, 0, 1, STRING("A_taru03"), 0, PTR(dou_puka_event_2), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("A_taru03"), 0, PTR(dou_puka_event_rev_2), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru03"), 0, PTR(dou_puka_event_2), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru03"), 0, PTR(dou_puka_event_rev_2), 0)
     SET_VALUE(LW(0), STRING("s09_fune01"))
     SET_VALUE(LW(1), STRING("a09_fune01"))
     SET_VALUE(LW(2), STRING("a09_fune_ata1"))
@@ -489,11 +469,10 @@ EVT_BEGIN(dou_09_init_evt)
     CALL_CHILD(PTR(dou_puka_event_init3))
     SPAWN_EVENT(PTR(dou_puka_event_main3))
     SPAWN_EVENT(PTR(dou_puka_event_sub3))
-    CALL(evt_run_case_evt, 0, 1, STRING("a09_fune_ata1"), 0, PTR(dou_puka_event_3), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("a09_fune_ata1"), 0, PTR(dou_puka_event_rev_3), 0)
-    CALL(evt_mobj_powerupblk, STRING("pblk1"), 500, 140, -100, 0, GSWF(5557), 0)
-    CALL(evt_mobj_brick, STRING("hblk1"), 500, 50, -100, 0, 13, 0, GSWF(2994))
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a09_fune_ata1"), 0, PTR(dou_puka_event_3), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("a09_fune_ata1"), 0, PTR(dou_puka_event_rev_3), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk1"), 500, 140, -100, 0, GSWF(GSWF_DOU09_SHINE_SPRITE), 0)
+    CALL(evt_mobj_brick, STRING("hblk1"), 500, 50, -100, 0, 13, 0, GSWF(GSWF_DOU09_HIDDEN_COIN_BLOCK_EMPTIED))
     SPAWN_EVENT(PTR(bombwall_init))
     RETURN
 EVT_END()
-

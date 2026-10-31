@@ -1,4 +1,6 @@
+// Star-power special move Earth Tremor (sac_deka): the timed-press game and its damage to every enemy.
 #pragma optimize_for_size on
+#include <dolphin/pad.h>
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
 #include "battle/battle_disp.h"
@@ -26,44 +28,32 @@
 #include "battle/sac/sac_common.h"
 #include "party/party_motion.h"
 #include "battle/sac/sac_deka.h"
+#include "battle/battle_sub.h"
+#include "eff/eff_starstone.h"
+#include "libc_decls.h"
 // US battle texture ids are 0x16 higher for these entries.
 #define BTL_TEX(id) ((id) + VERSION_PICK(0, 0x16))
 
-
-EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 size);
-void BattleAudienceSoundWhistleKind(s32 kind);
-void BattleAudienceSoundCallKind(s32 kind);
-void BattleAudienceSoundHandBeat(void);
-void BattleAudienceSoundBooing(void);
-void btl_camera_shake_h(s32 a, f32 b, f32 c, s32 d, s32 e);
-void psndSFX_pit(s32 id, s32 pitch);
-void test_kururing_mapdisp(CameraId cam);
-int rand(void);
-double tan(double);
-
-#define INTPL(mode, cur, steps, a, b) (((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(a, b, mode, cur, steps))
 #define SFXON(name) (psndSFXOn(name))
-#define TEXPLANE(m, id, col) (((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, id, col, 0))
 
 typedef struct DekaTiming {
-    s32 state;  // 0x0
-    s32 timer;  // 0x4, cleared when shown, never read
-    s32 type;   // 0x8
-    f32 pos;    // 0xC
-    Vec off;    // 0x10
-    u8 pad1C[0x34 - 0x1C];
-    u8 alpha;   // 0x34
-    u8 hit;     // 0x35
-    u8 pad36[2];
+    s32 state;                   // 0x0
+    s32 timer;                   // 0x4, cleared when shown, never read
+    s32 type;                    // 0x8
+    f32 pos;                     // 0xC
+    Vec off;                     // 0x10
+    u8 reserved_1C[0x34 - 0x1C]; // 0x1C, never accessed
+    u8 alpha;                    // 0x34
+    u8 hit;                      // 0x35
 } DekaTiming;
 
 typedef struct YukaMesh {
-    Vec pos[2][129];   // 0x0
-    Vec disp[2][129];  // 0xC18
-    Vec vel[2][129];   // 0x1830
-    Vec prev[2][129];  // 0x2448
-    f32 u[2][129];     // 0x3060
-    f32 v[2][129];     // 0x3468
+    Vec pos[2][129];  // 0x0
+    Vec disp[2][129]; // 0xC18
+    Vec vel[2][129];  // 0x1830
+    Vec prev[2][129]; // 0x2448
+    f32 u[2][129];    // 0x3060
+    f32 v[2][129];    // 0x3468
 } YukaMesh;
 
 typedef struct DekaWork {
@@ -88,7 +78,6 @@ typedef struct DekaWork {
     /* 0x058 */ f32 gaugeW;
     /* 0x05C */ Vec gaugePos;
     /* 0x068 */ u8 alpha;
-    /* 0x069 */ u8 pad69[3];
     /* 0x06C */ s32 sfx;
     /* 0x070 */ DekaTiming timing[8];
     /* 0x230 */ DekaTiming timing2[8];
@@ -110,23 +99,11 @@ typedef struct DekaWork {
     /* 0x478 */ Vec enemyVel[10];
     /* 0x4F0 */ f32 enemyRot[10];
     /* 0x518 */ u8 waveActive[6];
-    /* 0x51E */ u8 pad51E[2];
     /* 0x520 */ f32 waveSpeed[6];
     /* 0x538 */ s32 waveIdx[6];
     /* 0x550 */ f32 wavePos[6];
     /* 0x568 */ f32 waveAmp[6];
 } DekaWork;
-
-typedef struct StarEffWork {
-    u8 pad0[8];
-    Vec pos;  // 0x8
-    f32 scl;  // 0x14
-    Vec rot;  // 0x18
-    u8 pad24[0x34 - 0x24];
-    EffectEntry* sub; // 0x34
-    u8 pad38[0x5F - 0x38];
-    u8 alpha; // 0x5F
-} StarEffWork;
 
 static DekaWork* get_ptr(void);
 USER_FUNC(get_result);
@@ -136,7 +113,6 @@ static USER_FUNC(star_stone_appear);
 static USER_FUNC(wait_game_end);
 static USER_FUNC(start_game);
 USER_FUNC(wait_star_stone_take_on);
-s32 weaponGetPower_Deka(void);
 void create_timing(void);
 void yuka_disp(CameraId cam, void* param);
 void yuka_capture(CameraId cam, void* param);
@@ -144,24 +120,15 @@ static void disp_3D_alpha(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
 static void disp_2D(CameraId cam, void* param);
-USER_FUNC(end_deka);
 void main_enemy_sub(BattleUnit* unit, s32* n);
 void main_enemy(void);
 static void main_star(void);
 void main_timing(s32 idx);
 void main_gauge(void);
 static void main_base(void);
-USER_FUNC(yuka_end);
 static void yuka_main(void);
 static void yuka_init(void);
 USER_FUNC(main_deka);
-
-USER_FUNC(btlevtcmd_ACSuccessEffect);
-USER_FUNC(btlevtcmd_CheckAttribute);
-USER_FUNC(btlevtcmd_CheckPartsAttribute);
-USER_FUNC(btlevtcmd_CommandCheckDamage);
-USER_FUNC(btlevtcmd_GetSelectEnemy);
-USER_FUNC(btlevtcmd_GetSelectNextEnemy);
 
 static EVT_BEGIN(nice_event)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), 0, 100, 0)
@@ -179,7 +146,7 @@ USER_FUNC(main_deka) {
         w->unitId = evtGetValue(event, args[0]);
         yuka_init();
     }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     if (w->tex->address == NULL) {
         return 2;
     }
@@ -195,10 +162,10 @@ USER_FUNC(main_deka) {
     main_star();
     main_enemy();
     yuka_main();
-    dispEntry(8, 901.0f, 1, disp_2D, 0);
-    dispEntry(4, 0.0f, 1, disp_3D, 0);
-    dispEntry(4, 0.0f, 2, disp_3D_alpha, 0);
-    dispEntry(4, 0.0f, 0, yuka_disp, 0);
+    dispEntry(CAMERA_2D, 901.0f, 1, disp_2D, 0);
+    dispEntry(CAMERA_3D, 0.0f, 1, disp_3D, 0);
+    dispEntry(CAMERA_3D, 0.0f, 2, disp_3D_alpha, 0);
+    dispEntry(CAMERA_3D, 0.0f, 0, yuka_disp, 0);
     return 0;
 }
 
@@ -248,7 +215,7 @@ static void yuka_init(void) {
             m->v[r][i] = r;
         }
     }
-    dispEntry(2, 0.0f, 0, yuka_capture, 0);
+    dispEntry(CAMERA_SHADOW, 0.0f, 0, yuka_capture, 0);
 }
 
 static void yuka_main(void) {
@@ -330,11 +297,11 @@ USER_FUNC(yuka_end) {
     DekaWork* w = get_ptr();
 
     smartFree(w->tex);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     w->tex->address = NULL;
 #endif
     smartFree(w->mesh);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     w->mesh->address = NULL;
 #endif
     mapGrpFlagOff("stg_b_yuka", 0x400001);
@@ -353,128 +320,129 @@ static void main_base(void) {
     s32 found;
 
     switch (w->state) {
-    case 1:
-        w->state = 2;
-        w->round = 1;
-        w->result = 0;
-        w->gaugeLen = 180.0f;
-        w->cursor = 0.0f;
-        create_timing();
-        w->gaugeState = 1;
-    case 2:
-        if (w->gaugeState != 3) {
-            break;
-        }
-        w->state = 3;
-        w->sfx = SFXON("SFX_BTL_SAC_DOKKAN1_1");
-    case 3:
-        if (w->gaugeState == 3) {
-            w->cursor += 0.1f * w->result + 0.8f;
-            psndSFX_pit(w->sfx, 683.0f * w->result + 4096.0f * w->cursor / w->gaugeLen);
-            if (w->cursor >= w->gaugeLen) {
-                w->cursor = 0.0f;
-                w->round++;
-                w->result++;
-                w->starState = 6;
-                psndSFXOff(w->sfx);
-                ev = evtEntry(nice_event, 0, 0x20);
-                v = w->result + 1;
-                ev->lwData[0] = v < 6 ? v : 6;
-                if (w->round > 5) {
-                    w->state = 5;
-                    w->gaugeState = 5;
-                } else {
-                    w->state = 4;
-                    w->timer = 30;
-                    w->offsetY = -40.0f;
-                    create_timing();
-                }
+        case 1:
+            w->state = 2;
+            w->round = 1;
+            w->result = 0;
+            w->gaugeLen = 180.0f;
+            w->cursor = 0.0f;
+            create_timing();
+            w->gaugeState = 1;
+        case 2:
+            if (w->gaugeState != 3) {
+                break;
             }
-        }
-        for (i = 0; i < 8; i++) {
-            idx[i] = i;
-            pos[i] = w->timing[i].pos;
-        }
-        for (i = 0; i < 7; i++) {
-            for (j = i + 1; j < 8; j++) {
-                f32 pj;
-                f32 pi;
-                pi = pos[i];
-                pj = pos[j];
-                if (pi > pj) {
-                    s32 ti = idx[i];
-                    pos[i] = pj;
-                    idx[i] = idx[j];
-                    idx[j] = ti;
-                    pos[j] = pi;
-                }
-            }
-        }
-        if (keyGetButtonTrg(0) & 0x100) {
-            for (i = 0; i < 8; i++) {
-                t = &w->timing[idx[i]];
-                if (t->state == 2 && w->cursor >= t->pos - 7.0f && w->cursor <= 7.0f + t->pos) {
-                    if (t->type == 1) {
-                        t->state = 3;
-                        t->hit = 1;
-                        psndSFXOn("SFX_BTL_SAC_DOKKAN2");
-                        BattleAudienceSoundHandBeat();
+            w->state = 3;
+            w->sfx = SFXON("SFX_BTL_SAC_DOKKAN1_1");
+        case 3:
+            if (w->gaugeState == 3) {
+                w->cursor += 0.1f * w->result + 0.8f;
+                psndSFX_pit(w->sfx, 683.0f * w->result + 4096.0f * w->cursor / w->gaugeLen);
+                if (w->cursor >= w->gaugeLen) {
+                    w->cursor = 0.0f;
+                    w->round++;
+                    w->result++;
+                    w->starState = 6;
+                    psndSFXOff(w->sfx);
+                    ev = evtEntry(nice_event, 0, 0x20);
+                    v = w->result + 1;
+                    ev->lwData[0] = v < 6 ? v : 6;
+                    if (w->round > 5) {
+                        w->state = 5;
+                        w->gaugeState = 5;
                     } else {
-                        w->result = 0;
-                        w->state = 5;
-                        w->gaugeState = 4;
-                        w->starState = 8;
-                        t->hit = 2;
-                        psndSFXOn("SFX_BTL_SAC_DOKKAN3");
-                        BattleAudienceSoundBooing();
-                        psndSFXOff(w->sfx);
+                        w->state = 4;
+                        w->timer = 30;
+                        w->offsetY = -40.0f;
+                        create_timing();
                     }
-                    break;
                 }
             }
-            if (i == 8) {
-                found = 0;
-                for (j = 0; j < 8; j++) {
-                    DekaTiming* t2 = &w->timing[idx[j]]; t = t2;
-                    if (t->state == 2 && t->type == 1) {
-                        w->state = 5;
-                        w->gaugeState = 4;
-                        t->hit = 2;
-                        psndSFXOn("SFX_BTL_SAC_DOKKAN3");
-                        BattleAudienceSoundBooing();
-                        psndSFXOff(w->sfx);
-                        found = 1;
+            for (i = 0; i < 8; i++) {
+                idx[i] = i;
+                pos[i] = w->timing[i].pos;
+            }
+            for (i = 0; i < 7; i++) {
+                for (j = i + 1; j < 8; j++) {
+                    f32 pj;
+                    f32 pi;
+                    pi = pos[i];
+                    pj = pos[j];
+                    if (pi > pj) {
+                        s32 ti = idx[i];
+                        pos[i] = pj;
+                        idx[i] = idx[j];
+                        idx[j] = ti;
+                        pos[j] = pi;
+                    }
+                }
+            }
+            if (keyGetButtonTrg(0) & PAD_BUTTON_A) {
+                for (i = 0; i < 8; i++) {
+                    t = &w->timing[idx[i]];
+                    if (t->state == 2 && w->cursor >= t->pos - 7.0f && w->cursor <= 7.0f + t->pos) {
+                        if (t->type == 1) {
+                            t->state = 3;
+                            t->hit = 1;
+                            psndSFXOn("SFX_BTL_SAC_DOKKAN2");
+                            BattleAudienceSoundHandBeat();
+                        } else {
+                            w->result = 0;
+                            w->state = 5;
+                            w->gaugeState = 4;
+                            w->starState = 8;
+                            t->hit = 2;
+                            psndSFXOn("SFX_BTL_SAC_DOKKAN3");
+                            BattleAudienceSoundBooing();
+                            psndSFXOff(w->sfx);
+                        }
                         break;
                     }
                 }
-                if (found == 1) {
+                if (i == 8) {
+                    found = 0;
+                    for (j = 0; j < 8; j++) {
+                        DekaTiming* t2 = &w->timing[idx[j]];
+                        t = t2;
+                        if (t->state == 2 && t->type == 1) {
+                            w->state = 5;
+                            w->gaugeState = 4;
+                            t->hit = 2;
+                            psndSFXOn("SFX_BTL_SAC_DOKKAN3");
+                            BattleAudienceSoundBooing();
+                            psndSFXOff(w->sfx);
+                            found = 1;
+                            break;
+                        }
+                    }
+                    if (found == 1) {
+                        break;
+                    }
+                }
+            }
+            for (i = 0; i < 8; i++) {
+                t = &w->timing[idx[i]];
+                if (t->state == 2 && t->type != 2 && w->cursor > 7.0f + t->pos) {
+                    w->state = 5;
+                    w->gaugeState = 4;
+                    t->hit = 2;
+                    psndSFXOn("SFX_BTL_SAC_DOKKAN3");
+                    BattleAudienceSoundBooing();
+                    psndSFXOff(w->sfx);
                     break;
                 }
             }
-        }
-        for (i = 0; i < 8; i++) {
-            t = &w->timing[idx[i]];
-            if (t->state == 2 && t->type != 2 && w->cursor > 7.0f + t->pos) {
-                w->state = 5;
-                w->gaugeState = 4;
-                t->hit = 2;
-                psndSFXOn("SFX_BTL_SAC_DOKKAN3");
-                BattleAudienceSoundBooing();
-                psndSFXOff(w->sfx);
-                break;
+            break;
+        case 4:
+            w->timer--;
+            w->offsetY = intplGetValue(0, -40.0f, 0.0f, 30 - w->timer, 30);
+            if (w->timer <= 0) {
+                w->state = 3;
+                w->sfx = SFXON("SFX_BTL_SAC_DOKKAN1_1");
             }
-        }
-        break;
-    case 4:
-        w->timer--;
-        w->offsetY = intplGetValue(0, 30 - w->timer, 30, -40.0f, 0.0f);
-        if (w->timer <= 0) {
-            w->state = 3;
-            w->sfx = SFXON("SFX_BTL_SAC_DOKKAN1_1");
-        }
-        break;
-    case 5:
-        break;
+            break;
+        case 5:
+            break;
     }
 }
 
@@ -482,73 +450,74 @@ void main_gauge(void) {
     DekaWork* w = get_ptr();
 
     switch (w->gaugeState) {
-    case 0:
-        break;
-    case 1:
-        w->gaugeState = 2;
-        w->gaugeTimer = 0;
-        w->gaugePos = (Vec){-1000.0f, 100.0f, 0.0f};
-        w->gaugeW = 500.0f;
-        w->alpha = 255;
-    case 2:
-        w->gaugeTimer++;
-        w->gaugePos.x = intplGetValue(4, w->gaugeTimer, 30, -1000.0f, 0.0f);
-        if (w->gaugeTimer >= 30) {
-            w->gaugeState = 3;
+        case 0:
+            break;
+        case 1:
+            w->gaugeState = 2;
             w->gaugeTimer = 0;
-        }
-        break;
-    case 3:
-        w->gaugeTimer = 0;
-        break;
-    case 4:
-        w->gaugeTimer++;
-        if (w->gaugeTimer % 12 >= 0 && w->gaugeTimer % 12 <= 5) {
-            w->alpha = 0;
-        } else {
+            w->gaugePos = (Vec){-1000.0f, 100.0f, 0.0f};
+            w->gaugeW = 500.0f;
             w->alpha = 255;
-        }
-        if (w->gaugeTimer >= 80) {
-            w->gaugeState = 5;
+        case 2:
+            w->gaugeTimer++;
+            w->gaugePos.x = intplGetValue(4, -1000.0f, 0.0f, w->gaugeTimer, 30);
+            if (w->gaugeTimer >= 30) {
+                w->gaugeState = 3;
+                w->gaugeTimer = 0;
+            }
+            break;
+        case 3:
             w->gaugeTimer = 0;
-            w->alpha = 255;
-        }
-        break;
-    case 5:
-        w->gaugeTimer++;
-        w->gaugePos.x = intplGetValue(4, w->gaugeTimer, 30, 0.0f, -1000.0f);
-        if (w->gaugeTimer >= 30) {
-            w->gaugeState = 3;
-            w->gaugeTimer = 0;
-        }
-        break;
-    case 6:
-        break;
+            break;
+        case 4:
+            w->gaugeTimer++;
+            if (w->gaugeTimer % 12 >= 0 && w->gaugeTimer % 12 <= 5) {
+                w->alpha = 0;
+            } else {
+                w->alpha = 255;
+            }
+            if (w->gaugeTimer >= 80) {
+                w->gaugeState = 5;
+                w->gaugeTimer = 0;
+                w->alpha = 255;
+            }
+            break;
+        case 5:
+            w->gaugeTimer++;
+            w->gaugePos.x = intplGetValue(4, 0.0f, -1000.0f, w->gaugeTimer, 30);
+            if (w->gaugeTimer >= 30) {
+                w->gaugeState = 3;
+                w->gaugeTimer = 0;
+            }
+            break;
+        case 6:
+            break;
     }
 }
 
+// inlining off for main_timing, as in the original (the object differs without it)
 #pragma dont_inline on
 void main_timing(s32 idx) {
     DekaWork* w = get_ptr();
     DekaTiming* t = &w->timing[idx];
 
     switch (t->state) {
-    case 0:
-        t->type = 0;
-        break;
-    case 2:
-        t->alpha = 255;
-        t->off = (Vec){0.0f, 0.0f, 0.0f};
-        break;
-    case 3:
-        t->state = 4;
-        t->alpha = 255;
-        t->timer = 0;
-        break;
-    case 4:
-        break;
-    case 5:
-        break;
+        case 0:
+            t->type = 0;
+            break;
+        case 2:
+            t->alpha = 255;
+            t->off = (Vec){0.0f, 0.0f, 0.0f};
+            break;
+        case 3:
+            t->state = 4;
+            t->alpha = 255;
+            t->timer = 0;
+            break;
+        case 4:
+            break;
+        case 5:
+            break;
     }
 }
 #pragma dont_inline reset
@@ -562,177 +531,178 @@ static void main_star(void) {
     s32 k;
 
     switch (w->starState) {
-    case 1:
-        w->starState = 2;
-        w->starTimer = 0;
-        w->eff = effStarStoneEntry(0, 0.0f, -1000.0f, 0.0f, 1.0f);
-        BtlUnit_GetPos(mario, &w->starPos.x, &w->starPos.y, &w->starPos.z);
-        w->starPos.y += mario->mSizeMultiplier * mario->mHeight + 37.0f;
-        w->from = w->starPos;
-        w->to = w->starPos;
-        w->to.y += 50.0f;
-        w->to.z += -1.0f;
-        w->scale = (Vec){0.0f, 0.0f, 0.0f};
-        w->rot = (Vec){0.0f, 0.0f, 0.0f};
-    case 2:
-        w->starTimer++;
-        if (w->starTimer <= 100) {
-            w->starPos.x = INTPL(0, w->starTimer, 100, w->from.x, w->to.x);
-            w->starPos.y = INTPL(0, w->starTimer, 100, w->from.y, w->to.y);
-            w->starPos.z = INTPL(0, w->starTimer, 100, w->from.z, w->to.z);
-            w->scale.x = w->scale.y = w->scale.z = INTPL(0, w->starTimer, 100, 0.0f, 2.0f);
-        } else {
-            w->starPos.x = w->to.x;
-            w->starPos.y = w->to.y;
-            w->starPos.z = w->to.z;
-            w->scale.x = w->scale.y = w->scale.z = 2.0f;
-        }
-        w->rot.y = INTPL(4, w->starTimer, 120, 0.0f, 2160.0f);
-        if (w->starTimer >= 120) {
-            w->starState = 3;
+        case 1:
+            w->starState = 2;
             w->starTimer = 0;
+            w->eff = effStarStoneEntry(0, 0.0f, -1000.0f, 0.0f, 1.0f);
+            BtlUnit_GetPos(mario, &w->starPos.x, &w->starPos.y, &w->starPos.z);
+            w->starPos.y += mario->sizeMultiplier * mario->height + 37.0f;
             w->from = w->starPos;
-            w->to.x = -100.0f;
-            w->to.y = 30.0f;
-            w->to.z = 50.0f;
-        }
-        break;
-    case 3:
-        w->starTimer++;
-        w->starPos.x = INTPL(4, w->starTimer, 60, w->from.x, w->to.x);
-        w->starPos.y = INTPL(4, w->starTimer, 60, w->from.y, w->to.y);
-        w->starPos.z = INTPL(4, w->starTimer, 60, w->from.z, w->to.z);
-        if (w->starTimer >= 60) {
-            w->starState = 4;
+            w->to = w->starPos;
+            w->to.y += 50.0f;
+            w->to.z += -1.0f;
+            w->scale = (Vec){0.0f, 0.0f, 0.0f};
+            w->rot = (Vec){0.0f, 0.0f, 0.0f};
+        case 2:
+            w->starTimer++;
+            if (w->starTimer <= 100) {
+                w->starPos.x = intplGetValue(0, w->from.x, w->to.x, w->starTimer, 100);
+                w->starPos.y = intplGetValue(0, w->from.y, w->to.y, w->starTimer, 100);
+                w->starPos.z = intplGetValue(0, w->from.z, w->to.z, w->starTimer, 100);
+                w->scale.x = w->scale.y = w->scale.z = intplGetValue(0, 0.0f, 2.0f, w->starTimer, 100);
+            } else {
+                w->starPos.x = w->to.x;
+                w->starPos.y = w->to.y;
+                w->starPos.z = w->to.z;
+                w->scale.x = w->scale.y = w->scale.z = 2.0f;
+            }
+            w->rot.y = intplGetValue(4, 0.0f, 2160.0f, w->starTimer, 120);
+            if (w->starTimer >= 120) {
+                w->starState = 3;
+                w->starTimer = 0;
+                w->from = w->starPos;
+                w->to.x = -100.0f;
+                w->to.y = 30.0f;
+                w->to.z = 50.0f;
+            }
+            break;
+        case 3:
+            w->starTimer++;
+            w->starPos.x = intplGetValue(4, w->from.x, w->to.x, w->starTimer, 60);
+            w->starPos.y = intplGetValue(4, w->from.y, w->to.y, w->starTimer, 60);
+            w->starPos.z = intplGetValue(4, w->from.z, w->to.z, w->starTimer, 60);
+            if (w->starTimer >= 60) {
+                w->starState = 4;
+                w->starTimer = 0;
+            }
+            break;
+        case 6:
+            w->starState = 7;
             w->starTimer = 0;
+            w->sclFrom = w->sclTo = w->scale.x;
+            w->sclTo += 1.0f;
+            psndSFXOn("SFX_BTL_SAC_DOKKAN4");
+            if (num >= 1 && num <= 49) {
+                BattleAudienceSoundCallKind(1);
+            }
+            if (num >= 50 && num <= 99) {
+                BattleAudienceSoundCallKind(1);
+                BattleAudienceSoundWhistleKind(1);
+            }
+            if (num >= 100 && num <= 149) {
+                BattleAudienceSoundCallKind(2);
+                BattleAudienceSoundWhistleKind(2);
+            }
+            if (num >= 150) {
+                BattleAudienceSoundCallKind(2);
+                BattleAudienceSoundWhistleKind(3);
+            }
+        case 7: {
+            s32 tbl[11] = {1, 2, 0, 2, 3, 1, 3, 4, 2, 4, 5};
+            w->starTimer++;
+            w->scale.x = w->scale.y = w->scale.z = intplGetValue(4, w->sclFrom, w->sclTo, tbl[w->starTimer / 4], 5);
+            w->starPos.y = 12.5f * (w->scale.y - 2.0f) + 30.0f;
+            if (w->starTimer >= 43) {
+                w->starState = 5;
+                w->starTimer = 0;
+                w->scale.x = w->scale.y = w->scale.z = w->sclTo;
+            }
+            break;
         }
-        break;
-    case 6:
-        w->starState = 7;
-        w->starTimer = 0;
-        w->sclFrom = w->sclTo = w->scale.x;
-        w->sclTo += 1.0f;
-        psndSFXOn("SFX_BTL_SAC_DOKKAN4");
-        if (num >= 1 && num <= 49) {
-            BattleAudienceSoundCallKind(1);
-        }
-        if (num >= 50 && num <= 99) {
-            BattleAudienceSoundCallKind(1);
-            BattleAudienceSoundWhistleKind(1);
-        }
-        if (num >= 100 && num <= 149) {
-            BattleAudienceSoundCallKind(2);
-            BattleAudienceSoundWhistleKind(2);
-        }
-        if (num >= 150) {
-            BattleAudienceSoundCallKind(2);
-            BattleAudienceSoundWhistleKind(3);
-        }
-    case 7: {
-        s32 tbl[11] = {1, 2, 0, 2, 3, 1, 3, 4, 2, 4, 5};
-        w->starTimer++;
-        w->scale.x = w->scale.y = w->scale.z = INTPL(4, tbl[w->starTimer / 4], 5, w->sclFrom, w->sclTo);
-        w->starPos.y = 12.5f * (w->scale.y - 2.0f) + 30.0f;
-        if (w->starTimer >= 43) {
-            w->starState = 5;
+        case 8:
+            w->starState = 9;
             w->starTimer = 0;
-            w->scale.x = w->scale.y = w->scale.z = w->sclTo;
+            w->sclFrom = w->sclTo = w->scale.x;
+            w->sclTo = 2.0f;
+        case 9: {
+            s32 tbl[11] = {1, 2, 0, 2, 3, 1, 3, 4, 2, 4, 5};
+            w->starTimer++;
+            w->scale.x = w->scale.y = w->scale.z = intplGetValue(4, w->sclFrom, w->sclTo, tbl[w->starTimer / 4], 5);
+            w->starPos.y = 12.5f * (w->scale.y - 2.0f) + 30.0f;
+            if (w->starTimer >= 43) {
+                w->starState = 5;
+                w->starTimer = 0;
+                w->scale.x = w->scale.y = w->scale.z = w->sclTo;
+            }
+            break;
         }
-        break;
-    }
-    case 8:
-        w->starState = 9;
-        w->starTimer = 0;
-        w->sclFrom = w->sclTo = w->scale.x;
-        w->sclTo = 2.0f;
-    case 9: {
-        s32 tbl[11] = {1, 2, 0, 2, 3, 1, 3, 4, 2, 4, 5};
-        w->starTimer++;
-        w->scale.x = w->scale.y = w->scale.z = INTPL(4, tbl[w->starTimer / 4], 5, w->sclFrom, w->sclTo);
-        w->starPos.y = 12.5f * (w->scale.y - 2.0f) + 30.0f;
-        if (w->starTimer >= 43) {
-            w->starState = 5;
+        case 10:
+            w->starState = 11;
+            w->to.y = w->starPos.y;
+            w->velY = 5.0f;
             w->starTimer = 0;
-            w->scale.x = w->scale.y = w->scale.z = w->sclTo;
-        }
-        break;
-    }
-    case 10:
-        w->starState = 11;
-        w->to.y = w->starPos.y;
-        w->velY = 5.0f;
-        w->starTimer = 0;
-        w->starCount = 0;
-    case 11:
-        w->starPos.y += w->velY;
-        w->velY += -0.5f;
-        if (w->starPos.y < w->to.y) {
-            f32 shake[6] = {1.0f, 1.3f, 2.0f, 2.6f, 3.3f, 3.8f};
-            f32 amp[6] = {1.0f, 1.3f, 2.0f, 2.6f, 3.3f, 3.8f};
-            w->starCount++;
-            btl_camera_shake_h(0, w->starCount * shake[w->result], 0.0f, 20, 0);
-            psndSFXOn("SFX_BTL_SAC_DOKKAN5");
-            for (j = 0; j < 2; j++) {
-                for (k = 0; k < 6; k++) {
-                    if (w->waveActive[k] == 0) {
-                        w->waveActive[k] = 1;
-                        w->waveSpeed[k] = 2.0f;
-                        if (j == 1) {
-                            w->waveSpeed[k] *= -1.0f;
+            w->starCount = 0;
+        case 11:
+            w->starPos.y += w->velY;
+            w->velY += -0.5f;
+            if (w->starPos.y < w->to.y) {
+                f32 shake[6] = {1.0f, 1.3f, 2.0f, 2.6f, 3.3f, 3.8f};
+                f32 amp[6] = {1.0f, 1.3f, 2.0f, 2.6f, 3.3f, 3.8f};
+                w->starCount++;
+                btl_camera_shake_h(0, w->starCount * shake[w->result], 0.0f, 20, 0);
+                psndSFXOn("SFX_BTL_SAC_DOKKAN5");
+                for (j = 0; j < 2; j++) {
+                    for (k = 0; k < 6; k++) {
+                        if (w->waveActive[k] == 0) {
+                            w->waveActive[k] = 1;
+                            w->waveSpeed[k] = 2.0f;
+                            if (j == 1) {
+                                w->waveSpeed[k] *= -1.0f;
+                            }
+                            if (j == 0) {
+                                w->waveIdx[k] = 42;
+                            } else {
+                                w->waveIdx[k] = 41;
+                            }
+                            w->wavePos[k] = 43.0f;
+                            w->waveAmp[k] = w->starCount * amp[w->result] + 4.0f;
+                            break;
                         }
-                        if (j == 0) {
-                            w->waveIdx[k] = 42;
-                        } else {
-                            w->waveIdx[k] = 41;
-                        }
-                        w->wavePos[k] = 43.0f;
-                        w->waveAmp[k] = w->starCount * amp[w->result] + 4.0f;
-                        break;
                     }
                 }
+                if (w->starCount >= 6) {
+                    w->starState = 12;
+                    w->starTimer = 30;
+                    w->to = w->starPos;
+                    w->from = w->to;
+                    w->to.y += 40.0f;
+                } else {
+                    f32 h = 4.0f * w->starCount + 20.0f;
+                    w->starPos.y = w->to.y;
+                    w->velY = 0.5f * h * h / (2.0f * h);
+                }
             }
-            if (w->starCount >= 6) {
-                w->starState = 12;
+            break;
+        case 12:
+            w->starTimer--;
+            w->starPos.y = intplGetValue(4, w->from.y, w->to.y, 30 - w->starTimer, 30);
+            if (w->starTimer <= 0) {
+                w->starState = 13;
+                w->starTimer = 0;
+            }
+            break;
+        case 13:
+            w->starTimer++;
+            if (w->starTimer > 30) {
                 w->starTimer = 30;
-                w->to = w->starPos;
-                w->from = w->to;
-                w->to.y += 40.0f;
-            } else {
-                f32 h = 4.0f * w->starCount + 20.0f;
-                w->starPos.y = w->to.y;
-                w->velY = 0.5f * h * h / (2.0f * h);
             }
-        }
-        break;
-    case 12:
-        w->starTimer--;
-        w->starPos.y = INTPL(4, 30 - w->starTimer, 30, w->from.y, w->to.y);
-        if (w->starTimer <= 0) {
-            w->starState = 13;
-            w->starTimer = 0;
-        }
-        break;
-    case 13:
-        w->starTimer++;
-        if (w->starTimer > 30) {
-            w->starTimer = 30;
-        }
-        alpha = INTPL(0, w->starTimer, 30, 255.0f, 0.0f);
-        break;
+            alpha = intplGetValue(0, 255.0f, 0.0f, w->starTimer, 30);
+            break;
     }
     if (w->eff) {
-        StarEffWork* e = w->eff->userdata;
-        e->pos.x = w->starPos.x;
-        e->pos.y = w->starPos.y;
-        e->pos.z = w->starPos.z;
-        e->rot.x = w->rot.x;
-        e->rot.y = w->rot.y;
-        e->rot.z = w->rot.z;
-        e->scl = 1.5f * w->scale.x;
-        e->alpha = alpha;
+        EffStarStoneWork* e = w->eff->userdata;
+        e->position.x = w->starPos.x;
+        e->position.y = w->starPos.y;
+        e->position.z = w->starPos.z;
+        e->spinY = w->rot.x;
+        e->rotY = w->rot.y;
+        e->tiltZ = w->rot.z;
+        e->scale = 1.5f * w->scale.x;
+        e->a = alpha;
     }
 }
 
+// inlining off for main_enemy, as in the original (the object differs without it)
 #pragma dont_inline on
 void main_enemy(void) {
     BattleWork* bw = _battleWorkPointer;
@@ -741,9 +711,9 @@ void main_enemy(void) {
     s32 i;
     BattleUnit* unit;
 
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         unit = BattleGetUnitPtr(bw, i);
-        if (unit && unit->mAlliance == 1) {
+        if (unit && unit->alliance == 1) {
             main_enemy_sub(unit, &n);
         }
     }
@@ -765,9 +735,9 @@ void main_enemy_sub(BattleUnit* unit, s32* n) {
     BattleUnitPart* part;
     s32 i2;
 
-    unit->mRotationOffset = unit->offsetCenter;
+    unit->rotationOffset = unit->offsetCenter;
     w->enemyVel[*n].y -= 1.25f;
-    x = unit->mPosition.x;
+    x = unit->position.x;
     if (x >= 250.0f) {
         xc = 250.0f;
     } else if (x <= 0.0f) {
@@ -780,38 +750,38 @@ void main_enemy_sub(BattleUnit* unit, s32* n) {
         x0 = step * i + w->min.x;
         if (xc >= x0 && xc < x0 + step) {
             y = (xc - x0) / step * (m->disp[0][i + 1].y - m->disp[0][i].y) + m->disp[0][i].y;
-            if (unit->mPosition.y < y) {
-                if ((unit->mAttributeFlags & 2) && y < 120.0f) {
+            if (unit->position.y < y) {
+                if ((unit->attributeFlags & UNIT_ATTR_CEILING) && y < 120.0f) {
                     break;
                 }
                 if (m->vel[0][i].y > 0.0f) {
                     if (w->enemyVel[*n].y < 0.0f) {
                         w->enemyVel[*n].y = 0.0f;
                     }
-                    unit->mPosition.y = y;
-                    unit->mRotation.z = 0.0f;
+                    unit->position.y = y;
+                    unit->rotation.z = 0.0f;
                     w->enemyRot[*n] = 0.0f;
                     w->enemyVel[*n].y += 0.5f * m->vel[0][i].y;
                     i2 = BtlUnit_GetBodyPartsId(unit);
                     part = BtlUnit_GetPartsPtr(unit, i2);
-                    if (part->attributes & 0x20000000) {
+                    if (part->attributes & PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS) {
                         continue;
                     }
-                    if (part->attributes & 0x4000) {
+                    if (part->attributes & PART_ATTR_EVASIVE) {
                         continue;
                     }
-                    if (!(unit->mAttributeFlags & 0x20000) && !BtlUnit_CheckStatus(unit, 0x1B)) {
+                    if (!(unit->attributeFlags & UNIT_ATTR_INACTIVE) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
                         BtlUnit_SetAnimType(part, 0x27);
                     }
-                    effSmallStarEntry(0, 2, xc, unit->mPosition.y, unit->mPosition.z, 0.0f, -1.0f, 0.0f);
-                    BtlUnit_snd_se(unit, unit->mKindParams->damageSfxName, -250000000, 0);
-                    if (unit->mAttributeFlags & 0x200000) {
+                    effSmallStarEntry(0, 2, xc, unit->position.y, unit->position.z, 0.0f, -1.0f, 0.0f);
+                    BtlUnit_snd_se(unit, unit->kindParams->damageSfxName, -250000000, 0);
+                    if (unit->attributeFlags & UNIT_ATTR_NO_KNOCKBACK_POSE) {
                         continue;
                     }
-                    if (unit->mAttributeFlags & 0x20000) {
+                    if (unit->attributeFlags & UNIT_ATTR_INACTIVE) {
                         continue;
                     }
-                    if (BtlUnit_CheckStatus(unit, 0x1B)) {
+                    if (BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
                         continue;
                     }
                     w->enemyRot[*n] = 20.0f;
@@ -822,16 +792,16 @@ void main_enemy_sub(BattleUnit* unit, s32* n) {
             }
         }
     }
-    unit->mPosition.x = x;
-    unit->mPosition.x += w->enemyVel[*n].x;
-    unit->mPosition.y += w->enemyVel[*n].y;
-    unit->mPosition.z += w->enemyVel[*n].z;
-    unit->mRotation.z += w->enemyRot[*n];
-    if (unit->mPosition.y < unit->mHomePosition.y) {
-        unit->mPosition.y = unit->mHomePosition.y;
+    unit->position.x = x;
+    unit->position.x += w->enemyVel[*n].x;
+    unit->position.y += w->enemyVel[*n].y;
+    unit->position.z += w->enemyVel[*n].z;
+    unit->rotation.z += w->enemyRot[*n];
+    if (unit->position.y < unit->homePosition.y) {
+        unit->position.y = unit->homePosition.y;
         w->enemyVel[*n].y = 0.0f;
-        if (!(unit->mAttributeFlags & 0x20000) && !BtlUnit_CheckStatus(unit, 0x1B)) {
-            unit->mRotation.z = 0.0f;
+        if (!(unit->attributeFlags & UNIT_ATTR_INACTIVE) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
+            unit->rotation.z = 0.0f;
             w->enemyRot[*n] = 0.0f;
         }
     }
@@ -842,7 +812,7 @@ void main_enemy_sub(BattleUnit* unit, s32* n) {
 USER_FUNC(end_deka) {
     DekaWork* w = get_ptr();
 
-    effDelete(((StarEffWork*)w->eff->userdata)->sub);
+    effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
     return 2;
 }
@@ -865,21 +835,21 @@ static void disp_2D(CameraId cam, void* param) {
     if (w->gaugeState >= 2 && w->gaugeState <= 5) {
         col = (GXColor){0xFF, 0xFF, 0xFF, w->alpha};
         PSMTXTrans(m, w->gaugePos.x - 0.5f * w->gaugeW - 8.0f, w->gaugePos.y, w->gaugePos.z);
-        TEXPLANE(m, BTL_TEX(0x43), col);
+        btlDispTexPlane2(m, BTL_TEX(0x43), col, 0);
         PSMTXScale(sc, w->gaugeW / 4.0f, 1.0f, 1.0f);
         PSMTXTrans(tr, w->gaugePos.x, w->gaugePos.y, w->gaugePos.z);
         PSMTXConcat(tr, sc, m);
-        TEXPLANE(m, BTL_TEX(0x44), col);
+        btlDispTexPlane2(m, BTL_TEX(0x44), col, 0);
         PSMTXScale(sc, -1.0f, 1.0f, 1.0f);
         PSMTXTrans(tr, 8.0f + (0.5f * w->gaugeW + w->gaugePos.x), w->gaugePos.y, w->gaugePos.z);
         PSMTXConcat(tr, sc, m);
-        TEXPLANE(m, BTL_TEX(0x43), col);
+        btlDispTexPlane2(m, BTL_TEX(0x43), col, 0);
     }
     if (w->gaugeState >= 2 && w->gaugeState <= 5) {
         ratio = w->cursor / w->gaugeLen;
         if (ratio >= 0.0f && ratio <= 1.0f) {
             btlDispGXInit2DRasta();
-            GXLoadPosMtxImm(camGetPtr(8)->view, 0);
+            GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
             btlDispGXQuads2DRasta(left, 8.0f + w->gaugePos.y, ratio * (right - left) + left, w->gaugePos.y - 8.0f, 0xFF, 0, 0, w->alpha);
         }
     }
@@ -901,7 +871,7 @@ static void disp_2D(CameraId cam, void* param) {
                 PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
                 PSMTXTrans(tr, x, 40.0f + (w->offsetY + (w->gaugePos.y + t->off.y)), w->gaugePos.z + t->off.z);
                 PSMTXConcat(tr, sc, m);
-                TEXPLANE(m, BTL_TEX(0x2C), col);
+                btlDispTexPlane2(m, BTL_TEX(0x2C), col, 0);
             }
         }
         for (i = 0; i < 8; i++) {
@@ -928,21 +898,21 @@ static void disp_2D(CameraId cam, void* param) {
                     PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
                     PSMTXTrans(tr, x, w->offsetY + (w->gaugePos.y + t->off.y), w->gaugePos.z + t->off.z);
                     PSMTXConcat(tr, sc, m);
-                    TEXPLANE(m, BTL_TEX(0x2C), col);
+                    btlDispTexPlane2(m, BTL_TEX(0x2C), col, 0);
                 }
             }
             PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
             PSMTXTrans(tr, x, w->gaugePos.y + t->off.y - 40.0f, w->gaugePos.z + t->off.z);
             PSMTXConcat(tr, sc, m);
             switch (t->hit) {
-            case 0:
-                break;
-            case 1:
-                TEXPLANE(m, BTL_TEX(0x3E), col);
-                break;
-            case 2:
-                TEXPLANE(m, BTL_TEX(0x3F), col);
-                break;
+                case 0:
+                    break;
+                case 1:
+                    btlDispTexPlane2(m, BTL_TEX(0x3E), col, 0);
+                    break;
+                case 2:
+                    btlDispTexPlane2(m, BTL_TEX(0x3F), col, 0);
+                    break;
             }
         }
     }
@@ -968,7 +938,11 @@ void yuka_capture(CameraId cam, void* param) {
     camera->cameraUp = (Vec){0.0f, 0.0f, -1.0f};
     camera->cameraPos = c;
     camera->cameraAt = camera->cameraPos;
-    { f32 t = tan(0.21816616f); f32 h = w->h0; camera->cameraPos.y += (f32)w->h0 / 2 / t; }
+    {
+        f32 t = tan(0.21816616f);
+        f32 h = w->h0;
+        camera->cameraPos.y += (f32)w->h0 / 2 / t;
+    }
     C_MTXLookAt(camera->view, &camera->cameraPos, &camera->cameraUp, &camera->cameraAt);
     C_MTXPerspective(camera->projection, 25.0f, (f32)w->w0 / (f32)w->h0, 1.0f, 32767.0f);
     camera->projType = 0;
@@ -986,7 +960,7 @@ void yuka_capture(CameraId cam, void* param) {
 }
 
 EVT_BEGIN(marioAttackEvent_Deka)
-    CALL(btlevtcmd_GetUnitId, -4, LW(14))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(14))
     CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
     CALL(btlevtcmd_CheckActStatus, LW(14), LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -996,10 +970,10 @@ EVT_BEGIN(marioAttackEvent_Deka)
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, -2)
-    CALL(btlevtcmd_CommandGetWeaponAddress, -2, LW(0))
+    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
+    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_WeaponAftereffect, LW(0))
     CALL(btlevtcmd_reset_move_color_lv_all)
     BEGIN_SIBLING_EVENT
@@ -1007,16 +981,16 @@ EVT_BEGIN(marioAttackEvent_Deka)
     END_SIBLING_EVENT
     CALL_CHILD(sac_start_camera_evt)
     WAIT_MS(500)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL_CHILD(sac_mario_item_on_evt)
     WAIT_MS(500)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START2"), -250000000, 0, LW(11))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START2"), EVT_NULLPTR, 0, LW(11))
     CALL(star_stone_appear)
     BEGIN_SIBLING_EVENT
         CALL_CHILD(sac_start_stardust)
     END_SIBLING_EVENT
     WAIT_FRAMES(100)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_SAC_START3"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_snd_sfxoff, LW(11))
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(40)
@@ -1025,15 +999,15 @@ EVT_BEGIN(marioAttackEvent_Deka)
     CALL_CHILD(sac_mario_back_home)
     CALL(wait_star_stone_take_on)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 44)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 44)
         CALL(get_ride_pos, 0, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_JumpSetting, -2, 30, 0, FLOAT(0.39941406f))
-        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 30, -1)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_I_Y"))
+        CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 30, 0, FLOAT(0.39941406f))
+        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
     END_SIBLING_EVENT
     BEGIN_SIBLING_EVENT
         IF_INT_NOT_EQUAL(LW(14), -1)
-            CALL(btlevtcmd_GetUnitKind, -4, LW(0))
+            CALL(btlevtcmd_GetUnitKind, BTL_UNIT_PARTNER, LW(0))
             IF_INT_EQUAL(LW(0), 228)
                 LOOP(0)
                     CALL(btlevtcmd_SetUnitWork, LW(14), 3, 1)
@@ -1061,7 +1035,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
             WAIT_FRAMES(1)
             CALL(get_ride_pos, 0, LW(0), LW(1), LW(2))
             ADD(LW(2), FLOAT(5.0f))
-            CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             IF_INT_NOT_EQUAL(LW(14), -1)
                 CALL(get_ride_pos, 1, LW(0), LW(1), LW(2))
                 CALL(btlevtcmd_SetPos, LW(14), LW(0), LW(1), LW(2))
@@ -1086,11 +1060,11 @@ EVT_BEGIN(marioAttackEvent_Deka)
     END_INLINE_EVENT
     WAIT_MS(500)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 44)
-        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_JumpSetting, -2, 30, 0, FLOAT(0.39941406f))
-        CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 30, -1)
-        CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 44)
+        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 30, 0, FLOAT(0.39941406f))
+        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
     END_SIBLING_EVENT
     BEGIN_SIBLING_EVENT
         IF_INT_NOT_EQUAL(LW(14), -1)
@@ -1103,7 +1077,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
     END_SIBLING_EVENT
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(yuka_end)
     CALL(btlevtcmd_SacBgsetMove, 1)
     CALL(end_deka)
@@ -1111,17 +1085,17 @@ EVT_BEGIN(marioAttackEvent_Deka)
     CALL(btlevtcmd_SacBgsetMove, 1)
 #endif
     IF_INT_NOT_EQUAL(LW(14), -1)
-        CALL(btlevtcmd_GetUnitKind, -4, LW(0))
+        CALL(btlevtcmd_GetUnitKind, BTL_UNIT_PARTNER, LW(0))
         IF_INT_EQUAL(LW(0), 228)
             CALL(btlevtcmd_SetUnitWork, LW(14), 3, 0)
         END_IF
     END_IF
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(yuka_end)
     CALL(end_deka)
 #endif
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1133,13 +1107,13 @@ EVT_BEGIN(dmg_evt)
         RETURN
     END_IF
     IF_INT_LESS_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_CheckAttribute, LW(3), 2, LW(0))
+        CALL(btlevtcmd_CheckAttribute, LW(3), UNIT_ATTR_CEILING, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             GOTO(30)
         END_IF
-        CALL(btlevtcmd_CheckAttribute, LW(3), 4, LW(0))
+        CALL(btlevtcmd_CheckAttribute, LW(3), UNIT_ATTR_FLOATING, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), 2097152, LW(0))
+            CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), PART_ATTR_HAMMERLIKE_CANNOT_TARGET, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
                 GOTO(30)
             END_IF
@@ -1147,7 +1121,7 @@ EVT_BEGIN(dmg_evt)
         GOTO(20)
     END_IF
     IF_INT_LESS_OR_EQUAL(LW(10), 3)
-        CALL(btlevtcmd_CheckAttribute, LW(3), 2, LW(0))
+        CALL(btlevtcmd_CheckAttribute, LW(3), UNIT_ATTR_CEILING, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             GOTO(30)
         END_IF
@@ -1155,9 +1129,9 @@ EVT_BEGIN(dmg_evt)
     END_IF
     GOTO(20)
     LABEL(20)
-    CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), 16384, LW(0))
+    CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), PART_ATTR_EVASIVE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CommandCheckDamage, -3, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), 256, LW(5))
     END_IF
     LABEL(30)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -1167,15 +1141,15 @@ EVT_END()
 
 // Position writes go through a local FIFO pointer (keeps lis 0xcc01 ahead of the loop counters);
 // components are read z, y, x like GXPosition3f32's argument evaluation.
-#define YUKA_POSITION(fifo, v)        \
-    {                                 \
-        f32 _x, _y, _z;               \
-        _z = (v)->z;                  \
-        _y = (v)->y;                  \
-        _x = (v)->x;                  \
-        (fifo)->f32 = _x;             \
-        (fifo)->f32 = _y;             \
-        (fifo)->f32 = _z;             \
+#define YUKA_POSITION(fifo, v) \
+    {                          \
+        f32 _x, _y, _z;        \
+        _z = (v)->z;           \
+        _y = (v)->y;           \
+        _x = (v)->x;           \
+        (fifo)->f32 = _x;      \
+        (fifo)->f32 = _y;      \
+        (fifo)->f32 = _z;      \
     }
 
 void yuka_disp(CameraId cam, void* param) {
@@ -1188,7 +1162,7 @@ void yuka_disp(CameraId cam, void* param) {
 
     w = get_ptr();
     camera = camGetPtr(cam);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {
         m = w->mesh->address;
         {
@@ -1231,6 +1205,7 @@ void yuka_disp(CameraId cam, void* param) {
     }
 }
 
+// inlining off for get_ptr, as in the original (the object differs without it)
 #pragma dont_inline on
 static DekaWork* get_ptr(void) {
     return (DekaWork*)_battleWorkPointer->actionCommands.work;
@@ -1323,7 +1298,7 @@ restart:
     }
 }
 
-s32 weaponGetPower_Deka(void) {
+s32 weaponGetPower_Deka(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target, BattleUnitPart* part) {
     return get_ptr()->result + 1;
 }
 

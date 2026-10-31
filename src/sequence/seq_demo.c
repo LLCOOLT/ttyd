@@ -1,3 +1,4 @@
+// Movie sequence: plays the opening THP movie (simple THP player).
 #include "seq/seq_demo.h"
 #include "dolphin/ai.h"
 #include "dolphin/dvd.h"
@@ -15,6 +16,7 @@
 #include "dolphin/os.h"
 #include "manager/dvdmgr.h"
 #include "dolphin/thp.h"
+#include "version.h"
 
 typedef struct THPHeader {
     char magic[4];             // 0x0
@@ -130,7 +132,7 @@ static u16 VolumeTable[] = {
 // clang-format on
 
 //.bss
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 #include "manager/filemgr.h"
 
 // work for the demo's movie sequence (seq_demoInit and on, at the end of the file)
@@ -956,10 +958,10 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     GXSetTevAlphaOp(GX_TEVSTAGE3, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K2);
-    GXSetTevColorS10(GX_TEVREG0, (GXColorS10){ -90, 0, -114, 135 });
-    GXSetTevKColor(GX_KCOLOR0, (GXColor){ 0, 0, 226, 88 });
-    GXSetTevKColor(GX_KCOLOR1, (GXColor){ 179, 0, 0, 182 });
-    GXSetTevKColor(GX_KCOLOR2, (GXColor){ 255, 0, 255, 128 });
+    GXSetTevColorS10(GX_TEVREG0, (GXColorS10){-90, 0, -114, 135});
+    GXSetTevKColor(GX_KCOLOR0, (GXColor){0, 0, 226, 88});
+    GXSetTevKColor(GX_KCOLOR1, (GXColor){179, 0, 0, 182});
+    GXSetTevKColor(GX_KCOLOR2, (GXColor){255, 0, 255, 128});
     GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 }
 
@@ -993,7 +995,7 @@ void THPGXYuv2RgbDraw(u8* y_data, u8* u_data, u8* v_data, s16 x, s16 y, s16 text
     GXEnd();
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 /* The demo's movie sequence: plays demo.thp, then returns to the title screen. */
 
 #include "driver/camdrv.h"
@@ -1043,7 +1045,7 @@ void seq_demoExit(SequenceWork* seq) {
 void seq_demoMain(SequenceWork* seq) {
     switch (seq->state) {
         case 0:
-            fadeEntry(FADE_IN_BLACK, 200, (GXColor){ 0, 0, 0, 255 });
+            fadeEntry(FADE_IN_BLACK, 200, (GXColor){0, 0, 0, 255});
             seq->state++;
             break;
         case 1:
@@ -1060,7 +1062,7 @@ void seq_demoMain(SequenceWork* seq) {
             THPSimpleLoadStop();
             THPSimpleClose();
             THPSimpleQuit();
-            fadeEntry(FADE_OUT_BLACK, 200, (GXColor){ 0, 0, 0, 255 });
+            fadeEntry(FADE_OUT_BLACK, 200, (GXColor){0, 0, 0, 255});
             seq->state++;
             break;
         case 3:
@@ -1107,7 +1109,7 @@ void seq_demoDisp(CameraId cameraId, void* param) {
     TEXGetGXTexObjFromPalette(*wp->tpl->data, &texObj, 5);
     gxsubChgMode(-1);
     gxsubSetTexObj(&texObj);
-    color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
+    color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
     gxsubDrawQuad(-274, 210, GXGetTexObjWidth(&texObj) / 3, GXGetTexObjHeight(&texObj) / 3, &color);
     gxsubSetTexObj(NULL);
     gxsubChgMode(-1);

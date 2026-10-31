@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: freeze, a pale ice-coloured sprite at a point that also spawns snow dust.
+#include "eff/n64/eff_freeze_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,23 +9,21 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 #include "eff/n64/eff_glass_n64.h"
+#include "eff/n64/eff_snow_dust_n64.h"
+#include "eff/n64/eff_vapor_n64.h"
 
 typedef struct EffFreezeN64Work {
-    s32 type;           // 0x0
-    Vec position;       // 0x4
-    s32 lifetime;       // 0x10
-    s32 frame;          // 0x14
-    GXColor color;      // 0x18
-    GXColor color2;     // 0x1C
-    f32 scale;          // 0x20
-    s8 texIdx;          // 0x24
-    s8 timer;           // 0x25
-    EffectEntry* dust;  // 0x28
+    s32 type;          // 0x0
+    Vec position;      // 0x4
+    s32 lifetime;      // 0x10
+    s32 frame;         // 0x14
+    GXColor color;     // 0x18
+    GXColor color2;    // 0x1C
+    f32 scale;         // 0x20
+    s8 texIdx;         // 0x24
+    s8 timer;          // 0x25
+    EffectEntry* dust; // 0x28
 } EffFreezeN64Work;
-
-EffectEntry* effVaporN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale);
-EffectEntry* effSnowDustN64Entry(s32 a, s32 b, s32 c, f32 x, f32 y, f32 z, f32 d, f32 e, f32 f);
-
 
 static effN64Vtx size32x64_tex32x64_vtx[] = {
     {-16, 0, 3, 0, 0, 0, 0, 0, 255},
@@ -57,7 +57,7 @@ EffectEntry* effFreezeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFreezeN64Work));
     effect->userdata = work;
     effect->callback = effFreezeMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -99,8 +99,8 @@ void effFreezeMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -142,9 +142,9 @@ void effFreezeMain(EffectEntry* effect) {
         effVaporN64Entry(2, 30, work->position.x, work->position.y + 40.0f * work->scale, work->position.z,
                          work->scale);
     }
-    ((EffFreezeN64Work*)work->dust->userdata)->position.x = work->position.x;
-    ((EffFreezeN64Work*)work->dust->userdata)->position.y = 10.0f + work->position.y;
-    ((EffFreezeN64Work*)work->dust->userdata)->position.z = work->position.z;
+    ((EffSnowDustN64Work*)work->dust->userdata)->position.x = work->position.x;
+    ((EffSnowDustN64Work*)work->dust->userdata)->position.y = 10.0f + work->position.y;
+    ((EffSnowDustN64Work*)work->dust->userdata)->position.z = work->position.z;
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effFreezeDisp, effect);
 }
 

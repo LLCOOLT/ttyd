@@ -1,57 +1,32 @@
+// gon_01 (ゴンババ, Hooktail Castle): castle gate courtyard between gon_00 and gon_02.
+// Plays the gate cutscene (story 35 and 37) and has an HP Plus item.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "driver/hitdrv.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_goodbye_party);
-USER_FUNC(evt_mario_hello_party);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dispdir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_print);
-#ifdef VERSION_G8ME01_DEMO
-USER_FUNC(evt_msg_print_party);
-#endif
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_telop_entry);
+#include "mario/mario.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_telop.h"
+#include "party/party_motion.h"
+#include "gon.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static BeroEntry bero_entry_data[5];
 extern EvtWord honenoko_oidasare_evt[];
 extern EvtWord gon_01_GATEEVENT_evt[];
 static HitDamageReturn hitDmgRetPoints[17];
-extern EvtWord gon_01_init_evt[];
 
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -73,8 +48,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -89,8 +64,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -106,8 +81,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         12, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -123,8 +98,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -141,7 +116,7 @@ static BeroEntry bero_entry_data[] = {
 
 EVT_BEGIN(honenoko_oidasare_evt)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mario_dispflag_onoff, 1, 256)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_party_set_dir, 0, 270, -1)
     CALL(evt_mario_set_dispdir, 0)
     CALL(evt_mario_set_pos, 500, 0, 0)
@@ -294,7 +269,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
     END_SWITCH
     WAIT_FRAMES(30)
     CALL(evt_mario_cont_onoff, 1)
-    IF_INT_EQUAL(GSWF(1478), 1)
+    IF_INT_EQUAL(GSWF(GSWF_GON03_PUSHED_OUT_TWICE), 1)
         CALL(evt_mario_set_dispdir, 180)
         CALL(evt_mario_get_party, LW(0))
         SWITCH(LW(0))
@@ -312,9 +287,9 @@ EVT_BEGIN(honenoko_oidasare_evt)
     END_IF
     WAIT_FRAMES(1)
     CALL(evt_party_cont_onoff, 0, 1)
-    CALL(evt_mario_dispflag_onoff, 0, 256)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_mario_key_onoff, 1)
-    SET_VALUE(GSWF(1476), 0)
+    SET_VALUE(GSWF(GSWF_GON03_PUSHED_OUT), 0)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
@@ -323,9 +298,9 @@ EVT_END()
 EVT_BEGIN(gon_01_GATEEVENT_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_CASTLE1"))
-    CALL(evt_snd_envoff, 1024)
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_CASTLE1"))
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(evt_cam3d_evt_set, -200, 525, 690, 350, 675, 37, 0, 11)
     CALL(evt_seq_wait, 2)
     BEGIN_INLINE_EVENT
@@ -351,7 +326,7 @@ EVT_BEGIN(gon_01_GATEEVENT_evt)
     CALL(evt_mario_mov_pos2, -300, 0, FLOAT(120.0f))
     CALL(evt_party_stop, 0)
     WAIT_MS(500)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_msg_print_party, STRING("E3_stg1_gon_00"))
 #else
     CALL(evt_mario_get_party, LW(0))
@@ -362,10 +337,10 @@ EVT_BEGIN(gon_01_GATEEVENT_evt)
         CALL(evt_msg_print, 0, STRING("stg1_gon_01"), 0, STRING("party"))
     END_SWITCH
 #endif
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -392,41 +367,40 @@ static HitDamageReturn hitDmgRetPoints[] = {
 };
 
 EVT_BEGIN(gon_01_init_evt)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON2"))
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON2"))
     CALL(evt_snd_set_rev_mode, 0)
-    IF_INT_EQUAL(GSWF(1476), 1)
+    IF_INT_EQUAL(GSWF(GSWF_GON03_PUSHED_OUT), 1)
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
         SPAWN_EVENT(PTR(bero_case_entry))
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         SPAWN_EVENT(PTR(honenoko_oidasare_evt))
-        ELSE
+    ELSE
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
         CALL_CHILD(PTR(evt_bero_info_run))
-        IF_INT_LESS(GSW(0), 35)
-            SET_VALUE(GSW(0), 35)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_09_HOOKTAIL_CASTLE)
+            SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_09_HOOKTAIL_CASTLE)
             SPAWN_EVENT(PTR(gon_01_GATEEVENT_evt))
         END_IF
     END_IF
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, STRING("item00"), 278, 330, -150, 0, 15, GSWF(1501), 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, STRING("item00"), ITEM_HP_PLUS, 330, -150, 0, 15, GSWF(GSWF_GON01_HP_PLUS_TAKEN), 0)
 #else
-    CALL(evt_item_entry, STRING("item00"), 278, 330, -150, 0, 16, GSWF(1501), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_HP_PLUS, 330, -150, 0, 16, GSWF(GSWF_GON01_HP_PLUS_TAKEN), 0)
 #endif
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
     CALL(evt_map_playanim, STRING("m_mizu01"), 1, 0)
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi"))
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou1"), STRING("a_hi1"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hasj"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kabe_l"), 2)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("kabe_r"), 2)
-    IF_INT_LESS(GSW(0), 37)
-        SET_VALUE(GSW(0), 37)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hasj"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kabe_l"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kabe_r"), MAPOBJ_FLAG_BBOX_CULL)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_09_02_LOCK)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_09_02_LOCK)
     END_IF
     RETURN
 EVT_END()
-

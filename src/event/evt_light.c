@@ -1,3 +1,4 @@
+// Script commands for character and map lighting.
 #include "evt/evt_light.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/animdrv.h"
@@ -16,8 +17,7 @@ USER_FUNC(evt_light_charalight_all_onoff) {
         for (i = 0; i < lightGetEntryNum(); i++) {
             lightNumberToPtr(i)->flags |= LIGHT_CHARA;
         }
-    }
-    else {
+    } else {
         for (i = 0; i < lightGetEntryNum(); i++) {
             lightNumberToPtr(i)->flags &= ~LIGHT_CHARA;
         }
@@ -33,14 +33,13 @@ USER_FUNC(evt_light_mario_lighting_onoff) {
     on = evtGetValue(event, *event->args);
     mario = marioGetPtr();
     if (on) {
-        animPoseSetMaterialLightFlagOn(mario->paperAnimGroupId[0], 2);
-        animPoseSetMaterialLightFlagOn(mario->paperAnimGroupId[1], 2);
-        animPoseSetMaterialLightFlagOn(mario->paperAnimGroupId[2], 2);
-    }
-    else {
-        animPoseSetMaterialLightFlagOff(mario->paperAnimGroupId[0], 2);
-        animPoseSetMaterialLightFlagOff(mario->paperAnimGroupId[1], 2);
-        animPoseSetMaterialLightFlagOff(mario->paperAnimGroupId[2], 2);
+        animPoseSetMaterialLightFlagOn(mario->paperAnimGroupId[0], ANIM_MATERIAL_LIGHT_CHARA);
+        animPoseSetMaterialLightFlagOn(mario->paperAnimGroupId[1], ANIM_MATERIAL_LIGHT_CHARA);
+        animPoseSetMaterialLightFlagOn(mario->paperAnimGroupId[2], ANIM_MATERIAL_LIGHT_CHARA);
+    } else {
+        animPoseSetMaterialLightFlagOff(mario->paperAnimGroupId[0], ANIM_MATERIAL_LIGHT_CHARA);
+        animPoseSetMaterialLightFlagOff(mario->paperAnimGroupId[1], ANIM_MATERIAL_LIGHT_CHARA);
+        animPoseSetMaterialLightFlagOff(mario->paperAnimGroupId[2], ANIM_MATERIAL_LIGHT_CHARA);
     }
     return EVT_RETURN_DONE;
 }
@@ -53,10 +52,9 @@ USER_FUNC(evt_light_party_lighting_onoff) {
     on = evtGetValue(event, *event->args);
     party = partyGetPtr(marioGetPartyId());
     if (on) {
-        animPoseSetMaterialLightFlagOn(party->paperAnimGroup, 2);
-    }
-    else {
-        animPoseSetMaterialLightFlagOff(party->paperAnimGroup, 2);
+        animPoseSetMaterialLightFlagOn(party->paperAnimGroup, ANIM_MATERIAL_LIGHT_CHARA);
+    } else {
+        animPoseSetMaterialLightFlagOff(party->paperAnimGroup, ANIM_MATERIAL_LIGHT_CHARA);
     }
     return EVT_RETURN_DONE;
 }
@@ -70,10 +68,9 @@ USER_FUNC(evt_light_npc_lighting_onoff) {
     on = evtGetValue(event, args[0]);
     npc = npcNameToPtr((const char*)evtGetValue(event, args[1]));
     if (on) {
-        animPoseSetMaterialLightFlagOn(npc->poseId, 2);
-    }
-    else {
-        animPoseSetMaterialLightFlagOff(npc->poseId, 2);
+        animPoseSetMaterialLightFlagOn(npc->poseId, ANIM_MATERIAL_LIGHT_CHARA);
+    } else {
+        animPoseSetMaterialLightFlagOff(npc->poseId, ANIM_MATERIAL_LIGHT_CHARA);
     }
     return EVT_RETURN_DONE;
 }
@@ -96,7 +93,7 @@ USER_FUNC(evt_light_bind_mapobj) {
     light = lightNameToPtr(lightName);
     mapobj = mapGetMapObj(mapobjName);
     if (isFirstCall) {
-        offset = (Vec){ 0.0f, 0.0f, 0.0f };
+        offset = (Vec){0.0f, 0.0f, 0.0f};
         PSMTXMultVec(mapobj->modelWorldMtx, &offset, &offset);
         PSVECSubtract(&light->basePosition, &offset, &offset);
         event->userdataf[0] = offset.x;
@@ -115,7 +112,7 @@ USER_FUNC(evt_light_bind_mapobj) {
             PSMTXMultVec(mtx, &offset, &offset);
             break;
     }
-    origin = (Vec){ 0.0f, 0.0f, 0.0f };
+    origin = (Vec){0.0f, 0.0f, 0.0f};
     PSMTXMultVec(mapobj->modelWorldMtx, &origin, &origin);
     PSVECAdd(&origin, &offset, &light->position);
     return EVT_RETURN_BLOCK;

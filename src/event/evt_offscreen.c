@@ -1,3 +1,4 @@
+// Script commands for offscreen render targets (offscreendrv).
 #include "evt/evt_offscreen.h"
 #include "driver/offscreendrv.h"
 #include "manager/evtmgr_cmd.h"

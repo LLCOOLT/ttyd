@@ -1,3 +1,5 @@
+// Mist effect rising around a point for a given life; types 0-6.
+#include "eff/eff_mist.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -7,20 +9,19 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffMistWork {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    Vec scale;     // 0x10
-    Vec velocity;  // 0x1C
-    Vec accel;     // 0x28
-    f32 alpha;     // 0x34
-    s32 timer;     // 0x38
-    s32 life;      // 0x3C
-    f32 yaw;       // 0x40
-    u8 r, g, b;    // 0x44
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    Vec scale;    // 0x10
+    Vec velocity; // 0x1C
+    Vec accel;    // 0x28
+    f32 alpha;    // 0x34
+    s32 timer;    // 0x38
+    s32 life;     // 0x3C
+    f32 yaw;      // 0x40
+    u8 r, g, b;   // 0x44
     u8 pad;
 } EffMistWork;
 
@@ -42,7 +43,7 @@ EffectEntry* effMistEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 yaw) {
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffMistWork));
     effect->userdata = work;
     effect->callback = effMistMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -54,7 +55,7 @@ EffectEntry* effMistEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 yaw) {
     }
     work->timer = 0;
     work->alpha = 255.0f;
-    work->yaw = yaw - camGetPtr(4)->viewYaw;
+    work->yaw = yaw - camGetPtr(CAMERA_3D)->viewYaw;
     for (i = 1, p = work + 1; i < effect->count; i++, p++) {
         p->position.x = irand(50) - 25;
         p->position.y = irand(50) - 25;
@@ -66,7 +67,7 @@ EffectEntry* effMistEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 yaw) {
         p->alpha = 0.0f;
         p->life = irand(30) + 30;
         p->timer = 0;
-        p->yaw = yaw - camGetPtr(4)->viewYaw;
+        p->yaw = yaw - camGetPtr(CAMERA_3D)->viewYaw;
         switch (type) {
             case 0:
                 p->r = 255;
@@ -133,8 +134,8 @@ void effMistMain(EffectEntry* effect) {
     v.z = work->position.z;
     position = v;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 32;
     }
     if (work->life < 1000) {
@@ -151,41 +152,41 @@ void effMistMain(EffectEntry* effect) {
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         switch (type) {
-        case 4:
-            work->position.x += work->velocity.x;
-            work->position.y += work->velocity.y;
-            work->position.z += work->velocity.z;
-            work->velocity.x *= 0.9f;
-            work->velocity.y *= 0.88f;
-            work->velocity.z *= 0.9f;
-            work->position.y += work->accel.x;
-            work->accel.x += work->accel.y;
-            work->accel.y *= work->accel.z;
-            work->scale.x *= 1.02f;
-            work->scale.y *= 1.02f;
-            work->scale.z *= 1.02f;
-            work->alpha -= 2.0f;
-            if (work->alpha < 0.0f) {
-                work->alpha = 0.0f;
-            }
-            break;
-        default:
-            if (work->timer < 255) {
-                work->timer += irand(5);
-                work->alpha = work->timer;
-                if (work->alpha > 255.0f) {
-                    work->alpha = 255.0f;
-                }
-            } else {
-                work->alpha -= irand(5);
+            case 4:
+                work->position.x += work->velocity.x;
+                work->position.y += work->velocity.y;
+                work->position.z += work->velocity.z;
+                work->velocity.x *= 0.9f;
+                work->velocity.y *= 0.88f;
+                work->velocity.z *= 0.9f;
+                work->position.y += work->accel.x;
+                work->accel.x += work->accel.y;
+                work->accel.y *= work->accel.z;
+                work->scale.x *= 1.02f;
+                work->scale.y *= 1.02f;
+                work->scale.z *= 1.02f;
+                work->alpha -= 2.0f;
                 if (work->alpha < 0.0f) {
-                    work->timer = 0;
                     work->alpha = 0.0f;
                 }
-            }
-            work->position.x += work->velocity.x;
-            work->position.y += work->velocity.y;
-            work->position.z += work->velocity.z;
+                break;
+            default:
+                if (work->timer < 255) {
+                    work->timer += irand(5);
+                    work->alpha = work->timer;
+                    if (work->alpha > 255.0f) {
+                        work->alpha = 255.0f;
+                    }
+                } else {
+                    work->alpha -= irand(5);
+                    if (work->alpha < 0.0f) {
+                        work->timer = 0;
+                        work->alpha = 0.0f;
+                    }
+                }
+                work->position.x += work->velocity.x;
+                work->position.y += work->velocity.y;
+                work->position.z += work->velocity.z;
         }
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMistDisp, effect);

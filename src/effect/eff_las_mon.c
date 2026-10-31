@@ -1,3 +1,4 @@
+// "LasMon" effect: plays the MOBJ_EFF_las_mon animation at a point; types 0 and 1 pick the animation.
 #include "eff/eff_las_mon.h"
 #include "driver/animdrv.h"
 #include "driver/dispdrv.h"
@@ -25,7 +26,7 @@ EffectEntry* effLasMonEntry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffLasMonWork) * effect->count);
     effect->userdata = work;
     effect->callback = effLasMonMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -43,12 +44,12 @@ void effLasMonMain(EffectEntry* effect) {
     Vec position;
     BOOL inBattle;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
     inBattle = gp->inBattle != 0;
 
     // soft delete: start fading out
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {
@@ -95,8 +96,8 @@ void effLasMonDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         PSMTXScale(scale, work->scale, work->scale, work->scale);
         PSMTXConcat(mtx, scale, mtx);
-        animPoseSetMaterialFlagOn(work->poseId, 0x40);
-        animPoseSetMaterialEvtColor(work->poseId, (GXColor){ 0xFF, 0xFF, 0xFF, work->alpha });
+        animPoseSetMaterialFlagOn(work->poseId, ANIM_MATERIAL_FLAG_EVT_COLOR);
+        animPoseSetMaterialEvtColor(work->poseId, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
         animPoseMain(work->poseId);
         animPoseDrawMtx(work->poseId, mtx, 1, 0.0f, 10.0f);
         animPoseDrawMtx(work->poseId, mtx, 2, 0.0f, 10.0f);

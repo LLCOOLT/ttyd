@@ -1,3 +1,5 @@
+// evt_keijiban: Notice board (掲示板) text helper; builds board entries from "<prefix>_NNNN" messages.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -7,16 +9,22 @@
 #include "stdio.h"
 #include "string.h"
 #include "memory.h"
+#include "evt/evt_story.h"
 
-typedef struct KeijibanEntry { s16 flags; s16 evtNo; s16 index; } KeijibanEntry; /* flags: never accessed */
-typedef struct KeijibanData { KeijibanEntry* entries; s32 count; const char* prefix; char* label; s32 current; s32 maxEvtNo; } KeijibanData;
+typedef struct KeijibanEntry {
+    s16 flags;
+    s16 evtNo;
+    s16 index;
+} KeijibanEntry; /* flags: never accessed */
+typedef struct KeijibanData {
+    KeijibanEntry* entries;
+    s32 count;
+    const char* prefix;
+    char* label;
+    s32 current;
+    s32 maxEvtNo;
+} KeijibanData;
 #define KJDT (_kjdt)
-
-s32 keijiban_data_make(const char* prefix, BOOL fill);
-USER_FUNC(keijiban_joho_makelabel);
-USER_FUNC(keijiban_joho_check);
-USER_FUNC(keijiban_data_free);
-USER_FUNC(keijiban_data_alloc);
 
 KeijibanData _kjdt[1];
 
@@ -24,7 +32,7 @@ s32 keijiban_data_make(const char* prefix, BOOL fill) {
     char name[64];
     char buf[64];
     KeijibanData* kj = KJDT;
-    s32 gsw = evtGetValue(NULL, GSW(0));
+    s32 gsw = evtGetValue(NULL, GSW(GSW_STORY_PROGRESS));
     s32 i;
     s32 len;
     s32 field;
@@ -41,7 +49,7 @@ s32 keijiban_data_make(const char* prefix, BOOL fill) {
         kj->maxEvtNo = -1;
     }
     count = 0;
-    for (i = 0; ; i++) {
+    for (i = 0;; i++) {
         sprintf(name, "%s_%04d", prefix, i);
         p = (const s8*)msgSearch(name);
         if (*p++ != '<' || *p++ != '!') {
@@ -161,4 +169,3 @@ USER_FUNC(keijiban_data_alloc) {
 KeijibanData _kjdt[] = {
     {0},
 };
-

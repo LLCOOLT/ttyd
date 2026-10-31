@@ -1,3 +1,5 @@
+// dou_10 (洞窟, Pirate's Grotto): room linking dou_09, dou_06 and dou_11 with a wave-dodging section and a spear trap (story 248 to 249).
+// Bobbing platforms.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -10,55 +12,36 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "driver/hitdrv.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "mot/mot_ship.h"
+#include "party/party_motion.h"
+#include "dou.h"
+#include "evt/evt_story.h"
 
-void marioShipForceStop(void);
-double sin(double x);
-void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
-typedef struct EntryMgrEntry { s32 used; s32 id; f32 reg[3]; } EntryMgrEntry;
-typedef struct EntryMgr { s32 count; EntryMgrEntry* entries; } EntryMgr;
+typedef struct EntryMgrEntry {
+    s32 used;
+    s32 id;
+    f32 reg[3];
+} EntryMgrEntry;
+typedef struct EntryMgr {
+    s32 count;
+    EntryMgrEntry* entries;
+} EntryMgr;
 
 USER_FUNC(dou_namiatari_check);
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_event_from_road);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_get_shift);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_dou_normal_puka);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_dispdir);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_dispdir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(evt_sub_entrymgr_check);
 USER_FUNC(evt_sub_entrymgr_delete);
 USER_FUNC(evt_sub_entrymgr_entry);
 USER_FUNC(evt_sub_entrymgr_getreg);
 USER_FUNC(evt_sub_entrymgr_init);
 USER_FUNC(evt_sub_entrymgr_setreg);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
 USER_FUNC(nami_running_func);
 USER_FUNC(nami_running_init_func);
 USER_FUNC(namiyoke_fail_stop);
@@ -78,14 +61,13 @@ extern EvtWord namiyoke_init[];
 extern EvtWord namiyoke_se[];
 extern EvtWord namiyoke_check[];
 static HitDamageReturn hitDmgRetPoints[4];
-extern EvtWord dou_10_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -100,8 +82,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -116,8 +98,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "n_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -132,8 +114,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -297,7 +279,7 @@ EVT_BEGIN(namiyoke_fail)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(namiyoke_fail_stop)
-    CALL(evt_mario_dispflag_onoff, 1, 256)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(3))
     CALL(evt_cam3d_event_from_road, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
@@ -321,7 +303,7 @@ EVT_BEGIN(namiyoke_fail)
     CALL(evt_cam_road_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_cont_onoff, 1)
-    CALL(evt_mario_dispflag_onoff, 0, 256)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_letter_box_disable, 0)
     RETURN
@@ -451,10 +433,10 @@ EVT_BEGIN(namiyoke_se)
             IF_INT_EQUAL(LW(12), 0)
                 CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_MINIGAME_WAVE1"), LW(3), LW(4), LW(3), LW(13))
                 SET_VALUE(LW(12), 1)
-                ELSE
+            ELSE
                 CALL(evt_snd_sfx_pos, LW(13), LW(3), LW(4), LW(5))
             END_IF
-            ELSE
+        ELSE
             IF_INT_EQUAL(LW(12), 1)
                 CALL(evt_snd_sfxoff, LW(13))
                 SET_VALUE(LW(12), 0)
@@ -466,8 +448,8 @@ EVT_BEGIN(namiyoke_se)
 EVT_END()
 
 EVT_BEGIN(namiyoke_check)
-    IF_INT_EQUAL(GSW(0), 248)
-        SET_VALUE(GSW(0), 249)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_22_FLOODGATE)
+        SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_29_WAVE_DODGING)
     END_IF
     CALL(evt_sub_entrymgr_init, LW(9), 15)
     SPAWN_EVENT(PTR(namiyoke_init))
@@ -563,8 +545,8 @@ static HitDamageReturn hitDmgRetPoints[] = {
 };
 
 EVT_BEGIN(dou_10_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU10"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU10"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -580,7 +562,7 @@ EVT_BEGIN(dou_10_init_evt)
     SET_VALUE(LW(0), STRING("s10_fune_01"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main0), LW(10))
-    CALL(evt_mobj_powerupblk, STRING("pblk00"), 130, 50, -135, 0, GSWF(5558), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk00"), 130, 50, -135, 0, GSWF(GSWF_DOU10_SHINE_SPRITE), 0)
     RETURN
 EVT_END()
 

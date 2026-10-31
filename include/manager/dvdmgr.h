@@ -1,3 +1,4 @@
+// dvdmgr.c: the DVD manager (DVDEntry, DVDFlags): prioritised file reads run on a separate thread.
 #pragma once
 
 #include <dolphin/dvd.h>
@@ -8,26 +9,26 @@
 typedef BOOL (*DVDMgrCallback)(void);
 
 typedef enum DVDFlags {
-	DVDMGR_READING = (1 << 0),
-	DVDMGR_FINISHED = (1 << 1),
-	DVDMGR_CLOSED = (1 << 3),
-	DVDMGR_UNK_ERROR1 = (1 << 5),
-	DVDMGR_UNK_ERROR2 = (1 << 7),
-	DVDMGR_INUSE = (1 << 15)
+    DVDMGR_READING = (1 << 0),
+    DVDMGR_FINISHED = (1 << 1),
+    DVDMGR_CLOSED = (1 << 3),
+    DVDMGR_UNK_ERROR1 = (1 << 5),
+    DVDMGR_UNK_ERROR2 = (1 << 7),
+    DVDMGR_INUSE = (1 << 15)
 } DVDFlags;
 
 typedef struct DVDEntry {
-	char name[64]; //0x0
-	DVDFileInfo info; //0x40
-	void* address; //0x7C
-	s32 bytesLeft; //0x80
-	s32 offset; //0x84
-	s32 position; //0x88
-	DVDCallback callback; //0x8C, reuse SDK type
-	u16 status; //0x90
-	u16 priority; //0x92
-	u16 unknown; //0x94
-	u8 pad_96[2]; //0x96
+    char name[64];        // 0x0
+    DVDFileInfo info;     // 0x40
+    void* address;        // 0x7C
+    s32 bytesLeft;        // 0x80
+    s32 offset;           // 0x84
+    s32 position;         // 0x88
+    DVDCallback callback; // 0x8C, reuse SDK type
+    u16 status;           // 0x90
+    u16 priority;         // 0x92
+    u16 unknown;          // 0x94
+    u8 pad_96[2];         // 0x96
 } DVDEntry;
 
 void DVDMgrInit(void);

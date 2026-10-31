@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: rain of water (jetwrain) from a water jet.
+#include "eff/n64/eff_opuku_jetwrain_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -5,19 +7,8 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-
-
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
-void tri2();
+#include "eff/eff_n64.h"
+#include "libc_decls.h"
 
 typedef struct EffOpukuJetwrainWork {
     s32 type;      // 0x0
@@ -31,7 +22,6 @@ typedef struct EffOpukuJetwrainWork {
     s8 h[19][13];  // 0x23
     s16 v[19][13]; // 0x11A
 } EffOpukuJetwrainWork;
-
 
 static effN64Vtx opuku_jetwrain_vtx[16] = {
     {-160, -120, -320, 0, 0, 0, 0, 0, 255},
@@ -55,10 +45,16 @@ static effN64Vtx opuku_jetwrain_vtx[16] = {
 void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect);
 void effOpukuJetwrainMain(EffectEntry* effect);
 
-inline f32 sind(f32 deg) { return sin(6.2831855f * deg / 360.0f); }
+inline f32 sind(f32 deg) {
+    return sin(6.2831855f * deg / 360.0f);
+}
 
-inline int inline_fn2(s32 a) { return a < 12; }
-inline int inline_fn(s32 n) { return n < 13; }
+inline int inline_fn2(s32 a) {
+    return a < 12;
+}
+inline int inline_fn(s32 n) {
+    return n < 13;
+}
 
 EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime) {
     EffectEntry* effect;
@@ -72,7 +68,7 @@ EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwrainWork));
     effect->userdata = work;
     effect->callback = effOpukuJetwrainMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -116,8 +112,8 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 32;
     }
     if (work->lifetime < 1000) {
@@ -181,7 +177,8 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     s32 y1;
     s32 by, bx;
     s32 x0;
-    s32 k; s32 edgeX;
+    s32 k;
+    s32 edgeX;
 
     camGetPtr(cameraId);
     work = effect->userdata;
@@ -280,5 +277,3 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     }
     GXSetProjectionv(proj);
 }
-
-

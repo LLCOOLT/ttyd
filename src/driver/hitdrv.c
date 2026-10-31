@@ -1,3 +1,5 @@
+// Hit (collision) driver: builds the collision objects from the map joints and answers the ray and
+// sphere checks against them.
 #include "driver/hitdrv.h"
 #include "addr_word.h"
 #include "hwaccess.h"
@@ -6,43 +8,20 @@
 #include "driver/mapdrv.h"
 #include "memory.h"
 #include "party.h"
+#include "version.h"
 #include <string.h>
 
 // prototypes for asm stopgap forward references
-void hitBindUpdate(const char* name);
-void hitBindMapObj(const char* hitName, const char* mapobjName);
-Vec* hitGetDamageReturnPos(HitEntry* hit);
-void hitGrpDamageReturnSet(const char* name, HitDamageReturn* damage);
 void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion);
-s32 hitGetAttr(HitEntry* hit);
-const char* hitGetName(HitEntry* hit);
-void hitObjGetNormal(const char* name, Vec* normal);
-void hitObjGetPos(const char* name, Vec* position);
 void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion);
-HitEntry* hitNameToPtr(const char* name);
 BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry);
-BOOL hitCheckVecHitObjXZ(HitCheckQuery* query, HitEntry* entry);
 BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector);
-HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback);
 s32 hitCalcVtxPosition(HitEntry* hit);
 void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
-void hitReCalcMatrix(HitEntry* hit, Mtx mtx);
-void hitGrpAttrOff(const char* name, u32 mask);
-void hitGrpAttrOn(const char* name, u32 mask);
 void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
 void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
-void hitObjAttrOff(const char* name, u32 mask);
-void hitObjAttrOn(const char* name, u32 mask);
-void hitGrpFlagOff(const char* name, u16 mask);
-void hitGrpFlagOn(const char* name, u16 mask);
 void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
 void hitFlgOn(HitEntry* hit, u16 mask, s32 r);
-void hitObjFlagOff(const char* name, u16 mask);
-void hitObjFlagOn(const char* name, u16 mask);
-void hitMain(void);
-void hitDelete(const char* name);
-HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx);
-HitEntry* hitEntry(MapFileJoint* root, Mtx rootMtx, s32 mapIndex);
 HitEntry* hitEntrySub(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, BOOL ignoreSiblings, s32 mapIndex);
 HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapIndex);
 
@@ -99,8 +78,8 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
     0000dd7c 005e1c 8001335c  1 .text 	hitdrv.o
 */
 
-#ifndef VERSION_G8ME01_DEMO
-s32 unk_8041840C;
+#if VERSION != VERSION_DEMO
+s32 hitdrv_unused_sbss;     // nothing reads or writes it
 HitEntry* hitActiveListTop; // head of the active hit list (linked through nextActive)
 #endif
 
@@ -262,49 +241,35 @@ HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx) {
     return hitEntrySub(joint, NULL, mtx, TRUE, 0);
 }
 
-void mapCalcAnimMatrix(Mtx out, Mtx in, void* anim, void* joint);
-
 typedef struct HitAnimJointList {
     s32 count;
     void* joints[1];
 } HitAnimJointList;
 
-#ifdef VERSION_G8ME01_DEMO
-// The demo has no active list: hit objects without parts are flagged 0x8000 and skipped by the checks.
+// Builds the list of hit objects the checks walk (hitActiveListTop). The demo has no active list: hit objects
+// without parts are flagged 0x8000 and skipped by the checks.
 inline void hitPreCheck(void) {
     MapEntry* entry;
     s32 i;
     s32 j;
     MapWork* wp = mapGetWork();
     HitEntry* hit;
+#if VERSION != VERSION_DEMO
+    HitEntry* prev;
 
+    prev = hitActiveListTop = NULL;
+#endif
     i = 0;
     entry = wp->entries;
     for (; i < wp->entries->count; entry++, i++) {
         hit = entry->hitEntries;
         for (j = 0; j < entry->hitNumJoints; j++, hit++) {
+#if VERSION == VERSION_DEMO
             hit->flags |= 0x8000;
             if (hit->joint->partCount != 0) {
                 hit->flags &= ~0x8000;
             }
-        }
-    }
-}
 #else
-inline void hitPreCheck(void) {
-    MapEntry* entry;
-    s32 i;
-    s32 j;
-    MapWork* wp = mapGetWork();
-    HitEntry* hit;
-    HitEntry* prev;
-
-    prev = hitActiveListTop = NULL;
-    i = 0;
-    entry = wp->entries;
-    for (; i < wp->entries->count; entry++, i++) {
-        hit = entry->hitEntries;
-        for (j = 0; j < entry->hitNumJoints; j++, hit++) {
             if (hit->joint->partCount != 0 && !(hit->flags & 0x81)) {
                 if (prev == NULL) {
                     hitActiveListTop = hit;
@@ -314,13 +279,15 @@ inline void hitPreCheck(void) {
                     prev = hit;
                 }
             }
+#endif
         }
     }
+#if VERSION != VERSION_DEMO
     if (prev != NULL) {
         prev->nextActive = NULL;
     }
-}
 #endif
+}
 inline HitEntry* hitNameToPtrNoChk(const char* name) {
     MapWork* wp = mapGetWork();
     MapEntry* map;
@@ -353,7 +320,7 @@ void hitDelete(const char* name) {
             }
             if (strcmp(name, hit->joint->name) == 0) {
                 hit->flags |= 0x80;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
                 hitPreCheck();
 #endif
                 return;
@@ -650,7 +617,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     s32 o1;
                     s32 o2;
                     u16 i1;
-                    register u32 gqr;
+                    register u32 gqr; // an asm operand (HW_SET_GQR5) must be a register variable
                     HitVector* v2;
                     base = (s16*)mesh->vcdTable->positions->data;
                     v2 = &hit->vectors[count];
@@ -744,7 +711,7 @@ inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
     query->hitPos.x = query->targetPos.x;
     query->hitPos.y = query->targetPos.y - query->targetDistance;
     query->hitPos.z = query->targetPos.z;
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     query->hitNormal = vector->normal;
 #endif
     if (dotProduct >= 0.0f) {
@@ -878,7 +845,7 @@ inline BOOL tempfunc3(HitCheckQuery* query, HitVector* vector) {
     return 1;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo walks every map entry's hit objects (no active list) and has no separate straight-up case.
 HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     HitVector* vector2;
@@ -1124,10 +1091,10 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                 entry = entry->nextActive;
             }
         } else {
-            goto label_235;
+            goto check_entries;
         }
     } else {
-    label_235:
+    check_entries:
         while (entry != NULL) {
             if (callback == NULL || callback(query, entry)) {
                 if (!(PSVECDistance(&endPos, &entry->centerWorld) > (reach + entry->radius))) {
@@ -1170,8 +1137,8 @@ HitEntry* hitCheckFilter(HitFilterCallback callback, f32* hitX, f32* hitY, f32* 
     HitCheckQuery* query = &temp;
     HitEntry* entry;
 
-    query->targetPos = (Vec){ x, y, z };
-    query->targetDir = (Vec){ nx, ny, nz };
+    query->targetPos = (Vec){x, y, z};
+    query->targetDir = (Vec){nx, ny, nz};
     query->targetDistance = *distance;
     entry = hitCheckVecFilter(query, callback);
     if (entry == NULL) {
@@ -1292,8 +1259,8 @@ HitEntry* hitCheckAttr(s32 user0, f32* hitX, f32* hitY, f32* hitZ, f32* distance
     HitCheckQuery* query = &temp;
     HitEntry* entry;
 
-    query->targetPos = (Vec){ x, y, z };
-    query->targetDir = (Vec){ nx, ny, nz };
+    query->targetPos = (Vec){x, y, z};
+    query->targetDir = (Vec){nx, ny, nz};
     query->targetDistance = *distance;
     query->user0 = user0;
     entry = hitCheckVecFilter(query, chkFilterAttr);
@@ -1334,7 +1301,7 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     minDist = -1.0f;
     objectId = -1;
     query = &temp;
-    center = (Vec){ x, y, z };
+    center = (Vec){x, y, z};
     for (i = 0; i < map->count; mapEntry++, i++) {
         hitObj = mapEntry->hitEntries;
         for (j = 0; j < mapEntry->hitNumJoints; j++, hitObj++) {
@@ -1359,7 +1326,7 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     if (objectId < 0) {
         return 0;
     }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     if (minDist < (0.5f * radius)) {
         return &map[entryId].hitEntries[objectId];
     }
@@ -1441,10 +1408,10 @@ void hitObjGetPos(const char* name, Vec* position) { // 1:1
     HitEntry* hit;
 
     counter = 0;
-    sum = (Vec){ 0.0f, 0.0f, 0.0f };
+    sum = (Vec){0.0f, 0.0f, 0.0f};
     hit = hitNameToPtr(name);
     if (hit == NULL) {
-        *position = (Vec){ 0.0f, 0.0f, 0.0f };
+        *position = (Vec){0.0f, 0.0f, 0.0f};
         return;
     }
     hitObjGetPosSub(hit, &sum, &counter, 0);
@@ -1460,7 +1427,7 @@ void hitObjGetNormal(const char* name, Vec* normal) { // 1:1
     }
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 const char* hitGetName(HitEntry* hit) {
     if (hit != NULL) {
         return hit->joint->name;
@@ -1597,4 +1564,3 @@ void hitStrippedPool(f32* f) {
     f[0] = 0.0f;
     f[1] = 0.1f;
 }
-

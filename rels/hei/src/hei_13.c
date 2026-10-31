@@ -1,32 +1,33 @@
+// hei_13 (平原, Petal Meadows): field linking hei_00 and hei_01 with pipes.
+// Horsetail item, a Close Call block, bricks and a Happy Heart.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_case.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "hei.h"
 #include "data_tables.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_flag_onoff);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_sub_get_system_flag);
+#include "version.h"
+#include "mario/mariost.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
 static BeroEntry bero_entry_data[5];
 static TreeAccess ki_data[2];
 extern EvtWord evt_anm_kan[];
-extern EvtWord hei_13_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -41,8 +42,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -58,8 +59,8 @@ static BeroEntry bero_entry_data[] = {
         "a_dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -74,8 +75,8 @@ static BeroEntry bero_entry_data[] = {
         "a_dokan_2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -99,16 +100,16 @@ EVT_BEGIN(evt_anm_kan)
         GOTO(99)
     END_IF
     BEGIN_INLINE_EVENT
-        IF_INT_EQUAL(GSW(301), 10)
+        IF_INT_EQUAL(GSW(GSW_HEI13_CAN_HITS), 10)
             SET_VALUE(GF(0), 1)
             WAIT_MS(200)
-            CALL(evt_item_entry, STRING("item_tukushi"), 175, 565, 15, -65, 5, -1, 0)
-            ELSE
-            ADD(GSW(301), 1)
-            IF_INT_EQUAL(GSW(301), 10)
+            CALL(evt_item_entry, STRING("item_tukushi"), ITEM_HORSETAIL, 565, 15, -65, 5, -1, 0)
+        ELSE
+            ADD(GSW(GSW_HEI13_CAN_HITS), 1)
+            IF_INT_EQUAL(GSW(GSW_HEI13_CAN_HITS), 10)
                 SET_VALUE(GF(0), 1)
                 WAIT_MS(200)
-                CALL(evt_item_entry, STRING("item_tukushi"), 175, 565, 15, -65, 5, -1, 0)
+                CALL(evt_item_entry, STRING("item_tukushi"), ITEM_HORSETAIL, 565, 15, -65, 5, -1, 0)
             END_IF
         END_IF
     END_INLINE_EVENT
@@ -122,32 +123,31 @@ EVT_BEGIN(hei_13_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     SET_VALUE(GF(0), 0)
-    SET_VALUE(GSW(301), 0)
+    SET_VALUE(GSW(GSW_HEI13_CAN_HITS), 0)
     CALL(evt_npc_change_fbat_mode, 1)
-    CALL(evt_mobj_badgeblk, STRING("m"), -320, 60, -100, 299, 0, GSWF(1797), 1)
+    CALL(evt_mobj_badgeblk, STRING("m"), -320, 60, -100, ITEM_CLOSE_CALL, 0, GSWF(GSWF_HEI13_CLOSE_CALL_BLOCK_HIT), 1)
     SET_VALUE(LSWF(3), 0)
     CALL(evt_mobj_brick, STRING("mm"), 325, 175, -100, 0, 0, 0, LSWF(3))
     IF_INT_EQUAL(LSWF(3), 0)
-        CALL(evt_mobj_flag_onoff, 1, STRING("mm"), 2)
+        CALL(evt_mobj_flag_onoff, 1, STRING("mm"), MOBJ_FLAG_NO_SHADOW)
     END_IF
     CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_CLEAR(LW(0), 4096)
-#ifdef VERSION_G8ME01_DEMO
-        CALL(evt_item_entry, STRING("i"), 292, 325, 200, -100, 0, GSWF(1798), 0)
+    IF_BITS_CLEAR(LW(0), GLOBAL_FLAG_KIOSK)
+#if VERSION == VERSION_DEMO
+        CALL(evt_item_entry, STRING("i"), ITEM_HAPPY_HEART, 325, 200, -100, 0, GSWF(GSWF_HEI13_HAPPY_HEART_TAKEN), 0)
 #else
-        CALL(evt_item_entry, STRING("i"), 292, 325, 200, -100, 16, GSWF(1798), 0)
+        CALL(evt_item_entry, STRING("i"), ITEM_HAPPY_HEART, 325, 200, -100, 16, GSWF(GSWF_HEI13_HAPPY_HEART_TAKEN), 0)
 #endif
     END_IF
-    CALL(evt_mobj_brick, STRING("10m"), 325, 60, -100, 0, 3, 0, GSWF(1799))
+    CALL(evt_mobj_brick, STRING("10m"), 325, 60, -100, 0, 3, 0, GSWF(GSWF_HEI13_COIN_BRICK_EMPTIED))
     SET_VALUE(LW(0), PTR(ki_data))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     CALL(evt_map_playanim, STRING("anm_mugi"), 1, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_HEI1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_HEI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
     CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_CLEAR(LW(0), 4096)
-        CALL(evt_run_case_evt, 13, 1, STRING("a_kan_5"), 0, PTR(evt_anm_kan), 0)
+    IF_BITS_CLEAR(LW(0), GLOBAL_FLAG_KIOSK)
+        CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, STRING("a_kan_5"), 0, PTR(evt_anm_kan), 0)
     END_IF
     RETURN
 EVT_END()
-

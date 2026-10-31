@@ -1,3 +1,5 @@
+// Battle database of Boggly Woods (win.rel): stage data, enemy groups and the encounter tables of its maps.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -6,8 +8,7 @@
 #include "battle/battle_stage.h"
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
-
-extern BattleUnitKind unit_boss_vivian;
+#include "evt/evt_story.h"
 
 BattleStageObjectData win_btlobject_data[5];
 BattleStageData win_btlstage_data[1];
@@ -86,10 +87,10 @@ BattleStageObjectData win_btlobject_data[] = {
 
 BattleStageData win_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_02_0", // mSpecificStageDataDir
-        5, // mNumObjects
-        win_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_02_0", // specificStageDataDir
+        5, // numObjects
+        win_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -99,20 +100,20 @@ BattleStageData win_btlstage_data[] = {
 
 BattleUnitSetup btlparty_win_win_00_01_off_1[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -133,20 +134,20 @@ BattleGroupSetup btlgrp_win_win_00_01_off_1 = {
 
 BattleUnitSetup btlparty_win_win_00_01_on_1[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -167,30 +168,30 @@ BattleGroupSetup btlgrp_win_win_00_01_on_1 = {
 
 BattleUnitSetup btlparty_win_win_00_01_on_2[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -211,40 +212,40 @@ BattleGroupSetup btlgrp_win_win_00_01_on_2 = {
 
 BattleUnitSetup btlparty_win_win_00_01_on_3[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -265,20 +266,20 @@ BattleGroupSetup btlgrp_win_win_00_01_on_3 = {
 
 BattleUnitSetup btlparty_win_win_00_02_off_1[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -299,20 +300,20 @@ BattleGroupSetup btlgrp_win_win_00_02_off_1 = {
 
 BattleUnitSetup btlparty_win_win_00_02_on_1[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -333,30 +334,30 @@ BattleGroupSetup btlgrp_win_win_00_02_on_1 = {
 
 BattleUnitSetup btlparty_win_win_00_02_on_2[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -377,30 +378,30 @@ BattleGroupSetup btlgrp_win_win_00_02_on_2 = {
 
 BattleUnitSetup btlparty_win_win_00_03_off_1[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -421,20 +422,20 @@ BattleGroupSetup btlgrp_win_win_00_03_off_1 = {
 
 BattleUnitSetup btlparty_win_win_00_03_on_1[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -455,20 +456,20 @@ BattleGroupSetup btlgrp_win_win_00_03_on_1 = {
 
 BattleUnitSetup btlparty_win_win_00_03_on_2[] = {
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -489,10 +490,10 @@ BattleGroupSetup btlgrp_win_win_00_03_on_2 = {
 
 BattleUnitSetup btlparty_win_win_00_04_off_1[] = {
     {
-        &unit_boss_vivian, // mUnitKindParams
+        &unit_boss_vivian, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {55.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -512,20 +513,20 @@ BattleGroupSetup btlgrp_win_win_00_04_off_1 = {
 
 BattleUnitSetup btlparty_win_win_02_01_off_1[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -546,20 +547,20 @@ BattleGroupSetup btlgrp_win_win_02_01_off_1 = {
 
 BattleUnitSetup btlparty_win_win_02_01_on_1[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -580,30 +581,30 @@ BattleGroupSetup btlgrp_win_win_02_01_on_1 = {
 
 BattleUnitSetup btlparty_win_win_02_01_on_2[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -624,30 +625,30 @@ BattleGroupSetup btlgrp_win_win_02_01_on_2 = {
 
 BattleUnitSetup btlparty_win_win_02_01_on_3[] = {
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -668,20 +669,20 @@ BattleGroupSetup btlgrp_win_win_02_01_on_3 = {
 
 BattleUnitSetup btlparty_win_win_02_02_off_1[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -702,20 +703,20 @@ BattleGroupSetup btlgrp_win_win_02_02_off_1 = {
 
 BattleUnitSetup btlparty_win_win_02_02_on_1[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -736,30 +737,30 @@ BattleGroupSetup btlgrp_win_win_02_02_on_1 = {
 
 BattleUnitSetup btlparty_win_win_02_02_on_2[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -780,30 +781,30 @@ BattleGroupSetup btlgrp_win_win_02_02_on_2 = {
 
 BattleUnitSetup btlparty_win_win_02_02_on_3[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_sinemon, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -824,40 +825,40 @@ BattleGroupSetup btlgrp_win_win_02_02_on_3 = {
 
 BattleUnitSetup btlparty_win_win_03_01_off_1[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -878,20 +879,20 @@ BattleGroupSetup btlgrp_win_win_03_01_off_1 = {
 
 BattleUnitSetup btlparty_win_win_03_01_on_1[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -912,30 +913,30 @@ BattleGroupSetup btlgrp_win_win_03_01_on_1 = {
 
 BattleUnitSetup btlparty_win_win_03_01_on_2[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -956,30 +957,30 @@ BattleGroupSetup btlgrp_win_win_03_01_on_2 = {
 
 BattleUnitSetup btlparty_win_win_03_01_on_3[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome_kurokumorn, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1000,40 +1001,40 @@ BattleGroupSetup btlgrp_win_win_03_01_on_3 = {
 
 BattleUnitSetup btlparty_win_win_03_01_on_4[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monochrome__pakkun, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1147,7 +1148,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
         /*"win_00ドクガッスン１"*/"\x77\x69\x6E\x5F\x30\x30\x83\x68\x83\x4E\x83\x4B\x83\x62\x83\x58\x83\x93\x82\x50", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(2682), // swFlag
+        GSWF(GSWF_WIN04_FLURRIE_JOINED), // swFlag
         btlgrpsel_win_btlno_win_00_01_on, // altSelect
         btlgrpsel_win_btlno_win_00_01_off, // select
         0, 0, // battleFlags, randomMode
@@ -1157,7 +1158,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
         /*"win_00モノクロシンエモン"*/"\x77\x69\x6E\x5F\x30\x30\x83\x82\x83\x6D\x83\x4E\x83\x8D\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(2682), // swFlag
+        GSWF(GSWF_WIN04_FLURRIE_JOINED), // swFlag
         btlgrpsel_win_btlno_win_00_02_on, // altSelect
         btlgrpsel_win_btlno_win_00_02_off, // select
         0, 0, // battleFlags, randomMode
@@ -1167,7 +1168,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
         /*"win_00ドクガッスン３"*/"\x77\x69\x6E\x5F\x30\x30\x83\x68\x83\x4E\x83\x4B\x83\x62\x83\x58\x83\x93\x82\x52", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(2682), // swFlag
+        GSWF(GSWF_WIN04_FLURRIE_JOINED), // swFlag
         btlgrpsel_win_btlno_win_00_03_on, // altSelect
         btlgrpsel_win_btlno_win_00_03_off, // select
         0, 0, // battleFlags, randomMode
@@ -1181,7 +1182,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_win_btlno_win_00_04_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{5, 5}, {0}, {0}, {0}, {5, 5}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {5, 5}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG3_3WOMEN1", // bgmName
@@ -1189,7 +1190,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
         /*"win_02シンエモン１"*/"\x77\x69\x6E\x5F\x30\x32\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93\x82\x50", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(2680), // swFlag
+        GSWF(GSWF_WIN02_ALT_BATTLES), // swFlag; BUG: nothing sets this flag, so altSelect is never used (original game)
         btlgrpsel_win_btlno_win_02_01_on, // altSelect
         btlgrpsel_win_btlno_win_02_01_off, // select
         0, 0, // battleFlags, randomMode
@@ -1199,7 +1200,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
         /*"win_02パックンフラワー"*/"\x77\x69\x6E\x5F\x30\x32\x83\x70\x83\x62\x83\x4E\x83\x93\x83\x74\x83\x89\x83\x8F\x81\x5B", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(2680), // swFlag
+        GSWF(GSWF_WIN02_ALT_BATTLES), // swFlag; BUG: nothing sets this flag, so altSelect is never used (original game)
         btlgrpsel_win_btlno_win_02_02_on, // altSelect
         btlgrpsel_win_btlno_win_02_02_off, // select
         0, 0, // battleFlags, randomMode
@@ -1209,7 +1210,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
         /*"win_03パックン１"*/"\x77\x69\x6E\x5F\x30\x33\x83\x70\x83\x62\x83\x4E\x83\x93\x82\x50", // name
         NULL, 0, // mapName..fixedItem
-        GSWF(2681), // swFlag
+        GSWF(GSWF_WIN04_FLURRIE_REQUEST_HEARD), // swFlag
         btlgrpsel_win_btlno_win_03_01_on, // altSelect
         btlgrpsel_win_btlno_win_03_01_off, // select
         0, 0, // battleFlags, randomMode
@@ -1230,4 +1231,3 @@ NpcTerritoryInfo btl_win_setup_no_tbl[] = {
     {"BTLNO_WIN_03_01", 7},
     {0},
 };
-

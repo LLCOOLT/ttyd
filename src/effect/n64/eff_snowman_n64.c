@@ -1,32 +1,36 @@
+// Paper Mario 64 effect: a snowman that drops in, then hops along a preset path kicking up snow dust and vapor.
+#include "eff/n64/eff_snowman_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
+#include "eff/n64/eff_snow_dust_n64.h"
 #include "memory.h"
 #include <stdlib.h>
+#include "version.h"
 
 typedef struct EffSnowmanN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    s32 lifetime;  // 0x10
-    s32 frame;     // 0x14
-    s32 r;         // 0x18
-    s32 g;         // 0x1C
-    s32 b;         // 0x20
-    s32 alpha;     // 0x24
-    f32 scale;     // 0x28
-    f32 rotY;      // 0x2C
-    Vec offset;    // 0x30
-    Vec speed;     // 0x3C
-    f32 hscale;    // 0x48
-    f32 wscale;    // 0x4C
-    f32 gravity;   // 0x50
-    s32 counter;   // 0x54
-    s32 state;     // 0x58
-    s32 phase;     // 0x5C
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    s32 lifetime; // 0x10
+    s32 frame;    // 0x14
+    s32 r;        // 0x18
+    s32 g;        // 0x1C
+    s32 b;        // 0x20
+    s32 alpha;    // 0x24
+    f32 scale;    // 0x28
+    f32 rotY;     // 0x2C
+    Vec offset;   // 0x30
+    Vec speed;    // 0x3C
+    f32 hscale;   // 0x48
+    f32 wscale;   // 0x4C
+    f32 gravity;  // 0x50
+    s32 counter;  // 0x54
+    s32 state;    // 0x58
+    s32 phase;    // 0x5C
 } EffSnowmanN64Work;
 
+// FAKE: local prototype: effVaporN64Entry declares the parameters as (s32, f32 x4, s32) (eff_vapor_n64.h: (s32, s32, f32 x4), same registers); this file was compiled with it and the header prototype changes the code.
 EffectEntry* effVaporN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 delay);
-EffectEntry* effSnowDustN64Entry(s32 a, s32 b, s32 c, f32 x, f32 y, f32 z, f32 d, f32 e, f32 f);
 
 static s8 jump_hscale_data[] = {100, 90, 82, 76, 72, 70, 74, 89, 103, 116, 118, 120, 120, 120, 120, 118, 114, 110};
 static u8 land_hscale_data[] = "dZRLHFJYdlnlf`_`ceddddddddd";
@@ -35,7 +39,7 @@ static u8 jump2_hscale_data[] = {100, 90, 82, 76, 72, 70, 70, 70, 70, 70, 70, 70
 
 static s8 jump2_ry_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // An older jump table the demo still carries; nothing reads it.
 typedef struct SnowmanJumpStep {
     s16 x;
@@ -71,7 +75,7 @@ EffectEntry* effSnowmanN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32
     work = __memAlloc(HEAP_EFFECT, sizeof(EffSnowmanN64Work));
     effect->userdata = work;
     effect->callback = effSnowmanMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -117,8 +121,8 @@ void effSnowmanMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     zero = 0.0f;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {

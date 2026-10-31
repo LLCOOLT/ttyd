@@ -1,26 +1,28 @@
+// Shadow Queen's breath (toiki, 影の女王・吐息): a cloud that drifts and slows while its texture scrolls, releasing
+// mist puffs along the way; type 0 dark breath, 1 confusion breath, 2 poison breath.
 #include "eff/eff_toiki.h"
 #include "driver/dispdrv.h"
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
-
-void* effMistEntry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 angle);
+#include "eff/eff_mist.h"
 
 typedef struct EffToikiWork {
-    s32 type;         // 0x0
-    Vec position;     // 0x4
-    Vec velocity;     // 0x10
-    f32 scale;        // 0x1C
-    f32 angle;        // 0x20
-    f32 texOffset;    // 0x24
-    f32 alpha;        // 0x28
-    s32 counter;      // 0x2C
-    s32 timer;        // 0x30
+    s32 type;      // 0x0
+    Vec position;  // 0x4
+    Vec velocity;  // 0x10
+    f32 scale;     // 0x1C
+    f32 angle;     // 0x20
+    f32 texOffset; // 0x24
+    f32 alpha;     // 0x28
+    s32 counter;   // 0x2C
+    s32 timer;     // 0x30
 } EffToikiWork;
 
-
+// Model data in the exporter's layout: indexed vertex arrays (positions, normals, colours, texture coordinates),
+// display lists of GX commands (each padded to 32 bytes with GX_NOP) and, per list table, the list sizes in
+// 32-byte units for GXCallDisplayList.
 static s16 queen_toiki_vertex_tbl[] __attribute__((aligned(32))) = {
     -20614, -6729, 0, -20385, -6698, 0, -19918, -6319,
     0, -19960, -6208, 0, -20494, -6254, 0, -22117,
@@ -130,8 +132,8 @@ static u8 queen_toiki_dl_0_13[] __attribute__((aligned(32))) = {
     0x98, 0x00, 0x04, 0x15, 0x00, 0x01, 0x1A, 0x1E, 0x00, 0x00, 0x1B, 0x0A, 0x00, 0x01, 0x19, 0x1D,
     0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
-static u8* queen_toiki_dl_0_tbl[] = { queen_toiki_dl_0_0, queen_toiki_dl_0_1, queen_toiki_dl_0_2, queen_toiki_dl_0_3, queen_toiki_dl_0_4, queen_toiki_dl_0_5, queen_toiki_dl_0_6, queen_toiki_dl_0_7, queen_toiki_dl_0_8, queen_toiki_dl_0_9, queen_toiki_dl_0_10, queen_toiki_dl_0_11, queen_toiki_dl_0_12, queen_toiki_dl_0_13 };
-static u8 queen_toiki_dl_0_size_tbl[] = { 3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+static u8* queen_toiki_dl_0_tbl[] = {queen_toiki_dl_0_0, queen_toiki_dl_0_1, queen_toiki_dl_0_2, queen_toiki_dl_0_3, queen_toiki_dl_0_4, queen_toiki_dl_0_5, queen_toiki_dl_0_6, queen_toiki_dl_0_7, queen_toiki_dl_0_8, queen_toiki_dl_0_9, queen_toiki_dl_0_10, queen_toiki_dl_0_11, queen_toiki_dl_0_12, queen_toiki_dl_0_13};
+static u8 queen_toiki_dl_0_size_tbl[] = {3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 EffectEntry* effToikiEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -143,7 +145,7 @@ EffectEntry* effToikiEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffToikiWork));
     effect->userdata = work;
     effect->callback = effToikiMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -164,7 +166,7 @@ void effToikiMain(EffectEntry* effect) {
     EffToikiWork* work = effect->userdata;
     Vec position;
     Vec mist;
-    Vec tmp = { 0.0f, 0.0f, 0.0f };
+    Vec tmp = {0.0f, 0.0f, 0.0f};
     Mtx rot;
     s32 type;
     f32 angle;
@@ -175,8 +177,8 @@ void effToikiMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {
@@ -215,7 +217,7 @@ void effToikiMain(EffectEntry* effect) {
 
 void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
     EffToikiWork* work = effect->userdata;
-    static u8 color_tbl[3][4] = { { 0x03, 0x02, 0x21, 0xFF }, { 0xD8, 0x0F, 0x51, 0xFF }, { 0x0B, 0x1B, 0x00, 0xFF } };
+    static u8 color_tbl[3][4] = {{0x03, 0x02, 0x21, 0xFF}, {0xD8, 0x0F, 0x51, 0xFF}, {0x0B, 0x1B, 0x00, 0xFF}};
     GXTexObj texObj;
     Mtx mtx;
     Mtx rot;
@@ -232,8 +234,8 @@ void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetTevColor(GX_TEVREG0, (GXColor){ color_tbl[type][0], color_tbl[type][1], color_tbl[type][2],
-                                         (u8)work->alpha });
+    GXSetTevColor(GX_TEVREG0, (GXColor){color_tbl[type][0], color_tbl[type][1], color_tbl[type][2],
+                                        (u8)work->alpha});
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     PSMTXTrans(mtx, work->texOffset, 0.0f, 0.0f);

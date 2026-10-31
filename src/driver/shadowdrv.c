@@ -1,4 +1,7 @@
-#ifdef VERSION_G8ME01_DEMO
+// Shadow driver: blob, cylinder, projected and depth shadows (shadowInit, shadowMain, shadowDisp).
+#include "version.h"
+// Shadow driver: blob, cylinder, projected and depth shadows.
+#if VERSION == VERSION_DEMO
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -12,8 +15,7 @@
 #include "system.h"
 #include <string.h>
 #include "driver/mobjdrv.h"
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
+#include "eff/eff_n64.h"
 
 void shadowCharShadowDisp_Collision(CameraId cameraId, void* param);
 void shadowCharShadowDisp_Projection(CameraId cameraId, void* param);
@@ -26,136 +28,659 @@ void depthShadowEnd(CameraId cameraId, void* param);
 void shadowDisp(CameraId cameraId, void* param);
 BOOL _filter(HitCheckQuery* query, HitEntry* hit);
 
-
 static ShadowConfig shadowConfig[2] = {
-    {0, {-100.0f, 256.0f, 335.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, -20.0f, 20.0f, 356.0f, 741.0f, 0, 3, 0, -4.47f},
-    {1, {135.0f, 40.0f, 41.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, -240.0f, 240.0f, 80.0f, 10000.0f, 1, 3, 0, 0.0f},
+    { 0, { -100.0f, 256.0f, 335.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, -20.0f, 20.0f, 356.0f, 741.0f, 0, 3, 0, -4.47f },
+    { 1, { 135.0f, 40.0f, 41.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, -240.0f, 240.0f, 80.0f, 10000.0f, 1, 3, 0, 0.0f },
 };
 
 static f32 testKagePosArray[18] ATTRIBUTE_ALIGN(32) = {
-    0.0f, 0.0f, -1.0f,
-    0.9f, 0.0f, -0.5f,
-    -0.9f, 0.0f, -0.5f,
-    0.9f, 0.0f, 0.5f,
-    -0.9f, 0.0f, 0.5f,
-    0.0f, 0.0f, 1.0f,
+    0.0f,
+    0.0f,
+    -1.0f,
+    0.9f,
+    0.0f,
+    -0.5f,
+    -0.9f,
+    0.0f,
+    -0.5f,
+    0.9f,
+    0.0f,
+    0.5f,
+    -0.9f,
+    0.0f,
+    0.5f,
+    0.0f,
+    0.0f,
+    1.0f,
 };
 
 static u8 cylinder_dl_top[64] ATTRIBUTE_ALIGN(32) = {
-    0xA0, 0x00, 0x10, 0x00, 0x00, 0x0F, 0x00, 0x0E, 0x00, 0x0D, 0x00, 0x0C, 0x00, 0x0B, 0x00, 0x0A,
-    0x00, 0x09, 0x00, 0x08, 0x00, 0x07, 0x00, 0x06, 0x00, 0x05, 0x00, 0x04, 0x00, 0x03, 0x00, 0x02,
-    0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xA0,
+    0x00,
+    0x10,
+    0x00,
+    0x00,
+    0x0F,
+    0x00,
+    0x0E,
+    0x00,
+    0x0D,
+    0x00,
+    0x0C,
+    0x00,
+    0x0B,
+    0x00,
+    0x0A,
+    0x00,
+    0x09,
+    0x00,
+    0x08,
+    0x00,
+    0x07,
+    0x00,
+    0x06,
+    0x00,
+    0x05,
+    0x00,
+    0x04,
+    0x00,
+    0x03,
+    0x00,
+    0x02,
+    0x00,
+    0x01,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
 };
 
 static u8 cylinder_dl_bottom[64] ATTRIBUTE_ALIGN(32) = {
-    0xA0, 0x00, 0x10, 0x10, 0x01, 0x11, 0x01, 0x12, 0x01, 0x13, 0x01, 0x14, 0x01, 0x15, 0x01, 0x16,
-    0x01, 0x17, 0x01, 0x18, 0x01, 0x19, 0x01, 0x1A, 0x01, 0x1B, 0x01, 0x1C, 0x01, 0x1D, 0x01, 0x1E,
-    0x01, 0x1F, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xA0,
+    0x00,
+    0x10,
+    0x10,
+    0x01,
+    0x11,
+    0x01,
+    0x12,
+    0x01,
+    0x13,
+    0x01,
+    0x14,
+    0x01,
+    0x15,
+    0x01,
+    0x16,
+    0x01,
+    0x17,
+    0x01,
+    0x18,
+    0x01,
+    0x19,
+    0x01,
+    0x1A,
+    0x01,
+    0x1B,
+    0x01,
+    0x1C,
+    0x01,
+    0x1D,
+    0x01,
+    0x1E,
+    0x01,
+    0x1F,
+    0x01,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
 };
 
 static u8 cylinder_dl_side[64] ATTRIBUTE_ALIGN(32) = {
-    0x98, 0x00, 0x1E, 0x11, 0x01, 0x01, 0x02, 0x12, 0x01, 0x02, 0x02, 0x13, 0x01, 0x03, 0x02, 0x14,
-    0x01, 0x04, 0x02, 0x15, 0x01, 0x05, 0x02, 0x16, 0x01, 0x06, 0x02, 0x17, 0x01, 0x07, 0x02, 0x18,
-    0x01, 0x08, 0x02, 0x19, 0x01, 0x09, 0x02, 0x1A, 0x01, 0x0A, 0x02, 0x1B, 0x01, 0x0B, 0x02, 0x1C,
-    0x01, 0x0C, 0x02, 0x1D, 0x01, 0x0D, 0x02, 0x1E, 0x01, 0x0E, 0x02, 0x1F, 0x01, 0x0F, 0x02, 0x00,
+    0x98,
+    0x00,
+    0x1E,
+    0x11,
+    0x01,
+    0x01,
+    0x02,
+    0x12,
+    0x01,
+    0x02,
+    0x02,
+    0x13,
+    0x01,
+    0x03,
+    0x02,
+    0x14,
+    0x01,
+    0x04,
+    0x02,
+    0x15,
+    0x01,
+    0x05,
+    0x02,
+    0x16,
+    0x01,
+    0x06,
+    0x02,
+    0x17,
+    0x01,
+    0x07,
+    0x02,
+    0x18,
+    0x01,
+    0x08,
+    0x02,
+    0x19,
+    0x01,
+    0x09,
+    0x02,
+    0x1A,
+    0x01,
+    0x0A,
+    0x02,
+    0x1B,
+    0x01,
+    0x0B,
+    0x02,
+    0x1C,
+    0x01,
+    0x0C,
+    0x02,
+    0x1D,
+    0x01,
+    0x0D,
+    0x02,
+    0x1E,
+    0x01,
+    0x0E,
+    0x02,
+    0x1F,
+    0x01,
+    0x0F,
+    0x02,
+    0x00,
 };
 
 static u8 cylinder_dl_top_inside[64] ATTRIBUTE_ALIGN(32) = {
-    0xA0, 0x00, 0x10, 0x20, 0x00, 0x2F, 0x00, 0x2E, 0x00, 0x2D, 0x00, 0x2C, 0x00, 0x2B, 0x00, 0x2A,
-    0x00, 0x29, 0x00, 0x28, 0x00, 0x27, 0x00, 0x26, 0x00, 0x25, 0x00, 0x24, 0x00, 0x23, 0x00, 0x22,
-    0x00, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xA0,
+    0x00,
+    0x10,
+    0x20,
+    0x00,
+    0x2F,
+    0x00,
+    0x2E,
+    0x00,
+    0x2D,
+    0x00,
+    0x2C,
+    0x00,
+    0x2B,
+    0x00,
+    0x2A,
+    0x00,
+    0x29,
+    0x00,
+    0x28,
+    0x00,
+    0x27,
+    0x00,
+    0x26,
+    0x00,
+    0x25,
+    0x00,
+    0x24,
+    0x00,
+    0x23,
+    0x00,
+    0x22,
+    0x00,
+    0x21,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
 };
 
 static u8 cylinder_dl_top_outside[64] ATTRIBUTE_ALIGN(32) = {
-    0x98, 0x00, 0x1E, 0x01, 0x02, 0x21, 0x00, 0x02, 0x02, 0x22, 0x00, 0x03, 0x02, 0x23, 0x00, 0x04,
-    0x02, 0x24, 0x00, 0x05, 0x02, 0x25, 0x00, 0x06, 0x02, 0x26, 0x00, 0x07, 0x02, 0x27, 0x00, 0x08,
-    0x02, 0x28, 0x00, 0x09, 0x02, 0x29, 0x00, 0x0A, 0x02, 0x2A, 0x00, 0x0B, 0x02, 0x2B, 0x00, 0x0C,
-    0x02, 0x2C, 0x00, 0x0D, 0x02, 0x2D, 0x00, 0x0E, 0x02, 0x2E, 0x00, 0x0F, 0x02, 0x2F, 0x00, 0x00,
+    0x98,
+    0x00,
+    0x1E,
+    0x01,
+    0x02,
+    0x21,
+    0x00,
+    0x02,
+    0x02,
+    0x22,
+    0x00,
+    0x03,
+    0x02,
+    0x23,
+    0x00,
+    0x04,
+    0x02,
+    0x24,
+    0x00,
+    0x05,
+    0x02,
+    0x25,
+    0x00,
+    0x06,
+    0x02,
+    0x26,
+    0x00,
+    0x07,
+    0x02,
+    0x27,
+    0x00,
+    0x08,
+    0x02,
+    0x28,
+    0x00,
+    0x09,
+    0x02,
+    0x29,
+    0x00,
+    0x0A,
+    0x02,
+    0x2A,
+    0x00,
+    0x0B,
+    0x02,
+    0x2B,
+    0x00,
+    0x0C,
+    0x02,
+    0x2C,
+    0x00,
+    0x0D,
+    0x02,
+    0x2D,
+    0x00,
+    0x0E,
+    0x02,
+    0x2E,
+    0x00,
+    0x0F,
+    0x02,
+    0x2F,
+    0x00,
+    0x00,
 };
 
 static u8 cube_dl_top[64] ATTRIBUTE_ALIGN(32) = {
-    0x80, 0x00, 0x14, 0x30, 0x00, 0x31, 0x00, 0x32, 0x00, 0x33, 0x00, 0x34, 0x02, 0x35, 0x02, 0x31,
-    0x00, 0x30, 0x00, 0x31, 0x00, 0x35, 0x02, 0x36, 0x02, 0x32, 0x00, 0x33, 0x00, 0x32, 0x00, 0x36,
-    0x02, 0x37, 0x02, 0x34, 0x02, 0x30, 0x00, 0x33, 0x00, 0x37, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x80,
+    0x00,
+    0x14,
+    0x30,
+    0x00,
+    0x31,
+    0x00,
+    0x32,
+    0x00,
+    0x33,
+    0x00,
+    0x34,
+    0x02,
+    0x35,
+    0x02,
+    0x31,
+    0x00,
+    0x30,
+    0x00,
+    0x31,
+    0x00,
+    0x35,
+    0x02,
+    0x36,
+    0x02,
+    0x32,
+    0x00,
+    0x33,
+    0x00,
+    0x32,
+    0x00,
+    0x36,
+    0x02,
+    0x37,
+    0x02,
+    0x34,
+    0x02,
+    0x30,
+    0x00,
+    0x33,
+    0x00,
+    0x37,
+    0x02,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
 };
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // the demo's -sdata 8 keeps these in .data, ahead of the vertex table
 u8 cube_dl_bottom[32] ATTRIBUTE_ALIGN(32) = {
-    0x80, 0x00, 0x04, 0x38, 0x01, 0x39, 0x01, 0x3A, 0x01, 0x3B, 0x01, 0x00,
+    0x80,
+    0x00,
+    0x04,
+    0x38,
+    0x01,
+    0x39,
+    0x01,
+    0x3A,
+    0x01,
+    0x3B,
+    0x01,
+    0x00,
 };
 u8 cube_dl_side[32] ATTRIBUTE_ALIGN(32) = {
-    0x98, 0x00, 0x0A, 0x35, 0x02, 0x38, 0x01, 0x36, 0x02, 0x39, 0x01, 0x37,
-    0x02, 0x3A, 0x01, 0x38, 0x02, 0x3B, 0x01, 0x39, 0x02, 0x38, 0x01, 0x00,
+    0x98,
+    0x00,
+    0x0A,
+    0x35,
+    0x02,
+    0x38,
+    0x01,
+    0x36,
+    0x02,
+    0x39,
+    0x01,
+    0x37,
+    0x02,
+    0x3A,
+    0x01,
+    0x38,
+    0x02,
+    0x3B,
+    0x01,
+    0x39,
+    0x02,
+    0x38,
+    0x01,
+    0x00,
 };
 #endif
 static f32 vertex_tbl[180] ATTRIBUTE_ALIGN(32) = {
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f,
-    0.433884f, 0.0f, 0.900969f,
-    0.781832f, 0.0f, 0.62349f,
-    0.974928f, 0.0f, 0.222521f,
-    0.974928f, 0.0f, -0.222521f,
-    0.781831f, 0.0f, -0.62349f,
-    0.433884f, 0.0f, -0.900969f,
-    -0.0f, 0.0f, -1.0f,
-    -0.433884f, 0.0f, -0.900969f,
-    -0.781832f, 0.0f, -0.62349f,
-    -0.974928f, 0.0f, -0.222521f,
-    -0.974928f, 0.0f, 0.222521f,
-    -0.781832f, 0.0f, 0.62349f,
-    -0.433884f, 0.0f, 0.900969f,
-    0.0f, 0.0f, 1.0f,
-    0.0f, -1.0f, 0.0f,
-    0.0f, -1.0f, 1.0f,
-    0.433884f, -1.0f, 0.900969f,
-    0.781832f, -1.0f, 0.62349f,
-    0.974928f, -1.0f, 0.222521f,
-    0.974928f, -1.0f, -0.222521f,
-    0.781831f, -1.0f, -0.62349f,
-    0.433884f, -1.0f, -0.900969f,
-    -0.0f, -1.0f, -1.0f,
-    -0.433884f, -1.0f, -0.900969f,
-    -0.781832f, -1.0f, -0.62349f,
-    -0.974928f, -1.0f, -0.222521f,
-    -0.974928f, -1.0f, 0.222521f,
-    -0.781832f, -1.0f, 0.62349f,
-    -0.433884f, -1.0f, 0.900969f,
-    0.0f, -1.0f, 1.0f,
-    0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.6f,
-    0.2603304f, 0.0f, 0.54058146f,
-    0.4690992f, 0.0f, 0.374094f,
-    0.5849568f, 0.0f, 0.13351262f,
-    0.5849568f, 0.0f, -0.13351262f,
-    0.46909863f, 0.0f, -0.374094f,
-    0.2603304f, 0.0f, -0.54058146f,
-    0.0f, 0.0f, -0.6f,
-    -0.2603304f, 0.0f, -0.54058146f,
-    -0.4690992f, 0.0f, -0.374094f,
-    -0.5849568f, 0.0f, -0.13351262f,
-    -0.5849568f, 0.0f, 0.13351262f,
-    -0.4690992f, 0.0f, 0.374094f,
-    -0.2603304f, 0.0f, 0.54058146f,
-    0.0f, 0.0f, 0.6f,
-    -0.6f, 0.0f, 0.6f,
-    -0.6f, 0.0f, -0.6f,
-    0.6f, 0.0f, -0.6f,
-    0.6f, 0.0f, 0.6f,
-    -1.0f, 0.0f, 1.0f,
-    -1.0f, 0.0f, -1.0f,
-    1.0f, 0.0f, -1.0f,
-    1.0f, 0.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f,
-    -1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, 1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    0.433884f,
+    0.0f,
+    0.900969f,
+    0.781832f,
+    0.0f,
+    0.62349f,
+    0.974928f,
+    0.0f,
+    0.222521f,
+    0.974928f,
+    0.0f,
+    -0.222521f,
+    0.781831f,
+    0.0f,
+    -0.62349f,
+    0.433884f,
+    0.0f,
+    -0.900969f,
+    -0.0f,
+    0.0f,
+    -1.0f,
+    -0.433884f,
+    0.0f,
+    -0.900969f,
+    -0.781832f,
+    0.0f,
+    -0.62349f,
+    -0.974928f,
+    0.0f,
+    -0.222521f,
+    -0.974928f,
+    0.0f,
+    0.222521f,
+    -0.781832f,
+    0.0f,
+    0.62349f,
+    -0.433884f,
+    0.0f,
+    0.900969f,
+    0.0f,
+    0.0f,
+    1.0f,
+    0.0f,
+    -1.0f,
+    0.0f,
+    0.0f,
+    -1.0f,
+    1.0f,
+    0.433884f,
+    -1.0f,
+    0.900969f,
+    0.781832f,
+    -1.0f,
+    0.62349f,
+    0.974928f,
+    -1.0f,
+    0.222521f,
+    0.974928f,
+    -1.0f,
+    -0.222521f,
+    0.781831f,
+    -1.0f,
+    -0.62349f,
+    0.433884f,
+    -1.0f,
+    -0.900969f,
+    -0.0f,
+    -1.0f,
+    -1.0f,
+    -0.433884f,
+    -1.0f,
+    -0.900969f,
+    -0.781832f,
+    -1.0f,
+    -0.62349f,
+    -0.974928f,
+    -1.0f,
+    -0.222521f,
+    -0.974928f,
+    -1.0f,
+    0.222521f,
+    -0.781832f,
+    -1.0f,
+    0.62349f,
+    -0.433884f,
+    -1.0f,
+    0.900969f,
+    0.0f,
+    -1.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.6f,
+    0.2603304f,
+    0.0f,
+    0.54058146f,
+    0.4690992f,
+    0.0f,
+    0.374094f,
+    0.5849568f,
+    0.0f,
+    0.13351262f,
+    0.5849568f,
+    0.0f,
+    -0.13351262f,
+    0.46909863f,
+    0.0f,
+    -0.374094f,
+    0.2603304f,
+    0.0f,
+    -0.54058146f,
+    0.0f,
+    0.0f,
+    -0.6f,
+    -0.2603304f,
+    0.0f,
+    -0.54058146f,
+    -0.4690992f,
+    0.0f,
+    -0.374094f,
+    -0.5849568f,
+    0.0f,
+    -0.13351262f,
+    -0.5849568f,
+    0.0f,
+    0.13351262f,
+    -0.4690992f,
+    0.0f,
+    0.374094f,
+    -0.2603304f,
+    0.0f,
+    0.54058146f,
+    0.0f,
+    0.0f,
+    0.6f,
+    -0.6f,
+    0.0f,
+    0.6f,
+    -0.6f,
+    0.0f,
+    -0.6f,
+    0.6f,
+    0.0f,
+    -0.6f,
+    0.6f,
+    0.0f,
+    0.6f,
+    -1.0f,
+    0.0f,
+    1.0f,
+    -1.0f,
+    0.0f,
+    -1.0f,
+    1.0f,
+    0.0f,
+    -1.0f,
+    1.0f,
+    0.0f,
+    1.0f,
+    -1.0f,
+    -1.0f,
+    1.0f,
+    -1.0f,
+    -1.0f,
+    -1.0f,
+    1.0f,
+    -1.0f,
+    -1.0f,
+    1.0f,
+    -1.0f,
+    1.0f,
 };
-
 
 //.bss
 CharShadowWork char_shadow_work;
@@ -174,33 +699,66 @@ CharShadowWork* cswp = &char_shadow_work;
 ProjShadowWork* pswp = &proj_shadow_work;
 DepthShadowWork* dswp = &depth_shadow_work;
 u16 ShadowSizeTbl[4] = {0x190, 0x100, 0x80, 0x40};
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 u8 cube_dl_bottom[32] ATTRIBUTE_ALIGN(32) = {
-    0x80, 0x00, 0x04, 0x38, 0x01, 0x39, 0x01, 0x3A, 0x01, 0x3B, 0x01, 0x00,
+    0x80,
+    0x00,
+    0x04,
+    0x38,
+    0x01,
+    0x39,
+    0x01,
+    0x3A,
+    0x01,
+    0x3B,
+    0x01,
+    0x00,
 };
 u8 cube_dl_side[32] ATTRIBUTE_ALIGN(32) = {
-    0x98, 0x00, 0x0A, 0x35, 0x02, 0x38, 0x01, 0x36, 0x02, 0x39, 0x01, 0x37,
-    0x02, 0x3A, 0x01, 0x38, 0x02, 0x3B, 0x01, 0x39, 0x02, 0x38, 0x01, 0x00,
+    0x98,
+    0x00,
+    0x0A,
+    0x35,
+    0x02,
+    0x38,
+    0x01,
+    0x36,
+    0x02,
+    0x39,
+    0x01,
+    0x37,
+    0x02,
+    0x3A,
+    0x01,
+    0x38,
+    0x02,
+    0x3B,
+    0x01,
+    0x39,
+    0x02,
+    0x38,
+    0x01,
+    0x00,
 };
 #endif
 static GXColor color_tbl[3] ATTRIBUTE_ALIGN(32) = {
-    {0x00, 0x00, 0x00, 0x6E}, {0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x16},
+    { 0x00, 0x00, 0x00, 0x6E },
+    { 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x16 },
 };
 GXColor color_tbl_nodecay[3] ATTRIBUTE_ALIGN(32) = {
-    {0x00, 0x00, 0x00, 0x6E}, {0x00, 0x00, 0x00, 0x6E}, {0x00, 0x00, 0x00, 0x6E},
+    { 0x00, 0x00, 0x00, 0x6E },
+    { 0x00, 0x00, 0x00, 0x6E },
+    { 0x00, 0x00, 0x00, 0x6E },
 };
 GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
-    {0x00, 0x00, 0x00, 0x8E}, {0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x16},
+    { 0x00, 0x00, 0x00, 0x8E },
+    { 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x16 },
 };
-
-
-
-
-
 
 static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
-
 
 void shadowInit(void) {
     u32 bufferSize;
@@ -279,7 +837,7 @@ static inline void shadowSetupPolygon(void) {
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA); // no shadow alpha register in the demo
 #else
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_RASA, GX_CA_ZERO);
@@ -294,7 +852,7 @@ static inline void shadowSetupPolygon(void) {
 }
 
 static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
-    f32 (*proj)[4];
+    f32(*proj)[4];
     ShadowConfig* cfg;
     u16 size;
     Vec pos;
@@ -308,6 +866,8 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
     GXGetScissor(&tmp_sci[0], &tmp_sci[1], &tmp_sci[2], &tmp_sci[3]);
     GXSetViewport(0.0f, 0.0f, size, size, 0.0f, 1.0f);
     GXSetScissor(1, 1, size - 2, size - 2);
+    // FAKE: shadowBegin is inlined into shadowDisp; the comma expression and the byte-offset ShadowConfig reads
+    // (sizeIdx above, projType below) keep the target registers there; same addresses
     cfg = (0, &shadowConfig[wp->configIdx]);
     proj = wp->proj;
     pos = cfg->pos;
@@ -322,14 +882,13 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
     PSMTXCopy(wp->view, camGetCurPtr()->view);
 }
 
-
 void shadowDisp(CameraId cameraId, void* param) {
     DispEntry* disp;
     CameraEntry* cam;
 
     disp = dispGetCurWork();
 
-    if ((( cameraId == CAMERA_OFFSCREEN2 ) || (( (u32)(cameraId - CAMERA_3D) ) <= 1 )) || ( cameraId == CAMERA_3D_EFFECTB) ) {
+    if (((cameraId == CAMERA_OFFSCREEN2) || (((u32)(cameraId - CAMERA_3D)) <= 1)) || (cameraId == CAMERA_3D_EFFECTB)) {
         shadowCharShadowDisp_Polygon(cameraId, param);
         {
             f32 t;
@@ -346,7 +905,7 @@ void shadowDisp(CameraId cameraId, void* param) {
         GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-        GXSetArray(GX_VA_POS, (0, vertex_tbl) , 12);
+        GXSetArray(GX_VA_POS, vertex_tbl, 12);
         GXSetArray(GX_VA_CLR0, color_tbl, 4);
         cylinderShadowDraw(cameraId, param);
         shadowCharShadowDisp_Texture(cameraId, param);
@@ -356,7 +915,14 @@ void shadowDisp(CameraId cameraId, void* param) {
                 ShadowConfig* cfg;
                 shadowCharShadowDisp_Collision(cameraId, param);
                 if ((cfg = &shadowConfig[cswp->configIdx])->follow == 1) {
-                    cam->cameraAt.z = cam->cameraAt.z; // FAKE: self-assignment; removing it changes codegen
+                    // FAKE: a read of cam in a never-taken branch keeps a cam web live from entry into this case, which
+                    // gives cfg the target register (r27); it never executes, so nothing reads the unset pointer
+                    {
+                        s32 gz = 0;
+                        if (gz != 0) {
+                            cam->cameraAt.z = cam->cameraAt.z;
+                        }
+                    }
                     cam = camGetPtr(CAMERA_3D);
                     cfg->pos.x = cam->cameraAt.x;
                     cfg->pos.y = 1000.0f + cam->cameraAt.y;
@@ -388,9 +954,10 @@ void shadowDisp(CameraId cameraId, void* param) {
 }
 
 #pragma push
+// FAKE: keeps the dead stores that the target has; removing it changes the code
 #pragma opt_dead_assignments off
 BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
-    f32 t = 20.0f;
+    f32 t = 20.0f; // FAKE: dead store (kept by opt_dead_assignments off) that puts 20.0f at its target .sdata2 slot
 
     if ((hitGetAttr(hit) & 0x80000000) && (*(u32*)mobjHitObjPtrToPtr(hit) & 0x800)) {
         return FALSE;
@@ -399,12 +966,10 @@ BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
 }
 #pragma pop
 
-
-
 void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     s32 i;
-    f32 (*m)[4];
+    f32(*m)[4];
     f32 size;
     HitCheckQuery* q;
     f32 sy;
@@ -413,17 +978,20 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     camGetCurPtr();
     for (i = 0; i < cswp->numEntries; i++, entry++) {
         m = entry->mtx;
-        if (!entry->size) { continue;
+        if (!entry->size) {
+            continue;
         }
-        if (entry->flags & 2) { continue;
+        if (entry->flags & 2) {
+            continue;
         }
-        if ( (entry->mode != 3 ) && (entry->flags & 1)) {
+        if ((entry->mode != 3) && (entry->flags & 1)) {
             query.targetPos = entry->pos;
             query.targetPos.y += 1.0f;
             query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
             query.targetDistance = 150.0f;
             q = &query;
-            if (!hitCheckVecFilter(&query, _filter)) { continue;
+            if (!hitCheckVecFilter(&query, _filter)) {
+                continue;
             }
             size = entry->size;
             sy = entry->sizeY;
@@ -435,13 +1003,13 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
             m[1][2] = query.hitNormal.z * size;
             m[2][0] = 0.0f;
             m[2][1] = query.hitNormal.z * size;
-            m[2][2] = ( -query.hitNormal.y ) * size;
-            m[0][0] = size * ((( -query.hitNormal.y ) * query.hitNormal.y ) - ( query.hitNormal.z * query.hitNormal.z) );
+            m[2][2] = (-query.hitNormal.y) * size;
+            m[0][0] = size * (((-query.hitNormal.y) * query.hitNormal.y) - (query.hitNormal.z * query.hitNormal.z));
             m[0][1] = size * (query.hitNormal.x * query.hitNormal.y);
             m[0][2] = size * (query.hitNormal.x * query.hitNormal.z);
         } else {
             PSMTXTrans(m, entry->pos.x, 1.5f + entry->pos.y, entry->pos.z);
-            m[0][0] = ( m[2][2] = entry->size) ;
+            m[0][0] = (m[2][2] = entry->size);
             m[1][1] = entry->sizeY;
         }
         entry->flags |= 2;
@@ -452,7 +1020,7 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     ShadowConfig* cfg;
     CharShadowWork* wp;
     ShadowEntry* entry;
-    f32 (*view)[4];
+    f32(*view)[4];
     u8 alpha;
     s32 i;
     Mtx m;
@@ -476,9 +1044,12 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     }
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     for (i = 0; i < cswp->numEntries; i++, entry++) {
-        if (!entry->size) continue;
-        if (entry->mode != 3) continue;
-        if (!(entry->flags & 2)) continue;
+        if (!entry->size)
+            continue;
+        if (entry->mode != 3)
+            continue;
+        if (!(entry->flags & 2))
+            continue;
         PSMTXConcat(view, entry->mtx, m);
         GXLoadPosMtxImm(m, GX_PNMTX0);
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 6);
@@ -516,28 +1087,44 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
         GXBegin(GX_QUADS, GX_VTXFMT0, 16);
         cx = 0.0f;
         cz = 0.0f;
-        GXPosition3f32((cx - w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32((cx + w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32((cx + w), cx, fh + (cz - h)); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32((cx - w), cx, fh + (cz - h)); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32((cx - w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32((cx + w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32((cx + w), cx, (cz + h) - fh); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32((cx - w), cx, (cz + h) - fh); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32((cx - w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32((cx - w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(fw + (cx - w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(fw + (cx - w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32((cx + w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32((cx + w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32((cx + w) - fw, cx, (cz + h)); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32((cx + w) - fw, cx, (cz - h)); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz - h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz - h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, fh + (cz - h));
+        GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, fh + (cz - h));
+        GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz + h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz + h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz + h) - fh);
+        GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz + h) - fh);
+        GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz - h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx - w), cx, (cz + h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32(fw + (cx - w), cx, (cz + h));
+        GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32(fw + (cx - w), cx, (cz - h));
+        GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx + w), cx, (cz - h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz + h));
+        GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w) - fw, cx, (cz + h));
+        GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx + w) - fw, cx, (cz - h));
+        GXColor4u8(0, 0, 0, 0);
     }
 }
 
 void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
-    f32 (*view)[4];
+    f32(*view)[4];
     s32 i;
     Mtx m;
     u16 left, top, right, bottom;
@@ -549,10 +1136,14 @@ void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param) {
     GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     for (i = 0; i < cswp->numEntries; i++, entry++) {
-        if (!entry->size) continue;
-        if (entry->mode != 0) continue;
-        if (!(entry->flags & 2)) continue;
-        if (entry->camId != cameraId) continue;
+        if (!entry->size)
+            continue;
+        if (entry->mode != 0)
+            continue;
+        if (!(entry->flags & 2))
+            continue;
+        if (entry->camId != cameraId)
+            continue;
         if (cameraId == CAMERA_OFFSCREEN2) {
             sysWaitDrawSync();
             GXClearBoundingBox();
@@ -580,7 +1171,7 @@ static inline void shadowSetMat(void) {
 
 void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
-    f32 (*view)[4];
+    f32(*view)[4];
     s32 i;
     f32 size;
     Mtx m;
@@ -615,10 +1206,14 @@ void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     size = 2.5f;
     for (i = 0; i < cswp->numEntries; i++, entry++) {
-        if (!entry->size) continue;
-        if (entry->mode != 1) continue;
-        if (!(entry->flags & 2)) continue;
-        if (entry->camId != cameraId) continue;
+        if (!entry->size)
+            continue;
+        if (entry->mode != 1)
+            continue;
+        if (!(entry->flags & 2))
+            continue;
+        if (entry->camId != cameraId)
+            continue;
         if (cameraId == CAMERA_OFFSCREEN2) {
             sysWaitDrawSync();
             GXClearBoundingBox();
@@ -642,6 +1237,7 @@ void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
     }
 }
 
+// FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
 void cylinder(ShadowEntry* entry) {
     f32 inner;
@@ -711,27 +1307,30 @@ static inline void shadowSetMatZero(void) {
     GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0});
 }
 
-
 void cylinderShadowDraw(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
-    f32 (*view)[4];
+    f32(*view)[4];
     s32 i;
     Mtx m;
     u16 left, top, right, bottom;
 
     view = camGetCurPtr()->view;
     for (i = 0; i < cswp->numEntries; i++, entry++) {
-        if (!entry->size) continue;
-        if (entry->mode != 2) continue;
-        if (!(entry->flags & 2)) continue;
-        if (entry->camId != cameraId) continue;
+        if (!entry->size)
+            continue;
+        if (entry->mode != 2)
+            continue;
+        if (!(entry->flags & 2))
+            continue;
+        if (entry->camId != cameraId)
+            continue;
         if (cameraId == CAMERA_OFFSCREEN2) {
             sysWaitDrawSync();
             GXClearBoundingBox();
         }
         PSMTXConcat(view, entry->mtx, m);
         GXLoadPosMtxImm(m, GX_PNMTX0);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         shadowSetTev(entry->alpha);
 #endif
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -764,7 +1363,7 @@ void cylinderShadowDraw(CameraId cameraId, void* param) {
     }
 }
 
-const Vec vec3_802c1ac0 = {0.0f, 0.0f, 0.0f};
+const Vec shadow_unused_zero_vec0 = {0.0f, 0.0f, 0.0f};
 
 s32 shadowEntry(f32 x, f32 y, f32 z, f32 size) {
     s32 id = cswp->numEntries;
@@ -784,14 +1383,14 @@ s32 shadowEntry(f32 x, f32 y, f32 z, f32 size) {
     entry->volume = 1.0f;
     entry->decay = 0.2f;
     entry->decay2 = 0.4f;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     entry->alpha = 0xFF;
 #endif
     cswp->numEntries++;
     return id;
 }
 
-const Vec vec3_802c1ad8 = {0.0f, 0.0f, 0.0f};
+const Vec shadow_unused_zero_vec1 = {0.0f, 0.0f, 0.0f};
 
 s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size) {
     s32 id = cswp->numEntries;
@@ -811,21 +1410,21 @@ s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size) {
     entry->volume = 1.0f;
     entry->decay = 0.2f;
     entry->decay2 = 0.4f;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     entry->alpha = 0xFF;
 #endif
     cswp->numEntries++;
     return id;
 }
 
-const Vec vec3_802c1af0 = {0.0f, 0.0f, 0.0f};
+const Vec shadow_unused_zero_vec2 = {0.0f, 0.0f, 0.0f};
 
 void shadowSetType(s32 id, u8 type) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->type = type;
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 void U_shadowSetMode(s32 id, u8 alpha) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->alpha = alpha;
@@ -960,7 +1559,7 @@ ShadowConfig* shadowGetProjShadowConfig(void) {
 }
 
 static inline void shadowCalcTexMtx(ProjShadowWork* wp, Mtx texMtx, Mtx depthMtx) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     u32 is16;
     ShadowConfig* cfg = &shadowConfig[wp->configIdx];
     Mtx m;
@@ -1027,7 +1626,8 @@ void projShadowEnd(CameraId cameraId, void* param) {
     size = ShadowSizeTbl[cfg->sizeIdx];
     if (wp->flags & 2) {
         wp->texBuffer = smartAlloc((wp->flags & 4) ? GXGetTexBufferSize(size / 2, size / 2, GX_TF_IA4, GX_FALSE, 0)
-                                              : GXGetTexBufferSize(size, size, GX_TF_IA4, GX_FALSE, 0), 3);
+                                                   : GXGetTexBufferSize(size, size, GX_TF_IA4, GX_FALSE, 0),
+                                   3);
     }
     GXSetTexCopySrc(0, 0, size, size);
     if (wp->flags & 4) {
@@ -1070,6 +1670,8 @@ void depthShadowEnd(CameraId cameraId, void* param) {
         copyFmt = GX_TF_Z16;
         texFmt = GX_TF_IA8;
     }
+    // size is only set under flags bit 1, but depthShadowInit sets that bit and nothing clears it, so
+    // the copy below never reads it unset; setting size before the test (as projShadowEnd does) changes the code
     if (wp->flags & 2) {
         size = ShadowSizeTbl[cfg->sizeIdx];
         wp->texBuffer = smartAlloc(GXGetTexBufferSize(size, size, texFmt, GX_FALSE, 0), 3);
@@ -1086,15 +1688,20 @@ void depthShadowEnd(CameraId cameraId, void* param) {
 }
 
 // debug strings (from stripped debug code)
-const char str_802C1AFC[0x1C] = "result scene (8bit depth)";
-const char str_802C1B18[0x2C] = "actual depth from the light (8bit depth)";
-const char str_802C1B44[0x28] = "projected shadow depth map (8bit depth)";
-const char str_802C1B6C[0x1C] = "result scene (16bit depth)";
-const char str_802C1B88[0x2C] = "actual depth from the light (16bit depth)";
-const char str_802C1BB4[0x2C] = "projected shadow depth map (16bit depth)";
-#ifdef VERSION_G8ME01_DEMO
+const char shadowDepthViewResult8[0x1C] = "result scene (8bit depth)";
+const char shadowDepthViewLight8[0x2C] = "actual depth from the light (8bit depth)";
+const char shadowDepthViewMap8[0x28] = "projected shadow depth map (8bit depth)";
+const char shadowDepthViewResult16[0x1C] = "result scene (16bit depth)";
+const char shadowDepthViewLight16[0x2C] = "actual depth from the light (16bit depth)";
+const char shadowDepthViewMap16[0x2C] = "projected shadow depth map (16bit depth)";
+#if VERSION == VERSION_DEMO
 // the demo keeps a table of the depth-shadow debug view names
 const char* depthShadowViewName[6] = {
-    str_802C1AFC, str_802C1B18, str_802C1B44, str_802C1B6C, str_802C1B88, str_802C1BB4,
+    shadowDepthViewResult8,
+    shadowDepthViewLight8,
+    shadowDepthViewMap8,
+    shadowDepthViewResult16,
+    shadowDepthViewLight16,
+    shadowDepthViewMap16,
 };
 #endif

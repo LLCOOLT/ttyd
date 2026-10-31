@@ -1,3 +1,4 @@
+// eff_fukidashi.c: emote-bubble effect: effFukidashiEntry and its work data (EffFukidashiWork).
 #pragma once
 
 #include <dolphin/types.h>
@@ -24,6 +25,7 @@ typedef struct EffFukidashiWork {
     NpcEntry* npc;   // 0x44
     s32 alpha;       // 0x48
     CameraId camera; // 0x4C
-    s32 pad_50;       // 0x50, never accessed
+    s32 pad_50;      // 0x50, never accessed
     s32 stage;       // 0x54
 } EffFukidashiWork;
+EffectEntry* effFukidashiEntry(s32 type, s32 number, NpcEntry* npc, f32 x, f32 y, f32 z, f32 size, f32 angle, s32 duration);

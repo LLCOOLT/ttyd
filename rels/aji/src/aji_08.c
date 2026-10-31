@@ -1,3 +1,5 @@
+// aji_08 (敵のアジト, X-Naut Fortress): the corridor with the moving ceiling (evt_slit, tenjo) and an X-Naut
+// PhD (gundan_zako_magician).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -5,26 +7,19 @@
 #include "driver/camdrv.h"
 #include "mario/mario.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
 #include "aji.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 USER_FUNC(camAtY);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(slit_chk);
 
 extern EvtWord evt_slit0[];
@@ -32,7 +27,6 @@ extern EvtWord evt_slit1[];
 extern EvtWord evt_slit2[];
 static BeroEntry bero_entry_data[5];
 extern EvtWord heya_tenura_onoff[];
-extern EvtWord aji_08_init_evt[];
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
@@ -79,8 +73,8 @@ static BeroEntry bero_entry_data[] = {
         "s_bero_1", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -97,8 +91,8 @@ static BeroEntry bero_entry_data[] = {
         "s_bero_2", // hitName
         3840, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, // enterEvent..caseType
@@ -113,8 +107,8 @@ static BeroEntry bero_entry_data[] = {
         "s_bero_3", // hitName
         3840, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, // enterEvent..caseType
@@ -129,8 +123,8 @@ static BeroEntry bero_entry_data[] = {
         "s_bero_4", // hitName
         3840, // type
         0, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, 0, // enterEvent..caseType
@@ -145,21 +139,21 @@ static BeroEntry bero_entry_data[] = {
 };
 
 EVT_BEGIN(heya_tenura_onoff)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_heya"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_tenura"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_heya"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_tenura"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LW(0), 0)
     LOOP(0)
         CALL(camAtY, LW(1))
         IF_INT_GREATER_OR_EQUAL(LW(1), 180)
             IF_INT_EQUAL(LW(0), 0)
-                CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_heya"), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_tenura"), 1)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_heya"), MAPOBJ_FLAG_HIDE)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_tenura"), MAPOBJ_FLAG_HIDE)
                 SET_VALUE(LW(0), 1)
             END_IF
-            ELSE
+        ELSE
             IF_INT_EQUAL(LW(0), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_heya"), 1)
-                CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_tenura"), 1)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_heya"), MAPOBJ_FLAG_HIDE)
+                CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_tenura"), MAPOBJ_FLAG_HIDE)
                 SET_VALUE(LW(0), 0)
             END_IF
         END_IF
@@ -169,8 +163,8 @@ EVT_BEGIN(heya_tenura_onoff)
 EVT_END()
 
 EVT_BEGIN(aji_08_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
     CALL(evt_snd_set_rev_mode, 1)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -183,7 +177,7 @@ EVT_BEGIN(aji_08_init_evt)
     CALL(evt_map_playanim, STRING("bari"), 1, 0)
     CALL(evt_map_playanim, STRING("awa1"), 1, 0)
     CALL(evt_map_playanim, STRING("awa2"), 1, 0)
-    CALL(evt_item_entry, STRING("item00"), 125, -975, 170, 75, 16, GSWF(5666), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -975, 170, 75, 16, GSWF(GSWF_AJI08_STAR_PIECE), 0)
     BEGIN_INLINE_EVENT
         LOOP(0)
             CALL(evt_mapobj_get_position, STRING("S_ita"), LW(0), LW(1), LW(2))
@@ -210,7 +204,7 @@ EVT_BEGIN(aji_08_init_evt)
             END_IF
         END_LOOP
     END_INLINE_EVENT
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 373)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
     END_IF
     RETURN
@@ -225,7 +219,7 @@ USER_FUNC(camAtY) {
 USER_FUNC(slit_chk) {
     MarioWork* mario = marioGetPtr();
 
-    if (mario->flags & 0x100000) {
+    if (mario->flags & MARIO_FLAG_PAPER_MODE) {
         if ((mario->position.x < -200.0f || mario->position.x > 300.0f) && mario->position.y < 169.0f &&
             mario->position.y > 160.0f) {
             camCtrlOff(CAMERA_3D);

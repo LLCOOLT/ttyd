@@ -109,7 +109,7 @@ def main():
     us = ""
     # Other versions, each once it has been built (L 2026-10-26: PAL and the demo get tables too)
     for ver, label in (("G8ME01", "US (G8ME01)"), ("G8MP01", "Europe (G8MP01)"),
-                       ("G8ME01_DEMO", "Demo (G8ME01_DEMO, in progress)")):
+                       ("G8ME01_DEMO", "Demo (G8ME01_DEMO)")):
         vr_path = os.path.join(ROOT, "build", ver, "report.json")
         if not os.path.exists(vr_path):
             continue
@@ -124,6 +124,10 @@ def main():
         ]
         us += (f"\n\n**{label}**, data matched {pct(vm, 'matched_data_percent'):.2f}%:\n\n"
                + "\n".join(vtable))
+        if pct(vm, 'matched_data_percent') < 100.0:
+            us += ("\n\nobjdiff compares data symbol by symbol, and data it cannot pair with a symbol of the version's config "
+                   "counts as unmatched, so this figure can stay below 100% while the build check above confirms that every "
+                   "file is byte-identical.")
     section = (
         "<!-- progress-start -->\n"
         + head

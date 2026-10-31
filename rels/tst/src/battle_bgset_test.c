@@ -9,10 +9,9 @@
 #include "battle/battle_weapon_power.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_stage.h"
+#include "battle/battle_sub.h"
 #include "driver/npcdrv.h"
 #include "tst.h"
-
-f32 sinfd(f32 degrees);
 
 static USER_FUNC(_wave_offset);
 extern EvtWord bgset_tst_wave_event[];
@@ -41,70 +40,70 @@ BattleStageObjectData tst_btlobject_data[] = {
 
 BattleStageData tst_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_0", // mSpecificStageDataDir
-        0, // mNumObjects
-        NULL, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_0", // specificStageDataDir
+        0, // numObjects
+        NULL, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_0", // mSpecificStageDataDir
-        6, // mNumObjects
-        tst_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_0", // specificStageDataDir
+        6, // numObjects
+        tst_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_02", // mGlobalStageDataDir
-        "stg_01_1", // mSpecificStageDataDir
-        6, // mNumObjects
-        tst_btlobject_data, // mObjects
+        "bti_02", // globalStageDataDir
+        "stg_01_1", // specificStageDataDir
+        6, // numObjects
+        tst_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_03", // mGlobalStageDataDir
-        "stg_01_2", // mSpecificStageDataDir
-        6, // mNumObjects
-        tst_btlobject_data, // mObjects
+        "bti_03", // globalStageDataDir
+        "stg_01_2", // specificStageDataDir
+        6, // numObjects
+        tst_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_04", // mGlobalStageDataDir
-        "stg_01_3", // mSpecificStageDataDir
-        6, // mNumObjects
-        tst_btlobject_data, // mObjects
+        "bti_04", // globalStageDataDir
+        "stg_01_3", // specificStageDataDir
+        6, // numObjects
+        tst_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_0", // mSpecificStageDataDir
-        6, // mNumObjects
-        &tst_btlobject_data[13], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_0", // specificStageDataDir
+        6, // numObjects
+        &tst_btlobject_data[13], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, bgset_tst_wave_event, NULL, // initEvt..bgCEvt
         0, 0, 0, 0, // reserved_1B0..disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_01_0", // mSpecificStageDataDir
-        8, // mNumObjects
-        tst_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_01_0", // specificStageDataDir
+        8, // numObjects
+        tst_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x210006F, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgCEvt
@@ -114,10 +113,10 @@ BattleStageData tst_btlstage_data[] = {
 
 BattleUnitSetup btlparty_test_kuriboo_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -138,30 +137,30 @@ BattleGroupSetup btlgrp_test_kuriboo_1 = {
 
 BattleUnitSetup btlparty_test_kuriboo[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_test_kuriboo, // itemDropTable
     },
     {
-        &unit_togekuri, // mUnitKindParams
+        &unit_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_test_togekuri, // itemDropTable
     },
     {
-        &unit_patakuri, // mUnitKindParams
+        &unit_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -182,30 +181,30 @@ BattleGroupSetup btlgrp_test_kuriboo = {
 
 BattleUnitSetup btlparty_test_hyper_kuriboo[] = {
     {
-        &unit_hyper_kuriboo, // mUnitKindParams
+        &unit_hyper_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_test_hyper_kuriboo, // itemDropTable
     },
     {
-        &unit_hyper_togekuri, // mUnitKindParams
+        &unit_hyper_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_test_hyper_togekuri, // itemDropTable
     },
     {
-        &unit_hyper_patakuri, // mUnitKindParams
+        &unit_hyper_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -226,30 +225,30 @@ BattleGroupSetup btlgrp_test_hyper_kuriboo = {
 
 BattleUnitSetup btlparty_test_yamikuriboo[] = {
     {
-        &unit_yami_kuriboo, // mUnitKindParams
+        &unit_yami_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_test_yami_kuriboo, // itemDropTable
     },
     {
-        &unit_yami_togekuri, // mUnitKindParams
+        &unit_yami_togekuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -270,40 +269,40 @@ BattleGroupSetup btlgrp_test_yamikuriboo = {
 
 BattleUnitSetup btlparty_test_nokonoko_yaminoko[] = {
     {
-        &unit_nokonoko, // mUnitKindParams
+        &unit_nokonoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_patapata, // mUnitKindParams
+        &unit_patapata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_yami_noko, // mUnitKindParams
+        &unit_yami_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_test_yami_noko, // itemDropTable
     },
     {
-        &unit_yami_pata, // mUnitKindParams
+        &unit_yami_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -324,40 +323,40 @@ BattleGroupSetup btlgrp_test_nokonoko_yaminoko = {
 
 BattleUnitSetup btlparty_test_ura_noko_toge_noko[] = {
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_ura_pata, // mUnitKindParams
+        &unit_ura_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_togenoko, // mUnitKindParams
+        &unit_togenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -378,40 +377,40 @@ BattleGroupSetup btlgrp_test_ura_noko_toge_noko = {
 
 BattleUnitSetup btlparty_test_honenoko_fighter[] = {
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_karon, // mUnitKindParams
+        &unit_karon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_nokonoko_fighter, // mUnitKindParams
+        &unit_nokonoko_fighter, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_patapata_fighter, // mUnitKindParams
+        &unit_patapata_fighter, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -432,50 +431,50 @@ BattleGroupSetup btlgrp_test_honenoko_fighter = {
 
 BattleUnitSetup btlparty_test_basabasa[] = {
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 130.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 130.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_basabasa_chururu, // mUnitKindParams
+        &unit_basabasa_chururu, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 130.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_basabasa_green, // mUnitKindParams
+        &unit_basabasa_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 130.0f, 20.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -496,40 +495,40 @@ BattleGroupSetup btlgrp_test_basabasa = {
 
 BattleUnitSetup btlparty_test_chorobon[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_green_chorobon, // mUnitKindParams
+        &unit_green_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -550,50 +549,50 @@ BattleGroupSetup btlgrp_test_chorobon = {
 
 BattleUnitSetup btlparty_test_sinemon[] = {
     {
-        &unit_sinnosuke, // mUnitKindParams
+        &unit_sinnosuke, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_sinemon, // mUnitKindParams
+        &unit_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_monochrome_sinemon, // mUnitKindParams
+        &unit_monochrome_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hyper_sinnosuke, // mUnitKindParams
+        &unit_hyper_sinnosuke, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -614,40 +613,40 @@ BattleGroupSetup btlgrp_test_sinemon = {
 
 BattleUnitSetup btlparty_test_met[] = {
     {
-        &unit_met, // mUnitKindParams
+        &unit_met, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_togemet, // mUnitKindParams
+        &unit_togemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_patamet, // mUnitKindParams
+        &unit_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_patatogemet, // mUnitKindParams
+        &unit_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -668,40 +667,40 @@ BattleGroupSetup btlgrp_test_met = {
 
 BattleUnitSetup btlparty_test_crimson_met[] = {
     {
-        &unit_crimson_met, // mUnitKindParams
+        &unit_crimson_met, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_crimson_togemet, // mUnitKindParams
+        &unit_crimson_togemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_crimson_patamet, // mUnitKindParams
+        &unit_crimson_patamet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_crimson_patatogemet, // mUnitKindParams
+        &unit_crimson_patatogemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -722,40 +721,40 @@ BattleGroupSetup btlgrp_test_crimson_met = {
 
 BattleUnitSetup btlparty_test_pansy[] = {
     {
-        &unit_pansy, // mUnitKindParams
+        &unit_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_pansy, // mUnitKindParams
+        &unit_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_twinkling_pansy, // mUnitKindParams
+        &unit_twinkling_pansy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -776,40 +775,40 @@ BattleGroupSetup btlgrp_test_pansy = {
 
 BattleUnitSetup btlparty_test_bomhei[] = {
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -830,40 +829,40 @@ BattleGroupSetup btlgrp_test_bomhei = {
 
 BattleUnitSetup btlparty_test_heaby_bomb[] = {
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_heavy_bom, // mUnitKindParams
+        &unit_heavy_bom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_giant_bomb, // mUnitKindParams
+        &unit_giant_bomb, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -884,40 +883,40 @@ BattleGroupSetup btlgrp_test_heaby_bomb = {
 
 BattleUnitSetup btlparty_test_killer[] = {
     {
-        &unit_killer, // mUnitKindParams
+        &unit_killer, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_super_killer, // mUnitKindParams
+        &unit_super_killer, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_killer_cannon, // mUnitKindParams
+        &unit_killer_cannon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_test_killer_cannon, // itemDropTable
     },
     {
-        &unit_super_killer_cannon, // mUnitKindParams
+        &unit_super_killer_cannon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -938,50 +937,50 @@ BattleGroupSetup btlgrp_test_killer = {
 
 BattleUnitSetup btlparty_test_pakkun_flower[] = {
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_pakkun_flower, // mUnitKindParams
+        &unit_pakkun_flower, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_poison_pakkun, // mUnitKindParams
+        &unit_poison_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_poison_pakkun, // mUnitKindParams
+        &unit_poison_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1002,40 +1001,40 @@ BattleGroupSetup btlgrp_test_pakkun_flower = {
 
 BattleUnitSetup btlparty_test_togedaruma[] = {
     {
-        &unit_togedaruma, // mUnitKindParams
+        &unit_togedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_togedaruma, // mUnitKindParams
+        &unit_togedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_yamitogedaruma, // mUnitKindParams
+        &unit_yamitogedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1056,40 +1055,40 @@ BattleGroupSetup btlgrp_test_togedaruma = {
 
 BattleUnitSetup btlparty_test_hannya[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hennya, // mUnitKindParams
+        &unit_hennya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1110,40 +1109,40 @@ BattleGroupSetup btlgrp_test_hannya = {
 
 BattleUnitSetup btlparty_test_sambo[] = {
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_sambo_mummy, // mUnitKindParams
+        &unit_sambo_mummy, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1164,40 +1163,40 @@ BattleGroupSetup btlgrp_test_sambo = {
 
 BattleUnitSetup btlparty_test_bros[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_boomerang_bros, // mUnitKindParams
+        &unit_boomerang_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_fire_bros, // mUnitKindParams
+        &unit_fire_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1218,40 +1217,40 @@ BattleGroupSetup btlgrp_test_bros = {
 
 BattleUnitSetup btlparty_test_togezo_jyugem[] = {
     {
-        &unit_togezo, // mUnitKindParams
+        &unit_togezo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hyper_togezo, // mUnitKindParams
+        &unit_hyper_togezo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hyper_jyugem, // mUnitKindParams
+        &unit_hyper_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1272,40 +1271,40 @@ BattleGroupSetup btlgrp_test_togezo_jyugem = {
 
 BattleUnitSetup btlparty_test_wanwan[] = {
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_wanwan, // mUnitKindParams
+        &unit_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1326,40 +1325,40 @@ BattleGroupSetup btlgrp_test_wanwan = {
 
 BattleUnitSetup btlparty_test_kurokumorn[] = {
     {
-        &unit_kurokumorn, // mUnitKindParams
+        &unit_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_dokugassun, // mUnitKindParams
+        &unit_dokugassun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1380,40 +1379,40 @@ BattleGroupSetup btlgrp_test_kurokumorn = {
 
 BattleUnitSetup btlparty_test_piders[] = {
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_churantalar, // mUnitKindParams
+        &unit_churantalar, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1434,30 +1433,30 @@ BattleGroupSetup btlgrp_test_piders = {
 
 BattleUnitSetup btlparty_test_bubble[] = {
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hermos, // mUnitKindParams
+        &unit_hermos, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_phantom, // mUnitKindParams
+        &unit_phantom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1478,40 +1477,40 @@ BattleGroupSetup btlgrp_test_bubble = {
 
 BattleUnitSetup btlparty_test_monban[] = {
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_monban, // mUnitKindParams
+        &unit_monban, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_patapata, // mUnitKindParams
+        &unit_patapata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1532,30 +1531,30 @@ BattleGroupSetup btlgrp_test_monban = {
 
 BattleUnitSetup btlparty_test_borodo[] = {
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_badge_borodo, // mUnitKindParams
+        &unit_badge_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_borodo_king, // mUnitKindParams
+        &unit_borodo_king, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1576,50 +1575,50 @@ BattleGroupSetup btlgrp_test_borodo = {
 
 BattleUnitSetup btlparty_test_tamura[] = {
     {
-        &unit_barriern, // mUnitKindParams
+        &unit_barriern, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 40.0f, -20.0f}, // position
         0, // hitOffsetX
         {2, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_hyper_sinemon, // mUnitKindParams
+        &unit_hyper_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_super_killer_cannon, // mUnitKindParams
+        &unit_super_killer_cannon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1640,20 +1639,20 @@ BattleGroupSetup btlgrp_test_tamura = {
 
 BattleUnitSetup btlparty_test_kishi[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {2, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1674,10 +1673,10 @@ BattleGroupSetup btlgrp_test_kishi = {
 
 BattleUnitSetup btlparty_test_tamura2[] = {
     {
-        &unit_powan, // mUnitKindParams
+        &unit_powan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1698,30 +1697,30 @@ BattleGroupSetup btlgrp_test_tamura2 = {
 
 BattleUnitSetup btlparty_test_nakayama[] = {
     {
-        &unit_wanawana, // mUnitKindParams
+        &unit_wanawana, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_wanawana, // mUnitKindParams
+        &unit_wanawana, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_wanawana, // mUnitKindParams
+        &unit_wanawana, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1742,20 +1741,20 @@ BattleGroupSetup btlgrp_test_nakayama = {
 
 BattleUnitSetup btlparty_test_barriern[] = {
     {
-        &unit_barriern_z, // mUnitKindParams
+        &unit_barriern_z, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {4, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_barriern_custom, // mUnitKindParams
+        &unit_barriern_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {4, 0, 0, 0}, // unitWork
@@ -1776,50 +1775,50 @@ BattleGroupSetup btlgrp_test_barriern = {
 
 BattleUnitSetup btlparty_test_vriety_height[] = {
     {
-        &unit_met, // mUnitKindParams
+        &unit_met, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_bubble, // mUnitKindParams
+        &unit_bubble, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_kurokumorn, // mUnitKindParams
+        &unit_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_yami_patakuri, // mUnitKindParams
+        &unit_yami_patakuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 130.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1840,40 +1839,40 @@ BattleGroupSetup btlgrp_test_vriety_height = {
 
 BattleUnitSetup btlparty_test_teresa[] = {
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_teresa, // mUnitKindParams
+        &unit_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_purple_teresa, // mUnitKindParams
+        &unit_purple_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1894,30 +1893,30 @@ BattleGroupSetup btlgrp_test_teresa = {
 
 BattleUnitSetup btlparty_test_daisan[] = {
     {
-        &unit_gundan_zako, // mUnitKindParams
+        &unit_gundan_zako, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_gundan_zako_magician, // mUnitKindParams
+        &unit_gundan_zako_magician, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_gundan_zako_elite, // mUnitKindParams
+        &unit_gundan_zako_elite, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1938,30 +1937,30 @@ BattleGroupSetup btlgrp_test_daisan = {
 
 BattleUnitSetup btlparty_test_mahorn[] = {
     {
-        &unit_mahorn, // mUnitKindParams
+        &unit_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {40.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_super_mahorn, // mUnitKindParams
+        &unit_super_mahorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {100.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_mahorn_custom, // mUnitKindParams
+        &unit_mahorn_custom, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1982,40 +1981,40 @@ BattleGroupSetup btlgrp_test_mahorn = {
 
 BattleUnitSetup btlparty_test_kamec[] = {
     {
-        &unit_kamec, // mUnitKindParams
+        &unit_kamec, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_kamec_red, // mUnitKindParams
+        &unit_kamec_red, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_kamec_white, // mUnitKindParams
+        &unit_kamec_white, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_NONE, // itemDropTable
     },
     {
-        &unit_kamec_green, // mUnitKindParams
+        &unit_kamec_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork

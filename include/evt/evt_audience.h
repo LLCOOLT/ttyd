@@ -1,3 +1,4 @@
+// evt_audience.c: script commands for the battle audience (flags, positions, animations).
 #pragma once
 
 #include "evt/evt_cmd.h"
@@ -21,18 +22,9 @@ USER_FUNC(evt_audience_delete);
 USER_FUNC(evt_audience_ap_recovery);
 USER_FUNC(evt_audience_reflesh_natural_all);
 USER_FUNC(evt_audience_abnormal_natural_all);
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
-//USER_FUNC();
 
 USER_FUNC(evt_audience_acrobat_notry);
 USER_FUNC(evt_audience_num_updown_in_event);
+
+USER_FUNC(evt_audience_sound_cheer);
+USER_FUNC(evt_audience_joy_ending);

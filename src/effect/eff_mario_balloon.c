@@ -1,3 +1,4 @@
+// Balloon effect (Mario balloon) that follows Mario or a given NPC; types 0 and 1.
 #include "driver/camdrv.h"
 #include "eff/eff_mario_balloon.h"
 #include "driver/dispdrv.h"
@@ -9,11 +10,10 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-EffectEntry* effMarioBalloonEntry(s32 type, MarioWork* mario);
 void effMarioBalloonMain(EffectEntry* effect);
 void effMarioBalloonDisp(CameraId cameraId, EffectEntry* effect);
 
-EffectEntry* effMarioBalloonEntry(s32 type, MarioWork* mario) {
+EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc) {
     EffectEntry* effect;
     MarioBalloonWork* work;
 
@@ -25,34 +25,35 @@ EffectEntry* effMarioBalloonEntry(s32 type, MarioWork* mario) {
     effect->callback = effMarioBalloonMain;
     work->type = type;
     work->rotation = 0.0f;
-    work->mario = mario;
+    work->npc = npc;
     work->camera = 4;
     switch (type) {
-    case 0:
-        work->scale = 0.4f;
-        break;
-    case 1:
-        work->scale = 0.8f;
-        break;
+        case 0:
+            work->scale = 0.4f;
+            break;
+        case 1:
+            work->scale = 0.8f;
+            break;
     }
     return effect;
 }
 
 void effMarioBalloonMain(EffectEntry* effect) {
     MarioBalloonWork* work = effect->userdata;
+    NpcEntry* npc;
     MarioWork* mario;
     Vec pos;
 
-    mario = work->mario;
-    if (mario == NULL) {
+    npc = work->npc;
+    if (npc == NULL) {
         mario = marioGetPtr();
         work->position.x = mario->position.x;
         work->position.y = 10.0f + (mario->position.y + mario->wPlayerCollisionBox.y);
         work->position.z = mario->position.z;
     } else {
-        work->position.x = mario->position.x;
-        work->position.y = 10.0f + (mario->position.y + mario->camShiftRate.x);
-        work->position.z = mario->position.z;
+        work->position.x = npc->position.x;
+        work->position.y = 10.0f + (npc->position.y + npc->height);
+        work->position.z = npc->position.z;
     }
     work->rotation += 4.0f;
     pos = (Vec){0.0f, 0.0f, 0.0f};
@@ -97,137 +98,137 @@ void effMarioBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(camGetPtr(cameraId)->view, mT, mT);
     GXSetCurrentMtx(0);
     switch (work->type) {
-    case 0:
-        effGetTexObj(15, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        PSMTXTransApply(mT, mTA, 1.0f, -1.0f, 0.0f);
-        GXLoadPosMtxImm(mTA, 0);
-        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-        GXSetZCompLoc(GX_TRUE);
-        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-        GXSetCullMode(GX_CULL_NONE);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(-16.0f, 64.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(16.0f, 64.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(2.0f, 0.0f);
-        GXPosition3f32(16.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(2.0f, 1.0f);
-        GXPosition3f32(-16.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        effGetTexObj(14, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        GXSetTevColor(GX_TEVREG0, (GXColor){255, 255, 255, 255});
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        GXLoadPosMtxImm(mT, 0);
-        PSMTXInvXpose(mT, mN);
-        GXLoadNrmMtxImm(mN, 0);
-        GXSetCurrentMtx(0);
-        GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
-        GXSetZCompLoc(GX_FALSE);
-        GXSetAlphaCompare(GX_GEQUAL, 128, GX_AOP_OR, GX_NEVER, 0);
-        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-        GXSetCullMode(GX_CULL_BACK);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(-16.0f, 64.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(16.0f, 64.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(2.0f, 0.0f);
-        GXPosition3f32(16.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(2.0f, 1.0f);
-        GXPosition3f32(-16.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        GXSetTevColor(GX_TEVREG0, (GXColor){160, 160, 160, 255});
-        GXSetCullMode(GX_CULL_FRONT);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(-16.0f, 64.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(16.0f, 64.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(2.0f, 0.0f);
-        GXPosition3f32(16.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(2.0f, 1.0f);
-        GXPosition3f32(-16.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        break;
-    case 1:
-        effGetTexObj(17, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        PSMTXTransApply(mT, mTA, 1.0f, -1.0f, 0.0f);
-        GXLoadPosMtxImm(mTA, 0);
-        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-        GXSetZCompLoc(GX_TRUE);
-        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-        GXSetCullMode(GX_CULL_NONE);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(-20.0f, 32.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(20.0f, 32.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(20.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-20.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        effGetTexObj(16, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        GXSetTevColor(GX_TEVREG0, (GXColor){255, 255, 255, 255});
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        GXLoadPosMtxImm(mT, 0);
-        PSMTXInvXpose(mT, mN);
-        GXLoadNrmMtxImm(mN, 0);
-        GXSetCurrentMtx(0);
-        GXSetCullMode(GX_CULL_BACK);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(-20.0f, 32.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(20.0f, 32.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(20.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-20.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        GXSetTevColor(GX_TEVREG0, (GXColor){160, 160, 160, 255});
-        GXSetCullMode(GX_CULL_FRONT);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(-20.0f, 32.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(20.0f, 32.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(20.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-20.0f, 0.0f, 0.0f);
-        GXNormal3f32(0.0f, 0.0f, 1.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        break;
+        case 0:
+            effGetTexObj(15, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+            PSMTXTransApply(mT, mTA, 1.0f, -1.0f, 0.0f);
+            GXLoadPosMtxImm(mTA, 0);
+            GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+            GXSetZCompLoc(GX_TRUE);
+            GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+            GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+            GXSetCullMode(GX_CULL_NONE);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(-16.0f, 64.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXPosition3f32(16.0f, 64.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(2.0f, 0.0f);
+            GXPosition3f32(16.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(2.0f, 1.0f);
+            GXPosition3f32(-16.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 1.0f);
+            effGetTexObj(14, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            GXSetTevColor(GX_TEVREG0, (GXColor){255, 255, 255, 255});
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+            GXLoadPosMtxImm(mT, 0);
+            PSMTXInvXpose(mT, mN);
+            GXLoadNrmMtxImm(mN, 0);
+            GXSetCurrentMtx(0);
+            GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
+            GXSetZCompLoc(GX_FALSE);
+            GXSetAlphaCompare(GX_GEQUAL, 128, GX_AOP_OR, GX_NEVER, 0);
+            GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+            GXSetCullMode(GX_CULL_BACK);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(-16.0f, 64.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXPosition3f32(16.0f, 64.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(2.0f, 0.0f);
+            GXPosition3f32(16.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(2.0f, 1.0f);
+            GXPosition3f32(-16.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 1.0f);
+            GXSetTevColor(GX_TEVREG0, (GXColor){160, 160, 160, 255});
+            GXSetCullMode(GX_CULL_FRONT);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(-16.0f, 64.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXPosition3f32(16.0f, 64.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(2.0f, 0.0f);
+            GXPosition3f32(16.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(2.0f, 1.0f);
+            GXPosition3f32(-16.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 1.0f);
+            break;
+        case 1:
+            effGetTexObj(17, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+            PSMTXTransApply(mT, mTA, 1.0f, -1.0f, 0.0f);
+            GXLoadPosMtxImm(mTA, 0);
+            GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+            GXSetZCompLoc(GX_TRUE);
+            GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+            GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+            GXSetCullMode(GX_CULL_NONE);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(-20.0f, 32.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXPosition3f32(20.0f, 32.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(1.0f, 0.0f);
+            GXPosition3f32(20.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(1.0f, 1.0f);
+            GXPosition3f32(-20.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 1.0f);
+            effGetTexObj(16, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            GXSetTevColor(GX_TEVREG0, (GXColor){255, 255, 255, 255});
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+            GXLoadPosMtxImm(mT, 0);
+            PSMTXInvXpose(mT, mN);
+            GXLoadNrmMtxImm(mN, 0);
+            GXSetCurrentMtx(0);
+            GXSetCullMode(GX_CULL_BACK);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(-20.0f, 32.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXPosition3f32(20.0f, 32.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(1.0f, 0.0f);
+            GXPosition3f32(20.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(1.0f, 1.0f);
+            GXPosition3f32(-20.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 1.0f);
+            GXSetTevColor(GX_TEVREG0, (GXColor){160, 160, 160, 255});
+            GXSetCullMode(GX_CULL_FRONT);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(-20.0f, 32.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXPosition3f32(20.0f, 32.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(1.0f, 0.0f);
+            GXPosition3f32(20.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(1.0f, 1.0f);
+            GXPosition3f32(-20.0f, 0.0f, 0.0f);
+            GXNormal3f32(0.0f, 0.0f, 1.0f);
+            GXTexCoord2f32(0.0f, 1.0f);
+            break;
     }
 }

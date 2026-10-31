@@ -1,3 +1,4 @@
+// eff_blow_n64.c: Paper Mario 64 Blow effect entry (effBlowN64Entry).
 #pragma once
 
 #include <dolphin/types.h>

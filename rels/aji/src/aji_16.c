@@ -1,3 +1,5 @@
+// aji_16 (敵のアジト, X-Naut Fortress): Peach's room: her captivity scenes (peach_evt_stg*), the last e-mail
+// (evt_last_mail), and the door to the shower room.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -5,54 +7,24 @@
 #include "mario/mario.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
 #include "aji.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_del_case_evt);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_fade_softfocus_onoff);
-USER_FUNC(evt_fade_tec_onoff);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_mode);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_color);
-USER_FUNC(evt_npc_set_paper);
-USER_FUNC(evt_npc_set_paper_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_peach_set_condition);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_stopwatch);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 static USER_FUNC(peach_set_pose);
 
 extern EvtWord w_bero_in_evt[];
@@ -62,7 +34,6 @@ extern EvtWord evt_last_mail_init[];
 extern EvtWord evt_last_mail[];
 extern EvtWord peach_evt_door_open[];
 extern EvtWord peach_evt_stg2_1[];
-extern EvtWord aji_16_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -110,8 +81,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)w_bero_in_evt, // enterEvent
@@ -128,8 +99,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -150,8 +121,8 @@ static BeroEntry bero_peach_data[] = {
         "e_bero", // hitName
         0, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -219,8 +190,8 @@ EVT_BEGIN(peach_evt_door_open)
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_dispflag_onoff, 0, 1)
     CALL(evt_peach_set_condition, 4)
@@ -236,11 +207,11 @@ static EVT_BEGIN(peach_evt_stg1)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("peach_aji_34_01"), 0, STRING("mario"))
     CALL(evt_peach_set_condition, 0)
-    SET_VALUE(GSW(0), 57)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_PEACH_CAUGHT)
     WAIT_MS(300)
     CALL(evt_cam3d_evt_off, 600, 11)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -262,11 +233,11 @@ static EVT_BEGIN(peach_evt_stg1_1)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     CALL(evt_del_case_evt, 0, GW(15))
-    SET_VALUE(GSW(0), 58)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
     CALL(evt_cam3d_evt_off, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -294,7 +265,7 @@ EVT_BEGIN(peach_evt_stg2_1)
     CALL(evt_msg_print, 0, STRING("peach_aji_75"), 0, STRING("mario"))
     CALL(evt_cam3d_evt_off, 1000, 11)
     WAIT_MS(1000)
-    SET_VALUE(GSW(0), 113)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_01_PEACH_CRUMP_AND_X_NAUTS)
     CALL(evt_mario_key_onoff, 1)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_off))
@@ -307,8 +278,8 @@ EVT_END()
 
 static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_mode, 1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -75, 0, -50)
     CALL(evt_mario_set_dir, 90, 0, 0)
@@ -330,15 +301,15 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_cam3d_evt_off, 1000, 11)
     WAIT_MS(1000)
     SPAWN_EVENT(PTR(peach_evt_stg2_1))
-    SET_VALUE(GSWF(4202), 1)
+    SET_VALUE(GSWF(GSWF_AJI16_PEACH2_SCENE_DONE), 1)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_set_pos, -75, 0, -50)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_cam3d_evt_set, 115, 90, 444, 115, 60, -55, 0, 11)
@@ -366,7 +337,7 @@ static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_cam3d_evt_set, -75, 80, 184, -75, 40, -63, 0, 11)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_114"), 0, STRING("mario"))
-    SET_VALUE(GSW(0), 165)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
     CALL(evt_cam3d_evt_off, 1000, 11)
     WAIT_MS(1000)
     CALL(peach_set_pose, STRING("P_S_1"))
@@ -377,8 +348,8 @@ EVT_END()
 
 static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_set_pos, -75, 0, -50)
     CALL(evt_mario_set_dir, 270, 0, 0)
     WAIT_FRAMES(1)
@@ -408,7 +379,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_bero_overwrite, STRING("e_bero"), PTR(bero_peach_data))
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
-    SET_VALUE(GSW(0), 340)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_PEACH_GRODUS_AND_X_NAUT)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -433,15 +404,15 @@ EVT_BEGIN(aji_16_init_evt)
         CALL(evt_cam3d_evt_set, 78, 152, 528, 78, 57, -13, 0, 11)
         SPAWN_EVENT(PTR(peach_evt_stg1))
     END_IF
-    IF_INT_EQUAL(GSW(0), 57)
-        IF_INT_EQUAL(GSWF(4199), 1)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_PEACH_CAUGHT)
+        IF_INT_EQUAL(GSWF(GSWF_AJI15_PEACH1_SHOWER_ROOM_ENTERED), 1)
             SPAWN_EVENT(PTR(peach_evt_stg1_1))
         END_IF
     END_IF
-    IF_INT_EQUAL(GSW(0), 112)
-        IF_INT_EQUAL(GSWF(4202), 0)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
+        IF_INT_EQUAL(GSWF(GSWF_AJI16_PEACH2_SCENE_DONE), 0)
             SPAWN_EVENT(PTR(peach_evt_stg2))
-            ELSE
+        ELSE
             SPAWN_EVENT(PTR(peach_evt_stg2_1))
         END_IF
     END_IF
@@ -454,7 +425,7 @@ EVT_BEGIN(aji_16_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    IF_INT_EQUAL(GSW(0), 57)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_PEACH_CAUGHT)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING(""))
             CALL(evt_mario_set_pos, 100, 0, 0)
@@ -462,22 +433,22 @@ EVT_BEGIN(aji_16_init_evt)
             CALL(evt_cam_road_reset)
         END_IF
     END_IF
-    IF_INT_LESS(GSW(0), 58)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(peach_evt_door_stop), GW(15))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero"), 0, PTR(peach_evt_door_stop), GW(15))
     END_IF
-    IF_INT_EQUAL(GSW(0), 112)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(peach_evt_door_stop), GW(15))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero"), 0, PTR(peach_evt_door_stop), GW(15))
     END_IF
-    IF_INT_LESS(GSW(0), 352)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
         CALL(evt_mario_kill_party, 0)
         CALL(evt_mario_set_mode, 1)
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
-        CALL(evt_snd_envoff, 512)
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
     END_IF
     CALL(evt_snd_set_rev_mode, 1)
     CALL(evt_hitobj_onoff, STRING("A_door1_1"), 1, 0)

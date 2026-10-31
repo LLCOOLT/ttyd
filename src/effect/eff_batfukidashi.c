@@ -1,3 +1,4 @@
+// Coin speech bubble (CoinFukidashi, fukidashi: speech balloon) showing a number; bobs up and down and fades in and out.
 #include "eff/eff_batfukidashi.h"
 #include "driver/dispdrv.h"
 #include "manager/fontmgr.h"
@@ -35,7 +36,7 @@ EffectEntry* effCoinFukidashiEntry(s32 type, s32 number, s32 duration, f32 x, f3
     work = __memAlloc(HEAP_EFFECT, sizeof(EffCoinFukidashiWork) * effect->count);
     effect->userdata = work;
     effect->callback = effCoinFukidashiMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -45,8 +46,7 @@ EffectEntry* effCoinFukidashiEntry(s32 type, s32 number, s32 duration, f32 x, f3
     work->number = number;
     if (duration <= 0) {
         work->timer = 1000;
-    }
-    else {
+    } else {
         work->timer = duration;
     }
     work->frame = 0;
@@ -58,11 +58,11 @@ void effCoinFukidashiMain(EffectEntry* effect) {
     EffCoinFukidashiWork* work = effect->userdata;
     Vec position;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
 
     // soft delete: start fading out
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {
@@ -70,8 +70,7 @@ void effCoinFukidashiMain(EffectEntry* effect) {
     }
     if (work->timer < 16) {
         work->alpha = work->timer * 16;
-    }
-    else {
+    } else {
         work->alpha += 16;
         if (work->alpha > 255) {
             work->alpha = 255;
@@ -114,7 +113,7 @@ void effCoinFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumTevStages(1);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-    GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, alpha });
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, alpha});
     PSMTXTrans(mtx, work->position.x, work->position.y + work->offsetY, work->position.z);
     PSMTXScale(scale, work->scale, work->scale, work->scale);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));

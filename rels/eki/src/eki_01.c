@@ -1,28 +1,21 @@
+// eki_01 (駅, Riverside Station): central hub: paper-fold (origami) switch, stairs, a key lock and six paper panels; doors to eki_00, eki_02 and eki_03.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "mario/mario_pouch.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cloud_ent);
-USER_FUNC(evt_cloud_init);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_exec_cancel);
-USER_FUNC(evt_mobj_lock);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_win_item_select);
+#include "evt/evt_cam.h"
+#include "evt/evt_cloud.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "eki.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static BeroEntry bero_data[4];
 static s32 key_tbl[2];
@@ -32,7 +25,6 @@ extern EvtWord evt_kami_3[];
 extern EvtWord evt_kami_4[];
 extern EvtWord evt_kami_5[];
 extern EvtWord evt_kami_6[];
-extern EvtWord eki_01_init_evt[];
 
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
@@ -75,8 +67,8 @@ static BeroEntry bero_data[] = {
         "e_bero", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -93,8 +85,8 @@ static BeroEntry bero_data[] = {
         "w_dero", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -111,8 +103,8 @@ static BeroEntry bero_data[] = {
         "n_bero", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -148,14 +140,14 @@ static EVT_BEGIN(evt_origami)
         WAIT_MS(333)
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PERA_KAI_DOWN2"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("dann"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_origami"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dann"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_origami"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_oritatami"), 1, 1)
     CALL(evt_map_playanim, STRING("anm_kaidan"), 0, 0)
     CALL(evt_map_checkanim, STRING("anm_kaidan"), LW(0), LW(1))
     WAIT_MS(LW(1))
     WAIT_MS(1000)
-    SET_VALUE(GSW(0), 313)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_30_ORIGAMI_STAIRS)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     CALL(evt_mario_key_onoff, 1)
@@ -163,11 +155,11 @@ static EVT_BEGIN(evt_origami)
 EVT_END()
 
 static s32 key_tbl[] = {
-    ITEM_STEEPLE_KEY_0x19, -1,
+    ITEM_STATION_KEY_0x19, -1,
 };
 
 static EVT_BEGIN(evt_chk)
-    CALL(evt_pouch_check_item, 25, LW(0))
+    CALL(evt_pouch_check_item, ITEM_STATION_KEY_0x19, LW(0))
     IF_INT_GREATER(LW(0), 0)
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
         IF_INT_EQUAL(LW(0), -1)
@@ -180,37 +172,37 @@ EVT_END()
 static EVT_BEGIN(evt_lock)
     SET_VALUE(LW(0), 0)
     CALL_CHILD(PTR(bero_case_switch_on))
-    SET_VALUE(GSW(0), 315)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_32_UNLOCKING_THE_DOOR)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_kami_1)
-    SET_VALUE(GSWF(3748), 1)
+    SET_VALUE(GSWF(GSWF_EKI01_PAPER_1_BLOWN), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_kami_2)
-    SET_VALUE(GSWF(3749), 1)
+    SET_VALUE(GSWF(GSWF_EKI01_PAPER_2_BLOWN), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_kami_3)
-    SET_VALUE(GSWF(3750), 1)
+    SET_VALUE(GSWF(GSWF_EKI01_PAPER_3_BLOWN), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_kami_4)
-    SET_VALUE(GSWF(3751), 1)
+    SET_VALUE(GSWF(GSWF_EKI01_PAPER_4_BLOWN), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_kami_5)
-    SET_VALUE(GSWF(3752), 1)
+    SET_VALUE(GSWF(GSWF_EKI01_PAPER_5_BLOWN), 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_kami_6)
-    SET_VALUE(GSWF(3753), 1)
+    SET_VALUE(GSWF(GSWF_EKI01_PAPER_6_BLOWN), 1)
     RETURN
 EVT_END()
 
@@ -218,61 +210,60 @@ EVT_BEGIN(eki_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI2_2"))
-    IF_INT_LESS(GSW(0), 313)
-        CALL(evt_mobj_switch_blue, 0, STRING("origami_sw"), 90, 10, -60, PTR(evt_origami), GSWF(3727))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("dann"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("n_origami"), 1)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2_2"))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_30_ORIGAMI_STAIRS)
+        CALL(evt_mobj_switch_blue, 0, STRING("origami_sw"), 90, 10, -60, PTR(evt_origami), GSWF(GSWF_EKI01_STAIRS_SWITCH_PRESSED))
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dann"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_origami"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_oritatami"), 1, 0)
-        ELSE
+    ELSE
         CALL(evt_map_playanim, STRING("anm_kaidan"), 2, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("dann"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_origami"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dann"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_origami"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_oritatami"), 1, 1)
     END_IF
-    IF_INT_LESS(GSW(0), 315)
-        CALL(evt_mobj_lock, STRING("lock"), 25, 394, 10, 0, -80, PTR(evt_chk), PTR(evt_lock), GSWF(3726))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_32_UNLOCKING_THE_DOOR)
+        CALL(evt_mobj_lock, STRING("lock"), ITEM_STATION_KEY_0x19, 394, 10, 0, -80, PTR(evt_chk), PTR(evt_lock), GSWF(GSWF_EKI01_DOOR_UNLOCKED))
         SET_VALUE(LW(0), 0)
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
     CALL(evt_cloud_init)
-    IF_INT_EQUAL(GSWF(3748), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI01_PAPER_1_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_1"), STRING("a_kami_1"), PTR(evt_kami_1))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_1"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_1"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3749), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI01_PAPER_2_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_2"), STRING("a_kami_2"), PTR(evt_kami_2))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_2"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_2"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3750), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI01_PAPER_3_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_3"), STRING("a_kami_3"), PTR(evt_kami_3))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_3"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_3"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_3"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3751), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI01_PAPER_4_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_4"), STRING("a_kami_4"), PTR(evt_kami_4))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_4"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_4"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_4"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3752), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI01_PAPER_5_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_5"), STRING("a_kami_5"), PTR(evt_kami_5))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_5"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_5"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_5"), 1, 0)
     END_IF
-    IF_INT_EQUAL(GSWF(3753), 0)
+    IF_INT_EQUAL(GSWF(GSWF_EKI01_PAPER_6_BLOWN), 0)
         CALL(evt_cloud_ent, 0, STRING("kami_6"), STRING("a_kami_6"), PTR(evt_kami_6))
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_6"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_6"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kami_6"), 1, 0)
     END_IF
     RETURN
 EVT_END()
-

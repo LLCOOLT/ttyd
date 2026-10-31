@@ -1,80 +1,35 @@
+// dou_04 (洞窟, Pirate's Grotto): room off dou_03 with a lift raised by a red switch.
+// Grotto Key and Star Piece items, and a Goomba NPC (Kurichero) who gives a Couples Cake request.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "mario/mario.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/hitdrv.h"
+#include "driver/itemdrv.h"
 #include "string.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "evt/evt_npc.h"
+#include "battle/battle_sub.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "system.h"
+#include "dou.h"
+#include "evt/evt_story.h"
 
-f32 sinfd(f32 degrees);
-f32 reviseAngle(f32 angle);
-void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
-
-USER_FUNC(evt_bero_get_info);
 USER_FUNC(evt_box_pukapuka);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_off);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_item_get_item_end_wait);
-USER_FUNC(evt_item_get_position);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_check_menu);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_name_hitobj_head);
-USER_FUNC(evt_mario_get_name_hitobj_ride);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_party_use_check);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dir_npc);
-USER_FUNC(evt_mario_set_hosei_xyz);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_mobj_switch_red);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_wait_pera);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_get_name_hitobj_ride);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_jump_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_dir_npc);
-USER_FUNC(evt_party_set_hosei_xyz);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_get_haveitemcnt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_mapgrp_translate2);
 
 static BeroEntry bero_entry_data[2];
 extern EvtWord box_trans[];
@@ -89,7 +44,6 @@ extern EvtWord lift_event[];
 static HitDamageReturn hitDmgRetPoints[4];
 extern EvtWord kuribo_talk[];
 static NpcSetupInfo npcEnt[2];
-extern EvtWord dou_04_init_evt[];
 
 USER_FUNC(evt_mario_check_menu) {
     EvtWord* args = event->args;
@@ -102,8 +56,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -269,7 +223,7 @@ EVT_BEGIN(lift_event_00)
         CALL(evt_mapobj_get_position, STRING("s04_m_hako_b"), LW(10), LW(11), LW(12))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_STEP_DOWN1"), LW(10), LW(11), LW(12), 0)
         CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0009765625f), 150)
-        ELSE
+    ELSE
         SET_FLOAT_VALUE(LW(0), LW(3))
         LOOP(0)
             CALL(evt_mapobj_trans, 1, STRING("s04_m_hako_b"), 0, LW(0), 0)
@@ -346,7 +300,7 @@ EVT_BEGIN(lift_event_01)
             END_IF
         END_LOOP
         CALL(evt_snd_sfxoff, LW(9))
-        ELSE
+    ELSE
         CALL(evt_mapobj_get_position, STRING("s04_m_ita_b"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_STEP_FALL1"), LW(0), LW(1), LW(2), LW(9))
         SET_FLOAT_VALUE(LW(0), LW(3))
@@ -395,7 +349,7 @@ EVT_BEGIN(lift_main_00)
         IF_INT_EQUAL(LF(10), 0)
             SET_VALUE(LW(0), 0)
             SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
-            ELSE
+        ELSE
             SET_VALUE(LW(0), 0)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
@@ -404,7 +358,7 @@ EVT_BEGIN(lift_main_00)
         IF_INT_EQUAL(LF(10), 0)
             SET_VALUE(LW(0), 1)
             SET_FLOAT_VALUE(LW(3), FLOAT(-180.0f))
-            ELSE
+        ELSE
             SET_VALUE(LW(0), 1)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
@@ -421,7 +375,7 @@ EVT_BEGIN(lift_main_01)
         IF_INT_EQUAL(LF(10), 0)
             SET_VALUE(LW(0), 0)
             SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
-            ELSE
+        ELSE
             SET_VALUE(LW(0), 0)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
@@ -430,7 +384,7 @@ EVT_BEGIN(lift_main_01)
         IF_INT_EQUAL(LF(10), 0)
             SET_VALUE(LW(0), 1)
             SET_FLOAT_VALUE(LW(3), FLOAT(128.0f))
-            ELSE
+        ELSE
             SET_VALUE(LW(0), 1)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
@@ -462,7 +416,7 @@ static HitDamageReturn hitDmgRetPoints[] = {
 };
 
 static EVT_BEGIN(kuribo_init)
-    IF_INT_EQUAL(GSW(1420), 21)
+    IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 21)
         CALL(evt_npc_set_position, STRING("me"), -183, 10, 135)
         CALL(evt_npc_set_ry, STRING("me"), 90)
     END_IF
@@ -470,11 +424,11 @@ static EVT_BEGIN(kuribo_init)
 EVT_END()
 
 EVT_BEGIN(kuribo_talk)
-    IF_INT_EQUAL(GSW(1420), 21)
-        IF_INT_EQUAL(GSWF(5405), 0)
+    IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 21)
+        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
             CALL(evt_msg_print, 0, STRING("irai_21_001"), 0, 0)
-            SET_VALUE(GSWF(5405), 1)
-            ELSE
+            SET_VALUE(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
+        ELSE
             CALL(evt_mario_get_party, LW(0))
             IF_INT_EQUAL(LW(0), 1)
                 CALL(evt_party_stop, 0)
@@ -489,13 +443,13 @@ EVT_BEGIN(kuribo_talk)
                     CALL(evt_mario_set_dir, 270, 300, 0)
                 END_INLINE_EVENT
                 BEGIN_INLINE_EVENT
-                    CALL(evt_party_dispflg_onoff, 0, 16, 1)
+                    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 1)
                     CALL(evt_party_move_pos2, 0, -144, 86, 40)
                     WAIT_FRAMES(1)
-                    CALL(evt_party_dispflg_onoff, 0, 16, 0)
+                    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 0)
                     SET_VALUE(GF(0), 0)
                 END_INLINE_EVENT
-                CALL(evt_npc_flag_onoff, 1, STRING("me"), 32)
+                CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INTANGIBLE)
                 CALL(evt_npc_move_position, STRING("me"), -175, 86, 0, 40, 0)
                 WAIT_WHILE(GF(0))
                 WAIT_MS(500)
@@ -515,17 +469,17 @@ EVT_BEGIN(kuribo_talk)
                 END_INLINE_EVENT
                 BEGIN_INLINE_EVENT
                     WAIT_MS(250)
-                    CALL(evt_party_dispflg_onoff, 0, 16, 1)
+                    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 1)
                     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
                     CALL(evt_party_jump_pos, 0, LW(0), LW(1), LW(2), 200, 1, 5)
-                    CALL(evt_party_dispflg_onoff, 0, 16, 0)
+                    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 0)
                 END_INLINE_EVENT
                 CALL(evt_msg_print, 0, STRING("irai_21_005"), 0, STRING("me"))
                 CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
                 ADD(LW(0), 10)
                 ADD(LW(1), 15)
                 ADD(LW(2), 5)
-                CALL(evt_item_entry, STRING("ff"), 219, LW(0), LW(1), LW(2), 17, GSWF(2991), 0)
+                CALL(evt_item_entry, STRING("ff"), ITEM_COUPLES_CAKE, LW(0), LW(1), LW(2), 17, GSWF(GSWF_DOU04_TROUBLE21_COUPLES_CAKE_TAKEN), 0)
                 WAIT_MS(800)
                 CALL(evt_msg_print, 0, STRING("irai_21_006"), 0, STRING("party"))
                 WAIT_MS(500)
@@ -598,31 +552,31 @@ EVT_BEGIN(kuribo_talk)
                 CALL(evt_mario_set_dir, 270, 300, 0)
                 WAIT_MS(300)
                 CALL(evt_pouch_get_haveitemcnt, LW(0))
-                CALL(evt_pouch_check_item, 1, LW(1))
+                CALL(evt_pouch_check_item, ITEM_STRANGE_SACK, LW(1))
                 IF_INT_EQUAL(LW(1), 0)
                     SET_VALUE(LW(1), 10)
-                    ELSE
+                ELSE
                     SET_VALUE(LW(1), 20)
                 END_IF
                 IF_INT_LESS(LW(0), LW(1))
                     CALL(evt_msg_continue)
                     CALL(evt_item_get_item, STRING("ff"))
                     CALL(evt_item_get_item_end_wait, STRING("ff"))
-                    ELSE
+                ELSE
                     CALL(evt_msg_print_add, 0, STRING("irai_21_011_1"))
                     CALL(evt_party_set_dir, 0, 270, 300)
                     WAIT_MS(300)
                     CALL(evt_item_set_position, STRING("ff"), -165, 10, 106)
-                    CALL(evt_item_flag_off, STRING("ff"), 2)
+                    CALL(evt_item_flag_off, STRING("ff"), ITEM_FLAG_NO_TOUCH)
                     WAIT_MS(300)
                     CALL(evt_party_set_dir, 0, 90, 300)
                 END_IF
                 CALL(evt_msg_print, 0, STRING("irai_21_013"), 0, STRING("party"))
                 CALL(evt_party_run, 0)
-                SET_VALUE(GSW(1420), 0)
-                SET_VALUE(GSWF(5395), 1)
+                SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
+                SET_VALUE(GSWF(GSWF_TROUBLE_21_SOLVED), 1)
                 CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
-                ELSE
+            ELSE
                 LOOP(0)
                     CALL(evt_mario_party_use_check, LW(1))
                     IF_INT_EQUAL(LW(1), 0)
@@ -670,7 +624,7 @@ EVT_BEGIN(kuribo_talk)
                     CALL(evt_party_get_pos, 0, LW(5), LW(6), LW(7))
                     IF_INT_GREATER_OR_EQUAL(LW(2), LW(5))
                         CALL(evt_mario_set_dir, 270, 200, 0)
-                        ELSE
+                    ELSE
                         CALL(evt_mario_set_dir, 90, 200, 0)
                     END_IF
                 END_INLINE_EVENT
@@ -686,7 +640,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"クリチェロ"*/"\x83\x4E\x83\x8A\x83\x60\x83\x46\x83\x8D", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kuribo_init, // initEvent
         NULL, // regularEvent
@@ -700,8 +654,8 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 EVT_BEGIN(dou_04_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU6"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU6"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -713,13 +667,13 @@ EVT_BEGIN(dou_04_init_evt)
     SPAWN_EVENT(PTR(lift_event_init))
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
-    CALL(evt_item_entry, STRING("kagitsume"), 20, 122, 110, -118, 0, GSWF(2977), 0)
-    CALL(evt_item_entry, STRING("starpice"), 125, -230, 200, 110, 0, GSWF(5646), 0)
+    CALL(evt_item_entry, STRING("kagitsume"), ITEM_GROTTO_KEY, 122, 110, -118, 0, GSWF(GSWF_DOU04_GROTTO_KEY_TAKEN), 0)
+    CALL(evt_item_entry, STRING("starpice"), ITEM_STAR_PIECE, -230, 200, 110, 0, GSWF(GSWF_DOU04_STAR_PIECE), 0)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
-    CALL(evt_mobj_powerupblk, STRING("pblk00"), -230, 290, -105, 0, GSWF(5555), 0)
-    IF_INT_EQUAL(GSWF(5395), 1)
-        CALL(evt_item_entry, STRING("iri_21"), 219, -165, 10, 106, 16, GSWF(2991), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk00"), -230, 290, -105, 0, GSWF(GSWF_DOU04_SHINE_SPRITE), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TROUBLE_21_SOLVED), 1)
+        CALL(evt_item_entry, STRING("iri_21"), ITEM_COUPLES_CAKE, -165, 10, 106, 16, GSWF(GSWF_DOU04_TROUBLE21_COUPLES_CAKE_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -766,4 +720,3 @@ USER_FUNC(evt_mapgrp_translate2) {
     prev[2] = 10.0f * (z / 10.0f);
     return EVT_RETURN_DONE;
 }
-

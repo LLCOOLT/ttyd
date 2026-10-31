@@ -1,3 +1,5 @@
+// Pause menu root: the tabs, help text, sort menu and shared window frames, and the sort functions for every list.
+#include "version.h"
 #include "win/win_main.h"
 #include "battle/battle_monosiri.h"
 #include "data/item_data.h"
@@ -12,30 +14,25 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <dolphin/gx.h>
+#include "win/win_badge.h"
 #include "win/win_item.h"
+#include "win/win_log.h"
+#include "win/win_mario.h"
+#include "win/win_party.h"
 #include "libc_decls.h"
-
-extern ItemData itemDataTable[];
-void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void*, const void*));
-void pouchHiraToKata(const char* msg, char* out);
+#include "win/win_root.h"
+#include "evt/evt_story.h"
+#include <dolphin/pad.h>
+#include <demo/DEMOPad.h>
 
 typedef struct WinSortData {
     const char* name;
     void (*func)(WindowWork* wp);
 } WinSortData;
 
-void winMakeSkipList(WindowWork* wp);
-void winTexInit_x2(TEXPalette* tpl);
-void winTexSet_x2(u32 a, u32 b, Vec translate, Vec scale, GXColor color);
-void winMarioDisp(s32 camId, WindowWork* wp, s32 n);
-void winPartyDisp(s32 camId, WindowWork* wp, s32 n);
-void winItemDisp(s32 camId, WindowWork* wp, s32 n);
-void winBadgeDisp(s32 camId, WindowWork* wp, s32 n);
-void winLogDisp(s32 camId, WindowWork* wp, s32 n);
 void winMailDisp(WindowWork* wp);
 void winMsgDisp(WindowWork* wp, f32 x, f32 y);
 void winSortGX(WindowWork* wp);
-void winMakeEquipList(WindowWork* wp);
 
 void sort_1_1_func(WindowWork* wp);
 void sort_1_2_func(WindowWork* wp);
@@ -63,349 +60,318 @@ void sort_8_2_func(WindowWork* wp);
 #include "mario/mario_party.h"
 #include "memory.h"
 
-void winMarioInit();
-void winPartyInit();
-void winItemInit();
-void winBadgeInit();
-void winLogInit();
-void winMarioInit2();
-void winPartyInit2();
-void winItemInit2();
-void winBadgeInit2();
-void winLogInit2();
-s32 winMarioMain();
-s32 winPartyMain();
-s32 winItemMain();
-s32 winBadgeMain();
-s32 winLogMain();
-void winMarioMain2();
-void winPartyMain2();
-void winItemMain2();
-void winBadgeMain2();
-void winLogMain2();
-void winMarioExit();
-void winPartyExit();
-void winItemExit();
-void winBadgeExit();
-void winLogExit();
-#ifndef VERSION_G8ME01_DEMO
-void winRootBgDrawDisp();
-void winRootBgCaptureDisp();
+#if VERSION != VERSION_DEMO
+void winRootBgDrawDisp(CameraId camId, void* param);
+void winRootBgCaptureDisp(CameraId camId, void* param);
 #endif
-double sin(double);
-double fabs(double);
 
-#define WIN_ROOT_ADD_TAB(n)                       \
-    {                                             \
-        WinTab* t = &w->tab[w->tabNum];       \
-        t->id = n;                                \
-        t->state = 0;                             \
-        t->x = t->y = 1000.0f;                    \
-        t->msg = msg_help[n];                     \
-        w->tabNum++;                              \
+#define WIN_ROOT_ADD_TAB(n)             \
+    {                                   \
+        WinTab* t = &w->tab[w->tabNum]; \
+        t->id = n;                      \
+        t->state = 0;                   \
+        t->x = t->y = 1000.0f;          \
+        t->msg = msg_help[n];           \
+        w->tabNum++;                    \
     }
 
 void winBgMain(WindowWork* wp);
 void winMsgMain(WindowWork* wp);
 void winSortMain(WindowWork* wp);
 
-#ifdef VERSION_G8ME01
-#define WR_FRAMES(n) (gp->framerate * (n) / 60)
-#define WR_FSTEP(n) ((n) * gp->framerate / 60.0f)
-#else
-#define WR_FRAMES(n) (n)
-#define WR_FSTEP(n) (n)
-#endif
-
 static inline void winRootTabMain(WindowWork* w) {
     s32 i;
 
     for (i = 0; i < 5; i++) {
         switch (w->tab[i].state) {
-        case 0:
-            w->tab[i].x = i * 105 - 205;
-            w->tab[i].y = 300.0f;
-            w->tab[i].timer = i << 2;
-            w->tab[i].state++;
-            break;
-        case 1:
-        case 11:
-            if (--w->tab[i].timer < 0) {
-                w->tab[i].timer = 0;
+            case 0:
+                w->tab[i].x = i * 105 - 205;
+                w->tab[i].y = 300.0f;
+                w->tab[i].timer = i << 2;
                 w->tab[i].state++;
-            }
-            break;
-        case 2:
-            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, WR_FRAMES(10), 300.0f, 185.0f);
-            if (w->tab[i].timer > WR_FRAMES(10)) {
+                break;
+            case 1:
+            case 11:
+                if (--w->tab[i].timer < 0) {
+                    w->tab[i].timer = 0;
+                    w->tab[i].state++;
+                }
+                break;
+            case 2:
+                w->tab[i].y = intplGetValue(11, 300.0f, 185.0f, w->tab[i].timer++, FPS_FRAMES(10));
+                if (w->tab[i].timer > FPS_FRAMES(10)) {
+                    w->tab[i].state++;
+                }
+                break;
+            case 10:
+                w->tab[i].timer = (4 - i) * 4;
                 w->tab[i].state++;
-            }
-            break;
-        case 10:
-            w->tab[i].timer = (4 - i) * 4;
-            w->tab[i].state++;
-            break;
-        case 12:
-            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, WR_FRAMES(10), 180.0f, 300.0f);
-            if (w->tab[i].timer > WR_FRAMES(10)) {
-                w->tab[i].state++;
-            }
-            break;
-        case 13:
-            break;
+                break;
+            case 12:
+                w->tab[i].y = intplGetValue(11, 180.0f, 300.0f, w->tab[i].timer++, FPS_FRAMES(10));
+                if (w->tab[i].timer > FPS_FRAMES(10)) {
+                    w->tab[i].state++;
+                }
+                break;
+            case 13:
+                break;
         }
-        }
+    }
 }
 
 s32 winRootMain(WindowWork* w) {
     static char* msg_help[] = {
-        "msg_menu_mario", "msg_menu_nakama", "msg_menu_mochimono", "msg_menu_badge", "msg_menu_kiroku",
+        "msg_menu_mario",
+        "msg_menu_nakama",
+        "msg_menu_mochimono",
+        "msg_menu_badge",
+        "msg_menu_kiroku",
     };
     s32 x;
     s32 i;
     s32 ret;
 
     switch (w->active) {
-    case 0:
-        psndSFXOn((const char*)0x2002A);
-        w->tabNum = 0;
-        WIN_ROOT_ADD_TAB(0);
-        if (swByteGet(0) >= 7 || partyChkJoin(1)) {
-            WIN_ROOT_ADD_TAB(1);
-        }
-        WIN_ROOT_ADD_TAB(2);
-        if (swByteGet(0) >= 20 || pouchGetHaveBadgeCnt()) {
-            WIN_ROOT_ADD_TAB(3);
-        }
-        WIN_ROOT_ADD_TAB(4);
-#ifdef VERSION_G8ME01_DEMO
-        {
-            s32 j;
-            for (j = 0; j < w->tabNum; j++) {
-                if (w->tab[j].id == w->menuSel) {
-                    w->tabSel = j;
+        case 0:
+            psndSFXOn((const char*)0x2002A);
+            w->tabNum = 0;
+            WIN_ROOT_ADD_TAB(0);
+            if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(1)) {
+                WIN_ROOT_ADD_TAB(1);
+            }
+            WIN_ROOT_ADD_TAB(2);
+            if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_17_BADGE_TUTORIAL || pouchGetHaveBadgeCnt()) {
+                WIN_ROOT_ADD_TAB(3);
+            }
+            WIN_ROOT_ADD_TAB(4);
+#if VERSION == VERSION_DEMO
+            {
+                s32 j;
+                for (j = 0; j < w->tabNum; j++) {
+                    if (w->tab[j].id == w->menuSel) {
+                        w->tabSel = j;
+                    }
                 }
             }
-        }
 #else
-        for (i = 0; i < w->tabNum; i++) {
-            if (w->tab[i].id == w->menuSel) {
-                w->tabSel = i;
+            for (i = 0; i < w->tabNum; i++) {
+                if (w->tab[i].id == w->menuSel) {
+                    w->tabSel = i;
+                }
             }
-        }
 #endif
-        for (i = 0; i < 5; i++) {
-            w->menu[i].state = -1;
-            w->menu[i].x = w->menu[i].y = 1000.0f;
-            w->menu[i].id = -1;
-        }
-        w->menu[0].x = w->menu[0].y = 1000.0f;
-        w->menu[0].state = 0;
-        w->menu[0].id = w->tab[w->tabSel].id;
-        w->msgState = 0;
-        w->msgOfsX = w->msgOfsY = 1000.0f;
-        w->msg = NULL;
-        w->msgName = 0;
-        w->lastMsg = NULL;
-        winMarioInit(w);
-        winPartyInit(w);
-        winItemInit(w);
-        winBadgeInit(w);
-        winLogInit(w);
-        w->helpX = w->helpTgtX = w->tabSel * 105 - 270;
-        w->helpY = 300.0f;
-        w->helpTgtY = 185.0f;
-        w->sortPosX = w->sortTgtX = -1000.0f;
-        w->sortPosY = w->sortTgtY = -1000.0f;
-        winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
-        w->active = 10;
-        switch (w->menuSel) {
-        case 1:
-            winPartyInit2(w);
-            w->active = 12;
-            w->flags |= 0x4000;
-            break;
-        case 2:
-            winItemInit2(w);
-            w->active = 13;
-            w->flags |= 0x4000;
-            break;
-        case 3:
-            winBadgeInit2(w);
-            w->active = 14;
-            w->flags |= 0x4000;
-            break;
-        case 4:
-            winLogInit2(w);
-            w->active = 15;
-            w->flags |= 0x4000;
-            break;
-        }
-        if (gp->flags & 0x1000) {
-            w->tabNum = 0;
-            WIN_ROOT_ADD_TAB(1);
-            winPartyInit2(w);
-            w->active = 12;
-            w->tabSel = 0;
-        }
-#ifndef VERSION_G8ME01_DEMO
-        w->texBuf = smartAlloc(GXGetTexBufferSize(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE, 0), 1);
-        w->texBufValid = 0;
-        dispEntry(CAMERA_2D, 1000.0f, 0, (DispCallback)winRootBgCaptureDisp, w);
-#endif
-        break;
-    case 10:
-        if (w->buttonTrg & 0x1200) {
-            if (w->menu[0].state == 100) {
-                w->active = 20;
-            }
-        } else if (w->buttonTrg & 0x100) {
-            if (w->tab[w->tabSel].id == 1 && !w->party.count) {
-                break;
-            }
-            psndSFXOn((const char*)0x20012);
-            w->active = w->tab[w->tabSel].id + 11;
-            switch (w->tab[w->tabSel].id) {
-            case 0:
-                winMarioInit2(w);
-                break;
-            case 1:
-                winPartyInit2(w);
-                break;
-            case 2:
-                winItemInit2(w);
-                break;
-            case 3:
-                winBadgeInit2(w);
-                break;
-            case 4:
-                winLogInit2(w);
-                break;
-            }
-#ifdef VERSION_G8ME01
-        } else if (w->dirRep & 0x4000 && w->menu[0].state == 100) {
-#else
-        } else if (w->dirRep & 0x4000) {
-#endif
-            psndSFXOn((const char*)0x20032);
-            psndSFXOn((const char*)0x20031);
-            w->tabSel--;
-            if (w->tabSel < 0) {
-                w->tabSel = w->tabNum - 1;
-            }
-            for (i = 4; i > 0; i--) {
-                w->menu[i] = w->menu[i - 1];
+            for (i = 0; i < 5; i++) {
+                w->menu[i].state = -1;
+                w->menu[i].x = w->menu[i].y = 1000.0f;
+                w->menu[i].id = -1;
             }
             w->menu[0].x = w->menu[0].y = 1000.0f;
-            w->menu[0].state = 30;
+            w->menu[0].state = 0;
             w->menu[0].id = w->tab[w->tabSel].id;
-            w->helpTgtX = w->tabSel * 105 - 270;
+            w->msgState = 0;
+            w->msgOfsX = w->msgOfsY = 1000.0f;
+            w->msg = NULL;
+            w->msgName = 0;
+            w->lastMsg = NULL;
+            winMarioInit(w);
+            winPartyInit(w);
+            winItemInit(w);
+            winBadgeInit(w);
+            winLogInit(w);
+            w->helpX = w->helpTgtX = w->tabSel * 105 - 270;
+            w->helpY = 300.0f;
+            w->helpTgtY = 185.0f;
+            w->sortPosX = w->sortTgtX = -1000.0f;
+            w->sortPosY = w->sortTgtY = -1000.0f;
             winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
-#ifdef VERSION_G8ME01
-        } else if (w->dirRep & 0x8000 && w->menu[0].state == 100) {
-#else
-        } else if (w->dirRep & 0x8000) {
-#endif
-            psndSFXOn((const char*)0x20032);
-            psndSFXOn((const char*)0x20031);
-            w->tabSel++;
-            if (w->tabSel >= w->tabNum) {
+            w->active = 10;
+            switch (w->menuSel) {
+                case 1:
+                    winPartyInit2(w);
+                    w->active = 12;
+                    w->flags |= 0x4000;
+                    break;
+                case 2:
+                    winItemInit2(w);
+                    w->active = 13;
+                    w->flags |= 0x4000;
+                    break;
+                case 3:
+                    winBadgeInit2(w);
+                    w->active = 14;
+                    w->flags |= 0x4000;
+                    break;
+                case 4:
+                    winLogInit2(w);
+                    w->active = 15;
+                    w->flags |= 0x4000;
+                    break;
+            }
+            if (gp->flags & GLOBAL_FLAG_KIOSK) {
+                w->tabNum = 0;
+                WIN_ROOT_ADD_TAB(1);
+                winPartyInit2(w);
+                w->active = 12;
                 w->tabSel = 0;
             }
-            for (i = 4; i > 0; i--) {
-                w->menu[i] = w->menu[i - 1];
-            }
-            w->menu[0].x = w->menu[0].y = 1000.0f;
-            w->menu[0].state = 20;
-            w->menu[0].id = w->tab[w->tabSel].id;
-            w->helpTgtX = w->tabSel * 105 - 270;
-            winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
-        }
-        break;
-    case 100:
-#ifdef VERSION_G8ME01
-        if (w->menu[0].state == 100) {
-#else
-        if (w->menu[w->tabSel].state == 100) {
-#endif
-            w->active = 10;
-        }
-        break;
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    case 15:
-        switch (w->active) {
-        case 11:
-            ret = winMarioMain(w);
-            break;
-        case 12:
-            ret = winPartyMain(w);
-            break;
-        case 13:
-            ret = winItemMain(w);
-            break;
-        case 14:
-            ret = winBadgeMain(w);
-            break;
-        case 15:
-            ret = winLogMain(w);
-            break;
-        }
-        if ((gp->flags & 0x1000) && ret == -1) {
-            ret = -2;
-        }
-        if (ret == -1) {
-            w->helpTgtX = w->tabSel * 105 - 270;
-            w->helpTgtY = 185.0f;
-            w->active = 10;
-            winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
-            w->flags &= ~0x4000;
-        } else if (ret == -2) {
-            w->active = 20;
-            w->flags &= ~0x4000;
-        }
-        break;
-    case 20:
-        psndSFXOn((const char*)0x2002B);
-        for (i = 0; i < w->tabNum; i++) {
-            w->tab[i].state = 10;
-        }
-        for (i = 0; i < 5; i++) {
-            w->menu[i].state = 10;
-        }
-        w->msgState = 10;
-#ifndef VERSION_G8ME01_DEMO
-        N_mapDispOn();
-        camDispOn(CAMERA_3D);
-#endif
-        w->active++;
-        break;
-    default:
-#ifndef VERSION_G8ME01_DEMO
-        if (w->texBuf) {
-            smartFree(w->texBuf);
-            w->texBuf = NULL;
+#if VERSION != VERSION_DEMO
+            w->texBuf = smartAlloc(GXGetTexBufferSize(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE, 0), 1);
             w->texBufValid = 0;
-        }
+            dispEntry(CAMERA_2D, 1000.0f, 0, winRootBgCaptureDisp, w);
 #endif
-        w->active++;
-        if (w->active > 50) {
-            winMarioExit(w);
-            winPartyExit(w);
-            winItemExit(w);
-            winBadgeExit(w);
-            winLogExit(w);
-            if (w->party.switchRequested && w->party.cursor != w->party.openCursor) {
-                return -2;
+            break;
+        case 10:
+            if (w->buttonTrg & (PAD_BUTTON_B | PAD_BUTTON_START)) {
+                if (w->menu[0].state == 100) {
+                    w->active = 20;
+                }
+            } else if (w->buttonTrg & PAD_BUTTON_A) {
+                if (w->tab[w->tabSel].id == 1 && !w->party.count) {
+                    break;
+                }
+                psndSFXOn((const char*)0x20012);
+                w->active = w->tab[w->tabSel].id + 11;
+                switch (w->tab[w->tabSel].id) {
+                    case 0:
+                        winMarioInit2(w);
+                        break;
+                    case 1:
+                        winPartyInit2(w);
+                        break;
+                    case 2:
+                        winItemInit2(w);
+                        break;
+                    case 3:
+                        winBadgeInit2(w);
+                        break;
+                    case 4:
+                        winLogInit2(w);
+                        break;
+                }
+#if VERSION >= VERSION_US
+            } else if (w->dirRep & DEMO_STICK_LEFT && w->menu[0].state == 100) {
+#else
+            } else if (w->dirRep & DEMO_STICK_LEFT) {
+#endif
+                psndSFXOn((const char*)0x20032);
+                psndSFXOn((const char*)0x20031);
+                w->tabSel--;
+                if (w->tabSel < 0) {
+                    w->tabSel = w->tabNum - 1;
+                }
+                for (i = 4; i > 0; i--) {
+                    w->menu[i] = w->menu[i - 1];
+                }
+                w->menu[0].x = w->menu[0].y = 1000.0f;
+                w->menu[0].state = 30;
+                w->menu[0].id = w->tab[w->tabSel].id;
+                w->helpTgtX = w->tabSel * 105 - 270;
+                winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
+#if VERSION >= VERSION_US
+            } else if (w->dirRep & DEMO_STICK_RIGHT && w->menu[0].state == 100) {
+#else
+            } else if (w->dirRep & DEMO_STICK_RIGHT) {
+#endif
+                psndSFXOn((const char*)0x20032);
+                psndSFXOn((const char*)0x20031);
+                w->tabSel++;
+                if (w->tabSel >= w->tabNum) {
+                    w->tabSel = 0;
+                }
+                for (i = 4; i > 0; i--) {
+                    w->menu[i] = w->menu[i - 1];
+                }
+                w->menu[0].x = w->menu[0].y = 1000.0f;
+                w->menu[0].state = 20;
+                w->menu[0].id = w->tab[w->tabSel].id;
+                w->helpTgtX = w->tabSel * 105 - 270;
+                winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
             }
-            if (w->item.useItem) {
-                return -3;
+            break;
+        case 100:
+#if VERSION >= VERSION_US
+            if (w->menu[0].state == 100) {
+#else
+            if (w->menu[w->tabSel].state == 100) {
+#endif
+                w->active = 10;
             }
-            return -1;
-        }
-        break;
+            break;
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+            switch (w->active) {
+                case 11:
+                    ret = winMarioMain(w);
+                    break;
+                case 12:
+                    ret = winPartyMain(w);
+                    break;
+                case 13:
+                    ret = winItemMain(w);
+                    break;
+                case 14:
+                    ret = winBadgeMain(w);
+                    break;
+                case 15:
+                    ret = winLogMain(w);
+                    break;
+            }
+            if ((gp->flags & GLOBAL_FLAG_KIOSK) && ret == -1) {
+                ret = -2;
+            }
+            if (ret == -1) {
+                w->helpTgtX = w->tabSel * 105 - 270;
+                w->helpTgtY = 185.0f;
+                w->active = 10;
+                winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
+                w->flags &= ~0x4000;
+            } else if (ret == -2) {
+                w->active = 20;
+                w->flags &= ~0x4000;
+            }
+            break;
+        case 20:
+            psndSFXOn((const char*)0x2002B);
+            for (i = 0; i < w->tabNum; i++) {
+                w->tab[i].state = 10;
+            }
+            for (i = 0; i < 5; i++) {
+                w->menu[i].state = 10;
+            }
+            w->msgState = 10;
+#if VERSION != VERSION_DEMO
+            N_mapDispOn();
+            camDispOn(CAMERA_3D);
+#endif
+            w->active++;
+            break;
+        default:
+#if VERSION != VERSION_DEMO
+            if (w->texBuf) {
+                smartFree(w->texBuf);
+                w->texBuf = NULL;
+                w->texBufValid = 0;
+            }
+#endif
+            w->active++;
+            if (w->active > 50) {
+                winMarioExit(w);
+                winPartyExit(w);
+                winItemExit(w);
+                winBadgeExit(w);
+                winLogExit(w);
+                if (w->party.switchRequested && w->party.cursor != w->party.openCursor) {
+                    return -2;
+                }
+                if (w->item.useItem) {
+                    return -3;
+                }
+                return -1;
+            }
+            break;
     }
 
     winRootTabMain(w);
@@ -421,29 +387,29 @@ s32 winRootMain(WindowWork* w) {
 
     if (w->active < 20) {
         if (w->flags & 0x4000) {
-            w->helpX += (w->helpTgtX - w->helpX) / WR_FSTEP(4.0f);
-            w->helpY += (w->helpTgtY - w->helpY) / WR_FSTEP(4.0f);
+            w->helpX += (w->helpTgtX - w->helpX) / FPS_EASE(4.0f);
+            w->helpY += (w->helpTgtY - w->helpY) / FPS_EASE(4.0f);
         } else {
-            w->helpX += (w->helpTgtX - w->helpX) / WR_FSTEP(4.0f);
-            w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / WR_FSTEP(4.0f);
+            w->helpX += (w->helpTgtX - w->helpX) / FPS_EASE(4.0f);
+            w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / FPS_EASE(4.0f);
         }
     } else if (w->helpY > 180.0f) {
-        w->helpX += (w->helpTgtX - w->helpX) / WR_FSTEP(4.0f);
-        w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / WR_FSTEP(4.0f);
+        w->helpX += (w->helpTgtX - w->helpX) / FPS_EASE(4.0f);
+        w->helpY += ((w->helpTgtY + (w->tab[w->tabSel].y - 185.0f)) - w->helpY) / FPS_EASE(4.0f);
     } else {
-        w->helpX += ((w->helpTgtX + w->menu[0].x) - w->helpX) / WR_FSTEP(4.0f);
-        w->helpY += (w->helpTgtY - w->helpY) / WR_FSTEP(4.0f);
+        w->helpX += ((w->helpTgtX + w->menu[0].x) - w->helpX) / FPS_EASE(4.0f);
+        w->helpY += (w->helpTgtY - w->helpY) / FPS_EASE(4.0f);
     }
     w->helpX += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
-    w->sortPosX += (w->sortTgtX - w->sortPosX) / WR_FSTEP(4.0f);
-    w->sortPosY += (w->sortTgtY - w->sortPosY) / WR_FSTEP(4.0f);
-#ifndef VERSION_G8ME01_DEMO
-    dispEntry(CAMERA_2D, 1000.0f, 0, (DispCallback)winRootBgDrawDisp, w);
+    w->sortPosX += (w->sortTgtX - w->sortPosX) / FPS_EASE(4.0f);
+    w->sortPosY += (w->sortTgtY - w->sortPosY) / FPS_EASE(4.0f);
+#if VERSION != VERSION_DEMO
+    dispEntry(CAMERA_2D, 1000.0f, 0, winRootBgDrawDisp, w);
 #endif
     return 0;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // FAKE: stand-in for a function the linker stripped; codegen runs bottom-up, so
 // its 185.0f and 180.0f land in .sdata2 ahead of winRootMain's 1000.0f, as in the demo.
 void winRootStrippedPool(f32* f) {
@@ -498,7 +464,7 @@ void winRootDisp(s32 camId, WindowWork* wp) {
         winMailDisp(wp);
         winMsgDisp(wp, wp->msgOfsX, wp->msgOfsY);
         winSortGX(wp);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         if (!(wp->flags & 0x8000))
 #endif
         {
@@ -537,8 +503,8 @@ void winBgMain(WindowWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 1:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(16), 800.0f, 0.0f);
-                if (wp->menu[i].timer > WR_FRAMES(16)) {
+                wp->menu[i].x = intplGetValue(11, 800.0f, 0.0f, wp->menu[i].timer++, FPS_FRAMES(16));
+                if (wp->menu[i].timer > FPS_FRAMES(16)) {
                     wp->menu[i].state = 100;
                 }
                 break;
@@ -548,8 +514,8 @@ void winBgMain(WindowWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 11:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(16), 0.0f, 800.0f);
-                if (wp->menu[i].timer > WR_FRAMES(16)) {
+                wp->menu[i].x = intplGetValue(11, 0.0f, 800.0f, wp->menu[i].timer++, FPS_FRAMES(16));
+                if (wp->menu[i].timer > FPS_FRAMES(16)) {
                     wp->menu[i].state = -1;
                 }
                 break;
@@ -559,8 +525,8 @@ void winBgMain(WindowWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 21:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(24), 640.0f, 0.0f);
-                if (wp->menu[i].timer > WR_FRAMES(24)) {
+                wp->menu[i].x = intplGetValue(11, 640.0f, 0.0f, wp->menu[i].timer++, FPS_FRAMES(24));
+                if (wp->menu[i].timer > FPS_FRAMES(24)) {
                     wp->menu[i].state = 100;
                 }
                 break;
@@ -570,8 +536,8 @@ void winBgMain(WindowWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 31:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(24), -640.0f, 0.0f);
-                if (wp->menu[i].timer > WR_FRAMES(24)) {
+                wp->menu[i].x = intplGetValue(11, -640.0f, 0.0f, wp->menu[i].timer++, FPS_FRAMES(24));
+                if (wp->menu[i].timer > FPS_FRAMES(24)) {
                     wp->menu[i].state = 100;
                 }
                 break;
@@ -581,8 +547,8 @@ void winBgMain(WindowWork* wp) {
                 wp->menu[i].state++;
                 break;
             case 41:
-                wp->menu[i].x = intplGetValue(11, wp->menu[i].timer++, WR_FRAMES(24), 0.0f, -640.0f);
-                if (wp->menu[i].timer > WR_FRAMES(24)) {
+                wp->menu[i].x = intplGetValue(11, 0.0f, -640.0f, wp->menu[i].timer++, FPS_FRAMES(24));
+                if (wp->menu[i].timer > FPS_FRAMES(24)) {
                     wp->menu[i].state = -1;
                 }
                 break;
@@ -599,37 +565,37 @@ void winBgGX(WindowWork* wp, s32 type, f32 x, f32 y) {
     f32 sy;
 
     switch (type) {
-    case 0:
-        GXSetTevColor(GX_TEVREG0, (GXColor){ 0xC8, 0x66, 0x60, 0xFF });
-        GXSetTevColor(GX_TEVREG1, (GXColor){ 0xE1, 0xA5, 0xA1, 0xFF });
-        GXSetTevColor(GX_TEVREG2, (GXColor){ 0xF0, 0xCD, 0xCB, 0xFF });
-        break;
-    case 1:
-        GXSetTevColor(GX_TEVREG0, (GXColor){ 0xC8, 0x6B, 0x96, 0xFF });
-        GXSetTevColor(GX_TEVREG1, (GXColor){ 0xDB, 0xAB, 0xC6, 0xFF });
-        GXSetTevColor(GX_TEVREG2, (GXColor){ 0xEC, 0xD1, 0xE1, 0xFF });
-        break;
-    case 2:
-        GXSetTevColor(GX_TEVREG0, (GXColor){ 0xBB, 0x9C, 0x21, 0xFF });
-        GXSetTevColor(GX_TEVREG1, (GXColor){ 0xD7, 0xCD, 0x76, 0xFF });
-        GXSetTevColor(GX_TEVREG2, (GXColor){ 0xEA, 0xE5, 0xAD, 0xFF });
-        break;
-    case 3:
-        GXSetTevColor(GX_TEVREG0, (GXColor){ 0x2F, 0xA5, 0x30, 0xFF });
-        GXSetTevColor(GX_TEVREG1, (GXColor){ 0xA2, 0xD2, 0x6E, 0xFF });
-        GXSetTevColor(GX_TEVREG2, (GXColor){ 0xCB, 0xE7, 0xA7, 0xFF });
-        break;
-    case 4:
-        GXSetTevColor(GX_TEVREG0, (GXColor){ 0x28, 0x7E, 0xC5, 0xFF });
-        GXSetTevColor(GX_TEVREG1, (GXColor){ 0x78, 0xB3, 0xD6, 0xFF });
-        GXSetTevColor(GX_TEVREG2, (GXColor){ 0xAF, 0xD6, 0xEA, 0xFF });
-        break;
+        case 0:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0xC8, 0x66, 0x60, 0xFF});
+            GXSetTevColor(GX_TEVREG1, (GXColor){0xE1, 0xA5, 0xA1, 0xFF});
+            GXSetTevColor(GX_TEVREG2, (GXColor){0xF0, 0xCD, 0xCB, 0xFF});
+            break;
+        case 1:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0xC8, 0x6B, 0x96, 0xFF});
+            GXSetTevColor(GX_TEVREG1, (GXColor){0xDB, 0xAB, 0xC6, 0xFF});
+            GXSetTevColor(GX_TEVREG2, (GXColor){0xEC, 0xD1, 0xE1, 0xFF});
+            break;
+        case 2:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0xBB, 0x9C, 0x21, 0xFF});
+            GXSetTevColor(GX_TEVREG1, (GXColor){0xD7, 0xCD, 0x76, 0xFF});
+            GXSetTevColor(GX_TEVREG2, (GXColor){0xEA, 0xE5, 0xAD, 0xFF});
+            break;
+        case 3:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0x2F, 0xA5, 0x30, 0xFF});
+            GXSetTevColor(GX_TEVREG1, (GXColor){0xA2, 0xD2, 0x6E, 0xFF});
+            GXSetTevColor(GX_TEVREG2, (GXColor){0xCB, 0xE7, 0xA7, 0xFF});
+            break;
+        case 4:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0x28, 0x7E, 0xC5, 0xFF});
+            GXSetTevColor(GX_TEVREG1, (GXColor){0x78, 0xB3, 0xD6, 0xFF});
+            GXSetTevColor(GX_TEVREG2, (GXColor){0xAF, 0xD6, 0xEA, 0xFF});
+            break;
     }
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -640,7 +606,7 @@ void winBgGX(WindowWork* wp, s32 type, f32 x, f32 y) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
     GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     PSMTXTrans(m, x, 18.0f + y, 0.0f);
-    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    PSMTXConcat(camGetPtr(CAMERA_2D)->view, m, m);
     GXLoadPosMtxImm(m, 0);
     GXSetCurrentMtx(0);
     GXSetCullMode(GX_CULL_NONE);
@@ -707,25 +673,25 @@ void winMsgMain(WindowWork* wp) {
             wp->msgState++;
             break;
         case 1:
-            wp->msgOfsX = intplGetValue(11, wp->msgTimer++, WR_FRAMES(16), -800.0f, 0.0f);
-            if (wp->msgTimer > WR_FRAMES(16)) {
+            wp->msgOfsX = intplGetValue(11, -800.0f, 0.0f, wp->msgTimer++, FPS_FRAMES(16));
+            if (wp->msgTimer > FPS_FRAMES(16)) {
                 wp->msgState++;
             }
             break;
         case 2:
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             if (wp->item.state == 202) {
                 break;
             }
 #endif
-            if (keyGetDirTrg(0) & 0x100) {
+            if (keyGetDirTrg(0) & DEMO_SUBSTICK_UP) {
                 wp->msgLine -= 2;
                 if (wp->msgLine < 0) {
                     wp->msgLine = 0;
                 } else {
                     psndSFXOn(SFX_NAME_WORD(0x20006));
                 }
-            } else if (keyGetDirTrg(0) & 0x200) {
+            } else if (keyGetDirTrg(0) & DEMO_SUBSTICK_DOWN) {
                 if (wp->msgLine / 2 < (wp->msgLines + 1) / 2 - 1) {
                     wp->msgLine += 2;
                     psndSFXOn(SFX_NAME_WORD(0x20006));
@@ -745,8 +711,8 @@ void winMsgMain(WindowWork* wp) {
             wp->msgState++;
             break;
         case 11:
-            wp->msgOfsX = intplGetValue(11, wp->msgTimer++, WR_FRAMES(16), 0.0f, -800.0f);
-            if (wp->msgTimer > WR_FRAMES(16)) {
+            wp->msgOfsX = intplGetValue(11, 0.0f, -800.0f, wp->msgTimer++, FPS_FRAMES(16));
+            if (wp->msgTimer > FPS_FRAMES(16)) {
                 wp->msgState++;
             }
             break;
@@ -757,21 +723,14 @@ void winMsgMain(WindowWork* wp) {
 
 #include "evt/evt_lottery.h"
 #include "icon_ids.h"
-void windowDispGX_Waku_col(u16 gxTexMapID, GXColor color, f32 x, f32 y, f32 width, f32 height, f32 curve);
-void winIconInit(void);
-void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
-void winFontInit(void);
-void winFontSet(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
-void winFontSetEdge(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
-void winFontSetLabel(Vec translate, Vec scale, GXColor color, const char* msg);
+#include "driver/windowdrv.h"
 
-#ifdef VERSION_G8ME01
-void winFontSetEdgeWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...);
+#if VERSION >= VERSION_US
 #endif
 void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
-    GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
-    GXColor black = { 0x00, 0x00, 0x00, 0xFF };
-    GXColor waku = { 0xFF, 0xFF, 0xFF, 0xFF };
+    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXColor black = {0x00, 0x00, 0x00, 0xFF};
+    GXColor waku = {0xFF, 0xFF, 0xFF, 0xFF};
     char buf[1024];
     f32 ofs;
     f32 bx;
@@ -787,9 +746,9 @@ void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
     windowDispGX_Waku_col(0, waku, bx, by, 500.0f, 80.0f, 20.0f);
     if (wp->msgItem != 0 && wp->msgItem > 0) {
         winTexInit((TEXPalette*)*wp->res->data);
-        winTexSet(0x25, (Vec){ bx, by, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
+        winTexSet(0x25, (Vec){bx, by, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winIconInit();
-        winIconSet(itemDataTable[wp->msgItem].icon_id, (Vec){ bx, by, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
+        winIconSet(itemDataTable[wp->msgItem].icon_id, (Vec){bx, by, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     }
     if (wp->msgName != NULL) {
         if (wp->msgItem == -2) {
@@ -800,16 +759,16 @@ void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
         m = msgSearch(wp->msgName);
         fw = FontGetMessageWidth(m);
         winNameGX(wp, 1, (x - 120.0f) + ofs, ny = 8.0f + (16.0f + by), 240.0f, 32.0f);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         // US: long names are squeezed to 210 wide
         if (fw > 210.0f) {
             fw = 210.0f;
         }
         winFontInit();
-        winFontSetEdgeWidth((Vec){ ofs + ((x - 120.0f) + (240.0f - fw) / 2.0f), ny - 4.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white, 210.0f, m);
+        winFontSetEdgeWidth((Vec){ofs + ((x - 120.0f) + (240.0f - fw) / 2.0f), ny - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, 210.0f, m);
 #else
         winFontInit();
-        winFontSetEdge((Vec){ ofs + ((x - 120.0f) + (240.0f - fw) / 2.0f), ny - 4.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white, m);
+        winFontSetEdge((Vec){ofs + ((x - 120.0f) + (240.0f - fw) / 2.0f), ny - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, m);
 #endif
     }
     if (wp->msg != NULL) {
@@ -818,14 +777,14 @@ void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
             n = lotteryGetPtr()->number;
             sprintf(buf, msgSearch(wp->msg), n);
             winFontInit();
-            winFontSet((Vec){ (40.0f + (x - 250.0f)) - 10.0f, by + (f32)(wp->msgLine * 28), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, black, buf);
+            winFontSet((Vec){(40.0f + (x - 250.0f)) - 10.0f, by + (f32)(wp->msgLine * 28), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, buf);
         } else {
             winFontInit();
-            winFontSetLabel((Vec){ (40.0f + (x - 250.0f)) - 10.0f, by + (f32)(wp->msgLine * 28), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, black, wp->msg);
+            winFontSetLabel((Vec){(40.0f + (x - 250.0f)) - 10.0f, by + (f32)(wp->msgLine * 28), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, wp->msg);
         }
         GXSetScissor(0, 0, 0x260, 0x1E0);
     }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     if (wp->item.state != 202 && wp->msgLines > 2) {
 #else
     if (wp->msgLines > 2) {
@@ -833,20 +792,20 @@ void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
         winIconInit();
         if (wp->msgLine == 0) {
             if ((gp->retraceCount & 0x1F) < 0x14) {
-                winIconSet(ICON_1B6, (Vec){ (250.0f + x) - 10.0f, (40.0f + (y - 40.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_1B6, (Vec){(250.0f + x) - 10.0f, (40.0f + (y - 40.0f)) - 24.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             }
         } else if (wp->msgLine / 2 == (wp->msgLines + 1) / 2 - 1) {
             if ((gp->retraceCount & 0x1F) < 0x14) {
-                winIconSet(ICON_1B5, (Vec){ (250.0f + x) - 10.0f, 24.0f + (40.0f + (y - 40.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_1B5, (Vec){(250.0f + x) - 10.0f, 24.0f + (40.0f + (y - 40.0f)), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             }
         } else {
             if ((gp->retraceCount & 0x1F) < 0x14) {
                 ix = (250.0f + x) - 10.0f;
-                winIconSet(ICON_1B5, (Vec){ ix, 24.0f + (by = 40.0f + (y - 40.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-                winIconSet(ICON_1B6, (Vec){ ix, by - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_1B5, (Vec){ix, 24.0f + (by = 40.0f + (y - 40.0f)), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+                winIconSet(ICON_1B6, (Vec){ix, by - 24.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             }
         }
-        winIconSet(ICON_070, (Vec){ (250.0f + x) - 10.0f, 40.0f + (y - 40.0f), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        winIconSet(ICON_070, (Vec){(250.0f + x) - 10.0f, 40.0f + (y - 40.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     }
 }
 
@@ -902,10 +861,8 @@ static inline void winRootTexQuad(WindowWork* wp, s32 id, f32 x, f32 y, f32 w, f
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
-
-#pragma inline_max_total_size(100000)
 void winKirinukiGX(WindowWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
-#ifndef VERSION_G8ME01
+#if VERSION <= VERSION_JP
     f32 w74 = 74.0f;
     f32 w66 = 66.0f;
 #endif
@@ -913,7 +870,7 @@ void winKirinukiGX(WindowWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -925,7 +882,7 @@ void winKirinukiGX(WindowWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXLoadPosMtxImm(camGetPtr((CameraId)8)->view, 0);
+    GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
     GXSetCurrentMtx(0);
     if (type == 0) {
         winRootTexQuad(wp, 0xB, x, y, 8, 8);
@@ -937,7 +894,7 @@ void winKirinukiGX(WindowWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
         winRootTexQuad(wp, 0x8, x + 8, y - (h - 8), w - 8 - 8, 8);
         winRootTexQuad(wp, 0xE, x + w - 8, y - (h - 8), 8, 8);
     } else {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         // US: the tab under the frame is sized to the "remaining" label
         f32 nk = 0.5f * FontGetMessageWidth(msgSearch("msg_menu_badge_nokori")) + 60.0f;
 
@@ -974,25 +931,29 @@ void winKirinukiGX(WindowWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
     }
 }
 
-static inline double fabs_d(double x) { return __fabs(x); }
-static inline float fabsf_(float x) { return (float)fabs_d((double)x); }
-#define NAME_QUAD(x0, y0, x1, y1)              \
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);          \
-    GXPosition3f32(x0, y0, 0.0f);              \
-    GXTexCoord2f32(0.0f, 0.0f);                \
-    GXPosition3f32(x0, y1, 0.0f);              \
-    GXTexCoord2f32(0.0f, 1.0f);                \
-    GXPosition3f32(x1, y1, 0.0f);              \
-    GXTexCoord2f32(1.0f, 1.0f);                \
-    GXPosition3f32(x1, y0, 0.0f);              \
+static inline double fabs_d(double x) {
+    return __fabs(x);
+}
+static inline float fabsf_(float x) {
+    return (float)fabs_d((double)x);
+}
+#define NAME_QUAD(x0, y0, x1, y1)     \
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4); \
+    GXPosition3f32(x0, y0, 0.0f);     \
+    GXTexCoord2f32(0.0f, 0.0f);       \
+    GXPosition3f32(x0, y1, 0.0f);     \
+    GXTexCoord2f32(0.0f, 1.0f);       \
+    GXPosition3f32(x1, y1, 0.0f);     \
+    GXTexCoord2f32(1.0f, 1.0f);       \
+    GXPosition3f32(x1, y0, 0.0f);     \
     GXTexCoord2f32(1.0f, 0.0f)
 
-#define NAME_TEX(obj, id, mtx, tw, th)                                                        \
-    TEXGetGXTexObjFromPalette((TEXPalette*)*wp->res->data, &obj, id);                                   \
-    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1); \
-    GXLoadTexObj(&obj, GX_TEXMAP0);                                                           \
-    GXSetNumTexGens(1);                                                                       \
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY); \
+#define NAME_TEX(obj, id, mtx, tw, th)                                                                        \
+    TEXGetGXTexObjFromPalette((TEXPalette*)*wp->res->data, &obj, id);                                         \
+    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);            \
+    GXLoadTexObj(&obj, GX_TEXMAP0);                                                                           \
+    GXSetNumTexGens(1);                                                                                       \
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);           \
     MTXScale(mtx, fabsf_(tw) / (f32)GXGetTexObjWidth(&obj), fabsf_(th) / (f32)GXGetTexObjHeight(&obj), 1.0f); \
     GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4)
 
@@ -1026,7 +987,7 @@ void winNameGX(WindowWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -1038,34 +999,30 @@ void winNameGX(WindowWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXLoadPosMtxImm(camGetPtr(8)->view, 0);
+    GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
     GXSetCurrentMtx(0);
 
     if (type == 0) {
         NAME_TEX(t0a, 0x13, m0a, w - 16.0f, 32.0f);
         nameQuad(x, y, w - 16.0f, 32.0f);
         NAME_TEX(t0b, 0x14, m0b, 16.0f, 32.0f);
-        
+
         nameQuad((x + w) - 16.0f, y, 16.0f, 32.0f);
     } else if (type == 1) {
         NAME_TEX(t1a, 0x15, m1a, w - 16.0f, 32.0f);
         nameQuad(x, y, w - 16.0f, 32.0f);
         NAME_TEX(t1b, 0x16, m1b, 16.0f, 32.0f);
-        
+
         nameQuad((x + w) - 16.0f, y, 16.0f, 32.0f);
     } else if (type == 2) {
         NAME_TEX(t2a, 0x78, m2a, w - 8.0f, 24.0f);
         nameQuad(x, y, w - 8.0f, 24.0f);
         NAME_TEX(t2b, 0x79, m2b, 8.0f, 24.0f);
-        
+
         nameQuad((x + w) - 8.0f, y, 8.0f, 24.0f);
     }
 }
 
-
-void winFontInit(void);
-void winFontSetLabel(Vec pos, Vec scale, GXColor color, const char* msg);
-void* L_msgGetWork(void);
 #include "driver/animdrv.h"
 
 static inline void winBookTex(WindowWork* w, s32 id, f32 x, f32 y, f32 width, f32 height) {
@@ -1155,8 +1112,8 @@ void winBookGX(WindowWork* w, s32 a, f32 x, f32 y) {
                         luigi_book_list[w->item.bookIdx][w->item.bookPage * 2]);
         winFontSetLabel((Vec){220.0f + lx, y - 14.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, (GXColor){0x00, 0x00, 0x00, 0xFF},
                         luigi_book_list[w->item.bookIdx][w->item.bookPage * 2 + 1]);
-#ifndef VERSION_G8ME01_DEMO
-        pose = ((MessageWork*)L_msgGetWork())->poseId;
+#if VERSION != VERSION_DEMO
+        pose = L_msgGetWork()->poseId;
         anim = animPoseGetAnimDataPtr(pose);
         if (w->item.bookPage < w->item.bookPages - 1) {
             animPoseSetAnim(pose, "HOS_C_1", 0);
@@ -1200,7 +1157,7 @@ void winHalfBookGX(TEXPalette* tpl, s32 a, f32 x, f32 y) {
     s32 i;
     Mtx m;
 
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -1215,22 +1172,22 @@ void winHalfBookGX(TEXPalette* tpl, s32 a, f32 x, f32 y) {
 
     for (i = 0; i < 2; i++) {
         if (i == 0) {
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0x00, 0x00, 0x00, 0x80 });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0x00, 0x00, 0x00, 0x80});
             GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
             GXSetZCompLoc(GX_TRUE);
             GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
             GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
             MTXTrans(m, 8.0f, -8.0f, 0.0f);
-            MTXConcat(camGetPtr(8)->view, m, m);
+            MTXConcat(camGetPtr(CAMERA_2D)->view, m, m);
             GXLoadPosMtxImm(m, 0);
             GXSetCurrentMtx(0);
         } else {
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
             GXSetZCompLoc(GX_FALSE);
             GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
             GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-            GXLoadPosMtxImm(camGetPtr(8)->view, 0);
+            GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
             GXSetCurrentMtx(0);
         }
         winHalfBookQuad(tpl, 0x33, x + 8.0f, y - 8.0f, 320.0f, 248.0f);
@@ -1257,7 +1214,7 @@ void winMailGX(WindowWork* wp, f32 x, f32 y) {
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -1269,7 +1226,7 @@ void winMailGX(WindowWork* wp, f32 x, f32 y) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXLoadPosMtxImm(camGetPtr((CameraId)8)->view, 0);
+    GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
     GXSetCurrentMtx(0);
     winRootTexQuad(wp, 0x4D, x, y, 32, 24);
     winRootTexQuad(wp, 0x63, x + 32, y, 344, 24);
@@ -1292,11 +1249,6 @@ void winMailGX(WindowWork* wp, f32 x, f32 y) {
     winRootTexQuad(wp, 0x54, x + 384 + 8, y - 264, -8, 8);
     GXSetScissor(x + 304 + 32, 240 - y + 32 + 1, 344, 200);
 }
-
-void winIconInit(void);
-void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
-void winFontSet(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
-BOOL swGet(s32 id);
 
 void winHakoGX(WindowWork* w, s32 a, f32 x, f32 y) {
     u32 c0;
@@ -1421,11 +1373,11 @@ void winHakoGX(WindowWork* w, s32 a, f32 x, f32 y) {
                 }
                 yy = scroll + (y - j * 56) - p * 232 - 28.0f;
                 if (ofs == 0) {
-                    if (swGet(w->log.badgeIds[n] + 0x80)) {
+                    if (swGet(w->log.badgeIds[n] + GSWF_BADGE_FOUND_BASE)) {
                         continue;
                     }
                 } else {
-                    if (swGet(w->log.recipeIds[n] + 0x41)) {
+                    if (swGet(WIN_RECIPE_COOKED_SW(w->log.recipeIds[n]))) {
                         continue;
                     }
                 }
@@ -1446,15 +1398,15 @@ void winHakoGX(WindowWork* w, s32 a, f32 x, f32 y) {
                 }
                 yy = scroll + (y - j * 56) - p * 232 - 28.0f;
                 if (ofs == 0) {
-                    if (!swGet(w->log.badgeIds[n] + 0x80)) {
+                    if (!swGet(w->log.badgeIds[n] + GSWF_BADGE_FOUND_BASE)) {
                         continue;
                     }
-                    icon = itemDataTable[w->log.badgeIds[n] + 0xF0].icon_id;
+                    icon = itemDataTable[w->log.badgeIds[n] + BADGE_MIN].icon_id;
                 } else {
-                    if (!swGet(w->log.recipeIds[n] + 0x41)) {
+                    if (!swGet(WIN_RECIPE_COOKED_SW(w->log.recipeIds[n]))) {
                         continue;
                     }
-                    icon = itemDataTable[w->log.recipeIds[n] + 0xB3].icon_id;
+                    icon = itemDataTable[w->log.recipeIds[n] + WIN_RECIPE_MIN].icon_id;
                 }
                 winIconSet(icon, (Vec){4.0f + (24.0f + (x + i * 56)), yy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f},
                            (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -1520,7 +1472,7 @@ void winWazaGX(WindowWork* wp, s32 a, f32 x, f32 y, f32 w, f32 h) {
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -1532,7 +1484,7 @@ void winWazaGX(WindowWork* wp, s32 a, f32 x, f32 y, f32 w, f32 h) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXLoadPosMtxImm(camGetPtr(8)->view, 0);
+    GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
     GXSetCurrentMtx(0);
 
     w1 = 0.75f * w;
@@ -1584,7 +1536,7 @@ WinSortData sort_6[] = {
 };
 // The demo still gives every listed enemy its own number; retail later merged
 // variants that share an entry.
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 u8 enemy_monoshiri_sort_table[] = {
     0x00, 0x01, 0x02, 0x03, 0x2F, 0x30, 0x94, 0x2A, 0x62, 0x95, 0x96, 0x12, 0x24, 0x97, 0x0A, 0x0B,
     0x32, 0x14, 0x4D, 0x54, 0x33, 0x98, 0x15, 0x63, 0x43, 0x38, 0x4F, 0x3E, 0x6B, 0x6E, 0x6F, 0x79,
@@ -1621,7 +1573,6 @@ u8 enemy_monoshiri_sort_table[] = {
     0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6,
 };
 #endif
-
 
 void sort_1_1_func(WindowWork* wp) {
     s32 sel = wp->item.cursor[0];
@@ -1697,7 +1648,7 @@ void sort_3_3_func(WindowWork* wp) {
 
     pouchGetHaveBadgeCnt();
     pouchHaveBadge(sel);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     pouchSortItem(!wp->sortRev ? 4 : 11);
 #else
     pouchSortItem(!wp->sortRev ? 6 : 13);
@@ -1709,7 +1660,7 @@ void sort_3_3_func(WindowWork* wp) {
     wp->badge.page[0] = wp->badge.sel[0] / 8;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo sorts the equipped list through the pouch, like the owned list.
 void sort_4_1_func(WindowWork* wp) {
     pouchSortItem(!wp->sortRev ? 4 : 11);
@@ -1737,10 +1688,12 @@ void sort_4_3_func(WindowWork* wp) {
 }
 #else
 s32 N_compare_func4_1(const void* a, const void* b) {
+    const WinBadgeEnt* ea = a;
+    const WinBadgeEnt* eb = b;
     char buf1[128];
     char buf2[128];
-    s16 ia = ((WinBadgeEnt*)a)->id;
-    s16 ib = ((WinBadgeEnt*)b)->id;
+    s16 ia = ea->id;
+    s16 ib = eb->id;
 
     pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
     pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
@@ -1748,10 +1701,12 @@ s32 N_compare_func4_1(const void* a, const void* b) {
 }
 
 s32 N_compare_func4_1_r(const void* a, const void* b) {
+    const WinBadgeEnt* ea = a;
+    const WinBadgeEnt* eb = b;
     char buf1[128];
     char buf2[128];
-    s16 ia = ((WinBadgeEnt*)a)->id;
-    s16 ib = ((WinBadgeEnt*)b)->id;
+    s16 ia = ea->id;
+    s16 ib = eb->id;
 
     pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
     pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
@@ -1759,8 +1714,10 @@ s32 N_compare_func4_1_r(const void* a, const void* b) {
 }
 
 s32 N_compare_func4_2(const void* a, const void* b) {
-    s16 ia = itemDataTable[(s16)((WinBadgeEnt*)a)->id].type_sort_order;
-    s16 ib = itemDataTable[(s16)((WinBadgeEnt*)b)->id].type_sort_order;
+    const WinBadgeEnt* ea = a;
+    const WinBadgeEnt* eb = b;
+    s16 ia = itemDataTable[(s16)ea->id].type_sort_order;
+    s16 ib = itemDataTable[(s16)eb->id].type_sort_order;
 
     if (ia > ib) {
         return 1;
@@ -1771,8 +1728,10 @@ s32 N_compare_func4_2(const void* a, const void* b) {
 }
 
 s32 N_compare_func4_2_r(const void* a, const void* b) {
-    s16 ia = itemDataTable[(s16)((WinBadgeEnt*)a)->id].type_sort_order;
-    s16 ib = itemDataTable[(s16)((WinBadgeEnt*)b)->id].type_sort_order;
+    const WinBadgeEnt* ea = a;
+    const WinBadgeEnt* eb = b;
+    s16 ia = itemDataTable[(s16)ea->id].type_sort_order;
+    s16 ib = itemDataTable[(s16)eb->id].type_sort_order;
 
     if (ia < ib) {
         return 1;
@@ -1784,9 +1743,9 @@ s32 N_compare_func4_2_r(const void* a, const void* b) {
 
 void sort_4_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->badge.list, wp->badge.count, 12, N_compare_func4_1);
+        qqsort(wp->badge.list, wp->badge.count, sizeof(WinBadgeEnt), N_compare_func4_1);
     } else {
-        qqsort(wp->badge.list, wp->badge.count, 12, N_compare_func4_1_r);
+        qqsort(wp->badge.list, wp->badge.count, sizeof(WinBadgeEnt), N_compare_func4_1_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->badge.sel[1] = 0;
@@ -1795,9 +1754,9 @@ void sort_4_1_func(WindowWork* wp) {
 
 void sort_4_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->badge.list, wp->badge.count, 12, N_compare_func4_2);
+        qqsort(wp->badge.list, wp->badge.count, sizeof(WinBadgeEnt), N_compare_func4_2);
     } else {
-        qqsort(wp->badge.list, wp->badge.count, 12, N_compare_func4_2_r);
+        qqsort(wp->badge.list, wp->badge.count, sizeof(WinBadgeEnt), N_compare_func4_2_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->badge.sel[1] = 0;
@@ -1861,10 +1820,12 @@ void sort_4_3_func(WindowWork* wp) {
 }
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 s32 compare_func5_1(const void* a, const void* b) {
-    s16 ia = *(s16*)a + 0xF0;
-    s16 ib = *(s16*)b + 0xF0;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = *ea + BADGE_MIN;
+    s16 ib = *eb + BADGE_MIN;
     s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
 
     if (r > 0) {
@@ -1876,8 +1837,10 @@ s32 compare_func5_1(const void* a, const void* b) {
 }
 
 s32 compare_func5_1_r(const void* a, const void* b) {
-    s16 ia = *(s16*)a + 0xF0;
-    s16 ib = *(s16*)b + 0xF0;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = *ea + BADGE_MIN;
+    s16 ib = *eb + BADGE_MIN;
     s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
 
     if (r < 0) {
@@ -1889,10 +1852,12 @@ s32 compare_func5_1_r(const void* a, const void* b) {
 }
 #else
 s32 compare_func5_1(const void* a, const void* b) {
+    const s16* ea = a;
+    const s16* eb = b;
     char buf1[128];
     char buf2[128];
-    s16 ia = *(s16*)a + 0xF0;
-    s16 ib = *(s16*)b + 0xF0;
+    s16 ia = *ea + BADGE_MIN;
+    s16 ib = *eb + BADGE_MIN;
 
     pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
     pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
@@ -1900,10 +1865,12 @@ s32 compare_func5_1(const void* a, const void* b) {
 }
 
 s32 compare_func5_1_r(const void* a, const void* b) {
+    const s16* ea = a;
+    const s16* eb = b;
     char buf1[128];
     char buf2[128];
-    s16 ia = *(s16*)a + 0xF0;
-    s16 ib = *(s16*)b + 0xF0;
+    s16 ia = *ea + BADGE_MIN;
+    s16 ib = *eb + BADGE_MIN;
 
     pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
     pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
@@ -1912,8 +1879,10 @@ s32 compare_func5_1_r(const void* a, const void* b) {
 #endif
 
 s32 compare_func5_2(const void* a, const void* b) {
-    s16 ia = itemDataTable[(s16)(*(s16*)a + 0xF0)].type_sort_order;
-    s16 ib = itemDataTable[(s16)(*(s16*)b + 0xF0)].type_sort_order;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = itemDataTable[(s16)(*ea + BADGE_MIN)].type_sort_order;
+    s16 ib = itemDataTable[(s16)(*eb + BADGE_MIN)].type_sort_order;
 
     if (ia > ib) {
         return 1;
@@ -1924,8 +1893,10 @@ s32 compare_func5_2(const void* a, const void* b) {
 }
 
 s32 compare_func5_2_r(const void* a, const void* b) {
-    s16 ia = itemDataTable[(s16)(*(s16*)a + 0xF0)].type_sort_order;
-    s16 ib = itemDataTable[(s16)(*(s16*)b + 0xF0)].type_sort_order;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = itemDataTable[(s16)(*ea + BADGE_MIN)].type_sort_order;
+    s16 ib = itemDataTable[(s16)(*eb + BADGE_MIN)].type_sort_order;
 
     if (ia < ib) {
         return 1;
@@ -1937,9 +1908,9 @@ s32 compare_func5_2_r(const void* a, const void* b) {
 
 void sort_5_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->log.badgeIds, wp->log.badge.num, 2, compare_func5_1);
+        qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_1);
     } else {
-        qqsort(wp->log.badgeIds, wp->log.badge.num, 2, compare_func5_1_r);
+        qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_1_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->log.badge.cursor = 0;
@@ -1948,16 +1919,16 @@ void sort_5_1_func(WindowWork* wp) {
 
 void sort_5_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->log.badgeIds, wp->log.badge.num, 2, compare_func5_2);
+        qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_2);
     } else {
-        qqsort(wp->log.badgeIds, wp->log.badge.num, 2, compare_func5_2_r);
+        qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_2_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->log.badge.cursor = 0;
     wp->log.badge.idx = wp->log.badge.cursor / 28;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo sorts by name first, then bubbles by BP cost only.
 void sort_5_3_func(WindowWork* wp) {
     if (!wp->sortRev) {
@@ -1965,12 +1936,12 @@ void sort_5_3_func(WindowWork* wp) {
         s16 b;
         s32 i;
         s32 j;
-        qqsort(wp->log.badgeIds, wp->log.badge.num, 2, compare_func5_1);
+        qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_1);
         for (i = 0; i < wp->log.badge.num - 1; i++) {
             for (j = i + 1; j < wp->log.badge.num; j++) {
                 a = wp->log.badgeIds[i];
                 b = wp->log.badgeIds[j];
-                if (itemDataTable[a + 0xF0].bp_cost < itemDataTable[b + 0xF0].bp_cost) {
+                if (itemDataTable[a + BADGE_MIN].bp_cost < itemDataTable[b + BADGE_MIN].bp_cost) {
                     wp->log.badgeIds[i] = b;
                     wp->log.badgeIds[j] = a;
                 }
@@ -1981,12 +1952,12 @@ void sort_5_3_func(WindowWork* wp) {
         s16 b;
         s32 i;
         s32 j;
-        qqsort(wp->log.badgeIds, wp->log.badge.num, 2, compare_func5_1_r);
+        qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_1_r);
         for (i = 0; i < wp->log.badge.num - 1; i++) {
             for (j = i + 1; j < wp->log.badge.num; j++) {
                 a = wp->log.badgeIds[i];
                 b = wp->log.badgeIds[j];
-                if (itemDataTable[a + 0xF0].bp_cost > itemDataTable[b + 0xF0].bp_cost) {
+                if (itemDataTable[a + BADGE_MIN].bp_cost > itemDataTable[b + BADGE_MIN].bp_cost) {
                     wp->log.badgeIds[i] = b;
                     wp->log.badgeIds[j] = a;
                 }
@@ -2012,8 +1983,8 @@ void sort_5_3_func(WindowWork* wp) {
             for (j = i + 1; j < wp->log.badge.num; ++j) {
                 a = wp->log.badgeIds[i];
                 b = wp->log.badgeIds[j];
-                da = &itemDataTable[(s16)(a + 0xF0)];
-                db = &itemDataTable[(s16)(b + 0xF0)];
+                da = &itemDataTable[(s16)(a + BADGE_MIN)];
+                db = &itemDataTable[(s16)(b + BADGE_MIN)];
                 swap = FALSE;
 
                 if (da->bp_cost > db->bp_cost) {
@@ -2041,8 +2012,8 @@ void sort_5_3_func(WindowWork* wp) {
             for (j = i + 1; j < wp->log.badge.num; ++j) {
                 a = wp->log.badgeIds[i];
                 b = wp->log.badgeIds[j];
-                da = &itemDataTable[(s16)(a + 0xF0)];
-                db = &itemDataTable[(s16)(b + 0xF0)];
+                da = &itemDataTable[(s16)(a + BADGE_MIN)];
+                db = &itemDataTable[(s16)(b + BADGE_MIN)];
                 swap = FALSE;
 
                 if (da->bp_cost < db->bp_cost) {
@@ -2065,10 +2036,12 @@ void sort_5_3_func(WindowWork* wp) {
 }
 #endif
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 s32 compare_func6_1(const void* a, const void* b) {
-    s16 ia = *(s16*)a + 0xB3;
-    s16 ib = *(s16*)b + 0xB3;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = *ea + WIN_RECIPE_MIN;
+    s16 ib = *eb + WIN_RECIPE_MIN;
     s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
 
     if (r > 0) {
@@ -2080,8 +2053,10 @@ s32 compare_func6_1(const void* a, const void* b) {
 }
 
 s32 compare_func6_1_r(const void* a, const void* b) {
-    s16 ia = *(s16*)a + 0xB3;
-    s16 ib = *(s16*)b + 0xB3;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = *ea + WIN_RECIPE_MIN;
+    s16 ib = *eb + WIN_RECIPE_MIN;
     s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
 
     if (r < 0) {
@@ -2093,10 +2068,12 @@ s32 compare_func6_1_r(const void* a, const void* b) {
 }
 #else
 s32 compare_func6_1(const void* a, const void* b) {
+    const s16* ea = a;
+    const s16* eb = b;
     char buf1[128];
     char buf2[128];
-    s16 ia = *(s16*)a + 0xB3;
-    s16 ib = *(s16*)b + 0xB3;
+    s16 ia = *ea + WIN_RECIPE_MIN;
+    s16 ib = *eb + WIN_RECIPE_MIN;
 
     pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
     pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
@@ -2104,10 +2081,12 @@ s32 compare_func6_1(const void* a, const void* b) {
 }
 
 s32 compare_func6_1_r(const void* a, const void* b) {
+    const s16* ea = a;
+    const s16* eb = b;
     char buf1[128];
     char buf2[128];
-    s16 ia = *(s16*)a + 0xB3;
-    s16 ib = *(s16*)b + 0xB3;
+    s16 ia = *ea + WIN_RECIPE_MIN;
+    s16 ib = *eb + WIN_RECIPE_MIN;
 
     pouchHiraToKata(msgSearch(itemDataTable[ia].name), buf1);
     pouchHiraToKata(msgSearch(itemDataTable[ib].name), buf2);
@@ -2116,8 +2095,10 @@ s32 compare_func6_1_r(const void* a, const void* b) {
 #endif
 
 s32 compare_func6_2(const void* a, const void* b) {
-    s16 ia = itemDataTable[(s16)(*(s16*)a + 0xB3)].type_sort_order;
-    s16 ib = itemDataTable[(s16)(*(s16*)b + 0xB3)].type_sort_order;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = itemDataTable[(s16)(*ea + WIN_RECIPE_MIN)].type_sort_order;
+    s16 ib = itemDataTable[(s16)(*eb + WIN_RECIPE_MIN)].type_sort_order;
 
     if (ia > ib) {
         return 1;
@@ -2128,8 +2109,10 @@ s32 compare_func6_2(const void* a, const void* b) {
 }
 
 s32 compare_func6_2_r(const void* a, const void* b) {
-    s16 ia = itemDataTable[(s16)(*(s16*)a + 0xB3)].type_sort_order;
-    s16 ib = itemDataTable[(s16)(*(s16*)b + 0xB3)].type_sort_order;
+    const s16* ea = a;
+    const s16* eb = b;
+    s16 ia = itemDataTable[(s16)(*ea + WIN_RECIPE_MIN)].type_sort_order;
+    s16 ib = itemDataTable[(s16)(*eb + WIN_RECIPE_MIN)].type_sort_order;
 
     if (ia < ib) {
         return 1;
@@ -2141,9 +2124,9 @@ s32 compare_func6_2_r(const void* a, const void* b) {
 
 void sort_6_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->log.recipeIds, wp->log.recipe.num, 2, compare_func6_1);
+        qqsort(wp->log.recipeIds, wp->log.recipe.num, sizeof(s16), compare_func6_1);
     } else {
-        qqsort(wp->log.recipeIds, wp->log.recipe.num, 2, compare_func6_1_r);
+        qqsort(wp->log.recipeIds, wp->log.recipe.num, sizeof(s16), compare_func6_1_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->log.recipe.cursor = 0;
@@ -2152,9 +2135,9 @@ void sort_6_1_func(WindowWork* wp) {
 
 void sort_6_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->log.recipeIds, wp->log.recipe.num, 2, compare_func6_2);
+        qqsort(wp->log.recipeIds, wp->log.recipe.num, sizeof(s16), compare_func6_2);
     } else {
-        qqsort(wp->log.recipeIds, wp->log.recipe.num, 2, compare_func6_2_r);
+        qqsort(wp->log.recipeIds, wp->log.recipe.num, sizeof(s16), compare_func6_2_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->log.recipe.cursor = 0;
@@ -2162,18 +2145,22 @@ void sort_6_2_func(WindowWork* wp) {
 }
 
 s32 compare_func1(const void* a, const void* b) {
-    if (*(u8*)a > *(u8*)b) {
+    const u8* ea = a;
+    const u8* eb = b;
+    if (*ea > *eb) {
         return 1;
-    } else if (*(u8*)a < *(u8*)b) {
+    } else if (*ea < *eb) {
         return -1;
     }
     return 0;
 }
 
 s32 compare_func1_r(const void* a, const void* b) {
-    if (*(u8*)a < *(u8*)b) {
+    const u8* ea = a;
+    const u8* eb = b;
+    if (*ea < *eb) {
         return 1;
-    } else if (*(u8*)a > *(u8*)b) {
+    } else if (*ea > *eb) {
         return -1;
     }
     return 0;
@@ -2181,9 +2168,9 @@ s32 compare_func1_r(const void* a, const void* b) {
 
 void sort_7_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func1);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1);
     } else {
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func1_r);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->log.enemySel = 0;
@@ -2192,11 +2179,47 @@ void sort_7_1_func(WindowWork* wp) {
 
 static inline u32 getMonosiriPlace(const char* place) {
     static char* tbl[] = {
-        "nara", "gor", "tik", "shiga", "hei", "nok", "stn", "gon", "win", "hou", "mri", "tou", "usu",
-#ifdef VERSION_G8ME01_DEMO
-        "gra", "jin", "muj", "dou", "rsh", "hom", "eki", "pik", "sin", "bom", "moo", "aji", "las",
+        "nara",
+        "gor",
+        "tik",
+        "shiga",
+        "hei",
+        "nok",
+        "stn",
+        "gon",
+        "win",
+        "hou",
+        "mri",
+        "tou",
+        "usu",
+#if VERSION == VERSION_DEMO
+        "gra",
+        "jin",
+        "muj",
+        "dou",
+        "rsh",
+        "hom",
+        "eki",
+        "pik",
+        "sin",
+        "bom",
+        "moo",
+        "aji",
+        "las",
 #else
-        "gra", "jin", "muj", "dou", "hom", "eki", "rsh", "pik", "sin", "bom", "moo", "aji", "las",
+        "gra",
+        "jin",
+        "muj",
+        "dou",
+        "hom",
+        "eki",
+        "rsh",
+        "pik",
+        "sin",
+        "bom",
+        "moo",
+        "aji",
+        "las",
 #endif
     };
     char buf[64];
@@ -2228,8 +2251,10 @@ WinSortData sort_8[] = {
 WinSortData* sort_data[] = {sort_1, sort_2, sort_3, sort_4, sort_5, sort_6, sort_7, sort_8};
 
 s32 compare_func2(const void* a, const void* b) {
-    TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
-    TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
+    TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
+    TattleEntry* tb = battleGetUnitMonosiriPtr(eb->id);
     s32 ia = getMonosiriPlace(ta->locationTag);
     s32 ib = getMonosiriPlace(tb->locationTag);
 
@@ -2242,8 +2267,10 @@ s32 compare_func2(const void* a, const void* b) {
 }
 
 s32 compare_func2_r(const void* a, const void* b) {
-    TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
-    TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
+    TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
+    TattleEntry* tb = battleGetUnitMonosiriPtr(eb->id);
     s32 ia = getMonosiriPlace(ta->locationTag);
     s32 ib = getMonosiriPlace(tb->locationTag);
 
@@ -2257,21 +2284,23 @@ s32 compare_func2_r(const void* a, const void* b) {
 
 void sort_7_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func1);
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func2);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func2);
     } else {
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func1_r);
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func2_r);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1_r);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func2_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->log.enemySel = 0;
     wp->log.enemyPage = wp->log.enemySel / 16;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 s32 compare_func3(const void* a, const void* b) {
-    TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
-    TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
+    TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
+    TattleEntry* tb = battleGetUnitMonosiriPtr(eb->id);
     const char* sa = msgSearch(ta->enemyTag);
     const char* sb = msgSearch(tb->enemyTag);
 
@@ -2279,8 +2308,10 @@ s32 compare_func3(const void* a, const void* b) {
 }
 
 s32 compare_func3_r(const void* a, const void* b) {
-    TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
-    TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
+    TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
+    TattleEntry* tb = battleGetUnitMonosiriPtr(eb->id);
     const char* sa = msgSearch(ta->enemyTag);
     const char* sb = msgSearch(tb->enemyTag);
 
@@ -2288,22 +2319,24 @@ s32 compare_func3_r(const void* a, const void* b) {
 }
 #else
 s32 compare_func3(const void* a, const void* b) {
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
     char buf1[128];
     char buf2[128];
-    TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
-    TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
+    TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
+    TattleEntry* tb = battleGetUnitMonosiriPtr(eb->id);
 
     pouchHiraToKata(msgSearch(ta->enemyTag), buf1);
     pouchHiraToKata(msgSearch(tb->enemyTag), buf2);
-    if (((WinSortEnt*)a)->id == 0x4D || ((WinSortEnt*)a)->id == 0x87) {
-        if (evtGetValue(NULL, GSW(0)) < 210) {
+    if (ea->id == UNIT_DOOPLISS_CHAPTER4_FIGHT1 || ea->id == UNIT_DOOPLISS_CHAPTER8) {
+        if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
             pouchHiraToKata(msgSearch("btl_un_hatena"), buf1);
         } else {
             pouchHiraToKata(msgSearch("btl_un_rampell"), buf1);
         }
     }
-    if (((WinSortEnt*)b)->id == 0x4D || ((WinSortEnt*)b)->id == 0x87) {
-        if (evtGetValue(NULL, GSW(0)) < 210) {
+    if (eb->id == UNIT_DOOPLISS_CHAPTER4_FIGHT1 || eb->id == UNIT_DOOPLISS_CHAPTER8) {
+        if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
             pouchHiraToKata(msgSearch("btl_un_hatena"), buf2);
         } else {
             pouchHiraToKata(msgSearch("btl_un_rampell"), buf2);
@@ -2313,22 +2346,24 @@ s32 compare_func3(const void* a, const void* b) {
 }
 
 s32 compare_func3_r(const void* a, const void* b) {
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
     char buf1[128];
     char buf2[128];
-    TattleEntry* ta = battleGetUnitMonosiriPtr(((WinSortEnt*)a)->id);
-    TattleEntry* tb = battleGetUnitMonosiriPtr(((WinSortEnt*)b)->id);
+    TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
+    TattleEntry* tb = battleGetUnitMonosiriPtr(eb->id);
 
     pouchHiraToKata(msgSearch(ta->enemyTag), buf1);
     pouchHiraToKata(msgSearch(tb->enemyTag), buf2);
-    if (((WinSortEnt*)a)->id == 0x4D || ((WinSortEnt*)a)->id == 0x87) {
-        if (evtGetValue(NULL, GSW(0)) < 210) {
+    if (ea->id == UNIT_DOOPLISS_CHAPTER4_FIGHT1 || ea->id == UNIT_DOOPLISS_CHAPTER8) {
+        if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
             pouchHiraToKata(msgSearch("btl_un_hatena"), buf1);
         } else {
             pouchHiraToKata(msgSearch("btl_un_rampell"), buf1);
         }
     }
-    if (((WinSortEnt*)b)->id == 0x4D || ((WinSortEnt*)b)->id == 0x87) {
-        if (evtGetValue(NULL, GSW(0)) < 210) {
+    if (eb->id == UNIT_DOOPLISS_CHAPTER4_FIGHT1 || eb->id == UNIT_DOOPLISS_CHAPTER8) {
+        if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
             pouchHiraToKata(msgSearch("btl_un_hatena"), buf2);
         } else {
             pouchHiraToKata(msgSearch("btl_un_rampell"), buf2);
@@ -2340,11 +2375,11 @@ s32 compare_func3_r(const void* a, const void* b) {
 
 void sort_7_3_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func1);
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func3);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func3);
     } else {
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func1_r);
-        qqsort(wp->log.enemy, wp->log.enemyNum, 2, compare_func3_r);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1_r);
+        qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func3_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->log.enemySel = 0;
@@ -2352,8 +2387,10 @@ void sort_7_3_func(WindowWork* wp) {
 }
 
 s32 compare_func4(const void* a, const void* b) {
-    MailData* ma = mailGetPtr(((WinSortEnt*)a)->id);
-    MailData* mb = mailGetPtr(((WinSortEnt*)b)->id);
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
+    MailData* ma = mailGetPtr(ea->id);
+    MailData* mb = mailGetPtr(eb->id);
     const char* sa = msgSearch(ma->name);
     const char* sb = msgSearch(mb->name);
 
@@ -2361,8 +2398,10 @@ s32 compare_func4(const void* a, const void* b) {
 }
 
 s32 compare_func4_r(const void* a, const void* b) {
-    MailData* ma = mailGetPtr(((WinSortEnt*)a)->id);
-    MailData* mb = mailGetPtr(((WinSortEnt*)b)->id);
+    const WinSortEnt* ea = a;
+    const WinSortEnt* eb = b;
+    MailData* ma = mailGetPtr(ea->id);
+    MailData* mb = mailGetPtr(eb->id);
     const char* sa = msgSearch(ma->name);
     const char* sb = msgSearch(mb->name);
 
@@ -2371,9 +2410,9 @@ s32 compare_func4_r(const void* a, const void* b) {
 
 void sort_8_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->item.mail, wp->item.mailNum, 2, compare_func4);
+        qqsort(wp->item.mail, wp->item.mailNum, sizeof(WinSortEnt), compare_func4);
     } else {
-        qqsort(wp->item.mail, wp->item.mailNum, 2, compare_func4_r);
+        qqsort(wp->item.mail, wp->item.mailNum, sizeof(WinSortEnt), compare_func4_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->item.mailSel = 0;
@@ -2381,18 +2420,22 @@ void sort_8_1_func(WindowWork* wp) {
 }
 
 s32 compare_func5(const void* a, const void* b) {
-    if (*(u8*)a > *(u8*)b) {
+    const u8* ea = a;
+    const u8* eb = b;
+    if (*ea > *eb) {
         return 1;
-    } else if (*(u8*)a < *(u8*)b) {
+    } else if (*ea < *eb) {
         return -1;
     }
     return 0;
 }
 
 s32 compare_func5_r(const void* a, const void* b) {
-    if (*(u8*)a < *(u8*)b) {
+    const u8* ea = a;
+    const u8* eb = b;
+    if (*ea < *eb) {
         return 1;
-    } else if (*(u8*)a > *(u8*)b) {
+    } else if (*ea > *eb) {
         return -1;
     }
     return 0;
@@ -2400,9 +2443,9 @@ s32 compare_func5_r(const void* a, const void* b) {
 
 void sort_8_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
-        qqsort(wp->item.mail, wp->item.mailNum, 2, compare_func5);
+        qqsort(wp->item.mail, wp->item.mailNum, sizeof(WinSortEnt), compare_func5);
     } else {
-        qqsort(wp->item.mail, wp->item.mailNum, 2, compare_func5_r);
+        qqsort(wp->item.mail, wp->item.mailNum, sizeof(WinSortEnt), compare_func5_r);
     }
     wp->sortRev = 1 - wp->sortRev;
     wp->item.mailSel = 0;
@@ -2418,41 +2461,41 @@ void winSortMain(WindowWork* wp) {
         trg = 0;
         rep = 0;
     }
-#ifdef VERSION_G8ME01
-    // US: the 0x1000 button closes the sort menu first, without a sound
-    if (trg & 0x1000) {
+#if VERSION >= VERSION_US
+    // US: Start closes the sort menu first, without a sound
+    if (trg & PAD_BUTTON_START) {
         wp->sortActive = 0;
         wp->sortTgtX = -600.0f;
     } else
 #endif
-    if (trg & 0x200) {
+        if (trg & PAD_BUTTON_B) {
         psndSFXOn(SFX_NAME_WORD(0x20013));
         wp->sortActive = 0;
         wp->sortTgtX = -600.0f;
-    } else if (rep & 0x1000) {
+    } else if (rep & DEMO_STICK_UP) {
         psndSFXOn(SFX_NAME_WORD(0x20005));
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         wp->sortRev = 0;
 #endif
         wp->sortSel--;
         if (wp->sortSel < 0) {
             wp->sortSel = wp->sortNum - 1;
         }
-    } else if (rep & 0x2000) {
+    } else if (rep & DEMO_STICK_DOWN) {
         psndSFXOn(SFX_NAME_WORD(0x20005));
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         wp->sortRev = 0;
 #endif
         wp->sortSel++;
         if (wp->sortSel >= wp->sortNum) {
             wp->sortSel = 0;
         }
-    } else if (trg & 0x100) {
+    } else if (trg & PAD_BUTTON_A) {
         psndSFXOn(SFX_NAME_WORD(0x20012));
         sort_data[wp->sortType][wp->sortSel].func(wp);
     }
-#ifndef VERSION_G8ME01
-    else if (trg & 0x1000) {
+#if VERSION <= VERSION_JP
+    else if (trg & PAD_BUTTON_START) {
         wp->sortActive = 0;
         wp->sortTgtX = -600.0f;
     }
@@ -2506,7 +2549,7 @@ void winSortGX(WindowWork* wp) {
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -2518,7 +2561,7 @@ void winSortGX(WindowWork* wp) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXLoadPosMtxImm(camGetPtr((CameraId)8)->view, 0);
+    GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
     GXSetCurrentMtx(0);
 
     if (wp->sortType == 7) {
@@ -2553,16 +2596,16 @@ void winSortGX(WindowWork* wp) {
         if (i == wp->sortSel) {
             winTexInit((TEXPalette*)*wp->res->data);
             yy = (y - 20.0f) - (f32)(i * 40) - 16.0f - 8.0f;
-            winTexSet(0xB6, (Vec){ 16.0f + (3.0f + (64.0f + x)), yy, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f },
-                      (GXColor){ 0x00, 0x00, 0x00, 0x80 });
+            winTexSet(0xB6, (Vec){16.0f + (3.0f + (64.0f + x)), yy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
+                      (GXColor){0x00, 0x00, 0x00, 0x80});
             winTexInit_x2((TEXPalette*)*wp->res->data);
-            winTexSet_x2(kind, 0xB6, (Vec){ 4.0f + (16.0f + (64.0f + x)) - 6.0f, 6.0f + yy, 0.0f },
-                         (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+            winTexSet_x2(kind, 0xB6, (Vec){4.0f + (16.0f + (64.0f + x)) - 6.0f, 6.0f + yy, 0.0f},
+                         (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         } else {
             winTexInit_x2((TEXPalette*)*wp->res->data);
             winTexSet_x2(kind, 0xB6,
-                         (Vec){ 4.0f + (16.0f + (64.0f + x)), (y - 20.0f) - (f32)(i * 40) - 16.0f - 8.0f, 0.0f },
-                         (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0x80, 0x80, 0x80, 0xFF });
+                         (Vec){4.0f + (16.0f + (64.0f + x)), (y - 20.0f) - (f32)(i * 40) - 16.0f - 8.0f, 0.0f},
+                         (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0x80, 0x80, 0x80, 0xFF});
         }
     }
 
@@ -2603,7 +2646,7 @@ void winKageGX(WindowWork* wp, GXColor color, f32 x, f32 y, f32 z, f32 s) {
     GXTexObj obj;
     f32 sy;
 
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetZCompLoc(GX_TRUE);
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
@@ -2629,7 +2672,7 @@ void winKageGX(WindowWork* wp, GXColor color, f32 x, f32 y, f32 z, f32 s) {
     PSMTXRotRad(rot, 'x', -1.3962634f);
     PSMTXConcat(trans, rot, out);
     PSMTXConcat(out, scale, out);
-    PSMTXConcat(camGetPtr((CameraId)8)->view, out, out);
+    PSMTXConcat(camGetPtr(CAMERA_2D)->view, out, out);
     GXLoadPosMtxImm(out, 0);
     GXSetCurrentMtx(0);
     GXSetCullMode(GX_CULL_NONE);
@@ -2680,9 +2723,7 @@ void winZClear(void) {
     GXSetColorUpdate(GX_TRUE);
 }
 
-
-#ifdef VERSION_G8ME01
-void winFontSetWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...);
+#if VERSION >= VERSION_US
 #endif
 void winMailDisp(WindowWork* wp) {
     s32 i;
@@ -2692,7 +2733,7 @@ void winMailDisp(WindowWork* wp) {
     MailData* mail;
 
     if (wp->item.mailX < 320.0f && wp->item.mailY > -240.0f) {
-        ((void (*)(WindowWork*, f32, f32))winMailGX)(wp, wp->item.mailX, wp->item.mailY);
+        winMailGX(wp, wp->item.mailX, wp->item.mailY);
         if (wp->item.state != 0xCA) {
             for (i = 0; i < wp->item.mailNum; i++) {
                 GXColor white;
@@ -2701,116 +2742,118 @@ void winMailDisp(WindowWork* wp) {
                 kind = wp->item.mail[i].kind;
                 mail = mailGetPtr(id);
                 {
-                GXColor black = { 0x00, 0x00, 0x00, 0xFF };
-                if (mail->flags & 1) {
-                    col = (GXColor){ 0xD7, 0xAC, 0xBC, 0xFF };
-                } else if (mail->flags & 2) {
-                    col = (GXColor){ 0xD3, 0xD7, 0xAC, 0xFF };
-                } else if (mail->flags & 4) {
-                    col = (GXColor){ 0xAC, 0xC2, 0xD7, 0xFF };
-                } else {
-                    col = (GXColor){ 0xE1, 0xE1, 0xE1, 0xFF };
-                }
-                winTexInit((TEXPalette*)*wp->res->data);
-                winTexSet(0x77, (Vec){ 4.0f + (208.0f + wp->item.mailX), wp->item.mailScroll + ((wp->item.mailY - 56.0f) - (f32)(i * 40)), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, col);
-                white = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-                winTexSet((u32)((s32)pouchCheckMail(id) == 2 ? (void*)0x5E : (void*)0x5D), (Vec){ 72.0f + wp->item.mailX, wp->item.mailScroll + (((wp->item.mailY - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
-                winTexSet(0x65 + (kind + 1) / 10, (Vec){ 2.0f + (88.0f + wp->item.mailX), wp->item.mailScroll + (((wp->item.mailY - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
-                winTexSet(0x65 + (kind + 1) % 10, (Vec){ 2.0f + (104.0f + wp->item.mailX), wp->item.mailScroll + (((wp->item.mailY - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
-                winFontInit();
-#ifdef VERSION_G8ME01
-                winFontSetWidth((Vec){ 120.0f + wp->item.mailX, wp->item.mailScroll + (8.0f + ((wp->item.mailY - 56.0f) - (f32)(i * 40))), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, 230.0f, msgSearch(mail->name));
+                    GXColor black = {0x00, 0x00, 0x00, 0xFF};
+                    if (mail->flags & 1) {
+                        col = (GXColor){0xD7, 0xAC, 0xBC, 0xFF};
+                    } else if (mail->flags & 2) {
+                        col = (GXColor){0xD3, 0xD7, 0xAC, 0xFF};
+                    } else if (mail->flags & 4) {
+                        col = (GXColor){0xAC, 0xC2, 0xD7, 0xFF};
+                    } else {
+                        col = (GXColor){0xE1, 0xE1, 0xE1, 0xFF};
+                    }
+                    winTexInit((TEXPalette*)*wp->res->data);
+                    winTexSet(0x77, (Vec){4.0f + (208.0f + wp->item.mailX), wp->item.mailScroll + ((wp->item.mailY - 56.0f) - (f32)(i * 40)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                    white = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+                    winTexSet((u32)((s32)pouchCheckMail(id) == 2 ? (void*)0x5E : (void*)0x5D), (Vec){72.0f + wp->item.mailX, wp->item.mailScroll + (((wp->item.mailY - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+                    winTexSet(0x65 + (kind + 1) / 10, (Vec){2.0f + (88.0f + wp->item.mailX), wp->item.mailScroll + (((wp->item.mailY - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+                    winTexSet(0x65 + (kind + 1) % 10, (Vec){2.0f + (104.0f + wp->item.mailX), wp->item.mailScroll + (((wp->item.mailY - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+                    winFontInit();
+#if VERSION >= VERSION_US
+                    winFontSetWidth((Vec){120.0f + wp->item.mailX, wp->item.mailScroll + (8.0f + ((wp->item.mailY - 56.0f) - (f32)(i * 40))), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, 230.0f, msgSearch(mail->name));
 #else
-                winFontSetLabel((Vec){ 120.0f + wp->item.mailX, wp->item.mailScroll + (8.0f + ((wp->item.mailY - 56.0f) - (f32)(i * 40))), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, mail->name);
+                    winFontSetLabel((Vec){120.0f + wp->item.mailX, wp->item.mailScroll + (8.0f + ((wp->item.mailY - 56.0f) - (f32)(i * 40))), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, mail->name);
 #endif
                 }
             }
             GXSetScissor(0, 0, 0x260, 0x1E0);
         } else {
             s32 kind2 = wp->item.mail[wp->item.mailSel].kind;
-            GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
-            GXColor black = { 0x00, 0x00, 0x00, 0xFF };
+            GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+            GXColor black = {0x00, 0x00, 0x00, 0xFF};
             GXColor col;
 
             mail = mailGetPtr(wp->item.mail[wp->item.mailSel].id);
             if (mail->flags & 1) {
-                col = (GXColor){ 0xD7, 0xAC, 0xBC, 0xFF };
+                col = (GXColor){0xD7, 0xAC, 0xBC, 0xFF};
             } else if (mail->flags & 2) {
-                col = (GXColor){ 0xD3, 0xD7, 0xAC, 0xFF };
+                col = (GXColor){0xD3, 0xD7, 0xAC, 0xFF};
             } else if (mail->flags & 4) {
-                col = (GXColor){ 0xAC, 0xC2, 0xD7, 0xFF };
+                col = (GXColor){0xAC, 0xC2, 0xD7, 0xFF};
             } else {
-                col = (GXColor){ 0xE1, 0xE1, 0xE1, 0xFF };
+                col = (GXColor){0xE1, 0xE1, 0xE1, 0xFF};
             }
             winTexInit((TEXPalette*)*wp->res->data);
-            winTexSet(0x77, (Vec){ 4.0f + (208.0f + wp->item.mailX), wp->item.mailY - 56.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, col);
-            winTexSet(0x5E, (Vec){ 72.0f + wp->item.mailX, wp->item.mailY - 56.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
-            winTexSet(0x65 + (kind2 + 1) / 10, (Vec){ 2.0f + (88.0f + wp->item.mailX), (wp->item.mailY - 56.0f) - 3.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
-            winTexSet(0x65 + (kind2 + 1) % 10, (Vec){ 2.0f + (104.0f + wp->item.mailX), (wp->item.mailY - 56.0f) - 3.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
+            winTexSet(0x77, (Vec){4.0f + (208.0f + wp->item.mailX), wp->item.mailY - 56.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+            winTexSet(0x5E, (Vec){72.0f + wp->item.mailX, wp->item.mailY - 56.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+            winTexSet(0x65 + (kind2 + 1) / 10, (Vec){2.0f + (88.0f + wp->item.mailX), (wp->item.mailY - 56.0f) - 3.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+            winTexSet(0x65 + (kind2 + 1) % 10, (Vec){2.0f + (104.0f + wp->item.mailX), (wp->item.mailY - 56.0f) - 3.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
             winFontInit();
-#ifdef VERSION_G8ME01
-            winFontSetWidth((Vec){ 120.0f + wp->item.mailX, 8.0f + (wp->item.mailY - 56.0f), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, 230.0f, msgSearch(mail->name));
+#if VERSION >= VERSION_US
+            winFontSetWidth((Vec){120.0f + wp->item.mailX, 8.0f + (wp->item.mailY - 56.0f), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, 230.0f, msgSearch(mail->name));
 #else
-            winFontSetLabel((Vec){ 120.0f + wp->item.mailX, 8.0f + (wp->item.mailY - 56.0f), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, mail->name);
+            winFontSetLabel((Vec){120.0f + wp->item.mailX, 8.0f + (wp->item.mailY - 56.0f), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, mail->name);
 #endif
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             GXSetScissor((u32)(32.0f + (304.0f + wp->item.mailX)), (u32)(72.0f + (240.0f - wp->item.mailY)), 0x158, 0xAE);
 #else
             GXSetScissor((u32)(32.0f + (304.0f + wp->item.mailX)), (u32)(72.0f + (240.0f - wp->item.mailY)), 0x158, 0xB1);
 #endif
             winTexInit((TEXPalette*)*wp->res->data);
-            winTexSet(0x77, (Vec){ 4.0f + (208.0f + wp->item.mailX), (wp->item.mailY - 56.0f) - 80.0f, 0.0f }, (Vec){ 1.0f, 7.5f, 1.0f }, col);
+            winTexSet(0x77, (Vec){4.0f + (208.0f + wp->item.mailX), (wp->item.mailY - 56.0f) - 80.0f, 0.0f}, (Vec){1.0f, 7.5f, 1.0f}, col);
             winFontInit();
-#ifdef VERSION_G8ME01
-            winFontSetWidth((Vec){ 80.0f + wp->item.mailX, (wp->item.mailY - 80.0f) + (f32)(wp->item.mailLine * 21), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, (GXColor){ 0x00, 0x00, 0x00, 0xFF }, 280.0f, msgSearch(mail->body));
+#if VERSION >= VERSION_US
+            winFontSetWidth((Vec){80.0f + wp->item.mailX, (wp->item.mailY - 80.0f) + (f32)(wp->item.mailLine * 21), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, (GXColor){0x00, 0x00, 0x00, 0xFF}, 280.0f, msgSearch(mail->body));
 #else
-            winFontSetLabel((Vec){ 80.0f + wp->item.mailX, (wp->item.mailY - 80.0f) + (f32)(wp->item.mailLine * 21), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, (GXColor){ 0x00, 0x00, 0x00, 0xFF }, mail->body);
+            winFontSetLabel((Vec){80.0f + wp->item.mailX, (wp->item.mailY - 80.0f) + (f32)(wp->item.mailLine * 21), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, (GXColor){0x00, 0x00, 0x00, 0xFF}, mail->body);
 #endif
             if (mail->flags & 0x1000) {
                 winTexInit((TEXPalette*)*wp->mailRes->data);
-#ifdef VERSION_G8ME01_DEMO
-                winTexSet(mail->icon, (Vec){ 210.0f + wp->item.mailX, (wp->item.mailY - (f32)((wp->item.mailLines - 3) * 21)) + (f32)(wp->item.mailLine * 21), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+#if VERSION == VERSION_DEMO
+                winTexSet(mail->icon, (Vec){210.0f + wp->item.mailX, (wp->item.mailY - (f32)((wp->item.mailLines - 3) * 21)) + (f32)(wp->item.mailLine * 21), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
-                winTexSet(mail->icon, (Vec){ 210.0f + wp->item.mailX, 7.0f + ((wp->item.mailY - (f32)((wp->item.mailLines - 1) * 21)) + (f32)(wp->item.mailLine * 21)), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winTexSet(mail->icon, (Vec){210.0f + wp->item.mailX, 7.0f + ((wp->item.mailY - (f32)((wp->item.mailLines - 1) * 21)) + (f32)(wp->item.mailLine * 21)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
             }
             GXSetScissor(0, 0, 0x260, 0x1E0);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
             if (wp->item.mailLines > 8)
 #endif
             {
                 winIconInit();
                 if (wp->item.mailLine == 0) {
                     if ((gp->retraceCount & 0x1F) < 0x14) {
-                        winIconSet(ICON_1B6, (Vec){ 360.0f + wp->item.mailX, (20.0f + (wp->item.mailY - 230.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                        winIconSet(ICON_1B6, (Vec){360.0f + wp->item.mailX, (20.0f + (wp->item.mailY - 230.0f)) - 24.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
                     }
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
                 } else if (wp->item.mailLine + 8 == wp->item.mailLines) {
 #else
                 } else if (wp->item.mailLine + 6 == wp->item.mailLines) {
 #endif
                     if ((gp->retraceCount & 0x1F) < 0x14) {
-                        winIconSet(ICON_1B5, (Vec){ 360.0f + wp->item.mailX, 24.0f + (20.0f + (wp->item.mailY - 230.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                        winIconSet(ICON_1B5, (Vec){360.0f + wp->item.mailX, 24.0f + (20.0f + (wp->item.mailY - 230.0f)), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
                     }
                 } else {
                     if ((gp->retraceCount & 0x1F) < 0x14) {
-                        winIconSet(ICON_1B5, (Vec){ 360.0f + wp->item.mailX, 24.0f + (20.0f + (wp->item.mailY - 230.0f)), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-                        winIconSet(ICON_1B6, (Vec){ 360.0f + wp->item.mailX, (20.0f + (wp->item.mailY - 230.0f)) - 24.0f, 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                        winIconSet(ICON_1B5, (Vec){360.0f + wp->item.mailX, 24.0f + (20.0f + (wp->item.mailY - 230.0f)), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+                        winIconSet(ICON_1B6, (Vec){360.0f + wp->item.mailX, (20.0f + (wp->item.mailY - 230.0f)) - 24.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
                     }
                 }
-                winIconSet(ICON_070, (Vec){ 360.0f + wp->item.mailX, 20.0f + (wp->item.mailY - 230.0f), 0.0f }, (Vec){ 0.6f, 0.6f, 0.6f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+                winIconSet(ICON_070, (Vec){360.0f + wp->item.mailX, 20.0f + (wp->item.mailY - 230.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             }
         }
     }
 }
 
 // The demo has no captured-frame menu background.
-#ifndef VERSION_G8ME01_DEMO
-void winRootBgCaptureDisp(s32 unused, WindowWork* bg) {
+#if VERSION != VERSION_DEMO
+void winRootBgCaptureDisp(CameraId camId, void* param) {
+    WindowWork* bg = param;
+
     GXSetTexCopySrc(0, 0, gp->fbWidth, gp->efbHeight);
     GXSetTexCopyDst(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE);
     GXCopyTex(bg->texBuf->address, GX_FALSE);
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     GXPixModeSync();
     DCFlushRange(bg->texBuf->address, GXGetTexBufferSize(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE, 0));
     GXInvalidateTexAll();
@@ -2819,16 +2862,17 @@ void winRootBgCaptureDisp(s32 unused, WindowWork* bg) {
 #endif
     bg->texBufValid = 1;
     N_mapDispOff();
-    camDispOff((CameraId)4);
+    camDispOff(CAMERA_3D);
 }
 
-void winRootBgDrawDisp(s32 unused, WindowWork* bg) {
+void winRootBgDrawDisp(CameraId camId, void* param) {
+    WindowWork* bg = param;
     GXTexObj obj;
     f32 w;
     f32 h;
 
     if (bg->texBufValid) {
-        GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
+        GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXSetNumChans(0);
         GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
         GXSetNumTevStages(1);
@@ -2836,19 +2880,19 @@ void winRootBgDrawDisp(s32 unused, WindowWork* bg) {
         GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_OR);
 #else
         GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 #endif
         GXSetZCompLoc(GX_TRUE);
         GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
         GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
 #else
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
 #endif
-        GXLoadPosMtxImm(camGetPtr((CameraId)8)->view, 0);
+        GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
         GXSetCurrentMtx(0);
         GXInitTexObj(&obj, bg->texBuf->address, gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXLoadTexObj(&obj, GX_TEXMAP0);

@@ -1,3 +1,4 @@
+// Declarations of SDK demo statistics and sound-mode functions (DEMOPrintStats, DEMOUpdateStats, OSSetSoundMode).
 #pragma once
 
 #include "dolphin/gx/GXEnum.h"

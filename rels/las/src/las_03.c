@@ -1,31 +1,24 @@
+// las_03 (ラストダンジョン, Palace of Shadow): the hall with the spike traps (toge).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "driver/hitdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "las.h"
+#include "evt/evt_story.h"
 
 u16 toge_flag;
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_motion);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_area_check);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(get_toge_name);
 USER_FUNC(toge_check_flag);
 USER_FUNC(toge_flag_onoff);
@@ -33,9 +26,6 @@ USER_FUNC(toge_flag_onoff);
 static BeroEntry bero_entry_data[3];
 static HitDamageReturn dmgRetPoint[3];
 const char* toge_data[18];
-extern EvtWord toge_evt_sub[];
-extern EvtWord toge_evt[];
-extern EvtWord las_03_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -74,8 +64,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -92,8 +82,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero_1", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -208,13 +198,13 @@ EVT_BEGIN(toge_evt)
 EVT_END()
 
 EVT_BEGIN(las_03_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), -350, 0, -100, 264, 0, GSWF(4375), 1)
+    CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), -350, 0, -100, ITEM_ALL_OR_NOTHING, 0, GSWF(GSWF_LAS03_ALL_OR_NOTHING_BLOCK_HIT), 1)
     SPAWN_EVENT(PTR(toge_evt))
     RETURN
 EVT_END()

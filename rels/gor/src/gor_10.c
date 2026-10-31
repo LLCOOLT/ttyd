@@ -1,3 +1,5 @@
+// gor_10 (ゴロツキタウン, Rogueport): prologue scenes (the letter and Mario waking up), leading to pro_04 and then gor_00.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -13,7 +15,20 @@
 #include "manager/filemgr.h"
 #include "string.h"
 #include "win/win_main.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "gor.h"
 #include "pmario_sound.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 static inline f32 dd_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -22,14 +37,31 @@ static inline f32 dd_sin(f32 x) {
     f32 x2;
     if (x <= 3.1415927f) {
         if (x <= 1.5707964f) {
-            x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x;
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
         } else {
-            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y;
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * y;
         }
     } else if (x < 4.712389f) {
-        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
     } else {
-        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
     }
     return a;
 }
@@ -42,59 +74,40 @@ static inline f32 dd_cos(f32 x) {
     f32 x2;
     if (x <= 3.1415927f) {
         if (x <= 1.5707964f) {
-            x2 = x * x; a = a * x2 - b; a = a * x2 + c;
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
         } else {
-            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
+            y = 1.5707964f - (x - 1.5707964f);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = -a;
         }
     } else if (x < 4.712389f) {
-        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
+        y = x - 3.1415927f;
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = -a;
     } else {
-        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c;
+        y = 1.5707964f - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
     }
     return a;
 }
 
-double sin(double x);
-void mabutaDisp(CameraId camera, void* param);
-static void depthDisp(CameraId camera, void* param);
-typedef struct TegamiWork { s32 alpha; FileEntry* tpl; } TegamiWork;
+typedef struct TegamiWork {
+    s32 alpha;
+    FileEntry* tpl;
+} TegamiWork;
 static f32 view_dy;
 static s32 view_trg;
 static TegamiWork* wp;
-static void draw(CameraId camera, void* param);
 
-USER_FUNC(cam_yure);
 static USER_FUNC(depth);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam_ctrl_onoff);
-USER_FUNC(evt_cam_letter_box_camid);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_env_lpf);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxchk);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_sub_get_system_flag);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(mabuta);
-USER_FUNC(tegami);
-void mabutaDisp(CameraId camera, void* param);
-static void depthDisp(CameraId camera, void* param);
-void tegami_delete(void);
-static void draw(CameraId camera, void* param);
 
 static void draw(CameraId camera, void* param) {
     winTexInit(*(TEXPalette**)wp->tpl->data);
@@ -122,6 +135,7 @@ void tegami_delete(void) {
     }
 }
 
+// Optimisation pragmas: without them the function's code differs from the original (checked by removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static void depthDisp(CameraId camera, void* param) {
@@ -198,22 +212,17 @@ static USER_FUNC(depth) {
     return EVT_RETURN_BLOCK;
 }
 
-extern EvtWord tegami_init_evt[];
-extern EvtWord evt_mezame[];
-extern EvtWord mezame_init_evt[];
-extern EvtWord gor_10_init_evt[];
-
 EVT_BEGIN(tegami_init_evt)
-    CALL(evt_snd_envoff, 1024)
-    CALL(evt_snd_envon, 257, STRING("ENV_STG0_GOR6"))
-    CALL(evt_snd_bgmoff, 18432)
-    CALL(evt_snd_envoff, 18432)
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
+    CALL(evt_snd_envon, PSND_FADE_IN | PSND_CH(1), STRING("ENV_STG0_GOR6"))
+    CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     CALL(evt_cam_ctrl_onoff, 4, 0)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
-    CALL(evt_party_dispflg_onoff, 0, 1, 1)
+    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     BEGIN_INLINE_EVENT
         CALL(tegami)
     END_INLINE_EVENT
@@ -225,7 +234,7 @@ EVT_BEGIN(tegami_init_evt)
         CALL(evt_msg_print, 1, STRING("<diary><nowinse><once_stop>"), 0, 0)
         CALL(evt_msg_print_add, 0, STRING("pro_04"))
         CALL(evt_cam_letter_box_camid, 10)
-        CALL(evt_fade_set_mapchange_type, 1, 17, 800, 16, 800)
+        CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 800, FADE_IN_WHITE, 800)
         CALL(evt_bero_mapchange, STRING("aaa_00"), STRING("prologue2"))
     END_INLINE_EVENT
     RETURN
@@ -302,7 +311,7 @@ EVT_BEGIN(evt_mezame)
     CALL(evt_msg_print, 0, STRING("mac_0_012"), 0, 0)
     WAIT_MS(2000)
     CALL(evt_msg_print, 0, STRING("mac_0_013"), 0, 0)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_GOR0"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR0"))
     DELETE_EVENT(LW(10))
     WAIT_MS(300)
     CALL(evt_snd_sfxchk, GW(2), LW(0))
@@ -382,15 +391,15 @@ EVT_BEGIN(evt_mezame)
 EVT_END()
 
 EVT_BEGIN(mezame_init_evt)
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
-    CALL(evt_party_dispflg_onoff, 0, 1, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("marukongou"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("densha"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("pukupuku"), 1)
+    CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("marukongou"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("densha"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("pukupuku"), MAPOBJ_FLAG_HIDE)
     SET_FLOAT_VALUE(GW(0), FLOAT(50.0f))
     BEGIN_INLINE_EVENT
         CALL(depth)
@@ -410,12 +419,12 @@ EVT_BEGIN(gor_10_init_evt)
     CALL(evt_map_playanim, STRING("anm_umi"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_nami"), 1, 0)
     CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_SET(LW(0), 2)
+    IF_BITS_SET(LW(0), GLOBAL_FLAG_SKIP_MAP_EVENTS)
         RETURN
     END_IF
-    IF_INT_LESS(GSW(0), 2)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_02_MARIOS_HOUSE)
         CALL_CHILD(PTR(tegami_init_evt))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(mezame_init_evt))
     END_IF
     RETURN

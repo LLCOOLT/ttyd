@@ -1,11 +1,6 @@
+// Memory card manager: mounts, creates, formats, reads and writes the save file (banner, icon,
+// comment and checksums) as a step-by-step state machine.
 #include "version.h"
-/* "cardmgr" - Memory Card Manager
-* Status: almost 1:1, some functions don't work right with memcard_probe's opt_propagation it seems
-*
-* Function: handles all communication with save data and writing to memory cards
-*
-* Last Update: 1/19/2023, first finished, can prolly use a cleanup pass
-*/
 #include "manager/cardmgr.h"
 #include "mario/mario.h"
 #include "mario/mario_party.h"
@@ -23,23 +18,23 @@
 #include "assets/_mariost_icon_tlut.inc"
 #include "assets/_mariost_banner_tex.inc"
 #include "libc_decls.h"
-const char str_802CCC80[0x14] = "mariost_save_file";
-#if defined(VERSION_G8MP01)
+const char card_file_name[0x14] = "mariost_save_file";
+#if VERSION == VERSION_EU
 // PAL: memory card comment per language (gp->language)
 const char card_title_jp[0x18] = "ペーパーマリオＲＰＧ";
 const char card_date_jp[0x20] = "%2d月%2d日のセーブデータです";
-const char str_802CCC94[0xC] = "Paper Mario";
-const char str_802CCCAC[0x12] = "%2d/%2d save data";
+const char card_title[0xC] = "Paper Mario";
+const char card_date[0x12] = "%2d/%2d save data";
 const char card_date_de[0x18] = "Spielstand vom: %2d/%2d";
 const char card_date_fr[0x16] = "Sauvegarde du %2d/%2d";
 const char card_date_es[0x1B] = "Datos guardados el %2d/%2d";
 const char card_date_it[0x15] = "Salvataggio: %2d/%2d";
-#elif defined(VERSION_G8ME01)
-const char str_802CCC94[0xC] = "Paper Mario";
-const char str_802CCCAC[0x12] = "%2d/%2d save data";
+#elif VERSION >= VERSION_US
+const char card_title[0xC] = "Paper Mario";
+const char card_date[0x12] = "%2d/%2d save data";
 #else
-const char str_802CCC94[0x18] = "ペーパーマリオＲＰＧ";
-const char str_802CCCAC[0x20] = "%2d月%2d日のセーブデータです";
+const char card_title[0x18] = "ペーパーマリオＲＰＧ";
+const char card_date[0x20] = "%2d月%2d日のセーブデータです";
 #endif
 
 //.sbss
@@ -47,7 +42,7 @@ static CardWork* wp;
 
 // Set once a card has been opened; memcard_open then reads its serial number.
 // The demo keeps it in bit 0x4000 (retail moved it to make room for the insert watch).
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 #define CARD_FLAG_SERIAL 0x4000
 #else
 #define CARD_FLAG_SERIAL 0x2000
@@ -56,17 +51,17 @@ static CardWork* wp;
 //.sdata
 const char* version = VERSION_PICK("009", "010");
 
-//local prototypes
+// local prototypes
 static inline void check_sum(CardSaveSlot* save);
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 static void make_header(void);
 #else
 static inline void make_header(void);
 #endif
 static inline void make_data(void);
 
-#ifdef VERSION_G8ME01_DEMO
-static void memcard_probe(void);
+#if VERSION == VERSION_DEMO
+static void memcard_probe(void); // the demo calls it, the later versions inline it
 #else
 static inline void memcard_probe(void);
 #endif
@@ -106,74 +101,74 @@ static inline BOOL headerCheck2(void);
 static inline BOOL dataCheck(void);
 
 CardData* cardGetFilePtr(void) {
-	return wp->data;
+    return wp->data;
 }
 
 void cardBufReset(void) {
-	s32 flags;
-	s32 timeout;
+    s32 flags;
+    s32 timeout;
 
-	flags = wp->flags;
-	if (wp->flags & 1) {
-		CARDCancel(&wp->info);
-		for (timeout = 1000000; timeout > 0; timeout--) {
-			if (!(wp->flags & 1)) {
-				break;
-			}
-		}
-		wp->flags &= ~1;
-	}
+    flags = wp->flags;
+    if (wp->flags & 1) {
+        CARDCancel(&wp->info);
+        for (timeout = 1000000; timeout > 0; timeout--) {
+            if (!(wp->flags & 1)) {
+                break;
+            }
+        }
+        wp->flags &= ~1;
+    }
 
-	make_header();
-	make_data();
+    make_header();
+    make_data();
 
-	wp->chan = -1;
-	wp->fileNo = -1;
-	wp->serialNo = 0;
-	wp->op = 0;
-	wp->result = CARD_RESULT_NOCARD;
-	wp->flags = 0;
-#ifdef VERSION_G8ME01_DEMO
-	if (flags & 0x8000) {
-		wp->flags |= 0x8000;
-	}
+    wp->chan = -1;
+    wp->fileNo = -1;
+    wp->serialNo = 0;
+    wp->op = 0;
+    wp->result = CARD_RESULT_NOCARD;
+    wp->flags = 0;
+#if VERSION == VERSION_DEMO
+    if (flags & 0x8000) {
+        wp->flags |= 0x8000;
+    }
 #endif
 }
 
 void cardInit(void) {
-	wp = __memAlloc(HEAP_DEFAULT, sizeof(CardWork));
-	memset(wp, 0, sizeof(CardWork));
-	wp->workArea = __memAlloc(HEAP_DEFAULT, CARD_WORKAREA_SIZE);
-	memset(wp->workArea, 0, CARD_WORKAREA_SIZE);
-	wp->data = __memAlloc(HEAP_DEFAULT, sizeof(CardData));
-	memset(wp->data, 0, sizeof(CardData));
-	wp->readBuf = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
-	memset(wp->readBuf, 0, sizeof(CardSaveSlot));
-	wp->writeBuf = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
-	memset(wp->writeBuf, 0, sizeof(CardSaveSlot));
+    wp = __memAlloc(HEAP_DEFAULT, sizeof(CardWork));
+    memset(wp, 0, sizeof(CardWork));
+    wp->workArea = __memAlloc(HEAP_DEFAULT, CARD_WORKAREA_SIZE);
+    memset(wp->workArea, 0, CARD_WORKAREA_SIZE);
+    wp->data = __memAlloc(HEAP_DEFAULT, sizeof(CardData));
+    memset(wp->data, 0, sizeof(CardData));
+    wp->readBuf = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
+    memset(wp->readBuf, 0, sizeof(CardSaveSlot));
+    wp->writeBuf = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
+    memset(wp->writeBuf, 0, sizeof(CardSaveSlot));
 
-	make_header();
-	make_data();
+    make_header();
+    make_data();
 
-	wp->chan = -1;
-	wp->fileNo = -1;
-	wp->serialNo = 0;
-	wp->op = 0;
-	wp->result = CARD_RESULT_NOCARD;
-	wp->flags = 0;
-	CARDInit();
+    wp->chan = -1;
+    wp->fileNo = -1;
+    wp->serialNo = 0;
+    wp->op = 0;
+    wp->result = CARD_RESULT_NOCARD;
+    wp->flags = 0;
+    CARDInit();
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 void cardInsertWatchStart(void) {
-	wp->prevInserted = wp->chan;
-	wp->busyFrames = 10;
-	wp->flags |= 0x8000;
+    wp->prevInserted = wp->chan;
+    wp->busyFrames = 10;
+    wp->flags |= 0x8000;
 }
 
 void cardInsertWatchEnd(void) {
-	wp->flags &= ~0x8000;
-	wp->flags &= ~0xC000;
+    wp->flags &= ~0x8000;
+    wp->flags &= ~0xC000;
 }
 
 BOOL cardInsertChanged(void) {
@@ -185,7 +180,7 @@ BOOL cardInsertChanged(void) {
 #endif
 
 BOOL cardIsExec(void) {
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     if (wp == NULL) {
         return FALSE;
     }
@@ -200,134 +195,130 @@ BOOL cardIsExec(void) {
 }
 
 s32 cardGetCode(void) {
-	return wp->result;
+    return wp->result;
 }
 
 void cardMain(void) {
-#ifndef VERSION_G8ME01_DEMO
-	s32 inserted;
+#if VERSION != VERSION_DEMO
+    s32 inserted;
 
-	if (wp->flags & 0x8000) {
-		inserted = (s32)(s64)-(CARDProbe(0) == 0); //is something inserted?
-		if (wp->prevInserted != inserted) {
-			wp->flags |= 0x4000;
-		}
-		wp->prevInserted = inserted;
-		if (wp->busyFrames) {
-			wp->busyFrames--;
-		}
-	}
+    if (wp->flags & 0x8000) {
+        inserted = (s32)(s64) - (CARDProbe(0) == 0); // is something inserted?
+        if (wp->prevInserted != inserted) {
+            wp->flags |= 0x4000;
+        }
+        wp->prevInserted = inserted;
+        if (wp->busyFrames) {
+            wp->busyFrames--;
+        }
+    }
 #endif
 
-	switch (wp->op) {
-		case 1:
-			write_main();
-			break;
+    switch (wp->op) {
+        case 1:
+            write_main();
+            break;
 
-		case 2:
-			write_header_main();
-			break;
+        case 2:
+            write_header_main();
+            break;
 
-		case 3:
-			read_main();
-			break;
+        case 3:
+            read_main();
+            break;
 
-		case 4:
-			read_all_main();
-			break;
+        case 4:
+            read_all_main();
+            break;
 
-		case 5:
-			create_main();
-			break;
+        case 5:
+            create_main();
+            break;
 
-		case 6:
-			if (wp->result != CARD_RESULT_READY) {
-				wp->op = 8;
-				wp->flags |= 0x200;
-				wp->flags &= ~2;
-			}
-			else if (!(wp->flags & 1)) {
-				switch (wp->opStep) {
-					case 0:
-						memcard_probe();
-						break;
+        case 6:
+            if (wp->result != CARD_RESULT_READY) {
+                wp->op = 8;
+                wp->flags |= 0x200;
+                wp->flags &= ~2;
+            } else if (!(wp->flags & 1)) {
+                switch (wp->opStep) {
+                    case 0:
+                        memcard_probe();
+                        break;
 
-					case 1:
-						memcard_mount();
-						break;
+                    case 1:
+                        memcard_mount();
+                        break;
 
-					case 2:
-						memcard_format();
-						break;
+                    case 2:
+                        memcard_format();
+                        break;
 
-					case 3:
-						memcard_unmount();
-						break;
+                    case 3:
+                        memcard_unmount();
+                        break;
 
-					case 4:
-						wp->op = 0;
-						wp->flags |= 0x100;
-						wp->flags &= ~2;
-						break;
-				}
-				wp->opStep++;
-			}
-			else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
-				wp->result = CARDGetResultCode(wp->chan);
-				wp->flags &= ~1;
-			}
-			break;
+                    case 4:
+                        wp->op = 0;
+                        wp->flags |= 0x100;
+                        wp->flags &= ~2;
+                        break;
+                }
+                wp->opStep++;
+            } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+                wp->result = CARDGetResultCode(wp->chan);
+                wp->flags &= ~1;
+            }
+            break;
 
-		case 7:
-			if (wp->result != CARD_RESULT_READY) {
-				wp->op = 8;
-				wp->flags |= 0x200;
-				wp->flags &= ~2;
-			}
-			else if (!(wp->flags & 1)) {
-				switch (wp->opStep) {
-					case 0:
-						memcard_probe();
-						break;
+        case 7:
+            if (wp->result != CARD_RESULT_READY) {
+                wp->op = 8;
+                wp->flags |= 0x200;
+                wp->flags &= ~2;
+            } else if (!(wp->flags & 1)) {
+                switch (wp->opStep) {
+                    case 0:
+                        memcard_probe();
+                        break;
 
-					case 1:
-						memcard_mount();
-						break;
+                    case 1:
+                        memcard_mount();
+                        break;
 
-					case 2:
-						memcard_check();
-						break;
+                    case 2:
+                        memcard_check();
+                        break;
 
-					case 3:
-						memcard_delete();
-						break;
+                    case 3:
+                        memcard_delete();
+                        break;
 
-					case 4:
-						memcard_unmount();
-						break;
+                    case 4:
+                        memcard_unmount();
+                        break;
 
-					case 5:
-						wp->op = 0;
-						wp->flags |= 0x100;
-						wp->flags &= ~2;
-						break;
-				}
-				wp->opStep++;
-			}
-			else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
-				wp->result = CARDGetResultCode(wp->chan);
-				wp->flags &= ~1;
-			}
-			break;
+                    case 5:
+                        wp->op = 0;
+                        wp->flags |= 0x100;
+                        wp->flags &= ~2;
+                        break;
+                }
+                wp->opStep++;
+            } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+                wp->result = CARDGetResultCode(wp->chan);
+                wp->flags &= ~1;
+            }
+            break;
 
-		case 8:
-		default:
-			break;
-	}
+        case 8:
+        default:
+            break;
+    }
 }
 
 void cardCopy2Main(s32 slot) {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     void* backup2;
     s32 backup4;
     CardSaveSlot* save;
@@ -336,10 +327,10 @@ void cardCopy2Main(s32 slot) {
     s32 backup6;
     u32 backup3;
     s32 language;
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     s32 framerate;
 #endif
-#elif defined(VERSION_G8ME01_DEMO)
+#elif VERSION == VERSION_DEMO
     CardSaveSlot* save;
     void* backup1;
     void* backup2;
@@ -360,11 +351,11 @@ void cardCopy2Main(s32 slot) {
     save = &wp->data->saves[slot];
     backup1 = gp->fbatData;
     backup2 = gp->mapAlloc;
-    backup3 = (u32)(gp->flags & 8);
-#ifdef VERSION_G8ME01
+    backup3 = (u32)(gp->flags & GLOBAL_FLAG_PROGRESSIVE);
+#if VERSION >= VERSION_US
     language = gp->language;
 #endif
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     framerate = gp->framerate;
 #endif
     backup4 = gp->soundMode;
@@ -378,13 +369,13 @@ void cardCopy2Main(s32 slot) {
     memcpy(yuwp, &save->data.parlor, sizeof(PiantaParlorWork));
     memcpy(&_jdt.readFlags, &save->data.informant, sizeof(InformantUnknown));
     gp->resetType = 0;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     gp->resetButtonDown = 0;
 #endif
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     gp->softResetWait = 0;
 #endif
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     gp->dvdError = 0;
 #endif
     gp->retraceTime = OSGetTime();
@@ -397,15 +388,14 @@ void cardCopy2Main(s32 slot) {
     gp->debugFlag = 0;
     gp->debugBattle = 0;
     if (backup3 != 0) {
-        gp->flags |= 8;
+        gp->flags |= GLOBAL_FLAG_PROGRESSIVE;
+    } else {
+        gp->flags &= ~GLOBAL_FLAG_PROGRESSIVE;
     }
-    else {
-        gp->flags &= ~8;
-    }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     gp->language = language;
 #endif
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     // PAL: loading a save keeps the current 50/60 Hz frame rate
     gp->framerate = framerate;
 #endif
@@ -476,14 +466,14 @@ void cardWrite(s32 slot) {
         gp->savePartyId[1] = partyId;
         gp->saveTime = OSGetTime();
         gp->saveCount++;
-        gp->flags &= ~1;
-        gp->flags &= ~2;
+        gp->flags &= ~GLOBAL_FLAG_LOADED;
+        gp->flags &= ~GLOBAL_FLAG_SKIP_MAP_EVENTS;
         gp->resetType = 0;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         gp->resetButtonDown = 0;
         gp->softResetWait = 0;
 #endif
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         gp->dvdError = 0;
 #endif
         memcpy(&save->data.global, gp, sizeof(GlobalWork));
@@ -498,49 +488,12 @@ void cardWrite(s32 slot) {
     }
 }
 
-#ifndef VERSION_G8ME01_DEMO
-static inline void memcard_probe(void) {
-    s32 memSize, sectorSize;
-    s32 result;
-    s32 i;
-    s32 timeout;
-
-    wp->flags |= 1;
-    timeout = 1000000;
-    i = 0;
-    while ((result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY) {
-        if (++i > timeout) {
-            result = CARD_RESULT_FATAL_ERROR;
-            break;
-        }
-        timeout = (u32)timeout;
-    }
-
-    if (result == CARD_RESULT_READY && sectorSize != 0x2000) {
-        result = CARD_RESULT_WRONGDEVICE;
-    }
-    if (result == CARD_RESULT_READY) {
-        wp->result = CARD_RESULT_READY;
-        wp->chan = 0;
-    }
-    else if (result == CARD_RESULT_WRONGDEVICE) {
-        wp->result = CARD_RESULT_WRONGDEVICE;
-        wp->chan = 0;
-    }
-    else {
-        wp->result = result;
-        wp->chan = -1;
-    }
-    wp->flags &= ~1;
-}
-#endif
 void write_main(void) {
     if (wp->result) {
         wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
-    }
-    else if (!(wp->flags & 1)) {
+    } else if (!(wp->flags & 1)) {
         switch (wp->opStep) {
             case 0:
                 memcard_probe();
@@ -617,8 +570,7 @@ void write_main(void) {
                 break;
         }
         wp->opStep++;
-    }
-    else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+    } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
         wp->flags &= ~1;
     }
@@ -642,8 +594,7 @@ void write_header_main(void) {
         wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
-    }
-    else if (!(wp->flags & 1)) {
+    } else if (!(wp->flags & 1)) {
         switch (wp->opStep) {
             case 0:
                 memcard_probe();
@@ -677,22 +628,20 @@ void write_header_main(void) {
                 break;
         }
         wp->opStep++;
-    }
-    else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+    } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
         wp->flags &= ~1;
     }
 }
 
 void read_main(void) {
-    s32 saveType; //invalid = -1, main = 0, backup = 1
+    s32 saveType; // invalid = -1, main = 0, backup = 1
 
     if (wp->result) {
         wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
-    }
-    else if (!(wp->flags & 1)) {
+    } else if (!(wp->flags & 1)) {
         switch (wp->opStep) {
             case 0:
                 memcard_probe();
@@ -732,8 +681,7 @@ void read_main(void) {
                 if (wp->validSave1 != 0 && wp->validSave2 != 0) {
                     if (!(wp->lastSaveTime1 <= wp->lastSaveTime2)) {
                         saveType = 0;
-                    }
-                    else {
+                    } else {
                         saveType = 1;
                     }
                 } else if (wp->validSave1 == 0 && wp->validSave2 != 0) {
@@ -766,8 +714,7 @@ void read_main(void) {
                 break;
         }
         wp->opStep++;
-    }
-    else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+    } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
         wp->flags &= ~1;
     }
@@ -786,15 +733,14 @@ void cardReadAll(void) {
 }
 
 void read_all_main(void) {
-    s32 saveType; //invalid = -1, main = 0, backup = 1
+    s32 saveType; // invalid = -1, main = 0, backup = 1
 
     if (wp->result) {
         wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
         return;
-    }
-    else if (!(wp->flags & 1)) {
+    } else if (!(wp->flags & 1)) {
         switch (wp->opStep) {
             case 0:
                 memcard_probe();
@@ -838,8 +784,7 @@ void read_all_main(void) {
                 if (wp->validSave1 != 0 && wp->validSave2 != 0) {
                     if (!(wp->lastSaveTime1 <= wp->lastSaveTime2)) {
                         saveType = 0;
-                    }
-                    else {
+                    } else {
                         saveType = 1;
                     }
                 } else if (wp->validSave1 == 0 && wp->validSave2 != 0) {
@@ -876,8 +821,7 @@ void read_all_main(void) {
                 break;
         }
         wp->opStep++;
-    }
-    else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+    } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
         wp->flags &= ~1;
     }
@@ -900,8 +844,7 @@ void create_main(void) {
         wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
-    }
-    else if (!(wp->flags & 1)) {
+    } else if (!(wp->flags & 1)) {
         switch (wp->opStep) {
             case 0:
                 memcard_probe();
@@ -930,7 +873,7 @@ void create_main(void) {
                 memcard_get_stat();
                 break;
             case 8:
-                CARDSetCommentAddress(&wp->status,  0);
+                CARDSetCommentAddress(&wp->status, 0);
                 CARDSetIconAddress(&wp->status, 0x40);
                 CARDSetBannerFormat(&wp->status, CARD_STAT_BANNER_RGB5A3);
                 CARDSetIconAnim(&wp->status, CARD_STAT_ANIM_LOOP);
@@ -959,8 +902,7 @@ void create_main(void) {
                 break;
         }
         wp->opStep++;
-    }
-    else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+    } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
         wp->flags &= ~1;
     }
@@ -982,35 +924,32 @@ static inline void format_main(void) {
         wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
-    }
-    else if (!(wp->flags & 1)) {
+    } else if (!(wp->flags & 1)) {
         switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
-            
+
             case 1:
                 memcard_mount();
                 break;
-            
+
             case 2:
                 memcard_format();
                 break;
-            
+
             case 3:
                 memcard_unmount();
                 break;
-            
+
             case 4:
                 wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags &= ~2;
                 break;
-            
         }
         wp->opStep++;
-    }
-    else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+    } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
         wp->flags &= ~1;
     }
@@ -1021,39 +960,36 @@ static inline void delete_main(void) {
         wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
-    }
-    else if (!(wp->flags & 1)) {
+    } else if (!(wp->flags & 1)) {
         switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
-            
+
             case 1:
                 memcard_mount();
                 break;
-            
+
             case 2:
                 memcard_check();
                 break;
-            
+
             case 3:
                 memcard_delete();
                 break;
-            
+
             case 4:
                 memcard_unmount();
                 break;
-            
+
             case 5:
                 wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags &= ~2;
                 break;
-            
         }
         wp->opStep++;
-    }
-    else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
+    } else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
         wp->flags &= ~1;
     }
@@ -1061,17 +997,17 @@ static inline void delete_main(void) {
 
 static inline void check_sum(CardSaveSlot* save) {
     s32 i;
-    u8* temp;
+    u8* byte;
     u32 checksum;
-    
+
     strcpy(save->version, version);
     save->size = sizeof(save->data);
     save->checksum1 = (checksum = 0u);
     save->checksum2 = ~0u;
-    
-    temp = (u8*)&save->data;
+
+    byte = (u8*)&save->data;
     for (i = 0; i < (s32)sizeof(save->data); i++) {
-        checksum += temp[i];
+        checksum += byte[i];
     }
     save->checksum1 = checksum;
     save->checksum2 = ~save->checksum1;
@@ -1080,7 +1016,7 @@ static inline void check_sum(CardSaveSlot* save) {
 static inline BOOL headerCheck(void) {
     s32 i;
     s32 checksum;
-    u8* temp;
+    u8* byte;
     CardMetadata* metadata;
 
     metadata = wp->readBuf;
@@ -1088,9 +1024,9 @@ static inline BOOL headerCheck(void) {
         return FALSE;
     } else {
         checksum = 0;
-        temp = (u8*)&metadata->data;
+        byte = (u8*)&metadata->data;
         for (i = 0; i < (s32)sizeof(metadata->data); i++) {
-            checksum += temp[i];
+            checksum += byte[i];
         }
         if (metadata->checksum1 != checksum) {
             return FALSE;
@@ -1103,7 +1039,7 @@ static inline BOOL headerCheck(void) {
 static inline BOOL headerCheck2(void) {
     s32 i;
     s32 checksum;
-    u8* temp;
+    u8* byte;
     CardMetadata* metadata;
 
     metadata = &wp->data->metadata;
@@ -1111,9 +1047,9 @@ static inline BOOL headerCheck2(void) {
         return FALSE;
     } else {
         checksum = 0;
-        temp = (u8*)&metadata->data;
+        byte = (u8*)&metadata->data;
         for (i = 0; i < (s32)sizeof(metadata->data); i++) {
-            checksum += temp[i];
+            checksum += byte[i];
         }
         if (metadata->checksum1 != checksum) {
             return FALSE;
@@ -1126,7 +1062,7 @@ static inline BOOL headerCheck2(void) {
 static inline BOOL dataCheck(void) {
     s32 i;
     u32 checksum;
-    u8* temp;
+    u8* byte;
     CardSaveSlot* save;
 
     save = wp->readBuf;
@@ -1138,9 +1074,9 @@ static inline BOOL dataCheck(void) {
         return FALSE;
     } else {
         checksum = 0;
-        temp = (u8*)&save->data;
+        byte = (u8*)&save->data;
         for (i = 0; i < (s32)sizeof(save->data); i++) {
-            checksum += temp[i];
+            checksum += byte[i];
         }
         if (save->checksum1 != checksum) {
             return FALSE;
@@ -1151,92 +1087,91 @@ static inline BOOL dataCheck(void) {
 }
 
 static inline u32 header_sum(u8* data, s32 size) {
-	s32 i;
-	u32 sum;
-	sum = 0;
-	for (i = 0; i < size; i++) {
-		sum += data[i];
-	}
-	return sum;
+    s32 i;
+    u32 sum;
+    sum = 0;
+    for (i = 0; i < size; i++) {
+        sum += data[i];
+    }
+    return sum;
 }
 
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 // PAL: not inlined; the comment and its date order follow gp->language
 static void make_header(void) {
-	CardMetadata* metadata;
-	OSCalendarTime td;
-	metadata = &cardGetFilePtr()->metadata;
-	memset(metadata, 0, sizeof(metadata->data));
-	OSTicksToCalendarTime(OSGetTime(), &td);
-	switch (gp->language) {
-		case 0:
-			strcpy(metadata->data.fileName, card_title_jp);
-			sprintf(metadata->data.dateString, card_date_jp, td.mon + 1, td.mday);
-			break;
-		case 1:
-		case 6:
-			strcpy(metadata->data.fileName, str_802CCC94);
-			sprintf(metadata->data.dateString, str_802CCCAC, td.mon + 1, td.mday);
-			break;
-		case 2:
-			strcpy(metadata->data.fileName, str_802CCC94);
-			sprintf(metadata->data.dateString, card_date_de, td.mday, td.mon + 1);
-			break;
-		case 3:
-			strcpy(metadata->data.fileName, str_802CCC94);
-			sprintf(metadata->data.dateString, card_date_fr, td.mday, td.mon + 1);
-			break;
-		case 4:
-			strcpy(metadata->data.fileName, str_802CCC94);
-			sprintf(metadata->data.dateString, card_date_es, td.mday, td.mon + 1);
-			break;
-		case 5:
-			strcpy(metadata->data.fileName, str_802CCC94);
-			sprintf(metadata->data.dateString, card_date_it, td.mday, td.mon + 1);
-			break;
-	}
-	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
-	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
-	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
-	metadata->data.rumbleEnabled = (gp->rumbleEnabled != 0);
-	metadata->data.soundMode = (u16)gp->soundMode;
-	metadata->data.lastSlot = (u16)gp->lastSlot;
-	metadata->checksum1 = 0;
-	metadata->checksum2 = ~0u;
-	metadata->checksum1 = header_sum((u8*)&metadata->data, sizeof(metadata->data));
-	metadata->checksum2 = ~metadata->checksum1;
+    CardMetadata* metadata;
+    OSCalendarTime td;
+    metadata = &cardGetFilePtr()->metadata;
+    memset(metadata, 0, sizeof(metadata->data));
+    OSTicksToCalendarTime(OSGetTime(), &td);
+    switch (gp->language) {
+        case 0:
+            strcpy(metadata->data.fileName, card_title_jp);
+            sprintf(metadata->data.dateString, card_date_jp, td.mon + 1, td.mday);
+            break;
+        case 1:
+        case 6:
+            strcpy(metadata->data.fileName, card_title);
+            sprintf(metadata->data.dateString, card_date, td.mon + 1, td.mday);
+            break;
+        case 2:
+            strcpy(metadata->data.fileName, card_title);
+            sprintf(metadata->data.dateString, card_date_de, td.mday, td.mon + 1);
+            break;
+        case 3:
+            strcpy(metadata->data.fileName, card_title);
+            sprintf(metadata->data.dateString, card_date_fr, td.mday, td.mon + 1);
+            break;
+        case 4:
+            strcpy(metadata->data.fileName, card_title);
+            sprintf(metadata->data.dateString, card_date_es, td.mday, td.mon + 1);
+            break;
+        case 5:
+            strcpy(metadata->data.fileName, card_title);
+            sprintf(metadata->data.dateString, card_date_it, td.mday, td.mon + 1);
+            break;
+    }
+    memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
+    memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
+    memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
+    metadata->data.rumbleEnabled = (gp->rumbleEnabled != 0);
+    metadata->data.soundMode = (u16)gp->soundMode;
+    metadata->data.lastSlot = (u16)gp->lastSlot;
+    metadata->checksum1 = 0;
+    metadata->checksum2 = ~0u;
+    metadata->checksum1 = header_sum((u8*)&metadata->data, sizeof(metadata->data));
+    metadata->checksum2 = ~metadata->checksum1;
 }
 #else
 static inline void make_header(void) {
-	CardMetadata* metadata;
-	OSCalendarTime td;
-	metadata = &cardGetFilePtr()->metadata;
-	memset(metadata, 0, sizeof(metadata->data));
-	strcpy(metadata->data.fileName, str_802CCC94);
-	OSTicksToCalendarTime(OSGetTime(), &td);
-	sprintf(metadata->data.dateString, str_802CCCAC, td.mon + 1, td.mday);
-	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
-	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
-	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
-	metadata->data.rumbleEnabled = (gp->rumbleEnabled != 0);
-	metadata->data.soundMode = (u16)gp->soundMode;
-	metadata->data.lastSlot = (u16)gp->lastSlot;
-	metadata->checksum1 = 0;
-	metadata->checksum2 = ~0u;
-	metadata->checksum1 = header_sum((u8*)&metadata->data, sizeof(metadata->data));
-	metadata->checksum2 = ~metadata->checksum1;
+    CardMetadata* metadata;
+    OSCalendarTime td;
+    metadata = &cardGetFilePtr()->metadata;
+    memset(metadata, 0, sizeof(metadata->data));
+    strcpy(metadata->data.fileName, card_title);
+    OSTicksToCalendarTime(OSGetTime(), &td);
+    sprintf(metadata->data.dateString, card_date, td.mon + 1, td.mday);
+    memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
+    memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
+    memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
+    metadata->data.rumbleEnabled = (gp->rumbleEnabled != 0);
+    metadata->data.soundMode = (u16)gp->soundMode;
+    metadata->data.lastSlot = (u16)gp->lastSlot;
+    metadata->checksum1 = 0;
+    metadata->checksum2 = ~0u;
+    metadata->checksum1 = header_sum((u8*)&metadata->data, sizeof(metadata->data));
+    metadata->checksum2 = ~metadata->checksum1;
 }
 #endif
 
 static inline void make_data(void) {
     CardSaveSlot* save;
     s32 i;
-    
+
     for (i = 0; i < 4; i++) {
         if (i != -1) {
             save = &cardGetFilePtr()->saves[i];
-        }
-        else {
+        } else {
             save = wp->writeBuf;
         }
         memset(save, 0, sizeof(save->data));
@@ -1245,17 +1180,22 @@ static inline void make_data(void) {
     }
 }
 
-
-#ifdef VERSION_G8ME01_DEMO
-// The demo is not inlined, and it still tests a slot B result that it never
-// probes (resultB is read uninitialized, as in the original code).
+// Probes slot A and records the result in the card work. The demo also tests a slot B result that it never
+// probes. BUG: resultB is never set; the demo binary compares r31, a callee-saved register this function
+// never writes, so the slot B branches test whatever the caller left there. The later versions inline it.
 static void memcard_probe(void) {
     s32 memSize;
     s32 sectorSize;
     s32 result;
+    // the declaration order sets the registers: the demo's out-of-line copy and the inlined copies need opposite orders
+#if VERSION == VERSION_DEMO
     s32 resultB;
     s32 timeout;
     s32 i;
+#else
+    s32 i;
+    s32 timeout;
+#endif
 
     wp->flags |= 1;
     timeout = 1000000;
@@ -1265,7 +1205,7 @@ static void memcard_probe(void) {
             result = CARD_RESULT_FATAL_ERROR;
             break;
         }
-        timeout = (u32)timeout;
+        timeout = (u32)timeout; // FAKE: no-op self-assignment the target compiles to a register copy; see FAKES.md
     }
 
     if (result == CARD_RESULT_READY && sectorSize != 0x2000) {
@@ -1274,25 +1214,28 @@ static void memcard_probe(void) {
     if (result == CARD_RESULT_READY) {
         wp->result = CARD_RESULT_READY;
         wp->chan = 0;
+#if VERSION == VERSION_DEMO
     } else if (resultB == CARD_RESULT_READY) {
         wp->result = CARD_RESULT_READY;
         wp->chan = 1;
+#endif
     } else if (result == CARD_RESULT_WRONGDEVICE) {
         wp->result = CARD_RESULT_WRONGDEVICE;
         wp->chan = 0;
+#if VERSION == VERSION_DEMO
     } else if (resultB == CARD_RESULT_WRONGDEVICE) {
         wp->result = CARD_RESULT_WRONGDEVICE;
         wp->chan = 1;
+#endif
     } else {
         wp->result = result;
         wp->chan = -1;
     }
     wp->flags &= ~1;
 }
-#endif
 
 void mountDetachCallback(s32 chan, s32 result) {
-	; //stubbed in retail
+    ; // stubbed in retail
 }
 
 void mountAttachCallback(s32 chan, s32 result) {
@@ -1312,7 +1255,7 @@ static inline void memcard_mount(void) {
 static inline void memcard_unmount(void) {
     s32 result;
     s32 i;
-    
+
     wp->flags |= 1;
     i = 0;
     while (result = CARDUnmount(wp->chan), result == CARD_RESULT_BUSY) {
@@ -1326,8 +1269,8 @@ static inline void memcard_unmount(void) {
 }
 
 void checkCallback(s32 chan, s32 result) {
-	wp->result = result;
-	wp->flags &= ~1;
+    wp->result = result;
+    wp->flags &= ~1;
 }
 
 static inline void memcard_check(void) {
@@ -1336,8 +1279,8 @@ static inline void memcard_check(void) {
 }
 
 void formatCallback(s32 chan, s32 result) {
-	wp->result = result;
-	wp->flags &= ~1;
+    wp->result = result;
+    wp->flags &= ~1;
 }
 
 static inline void memcard_format(void) {
@@ -1348,17 +1291,17 @@ static inline void memcard_format(void) {
 static inline void memcard_delete(void) {
     s32 result;
     s32 i;
-    
+
     wp->flags |= 1;
-    
+
     i = 0;
-    while (result = CARDDelete(wp->chan, str_802CCC80), result == CARD_RESULT_BUSY) {
+    while (result = CARDDelete(wp->chan, card_file_name), result == CARD_RESULT_BUSY) {
         if (++i > 1000000) {
             result = CARD_RESULT_FATAL_ERROR;
             break;
         }
     }
-    
+
     if (result == CARD_RESULT_NOFILE) {
         result = CARD_RESULT_READY;
     }
@@ -1367,18 +1310,18 @@ static inline void memcard_delete(void) {
 }
 
 void createCallback(s32 chan, s32 result) {
-	wp->result = result;
-	wp->flags &= ~1;
+    wp->result = result;
+    wp->flags &= ~1;
 }
 
 static inline void memcard_create(void) {
     wp->flags |= 1;
-    CARDCreateAsync(wp->chan, str_802CCC80, sizeof(CardData) + (sizeof(CardSaveSlot) * 4), &wp->info, createCallback);
+    CARDCreateAsync(wp->chan, card_file_name, sizeof(CardData) + (sizeof(CardSaveSlot) * 4), &wp->info, createCallback);
 }
 
 void writeCallback(s32 chan, s32 result) {
-	wp->result = result;
-	wp->flags &= ~1;
+    wp->result = result;
+    wp->flags &= ~1;
 }
 
 static inline void memcard_write(void* addr, s32 length, s32 offset) {
@@ -1387,8 +1330,8 @@ static inline void memcard_write(void* addr, s32 length, s32 offset) {
 }
 
 void readCallback(s32 chan, s32 result) {
-	wp->result = result;
-	wp->flags &= ~1;
+    wp->result = result;
+    wp->flags &= ~1;
 }
 
 static inline void memcard_read(void* addr, s32 length, s32 offset) {
@@ -1397,8 +1340,8 @@ static inline void memcard_read(void* addr, s32 length, s32 offset) {
 }
 
 void statusCallback(s32 chan, s32 result) {
-	wp->result = result;
-	wp->flags &= ~1;
+    wp->result = result;
+    wp->flags &= ~1;
 }
 
 static inline void memcard_set_stat(void) {
@@ -1409,9 +1352,9 @@ static inline void memcard_set_stat(void) {
 static inline void memcard_get_stat(void) {
     s32 result;
     s32 i;
-    
+
     wp->flags |= 1;
-    
+
     i = 0;
     while (result = CARDGetStatus(wp->chan, wp->info.fileNo, &wp->status), result == CARD_RESULT_BUSY) {
         if (++i > 1000000) {
@@ -1481,20 +1424,18 @@ void memcard_open(void) {
         }
         if ((result != CARD_RESULT_NOFILE) && (result != CARD_RESULT_NOPERM)) {
             if (result == CARD_RESULT_READY) {
-                if (!strcmp(stat.fileName, str_802CCC80)) {
+                if (!strcmp(stat.fileName, card_file_name)) {
                     if ((stat.commentAddr == 0) && (stat.iconAddr == 0x40) && (stat.length == 0x22000)) {
                         wp->fileNo = fileNo;
                         break;
-                    }
-                    else {
+                    } else {
                         wp->fileNo = fileNo;
                         wp->result = CARD_RESULT_NOFILE;
                         wp->flags &= ~1;
                         return;
                     }
                 }
-            }
-            else {
+            } else {
                 if ((result == CARD_RESULT_FATAL_ERROR) || (result == CARD_RESULT_NOCARD)) {
                     wp->result = result;
                     wp->flags &= ~1;
@@ -1531,7 +1472,7 @@ void memcard_open(void) {
         return;
     }
     i = 0;
-    while (result = CARDOpen(wp->chan, str_802CCC80, &wp->info), result == CARD_RESULT_BUSY) {
+    while (result = CARDOpen(wp->chan, card_file_name, &wp->info), result == CARD_RESULT_BUSY) {
         if (++i > 1000000) {
             result = CARD_RESULT_FATAL_ERROR;
             break;

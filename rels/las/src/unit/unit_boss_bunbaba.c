@@ -1,3 +1,5 @@
+// Palace of Shadow battle unit: the Gloomtail (boss) (`boss_bunbaba`): parts, stats, poses and AI scripts.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -10,47 +12,11 @@
 #include "evt/evt_map.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
+#include "battle/battle_sub.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_snd.h"
+#include "version.h"
 
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AttackDeclareAll);
-USER_FUNC(btlevtcmd_CheckActStatus);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_CheckPhase);
-USER_FUNC(btlevtcmd_ChoiceSamplingEnemy);
-USER_FUNC(btlevtcmd_DrawLots);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_GetDamage);
-USER_FUNC(btlevtcmd_GetDamagePartsId);
-USER_FUNC(btlevtcmd_GetEnemyBelong);
-USER_FUNC(btlevtcmd_GetHitPos);
-USER_FUNC(btlevtcmd_GetHp);
-USER_FUNC(btlevtcmd_GetMaxHp);
-USER_FUNC(btlevtcmd_GetSelectNextEnemy);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_OnUnitFlag);
-USER_FUNC(btlevtcmd_PayWeaponCost);
-USER_FUNC(btlevtcmd_PreCheckDamage);
-USER_FUNC(btlevtcmd_ResultACDefence);
-USER_FUNC(btlevtcmd_SamplingEnemy);
-USER_FUNC(btlevtcmd_SetBaseScale);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventEntry);
-USER_FUNC(btlevtcmd_SetEventPhase);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetTalkBodyId);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_StartAvoid);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StatusWindowOnOff);
-USER_FUNC(btlevtcmd_WaitGuardMove);
-USER_FUNC(btlevtcmd_WeaponAftereffect);
-USER_FUNC(evt_btl_camera_shake_h);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
 static USER_FUNC(_leg_smoke_effect);
 
 BattleUnitKind unit_boss_bunbaba;
@@ -71,9 +37,6 @@ static EvtWord damage_event[10];
 extern EvtWord bunbaba_damage_sub_event[];
 static EvtWord dead_event[264];
 static EvtWord phase_event[160];
-extern EvtWord eq_attack_event[];
-extern EvtWord poison_attack_event[];
-extern EvtWord mega_attack_event[];
 static EvtWord attack_event[237];
 static EvtWord wait_event[6];
 
@@ -106,7 +69,7 @@ BattleUnitKind unit_boss_bunbaba = {
     115.0f,
     0.0f,
     -10.0f,
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     115.0f,
 #else
     0.0f,
@@ -182,30 +145,30 @@ BattleWeapon weapon_bunbaba_fumituke_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x21002000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, // element
     11, // damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    7, // special
-    0x7FF, // counterResistFlags
-    0x2004, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -213,7 +176,7 @@ BattleWeapon weapon_bunbaba_fumituke_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 10, 0, 0, 0}, // stageEffectRates
 };
 
@@ -223,28 +186,28 @@ BattleWeapon weapon_bunbaba_kamituki_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x21002000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x20007, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -252,7 +215,7 @@ BattleWeapon weapon_bunbaba_kamituki_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -262,28 +225,28 @@ BattleWeapon weapon_bunbaba_poison_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..dizzyTime
     50, // poisonChance
     10, // poisonTime
@@ -294,7 +257,7 @@ BattleWeapon weapon_bunbaba_poison_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
     0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -304,28 +267,28 @@ BattleWeapon weapon_bunbaba_eq_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {10, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000008, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_NO_FLOATING_2 | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x1047, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_FLIPS_SHELLED, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -333,7 +296,7 @@ BattleWeapon weapon_bunbaba_eq_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -344,22 +307,22 @@ BattleWeapon weapon_bunbaba_charge = {
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1004020, // targetClassFlags
-    0x10000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    8, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_ALWAYS_HITS, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -368,7 +331,7 @@ BattleWeapon weapon_bunbaba_charge = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -378,28 +341,28 @@ BattleWeapon weapon_bunbaba_mega_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x47, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -407,7 +370,7 @@ BattleWeapon weapon_bunbaba_mega_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -416,82 +379,82 @@ static EVT_BEGIN(battle_entry_event)
     CALL(evt_map_replayanim, 0, STRING("dontyo"))
     CALL(evt_btl_camera_set_mode, 1, 3)
     CALL(evt_btl_camera_set_moveto, 1, 0, 110, 1080, 0, 93, -2, 1, 0)
-    CALL(btlevtcmd_GetStageSize, LW(6), -250000000, -250000000)
+    CALL(btlevtcmd_GetStageSize, LW(6), EVT_NULLPTR, EVT_NULLPTR)
     MULTIPLY(LW(6), -1)
-    CALL(btlevtcmd_GetHomePos, -3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, -4, LW(3), LW(4), LW(5))
-    CALL(btlevtcmd_SetPos, -3, LW(6), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -4, LW(6), LW(4), LW(5))
-    CALL(btlevtcmd_GetStageSize, -250000000, LW(3), -250000000)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_PARTNER, LW(3), LW(4), LW(5))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_MARIO, LW(6), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_PARTNER, LW(6), LW(4), LW(5))
+    CALL(btlevtcmd_GetStageSize, EVT_NULLPTR, LW(3), EVT_NULLPTR)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), LW(3))
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     WAIT_MS(1000)
-    CALL(btlevtcmd_AnimeChangePoseType, -3, 1, 42)
-    CALL(btlevtcmd_GetBodyId, -4, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, -4, LW(0), 42)
-    CALL(btlevtcmd_GetHomePos, -3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, -4, LW(3), LW(4), LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_MARIO, 1, 42)
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 42)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_PARTNER, LW(3), LW(4), LW(5))
     SET_VALUE(LW(8), LW(0))
     SUBTRACT(LW(8), LW(3))
     IF_INT_LESS(LW(8), 0)
         MULTIPLY(LW(8), -1)
     END_IF
-    CALL(btlevtcmd_GetStageSize, LW(6), -250000000, -250000000)
+    CALL(btlevtcmd_GetStageSize, LW(6), EVT_NULLPTR, EVT_NULLPTR)
     SET_VALUE(LW(7), LW(6))
     ADD(LW(7), LW(8))
     MULTIPLY(LW(6), -1)
     MULTIPLY(LW(7), -1)
-    CALL(btlevtcmd_SetPos, -3, LW(6), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -4, LW(7), LW(4), LW(5))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_MARIO, LW(6), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_PARTNER, LW(7), LW(4), LW(5))
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_SetMoveSpeed, -4, FLOAT(6.0f))
-        CALL(btlevtcmd_MovePosition, -4, LW(3), LW(4), LW(5), 0, -1, 0)
-        CALL(btlevtcmd_GetBodyId, -4, LW(0))
-        CALL(btlevtcmd_AnimeChangePoseType, -4, LW(0), 43)
+        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_PARTNER, FLOAT(6.0f))
+        CALL(btlevtcmd_MovePosition, BTL_UNIT_PARTNER, LW(3), LW(4), LW(5), 0, -1, 0)
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 43)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_SetMoveSpeed, -3, FLOAT(6.0f))
-    CALL(btlevtcmd_MovePosition, -3, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_I_Y"))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_MARIO, FLOAT(6.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_MARIO, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_I_Y"))
     WAIT_MS(33)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_F_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_F_3"))
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     WAIT_MS(166)
     BEGIN_INLINE_EVENT
         WAIT_MS(83)
-        CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_I_O"))
-        CALL(btlevtcmd_SetFallAccel, -3, FLOAT(0.2998047f))
-        CALL(btlevtcmd_GetPos, -3, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_snd_se, -3, STRING("SFX_VOICE_MARIO_SURPRISED2_2"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_JumpPosition, -3, LW(0), LW(1), LW(2), 25, -1)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_I_O"))
+        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_MARIO, FLOAT(0.2998047f))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_MARIO, STRING("SFX_VOICE_MARIO_SURPRISED2_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_JumpPosition, BTL_UNIT_MARIO, LW(0), LW(1), LW(2), 25, -1)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(83)
-        CALL(btlevtcmd_SetFallAccel, -4, FLOAT(0.2998047f))
-        CALL(btlevtcmd_GetPos, -4, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_JumpPosition, -4, LW(0), LW(1), LW(2), 25, -1)
-        CALL(btlevtcmd_GetBodyId, -4, LW(0))
-        CALL(btlevtcmd_AnimeChangePoseType, -4, LW(0), 5)
+        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_PARTNER, FLOAT(0.2998047f))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_PARTNER, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_JumpPosition, BTL_UNIT_PARTNER, LW(0), LW(1), LW(2), 25, -1)
+        CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 5)
     END_INLINE_EVENT
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_GNB_APPEAR1"), 0)
     CALL(evt_btl_camera_shake_h, 1, 8, 0, 20, 13)
     WAIT_MS(500)
-    CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_I_Y"))
-    CALL(btlevtcmd_GetBodyId, -4, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, -4, LW(0), 43)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_I_Y"))
+    CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 43)
     CALL(evt_btl_camera_set_mode, 1, 3)
     CALL(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 60, 0)
     WAIT_MS(1000)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
-    CALL(btlevtcmd_SetTalkPose, -2, STRING("GNB_T_3"))
-    CALL(btlevtcmd_SetStayPose, -2, STRING("GNB_S_3"))
-    CALL(evt_msg_print, 2, STRING("stg8_las_49_01"), 0, -2)
+    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("GNB_T_3"))
+    CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("GNB_S_3"))
+    CALL(evt_msg_print, 2, STRING("stg8_las_49_01"), 0, BTL_UNIT_SELF)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_StartWaitEvent, -3)
-    CALL(btlevtcmd_StartWaitEvent, -4)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_MARIO)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_PARTNER)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_prilimit, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 3)
@@ -499,18 +462,18 @@ static EVT_BEGIN(battle_entry_event)
 EVT_END()
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, -2, 16777216)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventPhase, -2, PTR(phase_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetTalkBodyId, -2, 1)
-    CALL(btlevtcmd_SetBaseScale, -2, FLOAT(1.2998047f), FLOAT(1.2998047f), FLOAT(0.5f))
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 0)
-    CALL(btlevtcmd_SetEventEntry, -2, PTR(battle_entry_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetTalkBodyId, BTL_UNIT_SELF, 1)
+    CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, FLOAT(1.2998047f), FLOAT(1.2998047f), FLOAT(0.5f))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(battle_entry_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -522,10 +485,10 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 EVT_BEGIN(bunbaba_damage_sub_event)
-    CALL(btlevtcmd_GetDamagePartsId, -2, LW(11))
+    CALL(btlevtcmd_GetDamagePartsId, BTL_UNIT_SELF, LW(11))
     IF_INT_EQUAL(LW(11), 1)
         CALL(btlevtcmd_AnimeChangePose, LW(10), 1, STRING("GNB_D_2"))
-        ELSE
+    ELSE
         CALL(btlevtcmd_AnimeChangePose, LW(10), 1, STRING("GNB_D_1"))
     END_IF
     CALL(btlevtcmd_GetDamage, LW(10), LW(0))
@@ -538,17 +501,17 @@ EVT_BEGIN(bunbaba_damage_sub_event)
 EVT_END()
 
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_X_1"))
-    CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_DOWN1"), -250000000, 0, -250, 0, 0, LW(15))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_X_1"))
+    CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_DOWN1"), EVT_NULLPTR, 0, -250, 0, 0, LW(15))
     CALL(btlevtcmd_WaitAttackEnd)
     CALL(evt_btl_camera_set_prilimit, 1)
     CALL(evt_btl_camera_wait_move_end)
     CALL(evt_btl_camera_set_mode, 1, 3)
     SET_VALUE(LW(1), 160)
     SET_VALUE(LW(2), 536)
-    CALL(btlevtcmd_GetStageAudienceAreaSize, -250000000, LW(5), -250000000)
+    CALL(btlevtcmd_GetStageAudienceAreaSize, EVT_NULLPTR, LW(5), EVT_NULLPTR)
     ADD(LW(1), LW(5))
-    CALL(btlevtcmd_GetStageSize, -250000000, -250000000, LW(5))
+    CALL(btlevtcmd_GetStageSize, EVT_NULLPTR, EVT_NULLPTR, LW(5))
     ADD(LW(2), LW(5))
     ADD(LW(2), 80)
     SET_VALUE(LW(5), LW(1))
@@ -558,43 +521,43 @@ static EVT_BEGIN(dead_event)
     CALL(evt_btl_camera_set_moveto, 1, 93, LW(1), LW(2), 93, LW(5), LW(6), 30, 0)
     WAIT_MS(1500)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
-    CALL(btlevtcmd_SetTalkPose, -2, STRING("GNB_X_1"))
-    CALL(btlevtcmd_SetStayPose, -2, STRING("GNB_X_1"))
-    CALL(evt_msg_print, 2, STRING("stg8_las_49_08"), 0, -2)
+    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("GNB_X_1"))
+    CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("GNB_X_1"))
+    CALL(evt_msg_print, 2, STRING("stg8_las_49_08"), 0, BTL_UNIT_SELF)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 1, 3)
     CALL(evt_btl_camera_set_moveto, 1, -38, 33, 1005, -38, 92, 13, 60, 0)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_DOWN2"), -250000000, 0, -250, 0, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_D_3"))
+    CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_DOWN2"), EVT_NULLPTR, 0, -250, 0, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_D_3"))
     WAIT_MS(700)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_H_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_H_1"))
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), 25)
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_H_1"))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_H_1"))
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(5), 100)
         SET_VALUE(LW(4), 120)
-        CALL(btlevtcmd_SetRotateOffset, -2, 0, LW(5), 0)
+        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, LW(5), 0)
         LOOP(40)
-            CALL(btlevtcmd_SetRotate, -2, 0, 0, LW(4))
+            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, LW(4))
             SUBTRACT(LW(4), 3)
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_SetRotate, -2, 0, 0, 0)
+        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     END_INLINE_EVENT
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.19921875f))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SUBTRACT(LW(0), 20)
     SUBTRACT(LW(2), 20)
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 90, -1)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 90, -1)
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_GNB_DOWN3"), 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_H_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_H_2"))
     CALL(evt_btl_camera_shake_h, 1, 8, 0, 30, 13)
     WAIT_MS(166)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_H_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_H_3"))
     CALL(btlevtcmd_GetExp, LW(10), LW(0))
     CALL(btlevtcmd_StoreExp, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -602,57 +565,57 @@ static EVT_BEGIN(dead_event)
         END_LOOP
     END_IF
     WAIT_MS(1000)
-    CALL(btlevtcmd_KillUnit, -2, 1)
+    CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 1)
     CALL(evt_btl_camera_set_prilimit, 0)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(phase_event)
-    CALL(btlevtcmd_CheckPhase, LW(0), 67108867)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+    CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
-        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         MULTIPLY(LW(0), 60)
         DIVIDE(LW(0), 100)
-        CALL(btlevtcmd_GetHp, -2, LW(1))
+        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 2)
-            CALL(evt_msg_print, 2, STRING("stg8_las_49_03"), 0, -2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
+            CALL(evt_msg_print, 2, STRING("stg8_las_49_03"), 0, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
         END_IF
         CASE_EQUAL(3)
-        CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+        CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         MULTIPLY(LW(0), 40)
         DIVIDE(LW(0), 100)
-        CALL(btlevtcmd_GetHp, -2, LW(1))
+        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 4)
-            CALL(evt_msg_print, 2, STRING("stg8_las_49_04"), 0, -2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 4)
+            CALL(evt_msg_print, 2, STRING("stg8_las_49_04"), 0, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
         END_IF
         CASE_EQUAL(5)
-        CALL(evt_msg_print, 2, STRING("stg8_las_49_05"), 0, -2)
+        CALL(evt_msg_print, 2, STRING("stg8_las_49_05"), 0, BTL_UNIT_SELF)
         CASE_GREATER_OR_EQUAL(6)
-        CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
         IF_INT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetMaxHp, -2, LW(0))
+            CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
             MULTIPLY(LW(0), 20)
             DIVIDE(LW(0), 100)
-            CALL(btlevtcmd_GetHp, -2, LW(1))
+            CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
             IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
                 CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
-                CALL(evt_msg_print, 2, STRING("stg8_las_49_07"), 0, -2)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+                CALL(evt_msg_print, 2, STRING("stg8_las_49_07"), 0, BTL_UNIT_SELF)
                 CALL(btlevtcmd_StatusWindowOnOff, 1)
             END_IF
         END_IF
@@ -662,20 +625,20 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 static EVT_BEGIN(fumituke_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_W_2"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_W_2"))
     WAIT_MS(950)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_MOVE1"), -250000000, 0, -300, 0, -30, -250000000)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -300, 0, -30, EVT_NULLPTR)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(0), -300)
         ADD(LW(2), -30)
         CALL(_leg_smoke_effect, LW(0), LW(1), LW(2))
@@ -683,22 +646,22 @@ static EVT_BEGIN(fumituke_attack_event)
     CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
     WAIT_MS(766)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_MOVE1"), -250000000, 0, -300, 0, 30, -250000000)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -300, 0, 30, EVT_NULLPTR)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(0), -300)
         ADD(LW(2), 30)
         CALL(_leg_smoke_effect, LW(0), LW(1), LW(2))
     END_SIBLING_EVENT
     CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
     WAIT_MS(16)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_A_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_3"))
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_ARM_UP1"), -250000000, 0, -320, 30, 30, -250000000)
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_ARM_UP1"), EVT_NULLPTR, 0, -320, 30, 30, EVT_NULLPTR)
         WAIT_MS(700)
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_ARM_DOWN1"), -250000000, 0, -360, 50, 30, -250000000)
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_ARM_DOWN1"), EVT_NULLPTR, 0, -360, 50, 30, EVT_NULLPTR)
     END_INLINE_EVENT
     WAIT_MS(750)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -724,12 +687,12 @@ static EVT_BEGIN(fumituke_attack_event)
     GOTO(97)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     GOTO(97)
     LABEL(97)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_MOVE1"), -250000000, 0, -400, 0, -5, -250000000)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -400, 0, -5, EVT_NULLPTR)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(0), -400)
         ADD(LW(2), -5)
         CALL(_leg_smoke_effect, LW(0), LW(1), LW(2))
@@ -740,11 +703,11 @@ static EVT_BEGIN(fumituke_attack_event)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(evt_btl_camera_shake_h, 0, 8, 0, 30, 13)
     WAIT_MS(583)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_W_3"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_W_3"))
     WAIT_MS(850)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_MOVE1"), -250000000, 0, -180, 0, 30, -250000000)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -180, 0, 30, EVT_NULLPTR)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(0), -180)
         ADD(LW(2), 30)
         CALL(_leg_smoke_effect, LW(0), LW(1), LW(2))
@@ -752,8 +715,8 @@ static EVT_BEGIN(fumituke_attack_event)
     CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
     WAIT_MS(766)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_MOVE1"), -250000000, 0, -100, 0, 30, -250000000)
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -100, 0, 30, EVT_NULLPTR)
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(0), -100)
         ADD(LW(2), -30)
         CALL(_leg_smoke_effect, LW(0), LW(1), LW(2))
@@ -765,23 +728,23 @@ static EVT_BEGIN(fumituke_attack_event)
 EVT_END()
 
 static EVT_BEGIN(kamituki_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     BEGIN_INLINE_EVENT
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_BITE1"), -250000000, 0, -220, 80, 0, -250000000)
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_BITE1"), EVT_NULLPTR, 0, -220, 80, 0, EVT_NULLPTR)
         WAIT_MS(250)
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_BITE2"), -250000000, 0, -260, 40, 0, -250000000)
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_BITE2"), EVT_NULLPTR, 0, -260, 40, 0, EVT_NULLPTR)
     END_INLINE_EVENT
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_A_2"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_2"))
     WAIT_MS(333)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -807,7 +770,7 @@ static EVT_BEGIN(kamituki_attack_event)
     GOTO(97)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     LABEL(97)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     LABEL(99)
@@ -816,21 +779,21 @@ static EVT_BEGIN(kamituki_attack_event)
 EVT_END()
 
 EVT_BEGIN(eq_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_A_5"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_5"))
     WAIT_MS(666)
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_GNB_NECK_UP1"), 0)
     WAIT_MS(1000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_A_6"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_6"))
     WAIT_MS(233)
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_GNB_DOWN3"), 0)
     WAIT_MS(50)
@@ -838,7 +801,7 @@ EVT_BEGIN(eq_attack_event)
     WAIT_MS(250)
     SET_VALUE(LW(10), 0)
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -866,7 +829,7 @@ EVT_BEGIN(eq_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -882,37 +845,37 @@ EVT_BEGIN(eq_attack_event)
 EVT_END()
 
 EVT_BEGIN(poison_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_A2_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A2_1"))
     WAIT_MS(833)
-    CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_NECK_UP1"), -250000000, 0, -250, 0, 0, -250000000)
+    CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_NECK_UP1"), EVT_NULLPTR, 0, -250, 0, 0, EVT_NULLPTR)
     WAIT_MS(1000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_A2_3"))
-    CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_BREATH_POISON1"), -250000000, 0, -300, 0, 0, -250000000)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A2_3"))
+    CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_BREATH_POISON1"), EVT_NULLPTR, 0, -300, 0, 0, EVT_NULLPTR)
     SET_VALUE(LW(10), 120)
     SET_VALUE(LW(11), 30)
-    CALL(btlevtcmd_GetPos, -2, LW(6), LW(7), LW(8))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(6), 360)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(6), 360)
     ADD(LW(7), 30)
-    CALL(btlevtcmd_GetPos, -2, LW(12), -250000000, -250000000)
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(12), 360)
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(12), LW(10))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(12), EVT_NULLPTR, EVT_NULLPTR)
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(12), 360)
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(12), LW(10))
     BEGIN_INLINE_EVENT
         WAIT_MS(333)
         ADD(LW(11), 45)
         SUBTRACT(LW(8), 10)
         CALL(evt_eff, 0, STRING("gonbaba_breath"), 1, LW(6), LW(7), LW(8), FLOAT(3.0f), LW(11), 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(12), -250000000, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(12), EVT_NULLPTR, EVT_NULLPTR)
     SUBTRACT(LW(12), LW(6))
     IF_INT_LESS(LW(12), 0)
         MULTIPLY(LW(12), -1)
@@ -924,7 +887,7 @@ EVT_BEGIN(poison_attack_event)
     WAIT_FRAMES(LW(12))
     SET_VALUE(LW(10), 0)
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -952,7 +915,7 @@ EVT_BEGIN(poison_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -967,37 +930,37 @@ EVT_BEGIN(poison_attack_event)
 EVT_END()
 
 EVT_BEGIN(mega_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("GNB_A_1"))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_1"))
     SET_VALUE(LW(10), 120)
     SET_VALUE(LW(11), 30)
-    CALL(btlevtcmd_GetPos, -2, LW(6), LW(7), LW(8))
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(6), 360)
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(6), LW(7), LW(8))
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(6), 360)
     ADD(LW(7), 30)
-    CALL(btlevtcmd_GetPos, -2, LW(12), -250000000, -250000000)
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(12), 360)
-    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(12), LW(10))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(12), EVT_NULLPTR, EVT_NULLPTR)
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(12), 360)
+    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(12), LW(10))
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_NECK_UP1"), -250000000, 0, -250, 0, 0, -250000000)
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_NECK_UP1"), EVT_NULLPTR, 0, -250, 0, 0, EVT_NULLPTR)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(1750)
-        CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_MEGABREATH1"), -250000000, 0, -300, 0, 0, -250000000)
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MEGABREATH1"), EVT_NULLPTR, 0, -300, 0, 0, EVT_NULLPTR)
         ADD(LW(11), 45)
         SUBTRACT(LW(8), 10)
         CALL(evt_eff, 0, STRING("gonbaba_breath"), 2, LW(6), LW(7), LW(8), FLOAT(3.0f), LW(11), 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(12), -250000000, -250000000)
+    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(12), EVT_NULLPTR, EVT_NULLPTR)
     SUBTRACT(LW(12), LW(6))
     IF_INT_LESS(LW(12), 0)
         MULTIPLY(LW(12), -1)
@@ -1009,7 +972,7 @@ EVT_BEGIN(mega_attack_event)
     WAIT_FRAMES(LW(12))
     SET_VALUE(LW(10), 0)
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1037,7 +1000,7 @@ EVT_BEGIN(mega_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -1052,28 +1015,28 @@ EVT_BEGIN(mega_attack_event)
 EVT_END()
 
 static EVT_BEGIN(charge_event)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
-    CALL(btlevtcmd_snd_se_offset, -2, STRING("SFX_BOSS_GNB_CHARGE1"), -250000000, 0, -250, 0, 0, LW(15))
-    CALL(btlevtcmd_GetHitPos, -2, 2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_CHARGE1"), EVT_NULLPTR, 0, -250, 0, 0, LW(15))
+    CALL(btlevtcmd_GetHitPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
     ADD(LW(0), 20)
     ADD(LW(1), -25)
     CALL(evt_eff, STRING(""), STRING("charge"), 0, LW(0), LW(1), LW(2), FLOAT(2.0f), 60, 0, 0, 0, 0, 0, 0)
     WAIT_MS(1000)
-    CALL(btlevtcmd_CheckDamage, -2, -2, 1, LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_poison_attack))
         CALL_CHILD(PTR(poison_attack_event))
         CASE_EQUAL(1)
@@ -1090,7 +1053,7 @@ static EVT_BEGIN(attack_event)
             CALL_CHILD(PTR(poison_attack_event))
         END_SWITCH
         CASE_EQUAL(2)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 3)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_eq_attack))
         CALL_CHILD(PTR(eq_attack_event))
         CASE_EQUAL(3)
@@ -1110,18 +1073,18 @@ static EVT_BEGIN(attack_event)
             CALL_CHILD(PTR(eq_attack_event))
         END_SWITCH
         CASE_EQUAL(4)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 5)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 5)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_charge))
         CALL_CHILD(PTR(charge_event))
         CASE_EQUAL(5)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 7)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 7)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_mega_attack))
         CALL_CHILD(PTR(mega_attack_event))
         CALL(btlevtcmd_StatusWindowOnOff, 0)
-        CALL(evt_msg_print, 2, STRING("stg8_las_49_06"), 0, -2)
+        CALL(evt_msg_print, 2, STRING("stg8_las_49_06"), 0, BTL_UNIT_SELF)
         CALL(btlevtcmd_StatusWindowOnOff, 1)
         CASE_EQUAL(6)
-        CALL(btlevtcmd_SetUnitWork, -2, 0, 7)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 7)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_mega_attack))
         CALL_CHILD(PTR(mega_attack_event))
         CASE_EQUAL(7)
@@ -1140,7 +1103,7 @@ static EVT_BEGIN(attack_event)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_eq_attack))
             CALL_CHILD(PTR(eq_attack_event))
             CASE_EQUAL(4)
-            CALL(btlevtcmd_SetUnitWork, -2, 0, 6)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 6)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_charge))
             CALL_CHILD(PTR(charge_event))
             CASE_EQUAL(5)
@@ -1149,7 +1112,7 @@ static EVT_BEGIN(attack_event)
         END_SWITCH
     END_SWITCH
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -1166,7 +1129,6 @@ static USER_FUNC(_leg_smoke_effect) {
 }
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

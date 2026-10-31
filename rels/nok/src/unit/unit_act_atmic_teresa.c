@@ -1,9 +1,11 @@
+// Battle unit Atomic Boo (アトミックテレサ) as an actor in Flurrie's stage play in the epilogue (nok.rel): it only plays its
+// scripted part.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
-
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_StartWaitEvent);
+#include "battle/battle_sub.h"
+#include "battle/battle_event_cmd.h"
+#include "version.h"
 
 BattleUnitKind unit_act_atmic_teresa;
 static BattleUnitDefense defence;
@@ -93,7 +95,7 @@ static PoseTableEntry pose_table[] = {
     {39, "D_1"},
     {42, "R_1"},
     {40, "W_1"},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {63, "T_1"},
     {67, "S_1"},
 #else
@@ -111,8 +113,8 @@ static BattleUnitKindPart parts[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -129,7 +131,6 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

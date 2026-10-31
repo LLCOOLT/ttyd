@@ -1,34 +1,29 @@
+// mri_20 (巨木の中, The Great Tree): a pipe room with planters, guarded by an X-Naut and a Yux.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "mri_puni.h"
 #include "mri.h"
 #include "data_tables.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_puni_mem_init);
-USER_FUNC(evt_puni_set_hamari);
-USER_FUNC(evt_puni_set_yuka);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
+#include "evt/evt_story.h"
 
 BeroEntry bero_black_shadow[1];
 static BeroEntry bero_entry_data[5];
 static KusaAccess ueki_access_data[7];
-extern EvtWord mri_20_init_evt[];
 
 BeroEntry bero_black_shadow[] = {
     {
         "dokan1", // hitName
         2, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -47,8 +42,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan1", // hitName
         2, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -64,8 +59,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan2", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -81,8 +76,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan3", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -97,8 +92,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan4", // hitName
         2, // type
         0, // sfxId
-        6, // directionId
-        100000, // centerPosition
+        BERO_DIR_W, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -115,7 +110,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(evt_ueki_08)
     CALL(evt_item_delete_check, STRING("item_ueki_08"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki_08"), 142, 250, -320, 130, 4, GSWF(2875), 0)
+        CALL(evt_item_entry, STRING("item_ueki_08"), ITEM_POWER_PUNCH, 250, -320, 130, 4, GSWF(GSWF_MRI20_PLANTER_POWER_PUNCH_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -144,15 +139,15 @@ EVT_BEGIN(mri_20_init_evt)
     CALL_CHILD(PTR(evt_bero_info_run))
     SPAWN_EVENT(PTR(puni_disp_info))
     SPAWN_EVENT(PTR(mri_countdown))
-    SWITCH(GSW(0))
-        CASE_BETWEEN(109, 110)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI4"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI4"))
     END_SWITCH
-    IF_INT_GREATER(GSW(0), 113)
+    IF_INT_GREATER(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_01_PEACH_CRUMP_AND_X_NAUTS)
         CALL(evt_npc_check_delete, STRING("軍団ザコ２"))
         CALL(evt_npc_check_delete, STRING("バリアーン"))
     END_IF
@@ -162,7 +157,7 @@ EVT_BEGIN(mri_20_init_evt)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
-    IF_INT_EQUAL(GSW(0), 90)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_12_RIVAL_ARRIVAL)
         SET_VALUE(LW(0), STRING("dokan1"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_bero_overwrite, STRING("dokan1"), PTR(bero_black_shadow))
@@ -171,4 +166,3 @@ EVT_BEGIN(mri_20_init_evt)
     END_IF
     RETURN
 EVT_END()
-

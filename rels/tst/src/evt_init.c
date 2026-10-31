@@ -18,105 +18,56 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_sub.h"
+#include "manager/fontmgr.h"
+#include "npc_event.h"
+#include "party/party_motion.h"
+#include "driver/mapdrv.h"
 
 // One point of the drawn outline (and of the vertices the tessellator adds where edges cross).
 typedef struct TessVertex {
-    f64 x;                 // 0x00
-    f64 y;                 // 0x08
-    f64 z;                 // 0x10, always 0
-    u8 reserved_18[0x28];  // 0x18, never accessed
-    s32 contour;           // 0x40, index of the contour the point belongs to
-    GXColor color;         // 0x44, set on combined vertices
-    s32 edge;              // 0x48, 3 for a combined vertex, 4 when it lies on an outline edge
-    u8 reserved_4C[0xC];   // 0x4C, never accessed
+    f64 x;                // 0x00
+    f64 y;                // 0x08
+    f64 z;                // 0x10, always 0
+    u8 reserved_18[0x28]; // 0x18, never accessed
+    s32 contour;          // 0x40, index of the contour the point belongs to
+    GXColor color;        // 0x44, set on combined vertices
+    s32 edge;             // 0x48, 3 for a combined vertex, 4 when it lies on an outline edge
+    u8 reserved_4C[0xC];  // 0x4C, never accessed
 } TessVertex;
 
 #define TESS_MAX_VERTICES 512
 #define TESS_MAX_INDICES 2048
 
 typedef struct TessTestWork {
-    s32 x;                                // 0x00, cursor position, moved with the stick
-    s32 y;                                // 0x04
-    s32 lastX;                            // 0x08, cursor position when the last point was added
-    s32 lastY;                            // 0x0C
-    smartEntry* capture;                  // 0x10, screen copy the filled polygon is textured with
-    s32 vertexCount;                      // 0x14
-    s32 contourCount;                     // 0x18
+    s32 x;                                  // 0x00, cursor position, moved with the stick
+    s32 y;                                  // 0x04
+    s32 lastX;                              // 0x08, cursor position when the last point was added
+    s32 lastY;                              // 0x0C
+    smartEntry* capture;                    // 0x10, screen copy the filled polygon is textured with
+    s32 vertexCount;                        // 0x14
+    s32 contourCount;                       // 0x18
     TessVertex vertices[TESS_MAX_VERTICES]; // 0x20
-    s32 indexCount;                       // 0xB020
-    s32 indices[TESS_MAX_INDICES];        // 0xB024, triangle list from the tessellator
+    s32 indexCount;                         // 0xB020
+    s32 indices[TESS_MAX_INDICES];          // 0xB024, triangle list from the tessellator
 } TessTestWork;
-
-GXColor HSV2RGB(GXColor hsv);
-
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_shadow);
-USER_FUNC(evt_img_set_virtual_point);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_delete);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mobj_arrow);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_blk);
-USER_FUNC(evt_mobj_bombrock);
-USER_FUNC(evt_mobj_breaking_floor);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_float_blk);
-USER_FUNC(evt_mobj_floatswitch_blue);
-USER_FUNC(evt_mobj_floatswitch_red);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_jumpstand_blue);
-USER_FUNC(evt_mobj_jumpstand_red);
-USER_FUNC(evt_mobj_kururing_floor);
-USER_FUNC(evt_mobj_lock);
-USER_FUNC(evt_mobj_lv_blk);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_mobj_recovery_blk);
-USER_FUNC(evt_mobj_rideswitch_a);
-USER_FUNC(evt_mobj_rideswitch_b);
-USER_FUNC(evt_mobj_rideswitch_lightblue);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_mobj_signboard);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_mobj_switch_float_blk);
-USER_FUNC(evt_mobj_switch_red);
-USER_FUNC(evt_mobj_timerswitch);
-USER_FUNC(evt_mobj_tornadoswitch_blue);
-USER_FUNC(evt_mobj_tornadoswitch_red);
-USER_FUNC(evt_mobj_trap);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_npc_change_fbat_mode);
-USER_FUNC(evt_npc_change_interrupt);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_reaction_flag_onoff);
-USER_FUNC(evt_npc_return_interrupt);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_sub_random);
 
 USER_FUNC(tess_test_draw);
 USER_FUNC(tess_test_run);
 USER_FUNC(tess_test_disp_entry);
 USER_FUNC(tess_test_end);
-USER_FUNC(make_item_name);
 
-extern EvtWord npc_loiter_move_event[];
 extern EvtWord tst_nakayama_tess_evt[];
 
 void tess_test(void);
@@ -165,7 +116,7 @@ EVT_END()
 // Never ends, so it has no end command.
 EvtWord tst_npc_env_evt[] = {
     CALL(evt_snd_envon, 0, STRING("ENV_STG1_HEI2"))
-    CALL(evt_snd_envon, 1, STRING("ENV_STG1_HEI1"))
+    CALL(evt_snd_envon, PSND_CH(1), STRING("ENV_STG1_HEI1"))
     LABEL(0)
     CALL(evt_npc_get_position, STRING("NPC_01"), LW(0), LW(1), LW(2))
     WAIT_MS(1000)
@@ -176,7 +127,7 @@ EVT_BEGIN(tst_npc_init_evt)
     CALL(evt_npc_change_interrupt, STRING("NPC_01"), 1, PTR(npc_loiter_move_event))
     CALL(evt_npc_change_interrupt, STRING("NPC_01"), 8, PTR(tst_npc_talk_evt))
     CALL(evt_npc_reaction_flag_onoff, 1, STRING("NPC_01"), 2)
-    CALL(evt_npc_flag_onoff, 1, STRING("NPC_01"), 0x600)
+    CALL(evt_npc_flag_onoff, 1, STRING("NPC_01"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_change_fbat_mode, 1)
     SPAWN_EVENT(tst_npc_env_evt)
     RETURN
@@ -234,15 +185,15 @@ EVT_BEGIN(tst_moj_02_init_evt)
     CALL(evt_mobj_save_blk, STRING("sb"), -100, 64, 0, 0, LSWF(2))
     CALL(evt_mobj_blk, STRING("b"), 0, 64, 0, 0, 0, LSWF(3))
     CALL(evt_mobj_blk, STRING("pb"), 100, 64, 0, 1, 0, LSWF(4))
-    CALL(evt_mobj_badgeblk, STRING("hb"), 200, 64, 0, 148, 0, LSWF(5), 0)
-    CALL(evt_mobj_badgeblk, STRING("bb"), 300, 64, 0, 315, 0, LSWF(6), 1)
+    CALL(evt_mobj_badgeblk, STRING("hb"), 200, 64, 0, ITEM_MUSHROOM, 0, LSWF(5), 0)
+    CALL(evt_mobj_badgeblk, STRING("bb"), 300, 64, 0, ITEM_ATTACK_FX_R, 0, LSWF(6), 1)
     CALL(evt_mobj_powerupblk, STRING("pub"), 400, 64, 0, 0, LSWF(7), 0)
     CALL(evt_mobj_brick, STRING("b_n"), 50, 64, 100, 0, 0, 0, LSWF(8))
-    CALL(evt_mobj_brick, STRING("b_h"), 150, 64, 100, 148, 1, 0, LSWF(9))
-    CALL(evt_mobj_brick, STRING("b_b"), 250, 64, 100, 315, 2, 0, LSWF(10))
+    CALL(evt_mobj_brick, STRING("b_h"), 150, 64, 100, ITEM_MUSHROOM, 1, 0, LSWF(9))
+    CALL(evt_mobj_brick, STRING("b_b"), 250, 64, 100, ITEM_ATTACK_FX_R, 2, 0, LSWF(10))
     CALL(evt_mobj_brick, STRING("b_10"), 350, 64, 100, 0, 3, 0, LSWF(11))
-    CALL(evt_mobj_brick, STRING("hb_h"), 200, 64, 200, 148, 11, 0, LSWF(13))
-    CALL(evt_mobj_brick, STRING("hb_b"), 300, 64, 200, 315, 12, 0, LSWF(14))
+    CALL(evt_mobj_brick, STRING("hb_h"), 200, 64, 200, ITEM_MUSHROOM, 11, 0, LSWF(13))
+    CALL(evt_mobj_brick, STRING("hb_b"), 300, 64, 200, ITEM_ATTACK_FX_R, 12, 0, LSWF(14))
     CALL(evt_mobj_brick, STRING("hb_10"), 400, 64, 200, 0, 13, 0, LSWF(15))
     RETURN
 EVT_END()
@@ -250,7 +201,7 @@ EVT_END()
 EVT_BEGIN(tst_moj_03_init_evt)
     CALL(evt_mobj_jumpstand_red, 0, STRING("j1r"), 0, 0, -100, 0, LSWF(0))
     CALL(evt_mobj_jumpstand_blue, 0, STRING("j1b"), 200, 200, 0, -100, 0, LSWF(2))
-    CALL(evt_mobj_lock, STRING("l"), 12, 300, 0, -100, 0, 0, 0, LSWF(3))
+    CALL(evt_mobj_lock, STRING("l"), ITEM_CASTLE_KEY_0x0C, 300, 0, -100, 0, 0, 0, LSWF(3))
     CALL(evt_mobj_itembox, STRING("tb"), 50, 0, 0, 0, 0, 0, LSWF(4))
     CALL(evt_mobj_itembox, STRING("btb"), 150, 0, 0, 1, 0, 0, LSWF(5))
     CALL(evt_mobj_signboard, STRING("sb"), 250, 0, 0, 0, LSWF(6))
@@ -303,24 +254,24 @@ EVT_BEGIN(tst_off_01_init_evt)
 EVT_END()
 
 EVT_BEGIN(btl_tst_00_init_evt)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saku_00"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saku_01"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saku_02"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusa_b_01"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusa_b_02"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusa_b_04"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusa_b_05"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusa_b_06"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusa_b_07"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kusa_b_08"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("ki_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("ki_2"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("ki_6"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yama_a_01"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yama_a_02"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yama_a_03"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yama_a_04"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yama_a_05"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saku_00"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saku_01"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saku_02"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusa_b_01"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusa_b_02"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusa_b_04"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusa_b_05"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusa_b_06"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusa_b_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kusa_b_08"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ki_1"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ki_2"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ki_6"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yama_a_01"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yama_a_02"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yama_a_03"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yama_a_04"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yama_a_05"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
@@ -343,20 +294,20 @@ EVT_BEGIN(tst_nakayama_tess_evt)
         CALL(evt_sub_random, 50, LW(0))
         SWITCH(LW(0))
             CASE_LESS(10)
-                SET_VALUE(LW(10), STRING("OFF_gon_04_3"))
-                SET_VALUE(LW(11), STRING("A_1"))
+            SET_VALUE(LW(10), STRING("OFF_gon_04_3"))
+            SET_VALUE(LW(11), STRING("A_1"))
             CASE_LESS(20)
-                SET_VALUE(LW(10), STRING("OFF_d_nabi"))
-                SET_VALUE(LW(11), STRING("A_1"))
+            SET_VALUE(LW(10), STRING("OFF_d_nabi"))
+            SET_VALUE(LW(11), STRING("A_1"))
             CASE_LESS(30)
-                SET_VALUE(LW(10), STRING("OFF_d_roll"))
-                SET_VALUE(LW(11), STRING("A_2"))
+            SET_VALUE(LW(10), STRING("OFF_d_roll"))
+            SET_VALUE(LW(11), STRING("A_2"))
             CASE_LESS(40)
-                SET_VALUE(LW(10), STRING("OFF_d_pazu"))
-                SET_VALUE(LW(11), STRING("A_1"))
+            SET_VALUE(LW(10), STRING("OFF_d_pazu"))
+            SET_VALUE(LW(11), STRING("A_1"))
             CASE_LESS(50)
-                SET_VALUE(LW(10), STRING("OFF_d_ori"))
-                SET_VALUE(LW(11), STRING("A_1"))
+            SET_VALUE(LW(10), STRING("OFF_d_ori"))
+            SET_VALUE(LW(11), STRING("A_1"))
         END_SWITCH
         CALL(evt_paper_entry, LW(10))
         CALL(evt_offscreen_entry, STRING("ofs"))
@@ -776,6 +727,6 @@ EVT_BEGIN(tst_item_00_init_evt)
     CALL(evt_mobj_save_blk, STRING("saveblk"), 380, 45, -100, 0, LSWF(6))
     CALL(evt_mobj_recovery_blk, STRING("rcvblk"), 0, 410, 45, -100, 0, LSWF(6))
     CALL(evt_mobj_recovery_blk, STRING("rcvblk2"), 10, 440, 45, -100, 0, LSWF(6))
-    CALL(evt_mobj_lock, STRING("lock"), 26, 500, 10, -100, -90, 0, 0, LSWF(6))
+    CALL(evt_mobj_lock, STRING("lock"), ITEM_ELEVATOR_KEY_0x1A, 500, 10, -100, -90, 0, 0, LSWF(6))
     RETURN
 EVT_END()

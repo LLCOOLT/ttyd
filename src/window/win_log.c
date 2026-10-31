@@ -1,3 +1,4 @@
+// Pause menu: the journal window (map, crystal stars, badge and recipe logs, tattle log).
 #include "win/win_main.h"
 #include "driver/animdrv.h"
 #include "driver/effdrv.h"
@@ -17,8 +18,16 @@
 #include "win/win_root.h"
 #include "eff/eff_starstone.h"
 #include "mario/mario.h"
+#include "win/win_log.h"
 #include "pmario_sound.h"
 #include "system.h"
+#include "driver/msgdrv.h"
+#include "manager/fontmgr.h"
+#include "libc_decls.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include <dolphin/pad.h>
+#include <demo/DEMOPad.h>
 
 typedef struct TubuDt {
     s16 x;
@@ -29,30 +38,10 @@ typedef struct TubuDt {
     const char* map;
 } TubuDt;
 
-typedef struct MonosiriWork {
-    s32 state;          // 0x0
-    s32 id;             // 0x4
-    FileEntry* file1;   // 0x8
-    FileEntry* file2;   // 0xC
-    f32 curX;           // 0x10
-    f32 curY;           // 0x14
-    f32 x;              // 0x18
-    f32 y;              // 0x1C
-    s32 pose1;          // 0x20
-    s32 pose2;          // 0x24
-    smartEntry* smart;  // 0x28
-    s32 alpha;          // 0x2C
-} MonosiriWork;
-
-void qqsort(void* base, u32 n, u32 size, int (*compare)(void*, void*));
-int compare_func5_2(void* a, void* b);
-int compare_func6_2(void* a, void* b);
-extern ItemData itemDataTable[];
-
 void capture(CameraId camera, void* param);
 void monosiri_disp(CameraId camera, void* param);
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // Unreferenced; every demo TU that had it carries its own copy at the start of .data.
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 
@@ -83,7 +72,7 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
 
 // The demo has no per-chapter tubu switches (type) and opens the moo/aji
 // route one sequence step earlier.
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 #define TUBU_TYPE(t) 0
 #define TUBU_SEQ_361 360
 #else
@@ -187,7 +176,9 @@ TubuDt tubuDt[] = {
     {-33, -74, 1, 0, 382, "las"},
 };
 
-#ifndef VERSION_G8ME01_DEMO
+// Order-forced: the same winLogAddMenu as the demo copy above; its static msg_help is emitted where the
+// function is defined, after tubuDt in retail and before it in the demo.
+#if VERSION != VERSION_DEMO
 s32 stone_tbl[] = {ITEM_DIAMOND_STAR, ITEM_EMERALD_STAR, ITEM_GOLD_STAR, ITEM_RUBY_STAR, ITEM_SAPPHIRE_STAR, ITEM_GARNET_STAR, ITEM_CRYSTAL_STAR};
 
 static inline void winLogAddMenu(WindowWork* w, s32 id) {
@@ -214,7 +205,7 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
 #endif
 
 void winLogInit(WindowWork* w) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     s32 j;
     s32 i;
     u32 k;
@@ -235,10 +226,14 @@ void winLogInit(WindowWork* w) {
     w->log.cursor = 0;
     w->log.count = 0;
     winLogAddMenu(w, 0);
-    if (swByteGet(0) >= 0x13) winLogAddMenu(w, 1);
-    if (swByteGet(0) >= 7) winLogAddMenu(w, 4);
-    if (swByteGet(0) >= 0x14) winLogAddMenu(w, 2);
-    if (swGet(0x40)) winLogAddMenu(w, 3);
+    if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_16_FRANKLYS_HOUSE)
+        winLogAddMenu(w, 1);
+    if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS)
+        winLogAddMenu(w, 4);
+    if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_17_BADGE_TUTORIAL)
+        winLogAddMenu(w, 2);
+    if (swGet(GSWF_RECIPE_LOG_UNLOCKED))
+        winLogAddMenu(w, 3);
 
     w->log.stoneNum = 0;
     for (i = 0; i < 7; i++) {
@@ -259,7 +254,7 @@ void winLogInit(WindowWork* w) {
         }
         ((EffStarStoneWork*)e->userdata)->cam = 8;
         ((EffStarStoneWork*)e->userdata)->flags &= ~4;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         ((EffStarStoneWork*)e->userdata)->flags |= 0x20;
 #endif
     }
@@ -274,44 +269,52 @@ void winLogInit(WindowWork* w) {
     w->log.scrollX = w->log.scrollY = 0.0f;
 
     area = gp->currentAreaName;
-    if (!strcmp(gp->currentMapName, "pik_02") || !strcmp(gp->currentMapName, "pik_03")) area = "sin";
-    if (!strcmp(gp->currentMapName, "win_04") || !strcmp(gp->currentMapName, "win_05")) area = "hou";
+    if (!strcmp(gp->currentMapName, "pik_02") || !strcmp(gp->currentMapName, "pik_03"))
+        area = "sin";
+    if (!strcmp(gp->currentMapName, "win_04") || !strcmp(gp->currentMapName, "win_05"))
+        area = "hou";
     if (!strncmp(gp->currentMapName, "rsh", 3)) {
-        if (swByteGet(0) < 0x136) {
+        if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG6_27_RIVERSIDE_STATION) {
             area = "gor";
-        } else if (swByteGet(0) < 0x14E || swGet(0xDFB)) {
+        } else if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG6_49_POSHLEY_HEIGHTS || swGet(GSWF_TRAIN_AT_RIVERSIDE)) {
             area = "eki";
-        } else if (swGet(0xDFC)) {
+        } else if (swGet(GSWF_TRAIN_AT_POSHLEY)) {
             area = "pik";
         } else {
-            switch (swByteGet(0x366)) {
-            case 0:
-                area = "gor";
-                break;
-            case 1:
-                area = "eki";
-                break;
-            case 2:
-                area = "pik";
-                break;
-            case 3:
-                area = "gor";
-                break;
+            switch (swByteGet(GSW_TRAIN_LEG)) {
+                case 0:
+                    area = "gor";
+                    break;
+                case 1:
+                    area = "eki";
+                    break;
+                case 2:
+                    area = "pik";
+                    break;
+                case 3:
+                    area = "gor";
+                    break;
             }
         }
     }
-    if (!strncmp(gp->currentMapName, "hom", 3)) area = "eki";
-    if (!strncmp(gp->currentMapName, "jon", 3)) area = "tik";
-    if (!strcmp(gp->currentMapName, "gra_06")) area = "jin";
-#ifndef VERSION_G8ME01_DEMO
-    if (!strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "muj_11") || !strcmp(gp->currentMapName, "muj_12")) area = "dou";
+    if (!strncmp(gp->currentMapName, "hom", 3))
+        area = "eki";
+    if (!strncmp(gp->currentMapName, "jon", 3))
+        area = "tik";
+    if (!strcmp(gp->currentMapName, "gra_06"))
+        area = "jin";
+#if VERSION != VERSION_DEMO
+    if (!strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "muj_11") || !strcmp(gp->currentMapName, "muj_12"))
+        area = "dou";
 #endif
 
     {
         for (k = 0; k < 93; k++) {
-            if (!area || !strcmp(area, tubuDt[k].map)) break;
+            if (!area || !strcmp(area, tubuDt[k].map))
+                break;
         }
-        if (k < 93) w->log.mapIdx = k;
+        if (k < 93)
+            w->log.mapIdx = k;
     }
     w->log.mapX = 304.0f + tubuDt[w->log.mapIdx].x;
     w->log.mapY = 240.0f + tubuDt[w->log.mapIdx].y;
@@ -321,10 +324,14 @@ void winLogInit(WindowWork* w) {
         w->log.scrollX -= dx;
         w->log.scrollY -= dy;
     }
-    if (w->log.scrollX > 0.0f) w->log.scrollX = 0.0f;
-    if (w->log.scrollY > 0.0f) w->log.scrollY = 0.0f;
-    if (w->log.scrollX < -148.0f) w->log.scrollX = -148.0f;
-    if (w->log.scrollY < -240.0f) w->log.scrollY = -240.0f;
+    if (w->log.scrollX > 0.0f)
+        w->log.scrollX = 0.0f;
+    if (w->log.scrollY > 0.0f)
+        w->log.scrollY = 0.0f;
+    if (w->log.scrollX < -148.0f)
+        w->log.scrollX = -148.0f;
+    if (w->log.scrollY < -240.0f)
+        w->log.scrollY = -240.0f;
 
     w->log.fE60 = 0;
     w->log.fE80 = w->log.fE7C = 51.42857f * w->log.fE60;
@@ -333,20 +340,20 @@ void winLogInit(WindowWork* w) {
     w->log.fE74 = w->log.fE78 = 0.0f;
 
     w->log.badge.num = 0;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     w->log.badge.page = 0;
 #endif
     for (i = 0xF0; i < 0x153; i++) {
         if (itemDataTable[i].type_sort_order != -1) {
             w->log.badgeIds[w->log.badge.num++] = i - 0xF0;
-#ifdef VERSION_G8ME01
-            if (swGet(i - 0xF0 + 0x80)) {
+#if VERSION >= VERSION_US
+            if (swGet(i - BADGE_MIN + GSWF_BADGE_FOUND_BASE)) {
                 w->log.badge.page++;
             }
 #endif
         }
     }
-    qqsort(w->log.badgeIds, w->log.badge.num, 2, compare_func5_2);
+    qqsort(w->log.badgeIds, w->log.badge.num, sizeof(s16), compare_func5_2);
     w->log.badge.cursor = 0;
     w->log.badge.x = w->log.badge.tx = 320.0f;
     w->log.badge.y = w->log.badge.ty = -240.0f;
@@ -356,20 +363,20 @@ void winLogInit(WindowWork* w) {
     w->log.badge.f2C = w->log.badge.tf2C = -300.0f;
 
     w->log.recipe.num = 0;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     w->log.recipe.page = 0;
 #endif
-    for (i = 0xB3; i < 0xEC; i++) {
+    for (i = WIN_RECIPE_MIN; i < ITEM_MAX; i++) {
         if (itemDataTable[i].type_sort_order != -1) {
-            w->log.recipeIds[w->log.recipe.num++] = i - 0xB3;
-#ifdef VERSION_G8ME01
-            if (swGet(i - 0xB3 + 0x41)) {
+            w->log.recipeIds[w->log.recipe.num++] = i - WIN_RECIPE_MIN;
+#if VERSION >= VERSION_US
+            if (swGet(WIN_RECIPE_COOKED_SW(i - WIN_RECIPE_MIN))) {
                 w->log.recipe.page++;
             }
 #endif
         }
     }
-    qqsort(w->log.recipeIds, w->log.recipe.num, 2, compare_func6_2);
+    qqsort(w->log.recipeIds, w->log.recipe.num, sizeof(s16), compare_func6_2);
     w->log.recipe.cursor = 0;
     w->log.recipe.x = w->log.recipe.tx = 320.0f;
     w->log.recipe.y = w->log.recipe.ty = -240.0f;
@@ -381,16 +388,21 @@ void winLogInit(WindowWork* w) {
     w->log.enemyNum = 0;
     for (i = 1; i < 0xD8; i++) {
         t = battleGetUnitMonosiriPtr(i);
-        if (!t->tattleLogTag) continue;
+        if (!t->tattleLogTag)
+            continue;
         if (evtGetValue(NULL, 0xF5DE0180) < 0x187) {
-            if (i == 0x85 || i == 0x86 || i == 0x87) continue;
+            if (i == 0x85 || i == 0x86 || i == 0x87)
+                continue;
         } else {
-            if (i == 0x1F || i == 0x20 || i == 0x4D) continue;
+            if (i == 0x1F || i == 0x20 || i == 0x4D)
+                continue;
         }
         if (evtGetValue(NULL, 0xF5DE0180) < 0x190) {
-            if (i == 0x90) continue;
+            if (i == 0x90)
+                continue;
         } else {
-            if (i == 0x3F) continue;
+            if (i == 0x3F)
+                continue;
         }
         w->log.enemy[w->log.enemyNum].kind = enemy_monoshiri_sort_table[i];
         w->log.enemy[w->log.enemyNum++].id = i;
@@ -412,9 +424,11 @@ void winLogInit(WindowWork* w) {
     w->log.enemyKnown = 0;
     for (i = 1; i < 0xD8; i++) {
         t = battleGetUnitMonosiriPtr(i);
-        if (!t->tattleLogTag) continue;
-        if (i == 0x1F || i == 0x20 || i == 0x4D || i == 0x3F) continue;
-        if (swGet(i + 0x117A)) {
+        if (!t->tattleLogTag)
+            continue;
+        if (i == 0x1F || i == 0x20 || i == 0x4D || i == 0x3F)
+            continue;
+        if (swGet(i + GSWF_TATTLE_BASE)) {
             w->log.enemyKnown++;
         }
     }
@@ -453,34 +467,27 @@ void winLogExit(WindowWork* w) {
 
 static inline BOOL tubuCheck(u8 type) {
     switch (type) {
-    case 0:
-        return FALSE;
-    case 1:
-        if (swGet(0xFD)) return TRUE;
-        break;
-    case 2:
-        if (swGet(0xFE)) return TRUE;
-        break;
-    case 3:
-        if (swGet(0xFF)) return TRUE;
-        break;
-    case 4:
-        if (swGet(0x100)) return TRUE;
-        break;
+        case 0:
+            return FALSE;
+        case 1:
+            if (swGet(GSWF_LOG_MAP_WIN_ROUTE_SHOWN))
+                return TRUE;
+            break;
+        case 2:
+            if (swGet(GSWF_LOG_MAP_TIK_ROUTE_SHOWN))
+                return TRUE;
+            break;
+        case 3:
+            if (swGet(GSWF_LOG_MAP_GON_ROUTE_SHOWN))
+                return TRUE;
+            break;
+        case 4:
+            if (swGet(GSWF_LOG_MAP_GRA_ROUTE_SHOWN))
+                return TRUE;
+            break;
     }
     return FALSE;
 }
-
-MonosiriWork* monosiriInit(s32 id, f32 x, f32 y);
-void monosiriMain(MonosiriWork* m);
-void monosiriClose(MonosiriWork* m);
-BOOL monosiriCloseWait(MonosiriWork* m);
-void monosiriExit(MonosiriWork* m);
-const char* winGetMapTplName(void);
-f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
-s8 keyGetStickX(u32 chan);
-s8 keyGetStickY(u32 chan);
-u32 keyGetButton(u32 chan);
 
 s32 winLogMain(WindowWork* w) {
     static char name[0x40];
@@ -504,509 +511,551 @@ s32 winLogMain(WindowWork* w) {
     s32 iy;
 
     switch (w->log.fD68) {
-    case 0:
-        if (w->buttonTrg & 0x200) {
-            psndSFXOn(SFX_NAME_WORD(0x20013));
-            return -1;
-        }
-        if (w->buttonTrg & 0x1000) {
-            return -2;
-        }
-        if (w->dirRep & 0x2000) {
-            old = w->log.cursor;
-            w->log.cursor++;
-            if (w->log.cursor >= w->log.count) w->log.cursor = 0;
-            if (old != w->log.cursor) psndSFXOn(SFX_NAME_WORD(0x20005));
-        } else if (w->dirRep & 0x1000) {
-            old = w->log.cursor;
-            w->log.cursor--;
-            if (w->log.cursor < 0) w->log.cursor = w->log.count - 1;
-            if (old != w->log.cursor) psndSFXOn(SFX_NAME_WORD(0x20005));
-        } else if (w->buttonTrg & 0x100) {
-            for (i = 0; i < w->log.count; i++) {
-                w->log.menu[i].state = 30;
+        case 0:
+            if (w->buttonTrg & PAD_BUTTON_B) {
+                psndSFXOn(SFX_NAME_WORD(0x20013));
+                return -1;
             }
-            w->log.menu[w->log.cursor].state = 10;
-            w->log.fD68 = w->log.menu[w->log.cursor].id + 10;
-            switch (w->log.menu[w->log.cursor].id) {
-            case 0:
-                w->log.fE30 = 20.0f;
-                break;
-            case 1:
-                w->log.fE6C = 20.0f;
-                w->log.fE74 = 255.0f;
-                break;
-            case 2:
-                w->log.badge.tx = -130.0f;
-                w->log.badge.ty = 120.0f;
-                w->log.badge.tf24 = -200.0f;
-                w->log.badge.tf2C = 60.0f;
-                break;
-            case 3:
-                w->log.recipe.tx = -130.0f;
-                w->log.recipe.ty = 120.0f;
-                w->log.recipe.tf24 = -200.0f;
-                w->log.recipe.tf2C = 60.0f;
-                break;
-            case 4:
-                break;
+            if (w->buttonTrg & PAD_BUTTON_START) {
+                return -2;
             }
-            psndSFXOn(SFX_NAME_WORD(0x20012));
-        }
-        w->helpTgtX = -128.0f;
-        w->helpTgtY = 8.0f + (45.0f * w->log.count / 2.0f - 45.0f * w->log.cursor);
-        winMsgEntry(w, 0, w->log.menu[w->log.cursor].msg, 0);
-        break;
-    case 10:
-#ifdef VERSION_G8ME01
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName())) break;
+            if (w->dirRep & DEMO_STICK_DOWN) {
+                old = w->log.cursor;
+                w->log.cursor++;
+                if (w->log.cursor >= w->log.count)
+                    w->log.cursor = 0;
+                if (old != w->log.cursor)
+                    psndSFXOn(SFX_NAME_WORD(0x20005));
+            } else if (w->dirRep & DEMO_STICK_UP) {
+                old = w->log.cursor;
+                w->log.cursor--;
+                if (w->log.cursor < 0)
+                    w->log.cursor = w->log.count - 1;
+                if (old != w->log.cursor)
+                    psndSFXOn(SFX_NAME_WORD(0x20005));
+            } else if (w->buttonTrg & PAD_BUTTON_A) {
+                for (i = 0; i < w->log.count; i++) {
+                    w->log.menu[i].state = 30;
+                }
+                w->log.menu[w->log.cursor].state = 10;
+                w->log.fD68 = w->log.menu[w->log.cursor].id + 10;
+                switch (w->log.menu[w->log.cursor].id) {
+                    case 0:
+                        w->log.fE30 = 20.0f;
+                        break;
+                    case 1:
+                        w->log.fE6C = 20.0f;
+                        w->log.fE74 = 255.0f;
+                        break;
+                    case 2:
+                        w->log.badge.tx = -130.0f;
+                        w->log.badge.ty = 120.0f;
+                        w->log.badge.tf24 = -200.0f;
+                        w->log.badge.tf2C = 60.0f;
+                        break;
+                    case 3:
+                        w->log.recipe.tx = -130.0f;
+                        w->log.recipe.ty = 120.0f;
+                        w->log.recipe.tf24 = -200.0f;
+                        w->log.recipe.tf2C = 60.0f;
+                        break;
+                    case 4:
+                        break;
+                }
+                psndSFXOn(SFX_NAME_WORD(0x20012));
+            }
+            w->helpTgtX = -128.0f;
+            w->helpTgtY = 8.0f + (45.0f * w->log.count / 2.0f - 45.0f * w->log.cursor);
+            winMsgEntry(w, 0, w->log.menu[w->log.cursor].msg, 0);
+            break;
+        case 10:
+#if VERSION >= VERSION_US
+            if (!fileAsyncf(4, NULL, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName()))
+                break;
 #else
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, WIN_DIR "jp/%s", getMarioStDvdRoot(), winGetMapTplName())) break;
+            if (!fileAsyncf(4, NULL, WIN_DIR "jp/%s", getMarioStDvdRoot(), winGetMapTplName()))
+                break;
 #endif
-        if (!w->mapRes) {
-#ifdef VERSION_G8ME01
-            w->mapRes = fileAllocf(4, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
+            if (!w->mapRes) {
+#if VERSION >= VERSION_US
+                w->mapRes = fileAllocf(4, "%s/w/%s/%s", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us", winGetMapTplName());
 #else
-            w->mapRes = fileAllocf(4, WIN_DIR "jp/%s", getMarioStDvdRoot(), winGetMapTplName());
+                w->mapRes = fileAllocf(4, WIN_DIR "jp/%s", getMarioStDvdRoot(), winGetMapTplName());
 #endif
-        }
-        if (w->log.pose == -1) {
-            if (w->flags & 0x2000) {
-                anim = "W_1";
-                w->log.pose = animPoseEntry("d_mario", 0);
-                switch (marioGetColor()) {
-                case 0:
+            }
+            if (w->log.pose == -1) {
+                if (w->flags & 0x2000) {
                     anim = "W_1";
-                    break;
-                case 1:
-                    anim = "W_15";
-                    break;
-                case 2:
-                    anim = "W_17";
-                    break;
-                case 3:
-                    anim = "W_18";
-                    break;
-                }
-                animPoseSetAnim(w->log.pose, anim, 1);
-            } else {
-                model = "a_mario";
-                switch (marioGetColor()) {
-                case 0:
+                    w->log.pose = animPoseEntry("d_mario", 0);
+                    switch (marioGetColor()) {
+                        case 0:
+                            anim = "W_1";
+                            break;
+                        case 1:
+                            anim = "W_15";
+                            break;
+                        case 2:
+                            anim = "W_17";
+                            break;
+                        case 3:
+                            anim = "W_18";
+                            break;
+                    }
+                    animPoseSetAnim(w->log.pose, anim, 1);
+                } else {
                     model = "a_mario";
-                    break;
-                case 1:
-                    model = "a_mario_l";
-                    break;
-                case 2:
-                    model = "a_mario_w";
-                    break;
-                case 3:
-                    model = "a_mario_wl";
-                    break;
+                    switch (marioGetColor()) {
+                        case 0:
+                            model = "a_mario";
+                            break;
+                        case 1:
+                            model = "a_mario_l";
+                            break;
+                        case 2:
+                            model = "a_mario_w";
+                            break;
+                        case 3:
+                            model = "a_mario_wl";
+                            break;
+                    }
+                    w->log.pose = animPoseEntry(model, 0);
+                    animPoseSetAnim(w->log.pose, "M_W_1", 1);
                 }
-                w->log.pose = animPoseEntry(model, 0);
-                animPoseSetAnim(w->log.pose, "M_W_1", 1);
+                animPoseSetMaterialFlagOn(w->log.pose, ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2);
             }
-            animPoseSetMaterialFlagOn(w->log.pose, 0x1800);
-        }
-        if (w->buttonTrg & 0x200) {
-            psndSFXOn(SFX_NAME_WORD(0x20013));
-            for (i = 0; i < w->log.count; i++) {
-                w->log.menu[i].state = 40;
+            if (w->buttonTrg & PAD_BUTTON_B) {
+                psndSFXOn(SFX_NAME_WORD(0x20013));
+                for (i = 0; i < w->log.count; i++) {
+                    w->log.menu[i].state = 40;
+                }
+                w->log.menu[w->log.cursor].state = 20;
+                w->log.fD68 = 0;
+                w->log.fE30 = -480.0f;
+                fileFree(w->mapRes);
+                w->mapRes = NULL;
+                if (w->log.pose != -1)
+                    animPoseRelease(w->log.pose);
+                w->log.pose = -1;
+            } else if (w->buttonTrg & PAD_BUTTON_START) {
+                return -2;
             }
-            w->log.menu[w->log.cursor].state = 20;
-            w->log.fD68 = 0;
-            w->log.fE30 = -480.0f;
-            fileFree(w->mapRes);
-            w->mapRes = NULL;
-            if (w->log.pose != -1) animPoseRelease(w->log.pose);
-            w->log.pose = -1;
-        } else if (w->buttonTrg & 0x1000) {
-            return -2;
-        }
-        min = 10000.0f;
-        x = -230.0f + w->log.scrollX + w->log.mapX;
-        y = -120.0f + w->log.scrollY + w->log.mapY;
-        bx = 74.0f + w->log.scrollX;
-        by = 120.0f + w->log.scrollY;
-        for (k = 0; k < 0x5D; k++) {
-            t = &tubuDt[k];
-#ifdef VERSION_G8ME01_DEMO
-            if (swByteGet(0) < t->id) break;
-            {
+            min = 10000.0f;
+            x = -230.0f + w->log.scrollX + w->log.mapX;
+            y = -120.0f + w->log.scrollY + w->log.mapY;
+            bx = 74.0f + w->log.scrollX;
+            by = 120.0f + w->log.scrollY;
+            for (k = 0; k < 0x5D; k++) {
+                t = &tubuDt[k];
+#if VERSION == VERSION_DEMO
+                if (swByteGet(GSW_STORY_PROGRESS) < t->id)
+                    break;
+                {
 #else
-            if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
+                if (swByteGet(GSW_STORY_PROGRESS) >= t->id || tubuCheck(t->type)) {
 #endif
-                if (t->big) {
-                    f32 d = distABf(bx + t->x, by + t->y, x, y);
-                    if (min > d) {
-                        min = d;
-                        sel = k;
+                    if (t->big) {
+                        f32 d = distABf(bx + t->x, by + t->y, x, y);
+                        if (min > d) {
+                            min = d;
+                            sel = k;
+                        }
                     }
                 }
             }
-        }
-        if (min < 50.0f) {
-            sprintf(name, "menu_monosiri_%s", tubuDt[sel].map);
-            sprintf(help, "menu_map_%s", tubuDt[sel].map);
-            if (w->log.fE14 != sel) psndSFXOn(SFX_NAME_WORD(0x20035));
-            w->log.fE14 = sel;
-            winMsgEntry(w, 0, help, name);
-        } else {
-            w->log.fE14 = -1;
-            winMsgEntry(w, 0, "msg_menu_kiroku_map", 0);
-        }
-        dx = keyGetStickX(0) / 8.0f;
-        dy = keyGetStickY(0) / 8.0f;
-        if (dx == 0.0f && dy == 0.0f) {
-            if (keyGetButton(0) & 1) {
-                dx = -8.0f;
-            } else if (keyGetButton(0) & 2) {
-                dx = 8.0f;
-            }
-            if (keyGetButton(0) & 8) {
-                dy = 8.0f;
-            } else if (keyGetButton(0) & 4) {
-                dy = -8.0f;
-            }
-        }
-        if (dx == 0.0f && dy == 0.0f && w->log.fE14 != -1) {
-            dx = 304.0f + tubuDt[w->log.fE14].x - w->log.mapX;
-            dy = 240.0f + tubuDt[w->log.fE14].y - w->log.mapY;
-            dx *= 0.2f;
-            dy *= 0.2f;
-        }
-        w->log.mapX += dx;
-        w->log.mapY += dy;
-        if (w->log.mapX < 16.0f) w->log.mapX = 16.0f;
-        if (w->log.mapY < 8.0f) w->log.mapY = 8.0f;
-        if (w->log.mapX >= 604.0f) w->log.mapX = 604.0f;
-        if (w->log.mapY >= 468.0f) w->log.mapY = 468.0f;
-        ix = w->log.mapX + w->log.scrollX - 230.0f;
-        iy = w->log.mapY + w->log.scrollY - 120.0f;
-        if (ix >= 166.0f) w->log.scrollX -= ix - 166.0f;
-        if (ix <= -150.0f) w->log.scrollX -= 150.0f + ix;
-        if (iy >= 80.0f) w->log.scrollY -= iy - 80.0f;
-        if (iy <= -80.0f) w->log.scrollY -= 80.0f + iy;
-        if (w->log.scrollX > 0.0f) w->log.scrollX = 0.0f;
-        if (w->log.scrollY > 0.0f) w->log.scrollY = 0.0f;
-        if (w->log.scrollX < -148.0f) w->log.scrollX = -148.0f;
-        if (w->log.scrollY < -240.0f) w->log.scrollY = -240.0f;
-        w->helpTgtX = -230.0f + w->log.scrollX + w->log.mapX;
-        w->helpTgtY = -120.0f + w->log.scrollY + w->log.mapY;
-        w->helpTgtX -= 24.0f;
-        w->helpTgtY += 20.0f;
-        break;
-    case 11:
-        if (w->buttonTrg & 0x200) {
-            psndSFXOn(SFX_NAME_WORD(0x20013));
-            for (i = 0; i < w->log.count; i++) {
-                w->log.menu[i].state = 40;
-            }
-            w->log.menu[w->log.cursor].state = 20;
-            w->log.fD68 = 0;
-            w->log.fE6C = -480.0f;
-            w->log.fE74 = 0.0f;
-        } else if (w->dirRep & 0x4000) {
-            w->log.fE60--;
-            while (w->log.fE60 < 0) w->log.fE60 += 7;
-            w->log.fE7C = 51.42857f * w->log.fE60;
-            while (w->log.fE80 < w->log.fE7C) w->log.fE80 += 360.0f;
-            psndSFXOn(SFX_NAME_WORD(0x209D6));
-            psndSFXOn(SFX_NAME_WORD(0x20037));
-        } else if (w->dirRep & 0x8000) {
-            w->log.fE60++;
-            while (w->log.fE60 > 6) w->log.fE60 -= 7;
-            w->log.fE7C = 51.42857f * w->log.fE60;
-            while (w->log.fE80 > w->log.fE7C) w->log.fE80 -= 360.0f;
-            psndSFXOn(SFX_NAME_WORD(0x209D6));
-            psndSFXOn(SFX_NAME_WORD(0x20037));
-        } else if (w->buttonTrg & 0x1000) {
-            return -2;
-        }
-        w->helpTgtY = w->helpTgtX = -50.0f;
-        if (w->log.fE60 < w->log.stoneNum) {
-            winMsgEntry(w, -1, itemDataTable[stone_tbl[w->log.fE60]].description, itemDataTable[stone_tbl[w->log.fE60]].name);
-        } else {
-            winMsgEntry(w, -1, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
-        }
-        break;
-    case 12:
-        pages = (w->log.badge.num + 27) / 28;
-        if (w->buttonTrg & 0x200) {
-            psndSFXOn(SFX_NAME_WORD(0x20013));
-            for (i = 0; i < w->log.count; i++) {
-                w->log.menu[i].state = 40;
-            }
-            w->log.menu[w->log.cursor].state = 20;
-            w->log.fD68 = 0;
-            w->log.badge.tx = 330.0f;
-            w->log.badge.ty = -250.0f;
-            w->log.badge.tf24 = -200.0f;
-            w->log.badge.tf2C = -300.0f;
-        } else if (w->buttonRep & 0x40) {
-            w->log.badge.idx--;
-            if (w->log.badge.idx < 0) w->log.badge.idx = 0;
-            w->log.badge.cursor = w->log.badge.idx * 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->buttonRep & 0x20) {
-            w->log.badge.idx++;
-            if (w->log.badge.idx >= pages) w->log.badge.idx = pages - 1;
-            w->log.badge.cursor = w->log.badge.idx * 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x8000) {
-            if (w->log.badge.cursor % 7 < 6 && w->log.badge.cursor + 1 < w->log.badge.num) w->log.badge.cursor++;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x4000) {
-            if (w->log.badge.cursor % 7 > 0) w->log.badge.cursor--;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x1000) {
-            if ((s32)(w->log.badge.cursor - 7) >= 0 && w->log.badge.cursor - 7 < w->log.badge.num) { w->log.badge.cursor -= 7; }
-            w->log.badge.idx = w->log.badge.cursor / 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x2000) {
-            if ((s32)(w->log.badge.cursor + 7) >= 0 && w->log.badge.cursor + 7 < w->log.badge.num) {
-                w->log.badge.cursor += 7;
-            } else if (w->log.badge.cursor + (7 - w->log.badge.cursor % 7) < w->log.badge.num) {
-                w->log.badge.cursor = w->log.badge.num - 1;
-            }
-            w->log.badge.idx = w->log.badge.cursor / 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->buttonTrg & 0x10) {
-            winSortEntry(w, 4, -310.0f, 150.0f);
-            w->savedState = w->log.fD68;
-            psndSFXOn(SFX_NAME_WORD(0x20012));
-            w->log.fD68 = 1000;
-        } else if (w->buttonTrg & 0x1000) {
-            return -2;
-        }
-        w->helpTgtX = w->log.badge.cursor % 28 % 7 * 56 - 140;
-        w->helpTgtY = 90 - w->log.badge.cursor % 28 / 7 * 56;
-        if (swGet(w->log.badgeIds[w->log.badge.cursor] + 0x80)) {
-            winMsgEntry(w, -2, itemDataTable[w->log.badgeIds[w->log.badge.cursor] + 0xF0].menu_description, itemDataTable[w->log.badgeIds[w->log.badge.cursor] + 0xF0].name);
-        } else {
-            winMsgEntry(w, -2, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
-        }
-        break;
-    case 13:
-        pages = (w->log.recipe.num + 27) / 28;
-        if (w->buttonTrg & 0x200) {
-            psndSFXOn(SFX_NAME_WORD(0x20013));
-            for (i = 0; i < w->log.count; i++) {
-                w->log.menu[i].state = 40;
-            }
-            w->log.menu[w->log.cursor].state = 20;
-            w->log.fD68 = 0;
-            w->log.recipe.tx = 330.0f;
-            w->log.recipe.ty = -250.0f;
-            w->log.recipe.tf24 = -200.0f;
-            w->log.recipe.tf2C = -300.0f;
-        } else if (w->buttonRep & 0x40) {
-            w->log.recipe.idx--;
-            if (w->log.recipe.idx < 0) w->log.recipe.idx = 0;
-            w->log.recipe.cursor = w->log.recipe.idx * 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->buttonRep & 0x20) {
-            w->log.recipe.idx++;
-            if (w->log.recipe.idx >= pages) w->log.recipe.idx = pages - 1;
-            w->log.recipe.cursor = w->log.recipe.idx * 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x8000) {
-            if (w->log.recipe.cursor % 7 < 6 && w->log.recipe.cursor + 1 < w->log.recipe.num) w->log.recipe.cursor++;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x4000) {
-            if (w->log.recipe.cursor % 7 > 0) w->log.recipe.cursor--;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x1000) {
-            if ((s32)(w->log.recipe.cursor - 7) >= 0 && w->log.recipe.cursor - 7 < w->log.recipe.num) { w->log.recipe.cursor -= 7; }
-            w->log.recipe.idx = w->log.recipe.cursor / 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x2000) {
-            if ((s32)(w->log.recipe.cursor + 7) >= 0 && w->log.recipe.cursor + 7 < w->log.recipe.num) {
-                w->log.recipe.cursor += 7;
-            } else if (w->log.recipe.cursor + (7 - w->log.recipe.cursor % 7) < w->log.recipe.num) {
-                w->log.recipe.cursor = w->log.recipe.num - 1;
-            }
-            w->log.recipe.idx = w->log.recipe.cursor / 28;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->buttonTrg & 0x10) {
-            winSortEntry(w, 5, -310.0f, 150.0f);
-            w->savedState = w->log.fD68;
-            psndSFXOn(SFX_NAME_WORD(0x20012));
-            w->log.fD68 = 1000;
-        } else if (w->buttonTrg & 0x1000) {
-            return -2;
-        }
-        w->helpTgtX = w->log.recipe.cursor % 28 % 7 * 56 - 140;
-        w->helpTgtY = 90 - w->log.recipe.cursor % 28 / 7 * 56;
-        if (swGet(w->log.recipeIds[w->log.recipe.cursor] + 0x41)) {
-            winMsgEntry(w, -2, itemDataTable[w->log.recipeIds[w->log.recipe.cursor] + 0xB3].menu_description, itemDataTable[w->log.recipeIds[w->log.recipe.cursor] + 0xB3].name);
-        } else {
-            winMsgEntry(w, -2, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
-        }
-        break;
-    case 14:
-        pages = (w->log.enemyNum + 15) / 16;
-        if (w->buttonTrg & 0x200) {
-            psndSFXOn(SFX_NAME_WORD(0x20013));
-            for (i = 0; i < w->log.count; i++) {
-                w->log.menu[i].state = 40;
-            }
-            w->log.menu[w->log.cursor].state = 20;
-            w->log.fD68 = 0;
-            w->log.f102C = 320.0f;
-            w->log.f1034 = -240.0f;
-        } else if (w->buttonRep & 0x40) {
-            w->log.enemyPage--;
-            if (w->log.enemyPage < 0) w->log.enemyPage = 0;
-            w->log.enemySel = w->log.enemyPage * 16;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->buttonRep & 0x20) {
-            w->log.enemyPage++;
-            if (w->log.enemyPage >= pages) w->log.enemyPage = pages - 1;
-            w->log.enemySel = w->log.enemyPage * 16;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0xC000) {
-            if (w->log.enemySel % 16 < 8) {
-                w->log.enemySel += 8;
+            if (min < 50.0f) {
+                sprintf(name, "menu_monosiri_%s", tubuDt[sel].map);
+                sprintf(help, "menu_map_%s", tubuDt[sel].map);
+                if (w->log.fE14 != sel)
+                    psndSFXOn(SFX_NAME_WORD(0x20035));
+                w->log.fE14 = sel;
+                winMsgEntry(w, 0, help, name);
             } else {
-                w->log.enemySel -= 8;
+                w->log.fE14 = -1;
+                winMsgEntry(w, 0, "msg_menu_kiroku_map", 0);
             }
-            if (w->log.enemySel >= w->log.enemyNum) w->log.enemySel = w->log.enemyNum - 1;
-            if (w->log.enemySel < 0) w->log.enemySel = 0;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x1000) {
-            if (w->log.enemySel % 8 == 0) {
-                w->log.enemySel -= 9;
+            dx = keyGetStickX(0) / 8.0f;
+            dy = keyGetStickY(0) / 8.0f;
+            if (dx == 0.0f && dy == 0.0f) {
+                if (keyGetButton(0) & PAD_BUTTON_LEFT) {
+                    dx = -8.0f;
+                } else if (keyGetButton(0) & PAD_BUTTON_RIGHT) {
+                    dx = 8.0f;
+                }
+                if (keyGetButton(0) & PAD_BUTTON_UP) {
+                    dy = 8.0f;
+                } else if (keyGetButton(0) & PAD_BUTTON_DOWN) {
+                    dy = -8.0f;
+                }
+            }
+            if (dx == 0.0f && dy == 0.0f && w->log.fE14 != -1) {
+                dx = 304.0f + tubuDt[w->log.fE14].x - w->log.mapX;
+                dy = 240.0f + tubuDt[w->log.fE14].y - w->log.mapY;
+                dx *= 0.2f;
+                dy *= 0.2f;
+            }
+            w->log.mapX += dx;
+            w->log.mapY += dy;
+            if (w->log.mapX < 16.0f)
+                w->log.mapX = 16.0f;
+            if (w->log.mapY < 8.0f)
+                w->log.mapY = 8.0f;
+            if (w->log.mapX >= 604.0f)
+                w->log.mapX = 604.0f;
+            if (w->log.mapY >= 468.0f)
+                w->log.mapY = 468.0f;
+            ix = w->log.mapX + w->log.scrollX - 230.0f;
+            iy = w->log.mapY + w->log.scrollY - 120.0f;
+            if (ix >= 166.0f)
+                w->log.scrollX -= ix - 166.0f;
+            if (ix <= -150.0f)
+                w->log.scrollX -= 150.0f + ix;
+            if (iy >= 80.0f)
+                w->log.scrollY -= iy - 80.0f;
+            if (iy <= -80.0f)
+                w->log.scrollY -= 80.0f + iy;
+            if (w->log.scrollX > 0.0f)
+                w->log.scrollX = 0.0f;
+            if (w->log.scrollY > 0.0f)
+                w->log.scrollY = 0.0f;
+            if (w->log.scrollX < -148.0f)
+                w->log.scrollX = -148.0f;
+            if (w->log.scrollY < -240.0f)
+                w->log.scrollY = -240.0f;
+            w->helpTgtX = -230.0f + w->log.scrollX + w->log.mapX;
+            w->helpTgtY = -120.0f + w->log.scrollY + w->log.mapY;
+            w->helpTgtX -= 24.0f;
+            w->helpTgtY += 20.0f;
+            break;
+        case 11:
+            if (w->buttonTrg & PAD_BUTTON_B) {
+                psndSFXOn(SFX_NAME_WORD(0x20013));
+                for (i = 0; i < w->log.count; i++) {
+                    w->log.menu[i].state = 40;
+                }
+                w->log.menu[w->log.cursor].state = 20;
+                w->log.fD68 = 0;
+                w->log.fE6C = -480.0f;
+                w->log.fE74 = 0.0f;
+            } else if (w->dirRep & DEMO_STICK_LEFT) {
+                w->log.fE60--;
+                while (w->log.fE60 < 0)
+                    w->log.fE60 += 7;
+                w->log.fE7C = 51.42857f * w->log.fE60;
+                while (w->log.fE80 < w->log.fE7C)
+                    w->log.fE80 += 360.0f;
+                psndSFXOn(SFX_NAME_WORD(0x209D6));
+                psndSFXOn(SFX_NAME_WORD(0x20037));
+            } else if (w->dirRep & DEMO_STICK_RIGHT) {
+                w->log.fE60++;
+                while (w->log.fE60 > 6)
+                    w->log.fE60 -= 7;
+                w->log.fE7C = 51.42857f * w->log.fE60;
+                while (w->log.fE80 > w->log.fE7C)
+                    w->log.fE80 -= 360.0f;
+                psndSFXOn(SFX_NAME_WORD(0x209D6));
+                psndSFXOn(SFX_NAME_WORD(0x20037));
+            } else if (w->buttonTrg & PAD_BUTTON_START) {
+                return -2;
+            }
+            w->helpTgtY = w->helpTgtX = -50.0f;
+            if (w->log.fE60 < w->log.stoneNum) {
+                winMsgEntry(w, -1, itemDataTable[stone_tbl[w->log.fE60]].description, itemDataTable[stone_tbl[w->log.fE60]].name);
             } else {
-                w->log.enemySel -= 1;
+                winMsgEntry(w, -1, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
             }
-            if (w->log.enemySel < 0) w->log.enemySel = 0;
-            w->log.enemyPage = w->log.enemySel / 16;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->dirRep & 0x2000) {
-            if (w->log.enemySel % 8 == 7) {
-                w->log.enemySel += 9;
-            } else {
-                w->log.enemySel += 1;
-            }
-            if (w->log.enemySel >= w->log.enemyNum) w->log.enemySel = w->log.enemyNum - 1;
-            w->log.enemyPage = w->log.enemySel / 16;
-            psndSFXOn(SFX_NAME_WORD(0x20035));
-        } else if (w->buttonTrg & 0x100) {
-            if (swGet(w->log.enemy[w->log.enemySel].id + 0x117A)) {
+            break;
+        case 12:
+            pages = (w->log.badge.num + 27) / 28;
+            if (w->buttonTrg & PAD_BUTTON_B) {
+                psndSFXOn(SFX_NAME_WORD(0x20013));
+                for (i = 0; i < w->log.count; i++) {
+                    w->log.menu[i].state = 40;
+                }
+                w->log.menu[w->log.cursor].state = 20;
+                w->log.fD68 = 0;
+                w->log.badge.tx = 330.0f;
+                w->log.badge.ty = -250.0f;
+                w->log.badge.tf24 = -200.0f;
+                w->log.badge.tf2C = -300.0f;
+            } else if (w->buttonRep & PAD_TRIGGER_L) {
+                w->log.badge.idx--;
+                if (w->log.badge.idx < 0)
+                    w->log.badge.idx = 0;
+                w->log.badge.cursor = w->log.badge.idx * 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->buttonRep & PAD_TRIGGER_R) {
+                w->log.badge.idx++;
+                if (w->log.badge.idx >= pages)
+                    w->log.badge.idx = pages - 1;
+                w->log.badge.cursor = w->log.badge.idx * 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_RIGHT) {
+                if (w->log.badge.cursor % 7 < 6 && w->log.badge.cursor + 1 < w->log.badge.num)
+                    w->log.badge.cursor++;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_LEFT) {
+                if (w->log.badge.cursor % 7 > 0)
+                    w->log.badge.cursor--;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_UP) {
+                if ((s32)(w->log.badge.cursor - 7) >= 0 && w->log.badge.cursor - 7 < w->log.badge.num) {
+                    w->log.badge.cursor -= 7;
+                }
+                w->log.badge.idx = w->log.badge.cursor / 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_DOWN) {
+                if ((s32)(w->log.badge.cursor + 7) >= 0 && w->log.badge.cursor + 7 < w->log.badge.num) {
+                    w->log.badge.cursor += 7;
+                } else if (w->log.badge.cursor + (7 - w->log.badge.cursor % 7) < w->log.badge.num) {
+                    w->log.badge.cursor = w->log.badge.num - 1;
+                }
+                w->log.badge.idx = w->log.badge.cursor / 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->buttonTrg & PAD_TRIGGER_Z) {
+                winSortEntry(w, 4, -310.0f, 150.0f);
+                w->savedState = w->log.fD68;
                 psndSFXOn(SFX_NAME_WORD(0x20012));
-                w->log.fD68 = 21;
-                w->log.mono = monosiriInit(w->log.enemy[w->log.enemySel].id, -60.0f, 150.0f);
+                w->log.fD68 = 1000;
+            } else if (w->buttonTrg & PAD_BUTTON_START) {
+                return -2;
             }
-        } else if (w->buttonTrg & 0x10) {
-            winSortEntry(w, 6, -310.0f, 150.0f);
-            w->savedState = w->log.fD68;
-            psndSFXOn(SFX_NAME_WORD(0x20012));
-            w->log.fD68 = 1001;
-        } else if (w->buttonTrg & 0x1000) {
-            return -2;
-        }
-        w->helpTgtX = w->log.enemySel % 16 / 8 * 216 - 180;
-        w->helpTgtY = 106 - w->log.enemySel % 16 % 8 * 24;
-        if (swGet(w->log.enemy[w->log.enemySel].id + 0x117A)) {
-            winMsgEntry(w, 0, battleGetUnitMonosiriPtr(w->log.enemy[w->log.enemySel].id)->tattleLogTag, 0);
-        } else {
-            winMsgEntry(w, 0, "msg_menu_monosiri_enemy", 0);
-        }
-        break;
-    case 21:
-        if (w->buttonTrg & 0x200) {
-            psndSFXOn(SFX_NAME_WORD(0x20013));
-            w->log.fD68 = 22;
-            monosiriClose(w->log.mono);
-        } else if (w->buttonTrg & 0x1000) {
-            monosiriExit(w->log.mono);
-            return -2;
-        } else {
-            monosiriMain(w->log.mono);
-        }
-        break;
-    case 22:
-        if (monosiriCloseWait(w->log.mono)) {
-            w->log.fD68 = 14;
-            monosiriExit(w->log.mono);
-        } else {
-            monosiriMain(w->log.mono);
-        }
-        break;
-    case 1000:
-    case 1001:
-        if (!winSortWait(w)) {
-            w->log.fD68 = w->savedState;
-        }
-        if (w->buttonTrg & 0x1000) {
-            return -2;
-        }
-        break;
+            w->helpTgtX = w->log.badge.cursor % 28 % 7 * 56 - 140;
+            w->helpTgtY = 90 - w->log.badge.cursor % 28 / 7 * 56;
+            if (swGet(w->log.badgeIds[w->log.badge.cursor] + GSWF_BADGE_FOUND_BASE)) {
+                winMsgEntry(w, -2, itemDataTable[w->log.badgeIds[w->log.badge.cursor] + BADGE_MIN].menu_description, itemDataTable[w->log.badgeIds[w->log.badge.cursor] + BADGE_MIN].name);
+            } else {
+                winMsgEntry(w, -2, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
+            }
+            break;
+        case 13:
+            pages = (w->log.recipe.num + 27) / 28;
+            if (w->buttonTrg & PAD_BUTTON_B) {
+                psndSFXOn(SFX_NAME_WORD(0x20013));
+                for (i = 0; i < w->log.count; i++) {
+                    w->log.menu[i].state = 40;
+                }
+                w->log.menu[w->log.cursor].state = 20;
+                w->log.fD68 = 0;
+                w->log.recipe.tx = 330.0f;
+                w->log.recipe.ty = -250.0f;
+                w->log.recipe.tf24 = -200.0f;
+                w->log.recipe.tf2C = -300.0f;
+            } else if (w->buttonRep & PAD_TRIGGER_L) {
+                w->log.recipe.idx--;
+                if (w->log.recipe.idx < 0)
+                    w->log.recipe.idx = 0;
+                w->log.recipe.cursor = w->log.recipe.idx * 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->buttonRep & PAD_TRIGGER_R) {
+                w->log.recipe.idx++;
+                if (w->log.recipe.idx >= pages)
+                    w->log.recipe.idx = pages - 1;
+                w->log.recipe.cursor = w->log.recipe.idx * 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_RIGHT) {
+                if (w->log.recipe.cursor % 7 < 6 && w->log.recipe.cursor + 1 < w->log.recipe.num)
+                    w->log.recipe.cursor++;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_LEFT) {
+                if (w->log.recipe.cursor % 7 > 0)
+                    w->log.recipe.cursor--;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_UP) {
+                if ((s32)(w->log.recipe.cursor - 7) >= 0 && w->log.recipe.cursor - 7 < w->log.recipe.num) {
+                    w->log.recipe.cursor -= 7;
+                }
+                w->log.recipe.idx = w->log.recipe.cursor / 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_DOWN) {
+                if ((s32)(w->log.recipe.cursor + 7) >= 0 && w->log.recipe.cursor + 7 < w->log.recipe.num) {
+                    w->log.recipe.cursor += 7;
+                } else if (w->log.recipe.cursor + (7 - w->log.recipe.cursor % 7) < w->log.recipe.num) {
+                    w->log.recipe.cursor = w->log.recipe.num - 1;
+                }
+                w->log.recipe.idx = w->log.recipe.cursor / 28;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->buttonTrg & PAD_TRIGGER_Z) {
+                winSortEntry(w, 5, -310.0f, 150.0f);
+                w->savedState = w->log.fD68;
+                psndSFXOn(SFX_NAME_WORD(0x20012));
+                w->log.fD68 = 1000;
+            } else if (w->buttonTrg & PAD_BUTTON_START) {
+                return -2;
+            }
+            w->helpTgtX = w->log.recipe.cursor % 28 % 7 * 56 - 140;
+            w->helpTgtY = 90 - w->log.recipe.cursor % 28 / 7 * 56;
+            if (swGet(WIN_RECIPE_COOKED_SW(w->log.recipeIds[w->log.recipe.cursor]))) {
+                winMsgEntry(w, -2, itemDataTable[w->log.recipeIds[w->log.recipe.cursor] + WIN_RECIPE_MIN].menu_description, itemDataTable[w->log.recipeIds[w->log.recipe.cursor] + WIN_RECIPE_MIN].name);
+            } else {
+                winMsgEntry(w, -2, "msg_menu_stone_none_help", "msg_menu_stone_none_name");
+            }
+            break;
+        case 14:
+            pages = (w->log.enemyNum + 15) / 16;
+            if (w->buttonTrg & PAD_BUTTON_B) {
+                psndSFXOn(SFX_NAME_WORD(0x20013));
+                for (i = 0; i < w->log.count; i++) {
+                    w->log.menu[i].state = 40;
+                }
+                w->log.menu[w->log.cursor].state = 20;
+                w->log.fD68 = 0;
+                w->log.f102C = 320.0f;
+                w->log.f1034 = -240.0f;
+            } else if (w->buttonRep & PAD_TRIGGER_L) {
+                w->log.enemyPage--;
+                if (w->log.enemyPage < 0)
+                    w->log.enemyPage = 0;
+                w->log.enemySel = w->log.enemyPage * 16;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->buttonRep & PAD_TRIGGER_R) {
+                w->log.enemyPage++;
+                if (w->log.enemyPage >= pages)
+                    w->log.enemyPage = pages - 1;
+                w->log.enemySel = w->log.enemyPage * 16;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & (DEMO_STICK_LEFT | DEMO_STICK_RIGHT)) {
+                if (w->log.enemySel % 16 < 8) {
+                    w->log.enemySel += 8;
+                } else {
+                    w->log.enemySel -= 8;
+                }
+                if (w->log.enemySel >= w->log.enemyNum)
+                    w->log.enemySel = w->log.enemyNum - 1;
+                if (w->log.enemySel < 0)
+                    w->log.enemySel = 0;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_UP) {
+                if (w->log.enemySel % 8 == 0) {
+                    w->log.enemySel -= 9;
+                } else {
+                    w->log.enemySel -= 1;
+                }
+                if (w->log.enemySel < 0)
+                    w->log.enemySel = 0;
+                w->log.enemyPage = w->log.enemySel / 16;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->dirRep & DEMO_STICK_DOWN) {
+                if (w->log.enemySel % 8 == 7) {
+                    w->log.enemySel += 9;
+                } else {
+                    w->log.enemySel += 1;
+                }
+                if (w->log.enemySel >= w->log.enemyNum)
+                    w->log.enemySel = w->log.enemyNum - 1;
+                w->log.enemyPage = w->log.enemySel / 16;
+                psndSFXOn(SFX_NAME_WORD(0x20035));
+            } else if (w->buttonTrg & PAD_BUTTON_A) {
+                if (swGet(w->log.enemy[w->log.enemySel].id + GSWF_TATTLE_BASE)) {
+                    psndSFXOn(SFX_NAME_WORD(0x20012));
+                    w->log.fD68 = 21;
+                    w->log.mono = monosiriInit(w->log.enemy[w->log.enemySel].id, -60.0f, 150.0f);
+                }
+            } else if (w->buttonTrg & PAD_TRIGGER_Z) {
+                winSortEntry(w, 6, -310.0f, 150.0f);
+                w->savedState = w->log.fD68;
+                psndSFXOn(SFX_NAME_WORD(0x20012));
+                w->log.fD68 = 1001;
+            } else if (w->buttonTrg & PAD_BUTTON_START) {
+                return -2;
+            }
+            w->helpTgtX = w->log.enemySel % 16 / 8 * 216 - 180;
+            w->helpTgtY = 106 - w->log.enemySel % 16 % 8 * 24;
+            if (swGet(w->log.enemy[w->log.enemySel].id + GSWF_TATTLE_BASE)) {
+                winMsgEntry(w, 0, battleGetUnitMonosiriPtr(w->log.enemy[w->log.enemySel].id)->tattleLogTag, 0);
+            } else {
+                winMsgEntry(w, 0, "msg_menu_monosiri_enemy", 0);
+            }
+            break;
+        case 21:
+            if (w->buttonTrg & PAD_BUTTON_B) {
+                psndSFXOn(SFX_NAME_WORD(0x20013));
+                w->log.fD68 = 22;
+                monosiriClose(w->log.mono);
+            } else if (w->buttonTrg & PAD_BUTTON_START) {
+                monosiriExit(w->log.mono);
+                return -2;
+            } else {
+                monosiriMain(w->log.mono);
+            }
+            break;
+        case 22:
+            if (monosiriCloseWait(w->log.mono)) {
+                w->log.fD68 = 14;
+                monosiriExit(w->log.mono);
+            } else {
+                monosiriMain(w->log.mono);
+            }
+            break;
+        case 1000:
+        case 1001:
+            if (!winSortWait(w)) {
+                w->log.fD68 = w->savedState;
+            }
+            if (w->buttonTrg & PAD_BUTTON_START) {
+                return -2;
+            }
+            break;
     }
     return 0;
 }
-
 
 void winLogMain2(WindowWork* w) {
     s32 i;
 
     for (i = 0; i < w->log.count; i++) {
         switch (w->log.menu[i].state) {
-        case 10:
-            w->log.menu[i].tx = 0.0f;
-            w->log.menu[i].ty = 140.0f;
-            w->log.menu[i].timer = 0;
-            w->log.menu[i].state++;
-            break;
-        case 11:
-            if (++w->log.menu[i].timer > 8) {
-                w->log.menu[i].tx = -160.0f;
+            case 10:
+                w->log.menu[i].tx = 0.0f;
                 w->log.menu[i].ty = 140.0f;
                 w->log.menu[i].timer = 0;
                 w->log.menu[i].state++;
-            }
-            break;
-        case 20:
-            w->log.menu[i].tx = 0.0f;
-            w->log.menu[i].ty = 140.0f;
-            w->log.menu[i].timer = 0;
-            w->log.menu[i].state++;
-            break;
-        case 21:
-            if (++w->log.menu[i].timer > 8) {
+                break;
+            case 11:
+                if (++w->log.menu[i].timer > 8) {
+                    w->log.menu[i].tx = -160.0f;
+                    w->log.menu[i].ty = 140.0f;
+                    w->log.menu[i].timer = 0;
+                    w->log.menu[i].state++;
+                }
+                break;
+            case 20:
+                w->log.menu[i].tx = 0.0f;
+                w->log.menu[i].ty = 140.0f;
+                w->log.menu[i].timer = 0;
+                w->log.menu[i].state++;
+                break;
+            case 21:
+                if (++w->log.menu[i].timer > 8) {
+                    w->log.menu[i].tx = 0.0f;
+                    w->log.menu[i].ty = 45.0f * w->log.count / 2.0f - 45.0f * i;
+                    w->log.menu[i].timer = 0;
+                    w->log.menu[i].state++;
+                }
+                break;
+            case 30:
+                w->log.menu[i].tx = 0.0f;
+                w->log.menu[i].ty = -160.0f;
+                w->log.menu[i].timer = 0;
+                w->log.menu[i].state++;
+                break;
+            case 0:
+            case 41:
+                break;
+            case 40:
                 w->log.menu[i].tx = 0.0f;
                 w->log.menu[i].ty = 45.0f * w->log.count / 2.0f - 45.0f * i;
                 w->log.menu[i].timer = 0;
                 w->log.menu[i].state++;
-            }
-            break;
-        case 30:
-            w->log.menu[i].tx = 0.0f;
-            w->log.menu[i].ty = -160.0f;
-            w->log.menu[i].timer = 0;
-            w->log.menu[i].state++;
-            break;
-        case 0:
-        case 41:
-            break;
-        case 40:
-            w->log.menu[i].tx = 0.0f;
-            w->log.menu[i].ty = 45.0f * w->log.count / 2.0f - 45.0f * i;
-            w->log.menu[i].timer = 0;
-            w->log.menu[i].state++;
-            break;
+                break;
         }
         w->log.menu[i].x += (w->log.menu[i].tx - w->log.menu[i].x) / FPS_EASE(8.0f);
         w->log.menu[i].y += (w->log.menu[i].ty - w->log.menu[i].y) / FPS_EASE(8.0f);
     }
-    w->log.fE2C += (w->log.fE28 - w->log.fE2C) / FPS_EASE_D(8.0f, 8.0);
-    w->log.fE34 += (w->log.fE30 - w->log.fE34) / FPS_EASE_D(8.0f, 8.0);
-    w->log.fE68 += (w->log.fE64 - w->log.fE68) / FPS_EASE_D(8.0f, 8.0);
-    w->log.fE70 += (w->log.fE6C - w->log.fE70) / FPS_EASE_D(8.0f, 8.0);
-    w->log.fE78 += (w->log.fE74 - w->log.fE78) / FPS_EASE_D(8.0f, 8.0);
+    w->log.fE2C += (w->log.fE28 - w->log.fE2C) / FPS_EASE_D(8.0, 8.0f);
+    w->log.fE34 += (w->log.fE30 - w->log.fE34) / FPS_EASE_D(8.0, 8.0f);
+    w->log.fE68 += (w->log.fE64 - w->log.fE68) / FPS_EASE_D(8.0, 8.0f);
+    w->log.fE70 += (w->log.fE6C - w->log.fE70) / FPS_EASE_D(8.0, 8.0f);
+    w->log.fE78 += (w->log.fE74 - w->log.fE78) / FPS_EASE_D(8.0, 8.0f);
     w->log.fE80 += (w->log.fE7C - w->log.fE80) / FPS_EASE(4.0f);
     w->log.badge.scrollTgt = w->log.badge.idx * 0xE8;
     w->log.badge.scroll += (w->log.badge.scrollTgt - w->log.badge.scroll) / FPS_EASE(6.0f);
@@ -1022,21 +1071,10 @@ void winLogMain2(WindowWork* w) {
     w->log.recipe.f2C += (w->log.recipe.tf2C - w->log.recipe.f2C) / FPS_EASE(6.0f);
 }
 
-void winTexInit_x2(TEXPalette* t);
-void winTexSet_x2(u32 a, u32 b, Vec translate, Vec scale, GXColor color);
-void winIconInit(void);
-void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
-void effStarStoneDraw(CameraId cam, EffectEntry* e);
 void mapGX(WindowWork* w, f32 x, f32 y);
 void monoshiriGX(WindowWork* w, f32 x, f32 y);
 
-#ifdef VERSION_G8ME01
-void winFontInit(void);
-void winFontSet(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
-u16 FontGetMessageWidth(const char* message);
-#endif
-
-void winLogDisp(CameraId cam, void* param, s32 idx) {
+void winLogDisp(s32 camId, void* param, s32 idx) {
     static const GXColor kW = {0xFF, 0xFF, 0xFF, 0xFF};
     WindowWork* w = param;
     GXColor c1;
@@ -1068,7 +1106,7 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
             PSMTXRotRad(m2, 'y', 0.017453292f * (51.42857f * i - w->log.fE80));
             PSMTXMultVec(m2, &v, &v);
             PSMTXMultVec(m1, &v, &v);
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
             winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, v.x + (x + w->log.fE68), (v.y + (y + w->log.fE70)) - 30.0f, v.z, 1.0f);
 #endif
             wk = w->log.eff[i]->userdata;
@@ -1077,19 +1115,19 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
             wk->position.y = 20.0f + (v.y + (y + w->log.fE70));
             wk = w->log.eff[i]->userdata;
             wk->position.z = v.z;
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, v.x + (x + w->log.fE68), (v.y + (y + w->log.fE70)) - 30.0f, v.z, 1.0f);
 #endif
         }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         for (i = 0; i < 7; i++) {
-            effStarStoneDraw(8, w->log.eff[i]);
+            effStarStoneDraw(CAMERA_2D, w->log.eff[i]);
         }
 #endif
     }
     if (w->log.badge.x < 320.0f && w->log.badge.y > -240.0f) {
         winHakoGX(w, 0, x + w->log.badge.x, y + w->log.badge.y);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         {
             GXColor black;
             char buf[0x100];
@@ -1106,14 +1144,14 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
 #endif
         winTexInit(*w->res->data);
         winTexSet(0x95, (Vec){x + w->log.badge.f24, y + w->log.badge.f2C, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
-        if (swGet(w->log.badgeIds[w->log.badge.cursor] + 0x80)) {
+        if (swGet(w->log.badgeIds[w->log.badge.cursor] + GSWF_BADGE_FOUND_BASE)) {
             winIconInit();
-            winIconSet(itemDataTable[w->log.badgeIds[w->log.badge.cursor] + 0xF0].icon_id, (Vec){x + w->log.badge.f24, (y + w->log.badge.f2C) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
+            winIconSet(itemDataTable[w->log.badgeIds[w->log.badge.cursor] + BADGE_MIN].icon_id, (Vec){x + w->log.badge.f24, (y + w->log.badge.f2C) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
         }
     }
     if (w->log.recipe.x < 320.0f && w->log.recipe.y > -240.0f) {
         winHakoGX(w, 1, x + w->log.recipe.x, y + w->log.recipe.y);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         {
             GXColor black;
             char buf[0x100];
@@ -1130,9 +1168,9 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
 #endif
         winTexInit(*w->res->data);
         winTexSet(0x96, (Vec){x + w->log.recipe.f24, y + w->log.recipe.f2C, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
-        if (swGet(w->log.recipeIds[w->log.recipe.cursor] + 0x41)) {
+        if (swGet(WIN_RECIPE_COOKED_SW(w->log.recipeIds[w->log.recipe.cursor]))) {
             winIconInit();
-            winIconSet(itemDataTable[w->log.recipeIds[w->log.recipe.cursor] + 0xB3].icon_id, (Vec){x + w->log.recipe.f24, (y + w->log.recipe.f2C) - 10.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
+            winIconSet(itemDataTable[w->log.recipeIds[w->log.recipe.cursor] + WIN_RECIPE_MIN].icon_id, (Vec){x + w->log.recipe.f24, (y + w->log.recipe.f2C) - 10.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, c2);
         }
     }
     if (w->log.fD68 == 14 || (u32)(w->log.fD68 - 20) <= 2 || w->log.fD68 == 1001) {
@@ -1152,25 +1190,37 @@ void winLogDisp(CameraId cam, void* param, s32 idx) {
 }
 
 const char* winGetMapTplName(void) {
-    if (swByteGet(0) < 0x13) return "map0.tpl";
-    if (swByteGet(0) < 0x41) return "map1.tpl";
-    if (swByteGet(0) < 0x79) return "map2.tpl";
-    if (swByteGet(0) < 0xAF) return "map3.tpl";
-    if (swByteGet(0) < 0xDE) return "map4.tpl";
-    if (swByteGet(0) < 0x110) return "map5.tpl";
-    if (swByteGet(0) < 0x15C) return "map6.tpl";
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG0_16_FRANKLYS_HOUSE)
+        return "map0.tpl";
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG1_31_FRANKLYS_HOUSE)
+        return "map1.tpl";
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG2_41_FRANKLYS_HOUSE)
+        return "map2.tpl";
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG3_51_FRANKLYS_HOUSE)
+        return "map3.tpl";
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG4_31_FRANKLYS_HOUSE)
+        return "map4.tpl";
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG5_61_FRANKLYS_HOUSE)
+        return "map5.tpl";
+    if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG6_71_FRANKLYS_HOUSE)
+        return "map6.tpl";
     return "map7.tpl";
 }
 
-double sin(double);
 double __fabs(double);
-static inline double fabs(double x) { return __fabs(x); }
-
+static inline double fabs(double x) {
+    return __fabs(x);
+}
 
 void mapGX(WindowWork* w, f32 x, f32 y) {
     static f32 pos_tbl[7][2] = {
-        {165.0f, 68.0f}, {0.0f, 75.0f}, {97.0f, 150.0f}, {-139.0f, -33.0f},
-        {41.0f, -163.0f}, {211.0f, -91.0f}, {-209.0f, 159.0f},
+        {165.0f, 68.0f},
+        {0.0f, 75.0f},
+        {97.0f, 150.0f},
+        {-139.0f, -33.0f},
+        {41.0f, -163.0f},
+        {211.0f, -91.0f},
+        {-209.0f, 159.0f},
     };
     GXColor c2;
     GXColor c0;
@@ -1200,11 +1250,12 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
         winTexInit(*w->res->data);
         for (i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++) {
             t = &tubuDt[i];
-#ifdef VERSION_G8ME01_DEMO
-            if (swByteGet(0) < t->id) break;
+#if VERSION == VERSION_DEMO
+            if (swByteGet(GSW_STORY_PROGRESS) < t->id)
+                break;
             {
 #else
-            if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
+            if (swByteGet(GSW_STORY_PROGRESS) >= t->id || tubuCheck(t->type)) {
 #endif
                 if (w->log.fE14 == i) {
                     winTexSet((tex = 0xBA, ((gp->retraceCount >> 4) & 1) ? tex = 0xB9 : 0, tex), (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -1213,7 +1264,7 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
                 }
             }
         }
-        sw = swByteGet(0);
+        sw = swByteGet(GSW_STORY_PROGRESS);
         id = -1;
         if (sw >= 0x13 && sw < 0x37) {
             id = ICON_197;
@@ -1222,35 +1273,35 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
             id = ICON_198;
             k = 1;
         } else if (sw >= 0x79 && sw < 0xA4) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             id = ICON_199;
 #else
             id = ICON_19A;
 #endif
             k = 2;
         } else if (sw >= 0xAF && sw < 0xD5) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             id = ICON_19A;
 #else
             id = ICON_19C;
 #endif
             k = 3;
         } else if (sw >= 0xDE && sw < 0x105) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             id = ICON_19B;
 #else
             id = ICON_19D;
 #endif
             k = 4;
         } else if (sw >= 0x110 && sw < 0x152) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             id = ICON_19C;
 #else
             id = ICON_199;
 #endif
             k = 5;
         } else if (sw >= 0x15C && sw < 0x175) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             id = ICON_19D;
 #else
             id = ICON_19B;
@@ -1297,15 +1348,6 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
     }
 }
 
-void winFontInit(void);
-void winFontSet(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
-const char* msgSearch(const char* tag);
-u16 FontGetMessageWidth(const char* msg);
-int sprintf(char* buf, const char* fmt, ...);
-
-#ifdef VERSION_G8ME01
-void winFontSetWidth(Vec translate, Vec scale, GXColor color, f32 width, const char* fmt, ...);
-#endif
 void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     GXColor k1;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1326,13 +1368,13 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     winKirinukiGX(w, 0, x - 110.0f, y - 160.0f, 100.0f, 50.0f);
     msg = msgSearch("msg_menu_monosiri_kazu");
     tw = 0.75f * FontGetMessageWidth(msg);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     if (tw > 80.0f) {
         tw = tw * (80.0f / tw);
     }
 #endif
     winFontInit();
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     winFontSetWidth((Vec){(x - 108.0f) + (100 - tw) / 2, y - 166.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k1, 80.0f, msg);
     sprintf(buf, (u32)gp->language != 0 ? "%d/%d" : "%d／%d", w->log.enemyKnown, w->log.enemyNum);
 #else
@@ -1346,11 +1388,12 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
         s32 id;
         id = w->log.enemy[w->log.enemyPage * 16 + i].id;
         te = battleGetUnitMonosiriPtr(id);
-        if (w->log.enemyPage * 16 + i >= w->log.enemyNum) break;
-        if (swGet(id + 0x117A)) {
-#ifndef VERSION_G8ME01_DEMO
+        if (w->log.enemyPage * 16 + i >= w->log.enemyNum)
+            break;
+        if (swGet(id + GSWF_TATTLE_BASE)) {
+#if VERSION != VERSION_DEMO
             if (id == 0x4D || id == 0x87) {
-                if (evtGetValue(NULL, GSW(0)) < 0xD2) {
+                if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
                     name = msgSearch("btl_un_hatena");
                 } else {
                     name = msgSearch("btl_un_rampell");
@@ -1361,13 +1404,13 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
                 name = msgSearch(te->enemyTag);
             }
         } else {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             name = (u32)gp->language != 0 ? "???" : "？？？";
 #else
             name = "？？？";
 #endif
         }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         sprintf(num, (u32)gp->language != 0 ? "%d. " : "%d．", enemy_monoshiri_sort_table[id]);
         winFontSetWidth((Vec){((24.0f + x) - 5.0f) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, 40.0f, num);
         winFontSetWidth((Vec){(56.0f + x) + (i / 8) * 216, (y - 16.0f) - (i % 8) * 24, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, k2, 145.0f, name);
@@ -1410,7 +1453,7 @@ MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
     m->y = y;
     m->curX = 500.0f;
     m->curY = -300.0f;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     m->alpha = 0;
     m->pose1 = -1;
     m->pose2 = -1;
@@ -1420,65 +1463,72 @@ MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
 
 void monosiriMain(MonosiriWork* m) {
     s32 group = gp->inBattle ? 1 : 0;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
 #else
     const char* lang[2] = {"jp", "us"};
 #endif
-    
+
     GXTexObj tex;
     TattleEntry* t;
-    if (!m) return;
+    if (!m)
+        return;
     switch (m->state) {
-    case 0:
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(4, NULL, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang[gp->language])) break;
-#ifdef VERSION_G8ME01
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(0, NULL, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us")) break;
+        case 0:
+            if (!fileAsyncf(4, NULL, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]))
+                break;
+#if VERSION >= VERSION_US
+            if (!fileAsyncf(0, NULL, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us"))
+                break;
 #else
-        if (!((void* (*)(u8, FileCallback, const char*, ...))fileAsyncf)(0, NULL, WIN_DIR "jp/mono.dat", getMarioStDvdRoot())) break;
+            if (!fileAsyncf(0, NULL, WIN_DIR "jp/mono.dat", getMarioStDvdRoot()))
+                break;
 #endif
-        m->file1 = fileAllocf(4, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
-#ifdef VERSION_G8ME01
-        m->file2 = fileAllocf(0, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
+            m->file1 = fileAllocf(4, WIN_DIR "%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
+#if VERSION >= VERSION_US
+            m->file2 = fileAllocf(0, "%s/w/%s/mono.dat", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
 #else
-        m->file2 = fileAllocf(0, WIN_DIR "jp/mono.dat", getMarioStDvdRoot());
+            m->file2 = fileAllocf(0, WIN_DIR "jp/mono.dat", getMarioStDvdRoot());
 #endif
-        m->state++;
-#ifdef VERSION_G8ME01_DEMO
-        m->alpha = 0;
-        m->pose1 = -1;
-        m->pose2 = -1;
+            m->state++;
+#if VERSION == VERSION_DEMO
+            m->alpha = 0;
+            m->pose1 = -1;
+            m->pose2 = -1;
 #endif
-        TEXGetGXTexObjFromPalette(*(TEXPalette**)m->file1->data, &tex, 0x37);
-        m->smart = smartAlloc(GXGetTexBufferSize(GXGetTexObjWidth(&tex), GXGetTexObjHeight(&tex), 5, 0, 0), 0);
-        break;
-    case 1:
-        t = battleGetUnitMonosiriPtr(m->id);
-        if (!animGroupBaseAsync(t->modelName, group, NULL)) break;
-        if (m->id == 0x6B && !animGroupBaseAsync("c_n_moa_a", group, NULL)) break;
-        m->alpha += 20;
-        if (m->alpha > 255) m->alpha = 255;
-        if (m->pose1 == -1) {
-            if (m->id == 0x6B) {
-                m->pose1 = animPoseEntry(t->modelName, group);
-                animPoseSetAnim(m->pose1, t->poseName, 1);
-                animPoseWorldPositionEvalOn(m->pose1);
-                animPoseMain(m->pose1);
-                m->pose2 = animPoseEntry("c_n_moa_a", group);
-                animPoseSetAnim(m->pose2, "S_1", 1);
-                animPoseMain(m->pose2);
-            } else {
-                m->pose1 = animPoseEntry(t->modelName, group);
-                animPoseSetAnim(m->pose1, t->poseName, 1);
-                animPoseMain(m->pose1);
+            TEXGetGXTexObjFromPalette(*(TEXPalette**)m->file1->data, &tex, 0x37);
+            m->smart = smartAlloc(GXGetTexBufferSize(GXGetTexObjWidth(&tex), GXGetTexObjHeight(&tex), 5, 0, 0), 0);
+            break;
+        case 1:
+            t = battleGetUnitMonosiriPtr(m->id);
+            if (!animGroupBaseAsync(t->modelName, group, NULL))
+                break;
+            if (m->id == 0x6B && !animGroupBaseAsync("c_n_moa_a", group, NULL))
+                break;
+            m->alpha += 20;
+            if (m->alpha > 255)
+                m->alpha = 255;
+            if (m->pose1 == -1) {
+                if (m->id == 0x6B) {
+                    m->pose1 = animPoseEntry(t->modelName, group);
+                    animPoseSetAnim(m->pose1, t->poseName, 1);
+                    animPoseWorldPositionEvalOn(m->pose1);
+                    animPoseMain(m->pose1);
+                    m->pose2 = animPoseEntry("c_n_moa_a", group);
+                    animPoseSetAnim(m->pose2, "S_1", 1);
+                    animPoseMain(m->pose2);
+                } else {
+                    m->pose1 = animPoseEntry(t->modelName, group);
+                    animPoseSetAnim(m->pose1, t->poseName, 1);
+                    animPoseMain(m->pose1);
+                }
+                dispEntry(2, 0.0f, 6, capture, m);
             }
-            dispEntry(2, 0.0f, 6, capture, m);
-        }
-        break;
-    case 2:
-        m->x = 600.0f;
-        m->y = -400.0f;
-        break;
+            break;
+        case 2:
+            m->x = 600.0f;
+            m->y = -400.0f;
+            break;
     }
     m->curX += (m->x - m->curX) / FPS_EASE(6.0f);
     m->curY += (m->y - m->curY) / FPS_EASE(6.0f);
@@ -1494,13 +1544,15 @@ void monosiriClose(MonosiriWork* m) {
 }
 
 BOOL monosiriCloseWait(MonosiriWork* m) {
-    if (!m) return TRUE;
-    if (m->curX > 500.0f && m->curY < -300.0f) return TRUE;
+    if (!m)
+        return TRUE;
+    if (m->curX > 500.0f && m->curY < -300.0f)
+        return TRUE;
     return FALSE;
 }
 
 void monosiriExit(MonosiriWork* m) {
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     if (m) {
         if (m->file1) {
             fileFree(m->file1);
@@ -1556,19 +1608,6 @@ typedef struct MonoDatFile {
     MonoDat* entries; // 0x0
     u32 size;         // 0x4
 } MonoDatFile;
-
-typedef struct MoaChain {
-    const char* a;
-    const char* b;
-} MoaChain;
-
-extern const s32 g_moamoa_chain_num;
-extern MoaChain g_moamoa_chain_tbl[];
-double tan(double);
-void animPoseVivianMain(s32 poseId, Vec* v);
-
-
-
 
 void capture(CameraId camera, void* param) {
     MonosiriWork* m = param;
@@ -1629,7 +1668,8 @@ void capture(CameraId camera, void* param) {
     n = ((MonoDatFile*)m->file2->data)->size / sizeof(MonoDat);
     e = ((MonoDatFile*)m->file2->data)->entries;
     for (i = 0; i < n; i++, e++) {
-        if (e->id == m->id) break;
+        if (e->id == m->id)
+            break;
     }
     if (i < n) {
         tx = e->x;
@@ -1650,7 +1690,7 @@ void capture(CameraId camera, void* param) {
     if (animPoseGetVivianType(m->pose1)) {
         animPoseVivianMain(m->pose1, &(Vec){0.0f, 0.0f, 0.0f});
     }
-    animPoseSetMaterialFlagOn(m->pose1, 0x1800);
+    animPoseSetMaterialFlagOn(m->pose1, ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2);
     animPosePeraOff(m->pose1);
     PSMTXIdentity(t);
     animPoseDrawMtx(m->pose1, t, 1, 0.0f, 1.0f);
@@ -1665,13 +1705,13 @@ void capture(CameraId camera, void* param) {
         for (i = 0; 500 > i; i++) {
             idx[i] = cnt[i % g_moamoa_chain_num]++;
         }
-        animPoseSetMaterialFlagOn(m->pose2, 0x1800);
+        animPoseSetMaterialFlagOn(m->pose2, ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2);
         animPosePeraOff(m->pose2);
         for (i = 0; i < 500; i++) {
             k = i % g_moamoa_chain_num;
             f = (f32)idx[i] / (f32)cnt[k];
-            a = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].a)];
-            b = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].b)];
+            a = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].from)];
+            b = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].to)];
             PSVECScale(a, &v1, f);
             PSVECScale(b, &v2, 1.0f - f);
             PSVECAdd(&v1, &v2, &v1);
@@ -1687,7 +1727,7 @@ void capture(CameraId camera, void* param) {
     GXReadBoundingBox(&bb0, &bb1, &bb2, &bb3);
     GXSetTexCopySrc(0, 0, tw, th);
     GXSetTexCopyDst(tw, th, GX_TF_RGB5A3, GX_FALSE);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 #endif
     GXCopyTex(m->smart->address, GX_TRUE);
@@ -1696,13 +1736,6 @@ void capture(CameraId camera, void* param) {
     GXSetProjectionv(proj);
     GXSetScissor(sx, sy, sw, sh);
 }
-
-void winHalfBookGX(TEXPalette* tpl, s32 a, f32 x, f32 y);
-void winFontInit(void);
-void winFontSet(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
-const char* msgSearch(const char* tag);
-u16 FontGetMessageWidth(const char* msg);
-int sprintf(char* buf, const char* fmt, ...);
 
 void monosiri_disp(CameraId camera, void* param) {
     MonosiriWork* m = param;
@@ -1729,7 +1762,7 @@ void monosiri_disp(CameraId camera, void* param) {
 
     x = m->curX;
     y = m->curY;
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     if (m->file1)
 #endif
     {
@@ -1800,11 +1833,11 @@ void monosiri_disp(CameraId camera, void* param) {
             GXPosition3f32(x1 + qw, y1, 0.0f);
             GXTexCoord2f32(1.0f, 0.0f);
         }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
         if (id == 0x4D || id == 0x87) {
-            if (evtGetValue(NULL, GSW(0)) < 0xD2) {
+            if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
                 sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_hatena"));
             } else {
                 sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_rampell"));
@@ -1812,7 +1845,7 @@ void monosiri_disp(CameraId camera, void* param) {
         } else {
             sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
         }
-#elif defined(VERSION_G8ME01_DEMO)
+#elif VERSION == VERSION_DEMO
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
         sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
@@ -1820,7 +1853,7 @@ void monosiri_disp(CameraId camera, void* param) {
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
         if (id == 0x4D || id == 0x87) {
-            if (evtGetValue(NULL, GSW(0)) < 0xD2) {
+            if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
                 sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_hatena"));
             } else {
                 sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch("btl_un_rampell"));
@@ -1832,17 +1865,16 @@ void monosiri_disp(CameraId camera, void* param) {
         w = 0.75f * FontGetMessageWidth(buf);
         winFontInit();
         winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 180.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         sprintf(buf, (u32)gp->language != 0 ? "%s %s" : "%s　%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
 #else
         sprintf(buf, "%s　%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
 #endif
         w = 0.75f * FontGetMessageWidth(buf);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
         winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
 #else
         winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) / 2.0f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
 #endif
     }
 }
-

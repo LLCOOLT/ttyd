@@ -1,3 +1,5 @@
+// yuu_01 (遊技場, Pianta Parlor): minigame 2, Boat Mode (fune); entered from gor_03.
+
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -14,100 +16,73 @@
 #include "driver/icondrv.h"
 #include "icon_ids.h"
 #include "evt/evt_movefloor.h"
+#include "cam_shift.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_yuugijou.h"
+#include "evt/evt_yuuranking.h"
+#include "mario/mario_motion.h"
+#include "mot/mot_ship.h"
+#include "party.h"
+#include "party/party_motion.h"
 #include "yuu.h"
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_mapobj_flag_onoff);
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#if VERSION >= VERSION_US
 USER_FUNC(evt_sub_get_language);
 #endif
 
-typedef struct FuneWork { u32 flags; s32 phase; s32 coins; s32 result; s32 index; s32 state; f32 dist; Vec dir; s32 timer; f32 y; f32 x; s32 monteCount; EventEntry* viewEvent; } FuneWork;
-s32 yuucounter_get_data(void);
-void yuucounter_flag_on(s32 flag);
-void partyKeyOff(void);
-void partyKeyOn(void);
-void mapObjGetPos(const char* name, Vec* pos);
-BOOL marioChkSwirlPower(void);
-void marioSetSwirlPower(s32 time, f32 speed, f32 angle);
-void monteCountDisp(void);
-void marioChgShipMotion(void);
-typedef struct MonteSub { s32 flags; Vec pos; f32 scale; u8 iconData[0x38 - 0x14]; } MonteSub; /* mirrors IconEntry */
-typedef struct Monte { u8 hidden; u8 pad_1; s16 num; u8 state; u8 pad_5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
-typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
+typedef struct FuneWork {
+    u32 flags;
+    s32 phase;
+    s32 coins;
+    s32 result;
+    s32 index;
+    s32 state;
+    f32 dist;
+    Vec dir;
+    s32 timer;
+    f32 y;
+    f32 x;
+    s32 monteCount;
+    EventEntry* viewEvent;
+} FuneWork;
+
 static void* yuunpc_wp;
 static Monte* monte_p;
 #define MONTETABLE (montetable)
 static void monte_disp(CameraId camera, void* param);
-static inline BOOL monte_check_inl(Vec* a, Vec* b) { if (PSVECDistance(a, b) < 20.0f && __fabs(a->y - b->y) < 20.0) { return TRUE; } return FALSE; }
-static inline f32 randRange(f32 d) { return irand(100.0f * d) / 100.0f; }
-void camShiftReset(void);
+static inline BOOL monte_check_inl(Vec* a, Vec* b) {
+    if (PSVECDistance(a, b) < 20.0f && __fabs(a->y - b->y) < 20.0) {
+        return TRUE;
+    }
+    return FALSE;
+}
+static inline f32 randRange(f32 d) {
+    return irand(100.0f * d) / 100.0f;
+}
 
-USER_FUNC(eff_call_minigame);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_fade_in);
-USER_FUNC(evt_fade_out);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_prev_party_pos);
-USER_FUNC(evt_mario_wait_move_end);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_yuucounter_alloc);
-USER_FUNC(evt_yuucounter_free);
-USER_FUNC(evt_yuuminigame_alloc);
-USER_FUNC(evt_yuuranking_alloc);
-USER_FUNC(evt_yuuranking_free);
-USER_FUNC(evt_yuutitle_alloc);
-USER_FUNC(evt_yuutitle_free);
 static USER_FUNC(fall_rtn);
 static USER_FUNC(re_fall_rtn);
 USER_FUNC(yuu_01_cam_shift_reset);
-USER_FUNC(yuugijou_add_montemedal);
-USER_FUNC(yuugijou_get_montemedal);
-USER_FUNC(yuugijou_montemedal_disp_onoff);
-USER_FUNC(yuugijou_montemedal_wait);
 USER_FUNC(yuuminigame2_get_name);
 USER_FUNC(yuuminigame2_opening_chk);
 USER_FUNC(yuuminigame2_opening_on_off);
 USER_FUNC(yuuminigame2_set_phase);
-USER_FUNC(yuuminigame_get_dataadr);
-USER_FUNC(yuuminigame_set_dataadr);
-USER_FUNC(yuuranking_get_monte);
-USER_FUNC(yuuranking_wait_button);
-BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, FuneWork* data);
-void yuuminigame_disp_2fune(CameraId camera, void* param);
-void yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
-static void monte_disp(CameraId camera, void* param);
-static BOOL get_monte_check(Vec* a, Vec* b);
 
 const char* s_nametbl[21];
 const char* a2_nametbl[21];
 const char* a_nametbl[21];
 s32 turn_tbl[22];
 s32 hoko_tbl[22];
-static MonteTable montetable[6];
-extern EvtWord yuu_01_kaijo_init[];
-extern EvtWord yuu_01_kaijo_init2[];
-extern EvtWord minigame02_main[];
-extern EvtWord minigame02_start_cam[];
-extern EvtWord minigame02_start_cam_cancel[];
-extern EvtWord minigame02_start[];
-extern EvtWord minigame02_end[];
-extern EvtWord yuu_01_init_evt[];
 
 const char* s_nametbl[] = {
     NULL, "S_dai_uzu1", "S_dai_uzu2", "S_dai_uzu3", "S_dai_uzu4", "S_uzu1", "S_uzu2", "S_uzu3", "S_uzu4", "S_uzu5",
@@ -229,7 +204,7 @@ EVT_BEGIN(minigame02_start)
             IF_INT_EQUAL(LW(9), 0)
                 CALL(evt_seq_wait, 2)
                 BREAK_LOOP
-                ELSE
+            ELSE
                 CALL(evt_key_get_buttontrg, 0, LW(9))
                 IF_BITS_SET(LW(9), 768)
                     DELETE_EVENT(LW(8))
@@ -248,7 +223,7 @@ EVT_BEGIN(minigame02_start)
     CALL(evt_hitobj_onoff, STRING("taisaku"), 0, 0)
     CALL(evt_mario_mov_pos2, -660, 200, 120)
     CALL(evt_hitobj_onoff, STRING("taisaku"), 0, 1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_MINIGAME1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MINIGAME1"))
     CALL(eff_call_minigame, 0, 0, 0, 500)
     WAIT_MS(3000)
     CALL(evt_cam_letter_box_onoff, 0, 0)
@@ -265,7 +240,7 @@ EVT_BEGIN(minigame02_end)
     IF_INT_LESS(LW(0), 0)
         CALL(eff_call_minigame, 2, 0, 0, 500)
         WAIT_MS(4000)
-        ELSE
+    ELSE
         CALL(eff_call_minigame, 1, 0, 0, 500)
         WAIT_MS(4000)
     END_IF
@@ -287,14 +262,14 @@ EVT_BEGIN(minigame02_end)
     CALL(yuugijou_get_montemedal, LW(0))
     IF_INT_LESS(LW(0), LW(1))
         SET_VALUE(LW(0), 1)
-        ELSE
+    ELSE
         CALL(evt_msg_select, 0, STRING("sysyuu_01_00"))
     END_IF
     IF_INT_NOT_EQUAL(LW(0), 0)
-        SET_VALUE(GSWF(1229), 1)
+        SET_VALUE(GSWF(GSWF_YUU_MINIGAME_QUIT), 1)
         CALL(evt_mario_set_prev_party_pos, 0, 0, -1000, 0)
         CALL(evt_mario_set_prev_party_pos, 1, 0, -1000, 0)
-        CALL(evt_snd_bgmoff, 512)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_bero_mapchange, STRING("gor_03"), STRING("A_dokan_02"))
         RETURN
     END_IF
@@ -303,7 +278,7 @@ EVT_BEGIN(minigame02_end)
     CALL(yuugijou_montemedal_wait)
     WAIT_MS(200)
     CALL(yuugijou_montemedal_disp_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_sfxoff, GW(10))
     CALL(evt_snd_sfxoff, GW(11))
     CALL(evt_fade_out, 1000)
@@ -317,7 +292,7 @@ EVT_BEGIN(minigame02_end)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(yuu_01_init_evt)
     CALL(evt_map_playanim, STRING("den1"), 1, 0)
     CALL(evt_map_playanim, STRING("den2"), 1, 0)
@@ -647,26 +622,26 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame_set_dataadr, 20, LW(15))
     SPAWN_EVENT(PTR(minigame02_main))
     CALL_CHILD(evt_yuunpc_minigame2)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_mon"), 16384)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("J_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("E_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("F_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("Sp_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("I_mon"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_sub_get_language, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(2)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(3)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(4)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(5)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_mon"), MAPOBJ_FLAG_DISABLE)
     END_SWITCH
     RETURN
 EVT_END()
@@ -1043,8 +1018,8 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     data->index = i;
                     marioKeyOff();
                     partyKeyOff();
-                    mario->flags |= 0x200;
-                    mario->flags |= 0x100;
+                    mario->flags |= MARIO_FLAG_FORCE_WALL;
+                    mario->flags |= MARIO_FLAG_FLOORS_DISABLED;
                     data->state = 0;
                     PSVECSubtract(&tmp, &pos, &data->dir);
                     data->dir.y = 0.0f;
@@ -1052,7 +1027,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     PSVECNormalize(&data->dir, &data->dir);
                     data->timer = 120;
                     data->y = mario->position.y;
-                    mario->dispFlags |= 0x100;
+                    mario->dispFlags |= MARIO_DISP_FLAG_DIR_LOCK;
                     psndSFXOn_3D((const char*)0x8DB, &mario->position);
                     data->result--;
                     break;
@@ -1077,7 +1052,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                         }
                         data->index = i;
                         marioSetSwirlPower(1000, 8.0f, irand(91) + hoko_tbl[data->index] - 45);
-                        mario->dispFlags |= 0x100;
+                        mario->dispFlags |= MARIO_DISP_FLAG_DIR_LOCK;
                         break;
                     }
                 }
@@ -1092,65 +1067,65 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
         break;
     }
     if (data->index != 0x15) {
-    angle = mario->displayDirection + turn_tbl[data->index];
-    if (data->index >= 5 && data->index < 13) {
-        if (!marioChkSwirlPower()) {
-            data->index = 0x15;
-            mario->dispFlags &= ~0x100;
-            if (mario->displayDirection >= -90.0f && mario->displayDirection < 90.0f) {
-                angle = 0.0f;
-            } else {
-                angle = 180.0f;
+        angle = mario->displayDirection + turn_tbl[data->index];
+        if (data->index >= 5 && data->index < 13) {
+            if (!marioChkSwirlPower()) {
+                data->index = 0x15;
+                mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
+                if (mario->displayDirection >= -90.0f && mario->displayDirection < 90.0f) {
+                    angle = 0.0f;
+                } else {
+                    angle = 180.0f;
+                }
+            }
+        } else if (data->index >= 1 && data->index < 5) {
+            switch (data->state) {
+                case 0:
+                    data->timer--;
+                    PSMTXRotRad(mtx, 'Y', 0.017453292f * turn_tbl[data->index]);
+                    PSMTXMultVec(mtx, &data->dir, &data->dir);
+                    data->dir.y = 0.0f;
+                    PSVECNormalize(&data->dir, &data->dir);
+                    PSVECScale(&data->dir, &ofs, data->timer >= 30 ? data->dist * ((data->timer - 30) / 90.0f) : 0.0f);
+                    mapObjGetPos(s_nametbl[data->index], &pos);
+                    PSVECAdd(&ofs, &pos, &ofs);
+                    mario->position.x = ofs.x;
+                    mario->position.z = ofs.z;
+                    mario->position.y = data->y - 30.0f * ((120 - data->timer) / 120.0f);
+                    if (data->timer <= 0) {
+                        data->state++;
+                        angle = 0.0f;
+                        data->timer = 30;
+                        mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
+                        data->x = mario->position.x;
+                    }
+                    break;
+                case 1:
+                    data->timer--;
+                    angle = 0.0f;
+                    mario->position.x = data->x + -100.0f * ((30 - data->timer) / 30.0f);
+                    mario->position.y = data->y - 30.0f;
+                    if (data->timer <= 0) {
+                        data->state++;
+                        data->timer = 30;
+                    }
+                    break;
+                case 2:
+                    data->timer--;
+                    angle = 0.0f;
+                    mario->position.y = data->y - 30.0f * (data->timer / 30.0f);
+                    if (data->timer <= 0) {
+                        data->index = 0x15;
+                        marioKeyOn();
+                        partyKeyOn();
+                        mario->flags &= ~MARIO_FLAG_FORCE_WALL;
+                        mario->flags &= ~MARIO_FLAG_FLOORS_DISABLED;
+                    }
+                    break;
             }
         }
-    } else if (data->index >= 1 && data->index < 5) {
-        switch (data->state) {
-            case 0:
-                data->timer--;
-                PSMTXRotRad(mtx, 'Y', 0.017453292f * turn_tbl[data->index]);
-                PSMTXMultVec(mtx, &data->dir, &data->dir);
-                data->dir.y = 0.0f;
-                PSVECNormalize(&data->dir, &data->dir);
-                PSVECScale(&data->dir, &ofs, data->timer >= 30 ? data->dist * ((data->timer - 30) / 90.0f) : 0.0f);
-                mapObjGetPos(s_nametbl[data->index], &pos);
-                PSVECAdd(&ofs, &pos, &ofs);
-                mario->position.x = ofs.x;
-                mario->position.z = ofs.z;
-                mario->position.y = data->y - 30.0f * ((120 - data->timer) / 120.0f);
-                if (data->timer <= 0) {
-                    data->state++;
-                    angle = 0.0f;
-                    data->timer = 30;
-                    mario->dispFlags &= ~0x100;
-                    data->x = mario->position.x;
-                }
-                break;
-            case 1:
-                data->timer--;
-                angle = 0.0f;
-                mario->position.x = data->x + -100.0f * ((30 - data->timer) / 30.0f);
-                mario->position.y = data->y - 30.0f;
-                if (data->timer <= 0) {
-                    data->state++;
-                    data->timer = 30;
-                }
-                break;
-            case 2:
-                data->timer--;
-                angle = 0.0f;
-                mario->position.y = data->y - 30.0f * (data->timer / 30.0f);
-                if (data->timer <= 0) {
-                    data->index = 0x15;
-                    marioKeyOn();
-                    partyKeyOn();
-                    mario->flags &= ~0x200;
-                    mario->flags &= ~0x100;
-                }
-                break;
-        }
-    }
-    mario->displayDirectionTarget = reviseAngle(angle);
-    mario->displayDirection = mario->displayDirectionTarget;
+        mario->displayDirectionTarget = reviseAngle(angle);
+        mario->displayDirection = mario->displayDirectionTarget;
     }
     return FALSE;
 }
@@ -1278,7 +1253,7 @@ static USER_FUNC(fall_rtn) {
     f32 hi;
     Vec v;
     Monte* m;
-    MonteSub* sub;
+    IconEntry* sub;
 
     if (isFirstCall) {
         if (monte_p != NULL) {
@@ -1296,8 +1271,8 @@ static USER_FUNC(fall_rtn) {
         t = 0;
         k = 0;
         for (i = 0; i < monte_p->num; i++) {
-            sub = &monte_p[i].sub;
-            sub->pos.y = 0.0f;
+            sub = &monte_p[i].icon;
+            sub->position.y = 0.0f;
             do {
                 if (MONTETABLE[t].x0 < MONTETABLE[t].x1) {
                     lo = MONTETABLE[t].x0;
@@ -1307,7 +1282,7 @@ static USER_FUNC(fall_rtn) {
                     hi = MONTETABLE[t].x0;
                 }
                 hi -= lo;
-                sub->pos.x = lo + randRange(hi);
+                sub->position.x = lo + randRange(hi);
                 if (MONTETABLE[t].y0 < MONTETABLE[t].y1) {
                     lo = MONTETABLE[t].y0;
                     hi = MONTETABLE[t].y1;
@@ -1316,9 +1291,9 @@ static USER_FUNC(fall_rtn) {
                     hi = MONTETABLE[t].y0;
                 }
                 hi -= lo;
-                sub->pos.z = lo + randRange(hi);
+                sub->position.z = lo + randRange(hi);
                 for (j = 0; j < k; j++) {
-                    PSVECSubtract(&sub->pos, &(sub - (j + 1))->pos, &v);
+                    PSVECSubtract(&sub->position, &(sub - (j + 1))->position, &v);
                     if (PSVECMag(&v) < 20.0f) {
                         break;
                     }
@@ -1332,11 +1307,11 @@ static USER_FUNC(fall_rtn) {
         }
     }
     for (i = 0; i < monte_p->num; i++) {
-        sfx = (0, (SfxNameWord)"SFX_EVT_GAME_MONTE_COUNT1");
+        sfx = (SfxNameWord) "SFX_EVT_GAME_MONTE_COUNT1";
         m = &monte_p[i];
         switch (m->state) {
             case 0:
-                if (monte_check_inl(&m->sub.pos, &marioGetPtr()->position) == TRUE) {
+                if (monte_check_inl(&m->icon.position, &marioGetPtr()->position) == TRUE) {
                     data->monteCount++;
                     psndSFXOn_3D((const char*)sfx, &marioGetPtr()->position);
                     m->hidden = 1;
@@ -1360,7 +1335,7 @@ static void monte_disp(CameraId camera, void* param) {
     if (monte != NULL) {
         for (i = 0; i < monte->num; i++) {
             if (monte[i].hidden == 0) {
-                iconDispGx(&monte[i].sub.pos, 0, ICON_13F, 1.0f);
+                iconDispGx(&monte[i].icon.position, 0, ICON_13F, 1.0f);
             }
         }
     }

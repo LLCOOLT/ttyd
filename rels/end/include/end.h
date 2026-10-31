@@ -1,5 +1,7 @@
 #pragma once
 
+// Declarations shared by the end.rel units (エンディング, the ending).
+
 #include "dolphin/types.h"
 
 extern const char* end_moa_ext_anim;

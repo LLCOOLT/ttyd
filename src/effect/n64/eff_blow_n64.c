@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: blow, count puffs streamed from a point along a direction vector.
 #include "eff/eff_n64.h"
 #include "eff/n64/eff_blow_n64.h"
 #include "driver/camdrv.h"
@@ -7,7 +8,6 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 #include <math.h>
 

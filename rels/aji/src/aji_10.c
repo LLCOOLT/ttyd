@@ -1,3 +1,5 @@
+// aji_10 (敵のアジト, X-Naut Fortress): Sir Grodus's (shuryo) room with the monitor: Peach's scenes with
+// Grodus, Lord Crump and the Shadow Sirens.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -13,77 +15,28 @@
 #include "memory.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "evt/evt_shuryolight.h"
 #include "aji.h"
+#include "evt/evt_story.h"
 
-typedef struct MonitorWork { void* buf; s32 ready; s32 kanbu; } MonitorWork;
+typedef struct MonitorWork {
+    void* buf;
+    s32 ready;
+    s32 kanbu;
+} MonitorWork;
 static MonitorWork* monitor_wp;
-void mapObjGetPos(const char* name, Vec* pos);
 void monitor_cap_capture(CameraId cameraId, void* param);
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_bero_overwrite);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_fade_tec_onoff);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_mode);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_mode);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_wait_move_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_change_interrupt);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_majo_disp_off);
-USER_FUNC(evt_npc_majo_disp_on);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_stay_anim);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_npc_wait_pera);
-USER_FUNC(evt_peach_set_condition);
-USER_FUNC(evt_peach_transform_gundan_on);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_shuryolight_init);
-USER_FUNC(evt_shuryolight_run_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_dist);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_snd_sfxon_3d_ex);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(monitor_cap_evt);
-USER_FUNC(monitor_cap_init);
-USER_FUNC(monitor_kanbu_flag_onoff);
 static USER_FUNC(peach_evt_toumei);
 static USER_FUNC(peach_set_pose);
 static USER_FUNC(viewport);
@@ -101,7 +54,6 @@ extern EvtWord peach_evt_stg3_syuryo_talk[];
 extern EvtWord eff_test[];
 extern EvtWord kanbu_init[];
 static NpcSetupInfo npcEnt[9];
-extern EvtWord aji_10_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -140,8 +92,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -158,8 +110,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -192,8 +144,8 @@ static BeroEntry bero_peach_data[] = {
         "e_bero", // hitName
         1, // type
         10, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -209,7 +161,7 @@ static BeroEntry bero_peach_data[] = {
     {0},
 };
 
-USER_FUNC(monitor_cap_init) {
+static USER_FUNC(monitor_cap_init) {
     u32 size = GXGetTexBufferSize(0x260, 0x1E0, GX_TF_I4, GX_FALSE, 0);
 
     monitor_wp = _mapAlloc(sizeof(MonitorWork));
@@ -219,7 +171,7 @@ USER_FUNC(monitor_cap_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(monitor_kanbu_flag_onoff) {
+static USER_FUNC(monitor_kanbu_flag_onoff) {
     monitor_wp->kanbu = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
@@ -295,7 +247,7 @@ void monitor_cap_capture(CameraId cameraId, void* param) {
     monitor_wp->ready = 1;
 }
 
-USER_FUNC(monitor_cap_evt) {
+static USER_FUNC(monitor_cap_evt) {
     dispEntry(CAMERA_3D, 1000.0f, 0, monitor_cap_capture, NULL);
     return EVT_RETURN_BLOCK;
 }
@@ -376,7 +328,7 @@ static USER_FUNC(peach_evt_toumei) {
 }
 
 EVT_BEGIN(monitor_on)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("monitor"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("monitor"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, STRING("monitor"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_SCREEN_OPEN1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_map_playanim, STRING("monitore_1"), 0, 0)
@@ -391,24 +343,24 @@ EVT_BEGIN(monitor_off)
     CALL(evt_mapobj_get_position, STRING("monitor"), LW(2), LW(3), LW(4))
     CALL(evt_snd_sfxon_3d_ex, STRING("SFX_PEACH_SCREEN_SHUT1"), LW(2), LW(3), LW(4), 255, 255, LW(1), 16, 0)
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("monitor"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("monitor"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
 EVT_BEGIN(monitor_init)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("monitor"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("monitor"), MAPOBJ_FLAG_HIDE)
     CALL(monitor_cap_init)
-    IF_INT_EQUAL(GSW(0), 261)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_43_X_NAUTS_RETREAT)
         CALL(monitor_kanbu_flag_onoff, 1)
-        ELSE
+    ELSE
         CALL(monitor_kanbu_flag_onoff, 0)
     END_IF
     BEGIN_INLINE_EVENT
         CALL(monitor_cap_evt)
     END_INLINE_EVENT
     CALL(evt_map_set_tevcallback, 1, PTR(monitor_cap_tev))
-    CALL(evt_mapobj_flag_onoff, 0, 1, STRING("monitor_1"), 16777216)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("monitor_1"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("monitor_1"), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("monitor_1"), MAPOBJ_FLAG_DISPLAY_LIST)
     RETURN
 EVT_END()
 
@@ -659,7 +611,7 @@ static EVT_BEGIN(peach_evt_stg1)
         CALL(evt_mario_mov_pos2, -90, 0, 60)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("手下２"), -120, 0, 0, 60, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("手下３"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("手下３"), NPC_FLAG_HIDDEN)
     CALL_CHILD(PTR(monitor_off))
     WAIT_MS(700)
     CALL(evt_msg_print, 0, STRING("peach_aji_17"), 0, STRING("シュリョー"))
@@ -667,9 +619,9 @@ static EVT_BEGIN(peach_evt_stg1)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("peach_aji_17_01"), 0, STRING("シュリョー"))
     CALL(evt_msg_print, 0, STRING("peach_aji_18"), 0, STRING("カンブー"))
-    CALL(evt_npc_flag_onoff, 1, STRING("カンブー"), 131088)
+    CALL(evt_npc_flag_onoff, 1, STRING("カンブー"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     CALL(evt_npc_move_position, STRING("カンブー"), -150, -150, 0, 100, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("カンブー"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("カンブー"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_set_position, STRING("シュリョー"), 200, 30, 0)
     CALL(evt_cam3d_evt_set, 200, 130, 283, 200, 78, -13, 0, 11)
     WAIT_FRAMES(1)
@@ -706,7 +658,7 @@ static EVT_BEGIN(peach_evt_stg1)
     WAIT_MS(800)
     CALL(evt_npc_set_anim, STRING("手下２"), STRING("S_1"))
     CALL(evt_npc_move_position, STRING("手下２"), -30, 0, 1000, 0, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("手下２"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("手下２"), NPC_FLAG_HIDDEN)
     WAIT_MS(1000)
     LABEL(100)
     CALL(evt_msg_toge, 1, 0, 0, 0)
@@ -750,7 +702,7 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_fade_tec_onoff, 1, 1)
     WAIT_MS(1000)
     WAIT_MS(1000)
-    CALL(evt_fade_set_mapchange_type, 0, 12, 100, 11, 100)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_BLACK_2D, 100, FADE_IN_BLACK_2D, 100)
     CALL(evt_bero_mapchange, STRING("aji_01"), STRING("peach_evt_stg1"))
     RETURN
 EVT_END()
@@ -763,12 +715,12 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_npc_set_ry, STRING("シュリョー"), 270)
     CALL(evt_npc_set_position, STRING("研究員"), 60, 0, 0)
     CALL(evt_npc_set_ry, STRING("研究員"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("研究員"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("研究員"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 0, 273, 972, 0, 100, -13, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_fade_end_wait)
-    CALL(evt_npc_flag_onoff, 0, STRING("研究員"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING("研究員"), NPC_FLAG_INSTANT_TURN)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 200, 130, 283, 200, 78, -13, 0, 11)
     WAIT_FRAMES(1)
@@ -861,7 +813,7 @@ static EVT_BEGIN(peach_evt_stg2)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_72_14"), 0, STRING("シュリョー"))
     WAIT_MS(2000)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 300, FADE_IN_IRIS, 300)
     CALL(evt_bero_mapchange, STRING("aji_16"), 0)
     RETURN
 EVT_END()
@@ -873,19 +825,19 @@ static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_npc_set_ry, STRING("シュリョー"), 270)
     CALL(evt_npc_set_position, STRING("マジョリン"), 60, 0, 0)
     CALL(evt_npc_set_ry, STRING("マジョリン"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("マジョリン"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("マジョリン"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_position, STRING("マリリン"), 30, 0, -30)
     CALL(evt_npc_set_ry, STRING("マリリン"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("マリリン"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("マリリン"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_position, STRING("ビビアン"), 20, 0, 30)
     CALL(evt_npc_set_ry, STRING("ビビアン"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("ビビアン"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("ビビアン"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 0, 273, 972, 0, 100, -13, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_fade_end_wait)
-    CALL(evt_npc_flag_onoff, 0, STRING("マジョリン"), 32768)
-    CALL(evt_npc_flag_onoff, 0, STRING("マリリン"), 32768)
-    CALL(evt_npc_flag_onoff, 0, STRING("ビビアン"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING("マジョリン"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("マリリン"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("ビビアン"), NPC_FLAG_INSTANT_TURN)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 200, 130, 283, 200, 78, -13, 0, 11)
     WAIT_FRAMES(1)
@@ -921,7 +873,7 @@ static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_npc_majo_disp_off, STRING("ビビアン"))
     WAIT_MS(300)
     WAIT_MS(500)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 300, FADE_IN_IRIS, 300)
     CALL(evt_bero_mapchange, STRING("aji_16"), STRING("peach_evt_stg3"))
     RETURN
 EVT_END()
@@ -952,9 +904,9 @@ EVT_BEGIN(peach_move)
 EVT_END()
 
 EVT_BEGIN(peach_evt_stg3_syuryo_talk)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("シュリョー"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("シュリョー"), NPC_FLAG_INTANGIBLE)
     CALL_CHILD(PTR(peach_move))
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(300)
@@ -980,7 +932,7 @@ EVT_BEGIN(peach_evt_stg3_syuryo_talk)
     CALL(evt_msg_print, 0, STRING("peach_aji_150"), 0, STRING("シュリョー"))
     CALL(evt_msg_print, 0, STRING("peach_aji_151"), 0, STRING("mario"))
     CALL(evt_mario_mov_pos2, -300, 0, FLOAT(80.0f))
-    SET_VALUE(GSW(0), 168)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_03_PEACH_GRODUS)
     CALL(evt_bero_mapchange, STRING("aji_09"), STRING("s_bero"))
     RETURN
 EVT_END()
@@ -993,12 +945,12 @@ static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_npc_set_ry, STRING("シュリョー"), 270)
     CALL(evt_npc_set_position, STRING("研究員"), 60, 0, 0)
     CALL(evt_npc_set_ry, STRING("研究員"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("研究員"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("研究員"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 0, 273, 972, 0, 100, -13, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_fade_end_wait)
-    CALL(evt_npc_flag_onoff, 0, STRING("研究員"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING("研究員"), NPC_FLAG_INSTANT_TURN)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 200, 130, 283, 200, 78, -13, 0, 11)
     WAIT_FRAMES(1)
@@ -1031,7 +983,7 @@ static EVT_BEGIN(peach_evt_stg4)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("peach_aji_166_00_07"), 0, STRING("シュリョー"))
     WAIT_MS(1000)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 300, FADE_IN_IRIS, 300)
     CALL(evt_bero_mapchange, STRING("aji_17"), 0)
     RETURN
 EVT_END()
@@ -1043,7 +995,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_npc_set_position, STRING("手下１"), -375, 0, -70)
     CALL(evt_npc_set_ry, STRING("シュリョー"), 270)
     CALL(evt_cam3d_evt_set, 0, 273, 972, 0, 100, -13, 0, 11)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("monitor"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("monitor"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("monitore_1"), 2, 0)
     WAIT_FRAMES(1)
     CALL(evt_seq_wait, 2)
@@ -1096,7 +1048,7 @@ static EVT_BEGIN(peach_evt_stg5)
     WAIT_MS(1500)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("peach_aji_205"), 0, STRING("シュリョー"))
-    CALL(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 300, FADE_IN_IRIS, 300)
     CALL(evt_bero_mapchange, STRING("aji_17"), 0)
     RETURN
 EVT_END()
@@ -1108,11 +1060,11 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_npc_set_ry, STRING("シュリョー"), 270)
     CALL(evt_npc_set_position, STRING("手下１"), 60, 0, 0)
     CALL(evt_npc_set_ry, STRING("手下１"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("手下１"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("手下１"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 0, 273, 972, 0, 100, -13, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_fade_end_wait)
-    CALL(evt_npc_flag_onoff, 0, STRING("手下１"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING("手下１"), NPC_FLAG_INSTANT_TURN)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 200, 130, 283, 200, 78, -13, 0, 11)
     WAIT_FRAMES(1)
@@ -1140,7 +1092,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_cam3d_evt_set, 190, 150, 354, 190, 75, -13, 1200, 11)
     CALL(evt_npc_move_position, STRING("手下１"), 115, 0, 0, FLOAT(95.0f), 4)
     CALL(evt_npc_get_position, STRING("手下１"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_flag_onoff, 1, STRING("手下１"), 1073741856)
+    CALL(evt_npc_flag_onoff, 1, STRING("手下１"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     LOOP(5)
         ADD(LW(0), 2)
         ADD(LW(1), 2)
@@ -1148,10 +1100,10 @@ static EVT_BEGIN(peach_evt_stg6)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_npc_set_position, STRING("手下１"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_flag_onoff, 0, STRING("手下１"), 1073741824)
+    CALL(evt_npc_flag_onoff, 0, STRING("手下１"), NPC_FLAG_NO_WALL_HIT)
     CALL(evt_npc_move_position, STRING("手下１"), 145, -5, 0, FLOAT(95.0f), 4)
     CALL(evt_npc_get_position, STRING("手下１"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_flag_onoff, 1, STRING("手下１"), 1073741824)
+    CALL(evt_npc_flag_onoff, 1, STRING("手下１"), NPC_FLAG_NO_WALL_HIT)
     LOOP(5)
         ADD(LW(0), 2)
         ADD(LW(1), 2)
@@ -1172,7 +1124,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_msg_print, 0, STRING("peach_aji_279"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, 0, 273, 972, 0, 100, -13, 3000, 11)
     WAIT_MS(1500)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 300, 1, 300)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 300, FADE_IN_IRIS, 300)
     CALL(evt_bero_mapchange, STRING("aji_16"), STRING("peach_evt_stg6"))
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1215,10 +1167,10 @@ EVT_END()
 
 static EVT_BEGIN(syuryo_init)
     CALL_CHILD(PTR(npc_init_evt))
-    IF_INT_EQUAL(GSW(0), 167)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
         CALL(evt_npc_set_position, STRING("me"), -100, 0, 0)
         CALL(evt_npc_change_interrupt, STRING("me"), 6, PTR(peach_evt_stg3_syuryo_talk))
-        CALL(evt_npc_flag_onoff, 0, STRING("me"), 32)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_INTANGIBLE)
     END_IF
     RETURN
 EVT_END()
@@ -1235,7 +1187,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         teshita2_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1245,7 +1197,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"手下３"*/"\x8E\xE8\x89\xBA\x82\x52", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         teshita3_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1255,7 +1207,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"カンブー"*/"\x83\x4A\x83\x93\x83\x75\x81\x5B", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         kanbu_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1265,7 +1217,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"シュリョー"*/"\x83\x56\x83\x85\x83\x8A\x83\x87\x81\x5B", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         syuryo_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1304,58 +1256,58 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 EVT_BEGIN(aji_10_init_evt)
-    IF_INT_LESS(GSW(0), 352)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI5"))
-        ELSE
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN2"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI5"))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI5"))
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI5"))
     END_IF
     CALL(evt_snd_set_rev_mode, 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("monitor"), 1)
-    IF_INT_LESS(GSW(0), 352)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("monitor"), MAPOBJ_FLAG_HIDE)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
         DEBUG_PUT_MSG(STRING("npc setup"))
         CALL(evt_npc_setup, PTR(npcEnt))
         CALL(evt_npc_check_delete, STRING("バリアーンカスタム"))
         CALL(evt_shuryolight_init, STRING("シュリョー"))
         CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
     END_IF
-    SWITCH(GSW(0))
-        CASE_EQUAL(56)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG1_17_FATHER_AND_SON_REUNITED)
         CALL(evt_mario_set_mode, 1)
         CALL_CHILD(PTR(monitor_init))
         SPAWN_EVENT(PTR(peach_evt_stg1))
-        CASE_EQUAL(112)
+        CASE_EQUAL(STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_npc_entry, STRING("研究員"), STRING("c_zako_m"))
         CALL(evt_npc_set_tribe, STRING("研究員"), STRING("第三勢力研究員"))
         CALL(evt_npc_set_stay_anim, STRING("研究員"))
-        CALL(evt_npc_flag_onoff, 1, STRING("研究員"), 1536)
+        CALL(evt_npc_flag_onoff, 1, STRING("研究員"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
         SPAWN_EVENT(PTR(peach_evt_stg2))
-        CASE_EQUAL(164)
+        CASE_EQUAL(STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_mario_set_mode, 1)
         SPAWN_EVENT(PTR(peach_evt_stg3))
-        CASE_EQUAL(167)
+        CASE_EQUAL(STORY_STG3_33_02_PEACH_INCOGNITO)
         CALL(evt_mario_set_mode, 1)
-        CASE_EQUAL(214)
+        CASE_EQUAL(STORY_STG4_15_04_SHADOW_SIRENS_AND_DOOPLISS)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_npc_entry, STRING("研究員"), STRING("c_zako_m"))
         CALL(evt_npc_set_tribe, STRING("研究員"), STRING("第三勢力研究員"))
         CALL(evt_npc_set_stay_anim, STRING("研究員"))
-        CALL(evt_npc_flag_onoff, 1, STRING("研究員"), 1536)
+        CALL(evt_npc_flag_onoff, 1, STRING("研究員"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
         SPAWN_EVENT(PTR(peach_evt_stg4))
-        CASE_EQUAL(261)
+        CASE_EQUAL(STORY_STG5_43_X_NAUTS_RETREAT)
         CALL(evt_mario_set_mode, 1)
         CALL_CHILD(PTR(monitor_init))
         SPAWN_EVENT(PTR(peach_evt_stg5))
-        CASE_BETWEEN(263, 264)
+        CASE_BETWEEN(STORY_STG5_45_PEACH_POTION_PUZZLE, STORY_STG5_46_PEACH_DISK_SEARCH)
         CALL(evt_mario_set_mode, 1)
         CALL(peach_evt_toumei)
         CALL(evt_npc_entry, STRING("みはり"), STRING("c_baria_c"))
         CALL(evt_npc_set_tribe, STRING("みはり"), STRING("バリアーンカスタム"))
         CALL(evt_npc_set_position, STRING("みはり"), 370, 60, -65)
         CALL(evt_npc_set_ry, STRING("みはり"), 270)
-        CALL(evt_npc_flag_onoff, 1, STRING("みはり"), 1536)
+        CALL(evt_npc_flag_onoff, 1, STRING("みはり"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
         BEGIN_INLINE_EVENT
             CALL(evt_bero_exec_wait, 65536)
             SET_VALUE(LW(0), STRING("e_bero"))
@@ -1364,7 +1316,7 @@ EVT_BEGIN(aji_10_init_evt)
             SET_VALUE(LW(0), STRING("e_bero"))
             CALL_CHILD(PTR(bero_case_switch_on))
         END_INLINE_EVENT
-        CASE_EQUAL(339)
+        CASE_EQUAL(STORY_STG6_54_WELCOME_BACK)
         CALL(evt_mario_set_mode, 1)
         SPAWN_EVENT(PTR(peach_evt_stg6))
     END_SWITCH
@@ -1376,11 +1328,12 @@ EVT_BEGIN(aji_10_init_evt)
     CALL(evt_map_playanim, STRING("sikaku"), 1, 0)
     CALL(evt_map_playanim, STRING("mozaiku"), 1, 0)
     CALL(evt_map_playanim, STRING("moji"), 1, 0)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 373)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("バリアーンカスタム"))
     END_IF
-    SET_VALUE(GSWF(4195), 1)
-    IF_INT_EQUAL(GSWF(4195), 0)
+    // BUG: the flag is set just before it is tested for 0, so the e_bero lock below never runs (original game)
+    SET_VALUE(GSWF(GSWF_AJI10_VISITED), 1)
+    IF_INT_EQUAL(GSWF(GSWF_AJI10_VISITED), 0)
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
@@ -1388,15 +1341,15 @@ EVT_BEGIN(aji_10_init_evt)
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_kill_party, 0)
-        IF_INT_EQUAL(GSWF(4204), 1)
+        IF_INT_EQUAL(GSWF(GSWF_AJI09_PEACH3_DISGUISED), 1)
             CALL(evt_peach_transform_gundan_on)
         END_IF
-        IF_INT_EQUAL(GSW(0), 167)
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
             SET_VALUE(LW(0), STRING("e_bero"))
             CALL_CHILD(PTR(bero_case_switch_off))
         END_IF
-        IF_INT_GREATER_OR_EQUAL(GSW(0), 263)
-            IF_INT_LESS_OR_EQUAL(GSW(0), 264)
+        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
+            IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
                 SET_VALUE(LW(0), STRING("e_bero"))
                 CALL_CHILD(PTR(bero_case_switch_on))
             END_IF

@@ -1,12 +1,11 @@
+// ufo (unit kind 208): a test UFO unit carrying a dropped coin (おとしもの, part 2); it never attacks.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_event_subset.h"
-
-USER_FUNC(_ufo_damage_end);
-USER_FUNC(_ufo_damage_start);
-USER_FUNC(_ufo_main);
+#include "battle/battle_sub.h"
+#include "battle/battle_ufo.h"
 
 BattleUnitKind unit_ufo;
 static BattleUnitDefense defence;
@@ -119,10 +118,10 @@ static BattleUnitKindPart parts[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     SPAWN_EVENT(PTR(main_event))
     RETURN
 EVT_END()
@@ -143,9 +142,9 @@ static EVT_BEGIN(damage_event)
         CALL_CHILD(PTR(subsetevt_damage))
         SET_VALUE(LW(14), 40)
         CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
-        CALL(btlevtcmd_AnimeChangePoseType, -2, LW(10), LW(14))
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(10), LW(14))
         CALL(_ufo_damage_end)
-        ELSE
+    ELSE
         SET_VALUE(LW(14), 39)
         SET_VALUE(LW(15), LW(14))
         CALL_CHILD(PTR(subsetevt_damage))
@@ -161,6 +160,6 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END_PAD()

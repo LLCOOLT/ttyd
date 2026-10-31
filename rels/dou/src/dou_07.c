@@ -1,3 +1,5 @@
+// dou_07 (洞窟, Pirate's Grotto): room where the Black Key (0x24) opens a chest and the paper genie (peramajin) gives the Boat Curse (story 246, 247).
+// Elmos (erumosu) appears here; P-Down D-Up badge; the door leads to dou_08.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -8,70 +10,26 @@
 #include "dou.h"
 #include "evt/evt_npc.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_lecture.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "pmario_sound.h"
+#include "version.h"
+#include "evt/evt_story.h"
 
 static USER_FUNC(bgm_start_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_virtual_point);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_color);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_init_camid);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_camid);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mobj_exec_cancel);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_set_anim);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_set_color);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_add_item);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_win_item_select);
-USER_FUNC(lect_cam_load);
-USER_FUNC(lect_cam_save);
 static void majin_callback(s32 type);
 
 extern EvtWord erumosu_dead[];
@@ -81,7 +39,6 @@ static s32 key_tbl[2];
 extern EvtWord apper_elmos[];
 extern EvtWord peramajin_before[];
 extern EvtWord peramajin_after[];
-extern EvtWord dou_07_init_evt[];
 
 static EVT_BEGIN(erumosu_regl)
     RETURN
@@ -89,15 +46,15 @@ EVT_END()
 
 EVT_BEGIN(erumosu_dead)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
-    SET_VALUE(GSWF(2989), 1)
+    SET_VALUE(GSWF(GSWF_DOU07_EMBER_DEFEATED), 1)
     SPAWN_EVENT(PTR(enemy_event_dead_event))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_MS(1000)
     ADD(LW(1), 150)
-    CALL(evt_item_entry, STRING("item_key"), 36, LW(0), LW(1), LW(2), 13, GSWF(2987), 0)
+    CALL(evt_item_entry, STRING("item_key"), ITEM_BLACK_KEY_0x24, LW(0), LW(1), LW(2), 13, GSWF(GSWF_DOU07_BLACK_KEY_TAKEN), 0)
 #else
     WAIT_MS(500)
-    CALL(evt_item_entry, STRING("item_key"), 36, LW(0), LW(1), LW(2), 4, GSWF(2987), 0)
+    CALL(evt_item_entry, STRING("item_key"), ITEM_BLACK_KEY_0x24, LW(0), LW(1), LW(2), 4, GSWF(GSWF_DOU07_BLACK_KEY_TAKEN), 0)
 #endif
     RETURN
 EVT_END()
@@ -105,7 +62,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"エルモス"*/"\x83\x47\x83\x8B\x83\x82\x83\x58", // name
-        0x608, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_ENEMY, // flags
         0, // reactionFlags
         bubble_init_event, // initEvent
         bubble_move_event, // regularEvent
@@ -130,8 +87,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -151,7 +108,7 @@ static s32 key_tbl[] = {
 };
 
 EVT_BEGIN(apper_elmos)
-    SET_VALUE(GSWF(2988), 1)
+    SET_VALUE(GSWF(GSWF_DOU07_EMBER_APPEARED), 1)
     CALL(evt_npc_set_position, STRING("エルモス"), 100, -6, -37)
     CALL(evt_npc_set_color, STRING("エルモス"), 255, 255, 255, 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 1000)
@@ -167,7 +124,7 @@ EVT_BEGIN(apper_elmos)
 EVT_END()
 
 EVT_BEGIN(peramajin_before)
-    IF_INT_EQUAL(GSW(0), 246)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_21_GROTTO_KEY)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_normalize)
         CALL(evt_party_stop, 0)
@@ -178,11 +135,11 @@ EVT_BEGIN(peramajin_before)
             CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
             IF_INT_LESS_OR_EQUAL(LW(3), LW(0))
                 CALL(evt_mario_set_dir, 90, 200, 0)
-                ELSE
+            ELSE
                 CALL(evt_mario_set_dir, 270, 200, 0)
             END_IF
         END_INLINE_EVENT
-        CALL(evt_pouch_check_item, 36, LW(10))
+        CALL(evt_pouch_check_item, ITEM_BLACK_KEY_0x24, LW(10))
         IF_INT_LESS_OR_EQUAL(LW(10), 0)
             CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
             CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_08"), PTR(majin_callback), 0)
@@ -209,7 +166,7 @@ EVT_BEGIN(peramajin_before)
             CALL(evt_party_move_pos2, 0, LW(3), LW(5), FLOAT(80.0f))
             IF_INT_LESS_OR_EQUAL(LW(3), LW(0))
                 CALL(evt_party_set_dir, 0, 90, -1)
-                ELSE
+            ELSE
                 CALL(evt_party_set_dir, 0, 270, -1)
             END_IF
         END_INLINE_EVENT
@@ -217,7 +174,7 @@ EVT_BEGIN(peramajin_before)
         CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_11"), PTR(majin_callback), 0)
         CALL(evt_mario_set_pose, STRING("M_I_N"))
         CALL(evt_cam3d_evt_set, -33, 92, 412, -33, 36, 92, 500, 11)
-        CALL(evt_pouch_remove_item, 36, LW(10))
+        CALL(evt_pouch_remove_item, ITEM_BLACK_KEY_0x24, LW(10))
         CALL(evt_party_run, 0)
         CALL(evt_mario_key_onoff, 1)
         RETURN
@@ -232,7 +189,7 @@ EVT_BEGIN(peramajin_before)
         CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
         IF_INT_LESS_OR_EQUAL(LW(3), LW(0))
             CALL(evt_mario_set_dir, 90, 200, 0)
-            ELSE
+        ELSE
             CALL(evt_mario_set_dir, 270, 200, 0)
         END_IF
     END_INLINE_EVENT
@@ -273,7 +230,7 @@ EVT_BEGIN(peramajin_before)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_APPEAR1"), 0)
     CALL_CHILD(PTR(apper_elmos))
     CALL(evt_mobj_exec_cancel, STRING("mobj_box00"))
-    SET_VALUE(GSW(0), 246)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_21_GROTTO_KEY)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -283,10 +240,10 @@ EVT_BEGIN(peramajin_after)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
-    CALL(evt_pouch_add_item, 5, LW(0))
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_EVT_PERAMAJIN1"))
-    CALL(evt_snd_envoff, 1024)
+    CALL(evt_pouch_add_item, ITEM_BOAT_CURSE, LW(0))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_PERAMAJIN1"))
+    CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(bgm_start_wait)
     SET_VALUE(LW(1), 60)
     LOOP(LW(1))
@@ -342,7 +299,7 @@ EVT_BEGIN(peramajin_after)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PERAMAJIN_GOOUT1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_snd_bgmoff_f, 513, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 2000)
     CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_2"))
     CALL(evt_img_wait_animend, STRING("img"))
     BEGIN_INLINE_EVENT
@@ -355,39 +312,39 @@ EVT_BEGIN(peramajin_after)
     ADD(LW(1), 20)
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
     CALL(evt_msg_print_party, STRING("stg1_gon_majin4_19"))
-    SET_VALUE(GSW(0), 247)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_21_01_BOAT_MOD_OBTAINED)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-    CALL(evt_snd_envoff, 513)
-    CALL(evt_snd_envon, 288, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(dou_07_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU7"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU7"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    IF_INT_EQUAL(GSWF(2989), 0)
+    IF_INT_EQUAL(GSWF(GSWF_DOU07_EMBER_DEFEATED), 0)
         CALL(evt_npc_setup, PTR(npcEnt))
     END_IF
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_01"), STRING("Ship_Change_01"))
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     SET_VALUE(GF(0), 0)
-    CALL(evt_mobj_itembox, STRING("mobj_box00"), -33, -18, 56, 3, PTR(peramajin_before), PTR(peramajin_after), GSWF(2980))
-    CALL(evt_item_entry, STRING("item_00"), 270, -75, -30, -15, 16, GSWF(2985), 0)
-    IF_INT_EQUAL(GSWF(2988), 1)
-        IF_INT_EQUAL(GSWF(2989), 0)
+    CALL(evt_mobj_itembox, STRING("mobj_box00"), -33, -18, 56, 3, PTR(peramajin_before), PTR(peramajin_after), GSWF(GSWF_DOU07_BLACK_CHEST_OPENED))
+    CALL(evt_item_entry, STRING("item_00"), ITEM_P_DOWN_D_UP, -75, -30, -15, 16, GSWF(GSWF_DOU07_PDOWN_DUP_TAKEN), 0)
+    IF_INT_EQUAL(GSWF(GSWF_DOU07_EMBER_APPEARED), 1)
+        IF_INT_EQUAL(GSWF(GSWF_DOU07_EMBER_DEFEATED), 0)
             SPAWN_EVENT(PTR(apper_elmos))
         END_IF
     END_IF
-    IF_INT_EQUAL(GSWF(2989), 1)
-        CALL(evt_item_entry, STRING("item_key"), 36, 100, -6, -37, 14, GSWF(2987), 0)
+    IF_INT_EQUAL(GSWF(GSWF_DOU07_EMBER_DEFEATED), 1)
+        CALL(evt_item_entry, STRING("item_key"), ITEM_BLACK_KEY_0x24, 100, -6, -37, 14, GSWF(GSWF_DOU07_BLACK_KEY_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -405,8 +362,6 @@ static void majin_callback(s32 type) {
         animPoseSetAnim(mobj->poseId, "S_1", TRUE);
     }
 }
-
-BOOL psndBGMStartCheck(s32 id);
 
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;

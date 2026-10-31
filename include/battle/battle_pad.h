@@ -1,18 +1,28 @@
+// Declares the battle controller input structure and its update functions.
 #pragma once
 
 #include <dolphin/pad.h>
 
+// Bits above the PAD_BUTTON_* ones in the battle pad masks: stick and C-stick tilted past 30 (BtlPad_WorkUpdate)
+#define BTL_PAD_STICK_UP (1 << 16)
+#define BTL_PAD_STICK_DOWN (1 << 17)
+#define BTL_PAD_STICK_LEFT (1 << 18)
+#define BTL_PAD_STICK_RIGHT (1 << 19)
+#define BTL_PAD_SUBSTICK_UP (1 << 20)
+#define BTL_PAD_SUBSTICK_DOWN (1 << 21)
+#define BTL_PAD_SUBSTICK_LEFT (1 << 22)
+#define BTL_PAD_SUBSTICK_RIGHT (1 << 23)
+
 typedef struct BattleWorkPad {
-	PADStatus mPadData[2]; //0x0, current, last
+    PADStatus padData[2]; // 0x0, current, last
 
-	u32 mButtonsPressedHistory[30]; //0x18
-	u32 mButtonsHeldHistory[30]; //0x90
-	u32 mButtonsHistory[30]; //0x108
-	u32 mButtonsReleasedHistory[30]; //0x180
+    u32 buttonsPressedHistory[30];  // 0x18
+    u32 buttonsRepeatHistory[30];   // 0x90, repeat-fired buttons (from buttonRepeat), newest first
+    u32 buttonsHistory[30];         // 0x108
+    u32 buttonsReleasedHistory[30]; // 0x180
 
-	s8 mHoldRepeatState; //0x1F8
-	s8 mHoldRepeatFrameCounter; //0x1F9
-	u8 pad_0x1FA[2]; //0x1FA
+    s8 holdRepeatState;        // 0x1F8
+    s8 holdRepeatFrameCounter; // 0x1F9
 } BattleWorkPad;
 
 void BattlePadInit(void);

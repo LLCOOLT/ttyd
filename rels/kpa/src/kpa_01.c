@@ -1,3 +1,6 @@
+// kpa_01 (クッパ編, Bowser's interludes): a Bowser's Castle scene in the hall with Kammy Koopa, the Hammer Bros. and the
+// Spiny guards.
+
 #include "driver/msgdrv.h"
 #include "memory.h"
 #include "battle/battle_unit.h"
@@ -11,104 +14,35 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_case.h"
 #include "evt/evt_sub.h"
-#ifdef VERSION_G8MP01
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "kpa_act.h"
+#include "party/party_motion.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
+#if VERSION == VERSION_EU
 #include "koopa.h"
 #include "kpa.h"
 #endif
 
-USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_position);
-USER_FUNC(evt_img_set_virtual_point);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_mov_pos);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dispdir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_wait_move_end);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_kamek_kemuri2);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_npc_set_stay_anim);
-USER_FUNC(evt_npc_set_stop_anim);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_set_walk_anim);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_npc_wait_pera);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfx_pos);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_get_stopwatch);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
 USER_FUNC(get_togenoko_pos);
-USER_FUNC(kpa_chg_pose);
 static USER_FUNC(make_name);
 void kpa_stg1_008_cb(s32 type, smartEntry* smart);
 void kpa_stg1_014_2_cb(s32 type, smartEntry* smart);
 void kpa_stg1_036_cb(s32 type, smartEntry* smart);
 void kpa_stg1_034_cb(s32 type, smartEntry* smart);
 
-extern EvtWord kpa_01_door_open[];
-extern EvtWord kpa_01_door_close[];
-extern EvtWord kpa_01_touzyo_evt[];
-extern EvtWord kpa_01_syuppatu_evt[];
-extern EvtWord kpa_01_pos_check[];
-extern EvtWord douzou_1_touch_evt[];
-extern EvtWord douzou_2_touch_evt[];
-extern EvtWord douzou_3_touch_evt[];
-extern EvtWord togenoko_A_talk_evt[];
-extern EvtWord togenoko_B_talk_evt[];
-extern EvtWord togenoko_C_init_evt[];
-extern EvtWord hammer_AB_init_evt[];
-extern EvtWord hammer_AB_talk_evt[];
-extern EvtWord hammer_C_talk_evt[];
-extern EvtWord hammer_D_talk_evt[];
-extern EvtWord hammer_E_init_evt[];
-extern EvtWord hammer_E_talk_evt[];
-extern EvtWord baba_init_evt[];
-extern EvtWord kamek_init_evt[];
-extern EvtWord hkoopa_init_evt[];
 static NpcSetupInfo npcEnt[13];
-extern EvtWord kpa_01_init_evt[];
 
 EVT_BEGIN(kpa_01_door_open)
     BEGIN_INLINE_EVENT
@@ -276,8 +210,8 @@ EVT_BEGIN(kpa_01_door_close)
 EVT_END()
 
 EVT_BEGIN(kpa_01_touzyo_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STGK_CASTLE1"))
-    CALL(evt_snd_envoff, 512)
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STGK_CASTLE1"))
+    CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_kill_party, 0)
@@ -317,8 +251,8 @@ EVT_BEGIN(kpa_01_touzyo_evt)
     WAIT_MS(500)
     WAIT_MS(100)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_001"), 0, STRING("トゲノコＡ"))
-    SET_VALUE(GSW(0), 60)
-#ifndef VERSION_G8ME01_DEMO
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_19_01_BOWSER_CASTLE)
+#if VERSION != VERSION_DEMO
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -420,7 +354,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     DELETE_EVENT(LW(0))
     SET_VALUE(LSWF(1), 0)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0048828125f), 800)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0048828125f), 800)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(450)
@@ -452,7 +386,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
             WAIT_FRAMES(1)
         END_LOOP
         WAIT_MS(150)
-        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0048828125f), 1000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0048828125f), 1000)
     END_INLINE_EVENT
     CALL(evt_msg_print, 0, STRING("kpa_stg1_036"), PTR(kpa_stg1_036_cb), STRING("mario"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -470,7 +404,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
             IF_INT_NOT_EQUAL(GF(0), 0)
                 BREAK_LOOP
             END_IF
-            CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 150)
+            CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.009765625f), 150)
             WAIT_MS(150)
         END_LOOP
     END_INLINE_EVENT
@@ -523,13 +457,13 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_044"), 0, STRING("mario"))
     CALL(evt_cam3d_evt_set, 430, 180, 517, 430, 90, 0, 1500, 11)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_flag_onoff, 1, STRING("ババ"), 32)
+        CALL(evt_npc_flag_onoff, 1, STRING("ババ"), NPC_FLAG_INTANGIBLE)
         WAIT_MS(900)
         CALL(evt_npc_get_position, STRING("ババ"), LW(0), LW(1), LW(2))
         SUBTRACT(LW(2), 30)
         CALL(evt_npc_jump_position_nohit, STRING("ババ"), LW(0), LW(1), LW(2), 200, 20)
         WAIT_MS(1100)
-        CALL(evt_npc_flag_onoff, 0, STRING("ババ"), 32)
+        CALL(evt_npc_flag_onoff, 0, STRING("ババ"), NPC_FLAG_INTANGIBLE)
         CALL(evt_npc_move_position, STRING("ババ"), 325, 0, 0, 40, 0)
         WAIT_MS(100)
         CALL(evt_npc_set_anim, STRING("ババ"), STRING("P_1"))
@@ -620,10 +554,10 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
         CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
         CALL(evt_snd_sfxon, STRING("SFX_OFF_KUPPA_WALL_BREAK1"), 0)
         BEGIN_SIBLING_EVENT
-            CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.049804688f), 500)
+            CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.049804688f), 500)
         END_SIBLING_EVENT
         BEGIN_SIBLING_EVENT
-            CALL(evt_cam_shake, 6, FLOAT(0.0f), FLOAT(0.049804688f), 500)
+            CALL(evt_cam_shake, CAMERA_3D_IMAGE, FLOAT(0.0f), FLOAT(0.049804688f), 500)
         END_SIBLING_EVENT
         WAIT_MS(200)
         BEGIN_SIBLING_EVENT
@@ -705,7 +639,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(evt_npc_flag_onoff, 1, STRING("飛クッパ"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("飛クッパ"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_set_tribe, STRING("ババ"), STRING("カメックババ"))
     CALL(evt_sub_get_sincos, 132, LW(2), LW(3))
     MULTIPLY_FLOAT(LW(3), FLOAT(60.0f))
@@ -793,7 +727,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
             GOTO(10)
         END_IF
     END_INLINE_EVENT
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     BEGIN_INLINE_EVENT
         CALL(evt_npc_kamek_kemuri2, STRING("ババ"), 1500, 1)
     END_INLINE_EVENT
@@ -823,7 +757,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
         GOTO(11)
     END_IF
     SET_VALUE(GF(0), 1)
-    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), NPC_FLAG_HIDDEN)
     WAIT_MS(500)
     CALL(evt_bero_mapchange, STRING("kpa_00"), STRING(""))
     CALL(evt_mario_key_onoff, 1)
@@ -869,12 +803,12 @@ EVT_BEGIN(douzou_3_touch_evt)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(evt_snd_bgmon, 513, STRING("BGM_FF_GET_ITEM1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_FF_GET_ITEM1"))
     END_INLINE_EVENT
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_1"), STRING("KPA_T_1"))
     CALL(evt_msg_print, 0, STRING("kpa_stg1_014_2"), PTR(kpa_stg1_014_2_cb), STRING("mario"))
     WAIT_MS(300)
-    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -891,21 +825,21 @@ EVT_END()
 
 EVT_BEGIN(togenoko_C_init_evt)
     CALL_CHILD(PTR(npc_init_evt))
-    CALL(evt_npc_flag_onoff, 1, STRING("me"), 131088)
+    CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 EVT_BEGIN(hammer_AB_init_evt)
     CALL_CHILD(PTR(npc_init_evt))
-    IF_INT_EQUAL(GSWF(4775), 0)
-        CALL(evt_npc_flag_onoff, 1, STRING("me"), 16777216)
+    IF_INT_EQUAL(GSWF(GSWF_KPA01_HAMMER_BROS_TALKED), 0)
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_TURN_TO_MARIO)
     END_IF
     RETURN
 EVT_END()
 
 EVT_BEGIN(hammer_AB_talk_evt)
-    IF_INT_EQUAL(GSWF(4775), 0)
+    IF_INT_EQUAL(GSWF(GSWF_KPA01_HAMMER_BROS_TALKED), 0)
         CALL(evt_msg_print, 0, STRING("kpa_stg1_006"), 0, STRING("ハンマーＡ"))
         CALL(evt_msg_print, 0, STRING("kpa_stg1_007"), 0, STRING("ハンマーＢ"))
         SET_VALUE(LSWF(1), 0)
@@ -926,10 +860,10 @@ EVT_BEGIN(hammer_AB_talk_evt)
         CALL(evt_msg_print, 0, STRING("kpa_stg1_008"), PTR(kpa_stg1_008_cb), STRING("ハンマーＡ"))
         CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_1"), STRING("KPA_T_1"))
         CALL(evt_msg_print, 0, STRING("kpa_stg1_009"), 0, STRING("mario"))
-        SET_VALUE(GSWF(4775), 1)
-        CALL(evt_npc_flag_onoff, 0, STRING("ハンマーＡ"), 16777216)
-        CALL(evt_npc_flag_onoff, 0, STRING("ハンマーＢ"), 16777216)
-        ELSE
+        SET_VALUE(GSWF(GSWF_KPA01_HAMMER_BROS_TALKED), 1)
+        CALL(evt_npc_flag_onoff, 0, STRING("ハンマーＡ"), NPC_FLAG_NO_TURN_TO_MARIO)
+        CALL(evt_npc_flag_onoff, 0, STRING("ハンマーＢ"), NPC_FLAG_NO_TURN_TO_MARIO)
+    ELSE
         CALL(evt_set_dir_to_target, STRING("ハンマーＡ"), STRING("mario"))
         CALL(evt_set_dir_to_target, STRING("ハンマーＢ"), STRING("mario"))
         WAIT_FRAMES(1)
@@ -1099,7 +1033,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
-        0x20, // flags
+        NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         hkoopa_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1114,7 +1048,7 @@ static EVT_BEGIN(shan_init)
     SET_VALUE(LW(0), 1)
     LOOP(12)
         CALL(make_name, LW(0), LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_get_position, LW(1), LW(2), LW(3), LW(4))
         SUBTRACT_FLOAT(LW(3), FLOAT(2.5f))
         CALL(evt_eff, STRING(""), STRING("fire"), 6, LW(2), LW(3), LW(4), FLOAT(0.2998047f), 1000, 0, 0, 0, 0, 0, 0)
@@ -1126,16 +1060,16 @@ EVT_END()
 EVT_BEGIN(kpa_01_init_evt)
     CALL(evt_mario_set_mode, 2)
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_run_case_evt, 9, 1, STRING("a_zou_1"), 0, PTR(douzou_1_touch_evt), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("a_zou_2"), 0, PTR(douzou_2_touch_evt), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("a_zou_3"), 0, PTR(douzou_3_touch_evt), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_zou_1"), 0, PTR(douzou_1_touch_evt), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_zou_2"), 0, PTR(douzou_2_touch_evt), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_zou_3"), 0, PTR(douzou_3_touch_evt), 0)
     CALL_CHILD(shan_init)
-    SWITCH(GSW(0))
-        CASE_EQUAL(59)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_EQUAL(STORY_STG1_19_PEACH_TEC)
         SPAWN_EVENT(kpa_01_touzyo_evt)
         SPAWN_EVENT(kpa_01_pos_check)
-        CASE_EQUAL(60)
-        CALL(evt_snd_bgmoff, 30720)
+        CASE_EQUAL(STORY_STG1_19_01_BOWSER_CASTLE)
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(80))
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("player"))
             CALL(evt_mario_set_pos, -700, 0, 0)
@@ -1152,7 +1086,7 @@ EVT_BEGIN(kpa_01_init_evt)
         END_IF
     END_SWITCH
     RETURN
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 EVT_END()
 #else
 EVT_END_PAD()
@@ -1237,7 +1171,7 @@ USER_FUNC(get_togenoko_pos) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 // PAL only: called at the start of kpa_03's jumpstand_evt
 USER_FUNC(kpa_cancel_attack_mode) {
     kpaCancelAttackMode();

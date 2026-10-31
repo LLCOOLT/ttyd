@@ -1,3 +1,4 @@
+// Excess Express (rsh) battle database: the Smorg (moamoa) boss setup, its stage and background scripting, and the area battle tables.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
@@ -8,10 +9,10 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_stage.h"
 #include "driver/npcdrv.h"
+#include "rsh.h"
 
 USER_FUNC(_set_destroy_flag);
 USER_FUNC(_set_offset);
-extern BattleUnitKind unit_boss_moamoa;
 
 BattleStageObjectData rsh_btlobject_data[7];
 BattleStageData rsh_btlstage_data[1];
@@ -35,10 +36,10 @@ BattleStageObjectData rsh_btlobject_data[] = {
 
 BattleStageData rsh_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_06_0", // mSpecificStageDataDir
-        7, // mNumObjects
-        rsh_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_06_0", // specificStageDataDir
+        7, // numObjects
+        rsh_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, NULL, {0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgA2Evt
@@ -49,10 +50,10 @@ BattleStageData rsh_btlstage_data[] = {
 
 BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[] = {
     {
-        &unit_boss_moamoa, // mUnitKindParams
+        &unit_boss_moamoa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, -20.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -97,7 +98,7 @@ NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_rsh_btlno_rsh_06_01_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         6, // randomMode
         {{3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG6_GREAT_MOAMOA1", // bgmName

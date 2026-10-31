@@ -1,3 +1,6 @@
+// Paper Mario 64 effect: a green blob lobbed from a start point to an end point along an arc,
+// squashing and stretching as it moves; lasts `duration` frames plus a fade-out.
+#include "eff/n64/eff_pokopi_pipo_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -8,29 +11,28 @@
 #include <stdlib.h>
 
 typedef struct EffPokopiPipoN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    Vec start;     // 0x10
-    Vec end;       // 0x1C
-    s32 timeLeft;  // 0x28 lifetime
-    s32 frame;     // 0x2C
-    s32 r;         // 0x30
-    s32 g;         // 0x34
-    s32 b;         // 0x38
-    s32 alpha;     // 0x3C
-    f32 scale;     // 0x40
-    f32 velX;      // 0x44
-    f32 velY;      // 0x48
-    f32 velZ;      // 0x4C
-    f32 angle;     // 0x50
-    f32 angleVel;  // 0x54
-    f32 scaleX;    // 0x58
-    f32 scaleY;    // 0x5C
-    s32 scaleIdx;  // 0x60
-    s32 falling;   // 0x64
-    s32 duration;  // 0x68
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    Vec start;    // 0x10
+    Vec end;      // 0x1C
+    s32 timeLeft; // 0x28 lifetime
+    s32 frame;    // 0x2C
+    s32 r;        // 0x30
+    s32 g;        // 0x34
+    s32 b;        // 0x38
+    s32 alpha;    // 0x3C
+    f32 scale;    // 0x40
+    f32 velX;     // 0x44
+    f32 velY;     // 0x48
+    f32 velZ;     // 0x4C
+    f32 angle;    // 0x50
+    f32 angleVel; // 0x54
+    f32 scaleX;   // 0x58
+    f32 scaleY;   // 0x5C
+    s32 scaleIdx; // 0x60
+    s32 falling;  // 0x64
+    s32 duration; // 0x68
 } EffPokopiPipoN64Work;
-
 
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
@@ -55,7 +57,7 @@ EffectEntry* effPokopiPipoN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPokopiPipoN64Work));
     effect->userdata = work;
     effect->callback = effPokopiPipoMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (duration <= 0) {
@@ -105,8 +107,8 @@ void effPokopiPipoMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timeLeft = 16;
     }
     if (work->timeLeft < 1000) {

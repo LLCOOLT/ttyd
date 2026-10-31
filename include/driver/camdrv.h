@@ -1,3 +1,4 @@
+// camdrv.c: the camera driver (CameraEntry, CameraId): the fixed camera set, projection and view matrices.
 #pragma once
 
 #include <dolphin/gx.h>
@@ -23,8 +24,22 @@ typedef enum CameraId {
     CAMERA_MAX,
 } CameraId;
 
+// CameraEntry.flags
+typedef enum CameraFlags {
+    CAM_FLAG_HIDDEN = 0x1,               // camDispOff; camDraw skips the camera
+    CAM_FLAG_CTRL_OFF = 0x2,             // camCtrlOff; cam3dMain returns early
+    CAM_FLAG_ROAD_LOADED = 0x4,          // camLoadRoad when camRoadSetup succeeds; cleared by camUnLoadRoad
+    CAM_FLAG_PROJ_ADJUST = 0x8,          // evt_cam shake; camDraw concatenates projAdjust into the projection, clears it
+    CAM_FLAG_FOLLOW_Y_OFF = 0x10,        // camFollowYOff; cam3dMain skips the Y follow of Mario
+    CAM_FLAG_ROAD_SHIFT_OFF = 0x20,      // evt_cam3d_road_shift_onoff off; camShiftMain resets the shift
+    CAM_FLAG_EVAL_NEAR_FAR = 0x40,       // camDraw re-evaluates near/far for perspective cameras; never set in C
+    CAM_FLAG_LETTER_BOX = 0x100,         // letterbox on (evt_cam_letter_box_onoff, camLetterBox when Mario lacks control)
+    CAM_FLAG_LETTER_BOX_DISABLE = 0x200, // camLetterBox leaves the letterbox alone (evt_cam_letter_box_disable)
+    CAM_FLAG_LETTER_BOX_SNAP = 0x400,    // next camLetterBox jumps to the final letterbox state, then clears it
+} CameraFlags;
+
 struct CameraEntry {
-    u16 flags;                   // 0x0
+    u16 flags;                   // 0x0, CameraFlags
     u16 mode;                    // 0x2
     u16 stateA;                  // 0x4
     u8 align_6[0x8 - 0x6];       // 0x6
@@ -76,25 +91,26 @@ struct CameraEntry {
     u8 align_1E6[0x1E8 - 0x1E6]; // 0x1E6
     CameraId letterBoxCamId;     // 0x1E8
     CameraCallback callback;     // 0x1EC
-    Vec reserved_1F0;               // 0x1F0, camInit sets (0, 8, 400), never read
-    u32 pad_1FC;               // 0x1FC, never accessed
-    Vec reserved_200;               // 0x200, camInit zeroes, never read
-    Vec reserved_20C;               // 0x20C, camInit zeroes, never read
-    u16 reserved_218;               // 0x218, camInit zeroes, never read
-    u16 reserved_21A;               // 0x21A, camInit zeroes, never read
-    u16 reserved_21C;               // 0x21C, camInit zeroes, never read
-    u16 reserved_21E;               // 0x21E, camInit zeroes, never read
-    u32 pad_220;               // 0x220, never accessed
-    Vec reserved_224;               // 0x224, camInit zeroes, never read
-    Vec reserved_230;               // 0x230, camInit sets (10, 10, 10), never read
-    Vec reserved_23C;               // 0x23C, camInit zeroes, never read
-    Vec reserved_248;               // 0x248, camInit zeroes, never read
+    Vec reserved_1F0;            // 0x1F0, camInit sets (0, 8, 400), never read
+    u32 pad_1FC;                 // 0x1FC, never accessed
+    Vec reserved_200;            // 0x200, camInit zeroes, never read
+    Vec reserved_20C;            // 0x20C, camInit zeroes, never read
+    u16 reserved_218;            // 0x218, camInit zeroes, never read
+    u16 reserved_21A;            // 0x21A, camInit zeroes, never read
+    u16 reserved_21C;            // 0x21C, camInit zeroes, never read
+    u16 reserved_21E;            // 0x21E, camInit zeroes, never read
+    u32 pad_220;                 // 0x220, never accessed
+    Vec reserved_224;            // 0x224, camInit zeroes, never read
+    Vec reserved_230;            // 0x230, camInit sets (10, 10, 10), never read
+    Vec reserved_23C;            // 0x23C, camInit zeroes, never read
+    Vec reserved_248;            // 0x248, camInit zeroes, never read
     char name[0xC];              // 0x254
 };
 
 void camInit(void);
 void camMain(void);
 void camDraw(void);
+void camLetterBoxDraw(CameraId cameraId, void* param);
 
 void camLoadRoad(CameraId cameraId, const char* filename);
 void camUnLoadRoad(CameraId cameraId);

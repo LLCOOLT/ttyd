@@ -1,3 +1,4 @@
+// Smorg (moamoa): mouth part of the boss battle unit, used on the Excess Express.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -7,17 +8,9 @@
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
-
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetHpGaugeOffset);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-extern PoseTableEntry moamoa1_weakness_pose_table[];
-extern s32 moamoa_defence_no_parts[];
+#include "battle/battle_sub.h"
+#include "rsh.h"
+#include "version.h"
 
 BattleUnitKind unit_boss_moamoa_mouth;
 static BattleUnitDefense defence;
@@ -129,28 +122,28 @@ static BattleWeapon weapon_moamoa_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {10, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x7FF, // counterResistFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
@@ -158,17 +151,17 @@ static BattleWeapon weapon_moamoa_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetHpGaugeOffset, -2, 50, 62)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetHpGaugeOffset, BTL_UNIT_SELF, 50, 62)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -180,23 +173,23 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_DOWN2"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("L_2_6"))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_DOWN2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("L_2_6"))
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(1))
+    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
     CALL(btlevtcmd_SetUnitWork, LW(1), 6, -1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(1), 1, PTR(moamoa_defence_no_parts))
     CALL(btlevtcmd_OffPartsAttribute, LW(1), 1, 536870912)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(1), 1, PTR(moamoa1_weakness_pose_table))
     CALL(btlevtcmd_SetHitOffset, LW(1), 1, 0, 32, 0)
     CALL(btlevtcmd_SetHitCursorOffset, LW(1), 1, 0, 41, 0)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_BIG1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_BIG2"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_BIG1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_BIG2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, LW(1), 1, STRING("V_1"))
     WAIT_FRAMES(1)
     CALL(btlevtcmd_AnimeWaitPlayComplete, LW(1), 1)
-    CALL(btlevtcmd_KillUnit, -2, 0)
+    CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN
 EVT_END()
 
@@ -205,20 +198,20 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     CALL_CHILD(PTR(evt_attack))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_attack_other_arm)
     SET_INT_READ_ADDR(LW(1))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_MOVE1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_MOVE1"), EVT_NULLPTR, 0, LW(15))
     LOOP(0)
         READ_INT(LW(2))
         IF_INT_EQUAL(LW(2), 0)
@@ -236,7 +229,7 @@ static EVT_BEGIN(evt_attack_other_arm)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_MOVE1"), -250000000, 0, LW(15))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_MOVE1"), EVT_NULLPTR, 0, LW(15))
     LOOP(0)
         READ_INT(LW(2))
         IF_INT_EQUAL(LW(2), 0)
@@ -261,10 +254,10 @@ const char* mouth_Attack_front[] = {
 };
 
 static EVT_BEGIN(evt_attack)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_moamoa_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_moamoa_attack))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -272,39 +265,39 @@ static EVT_BEGIN(evt_attack)
         RETURN
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 8)
-    CALL(evt_btl_camera_set_homing_unit, 0, -2, LW(3))
+    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 100)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_moamoa_attack))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_moamoa_attack))
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(6))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_moamoa_attack))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(6))
     CALL(btlevtcmd_SetUnitWork, LW(6), 0, 0)
     CALL(btlevtcmd_AnimeChangePose, LW(6), 1, STRING("S_1_1"))
     SET_VALUE(LW(15), 0)
     SET_INT_READ_ADDR(PTR(&mouth_Attack_front))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_MOVE4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_MOVE4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LOOP(0)
         READ_INT(LW(2))
         IF_INT_EQUAL(LW(2), 0)
             BREAK_LOOP
         END_IF
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+        CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     END_LOOP
     WAIT_MS(1000)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BOSS_MOA_G_ARM_MOVE5"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_MOVE5"), EVT_NULLPTR, 0, EVT_NULLPTR)
     IF_INT_EQUAL(LW(15), 0)
         LOOP(0)
             READ_INT(LW(2))
             IF_INT_EQUAL(LW(2), 0)
                 BREAK_LOOP
             END_IF
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+            CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
         END_LOOP
     ELSE
         BEGIN_SIBLING_EVENT
@@ -313,18 +306,18 @@ static EVT_BEGIN(evt_attack)
                 IF_INT_EQUAL(LW(2), 0)
                     BREAK_LOOP
                 END_IF
-                CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
                 WAIT_FRAMES(1)
-                CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+                CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
             END_LOOP
             LOOP(0)
                 READ_INT(LW(2))
                 IF_INT_EQUAL(LW(2), 0)
                     BREAK_LOOP
                 END_IF
-                CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
                 WAIT_FRAMES(1)
-                CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+                CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
             END_LOOP
             SET_VALUE(GF(9), 0)
         END_SIBLING_EVENT
@@ -333,13 +326,13 @@ static EVT_BEGIN(evt_attack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(0)
-        CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_moamoa_attack), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_moamoa_attack), 256, LW(5))
         SWITCH(LW(5))
             CASE_EQUAL(1)
             IF_INT_EQUAL(LW(10), 0)
                 CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_moamoa_attack))
             END_IF
-            CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_moamoa_attack), 256, LW(5))
+            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_moamoa_attack), 256, LW(5))
             CASE_EQUAL(4)
             CASE_EQUAL(3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -362,9 +355,9 @@ static EVT_BEGIN(evt_attack)
             IF_INT_EQUAL(LW(2), 0)
                 BREAK_LOOP
             END_IF
-            CALL(btlevtcmd_AnimeChangePose, -2, 1, LW(2))
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_AnimeWaitPlayComplete, -2, 1)
+            CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
         END_LOOP
     ELSE
         SET_VALUE(GF(9), 1)
@@ -374,7 +367,6 @@ static EVT_BEGIN(evt_attack)
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

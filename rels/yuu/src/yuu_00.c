@@ -1,3 +1,6 @@
+// yuu_00 (遊技場, Pianta Parlor): minigame 1, Plane Mode (hikoki); entered from gor_03.
+
+// defer_codegen: the original emits this unit's functions in deferred order (checked by removing it).
 #pragma defer_codegen on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -15,103 +18,54 @@
 #include "dolphin/mtx.h"
 #include "driver/icondrv.h"
 #include "evt/evt_movefloor.h"
+#include "cam_shift.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_yuugijou.h"
+#include "party.h"
+#include "party/party_motion.h"
+#include "evt/evt_yuuranking.h"
 #include "yuu.h"
+#include "icon_ids.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-#ifdef VERSION_G8ME01
-#define YUU_ICON_OFS 8
-#else
-#define YUU_ICON_OFS 0
-#endif
-typedef struct HikokiWork { u32 flags; s32 phase; s32 coins; s32 result; s32 monteCount; EventEntry* viewEvent; } HikokiWork;
-s32 yuucounter_get_data(void);
-void yuucounter_flag_on(s32 flag);
-void partyKeyOff(void);
-void monteCountDisp(void);
-#ifdef VERSION_G8ME01
+typedef struct HikokiWork {
+    u32 flags;
+    s32 phase;
+    s32 coins;
+    s32 result;
+    s32 monteCount;
+    EventEntry* viewEvent;
+} HikokiWork;
+#if VERSION >= VERSION_US
 USER_FUNC(yuuminigame1_floor_chk);
 USER_FUNC(yuuminigame1_floor_on_off);
 #endif
-typedef struct MonteSub { s32 flags; Vec pos; f32 scale; u8 iconData[0x38 - 0x14]; } MonteSub; /* mirrors IconEntry */
-typedef struct Monte { u8 hidden; u8 pad_1; s16 num; u8 state; u8 pad_5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
-typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
+
 static void* yuunpc_wp;
 static Monte* monte_p;
 #define MONTETABLE (montetable)
-static void monte_disp(CameraId camera, void* param);
-void camShiftReset(void);
 
-USER_FUNC(eff_call_minigame);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(evt_cam_letter_box_onoff);
 USER_FUNC(evt_change_plane);
-USER_FUNC(evt_fade_in);
-USER_FUNC(evt_fade_out);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_kill_party);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_set_prev_party_pos);
-USER_FUNC(evt_mario_wait_move_end);
-USER_FUNC(evt_moving_floor_delete);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_yuucounter_alloc);
-USER_FUNC(evt_yuucounter_free);
-USER_FUNC(evt_yuuminigame_alloc);
-USER_FUNC(evt_yuuranking_alloc);
-USER_FUNC(evt_yuuranking_free);
-USER_FUNC(evt_yuutitle_alloc);
-USER_FUNC(evt_yuutitle_free);
 static USER_FUNC(fall_rtn);
 static USER_FUNC(re_fall_rtn);
 USER_FUNC(yuu_00_cam_shift_reset);
-USER_FUNC(yuu_atai_init);
-USER_FUNC(yuu_atai_pop);
-USER_FUNC(yuu_atai_push);
-USER_FUNC(yuugijou_add_montemedal);
-USER_FUNC(yuugijou_get_montemedal);
-USER_FUNC(yuugijou_montemedal_disp_onoff);
-USER_FUNC(yuugijou_montemedal_wait);
 USER_FUNC(yuuminigame1_opening_chk);
 USER_FUNC(yuuminigame1_opening_on_off);
 USER_FUNC(yuuminigame1_set_phase);
-USER_FUNC(yuuminigame_get_dataadr);
-USER_FUNC(yuuminigame_set_dataadr);
-USER_FUNC(yuuranking_get_monte);
-USER_FUNC(yuuranking_wait_button);
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_mapobj_flag_onoff);
+#if VERSION >= VERSION_US
 USER_FUNC(evt_sub_get_language);
-USER_FUNC(evt_sub_random);
 #endif
 BOOL yuuminigame1_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, HikokiWork* data);
-void yuuminigame_disp_1hikoki(CameraId camera, void* param);
-void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
-static void monte_disp(CameraId camera, void* param);
-
-static MonteTable montetable[4];
-extern EvtWord yuu_00_kaijo_init[];
-extern EvtWord yuu_00_kaijo_init2[];
-extern EvtWord light_sub_event[];
-extern EvtWord minigame01_main[];
-extern EvtWord minigame01_start_cam[];
-extern EvtWord minigame01_start_cam_cancel[];
-extern EvtWord minigame01_start[];
-extern EvtWord minigame01_end[];
-extern EvtWord yuu_00_init_evt[];
 
 static MonteTable montetable[] = {
     {-1200.0f, -800.0f, 450.0f, 200.0f, 2},
@@ -125,7 +79,7 @@ static EVT_BEGIN(minigame_view_monte)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(minigame01_floor_delete)
     CALL(yuuminigame1_floor_chk, LW(0), LW(1))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -360,7 +314,7 @@ EVT_BEGIN(minigame01_start)
     CALL(yuu_atai_init)
     CALL(yuu_atai_push, LW(0))
     CALL(evt_map_playanim, STRING("neon_01"), 1, 0)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -395,21 +349,21 @@ EVT_BEGIN(minigame01_start)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
         CASE_EQUAL(2)
 #endif
-    SET_VALUE(LW(0), STRING("S_dai_01"))
-    SET_VALUE(LW(1), STRING("A_dai_01"))
-    SET_VALUE(LW(2), -150)
-    SET_VALUE(LW(3), 150)
-    SET_VALUE(LW(4), 2000)
-    SET_VALUE(LW(5), 500)
-    SET_VALUE(LW(6), 0)
-    SET_VALUE(LW(7), STRING("S_dai_01_k"))
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), 0)
-    SET_VALUE(LW(12), 0)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-#ifdef VERSION_G8ME01
+        SET_VALUE(LW(0), STRING("S_dai_01"))
+        SET_VALUE(LW(1), STRING("A_dai_01"))
+        SET_VALUE(LW(2), -150)
+        SET_VALUE(LW(3), 150)
+        SET_VALUE(LW(4), 2000)
+        SET_VALUE(LW(5), 500)
+        SET_VALUE(LW(6), 0)
+        SET_VALUE(LW(7), STRING("S_dai_01_k"))
+        SET_VALUE(LW(8), 0)
+        SET_VALUE(LW(9), 0)
+        SET_VALUE(LW(10), 0)
+        SET_VALUE(LW(11), 0)
+        SET_VALUE(LW(12), 0)
+        SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
+#if VERSION >= VERSION_US
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_01"))
         SET_VALUE(LW(1), STRING("A_dai_01"))
@@ -458,7 +412,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 1, LW(15))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -493,21 +447,21 @@ EVT_BEGIN(minigame01_start)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
         CASE_EQUAL(2)
 #endif
-    SET_VALUE(LW(0), STRING("S_dai_02"))
-    SET_VALUE(LW(1), STRING("A_dai_02"))
-    SET_VALUE(LW(2), -150)
-    SET_VALUE(LW(3), 150)
-    SET_VALUE(LW(4), 2000)
-    SET_VALUE(LW(5), 500)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), STRING("S_dai_02_k"))
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), 0)
-    SET_VALUE(LW(12), 0)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-#ifdef VERSION_G8ME01
+        SET_VALUE(LW(0), STRING("S_dai_02"))
+        SET_VALUE(LW(1), STRING("A_dai_02"))
+        SET_VALUE(LW(2), -150)
+        SET_VALUE(LW(3), 150)
+        SET_VALUE(LW(4), 2000)
+        SET_VALUE(LW(5), 500)
+        SET_VALUE(LW(6), 2)
+        SET_VALUE(LW(7), STRING("S_dai_02_k"))
+        SET_VALUE(LW(8), 0)
+        SET_VALUE(LW(9), 0)
+        SET_VALUE(LW(10), 0)
+        SET_VALUE(LW(11), 0)
+        SET_VALUE(LW(12), 0)
+        SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
+#if VERSION >= VERSION_US
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_02"))
         SET_VALUE(LW(1), STRING("A_dai_02"))
@@ -556,7 +510,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 2, LW(15))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -591,25 +545,25 @@ EVT_BEGIN(minigame01_start)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
         CASE_EQUAL(2)
 #endif
-    SET_VALUE(LW(0), STRING("S_dai_03"))
-    SET_VALUE(LW(1), STRING("A_dai_03"))
-    SET_VALUE(LW(2), -150)
-    SET_VALUE(LW(3), 150)
-    SET_VALUE(LW(4), 2000)
-    SET_VALUE(LW(5), 200)
-#ifdef VERSION_G8ME01
+        SET_VALUE(LW(0), STRING("S_dai_03"))
+        SET_VALUE(LW(1), STRING("A_dai_03"))
+        SET_VALUE(LW(2), -150)
+        SET_VALUE(LW(3), 150)
+        SET_VALUE(LW(4), 2000)
+        SET_VALUE(LW(5), 200)
+#if VERSION >= VERSION_US
         SET_VALUE(LW(6), 4)
 #else
     SET_VALUE(LW(6), 3)
 #endif
-    SET_VALUE(LW(7), STRING("S_dai_03_k"))
-    SET_VALUE(LW(8), -150)
-    SET_VALUE(LW(9), 150)
-    SET_VALUE(LW(10), 2000)
-    SET_VALUE(LW(11), 0)
-    SET_VALUE(LW(12), 0)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-#ifdef VERSION_G8ME01
+        SET_VALUE(LW(7), STRING("S_dai_03_k"))
+        SET_VALUE(LW(8), -150)
+        SET_VALUE(LW(9), 150)
+        SET_VALUE(LW(10), 2000)
+        SET_VALUE(LW(11), 0)
+        SET_VALUE(LW(12), 0)
+        SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
+#if VERSION >= VERSION_US
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_03"))
         SET_VALUE(LW(1), STRING("A_dai_03"))
@@ -658,7 +612,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 3, LW(15))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -693,21 +647,21 @@ EVT_BEGIN(minigame01_start)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
         CASE_EQUAL(2)
 #endif
-    SET_VALUE(LW(0), STRING("S_dai_04"))
-    SET_VALUE(LW(1), STRING("A_dai_04"))
-    SET_VALUE(LW(2), -150)
-    SET_VALUE(LW(3), 150)
-    SET_VALUE(LW(4), 2000)
-    SET_VALUE(LW(5), 200)
-    SET_VALUE(LW(6), 4)
-    SET_VALUE(LW(7), STRING("S_dai_04_k"))
-    SET_VALUE(LW(8), -150)
-    SET_VALUE(LW(9), 150)
-    SET_VALUE(LW(10), 2000)
-    SET_VALUE(LW(11), 0)
-    SET_VALUE(LW(12), 0)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-#ifdef VERSION_G8ME01
+        SET_VALUE(LW(0), STRING("S_dai_04"))
+        SET_VALUE(LW(1), STRING("A_dai_04"))
+        SET_VALUE(LW(2), -150)
+        SET_VALUE(LW(3), 150)
+        SET_VALUE(LW(4), 2000)
+        SET_VALUE(LW(5), 200)
+        SET_VALUE(LW(6), 4)
+        SET_VALUE(LW(7), STRING("S_dai_04_k"))
+        SET_VALUE(LW(8), -150)
+        SET_VALUE(LW(9), 150)
+        SET_VALUE(LW(10), 2000)
+        SET_VALUE(LW(11), 0)
+        SET_VALUE(LW(12), 0)
+        SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
+#if VERSION >= VERSION_US
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_04"))
         SET_VALUE(LW(1), STRING("A_dai_04"))
@@ -756,7 +710,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 4, LW(15))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -791,21 +745,21 @@ EVT_BEGIN(minigame01_start)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
         CASE_EQUAL(2)
 #endif
-    SET_VALUE(LW(0), STRING("S_dai_05"))
-    SET_VALUE(LW(1), STRING("A_dai_05"))
-    SET_VALUE(LW(2), -150)
-    SET_VALUE(LW(3), 150)
-    SET_VALUE(LW(4), 2000)
-    SET_VALUE(LW(5), 200)
-    SET_VALUE(LW(6), 4)
-    SET_VALUE(LW(7), STRING("S_dai_05_k"))
-    SET_VALUE(LW(8), -150)
-    SET_VALUE(LW(9), 150)
-    SET_VALUE(LW(10), 2000)
-    SET_VALUE(LW(11), 0)
-    SET_VALUE(LW(12), 0)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-#ifdef VERSION_G8ME01
+        SET_VALUE(LW(0), STRING("S_dai_05"))
+        SET_VALUE(LW(1), STRING("A_dai_05"))
+        SET_VALUE(LW(2), -150)
+        SET_VALUE(LW(3), 150)
+        SET_VALUE(LW(4), 2000)
+        SET_VALUE(LW(5), 200)
+        SET_VALUE(LW(6), 4)
+        SET_VALUE(LW(7), STRING("S_dai_05_k"))
+        SET_VALUE(LW(8), -150)
+        SET_VALUE(LW(9), 150)
+        SET_VALUE(LW(10), 2000)
+        SET_VALUE(LW(11), 0)
+        SET_VALUE(LW(12), 0)
+        SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
+#if VERSION >= VERSION_US
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_05"))
         SET_VALUE(LW(1), STRING("A_dai_05"))
@@ -855,7 +809,7 @@ EVT_BEGIN(minigame01_start)
 #endif
     CALL(yuuminigame_set_dataadr, 5, LW(15))
     CALL(yuu_atai_pop, LW(0))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(yuuminigame1_floor_on_off, LW(0), 1)
 #endif
     CALL(yuuminigame1_opening_chk, LW(0), LW(1))
@@ -866,7 +820,7 @@ EVT_BEGIN(minigame01_start)
             IF_INT_EQUAL(LW(9), 0)
                 CALL(evt_seq_wait, 2)
                 BREAK_LOOP
-                ELSE
+            ELSE
                 CALL(evt_key_get_buttontrg, 0, LW(9))
                 IF_BITS_SET(LW(9), 768)
                     DELETE_EVENT(LW(8))
@@ -882,7 +836,7 @@ EVT_BEGIN(minigame01_start)
         CALL(evt_cam3d_evt_off, 0, 11)
         WAIT_FRAMES(1)
     END_IF
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_MINIGAME1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MINIGAME1"))
     WAIT_MS(200)
     CALL(evt_mario_set_pose, STRING("M_I_1"))
     WAIT_MS(400)
@@ -906,7 +860,7 @@ EVT_BEGIN(minigame01_end)
     CALL(evt_cam_letter_box_onoff, 1, 0)
     CALL(evt_cam_letter_box_disable, 0)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE2"), 0)
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(yuu_atai_push, LW(0))
     CALL(yuu_atai_push, LW(1))
     CALL(yuu_atai_push, LW(2))
@@ -934,15 +888,15 @@ EVT_BEGIN(minigame01_end)
         WAIT_MS(3800)
         CALL(evt_mario_set_pose, STRING("M_D_2"))
         WAIT_MS(200)
-        ELSE
+    ELSE
         CALL(eff_call_minigame, 1, 0, 0, 500)
         WAIT_MS(500)
         IF_INT_LESS(LW(1), 1)
             CALL(evt_mario_set_pose, STRING("M_X_1"))
-            ELSE
+        ELSE
             IF_INT_GREATER(LW(1), 1)
                 CALL(evt_mario_set_pose, STRING("M_V_2"))
-                ELSE
+            ELSE
                 CALL(evt_mario_set_pose, STRING("M_I_1"))
             END_IF
         END_IF
@@ -966,14 +920,14 @@ EVT_BEGIN(minigame01_end)
     CALL(yuugijou_get_montemedal, LW(0))
     IF_INT_LESS(LW(0), LW(1))
         SET_VALUE(LW(0), 1)
-        ELSE
+    ELSE
         CALL(evt_msg_select, 0, STRING("sysyuu_00_00"))
     END_IF
     IF_INT_NOT_EQUAL(LW(0), 0)
-        SET_VALUE(GSWF(1229), 1)
+        SET_VALUE(GSWF(GSWF_YUU_MINIGAME_QUIT), 1)
         CALL(evt_mario_set_prev_party_pos, 0, 0, -1000, 0)
         CALL(evt_mario_set_prev_party_pos, 1, 0, -1000, 0)
-        CALL(evt_snd_bgmoff, 512)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_bero_mapchange, STRING("gor_03"), STRING("A_dokan_02"))
         RETURN
     END_IF
@@ -982,7 +936,7 @@ EVT_BEGIN(minigame01_end)
     CALL(yuugijou_montemedal_wait)
     WAIT_MS(200)
     CALL(yuugijou_montemedal_disp_onoff, 0)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_sfxoff, GW(10))
     CALL(evt_fade_out, 1000)
     CALL(re_fall_rtn)
@@ -1000,83 +954,83 @@ EVT_BEGIN(yuu_00_init_evt)
     CALL(evt_map_playanim, STRING("neon_02"), 1, 0)
     SPAWN_EVENT(PTR(minigame01_main))
     CALL_CHILD(PTR(evt_yuunpc_minigame1))
-#ifdef VERSION_G8ME01
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_1"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_2"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_3"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_4"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_5"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_6"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_7"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("saka_k_8"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("J_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("E_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("D_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("F_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("Sp_mon"), 16384)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("I_mon"), 16384)
+#if VERSION >= VERSION_US
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_1"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_2"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_3"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_4"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_5"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_6"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_7"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_8"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("J_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("E_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("F_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("Sp_mon"), MAPOBJ_FLAG_DISABLE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("I_mon"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_sub_get_language, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_1"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_2"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_3"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_4"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_5"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_6"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_7"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_saka_k_8"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("J_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_1"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_2"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_3"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_4"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_5"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_6"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_7"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_saka_k_8"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("J_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_1"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_2"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_3"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_4"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_5"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_6"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_7"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_saka_k_8"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("E_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_1"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_2"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_3"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_4"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_5"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_6"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_7"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_saka_k_8"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("E_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(2)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_1"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_2"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_3"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_4"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_5"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_6"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_7"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_saka_k_8"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("D_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_1"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_2"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_3"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_4"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_5"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_6"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_7"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_saka_k_8"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("D_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(3)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_1"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_2"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_3"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_4"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_5"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_6"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_7"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_saka_k_8"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("F_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_1"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_2"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_3"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_4"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_5"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_6"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_7"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_saka_k_8"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("F_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(4)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_1"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_2"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_3"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_4"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_5"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_6"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_7"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_saka_k_8"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("Sp_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_1"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_2"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_3"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_4"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_5"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_6"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_7"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_saka_k_8"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("Sp_mon"), MAPOBJ_FLAG_DISABLE)
         CASE_EQUAL(5)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_saka_k_1"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_saka_k_2"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_saka_k_3"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_saka_k_4"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_saka_k_5"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_saka_k_6"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_saka_k_7"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("i_saka_k_8"), 16384)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("I_mon"), 16384)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_saka_k_1"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_saka_k_2"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_saka_k_3"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_saka_k_4"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_saka_k_5"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_saka_k_6"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_saka_k_7"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("i_saka_k_8"), MAPOBJ_FLAG_DISABLE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_mon"), MAPOBJ_FLAG_DISABLE)
     END_SWITCH
 #endif
     RETURN
@@ -1107,7 +1061,7 @@ static inline void monte_disp(CameraId camera, void* param) {
     if (monte != NULL) {
         for (i = 0; i < monte->num; i++) {
             if (monte[i].hidden == 0) {
-                iconDispGx(&monte[i].sub.pos, 0, 0x13F + YUU_ICON_OFS, 1.0f);
+                iconDispGx(&monte[i].icon.position, 0, ICON_13F, 1.0f);
             }
         }
     }
@@ -1125,7 +1079,7 @@ static USER_FUNC(fall_rtn) {
     s32 k;
     SfxNameWord sfx;
     s32 j;
-    MonteSub* sub;
+    IconEntry* sub;
     f32 lo;
     f32 hi;
     Vec v;
@@ -1148,8 +1102,8 @@ static USER_FUNC(fall_rtn) {
         t = 0;
         k = 0;
         for (i = 0; i < monte_p->num; i++) {
-            sub = &monte_p[i].sub;
-            sub->pos.z = 0.0f;
+            sub = &monte_p[i].icon;
+            sub->position.z = 0.0f;
             do {
                 if (MONTETABLE[t].x0 < MONTETABLE[t].x1) {
                     lo = MONTETABLE[t].x0;
@@ -1159,7 +1113,7 @@ static USER_FUNC(fall_rtn) {
                     hi = MONTETABLE[t].x0;
                 }
                 hi -= lo;
-                sub->pos.x = lo + randRange(hi);
+                sub->position.x = lo + randRange(hi);
                 if (MONTETABLE[t].y0 < MONTETABLE[t].y1) {
                     lo = MONTETABLE[t].y0;
                     hi = MONTETABLE[t].y1;
@@ -1168,9 +1122,9 @@ static USER_FUNC(fall_rtn) {
                     hi = MONTETABLE[t].y0;
                 }
                 hi -= lo;
-                sub->pos.y = lo + randRange(hi);
+                sub->position.y = lo + randRange(hi);
                 for (j = 0; j < k; j++) {
-                    PSVECSubtract(&sub->pos, &(sub - (j + 1))->pos, &v);
+                    PSVECSubtract(&sub->position, &(sub - (j + 1))->position, &v);
                     if (PSVECMag(&v) < 20.0f) {
                         break;
                     }
@@ -1184,11 +1138,11 @@ static USER_FUNC(fall_rtn) {
         }
     }
     for (i = 0; i < monte_p->num; i++) {
-        sfx = (0, (SfxNameWord)"SFX_EVT_GAME_MONTE_COUNT1");
+        sfx = (SfxNameWord) "SFX_EVT_GAME_MONTE_COUNT1";
         m = &monte_p[i];
         switch (m->state) {
             case 0:
-                if (get_monte_check(&m->sub.pos, &marioGetPtr()->position) == 1) {
+                if (get_monte_check(&m->icon.position, &marioGetPtr()->position) == 1) {
                     data->monteCount++;
                     psndSFXOn_3D((const char*)sfx, &marioGetPtr()->position);
                     m->hidden = 1;
@@ -1258,7 +1212,7 @@ USER_FUNC(yuuminigame1_opening_chk) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 USER_FUNC(yuuminigame1_floor_on_off) {
     EvtWord* args = event->args;
     u32* flags = &((HikokiWork*)((MiniGameWork*)evtGetValue(event, args[0]))->data)->flags;
@@ -1317,7 +1271,7 @@ void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall) {
             wp->subEvent->lwData[0] = data->coins;
             wp->subEvent->lwData[1] = data->result;
             wp->subEvent->lwData[2] = data->monteCount;
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             wp->subEvent->lwData[3] = event->lwData[0];
 #endif
             data->phase++;
@@ -1329,65 +1283,66 @@ void yuuminigame_disp_1hikoki(CameraId camera, void* param) {
     monteCountDisp();
 }
 
+// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 BOOL yuuminigame1_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, HikokiWork* data) {
     MarioWork* mario = marioGetPtr();
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     EventEntry* sub;
 
     if (mario->hitobjStandOn != NULL) {
         sub = evtEntry(minigame01_floor_delete, 0, 0);
         sub->lwData[0] = event->lwData[0];
-        if ((u16)((mario->trigFlags & 1) ? mario->prevMotionId : mario->currMotionId) != 0x18) {
+        if ((u16)((mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) ? mario->prevMotionId : mario->currMotionId) != 0x18) {
 #else
-    if (mario->hitobjStandOn != NULL && (u16)((mario->trigFlags & 1) ? mario->prevMotionId : mario->currMotionId) != 0x18) {
+    if (mario->hitobjStandOn != NULL && (u16)((mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) ? mario->prevMotionId : mario->currMotionId) != 0x18) {
 #endif
-        data->result = 1;
-        data->coins = yuucounter_get_data();
-        if (!strcmp("A_dai_01", hitGetName(mario->hitobjStandOn))) {
-            data->result = 2;
-        }
-        if (!strcmp("A_dai_02", hitGetName(mario->hitobjStandOn))) {
-            data->result = 2;
-        }
-        if (!strcmp("A_dai_03", hitGetName(mario->hitobjStandOn))) {
-            data->result = 2;
-        }
-        if (!strcmp("A_dai_04", hitGetName(mario->hitobjStandOn))) {
-#ifdef VERSION_G8ME01
-            data->result = 2;
+            data->result = 1;
+            data->coins = yuucounter_get_data();
+            if (!strcmp("A_dai_01", hitGetName(mario->hitobjStandOn))) {
+                data->result = 2;
+            }
+            if (!strcmp("A_dai_02", hitGetName(mario->hitobjStandOn))) {
+                data->result = 2;
+            }
+            if (!strcmp("A_dai_03", hitGetName(mario->hitobjStandOn))) {
+                data->result = 2;
+            }
+            if (!strcmp("A_dai_04", hitGetName(mario->hitobjStandOn))) {
+#if VERSION >= VERSION_US
+                data->result = 2;
 #else
             data->result = 3;
 #endif
-        }
-        if (!strcmp("A_dai_05", hitGetName(mario->hitobjStandOn))) {
-#ifdef VERSION_G8ME01
-            data->result = 3;
+            }
+            if (!strcmp("A_dai_05", hitGetName(mario->hitobjStandOn))) {
+#if VERSION >= VERSION_US
+                data->result = 3;
 #else
             data->result = 5;
 #endif
-        }
-        if (!strcmp(yuu00_gnd_02, hitGetName(mario->hitobjStandOn))) {
-            data->result = -5;
-        }
-        if (!strcmp(yuu00_gnd_05, hitGetName(mario->hitobjStandOn))) {
-            data->result = -5;
-        }
-        if (!strcmp(yuu00_gnd_03, hitGetName(mario->hitobjStandOn))) {
-            data->result = -10;
-        }
-        if (!strcmp(yuu00_gnd_06, hitGetName(mario->hitobjStandOn))) {
-            data->result = -15;
-        }
-        if (!strcmp(yuu00_gnd_04, hitGetName(mario->hitobjStandOn))) {
-            data->result = -20;
-        }
-        marioKeyOff();
-        partyKeyOff();
-        yuucounter_flag_on(2);
-        return TRUE;
-#ifdef VERSION_G8ME01
+            }
+            if (!strcmp(yuu00_gnd_02, hitGetName(mario->hitobjStandOn))) {
+                data->result = -5;
+            }
+            if (!strcmp(yuu00_gnd_05, hitGetName(mario->hitobjStandOn))) {
+                data->result = -5;
+            }
+            if (!strcmp(yuu00_gnd_03, hitGetName(mario->hitobjStandOn))) {
+                data->result = -10;
+            }
+            if (!strcmp(yuu00_gnd_06, hitGetName(mario->hitobjStandOn))) {
+                data->result = -15;
+            }
+            if (!strcmp(yuu00_gnd_04, hitGetName(mario->hitobjStandOn))) {
+                data->result = -20;
+            }
+            marioKeyOff();
+            partyKeyOff();
+            yuucounter_flag_on(2);
+            return TRUE;
+#if VERSION >= VERSION_US
         }
 #endif
     }

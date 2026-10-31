@@ -1,3 +1,5 @@
+// las_28 (ラストダンジョン, Palace of Shadow): Sir Grodus (シュリョー) and then Bowser and Kammy Koopa.
+
 #include "battle/battle_unit.h"
 #include "eff/n64/eff_guruguru_n64.h"
 #include "evt/evt_cmd.h"
@@ -12,128 +14,36 @@
 #include "stdio.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_env.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "evt/evt_shuryolight.h"
 #include "las.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
 static char name[8];
 
-USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
-static USER_FUNC(eff_guruguru);
-USER_FUNC(evt_bero_get_entername);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_road_reset);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_delete);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_eff_softdelete);
-USER_FUNC(evt_env_blur_on);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_adjust_dir);
-USER_FUNC(evt_mario_check_landon);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_dispdir);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_dispdir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_battle_start);
-USER_FUNC(evt_npc_change_interrupt);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_kamek_kemuri2);
-USER_FUNC(evt_npc_kamek_move_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_pera_onoff);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_battle_info);
-USER_FUNC(evt_npc_set_height);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_rotate);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_set_width);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_npc_wait_anim);
-USER_FUNC(evt_npc_wait_battle_end);
-USER_FUNC(evt_paper_delete);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_get_dispdir);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_jump_pos);
-USER_FUNC(evt_party_move_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_breed_pose);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_dispdir);
-USER_FUNC(evt_party_set_homing_dist);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_shuryolight_init);
-USER_FUNC(evt_shuryolight_run_evt);
-USER_FUNC(evt_shuryolight_run_head_evt);
-USER_FUNC(evt_snd_bgm_scope);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envoff_f);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_sub_random);
 static USER_FUNC(make_name);
-USER_FUNC(syuryo_baria);
-USER_FUNC(syuryo_baria_recalc_pos);
 
 static BeroEntry bero_entry_data[3];
-extern EvtWord koopa_init[];
-extern EvtWord koopa_talk[];
 static NpcSetupInfo npcEnt[5];
-extern EvtWord syuryo_thunder[];
 extern EvtWord syuryo_evt[];
-extern EvtWord gareki_fall[];
 extern EvtWord koopa_evt[];
-extern EvtWord las_28_init_evt[];
 
-USER_FUNC(syuryo_baria) {
-    // ピーチ単
+static USER_FUNC(syuryo_baria) {
+    // ピーチ姫
     NpcEntry* npc = npcNameToPtr("\x83\x73\x81\x5B\x83\x60\x95\x50");
     EffectEntry* eff = effSyuryouEntry(1, 1000, npc->position.x, npc->position.y - 8.0f, 10.0f + npc->position.z);
 
@@ -163,8 +73,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -180,8 +90,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -198,11 +108,11 @@ static BeroEntry bero_entry_data[] = {
 
 static EVT_BEGIN(syuryo_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 398)
-        IF_INT_LESS_OR_EQUAL(GSW(0), 399)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
+        IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_01_QUEENS_CHAMBER)
             CALL(evt_npc_set_position, STRING("me"), 410, 25, 0)
             CALL(evt_npc_set_ry, STRING("me"), 270)
-            CALL(evt_npc_flag_onoff, 1, STRING("me"), 131088)
+            CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
         END_IF
     END_IF
     RETURN
@@ -231,7 +141,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"シュリョー"*/"\x83\x56\x83\x85\x83\x8A\x83\x87\x81\x5B", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         syuryo_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -241,7 +151,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"クッパ"*/"\x83\x4E\x83\x62\x83\x70", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         koopa_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -251,7 +161,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ババ"*/"\x83\x6F\x83\x6F", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         baba_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -290,7 +200,7 @@ static EVT_BEGIN(first_evt)
             SET_FLOAT_VALUE(LW(0), FLOAT(-180.0f))
             CALL_CHILD(PTR(w_door_open))
             BREAK_LOOP
-            ELSE
+        ELSE
             CALL_CHILD(PTR(w_door_open))
         END_IF
     END_LOOP
@@ -307,7 +217,7 @@ static EVT_BEGIN(first_evt)
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
             CALL_CHILD(PTR(w_door_close))
             BREAK_LOOP
-            ELSE
+        ELSE
             CALL_CHILD(PTR(w_door_close))
         END_IF
     END_LOOP
@@ -318,7 +228,7 @@ static EVT_BEGIN(first_evt)
     WAIT_MS(500)
     CALL(evt_msg_print_party, STRING("stg8_las_50"))
     SPAWN_EVENT(PTR(syuryo_evt))
-    SET_VALUE(GSW(0), 399)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_01_QUEENS_CHAMBER)
     CALL_CHILD(PTR(bero_case_entry))
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
@@ -327,8 +237,8 @@ static EVT_BEGIN(first_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(syuryo_baria_recalc_pos) {
-    // ピーチ単
+static USER_FUNC(syuryo_baria_recalc_pos) {
+    // ピーチ姫
     NpcEntry* npc = npcNameToPtr("\x83\x73\x81\x5B\x83\x60\x95\x50");
     static const Vec base = {0.0f, -8.0f, 10.0f};
     Vec offset = base;
@@ -363,7 +273,7 @@ EVT_BEGIN(syuryo_thunder)
     CALL(evt_eff64, 0, STRING("thunder_n64"), 5, LW(0), LW(1), LW(2), FLOAT(20.0f), FLOAT(37.0f), 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_SHURYO_THUNDER1"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.059570313f), 500)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.059570313f), 500)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_party_cont_onoff, 0, 0)
@@ -477,14 +387,14 @@ EVT_BEGIN(syuryo_evt)
     END_LOOP
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
-    CALL(evt_snd_envoff_f, 512, 2000)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     SUBTRACT(LW(0), 30)
     ADD(LW(2), 25)
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     IF_INT_GREATER_OR_EQUAL(LW(4), 0)
         CALL(evt_party_move_pos, 0, LW(0), LW(2), 600)
-        ELSE
+    ELSE
         CALL(evt_party_jump_pos, 0, LW(0), LW(1), LW(2), 600, 0, -1000)
     END_IF
     CALL(evt_party_set_dir, 0, 90, -1)
@@ -492,7 +402,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_msg_print, 0, STRING("stg8_las_51"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, -777, 37, 200, 400, 125, -16, 1000, 11)
     WAIT_MS(1000)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG8_3RDHEAD1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG8_3RDHEAD1"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_las_52"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, 8, 80, 62, 401, 80, -10, 1000, 11)
@@ -518,7 +428,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_cam3d_evt_set, -160, 77, 279, -160, 35, -18, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_msg_print_party, STRING("stg8_las_57"))
-    CALL(evt_npc_flag_onoff, 1, STRING("シュリョー"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("シュリョー"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 90, 85, 305, 90, 50, -18, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(500)
@@ -530,7 +440,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_cam3d_evt_set, -160, 67, 230, -160, 32, -18, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(500)
-    CALL(evt_npc_flag_onoff, 0, STRING("シュリョー"), 32768)
+    CALL(evt_npc_flag_onoff, 0, STRING("シュリョー"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_msg_print_party, STRING("stg8_las_61"))
     CALL(evt_cam3d_evt_set, 90, 85, 305, 90, 50, -18, 0, 11)
     WAIT_FRAMES(1)
@@ -569,11 +479,11 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_mario_set_pose, STRING("M_R_1"))
     WAIT_WHILE(GF(0))
     CALL(evt_mario_dispflag_onoff, 0, 2)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_npc_set_battle_info, STRING("シュリョー"), 15)
     CALL(evt_npc_battle_start, STRING("シュリョー"))
     CALL(evt_npc_wait_battle_end)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_tenmetu), PTR(shuryolight_head_off), PTR(shuryolight_tue_normal))
     CALL(evt_party_stop, 0)
     CALL(evt_mario_set_pos, -75, 0, 0)
@@ -595,7 +505,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_msg_print, 0, STRING("stg8_las_72"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, 415, 105, 379, 415, 62, -18, 800, 11)
     WAIT_MS(800)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG8_3RDHEAD1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG8_3RDHEAD1"))
     CALL(evt_paper_entry, STRING("OFF_hei_07"))
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_onoff, STRING("img"), 0)
@@ -634,7 +544,7 @@ EVT_BEGIN(syuryo_evt)
                 SET_VALUE(LW(0), 180)
                 CALL(evt_npc_set_rotate, STRING("ピーチ姫"), 0, LW(0), 0)
                 BREAK_LOOP
-                ELSE
+            ELSE
                 CALL(evt_npc_set_rotate, STRING("ピーチ姫"), 0, LW(0), 0)
             END_IF
             WAIT_FRAMES(1)
@@ -646,7 +556,7 @@ EVT_BEGIN(syuryo_evt)
                 SET_VALUE(LW(0), 0)
                 CALL(evt_npc_set_rotate, STRING("ピーチ姫"), 0, LW(0), 0)
                 BREAK_LOOP
-                ELSE
+            ELSE
                 CALL(evt_npc_set_rotate, STRING("ピーチ姫"), 0, LW(0), 0)
             END_IF
             WAIT_FRAMES(1)
@@ -677,7 +587,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_mario_set_dir, 0, 0, 0)
     CALL(evt_mario_set_dispdir, 180)
-    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), NPC_FLAG_INSTANT_TURN)
     WAIT_FRAMES(1)
     CALL(syuryo_baria_recalc_pos)
     WAIT_MS(500)
@@ -715,7 +625,7 @@ EVT_BEGIN(syuryo_evt)
     WAIT_FRAMES(1)
     CALL(syuryo_baria_recalc_pos)
     CALL(evt_msg_print, 0, STRING("stg8_las_79"), 0, STRING("ピーチ姫"))
-    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), 32768)
+    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 75, 86, 230, 75, 50, -18, 500, 11)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_las_80"), 0, STRING("シュリョー"))
@@ -770,7 +680,7 @@ EVT_BEGIN(syuryo_evt)
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print, 0, STRING("stg8_las_83"), 0, STRING("シュリョー"))
-        ELSE
+    ELSE
         CALL(evt_msg_print, 0, STRING("stg8_las_84"), 0, STRING("シュリョー"))
         CALL(evt_npc_set_ry, STRING("シュリョー"), 90)
         WAIT_MS(300)
@@ -784,8 +694,6 @@ EVT_BEGIN(syuryo_evt)
     SPAWN_EVENT(PTR(koopa_evt))
     RETURN
 EVT_END()
-
-EffectEntry* effGuruguruN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 radius);
 
 static USER_FUNC(eff_guruguru) {
     EvtWord* args = event->args;
@@ -806,7 +714,7 @@ EVT_BEGIN(gareki_fall)
     SET_VALUE(LW(8), LW(1))
     SET_VALUE(LW(9), LW(2))
     SET_VALUE(LW(10), LW(3))
-    CALL(evt_mapobj_flag_onoff, 1, 0, LW(7), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(7), MAPOBJ_FLAG_HIDE)
     CALL(evt_sub_intpl_msec_init, 2, 350, 0, LW(10))
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -822,11 +730,11 @@ EVT_END()
 EVT_BEGIN(koopa_evt)
     CALL(evt_party_stop, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KOOPA_QUAKE1"), 75, 300, 0, LW(0))
-    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 1500)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.01953125f), 1500)
     CALL(evt_snd_sfxoff, LW(0))
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("S_3"))
     CALL(evt_shuryolight_run_head_evt, PTR(shuryolight_head_off))
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     WAIT_MS(1000)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_CEILING_BREAK1"), 75, 300, 0, LW(0))
     CALL(evt_eff64, 0, STRING("hokori_n64"), 0, 75, 300, 0, 90, 0, 0, 0, 0, 0, 0, 0)
@@ -842,7 +750,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_npc_set_autotalkpose, STRING("シュリョー"), STRING("S_3"), STRING("T_4"))
     CALL(evt_msg_print, 0, STRING("stg8_las_85"), 0, STRING("シュリョー"))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KOOPA_QUAKE1"), 75, 300, 0, LW(0))
-    CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.029296875f), 1500)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.029296875f), 1500)
     CALL(evt_snd_sfxoff, LW(0))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_CEILING_BREAK1"), 75, 300, 0, LW(0))
     CALL(evt_eff64, 0, STRING("hokori_n64"), 0, 75, 300, 0, 72, 0, 0, 0, 0, 0, 0, 0)
@@ -855,7 +763,7 @@ EVT_BEGIN(koopa_evt)
     ADD(LW(3), 300)
     CALL(evt_npc_set_position, STRING("クッパ"), LW(2), LW(3), LW(4))
     CALL(evt_npc_set_ry, STRING("クッパ"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("クッパ"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("クッパ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_msg_print, 0, STRING("stg8_las_86"), 0, STRING("クッパ"))
     CALL(evt_npc_set_anim, STRING("クッパ"), STRING("KPA_D_1"))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_CEILING_BREAK2"), LW(2), LW(3), LW(4), 0)
@@ -929,7 +837,7 @@ EVT_BEGIN(koopa_evt)
         GOTO(0)
     END_IF
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.029296875f), FLOAT(0.0f), 1000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.029296875f), FLOAT(0.0f), 1000)
     END_INLINE_EVENT
     CALL(evt_eff, 0, STRING("hit"), 0, LW(2), LW(0), LW(4), FLOAT(1.0f), 6, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KOOPA_STRIKE1"), LW(2), LW(0), LW(4), 0)
@@ -968,10 +876,10 @@ EVT_BEGIN(koopa_evt)
     END_IF
     CALL(evt_npc_get_position, STRING("クッパ"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_KOOPA_SATIATED2_1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_KUPPA1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 1000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.01953125f), FLOAT(0.0f), 1000)
     END_INLINE_EVENT
     CALL(evt_npc_get_position, STRING("クッパ"), LW(0), LW(1), LW(2))
     CALL(evt_eff64, 0, STRING("kemuri1_n64"), 4, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
@@ -989,13 +897,13 @@ EVT_BEGIN(koopa_evt)
     WAIT_MS(500)
     SET_VALUE(LW(0), 30)
     LOOP(10)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_gare"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_gare"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(LW(0))
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_gare"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_gare"), MAPOBJ_FLAG_HIDE)
         WAIT_MS(LW(0))
         SUBTRACT(LW(0), 2)
     END_LOOP
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_gare"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_gare"), MAPOBJ_FLAG_HIDE)
     CALL(evt_cam3d_evt_set, 65, 95, 329, 65, 45, -18, 800, 11)
     WAIT_MS(800)
     CALL(evt_npc_set_autotalkpose, STRING("クッパ"), STRING("KPA_Z_3"), STRING("KPA_T_8"))
@@ -1054,7 +962,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_KOOPA_SURPRISED1_1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 1, 0, STRING("クッパ"), 0, 0, 0, 0, 0, 0, 0, 30)
     WAIT_MS(600)
-    CALL(evt_npc_flag_onoff, 1, STRING("クッパ"), 512)
+    CALL(evt_npc_flag_onoff, 1, STRING("クッパ"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_set_autotalkpose, STRING("クッパ"), STRING("KPA_S_1"), STRING("KPA_T_1"))
     BEGIN_INLINE_EVENT
         CALL(evt_npc_get_position, STRING("クッパ"), LW(2), LW(3), LW(4))
@@ -1153,7 +1061,7 @@ EVT_BEGIN(koopa_evt)
         CALL(evt_npc_kamek_move_position, STRING("ババ"), LW(0), LW(2), 5, 0, FLOAT(120.0f), 0)
     END_INLINE_EVENT
     WAIT_MS(400)
-    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_npc_set_battle_info, STRING("クッパ"), 13)
     CALL(evt_npc_battle_start, STRING("クッパ"))
     CALL(evt_npc_wait_battle_end)
@@ -1173,7 +1081,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_npc_set_autotalkpose, STRING("クッパ"), STRING("KPA_Z_3"), STRING("KPA_T_8"))
     CALL(evt_npc_set_position, STRING("ピーチ姫"), 650, 25, 0)
     CALL(evt_npc_set_position, STRING("シュリョー"), 650, 25, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), 128)
+    CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), NPC_FLAG_HIDDEN)
     CALL(eff_guruguru, STRING("koopa_piyo"), -10, 60, -10, 20)
     CALL(eff_guruguru, STRING("baba_piyo"), 70, 30, 20, 20)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KOOPA_PIYO1"), -10, 60, -10, 0)
@@ -1203,7 +1111,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_cam3d_evt_set, -40, 65, 230, -40, 30, -18, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(750)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER2"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
     BEGIN_INLINE_EVENT
         WAIT_MS(100)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1216,9 +1124,9 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_msg_print_party, STRING("stg8_las_105"))
     CALL(evt_mapobj_trans, 1, STRING("S_gyoku"), -100, 0, 0)
     CALL(evt_hit_bind_update, STRING("A_gyoku"))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isu"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isu"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_i02_f2_isu_04C"), 1, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_isu_tao"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_isu_tao"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_i02_f2_isu_04C1"), 1, 1)
     CALL(evt_npc_pera_onoff, STRING("クッパ"), 0)
     CALL(evt_npc_pera_onoff, STRING("ババ"), 0)
@@ -1226,8 +1134,8 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_npc_set_ry, STRING("ババ"), 0)
     CALL(evt_npc_set_position, STRING("シュリョー"), 600, 25, 0)
     CALL(evt_npc_set_ry, STRING("シュリョー"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING("シュリョー"), 1073750016)
-    CALL(evt_npc_flag_onoff, 0, STRING("シュリョー"), 131088)
+    CALL(evt_npc_flag_onoff, 1, STRING("シュリョー"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_SKIP_HIT_ATTR4)
+    CALL(evt_npc_flag_onoff, 0, STRING("シュリョー"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     CALL(evt_npc_set_tribe, STRING("シュリョー"), STRING("第三勢力総統（ヒビ）"))
     BEGIN_INLINE_EVENT
         WAIT_MS(600)
@@ -1243,21 +1151,21 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_npc_set_ry, STRING("ババ"), 270)
     CALL(evt_cam3d_evt_off, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_npc_flag_onoff, 0, STRING("クッパ"), 1568)
-    CALL(evt_npc_flag_onoff, 0, STRING("ババ"), 1536)
-    CALL(evt_npc_flag_onoff, 1, STRING("クッパ"), 16777216)
-    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), 16777216)
+    CALL(evt_npc_flag_onoff, 0, STRING("クッパ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 0, STRING("ババ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("クッパ"), NPC_FLAG_NO_TURN_TO_MARIO)
+    CALL(evt_npc_flag_onoff, 1, STRING("ババ"), NPC_FLAG_NO_TURN_TO_MARIO)
     CALL(evt_npc_change_interrupt, STRING("クッパ"), 6, PTR(koopa_talk))
     CALL(evt_npc_change_interrupt, STRING("ババ"), 6, PTR(baba_talk))
-    SET_VALUE(GSW(0), 400)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(shuryolight_init)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 398)
-        IF_INT_LESS(GSW(0), 400)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
+        IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
             CALL(evt_shuryolight_init, STRING("シュリョー"))
             CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
         END_IF
@@ -1269,7 +1177,7 @@ static EVT_BEGIN(shan_init)
     SET_VALUE(LW(0), 1)
     LOOP(20)
         CALL(make_name, LW(0), LW(1))
-        CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_get_position, LW(1), LW(2), LW(3), LW(4))
         SUBTRACT_FLOAT(LW(3), FLOAT(9.0f))
         CALL(evt_eff, 0, STRING("fire"), 3, LW(2), LW(3), LW(4), FLOAT(0.69921875f), 1000, 0, 0, 0, 0, 0, 0)
@@ -1279,38 +1187,38 @@ static EVT_BEGIN(shan_init)
 EVT_END()
 
 EVT_BEGIN(las_28_init_evt)
-    IF_INT_EQUAL(GSW(0), 400)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER2"))
-        CALL(evt_snd_envoff, 512)
-        ELSE
-        CALL(evt_snd_bgmoff, 512)
-        CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS9"))
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
+    ELSE
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS9"))
     END_IF
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    IF_INT_NOT_EQUAL(GSW(0), 398)
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
         CALL_CHILD(PTR(evt_bero_info_run))
     END_IF
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL_CHILD(PTR(shuryolight_init))
     CALL(evt_hit_bind_mapobj, STRING("A_gyoku"), STRING("S_gyoku"))
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 400)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_mapobj_trans, 1, STRING("S_gyoku"), -100, 0, 0)
         CALL(evt_hit_bind_update, STRING("A_gyoku"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isu"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isu"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_i02_f2_isu_04C"), 1, 0)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isu_tao"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isu_tao"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_i02_f2_isu_04C1"), 1, 0)
     END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_gare"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_gare"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_gare"), 1, 0)
     CALL_CHILD(PTR(shan_init))
-    IF_INT_EQUAL(GSW(0), 398)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
         SPAWN_EVENT(PTR(first_evt))
     END_IF
-    IF_INT_EQUAL(GSW(0), 399)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_01_QUEENS_CHAMBER)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("koopa_evt"))
             BEGIN_INLINE_EVENT
@@ -1331,7 +1239,7 @@ EVT_BEGIN(las_28_init_evt)
                 CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3B"))
                 SPAWN_EVENT(PTR(koopa_evt))
             END_INLINE_EVENT
-            ELSE
+        ELSE
             SPAWN_EVENT(PTR(syuryo_evt))
         END_IF
     END_IF
@@ -1362,4 +1270,3 @@ static USER_FUNC(make_name) {
     evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }
-

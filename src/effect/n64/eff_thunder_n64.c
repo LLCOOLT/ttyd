@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: lightning strike with a charge light or flare and a shock flash; type picks variant.
+#include "eff/n64/eff_thunder_n64.h"
 #include "eff/eff_n64.h"
 #include "eff/n64/eff_akari_charge_n64.h"
 #include "driver/camdrv.h"
@@ -7,6 +9,8 @@
 #include "mario/mariost.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/n64/eff_shock_n64.h"
+#include "eff/n64/eff_thunderflare_n64.h"
 
 typedef struct EffThunderN64Work {
     s32 type;            // 0x0
@@ -27,10 +31,6 @@ typedef struct EffThunderN64Work {
     EffectEntry* flare;  // 0x44
     EffectEntry* charge; // 0x48
 } EffThunderN64Work;
-
-EffectEntry* effThunderflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 w);
-EffectEntry* effAkariChargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 size);
-EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b);
 
 void effThunderMain(EffectEntry* effect);
 void effThunderDisp(CameraId cameraId, EffectEntry* effect);
@@ -600,7 +600,7 @@ EffectEntry* effThunderN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffThunderN64Work));
     effect->userdata = work;
     effect->callback = effThunderMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (type >= 3) {
@@ -630,12 +630,12 @@ EffectEntry* effThunderN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
         }
         if (type != 1) {
             work->charge = effAkariChargeN64Entry(0, 0, -120.0f, 189.0f, 72.0f, 1.0f);
-            ((EffAkariChargeN64Elem*)work->charge->userdata)->r2 = 255;
-            ((EffAkariChargeN64Elem*)work->charge->userdata)->g2 = 255;
-            ((EffAkariChargeN64Elem*)work->charge->userdata)->b2 = 255;
-            ((EffAkariChargeN64Elem*)work->charge->userdata)->r = 255;
-            ((EffAkariChargeN64Elem*)work->charge->userdata)->g = 0;
-            ((EffAkariChargeN64Elem*)work->charge->userdata)->b = 255;
+            ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].r2 = 255;
+            ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].g2 = 255;
+            ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].b2 = 255;
+            ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].r = 255;
+            ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].g = 0;
+            ((EffAkariChargeN64Work*)work->charge->userdata)->elem[0].b = 255;
         }
     }
     if (type >= 3) {
@@ -658,8 +658,8 @@ void effThunderMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 0;
     }
     type = work->type;
@@ -729,7 +729,7 @@ void effThunderMain(EffectEntry* effect) {
         }
     }
 
-    ((void (*)(s32, s32, f32, DispCallback, void*))dispEntry)(CAMERA_3D, 2, dispCalcZ(&position), (DispCallback)effThunderDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effThunderDisp, effect);
 }
 
 void effThunderDisp(CameraId cameraId, EffectEntry* effect) {
@@ -809,26 +809,26 @@ void effThunderDisp(CameraId cameraId, EffectEntry* effect) {
         case 0:
         case 1:
         case 2:
-        PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
-        PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(4)->viewYaw);
-        PSMTXConcat(mtx, rot, view);
-        PSMTXTrans(mtx, 0.0f, 0.0f, 1.0f);
-        PSMTXConcat(view, mtx, view);
-        PSMTXConcat(camera->view, view, view);
-        GXLoadPosMtxImm(view, 0);
-        GXSetCurrentMtx(0);
-        GXSetTevColor(1, (GXColor){255, 47, 198, 255});
+            PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
+            PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
+            PSMTXConcat(mtx, rot, view);
+            PSMTXTrans(mtx, 0.0f, 0.0f, 1.0f);
+            PSMTXConcat(view, mtx, view);
+            PSMTXConcat(camera->view, view, view);
+            GXLoadPosMtxImm(view, 0);
+            GXSetCurrentMtx(0);
+            GXSetTevColor(1, (GXColor){255, 47, 198, 255});
             break;
         default:
-        PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
-        PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(4)->viewYaw);
-        PSMTXConcat(mtx, rot, view);
-        PSMTXTrans(mtx, 0.0f, 0.0f, 1.0f);
-        PSMTXConcat(view, mtx, view);
-        PSMTXConcat(camera->view, view, view);
-        GXLoadPosMtxImm(view, 0);
-        GXSetCurrentMtx(0);
-        GXSetTevColor(1, (GXColor){255, 255, 0, work->alpha});
+            PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
+            PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
+            PSMTXConcat(mtx, rot, view);
+            PSMTXTrans(mtx, 0.0f, 0.0f, 1.0f);
+            PSMTXConcat(view, mtx, view);
+            PSMTXConcat(camera->view, view, view);
+            GXLoadPosMtxImm(view, 0);
+            GXSetCurrentMtx(0);
+            GXSetTevColor(1, (GXColor){255, 255, 0, work->alpha});
             break;
     }
     effGetTexObjN64(84, &tex);

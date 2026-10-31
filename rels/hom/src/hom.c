@@ -1,16 +1,11 @@
+// hom.rel (途中駅ホーム, Excess Express platform): registers hom_00 and the train scenes hom_10..hom_12.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
 #include "data/mapdata.h"
 #include "hom.h"
-
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-
-void _unresolved(void);
-void _epilog(void);
-void _prolog(void);
+#include "rel_module.h"
 
 void _prolog(void) {
     voidfunctionptr* ctor;

@@ -1,7 +1,8 @@
+// Table of all action commands: action-command ids and their handlers.
 #include "battle/ac/ac_table.h"
 
 #define AC_ENTRY(id, name) \
-    { id, battleAcMain_##name, battleAcResult_##name, battleAcDisp_##name, battleAcDelete_##name }
+    {id, battleAcMain_##name, battleAcResult_##name, battleAcDisp_##name, battleAcDelete_##name}
 
 ActionCommandEntry ActionCommandList[] = {
     AC_ENTRY(1, TimingA),

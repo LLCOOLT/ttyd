@@ -1,3 +1,5 @@
+// dou_05 (洞窟, Pirate's Grotto): room with waterfalls, a big door opened by a blue switch (story 245) and a lock opened with the Grotto Key.
+// Save block, a badge chest and a hidden brick; doors to dou_03 and dou_06.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -8,52 +10,31 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_damage.h"
 #include "driver/hitdrv.h"
+#include "driver/itemdrv.h"
 #include "mario/mario_pouch.h"
 #include "manager/evtmgr_cmd.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "dou.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
 
 static u8* _ap;
 
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
-USER_FUNC(cam_displacement);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_hit_damage_return_set);
-USER_FUNC(evt_hitobj_attr_onoff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_mov_spd);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_exec_cancel);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_lock);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_win_item_select);
 static void alpha_tev(MapTevCallbackInfo* info);
 
 static BeroEntry bero_entry_data[5];
@@ -65,7 +46,6 @@ extern EvtWord waterfall_main[];
 extern EvtWord waterfall_init[];
 extern EvtWord ride_waterfall[];
 extern EvtWord nonride_waterfall[];
-extern EvtWord dou_05_init_evt[];
 
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
@@ -102,8 +82,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -118,8 +98,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_2", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -134,8 +114,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero_3", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -151,8 +131,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -173,7 +153,7 @@ static s32 key_tbl[] = {
 };
 
 static EVT_BEGIN(evt_chk)
-    CALL(evt_pouch_check_item, 20, LW(0))
+    CALL(evt_pouch_check_item, ITEM_GROTTO_KEY, LW(0))
     IF_INT_GREATER(LW(0), 0)
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
         IF_INT_EQUAL(LW(0), -1)
@@ -190,12 +170,12 @@ static EVT_BEGIN(evt_unlock)
 EVT_END()
 
 EVT_BEGIN(bigdoor_event_init)
-    IF_INT_LESS(GSW(0), 245)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_20_THE_BLUE_BLOCK)
         DEBUG_PUT_MSG(STRING("dou_05：扉が開く前の処理"))
         SET_VALUE(LW(0), STRING("w_bero_3"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CALL(evt_mapobj_trans, 0, STRING("tetu"), 1, 0, 0)
-        ELSE
+    ELSE
         DEBUG_PUT_MSG(STRING("dou_05：扉が開く後の処理"))
         CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero_3"), 4)
         CALL(evt_mapobj_trans, 0, STRING("tetu"), 1, 100, 0)
@@ -245,7 +225,7 @@ EVT_BEGIN(bigdoor_event)
     SET_VALUE(LW(0), STRING("w_bero_3"))
     CALL_CHILD(PTR(bero_case_switch_on))
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero_3"), 4)
-    SET_VALUE(GSW(0), 245)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_20_THE_BLUE_BLOCK)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -262,12 +242,12 @@ static HitDamageReturn hitDmgRetPoints[] = {
 
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
-#ifdef VERSION_G8ME01
-    CALL(evt_item_entry, STRING("item00"), 275, 0, -1000, 0, 16, -1, 0)
+#if VERSION >= VERSION_US
+    CALL(evt_item_entry, STRING("item00"), ITEM_DEFEND_PLUS_P, 0, -1000, 0, 16, -1, 0)
 #else
-    CALL(evt_item_entry, STRING("item00"), 277, 0, -1000, 0, 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_DAMAGE_DODGE_P, 0, -1000, 0, 16, -1, 0)
 #endif
-    CALL(evt_item_flag_on, STRING("item00"), 258)
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -293,8 +273,8 @@ EVT_END()
 EVT_BEGIN(waterfall_init)
     CALL(alpha_init_func)
     CALL(evt_map_set_tevcallback, 1, PTR(alpha_tev))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_mizu_ata"), 16777216)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_mizu_ata"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mizu_ata"), MAPOBJ_TEV_CALLBACK(1))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mizu_ata"), MAPOBJ_FLAG_DISPLAY_LIST)
     SET_VALUE(GW(0), 0)
     SPAWN_EVENT(PTR(waterfall_main))
     RETURN
@@ -309,15 +289,15 @@ EVT_BEGIN(nonride_waterfall)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     IF_INT_LESS_OR_EQUAL(LW(2), -700)
         SET_VALUE(GW(0), -4)
-        ELSE
+    ELSE
         SET_VALUE(GW(0), 4)
     END_IF
     RETURN
 EVT_END()
 
 EVT_BEGIN(dou_05_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG5_DOU1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG5_DOU5"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU5"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -326,26 +306,25 @@ EVT_BEGIN(dou_05_init_evt)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("tubo"), 1, 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 175, 120, -135, 0, 0)
-    CALL(evt_mobj_lock, STRING("mobj_lock00"), 20, 190, 10, 0, 270, PTR(evt_chk), PTR(evt_unlock), GSWF(2979))
-    IF_INT_EQUAL(GSWF(2979), 1)
+    CALL(evt_mobj_lock, STRING("mobj_lock00"), ITEM_GROTTO_KEY, 190, 10, 0, 270, PTR(evt_chk), PTR(evt_unlock), GSWF(GSWF_DOU05_DOOR_UNLOCKED))
+    IF_INT_EQUAL(GSWF(GSWF_DOU05_DOOR_UNLOCKED), 1)
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_on))
-        ELSE
+    ELSE
         SET_VALUE(LW(0), STRING("e_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
-    CALL(evt_mobj_switch_blue, 0, STRING("mobj00"), -60, 330, -565, PTR(bigdoor_event), GSWF(2978))
+    CALL(evt_mobj_switch_blue, 0, STRING("mobj00"), -60, 330, -565, PTR(bigdoor_event), GSWF(GSWF_DOU05_BIG_DOOR_SWITCH_PRESSED))
     SPAWN_EVENT(PTR(bigdoor_event_init))
-    CALL(evt_mobj_itembox, STRING("mobj_box00"), 500, 275, -800, 0, 0, PTR(mobj_box00), GSWF(2986))
-    CALL(evt_mobj_powerupblk, STRING("pblk1"), -65, 280, -175, 0, GSWF(5556), 0)
-    CALL(evt_mobj_brick, STRING("mobj_hidden1"), -35, 255, -175, 121, 11, 0, GSWF(2993))
+    CALL(evt_mobj_itembox, STRING("mobj_box00"), 500, 275, -800, 0, 0, PTR(mobj_box00), GSWF(GSWF_DOU05_CHEST_OPENED))
+    CALL(evt_mobj_powerupblk, STRING("pblk1"), -65, 280, -175, 0, GSWF(GSWF_DOU05_SHINE_SPRITE), 0)
+    CALL(evt_mobj_brick, STRING("mobj_hidden1"), -35, 255, -175, ITEM_COIN, 11, 0, GSWF(GSWF_DOU05_HIDDEN_COIN_BLOCK_HIT))
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(PTR(evt_gazigazi_entry))
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change"), STRING("Ship_Change"))
     CALL_CHILD(PTR(waterfall_init))
-    CALL(evt_run_case_evt, 0, 1, STRING("mizu_atari"), 0, PTR(ride_waterfall), 0)
-    CALL(evt_run_case_evt, 1, 1, STRING("mizu_atari"), 0, PTR(nonride_waterfall), 0)
+    CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("mizu_atari"), 0, PTR(ride_waterfall), 0)
+    CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("mizu_atari"), 0, PTR(nonride_waterfall), 0)
     CALL(cam_displacement)
     RETURN
 EVT_END()
-

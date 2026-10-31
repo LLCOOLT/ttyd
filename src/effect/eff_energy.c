@@ -1,3 +1,5 @@
+// Energy orb (Energy): a glowing sprite that spins, scales and pulses in brightness; type picks the colour pair.
+// Spawned by Mario's battle moves.
 #include "eff/eff_energy.h"
 #include "driver/dispdrv.h"
 #include "memory.h"
@@ -6,7 +8,6 @@
 #include "version.h"
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
-
 
 typedef struct EffEnergyWork {
     s32 type;        // 0x0, index into color_tbl
@@ -56,8 +57,7 @@ EffectEntry* effEnergyEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 siz
     work->brightSpeed = 32;
     if (duration <= 0) {
         work->timer = 1000;
-    }
-    else {
+    } else {
         work->timer = duration;
     }
     return effect;
@@ -67,11 +67,11 @@ void effEnergyMain(EffectEntry* effect) {
     EffEnergyWork* work = effect->userdata;
     Vec position;
 
-    position = (Vec){ work->position.x, work->position.y, work->position.z };
+    position = (Vec){work->position.x, work->position.y, work->position.z};
 
     // soft delete: start fading out
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->timer = 16;
     }
     if (work->timer < 1000) {
@@ -128,7 +128,7 @@ void effEnergyDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetChanMatColor(GX_COLOR0A0,
-                      (GXColor){ work->brightness, work->brightness, work->brightness, work->alpha });
+                      (GXColor){work->brightness, work->brightness, work->brightness, work->alpha});
     GXSetTevColor(GX_TEVREG0, color_tbl[type * 2]);
     GXSetTevColor(GX_TEVREG1, color_tbl[type * 2 + 1]);
     GXSetNumTevStages(1);

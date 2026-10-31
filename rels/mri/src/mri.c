@@ -1,3 +1,6 @@
+// mri (巨木の中, The Great Tree; mri is mori, "forest"): the REL prolog/epilog and area-wide code: the Puni and Jabbi
+// (toge) follower movement helpers, the tree's door events, the planter (ueki) animation, and the Puni save and
+// Puni-item events.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,89 +12,44 @@
 #include "dolphin/gx.h"
 #include "evt/evt_npc.h"
 #include "driver/npcdrv.h"
+#include "driver/itemdrv.h"
 #include "dolphin/mtx.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "stdlib.h"
 #include "mri.h"
 #include "mri_puni.h"
+#include "manager/fontmgr.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "rel_module.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "driver/seqdrv.h"
+#include "driver/camdrv.h"
 
-typedef void (*voidfunctionptr)(void);
-extern voidfunctionptr _ctors[];
-extern voidfunctionptr _dtors[];
-void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
-void mapGrpSetColor(const char* name, GXColor color);
-typedef struct HSV { u8 h; u8 s; u8 v; u8 a; } HSV;
-GXColor HSV2RGB(HSV hsv);
-PuniData* puniGetPunidat(void);
-void puniMoveDecel(PuniData* puni);
-PuniWork* puniGetPunigp(void);
-void PuniDokuritsu(PuniData* puni);
 void puniModeWinjump(PuniData* puni);
 
-USER_FUNC(evt_bero_exec_get);
-USER_FUNC(evt_bero_exec_onoff);
-USER_FUNC(evt_bero_mario_go);
-USER_FUNC(evt_cam_get_pos);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_position);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_get_dir);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
 USER_FUNC(evt_mri_door_naname_func);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_pouch_add_item);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_puni_all_save);
-USER_FUNC(evt_puni_flag_onoff);
-USER_FUNC(evt_puni_get_lsw_index);
-USER_FUNC(evt_puni_get_mode);
-USER_FUNC(evt_puni_get_trap_index);
-USER_FUNC(evt_puni_init_puni);
-USER_FUNC(evt_puni_set_lsw_index);
-USER_FUNC(evt_puni_set_position);
-USER_FUNC(evt_puni_set_trap_index);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_set_seq);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_envoff_f);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_countdown_get_status);
-USER_FUNC(evt_sub_countdown_set_restart_time);
-USER_FUNC(evt_sub_countdown_start);
-USER_FUNC(evt_sub_get_mapname);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_target_flag_onoff);
-USER_FUNC(evt_win_item_select);
 USER_FUNC(hakari_color);
-void _prolog(void);
-void _epilog(void);
-void _unresolved(void);
-USER_FUNC(evt_mri_get16bitdata);
-USER_FUNC(mri_npc_buruburu);
 BOOL toge_searchParent(PuniData* self, s16 group);
 void togeModeParent(PuniData* puni);
 void togeMoveParent(PuniData* puni);
 void puniModeWinjump(PuniData* puni);
-void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end);
-USER_FUNC(evt_mri_toge_make_retsu);
-USER_FUNC(evt_mri_toge_retsu_stop);
-USER_FUNC(evt_mri_toge_enter_init);
-USER_FUNC(evt_mri_puni_win_init);
-USER_FUNC(evt_mri_puni_win_attack);
-USER_FUNC(evt_mri_puni_win_end);
 
 void _prolog(void) {
     voidfunctionptr* ctor;
@@ -134,34 +92,14 @@ void _epilog(void) {
 void _unresolved(void) {
 }
 
-extern EvtWord evt_mri_door_open_pure[];
-extern EvtWord evt_mri_door_open[];
-extern EvtWord evt_mri_door_close_pure[];
-extern EvtWord evt_mri_door_close[];
-extern EvtWord evt_mri_door_naname_open_pure[];
-extern EvtWord evt_mri_door_naname_open[];
-extern EvtWord evt_mri_door_naname_close_pure[];
-extern EvtWord evt_mri_door_naname_close[];
 extern EvtWord _ueki_anime[];
 extern EvtWord mri_ueki_entry[];
-extern EvtWord mri_puni_save[];
 s32 mri_itemsel_table[2];
-extern EvtWord mri_punipuni_setup[];
-extern EvtWord mri_punipuni_itemselect[];
-extern EvtWord mri_punipuni_itemset[];
-extern EvtWord mri_punipuni_itemremove[];
-extern EvtWord mri_hikari_color[];
-extern EvtWord mri_countdown[];
-extern EvtWord mri_waterfall_effect[];
-extern EvtWord mri_guide_hagure_check[];
-extern EvtWord mri_guide_goryu[];
-extern EvtWord mri_puni_walk_se[];
-extern EvtWord mri_puni_jump_se[];
 
 EVT_BEGIN(evt_mri_door_open_pure)
     IF_INT_EQUAL(LW(9), 0)
         SET_VALUE(LW(2), -5)
-        ELSE
+    ELSE
         SET_VALUE(LW(2), 5)
     END_IF
     BEGIN_INLINE_EVENT
@@ -207,7 +145,7 @@ EVT_END()
 EVT_BEGIN(evt_mri_door_close_pure)
     IF_INT_EQUAL(LW(9), 0)
         SET_VALUE(LW(2), -5)
-        ELSE
+    ELSE
         SET_VALUE(LW(2), 5)
     END_IF
     CALL(evt_mapobj_trans, 1, LW(10), LW(2), 0, -60)
@@ -244,7 +182,7 @@ EVT_END()
 
 EVT_BEGIN(evt_mri_door_close)
     BEGIN_INLINE_EVENT
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         WAIT_MS(600)
 #else
         WAIT_MS(200)
@@ -298,7 +236,7 @@ EVT_END()
 
 EVT_BEGIN(evt_mri_door_naname_close)
     BEGIN_INLINE_EVENT
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         WAIT_MS(600)
 #else
         WAIT_MS(200)
@@ -328,8 +266,8 @@ USER_FUNC(evt_mri_door_naname_func) {
         f32 x;
         f32 z;
         isFirstCall = elapsed;
-        x = intplGetValue(mode, isFirstCall, frames, x0, x1);
-        z = intplGetValue(mode, isFirstCall, frames, z0, z1);
+        x = intplGetValue(mode, x0, x1, isFirstCall, frames);
+        z = intplGetValue(mode, z0, z1, isFirstCall, frames);
         mapObjTranslate(name, x, 0.0f, z);
         return EVT_RETURN_BLOCK;
     }
@@ -362,8 +300,8 @@ EVT_BEGIN(mri_ueki_entry)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
-        CALL(evt_run_case_evt, 9, 1, LW(1), 0, PTR(_ueki_anime), 0)
-        CALL(evt_run_case_evt, 13, 1, LW(1), 0, PTR(_ueki_anime), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(1), 0, PTR(_ueki_anime), 0)
+        CALL(evt_run_case_evt, CASE_COND_HAMMER, 1, LW(1), 0, PTR(_ueki_anime), 0)
     END_LOOP
     RETURN
 EVT_END()
@@ -379,24 +317,24 @@ s32 mri_itemsel_table[] = {
 };
 
 EVT_BEGIN(mri_punipuni_setup)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, LW(10), 64, 0, -1000, 0, 15, -1, 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, LW(10), ITEM_PUNI_ORB, 0, -1000, 0, 15, -1, 0)
 #else
-    CALL(evt_item_entry, LW(10), 64, 0, -20000, 0, 16, -1, 0)
+    CALL(evt_item_entry, LW(10), ITEM_PUNI_ORB, 0, -20000, 0, 16, -1, 0)
 #endif
-    CALL(evt_item_flag_on, LW(10), 2)
+    CALL(evt_item_flag_on, LW(10), ITEM_FLAG_NO_TOUCH)
     RETURN
 EVT_END()
 
 EVT_BEGIN(mri_punipuni_itemselect)
     SET_VALUE(LW(1), 0)
-    CALL(evt_pouch_check_item, 64, LW(0))
+    CALL(evt_pouch_check_item, ITEM_PUNI_ORB, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("sys_no_item_to_put_on"), 0, 0)
         RETURN
     END_IF
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_win_item_select, PTR(mri_itemsel_table), LW(0))
 #else
     CALL(evt_win_item_select, 0, PTR(mri_itemsel_table), LW(0), 0)
@@ -410,7 +348,7 @@ EVT_END()
 
 EVT_BEGIN(mri_punipuni_itemset)
     CALL(evt_target_flag_onoff, LW(11), 0, 3)
-    CALL(evt_pouch_remove_item, 64, LW(0))
+    CALL(evt_pouch_remove_item, ITEM_PUNI_ORB, LW(0))
     CALL(evt_item_get_position, LW(10), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNIDAMA_SET1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_msg_toge, 1, 0, 0, 0)
@@ -420,8 +358,8 @@ EVT_END()
 
 EVT_BEGIN(mri_punipuni_itemremove)
     CALL(evt_target_flag_onoff, LW(11), 1, 1)
-    CALL(evt_pouch_add_item, 64, LW(0))
-#ifdef VERSION_G8ME01_DEMO
+    CALL(evt_pouch_add_item, ITEM_PUNI_ORB, LW(0))
+#if VERSION == VERSION_DEMO
     CALL(evt_item_set_position, LW(10), 0, -1000, 0)
 #else
     CALL(evt_item_set_position, LW(10), 0, -20000, 0)
@@ -438,7 +376,7 @@ USER_FUNC(hakari_color) {
     s32 max = evtGetValue(event, args[2]);
 
     if (now <= max) {
-        mapGrpSetColor(name, HSV2RGB((HSV){gp->retraceCount, 0xFF, 0xFF, 0xFF}));
+        mapGrpSetColor(name, HSV2RGB((GXColor){gp->retraceCount, 0xFF, 0xFF, 0xFF}));
     } else {
         GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
         mapGrpSetColor(name, white);
@@ -455,7 +393,7 @@ USER_FUNC(evt_mri_get16bitdata) {
 }
 
 EVT_BEGIN(mri_hikari_color)
-    CALL(evt_mapobj_flag_onoff, 0, 0, LW(0), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, LW(0), MAPOBJ_FLAG_DISPLAY_LIST)
     GET_INT_INDEXED(LW(1), LW(11))
     LOOP(0)
         GET_INT_INDEXED(LW(1), LW(10))
@@ -464,7 +402,7 @@ EVT_BEGIN(mri_hikari_color)
                 CALL(evt_mapobj_get_position, LW(0), LW(4), LW(5), LW(6))
                 CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNISWITCH_RIDE1"), LW(4), LW(5), LW(6), 0)
             END_IF
-            ELSE
+        ELSE
             IF_INT_LESS_OR_EQUAL(LW(11), LW(2))
                 CALL(evt_mapobj_get_position, LW(0), LW(4), LW(5), LW(6))
                 CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNISWITCH_RIDE1"), LW(4), LW(5), LW(6), 0)
@@ -537,12 +475,12 @@ USER_FUNC(mri_npc_buruburu) {
 }
 
 EVT_BEGIN(mri_countdown)
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 118)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_26_PRAISE_FROM_THE_PUNI)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(2880), 1)
+    IF_INT_EQUAL(GSWF(GSWF_MRI_BOMB_COUNTDOWN_PENDING), 1)
         CALL(evt_sub_countdown_start, 300000, 300000)
-        SET_VALUE(GSWF(2880), 0)
+        SET_VALUE(GSWF(GSWF_MRI_BOMB_COUNTDOWN_PENDING), 0)
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("mri_13"))
@@ -554,7 +492,7 @@ EVT_BEGIN(mri_countdown)
     IF_STR_EQUAL(LW(0), STRING("mri_01"))
         CALL(evt_sub_countdown_set_restart_time, 100000)
     END_IF
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     WAIT_FRAMES(5)
 #endif
     LOOP(0)
@@ -575,33 +513,29 @@ EVT_BEGIN(mri_countdown)
         RESUME_TYPES_OTHER(4)
         RETURN
     END_IF
-    SET_VALUE(GSW(0), 127)
-    CALL(evt_snd_bgmoff_f, 512, 500)
-    CALL(evt_snd_envoff_f, 512, 500)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_00_WELCOME_TO_GLITZVILLE)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 500)
+    CALL(evt_snd_envoff_f, PSND_FADE_OUT, 500)
     CALL(evt_snd_sfxon, STRING("SFX_STG2_QUAKE1"), 0)
-    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 500)
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 500)
-    CALL(evt_cam_shake, 4, FLOAT(0.0146484375f), FLOAT(0.0f), 500)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0f), 500)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 500)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0146484375f), FLOAT(0.0f), 500)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 10000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.01953125f), FLOAT(0.0f), 10000)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(1), 150)
-        CALL(evt_cam_get_pos, 4, LW(10), LW(11), LW(12))
+        CALL(evt_cam_get_pos, CAMERA_3D, LW(10), LW(11), LW(12))
         LOOP(0)
             CALL(evt_eff64, STRING(""), STRING("hokori_n64"), 0, LW(10), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
             WAIT_MS(300)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(2000)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_entry, 15, 4000, 0, 0, 0)
-#else
-    CALL(evt_fade_entry, 17, 4000, 0, 0, 0)
-#endif
+    CALL(evt_fade_entry, FADE_OUT_WHITE, 4000, 0, 0, 0)
     WAIT_MS(4000)
-    CALL(evt_seq_set_seq, 5, 1, 0)
+    CALL(evt_seq_set_seq, SEQ_GAME_OVER, 1, 0)
     RETURN
 EVT_END()
 
@@ -616,11 +550,11 @@ EVT_END()
 
 EVT_BEGIN(mri_guide_hagure_check)
     CALL(evt_puni_get_lsw_index, LSW(0), 0, LW(0), LW(1), LW(2), LW(3))
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_puni_get_trap_index, 1, LW(4))
 #endif
     SET_VALUE(LW(1), 0)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     IF_INT_NOT_EQUAL(LW(4), 0)
         SET_VALUE(LW(1), 3)
         DEBUG_PUT_MSG(STRING("ガイド・トラップにはまっている"))
@@ -635,7 +569,7 @@ EVT_BEGIN(mri_guide_hagure_check)
         SET_VALUE(LW(1), 2)
         DEBUG_PUT_MSG(STRING("ガイド・同じエリアではぐれている"))
     END_IF
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     DEBUG_PUT_MSG(STRING("ガイド・普通の状態"))
 #endif
     RETURN
@@ -647,7 +581,7 @@ EVT_BEGIN(mri_guide_goryu)
         RETURN
     END_IF
     CALL(evt_puni_set_lsw_index, LSW(0), 0, 0, 0, 0, 0)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_puni_set_trap_index, 1, 0)
 #endif
     CALL(evt_puni_init_puni, 1, 30, 0, -1000, 0, 0)
@@ -657,7 +591,7 @@ EVT_BEGIN(mri_guide_goryu)
     ADD(LW(2), -10)
     IF_INT_LESS_OR_EQUAL(LW(0), 180)
         ADD(LW(0), -10)
-        ELSE
+    ELSE
         ADD(LW(0), 10)
     END_IF
     CALL(evt_puni_set_position, 1, LW(0), LW(1), LW(2))
@@ -686,7 +620,7 @@ BOOL toge_searchParent(PuniData* self, s16 group) {
 
     for (i = 110; i <= 209; i++) {
         PuniData* p = &puniGetPunidat()[i];
-        if ((p->flags & 0x400) && (p->flags & 0x80000) && p->groupId == group && p->child1 == NULL && p != self &&
+        if ((p->flags & PUNI_FLAG_ACTIVE) && (p->flags & PUNI_FLAG_IN_GROUP) && p->groupId == group && p->child1 == NULL && p != self &&
             (s16)order > p->depth) {
             parent = p;
             order = p->depth + 1;
@@ -744,7 +678,7 @@ void puniModeWinjump(PuniData* puni) {
                 puni->pos.y = puni->modeF0 + t * (puni->modeF1 * t + puni->modeF2);
             } else {
                 puni->pos.y = puni->modeF0;
-                puni->mode = 0x1B;
+                puni->mode = PUNI_MODE_POINT;
                 puni->anim = 1;
                 puni->modeStep = 0;
             }
@@ -763,7 +697,7 @@ void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end) {
     puni->moveFunc = NULL;
     puni->groupId = puni->index;
     puni->anim = 1;
-    puni->flags |= 0x80000;
+    puni->flags |= PUNI_FLAG_IN_GROUP;
     for (i = start; i <= end; i++) {
         puni = &puniGetPunidat()[i];
         puni->modeFunc = togeModeParent;
@@ -772,7 +706,7 @@ void togeMakeRetsu(Vec* pos, s16 leader, s16 start, s16 end) {
         puni->pos.y = pos->y;
         puni->pos.z = pos->z;
         puni->anim = 1;
-        puni->flags |= 0x80000;
+        puni->flags |= PUNI_FLAG_IN_GROUP;
         toge_searchParent(puni, leader);
     }
 }
@@ -805,13 +739,13 @@ USER_FUNC(evt_mri_toge_retsu_stop) {
     puni->modeFunc = NULL;
     puni->moveFunc = NULL;
     puni->anim = 0;
-    puni->flags &= ~0x80000;
+    puni->flags &= ~PUNI_FLAG_IN_GROUP;
     for (i = start; i <= end; i++) {
         puni = &puniGetPunidat()[i];
         puni->modeFunc = NULL;
         puni->moveFunc = NULL;
         puni->anim = 0;
-        puni->flags &= ~0x80000;
+        puni->flags &= ~PUNI_FLAG_IN_GROUP;
     }
     return EVT_RETURN_DONE;
 }
@@ -821,13 +755,13 @@ USER_FUNC(evt_mri_toge_enter_init) {
 
     for (i = 110; i <= 209; i++) {
         PuniData* puni = &puniGetPunidat()[i];
-        if (puni->flags & 0x400) {
+        if (puni->flags & PUNI_FLAG_ACTIVE) {
             puni->pos.x = 0.0f;
             puni->pos.y = -1000.0f;
             puni->pos.z = 0.0f;
-            puni->mode = 0x1D;
+            puni->mode = PUNI_MODE_FUNC;
             puni->anim = 0;
-            puni->flags &= ~0x100000;
+            puni->flags &= ~PUNI_FLAG_COLLIDE;
         }
     }
     return EVT_RETURN_DONE;
@@ -838,7 +772,7 @@ USER_FUNC(evt_mri_puni_win_init) {
 
     for (i = 1; i <= 102; i++) {
         PuniData* puni = &puniGetPunidat()[i];
-        if (puni->flags & 0x400) {
+        if (puni->flags & PUNI_FLAG_ACTIVE) {
             puni->hp = puni->maxHp;
             puni->rotOffsetY = 0.0f;
             puni->spin = 0.0f;
@@ -871,17 +805,17 @@ USER_FUNC(evt_mri_puni_win_attack) {
     wp->beroEndRange = 100.0f;
     for (i = 1; i <= 102; i++) {
         PuniData* puni = &puniGetPunidat()[i];
-        if (puni->flags & 0x400) {
+        if (puni->flags & PUNI_FLAG_ACTIVE) {
             PuniDokuritsu(puni);
             puni->anim = 1;
             puni->modeStep = 0;
-            if (puni->flags & 0x4000) {
-                puni->flags &= ~0x4000;
-                puni->mode = 0x1D;
+            if (puni->flags & PUNI_FLAG_DEFEATED) {
+                puni->flags &= ~PUNI_FLAG_DEFEATED;
+                puni->mode = PUNI_MODE_FUNC;
                 puni->modeFunc = puniModeWinjump;
                 puni->moveFunc = puniMoveDecel;
             } else {
-                puni->mode = 0x1B;
+                puni->mode = PUNI_MODE_POINT;
             }
         }
     }
@@ -902,7 +836,7 @@ USER_FUNC(evt_mri_puni_win_end) {
     wp->allMode = 0;
     for (i = 1; i <= 102; i++) {
         PuniData* puni = &puniGetPunidat()[i];
-        if (puni->flags & 0x400) {
+        if (puni->flags & PUNI_FLAG_ACTIVE) {
             f32 rx;
             f32 rz;
             PuniDokuritsu(puni);
@@ -914,7 +848,7 @@ USER_FUNC(evt_mri_puni_win_end) {
             puni->moveStart.x = x1 + rx - 10.0f;
             puni->moveStart.y = y1;
             puni->moveStart.z = z1 + rz - 10.0f;
-            puni->mode = 0x19;
+            puni->mode = PUNI_MODE_ENTER;
             puni->modeStep = 0;
         }
     }

@@ -1,3 +1,4 @@
+// Battle party setup: the table that places each partner (Goombella, Koops, Flurrie, ...) into a battle.
 #include "battle/battle_party.h"
 #include "battle/battle_unit.h"
 #include "unit/party/unit_party_nokotarou.h"
@@ -6,17 +7,16 @@
 #include "unit/party/unit_party_vivian.h"
 #include "unit/party/unit_party_sanders.h"
 #include "unit/party/unit_party_chuchurina.h"
+#include "unit/party/unit_party_christine.h"
 
-extern BattleUnitKind unitdata_Party_Christine;
-
-#define PARTY_SETUP(kind) {&kind, 0, {0}, 0x04000002, {1000.0f, 0.0f, 1000.0f}, 0, {0, 0, 0, 0}, NULL}
+#define PARTY_SETUP(kind) {&kind, 0, {0}, BATTLE_PHASE_PLAYER, {1000.0f, 0.0f, 1000.0f}, 0, {0, 0, 0, 0}, NULL}
 
 BattleUnitSetup entryunit_party[7] = {
-	PARTY_SETUP(unitdata_Party_Christine),
-	PARTY_SETUP(unitdata_Party_Nokotarou),
-	PARTY_SETUP(unitdata_Party_Yoshi),
-	PARTY_SETUP(unitdata_Party_Clauda),
-	PARTY_SETUP(unitdata_Party_Vivian),
-	PARTY_SETUP(unitdata_Party_Sanders),
-	PARTY_SETUP(unitdata_Party_Chuchurina),
+    PARTY_SETUP(unitdata_Party_Christine),
+    PARTY_SETUP(unitdata_Party_Nokotarou),
+    PARTY_SETUP(unitdata_Party_Yoshi),
+    PARTY_SETUP(unitdata_Party_Clauda),
+    PARTY_SETUP(unitdata_Party_Vivian),
+    PARTY_SETUP(unitdata_Party_Sanders),
+    PARTY_SETUP(unitdata_Party_Chuchurina),
 };

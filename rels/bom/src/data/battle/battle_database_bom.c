@@ -1,3 +1,5 @@
+// Battle database of Fahr Outpost (bom.rel): stage data, enemy groups and the encounter tables of its maps.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -58,10 +60,10 @@ BattleStageObjectData bom_btlobject_data[] = {
 
 BattleStageData bom_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_07_0", // mSpecificStageDataDir
-        11, // mNumObjects
-        bom_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_07_0", // specificStageDataDir
+        11, // numObjects
+        bom_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgBEvt
@@ -75,10 +77,10 @@ BattleStageData bom_btlstage_data[] = {
 
 BattleUnitSetup btlparty_bom_bom_00_01_off_1[] = {
     {
-        &unit_kuriboo, // mUnitKindParams
+        &unit_kuriboo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -98,20 +100,20 @@ BattleGroupSetup btlgrp_bom_bom_00_01_off_1 = {
 
 BattleUnitSetup btlparty_bom_bom_03_01_off_1[] = {
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -132,30 +134,30 @@ BattleGroupSetup btlgrp_bom_bom_03_01_off_1 = {
 
 BattleUnitSetup btlparty_bom_bom_03_01_off_2[] = {
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -176,20 +178,20 @@ BattleGroupSetup btlgrp_bom_bom_03_01_off_2 = {
 
 BattleUnitSetup btlparty_bom_bom_03_03_off_1[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -210,30 +212,30 @@ BattleGroupSetup btlgrp_bom_bom_03_03_off_1 = {
 
 BattleUnitSetup btlparty_bom_bom_03_03_off_2[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -254,20 +256,20 @@ BattleGroupSetup btlgrp_bom_bom_03_03_off_2 = {
 
 BattleUnitSetup btlparty_bom_bom_04_01_off_1[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -288,30 +290,30 @@ BattleGroupSetup btlgrp_bom_bom_04_01_off_1 = {
 
 BattleUnitSetup btlparty_bom_bom_04_01_off_2[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -332,20 +334,20 @@ BattleGroupSetup btlgrp_bom_bom_04_01_off_2 = {
 
 BattleUnitSetup btlparty_bom_bom_04_02_off_1[] = {
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -366,30 +368,30 @@ BattleGroupSetup btlgrp_bom_bom_04_02_off_1 = {
 
 BattleUnitSetup btlparty_bom_bom_04_02_off_2[] = {
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 40.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bllizard, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_bllizard, // mUnitKindParams
+        &unit_bllizard, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -410,40 +412,40 @@ BattleGroupSetup btlgrp_bom_bom_04_02_off_2 = {
 
 BattleUnitSetup btlparty_bom_bom_04_03_off_1[] = {
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ice_pakkun, // itemDropTable
     },
     {
-        &unit_ice_pakkun, // mUnitKindParams
+        &unit_ice_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork

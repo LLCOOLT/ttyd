@@ -1,3 +1,6 @@
+// gor_irai: Trouble Center request system (irai): request state flags, request window and notice display.
+// Start/cancel/init/main/check/end helpers for the requests taken in Rogueport.
+
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -16,47 +19,62 @@
 #include "string.h"
 #include "mario/mario_pouch.h"
 #include "evt/evt_cmd.h"
+#include "evt/evt_case.h"
+#include "evt/evt_door.h"
+#include "evt/evt_item.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
 #include "gor.h"
 #include "pmario_sound.h"
-#ifdef VERSION_G8ME01
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_item_delete_check);
-USER_FUNC(evt_item_delete);
-#endif
+#include "evt/evt_story.h"
+#include <demo/DEMOPad.h>
+#include <dolphin/pad.h>
+#include "evt/evt_pouch.h"
+#include "driver/casedrv.h"
 
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 // PAL: the request names and texts get 101 bytes each, and there is no unused tail
-typedef struct IraiWork { s32 state; s32 count; s32 list[30]; s32 cursor; s32 last; s32 top; s32 yubiX; s32 yubiY; s32 cursorTimer; f32 scroll; char client[30][101]; char contents[30][101]; } IraiWork;
+typedef struct IraiWork {
+    s32 state;
+    s32 count;
+    s32 list[30];
+    s32 cursor;
+    s32 last;
+    s32 top;
+    s32 yubiX;
+    s32 yubiY;
+    s32 cursorTimer;
+    f32 scroll;
+    char client[30][101];
+    char contents[30][101];
+} IraiWork;
 #else
-typedef struct IraiWork { s32 state; s32 count; s32 list[30]; s32 cursor; s32 last; s32 top; s32 yubiX; s32 yubiY; s32 cursorTimer; f32 scroll; char client[30][21]; char contents[30][31]; u8 textWork[0x416C - 0x6B4]; } IraiWork; /* textWork: never accessed */
+typedef struct IraiWork {
+    s32 state;
+    s32 count;
+    s32 list[30];
+    s32 cursor;
+    s32 last;
+    s32 top;
+    s32 yubiX;
+    s32 yubiY;
+    s32 cursorTimer;
+    f32 scroll;
+    char client[30][21];
+    char contents[30][31];
+    u8 textWork[0x416C - 0x6B4];
+} IraiWork; /* textWork: never accessed */
 #endif
-void FontDrawString(const char* message, f32 x, f32 y);
-void FontDrawScale(f32 scale);
 void irai_window_disp(CameraId camera, void* param);
-void irai_flag_disp(void);
-void irai_flag_clear(void);
 
-USER_FUNC(evt_door_set_param);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_pouch_add_coin);
-USER_FUNC(evt_pouch_get_coin);
-USER_FUNC(evt_run_case_evt);
 USER_FUNC(irai_cancel_func);
 USER_FUNC(irai_check_func);
 USER_FUNC(irai_end_func);
 USER_FUNC(irai_init_func);
 USER_FUNC(irai_main_func);
 USER_FUNC(irai_start_func);
-void irai_window_disp(CameraId camera, void* param);
-void irai_flag_disp(void);
-void irai_flag_clear(void);
 
 const char* irai_msg_client[30];
 const char* irai_msg_contents[30];
@@ -74,19 +92,8 @@ s32 irai_item_data25[2];
 s32 irai_item_data29[2];
 s32 irai_item_null[1];
 s32* irai_item_table[30];
-extern EvtWord irai_start_event_null[];
-extern EvtWord irai_start_event01[];
-extern EvtWord irai_start_event04[];
 EvtWord* irai_start_event[30];
-extern EvtWord irai_end_event_null[];
-extern EvtWord irai_end_event01[];
-extern EvtWord irai_end_event04[];
-#ifdef VERSION_G8ME01
-extern EvtWord irai_end_event19[];
-#endif
 EvtWord* irai_end_event[30];
-extern EvtWord gor_irai_init[];
-extern EvtWord gor_irai_lecture[];
 extern EvtWord gor_irai_main[];
 extern EvtWord gor_irai_tenshu_main[];
 
@@ -268,7 +275,7 @@ EVT_BEGIN(irai_end_event04)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(irai_end_event19)
     DEBUG_PUT_MSG(STRING("ピートンの依頼キャンセル"))
     CALL(evt_item_delete_check, STRING("wr"), LW(0))
@@ -282,7 +289,7 @@ EVT_END()
 EvtWord* irai_end_event[] = {
     irai_end_event01, irai_end_event_null, irai_end_event_null, irai_end_event04, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
     irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     irai_end_event_null, irai_end_event_null, irai_end_event19, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
 #else
     irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
@@ -291,8 +298,8 @@ EvtWord* irai_end_event[] = {
 };
 
 EVT_BEGIN(gor_irai_init)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_i04_keizi"), 0, PTR(gor_irai_main), 0)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_i04_kunter"), 0, PTR(gor_irai_tenshu_main), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_i04_keizi"), 0, PTR(gor_irai_main), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_i04_kunter"), 0, PTR(gor_irai_tenshu_main), 0)
     RETURN
 EVT_END()
 
@@ -303,17 +310,17 @@ EVT_BEGIN(gor_irai_lecture)
     CALL(evt_msg_select, 0, STRING("irai_01"))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("irai_03"))
-        SET_VALUE(GSWF(5374), 1)
-        ELSE
+        SET_VALUE(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 1)
+    ELSE
         CALL(evt_msg_print_add, 0, STRING("irai_02"))
     END_IF
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 EVT_BEGIN(gor_irai_main)
-    IF_INT_EQUAL(GSWF(5374), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
         BEGIN_INLINE_EVENT
             CALL(evt_mario_set_dir, 270, 200, 0)
         END_INLINE_EVENT
@@ -351,9 +358,9 @@ EVT_BEGIN(gor_irai_main)
         ADD(LW(0), -1)
         READ_INT_INDEXED(LW(1), LW(0))
         SPAWN_EVENT(LW(1))
-        SET_VALUE(GSW(1420), LW(11))
-        DEBUG_PUT_REG(GSW(1420))
-        ELSE
+        SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), LW(11))
+        DEBUG_PUT_REG(GSW(GSW_TROUBLE_ACTIVE))
+    ELSE
         CALL(evt_msg_continue)
         GOTO(10)
     END_IF
@@ -364,7 +371,7 @@ EVT_BEGIN(gor_irai_main)
 EVT_END()
 #else
 EVT_BEGIN(gor_irai_main)
-    IF_INT_EQUAL(GSWF(5374), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
         CALL_CHILD(PTR(gor_irai_lecture))
         RETURN
     END_IF
@@ -393,9 +400,9 @@ EVT_BEGIN(gor_irai_main)
         ADD(LW(0), -1)
         READ_INT_INDEXED(LW(1), LW(0))
         SPAWN_EVENT(LW(1))
-        SET_VALUE(GSW(1420), LW(11))
-        DEBUG_PUT_REG(GSW(1420))
-        ELSE
+        SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), LW(11))
+        DEBUG_PUT_REG(GSW(GSW_TROUBLE_ACTIVE))
+    ELSE
         CALL(evt_msg_continue)
         GOTO(10)
     END_IF
@@ -407,36 +414,36 @@ EVT_END()
 #endif
 
 EVT_BEGIN(gor_irai_tenshu_main)
-    SET_VALUE(LW(0), GSWF(5375))
-    ADD(LW(0), GSWF(5376))
-    ADD(LW(0), GSWF(5377))
-    ADD(LW(0), GSWF(5378))
-    ADD(LW(0), GSWF(5379))
-    ADD(LW(0), GSWF(5380))
-    ADD(LW(0), GSWF(5381))
-    ADD(LW(0), GSWF(5382))
-    ADD(LW(0), GSWF(5383))
-    ADD(LW(0), GSWF(5384))
-    ADD(LW(0), GSWF(5385))
-    ADD(LW(0), GSWF(5386))
-    ADD(LW(0), GSWF(5387))
-    ADD(LW(0), GSWF(5388))
-    ADD(LW(0), GSWF(5389))
-    ADD(LW(0), GSWF(5390))
-    ADD(LW(0), GSWF(5391))
-    ADD(LW(0), GSWF(5392))
-    ADD(LW(0), GSWF(5393))
-    ADD(LW(0), GSWF(5394))
-    ADD(LW(0), GSWF(5395))
-    ADD(LW(0), GSWF(5396))
-    ADD(LW(0), GSWF(5397))
-    ADD(LW(0), GSWF(5398))
-    ADD(LW(0), GSWF(5399))
-    ADD(LW(0), GSWF(5400))
-    ADD(LW(0), GSWF(5401))
-    ADD(LW(0), GSWF(5402))
-    ADD(LW(0), GSWF(5403))
-    ADD(LW(0), GSWF(5404))
+    SET_VALUE(LW(0), GSWF(GSWF_TROUBLE_01_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_02_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_03_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_04_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_05_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_06_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_07_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_08_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_09_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_10_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_11_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_12_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_13_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_14_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_15_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_16_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_17_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_18_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_19_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_20_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_21_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_22_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_23_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_24_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_25_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_26_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_27_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_28_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_29_SOLVED))
+    ADD(LW(0), GSWF(GSWF_TROUBLE_30_SOLVED))
     IF_INT_EQUAL(LW(0), 30)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_msg_toge, 2, 150, 12, -156)
@@ -444,15 +451,15 @@ EVT_BEGIN(gor_irai_tenshu_main)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
-    IF_INT_EQUAL(GSWF(5374), 0)
+    IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
         CALL_CHILD(PTR(gor_irai_lecture))
         RETURN
     END_IF
     CALL(evt_mario_key_onoff, 0)
-    IF_INT_EQUAL(GSW(1420), 0)
+    IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 0)
         CALL(evt_msg_toge, 2, 150, 12, -156)
         CALL(evt_msg_print, 0, STRING("irai_06"), 0, 0)
-        ELSE
+    ELSE
         CALL(evt_msg_toge, 2, 150, 12, -156)
         CALL(evt_msg_print, 0, STRING("irai_07"), 0, 0)
         CALL(evt_msg_select, 0, STRING("irai_08"))
@@ -461,7 +468,7 @@ EVT_BEGIN(gor_irai_tenshu_main)
             DEBUG_PUT_MSG(STRING("依頼メニューキャンセル"))
         END_IF
         IF_INT_EQUAL(LW(0), 0)
-            SET_VALUE(LW(10), GSW(1420))
+            SET_VALUE(LW(10), GSW(GSW_TROUBLE_ACTIVE))
             SET_INT_READ_ADDR(PTR(&irai_msg_hikiukechu))
             ADD(LW(10), -1)
             READ_INT_INDEXED(LW(11), LW(10))
@@ -475,21 +482,21 @@ EVT_BEGIN(gor_irai_tenshu_main)
                 IF_INT_GREATER_OR_EQUAL(LW(10), 30)
                     CALL(evt_msg_print_add, 0, STRING("irai_10"))
                     CALL(evt_pouch_add_coin, -30)
-                    SET_VALUE(LW(11), GSW(1420))
-                    CALL(irai_cancel_func, GSW(1420))
-                    SET_VALUE(GSW(1420), 0)
+                    SET_VALUE(LW(11), GSW(GSW_TROUBLE_ACTIVE))
+                    CALL(irai_cancel_func, GSW(GSW_TROUBLE_ACTIVE))
+                    SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
                     SET_INT_READ_ADDR(PTR(irai_end_event))
                     SET_VALUE(LW(0), LW(11))
                     ADD(LW(0), -1)
                     READ_INT_INDEXED(LW(1), LW(0))
                     SPAWN_EVENT(LW(1))
-                    ELSE
+                ELSE
                     CALL(evt_msg_print_add, 0, STRING("irai_11"))
                 END_IF
-                ELSE
+            ELSE
                 CALL(evt_msg_print_add, 0, STRING("irai_12"))
             END_IF
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
             SET_VALUE(LW(0), 1)
 #endif
         END_IF
@@ -504,10 +511,10 @@ EVT_END()
 void irai_flag_clear(void) {
     s32 i;
 
-    for (i = GSWF(5405); i <= GSWF(5421); i++) {
+    for (i = GSWF(GSWF_TROUBLE_WORK_BASE); i <= GSWF(GSWF_TROUBLE_WORK_LAST); i++) {
         swClear(i + EVTDAT_GSWF_BASE);
     }
-    for (i = GSW(1469); i <= GSW(1474); i++) {
+    for (i = GSW(GSW_TROUBLE_WORK_FIRST); i <= GSW(GSW_TROUBLE_WORK_LAST); i++) {
         swByteSet(i + EVTDAT_GSW_BASE, 0);
     }
 }
@@ -515,9 +522,9 @@ void irai_flag_clear(void) {
 void irai_flag_disp(void) {
     s32 i;
 
-    for (i = GSWF(5405); i <= GSWF(5421); i++) {
+    for (i = GSWF(GSWF_TROUBLE_WORK_BASE); i <= GSWF(GSWF_TROUBLE_WORK_LAST); i++) {
     }
-    for (i = GSW(1469); i <= GSW(1474); i++) {
+    for (i = GSW(GSW_TROUBLE_WORK_FIRST); i <= GSW(GSW_TROUBLE_WORK_LAST); i++) {
     }
 }
 
@@ -564,7 +571,7 @@ USER_FUNC(irai_init_func) {
     wp = _mapAlloc(sizeof(IraiWork));
     memset(wp, 0, sizeof(IraiWork));
     wp->state = 0;
-    seq = swByteGet(0);
+    seq = swByteGet(GSW_STORY_PROGRESS);
     wp->list[0] = 1;
     wp->list[1] = 2;
     wp->list[2] = 3;
@@ -662,20 +669,20 @@ USER_FUNC(irai_main_func) {
             psndSFXOn((const char*)0x2A);
             break;
         case 1:
-            if ((keyGetButtonTrg(0) & 0x100) && swByteGet(1420) == 0 && !swGet(wp->list[wp->cursor] + 5374)) {
+            if ((keyGetButtonTrg(0) & PAD_BUTTON_A) && swByteGet(GSW_TROUBLE_ACTIVE) == 0 && !swGet(wp->list[wp->cursor] + GSWF_TROUBLE_SOLVED_BASE)) {
                 psndSFXOn((const char*)0x12);
                 wp->state = 100;
                 break;
             }
-            if (keyGetButtonTrg(0) & 0x200) {
+            if (keyGetButtonTrg(0) & PAD_BUTTON_B) {
                 psndSFXOn((const char*)0x13);
                 wp->state = 101;
                 break;
             }
             prev = wp->cursor;
-            if (keyGetDirRep(0) & 0x2000) {
+            if (keyGetDirRep(0) & DEMO_STICK_DOWN) {
                 if (wp->count - 1 <= wp->cursor) {
-                    if (keyGetDirTrg(0) & 0x2000) {
+                    if (keyGetDirTrg(0) & DEMO_STICK_DOWN) {
                         psndSFXOn((const char*)5);
                         wp->cursor++;
                     }
@@ -684,9 +691,9 @@ USER_FUNC(irai_main_func) {
                     wp->cursor++;
                 }
             }
-            if (keyGetDirRep(0) & 0x1000) {
+            if (keyGetDirRep(0) & DEMO_STICK_UP) {
                 if (wp->cursor <= 0) {
-                    if (keyGetDirTrg(0) & 0x1000) {
+                    if (keyGetDirTrg(0) & DEMO_STICK_UP) {
                         psndSFXOn((const char*)5);
                         wp->cursor--;
                     }
@@ -715,7 +722,7 @@ USER_FUNC(irai_main_func) {
                     wp->top--;
                 }
             }
-            if (wp->top > 0 && (keyGetButtonTrg(0) & 0x40)) {
+            if (wp->top > 0 && (keyGetButtonTrg(0) & PAD_TRIGGER_L)) {
                 n = 10;
                 if (wp->top < 10) {
                     n = wp->top;
@@ -724,7 +731,7 @@ USER_FUNC(irai_main_func) {
                 wp->cursor -= n;
                 psndSFXOn((const char*)5);
             }
-            if (wp->top < wp->count - 10 && (keyGetButtonTrg(0) & 0x20)) {
+            if (wp->top < wp->count - 10 && (keyGetButtonTrg(0) & PAD_TRIGGER_R)) {
                 n = 10;
                 if (-wp->top + (wp->count - 10) < 10) {
                     n = -wp->top + (wp->count - 10);
@@ -802,32 +809,33 @@ USER_FUNC(irai_end_func) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01
-void FontDrawScaleVec(Vec scale);
+#if VERSION >= VERSION_US
 
 // US: text centered in a boxW-wide box at x, x-squeezed to maxW; w is the width variable of the caller.
-#define iraiDrawCentered(msg, x, y, boxW, maxW, scale, trans, w) { \
-    w = FontGetMessageWidth(msg);                                    \
-    if (w > (maxW)) {                                                \
-        PSMTXScale(scale, (maxW) / w, 1.0f, 1.0f);                   \
-        w = (maxW);                                                  \
-    } else {                                                         \
-        PSMTXScale(scale, 1.0f, 1.0f, 1.0f);                         \
-    }                                                                \
-    PSMTXTrans(trans, (x) + ((boxW) - w) / 2, y, 0.0f);              \
-    PSMTXConcat(trans, scale, trans);                                \
-    FontDrawStringMtx(trans, msg);                                   \
-}
+#define iraiDrawCentered(msg, x, y, boxW, maxW, scale, trans, w) \
+    {                                                            \
+        w = FontGetMessageWidth(msg);                            \
+        if (w > (maxW)) {                                        \
+            PSMTXScale(scale, (maxW) / w, 1.0f, 1.0f);           \
+            w = (maxW);                                          \
+        } else {                                                 \
+            PSMTXScale(scale, 1.0f, 1.0f, 1.0f);                 \
+        }                                                        \
+        PSMTXTrans(trans, (x) + ((boxW) - w) / 2, y, 0.0f);      \
+        PSMTXConcat(trans, scale, trans);                        \
+        FontDrawStringMtx(trans, msg);                           \
+    }
 
 // US: one row cell, x-squeezed to fit maxW. "y" is stored in the caller's float var v (the
 // original reuses one float local for these; this keeps the MWCC float register choice).
-#define iraiDrawFit(msg, x, y, maxW, v) {                                              \
-    f32 w_;                                                                            \
-    v = (y);                                                                           \
-    w_ = FontGetMessageWidth(msg);                                                     \
-    FontDrawScaleVec((Vec){w_ > (maxW) ? 0.85f * ((maxW) / w_) : 0.85f, 0.85f, 0.85f}); \
-    FontDrawString(msg, x, v);                                                         \
-}
+#define iraiDrawFit(msg, x, y, maxW, v)                                                     \
+    {                                                                                       \
+        f32 w_;                                                                             \
+        v = (y);                                                                            \
+        w_ = FontGetMessageWidth(msg);                                                      \
+        FontDrawScaleVec((Vec){w_ > (maxW) ? 0.85f * ((maxW) / w_) : 0.85f, 0.85f, 0.85f}); \
+        FontDrawString(x, v, msg);                                                          \
+    }
 
 void irai_window_disp(CameraId camera, void* param) {
     IraiWork* wp = param;
@@ -877,12 +885,12 @@ void irai_window_disp(CameraId camera, void* param) {
     FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
     FontDrawScale(0.85f);
     for (i = 0; i < wp->count; i++) {
-        if (swGet(wp->list[i] + 5374)) {
+        if (swGet(wp->list[i] + GSWF_TROUBLE_SOLVED_BASE)) {
             FontDrawColor((GXColor){0x80, 0x80, 0x80, 0xFF});
         } else {
             FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
         }
-        if (wp->list[i] == swByteGet(1420)) {
+        if (wp->list[i] == swByteGet(GSW_TROUBLE_ACTIVE)) {
             FontDrawColor((GXColor){0xFF, 0x00, 0x00, 0xFF});
         }
         no = wp->list[i] - 1;
@@ -914,8 +922,9 @@ void irai_window_disp(CameraId camera, void* param) {
     FontDrawScale(0.85f);
     msg = msgSearch("irai_name1_win");
     FontDrawEdge();
-    FontDrawString(msg, -270.0f, 152.0f);
-    FontDrawString(msgSearch("irai_name2_win"), -270.0f, 127.0f);
+    FontDrawString(-270.0f, 152.0f, msg);
+    msg = msgSearch("irai_name2_win");
+    FontDrawString(-270.0f, 127.0f, msg);
     FontDrawEdgeOff();
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -129.0f, 170.0f, 410.0f, 340.0f, 12.0f);
     windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA3, 0xFF, 0xFF}, -103.0f, 190.0f, 120.0f, 40.0f, 12.0f);
@@ -926,11 +935,11 @@ void irai_window_disp(CameraId camera, void* param) {
     negX = -77.0f;
     msg = msgSearch("irai_client_win");
     FontDrawEdge();
-    FontDrawString(msg, negX, 180.0f);
+    FontDrawString(negX, 180.0f, msg);
     FontDrawEdgeOff();
     msg = msgSearch("irai_contents_win");
     FontDrawEdge();
-    FontDrawString(msg, 115.0f, 180.0f);
+    FontDrawString(115.0f, 180.0f, msg);
     FontDrawEdgeOff();
     GXGetScissor(&left, &top, &width, &height);
     GXSetScissor(175, 98, 410, 304);
@@ -938,17 +947,17 @@ void irai_window_disp(CameraId camera, void* param) {
     FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
     FontDrawScale(0.85f);
     for (i = 0; i < wp->count; i++) {
-        if (swGet(wp->list[i] + 5374)) {
+        if (swGet(wp->list[i] + GSWF_TROUBLE_SOLVED_BASE)) {
             FontDrawColor((GXColor){0x80, 0x80, 0x80, 0xFF});
         } else {
             FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
         }
-        if (wp->list[i] == swByteGet(1420)) {
+        if (wp->list[i] == swByteGet(GSW_TROUBLE_ACTIVE)) {
             FontDrawColor((GXColor){0xFF, 0x00, 0x00, 0xFF});
         }
         no = wp->list[i] - 1;
-        FontDrawString(wp->client[no], -119.0f, iraiAddI(wp->scroll, 140 - i * 30));
-        FontDrawString(wp->contents[no], 51.0f, wp->scroll + (140 - i * 30));
+        FontDrawString(-119.0f, iraiAddI(wp->scroll, 140 - i * 30), wp->client[no]);
+        FontDrawString(51.0f, wp->scroll + (140 - i * 30), wp->contents[no]);
     }
     GXSetScissor(left, top, width, height);
 }

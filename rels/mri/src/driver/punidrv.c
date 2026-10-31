@@ -1,3 +1,5 @@
+// The Great Tree (mri): punidrv, the billboard renderer for the Puni crowd (a copy of the DOL extdrv): sorts the
+// poses by depth and draws each puni as a textured quad with its shadow.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -8,37 +10,15 @@
 #include "win/win_main.h"
 #include "system.h"
 #include "driver/animdrv.h"
+#include "libc_decls.h"
+// FAKE: punidrv.c calls animPoseDisp_MakeExtTexture through this prototype (the types it was compiled with) instead of the one in driver/animdrv.h; same registers, behaviour-identical.
+typedef void (*AnimPoseDisp_MakeExtTextureLocalFn)(const char*, const char*, f32, f32, GXTexObj*, void***, s32*, s32*, s32*, s32*);
 
-void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj, void*** image, s32* x0, s32* y0, s32* x1, s32* y1);
 static f32 camGetRy(void);
 static s32 compare(const void* a, const void* b);
-void mapGetBlend(GXColor* color);
-double atan2(double y, double x);
 
-void puniSinCosRet(u32 deg, f32* x, f32* z, f32 rx, f32 rz);
-void puniInit(void);
-void puniEntry(s32 poseNum, PunidrvTexInfo* texInfo, void (*initFunc)(void), void (*mainFunc)(void), void (*mainFunc2)(void));
-void puniMakeTexture(CameraId camId, void* param);
-void puniReset(void);
-void puniFadeOff(BOOL useFade);
-void puniMain(void);
 static s32 compare(const void* a, const void* b);
-PunidrvPose* puniGetPosePtr(void);
-s32 puniGetPoseNum(void);
-void puniPoseDraw(s32 index);
-void puniDraw(void);
-void puniLoadRenderMode(void);
-void puniLoadVertex(void);
-void puniLoadTexture(void);
-u32 puniGetUsedTmemSize(void);
-void puniLoadTextureExit(void);
-void puniLoadTev(void);
 static f32 camGetRy(void);
-void puniLoadShadowVertex(void);
-void puniLoadShadowTev(void);
-void puniLoadShadowRenderMode(void);
-void puniLoadShadowMtx(Mtx mtx);
-void puniDrawShadow(void);
 
 static f32 sintbl[450];
 static u8 shadow_dl[32];
@@ -175,7 +155,7 @@ void puniMakeTexture(CameraId camId, void* param) {
     anim_ext_tex_size = 0;
     for (i = 0; i < wp->texNum; i++, info++, tex++) {
         n = i * 12;
-        animPoseDisp_MakeExtTexture(info->group, info->anim, info->frame, 5.84f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
+        ((AnimPoseDisp_MakeExtTextureLocalFn)animPoseDisp_MakeExtTexture)(info->group, info->anim, info->frame, 5.84f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
         wp->vtx[n++] = x0 * scale;
         wp->vtx[n++] = -y0 * scale;
         wp->vtx[n++] = 0.0f;
@@ -240,7 +220,6 @@ void puniMain(void) {
     s32 i;
     PunidrvPose* pose;
     PunidrvSort* sort;
-    CameraEntry* cam;
     f32 ry, angle, diff, c, s;
     u32 flags;
 
@@ -253,8 +232,8 @@ void puniMain(void) {
     pose = wp->poses;
     sort = wp->sort;
     ry = camGetRy();
-    cam = camGetPtr(CAMERA_3D);
-    cam = camGetPtr(CAMERA_3D);
+    camGetPtr(CAMERA_3D);
+    camGetPtr(CAMERA_3D);
     for (i = wp->poseNum - 1; i >= 0; i--, pose++, sort++) {
         flags = pose->flags;
         sort->index = i;
@@ -299,7 +278,7 @@ void puniMain(void) {
         (*pose->mtx)[2][0] = -s;
     }
     if (wp->poseNum != 0) {
-        qqsort(wp->sort, wp->poseNum, sizeof(PunidrvSort), (void*)compare);
+        qqsort(wp->sort, wp->poseNum, sizeof(PunidrvSort), compare);
     }
     wp->curTex = -1;
     wp->usedTmem = 0;
@@ -449,6 +428,7 @@ GXColor shadow_col[8] ATTRIBUTE_ALIGN(32) = {
 
 void puniLoadTev(void) {
     GXColor blend;
+    // unused in the game too, but their initialisers are part of the original .rodata
     GXColor unused0 = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor unused1 = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor fogColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -545,4 +525,3 @@ void puniDrawShadow(void) {
         }
     }
 }
-

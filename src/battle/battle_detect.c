@@ -1,16 +1,13 @@
+// Target detection: picks which enemies a weapon can hit and who attacks first.
 #include "version.h"
+// this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_monosiri.h"
 #include "battle/battle_unit.h"
 #include "data/item_data.h"
+#include "battle/battle_sub.h"
 #include "system.h"
-
-extern ItemData itemDataTable[];
-
-BOOL BtlUnit_CanActStatus(BattleUnit* unit);
-s32 BtlCompForwardLv(s32 dir, f32 x);
-
 
 void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
     BattleUnitKindPart* kp;
@@ -28,171 +25,216 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
     s32 np2;
     BattleUnit* u2;
 
-    if (d->classFlags & 0x80000000) {
+    if (d->classFlags & TARGET_CLASS_NONE) {
         d->numTargets = -1;
         return;
     }
     {
-    for (i = 0; i < 64; i++) {
-        BattleUnit* unit = BattleGetUnitPtr(wp, i);
-        if (unit && !BtlUnit_CheckStatus(unit, 0x1B) && !(unit->mAttributeFlags & 0x40)) {
-            part = unit->mParts;
-            np2 = unit->mKindParams->numParts & 0xFF;
-            for (j = 0; j < np2; j++) {
+        for (i = 0; i < BATTLE_UNIT_MAX; i++) {
+            BattleUnit* unit = BattleGetUnitPtr(wp, i);
+            if (unit && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) && !(unit->attributeFlags & UNIT_ATTR_NOT_SAMPLED_AS_TARGET)) {
+                part = unit->parts;
+                np2 = unit->kindParams->numParts & 0xFF;
+                for (j = 0; j < np2; j++) {
 
-                s32 dir;
-                f32 x, y, z;
-                f32 ox, oy, oz;
-                if (part->attributes & 0x10000) {
-                    part = part->mNextPart;
-                    continue;
+                    s32 dir;
+                    f32 x, y, z;
+                    f32 ox, oy, oz;
+                    if (part->attributes & PART_ATTR_NOT_TARGETABLE) {
+                        part = part->nextPart;
+                        continue;
+                    }
+                    kp = part->kindPartParams;
+                    dir = part->faceDirection;
+                    BtlUnit_GetPartsWorldPos(part, &x, &y, &z);
+                    if (!(unit->attributeFlags & UNIT_ATTR_CEILING)) {
+                        y += part->positionOffset.y * unit->sizeMultiplier;
+                    }
+                    ox = x;
+                    oy = y;
+                    oz = 5.0f + z;
+                    x += dir * (unit->sizeMultiplier * (part->hitCursorBaseOffset.x + part->hitCursorOffset.x));
+                    y += unit->sizeMultiplier * (part->hitCursorBaseOffset.y + part->hitCursorOffset.y);
+                    z += unit->sizeMultiplier * (part->hitCursorBaseOffset.z + part->hitCursorOffset.z);
+                    t->unitIdx = i;
+                    t->partIdx = kp->partNum;
+                    t->posX = x;
+                    t->posY = y;
+                    t->posZ = z;
+                    t->score = 0;
+                    t->reserved_20 = -1;
+                    if ((unit->attributeFlags & UNIT_ATTR_TARGET_SORT_OFFSET) && !(part->attributes & PART_ATTR_NO_TARGET_SORT_OFFSET)) {
+                        t->score += d->direction * 300;
+                    }
+                    t->score += part->hitOffsetX * dir;
+                    t->x = (s16)(ox + t->score);
+                    t->y = (s16)oy;
+                    t->z = (s16)oz;
+                    t->forwardLv = BtlCompForwardLv(d->direction, t->x);
+                    if (t->z < -30) {
+                        t->side = 0;
+                    } else {
+                        t->side = 1;
+                    }
+                    part = part->nextPart;
+                    n++;
+                    t++;
                 }
-                kp = part->mKindPartParams;
-                dir = part->faceDirection;
-                BtlUnit_GetPartsWorldPos(part, &x, &y, &z);
-                if (!(unit->mAttributeFlags & 2)) {
-                    y += part->mPositionOffset.y * unit->mSizeMultiplier;
-                }
-                ox = x;
-                oy = y;
-                oz = 5.0f + z;
-                x += dir * (unit->mSizeMultiplier * (part->mHitCursorBaseOffset.x + part->mHitCursorOffset.x));
-                y += unit->mSizeMultiplier * (part->mHitCursorBaseOffset.y + part->mHitCursorOffset.y);
-                z += unit->mSizeMultiplier * (part->mHitCursorBaseOffset.z + part->mHitCursorOffset.z);
-                t->unitIdx = i;
-                t->partIdx = kp->partNum;
-                t->posX = x;
-                t->posY = y;
-                t->posZ = z;
-                t->score = 0;
-                t->reserved_20 = -1;
-                if ((unit->mAttributeFlags & 1) && !(part->attributes & 0x20000)) {
-                    t->score += d->direction * 300;
-                }
-                t->score += part->hitOffsetX * dir;
-                t->x = (s16)(ox + t->score);
-                t->y = (s16)oy;
-                t->z = (s16)oz;
-                t->forwardLv = BtlCompForwardLv(d->direction, t->x);
-                if (t->z < -30) {
-                    t->side = 0;
-                } else {
-                    t->side = 1;
-                }
-                part = part->mNextPart;
-                n++;
-                t++;
             }
         }
     }
-    }
     {
-    d->currentTarget = i = 0;
-    d->numTargets = n;
-    n = d->numTargets;
-    t = d->targets;
+        d->currentTarget = i = 0;
+        d->numTargets = n;
+        n = d->numTargets;
+        t = d->targets;
         for (; n > i; i++) {
             BattleWorkTarget* tg = &t[i];
             BattleUnit* unit = BattleGetUnitPtr(wp, tg->unitIdx);
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, tg->partIdx);
             {
-        BOOL ok;
-        do {
-            u32 flags = d->classFlags;
-            if (flags & 0x80000000) {
-                { ok = FALSE; break; }
-            }
-            if (flags & 0x10000) {
-                if (unit->currentKind != 0xDE) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x20000) {
-                if (unit->currentKind < 0xD8 || unit->currentKind >= 0xDA) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 1) {
-#ifdef VERSION_G8ME01_DEMO
-                if (unit->currentKind == 0xDE) {
+                BOOL ok;
+                do {
+                    u32 flags = d->classFlags;
+                    if (flags & TARGET_CLASS_NONE) {
+                        {
+                            ok = FALSE;
+                            break;
+                        }
+                    }
+                    if (flags & TARGET_CLASS_ONLY_MARIO) {
+                        if (unit->currentKind != UNIT_MARIO) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_ONLY_TREE_OR_SWITCH) {
+                        if (unit->currentKind < UNIT_UNUSED_TREE || unit->currentKind >= UNIT_UNUSED_TESTNPC) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_MARIO) {
+#if VERSION == VERSION_DEMO
+                        if (unit->currentKind == UNIT_MARIO) {
 #else
-                if (unit->currentKind == 0xDE || unit->currentKind == 0xDF) {
+                        if (unit->currentKind == UNIT_MARIO || unit->currentKind == UNIT_SHELL_SHIELD) {
 #endif
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 2) {
-                if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x10) {
-                if (unit->currentKind >= 1 && unit->currentKind < 0xD8) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x40) {
-                if (unit->currentKind >= 0xDA && unit->currentKind < 0xDE) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x20) {
-                if (unit->currentKind >= 0xD8 && unit->currentKind < 0xDA) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x1000) {
-                if (d->unitId == unit->unitId) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x100) {
-                if (d->belong == unit->mAlliance) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x200) {
-                if (d->belong != unit->mAlliance && unit->mAlliance != 2) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x2000) {
-                if (d->unitId != unit->unitId && unit->currentKind == BattleGetUnitPtr(wp, d->unitId)->currentKind) {
-                    { ok = FALSE; break; }
-                }
-            }
-            flags = d->classFlags;
-            if (flags & 0x4000) {
-                if (d->unitId != unit->unitId) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x100000) {
-                u32 a = part->attributes;
-                if (!((a & 1) || (a & 2)) || (a & 0x40000)) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (flags & 0x200000) {
-                u32 a = part->attributes;
-#ifdef VERSION_G8ME01
-                if (!((a & 1) || (a & 2) || (a & 4)) || (a & 0x10) || (a & 0x40000)) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_PARTNER) {
+                        if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_ENEMY) {
+                        if (unit->currentKind >= UNIT_GOOMBA && unit->currentKind < UNIT_UNUSED_TREE) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_SYSTEM_UNIT) {
+                        if (unit->currentKind >= UNIT_UNUSED_TESTNPC && unit->currentKind < UNIT_MARIO) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_TREE_OR_SWITCH) {
+                        if (unit->currentKind >= UNIT_UNUSED_TREE && unit->currentKind < UNIT_UNUSED_TESTNPC) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_SELF) {
+                        if (d->unitId == unit->unitId) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_OPPOSING_ALLIANCE) {
+                        if (d->belong == unit->alliance) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_OWN_ALLIANCE) {
+                        if (d->belong != unit->alliance && unit->alliance != 2) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_NO_SAME_KIND) {
+                        if (d->unitId != unit->unitId && unit->currentKind == BattleGetUnitPtr(wp, d->unitId)->currentKind) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    flags = d->classFlags;
+                    if (flags & TARGET_CLASS_ONLY_SELF) {
+                        if (d->unitId != unit->unitId) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_MAIN_PARTS) {
+                        u32 a = part->attributes;
+                        if (!((a & PART_ATTR_MAIN) || (a & PART_ATTR_IMPORTANT)) || (a & PART_ATTR_NOT_PART_TARGET)) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (flags & TARGET_CLASS_ANY_PART) {
+                        u32 a = part->attributes;
+#if VERSION >= VERSION_US
+                        if (!((a & PART_ATTR_MAIN) || (a & PART_ATTR_IMPORTANT) || (a & PART_ATTR_SEMI_IMPORTANT)) || (a & PART_ATTR_NOT_ANY_PART_TARGET) || (a & PART_ATTR_NOT_PART_TARGET)) {
 #else
-                if (!((a & 1) || (a & 2) || (a & 4)) || (a & 0x40000)) {
+                        if (!((a & PART_ATTR_MAIN) || (a & PART_ATTR_IMPORTANT) || (a & PART_ATTR_SEMI_IMPORTANT)) || (a & PART_ATTR_NOT_PART_TARGET)) {
 #endif
-                    { ok = FALSE; break; }
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    ok = TRUE;
+                } while (0);
+                if (!ok) {
+                    for (k = i; k < n - 1; k++) {
+                        d->targets[k] = d->targets[k + 1];
+                    }
+                    n--;
+                    i--;
                 }
             }
-            ok = TRUE;
-        } while (0);
-        if (!ok) {
-                for (k = i; k < n - 1; k++) {
-                    d->targets[k] = d->targets[k + 1];
-                }
-                n--;
-                i--;
-            }
-        }
         }
     }
 
@@ -202,100 +244,142 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
             BattleUnit* unit = BattleGetUnitPtr(wp, tg->unitIdx);
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, tg->partIdx);
             {
-        BOOL ok;
-        do {
-                        if (d->propFlags & 1) {
-                if (part->attributes & 0x80000) {
-                    { ok = FALSE; break; }
-                }
-                if (!battleGetUnitMonosiriPtr(unit->currentKind)) {
-                    { ok = FALSE; break; }
-                }
-                if (!battleGetUnitMonosiriPtr(unit->currentKind)->tattleBtlTag) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 2) {
-                if (unit->mAttributeFlags & 4) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 4) {
-                if (unit->mAttributeFlags & 2) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 8) {
-                if (unit->mAttributeFlags & 4) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 0x10) {
-                u32 a = unit->mAttributeFlags;
-                if (!(a & 4) && !(a & 2)) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 0x1000) {
-                if (part->attributes & 0x100000) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 0x2000) {
-                if (part->attributes & 0x200000) {
-#ifdef VERSION_G8ME01_DEMO
-                    { ok = FALSE; break; }
-#else
-                    if (!(d->propFlags & 0x100000) || d->unitId != unit->unitId) {
-                        { ok = FALSE; break; }
+                BOOL ok;
+                do {
+                    if (d->propFlags & TARGET_PROP_TATTLE) {
+                        if (part->attributes & PART_ATTR_UNTATTLEABLE) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                        if (!battleGetUnitMonosiriPtr(unit->currentKind)) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                        if (!battleGetUnitMonosiriPtr(unit->currentKind)->tattleBtlTag) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
                     }
+                    if (d->propFlags & TARGET_PROP_NO_FLOATING) {
+                        if (unit->attributeFlags & UNIT_ATTR_FLOATING) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_NO_CEILING) {
+                        if (unit->attributeFlags & UNIT_ATTR_CEILING) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_NO_FLOATING_2) {
+                        if (unit->attributeFlags & UNIT_ATTR_FLOATING) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_ONLY_AIRBORNE) {
+                        u32 a = unit->attributeFlags;
+                        if (!(a & 4) && !(a & 2)) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_JUMPLIKE) {
+                        if (part->attributes & PART_ATTR_JUMPLIKE_CANNOT_TARGET) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_HAMMERLIKE) {
+                        if (part->attributes & PART_ATTR_HAMMERLIKE_CANNOT_TARGET) {
+#if VERSION == VERSION_DEMO
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+#else
+                            if (!(d->propFlags & TARGET_PROP_RECOIL) || d->unitId != unit->unitId) {
+                                {
+                                    ok = FALSE;
+                                    break;
+                                }
+                            }
 #endif
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_SHELL_TOSS_LIKE) {
+                        if (part->attributes & PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_ONLY_SHELL_TOSS_IMMUNE) {
+                        if (!(part->attributes & PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_NO_SHELL_SHIELDED) {
+                        if (unit->attributeFlags & UNIT_ATTR_SHELL_SHIELDED) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    if (d->propFlags & TARGET_PROP_NO_PART_ATTR_2000000) {
+                        if (part->attributes & PART_ATTR_NO_SHADOW) {
+                            {
+                                ok = FALSE;
+                                break;
+                            }
+                        }
+                    }
+                    ok = TRUE;
+                } while (0);
+                if (!ok) {
+                    for (k = i; k < n - 1; k++) {
+                        d->targets[k] = d->targets[k + 1];
+                    }
+                    n--;
+                    i--;
                 }
             }
-            if (d->propFlags & 0x4000) {
-                if (part->attributes & 0x400000) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 0x8000) {
-                if (!(part->attributes & 0x400000)) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 0x2000000) {
-                if (unit->mAttributeFlags & 0x20) {
-                    { ok = FALSE; break; }
-                }
-            }
-            if (d->propFlags & 0x4000000) {
-                if (part->attributes & 0x2000000) {
-                    { ok = FALSE; break; }
-                }
-            }
-            ok = TRUE;
-        } while (0);
-        if (!ok) {
-                for (k = i; k < n - 1; k++) {
-                    d->targets[k] = d->targets[k + 1];
-                }
-                n--;
-                i--;
-            }
-        }
         }
     }
 
-    if (d->classFlags & 0x100000) {
+    if (d->classFlags & TARGET_CLASS_MAIN_PARTS) {
         {
             for (i = 0; n > i; i++) {
                 BattleWorkTarget* tg = &t[i];
                 BattleUnitPart* part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg->unitIdx), tg->partIdx);
                 BOOL keep = TRUE;
-                if (part->attributes & 2) {
+                if (part->attributes & PART_ATTR_IMPORTANT) {
                     for (j = 0; j < n; j++) {
                         BattleWorkTarget* o = &t[j];
                         if (tg != o && tg->unitIdx == o->unitIdx) {
-                            if (BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, o->unitIdx), o->partIdx)->attributes & 1) {
+                            if (BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, o->unitIdx), o->partIdx)->attributes & PART_ATTR_MAIN) {
                                 keep = FALSE;
                                 break;
                             }
@@ -320,36 +404,39 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
             tg4 = &t[i];
             part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg4->unitIdx), tg4->partIdx);
             do {
-            if ((d->propFlags & 0x1000000) && !(part->attributes & VERSION_PICK(0x10, 0x40))) {
-                ok4 = TRUE;
-                for (j = 0; j < n; j++) {
-                    s32 a;
-                    s32 b;
-                    o4 = &t[j];
-                    if (tg4 == o4 || tg4->side != o4->side) {
-                        continue;
-                    }
-                    a = tg4->x;
-                    b = o4->x;
-                    if (d->direction < 0) {
-                        a *= -1;
-                        b *= -1;
-                    }
-                    if (a > b) {
-                        BattleUnitPart* op = BattleGetUnitPartsPtr(o4->unitIdx, o4->partIdx);
-                        if (!(op->attributes & VERSION_PICK(0x10, 0x40)) && !(op->attributes & 0x400000)) {
-                            u1 = BattleGetUnitPtr(wp, d->unitId);
-                            u2 = BattleGetUnitPtr(wp, o4->unitIdx);
-                            if (!(u1->mTokenFlags & 0x10) || u1 != u2) {
-                                ok4 = FALSE;
-                                break;
+                if ((d->propFlags & TARGET_PROP_FRONTMOST) && !(part->attributes & PART_ATTR_INTANGIBLE)) {
+                    ok4 = TRUE;
+                    for (j = 0; j < n; j++) {
+                        s32 a;
+                        s32 b;
+                        o4 = &t[j];
+                        if (tg4 == o4 || tg4->side != o4->side) {
+                            continue;
+                        }
+                        a = tg4->x;
+                        b = o4->x;
+                        if (d->direction < 0) {
+                            a *= -1;
+                            b *= -1;
+                        }
+                        if (a > b) {
+                            BattleUnitPart* op = BattleGetUnitPartsPtr(o4->unitIdx, o4->partIdx);
+                            if (!(op->attributes & PART_ATTR_INTANGIBLE) && !(op->attributes & PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)) {
+                                u1 = BattleGetUnitPtr(wp, d->unitId);
+                                u2 = BattleGetUnitPtr(wp, o4->unitIdx);
+                                if (!(u1->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION) || u1 != u2) {
+                                    ok4 = FALSE;
+                                    break;
+                                }
                             }
                         }
                     }
+                    if (!ok4) {
+                        keep = FALSE;
+                        break;
+                    }
                 }
-                if (!ok4) { keep = FALSE; break; }
-            }
-            keep = TRUE;
+                keep = TRUE;
             } while (0);
 
             if (!keep) {
@@ -364,33 +451,41 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
 
     d->numTargets = n;
     {
-    s8* idx = d->targetIndices;
-    t = d->targets;
-    n = d->numTargets;
-    for (i = 0; i < n; i++) {
-        idx[i] = i;
-    }
-    if (d->direction > 0) {
-        for (i = 0; i < n - 1; i++) {
-            for (j = i + 1; j < n; j++) {
-                BattleWorkTarget* ta = &t[idx[i]];
-                BattleWorkTarget* tb = &t[idx[j]];
-                if (ta->posX + ta->score * 10 > tb->posX + tb->score * 10) {
-                    { s8 a = idx[i]; idx[i] = idx[j]; idx[j] = a; }
+        s8* idx = d->targetIndices;
+        t = d->targets;
+        n = d->numTargets;
+        for (i = 0; i < n; i++) {
+            idx[i] = i;
+        }
+        if (d->direction > 0) {
+            for (i = 0; i < n - 1; i++) {
+                for (j = i + 1; j < n; j++) {
+                    BattleWorkTarget* ta = &t[idx[i]];
+                    BattleWorkTarget* tb = &t[idx[j]];
+                    if (ta->posX + ta->score * 10 > tb->posX + tb->score * 10) {
+                        {
+                            s8 a = idx[i];
+                            idx[i] = idx[j];
+                            idx[j] = a;
+                        }
+                    }
+                }
+            }
+        } else {
+            for (i = 0; i < n - 1; i++) {
+                for (j = i + 1; j < n; j++) {
+                    BattleWorkTarget* ta = &t[idx[i]];
+                    BattleWorkTarget* tb = &t[idx[j]];
+                    if (ta->posX + ta->score * 10 <= tb->posX + tb->score * 10) {
+                        {
+                            s8 a = idx[i];
+                            idx[i] = idx[j];
+                            idx[j] = a;
+                        }
+                    }
                 }
             }
         }
-    } else {
-        for (i = 0; i < n - 1; i++) {
-            for (j = i + 1; j < n; j++) {
-                BattleWorkTarget* ta = &t[idx[i]];
-                BattleWorkTarget* tb = &t[idx[j]];
-                if (ta->posX + ta->score * 10 <= tb->posX + tb->score * 10) {
-                    { s8 a = idx[i]; idx[i] = idx[j]; idx[j] = a; }
-                }
-            }
-        }
-    }
     }
 }
 
@@ -403,15 +498,15 @@ BOOL BattleSamplingEnemy(BattleWorkWeaponTargets* d, BattleWeapon* weapon, s32 u
     d->classFlags = classFlags;
     d->propFlags = propFlags;
     d->direction = direction;
-    if (BattleGetUnitPtr(_battleWorkPointer, unitId)->mTokenFlags & 0x10) {
-        if ((d->classFlags & 0x100) && !(d->classFlags & 0x200)) {
+    if (BattleGetUnitPtr(_battleWorkPointer, unitId)->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION) {
+        if ((d->classFlags & TARGET_CLASS_NO_OPPOSING_ALLIANCE) && !(d->classFlags & TARGET_CLASS_NO_OWN_ALLIANCE)) {
             r = TRUE;
-            d->classFlags &= ~0x100;
-            d->classFlags |= 0x200;
-        } else if (!(d->classFlags & 0x100) && (d->classFlags & 0x200)) {
+            d->classFlags &= ~TARGET_CLASS_NO_OPPOSING_ALLIANCE;
+            d->classFlags |= TARGET_CLASS_NO_OWN_ALLIANCE;
+        } else if (!(d->classFlags & TARGET_CLASS_NO_OPPOSING_ALLIANCE) && (d->classFlags & TARGET_CLASS_NO_OWN_ALLIANCE)) {
             r = TRUE;
-            d->classFlags |= 0x100;
-            d->classFlags &= ~0x200;
+            d->classFlags |= TARGET_CLASS_NO_OPPOSING_ALLIANCE;
+            d->classFlags &= ~TARGET_CLASS_NO_OWN_ALLIANCE;
         }
     }
     _btlSamplingEnemy(d);
@@ -444,113 +539,108 @@ void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* d, u32 flags, s32* unitO
             s32 id = d->targetIndices[i];
             unit = BattleGetUnitPtr(wp, d->targets[id].unitIdx);
             w[id] += 100;
-            if ((flags & 1) && unit->currentKind == 0xDE) {
+            if ((flags & TARGET_WEIGHT_PREFER_MARIO) && unit->currentKind == UNIT_MARIO) {
                 w[id] = 1.5f * w[id];
             }
-            if ((flags & 2) && unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {
+            if ((flags & TARGET_WEIGHT_PREFER_PARTNER) && unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
                 w[id] = 1.5f * w[id];
             }
-            if ((flags & 4)) {
+            if ((flags & TARGET_WEIGHT_PREFER_FRONT)) {
                 f32 t = 0.4f * (d->numTargets - i);
                 w[id] *= 0.1f + t;
             }
-            if ((flags & 8)) {
+            if ((flags & TARGET_WEIGHT_PREFER_BACK)) {
                 f32 t = 0.4f * i;
                 w[id] = (0.5f + t) * w[id];
             }
-            if ((flags & 0x10) && active->mAlliance == unit->mAlliance) {
+            if ((flags & TARGET_WEIGHT_PREFER_OWN_ALLIANCE) && active->alliance == unit->alliance) {
                 w[id] = 1.5f * w[id];
             }
-            if ((flags & 0x20) && active->mAlliance != unit->mAlliance && unit->mAlliance != 2) {
+            if ((flags & TARGET_WEIGHT_PREFER_OPPOSING_ALLIANCE) && active->alliance != unit->alliance && unit->alliance != 2) {
                 w[id] = 1.5f * w[id];
             }
-            if ((flags & 0x100)) {
+            if ((flags & TARGET_WEIGHT_PREFER_LOW_HP_RATIO)) {
                 w[id] = (2.0f - (f32)unit->currentHp / (f32)unit->maxHp) * w[id];
             }
-            if ((flags & 0x200)) {
+            if ((flags & TARGET_WEIGHT_PREFER_HIGH_HP_RATIO)) {
                 w[id] = (1.0f + (f32)unit->currentHp / (f32)unit->maxHp) * w[id];
             }
-            if ((flags & 0x400)) {
+            if ((flags & TARGET_WEIGHT_PREFER_LOW_HP)) {
                 w[id] = (1.5f - 0.05f * unit->currentHp) * w[id];
             }
-            if ((flags & 0x800)) {
+            if ((flags & TARGET_WEIGHT_PREFER_HIGH_HP)) {
                 w[id] = (1.0f + 0.05f * unit->currentHp) * w[id];
             }
-            if ((flags & 0x1000) && unit->currentHp <= unit->mKindParams->mPerilHP) {
+            if ((flags & TARGET_WEIGHT_PREFER_IN_PERIL) && unit->currentHp <= unit->kindParams->perilHP) {
                 w[id] = 1.5f * w[id];
             }
             if (d->weapon) {
-                if (unit->mAttributeFlags & 0x20000) {
+                if (unit->attributeFlags & UNIT_ATTR_INACTIVE) {
                     w[id] = 1;
                 }
                 switch (d->weapon->itemId) {
-                case 0:
-                    break;
-                case 0x8E:
-                    if (!BtlUnit_CanActStatus(unit) || BtlUnit_CheckStatus(unit, 10)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x92:
-                    if (BtlUnit_CheckStatus(unit, 0xB)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x93:
-                    if (BtlUnit_CheckStatus(unit, 0xF)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x8F:
-                    if (BtlUnit_CheckStatus(unit, 0xE)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x86:
-                    if (BtlUnit_CheckStatus(unit, 0x12)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x87:
-                    if (BtlUnit_CheckStatus(unit, 6)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x88:
-                    if (BtlUnit_CheckStatus(unit, 7)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x89:
-                    if (BtlUnit_CheckStatus(unit, 5)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x99:
-                    if (!BtlUnit_CheckStatus(unit, 1) && !BtlUnit_CheckStatus(unit, 2)
-                        && !BtlUnit_CheckStatus(unit, 3) && !BtlUnit_CheckStatus(unit, 4)
-                        && !BtlUnit_CheckStatus(unit, 5) && !BtlUnit_CheckStatus(unit, 8)
-                        && !BtlUnit_CheckStatus(unit, 9) && !BtlUnit_CheckStatus(unit, 0xB)
-                        && !BtlUnit_CheckStatus(unit, 0xF) && !BtlUnit_CheckStatus(unit, 0x14)) {
-                        w[id] = 1;
-                    }
-                    break;
-                default:
-                    if (itemDataTable[d->weapon->itemId].fp_restored) {
-                        s32 mx = BtlUnit_GetMaxFp(unit);
-                        if (BtlUnit_GetFp(unit) < mx) {
-                            mx = BtlUnit_GetMaxFp(unit);
-                            w[id] = w[id] * (1.0f + 0.1f * (mx - BtlUnit_GetFp(unit)));
-                        } else if (!itemDataTable[d->weapon->itemId].hp_restored
-                                   && !itemDataTable[d->weapon->itemId].sp_restored) {
+                    case ITEM_NULL:
+                        break;
+                    case ITEM_POWER_PUNCH:
+                        if (!BtlUnit_CanActStatus(unit) || BtlUnit_CheckStatus(unit, STATUS_HUGE)) {
                             w[id] = 1;
                         }
-                    }
-                    break;
+                        break;
+                    case ITEM_MINI_MR_MINI:
+                        if (BtlUnit_CheckStatus(unit, STATUS_TINY)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    case ITEM_MR_SOFTENER:
+                        if (BtlUnit_CheckStatus(unit, STATUS_DEFENSE_DOWN)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    case ITEM_COURAGE_SHELL:
+                        if (BtlUnit_CheckStatus(unit, STATUS_DEFENSE_UP)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    case ITEM_BOOS_SHEET:
+                        if (BtlUnit_CheckStatus(unit, STATUS_INVISIBLE)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    case ITEM_VOLT_SHROOM:
+                        if (BtlUnit_CheckStatus(unit, STATUS_ELECTRIC)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    case ITEM_REPEL_CAPE:
+                        if (BtlUnit_CheckStatus(unit, STATUS_DODGY)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    case ITEM_RUIN_POWDER:
+                        if (BtlUnit_CheckStatus(unit, STATUS_CONFUSE)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    case ITEM_TASTY_TONIC:
+                        if (!BtlUnit_CheckStatus(unit, STATUS_SLEEP) && !BtlUnit_CheckStatus(unit, STATUS_STOP) && !BtlUnit_CheckStatus(unit, STATUS_DIZZY) && !BtlUnit_CheckStatus(unit, STATUS_POISON) && !BtlUnit_CheckStatus(unit, STATUS_CONFUSE) && !BtlUnit_CheckStatus(unit, STATUS_BURN) && !BtlUnit_CheckStatus(unit, STATUS_FREEZE) && !BtlUnit_CheckStatus(unit, STATUS_TINY) && !BtlUnit_CheckStatus(unit, STATUS_DEFENSE_DOWN) && !BtlUnit_CheckStatus(unit, STATUS_SLOW)) {
+                            w[id] = 1;
+                        }
+                        break;
+                    default:
+                        if (itemDataTable[d->weapon->itemId].fp_restored) {
+                            s32 mx = BtlUnit_GetMaxFp(unit);
+                            if (BtlUnit_GetFp(unit) < mx) {
+                                mx = BtlUnit_GetMaxFp(unit);
+                                w[id] = w[id] * (1.0f + 0.1f * (mx - BtlUnit_GetFp(unit)));
+                            } else if (!itemDataTable[d->weapon->itemId].hp_restored && !itemDataTable[d->weapon->itemId].sp_restored) {
+                                w[id] = 1;
+                            }
+                        }
+                        break;
                 }
             }
         }
-        if (!(flags & 0x80000000)) {
+        if (!(flags & TARGET_WEIGHT_RANDOM)) {
             s32 best = 0;
             s32 bestVal = 0;
             for (i = 0; i < 74; i++) {
@@ -588,27 +678,33 @@ void BattleGetFirstAttackUnit(BattleWork* wp, BattleUnit** a, BattleUnit** b) {
     BattleUnit* other;
     BattleUnit* tmp;
     s32 i;
-    for (i = 0; i < 64; i++) {
+    for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         found = BattleGetUnitPtr(wp, i);
-        if (found && found->mAlliance == 1) {
+        if (found && found->alliance == 1) {
             break;
         }
     }
     switch (wp->fbatInfo->partyId) {
-    case 1: case 2: case 3: case 4: case 5: case 6:
-        tmp = BattleGetMarioPtr(wp);
-        other = found;
-        found = tmp;
-        break;
-    case 7: case 8:
-        tmp = BattleGetPartnerPtr(wp, BattleGetMarioPtr(wp));
-        other = found;
-        found = tmp;
-        break;
-    case 9:
-    default:
-        other = BattleGetMarioPtr(wp);
-        break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            tmp = BattleGetMarioPtr(wp);
+            other = found;
+            found = tmp;
+            break;
+        case 7:
+        case 8:
+            tmp = BattleGetPartnerPtr(wp, BattleGetMarioPtr(wp));
+            other = found;
+            found = tmp;
+            break;
+        case 9:
+        default:
+            other = BattleGetMarioPtr(wp);
+            break;
     }
     *a = found;
     *b = other;

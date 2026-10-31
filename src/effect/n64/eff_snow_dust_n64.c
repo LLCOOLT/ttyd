@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: puffs of snowy dust; used by the freeze and Crystal Star effects.
 #include "eff/n64/eff_snow_dust_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -7,15 +8,10 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-double cos(double);
-s32 rand(void);
-s32 irand(s32);
+#include "libc_decls.h"
 
 void effSnowDustMain(EffectEntry* effect);
 void effSnowDustDisp(CameraId cameraId, EffectEntry* effect);
-
 
 static u8 scale_data[] = {
     2, 4, 8, 13, 15, 13, 9, 6, 4, 3, 2, 4, 8, 13, 15, 13, 9, 6, 4, 3, 2, 4, 8, 13, 15, 13, 9, 6, 4, 3,
@@ -79,7 +75,7 @@ EffectEntry* effSnowDustN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y
     work = __memAlloc(HEAP_EFFECT, (count + 1) * sizeof(EffSnowDustN64Work));
     effect->userdata = work;
     effect->callback = effSnowDustMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -169,8 +165,8 @@ void effSnowDustMain(EffectEntry* effect) {
     position = tmp;
     camId = work->camId;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {

@@ -1,3 +1,4 @@
+// Ms. Mowz (chuchu): partner init, follow and the treasure search ability.
 #include "driver/itemdrv.h"
 #include "driver/mobjdrv.h"
 #include "evt/evt_cmd.h"
@@ -14,47 +15,51 @@
 #include "party/party_hit.h"
 #include "party/party_move.h"
 #include "manager/evtmgr_cmd.h"
+#include "eff/eff_fukidashi.h"
+#include "version.h"
+// FAKE: party_chuchu.c calls effFukidashiEntry through this prototype (the types it was compiled with) instead of the one in eff/eff_fukidashi.h; same registers, behaviour-identical.
+typedef void* (*EffFukidashiEntryRetVoidptrS32Fn)(s32, s32, s32, f32, f32, f32, f32, f32, s32);
 
 typedef struct ChuchuParty {
-    u32 flags;                 // 0x0
-    u8 pad4[0x8 - 0x4];        // 0x4
-    u32 trigFlags;             // 0x8
-    u8 padC[0x24 - 0xC];       // 0xC
-    s32 timer;                 // 0x24
-    u8 pad28[0x32 - 0x28];     // 0x28
-    u8 moveKind;               // 0x32
-    u8 memberKind;             // 0x33
-    u8 pad34[0x39 - 0x34];     // 0x34
-    u8 state;                  // 0x39
-    u8 pad3A;                  // 0x3A
-    u8 moveMode;               // 0x3B
-#ifdef VERSION_G8ME01_DEMO
-    u8 pad3C[0x54 - 0x3C];     // 0x3C, the demo PartyEntry is 4 bytes shorter here
+    u32 flags;             // 0x0
+    u8 pad4[0x8 - 0x4];    // 0x4
+    u32 trigFlags;         // 0x8
+    u8 padC[0x24 - 0xC];   // 0xC
+    s32 timer;             // 0x24
+    u8 pad28[0x32 - 0x28]; // 0x28
+    u8 moveKind;           // 0x32
+    u8 memberKind;         // 0x33
+    u8 pad34[0x39 - 0x34]; // 0x34
+    u8 state;              // 0x39
+    u8 pad3A;              // 0x3A
+    u8 moveMode;           // 0x3B
+#if VERSION == VERSION_DEMO
+    u8 pad3C[0x54 - 0x3C]; // 0x3C, the demo PartyEntry is 4 bytes shorter here
 #else
-    u8 pad3C[0x58 - 0x3C];     // 0x3C
+    u8 pad3C[0x58 - 0x3C]; // 0x3C
 #endif
-    Vec position;              // 0x58
-    u8 pad64[0x94 - 0x64];     // 0x64
-    Vec target;                // 0x94
-#ifdef VERSION_G8ME01_DEMO
-    u8 padA0[0xD8 - 0x9C];     // 0xA0, the demo PartyEntry is 0x14 shorter here
+    Vec position;          // 0x58
+    u8 pad64[0x94 - 0x64]; // 0x64
+    Vec target;            // 0x94
+#if VERSION == VERSION_DEMO
+    u8 padA0[0xD8 - 0x9C]; // 0xA0, the demo PartyEntry is 0x14 shorter here
 #else
-    u8 padA0[0xF0 - 0xA0];     // 0xA0
+    u8 padA0[0xF0 - 0xA0]; // 0xA0
 #endif
-    f32 height;                // 0xF0
-    f32 width;                 // 0xF4
-    f32 camDir;                // 0xF8
-    f32 moveDir;               // 0xFC
-    f32 targetDir;             // 0x100
-    f32 moveSpeed;             // 0x104
-#ifndef VERSION_G8ME01_DEMO
-    u8 pad108[0x10C - 0x108];  // 0x108, PartyEntry.targetSpeed (not in the demo)
+    f32 height;    // 0xF0
+    f32 width;     // 0xF4
+    f32 camDir;    // 0xF8
+    f32 moveDir;   // 0xFC
+    f32 targetDir; // 0x100
+    f32 moveSpeed; // 0x104
+#if VERSION != VERSION_DEMO
+    u8 pad108[0x10C - 0x108]; // 0x108, PartyEntry.targetSpeed (not in the demo)
 #endif
-    f32 displayDirection;      // 0x10C
-    f32 displayDirectionTarget;  // 0x110
-    f32 velY;                  // 0x114
-    u8 pad118[0x160 - 0x118];  // 0x118
-    MarioWork* player;         // 0x160
+    f32 displayDirection;       // 0x10C
+    f32 displayDirectionTarget; // 0x110
+    f32 velY;                   // 0x114
+    u8 pad118[0x160 - 0x118];   // 0x118
+    MarioWork* player;          // 0x160
 } ChuchuParty;
 
 typedef struct ChuchuTreasure {
@@ -65,25 +70,13 @@ typedef struct ChuchuTreasure {
     s32 z;
 } ChuchuTreasure;
 
-extern void partyGetAppearPos3(PartyEntry* party, Vec* pos);
-extern char* partyChgPoseId(PartyEntry* party, s32 index);
-extern void partyChgPose(PartyEntry* party, char* pose);
-extern void partyChgRunMode(PartyEntry* party, s32 mode);
-extern void partyWalkInit(PartyEntry* party, s32 mode);
-extern void partyUpdMoveSpd(PartyEntry* party);
-extern void* effFukidashiEntry(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h, s32 frames);
-extern void* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
-extern void* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 range, char** names);
-#ifdef VERSION_G8ME01_DEMO
-extern MapObjectEntry* mobjNearDistCheck(f32 x, f32 y, f32 z, f32 range);
+#if VERSION == VERSION_DEMO
 extern s32 mobjCheckKururingFloorItem(MapObjectEntry* mobj);
-extern s32 mobjCheckItemboxOpen(MapObjectEntry* mobj);
 #endif
 extern USER_FUNC(evt_msg_print);
 
-
 char* mobj_list[] = {
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     "MOBJ_TreasureBox",
     "MOBJ_BigTreasureBox",
     "MOBJ_GrayTreasureBox",
@@ -111,14 +104,14 @@ USER_FUNC(post_msg);
 EVT_BEGIN(msg_evt)
     CALL(set_msg)
     CALL(search_result)
-    IF_INT_NOT_EQUAL(4264967296, 0)
-        CALL(evt_msg_print, 0, 4264967296, 0, STRING("party"))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, LW(0), 0, STRING("party"))
     END_IF
     CALL(post_msg)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 ChuchuTreasure chuchu_treasure_tbl[] = {
     {"hei_00", 0xF840715E, -468, 139, -127},
     {"hei_00", 0xF8406272, -408, 139, -127},
@@ -171,10 +164,10 @@ USER_FUNC(search_result) {
         if ((u32)event->lwData[0] == 0 || event->lwData[1] == 0) {
             return EVT_RETURN_DONE;
         }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
         if (event->lwData[1] == 1) {
             if (party) {
-                effFukidashiEntry(6, 0, -2, 0.0f, 18.0f, 0.0f, 0.0f, 0.0f, sysMsec2Frame(1500));
+                ((EffFukidashiEntryRetVoidptrS32Fn)effFukidashiEntry)(6, 0, -2, 0.0f, 18.0f, 0.0f, 0.0f, 0.0f, sysMsec2Frame(1500));
             }
             return EVT_RETURN_DONE;
         }
@@ -188,12 +181,12 @@ USER_FUNC(search_result) {
         return EVT_RETURN_BLOCK;
     }
     if (party) {
-        effFukidashiEntry(6, 0, -2, 0.0f, 18.0f, 0.0f, 0.0f, 0.0f, sysMsec2Frame(1500));
+        ((EffFukidashiEntryRetVoidptrS32Fn)effFukidashiEntry)(6, 0, -2, 0.0f, 18.0f, 0.0f, 0.0f, 0.0f, sysMsec2Frame(1500));
     }
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo stops at the first item or block in range and has no buried treasure table.
 USER_FUNC(set_msg) {
     int pass;
@@ -234,7 +227,7 @@ USER_FUNC(set_msg) {
             return EVT_RETURN_DONE;
         }
     }
-    event->lwData[0] = (EvtWord)"map_no_exist";
+    event->lwData[0] = (EvtWord) "map_no_exist";
     event->lwData[1] = 0;
     return EVT_RETURN_DONE;
 }
@@ -242,12 +235,12 @@ USER_FUNC(set_msg) {
 static inline int chuchu_findTreasure2(ChuchuParty* cpp, f32 range, Vec* bestPos) {
     u32 i;
     int found;
-    MarioWork* pl;
+    MarioWork* mario;
     ChuchuTreasure* tbl;
     f32 minDist;
 
     found = 0;
-    pl = cpp->player;
+    mario = cpp->player;
     minDist = 10000.0f;
     tbl = chuchu_treasure_tbl;
     for (i = 0; i < 40; i++, tbl++) {
@@ -259,7 +252,7 @@ static inline int chuchu_findTreasure2(ChuchuParty* cpp, f32 range, Vec* bestPos
             p.y = tbl->y;
             p.z = tbl->z;
             pos = p;
-            d = PSVECDistance(&pl->position, &pos);
+            d = PSVECDistance(&mario->position, &pos);
             if (!(range < d) && minDist > d) {
                 minDist = d;
                 found = 1;
@@ -343,17 +336,17 @@ USER_FUNC(set_msg) {
 
     if (type >= 0) {
         if (range == 150.0f) {
-            event->lwData[0] = (EvtWord)"map_exist_near";
+            event->lwData[0] = (EvtWord) "map_exist_near";
             event->lwData[1] = 2;
         } else {
-            event->lwData[0] = (EvtWord)"map_exist_far";
+            event->lwData[0] = (EvtWord) "map_exist_far";
             event->lwData[1] = 1;
         }
         cp->displayDirectionTarget = (angle <= 180.0f) ? 180.0f : 0.0f;
         cp->moveDir = partyToMovedir(party, cp->displayDirectionTarget);
         cp->targetDir = cp->moveDir;
     } else {
-        event->lwData[0] = (EvtWord)"map_no_exist";
+        event->lwData[0] = (EvtWord) "map_no_exist";
         event->lwData[1] = 0;
     }
     return EVT_RETURN_DONE;
@@ -370,17 +363,17 @@ USER_FUNC(post_msg) {
     return EVT_RETURN_DONE;
 }
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 BOOL chuchu_searchObject(void) {
     char** name;
     ChuchuParty* cp = (ChuchuParty*)partyGetPtr(marioGetPartyId());
     MapObjectEntry* mobj;
-    MarioWork* player = cp->player;
+    MarioWork* mario = cp->player;
 
-    if (itemNearDistCheck(player->position.x, player->position.y, player->position.z, 150.0f)) {
+    if (itemNearDistCheck(mario->position.x, mario->position.y, mario->position.z, 150.0f)) {
         return TRUE;
     }
-    mobj = mobjNearDistCheck(player->position.x, player->position.y, player->position.z, 150.0f);
+    mobj = mobjNearDistCheck(mario->position.x, mario->position.y, mario->position.z, 150.0f);
     if (mobj) {
         if (mobjCheckItemboxOpen(mobj) == 1) {
             return TRUE;
@@ -400,12 +393,12 @@ BOOL chuchu_searchObject(void) {
 static inline int chuchu_findTreasure(ChuchuParty* cpp, f32 range) {
     u32 i;
     int found;
-    MarioWork* player2;
+    MarioWork* mario;
     ChuchuTreasure* tbl;
     f32 minDist;
 
     found = 0;
-    player2 = cpp->player;
+    mario = cpp->player;
     tbl = chuchu_treasure_tbl;
     minDist = 10000.0f;
     for (i = 0; i < 40; i++, tbl++) {
@@ -417,7 +410,7 @@ static inline int chuchu_findTreasure(ChuchuParty* cpp, f32 range) {
             p.y = tbl->y;
             p.z = tbl->z;
             pos = p;
-            d = PSVECDistance(&player2->position, &pos);
+            d = PSVECDistance(&mario->position, &pos);
             if (!(range < d) && minDist > d) {
                 minDist = d;
                 found = 1;
@@ -462,12 +455,13 @@ void chuchu_exit(PartyEntry* party) {
 }
 
 void chuchu_move(PartyEntry* party) {
-    if (party->trigFlags & 8) {
-        party->trigFlags &= ~8;
-        party->flags &= ~0x100;
-        partyWalkInit(party, 1);
+    if (party->trigFlags & PARTY_TRIG_FLAG_CHG_RUN_MODE) {
+        party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;
+        party->flags &= ~PARTY_FLAG_IS_BEING_USED;
+        // FAKE: the call passes a second argument partyWalkInit does not take (no effect); the cast keeps it.
+        ((void (*)(PartyEntry*, s32))partyWalkInit)(party, 1);
     }
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     partyUpdMoveSpd(party);
 #endif
     partyWalkMain(party);
@@ -475,79 +469,79 @@ void chuchu_move(PartyEntry* party) {
 
 void chuchu_use(PartyEntry* party) {
     ChuchuParty* cp = (ChuchuParty*)party;
-    MarioWork* player = cp->player;
+    MarioWork* mario = cp->player;
     Vec pos;
     Vec pos1;
 
-    if (cp->trigFlags & 8) {
-        cp->trigFlags &= ~8;
+    if (cp->trigFlags & PARTY_TRIG_FLAG_CHG_RUN_MODE) {
+        cp->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;
         cp->state = 0;
         marioStSystemLevel(1);
     }
 
     switch (cp->state) {
-    case 0:
-        partyGetAppearPos3(party, &pos);
-        cp->target = pos;
-        cp->timer = 4;
-        cp->moveDir = angleABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z);
-        cp->targetDir = cp->moveDir;
-        cp->displayDirection = player->displayDirection;
-        cp->displayDirectionTarget = player->displayDirection;
-        cp->moveSpeed = distABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z) / cp->timer;
-        cp->velY = 0.0f;
-        cp->state = 1;
-        break;
-    case 1:
-        partyGetAppearPos3(party, &pos1);
-        cp->target = pos1;
-        cp->position.x += (cp->target.x - cp->position.x) / cp->timer;
-        cp->position.y += (cp->target.y - cp->position.y) / cp->timer;
-        cp->position.z += (cp->target.z - cp->position.z) / cp->timer;
-        if (--cp->timer > 0) {
-            return;
-        }
-        partyChgPoseId(party, 1);
-        cp->moveSpeed = 0.0f;
-        cp->state = 10;
-        break;
-    case 10:
-        cp->displayDirectionTarget = player->displayDirectionTarget;
-        cp->moveDir = toMovedir(cp->displayDirectionTarget);
-        cp->targetDir = cp->moveDir;
-        cp->state = 20;
-        cp->timer = 25;
-        break;
-    case 20:
-        if (--cp->timer > 0) {
+        case 0:
+            partyGetAppearPos3(party, &pos);
+            cp->target = pos;
+            cp->timer = 4;
+            cp->moveDir = angleABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z);
+            cp->targetDir = cp->moveDir;
+            cp->displayDirection = mario->displayDirection;
+            cp->displayDirectionTarget = mario->displayDirection;
+            cp->moveSpeed = distABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z) / cp->timer;
+            cp->velY = 0.0f;
+            cp->state = 1;
             break;
-        }
-        psndSFXOn_3D((const char*)0x944, &cp->position);
-        partyChgPose(party, "PCH_A2_1");
-        cp->state = 21;
-        cp->timer = 30;
-    case 21:
-        if (--cp->timer > 0) {
+        case 1:
+            partyGetAppearPos3(party, &pos1);
+            cp->target = pos1;
+            cp->position.x += (cp->target.x - cp->position.x) / cp->timer;
+            cp->position.y += (cp->target.y - cp->position.y) / cp->timer;
+            cp->position.z += (cp->target.z - cp->position.z) / cp->timer;
+            if (--cp->timer > 0) {
+                return;
+            }
+            partyChgPoseId(party, 1);
+            cp->moveSpeed = 0.0f;
+            cp->state = 10;
             break;
-        }
-        partyChgPoseId(party, 1);
-        evtEntryType(msg_evt, 0, 0, 26);
-        cp->state = 22;
-        break;
-    case 23:
-        partyChgPoseId(party, 1);
-        cp->state = 80;
-        break;
+        case 10:
+            cp->displayDirectionTarget = mario->displayDirectionTarget;
+            cp->moveDir = toMovedir(cp->displayDirectionTarget);
+            cp->targetDir = cp->moveDir;
+            cp->state = 20;
+            cp->timer = 25;
+            break;
+        case 20:
+            if (--cp->timer > 0) {
+                break;
+            }
+            psndSFXOn_3D((const char*)0x944, &cp->position);
+            partyChgPose(party, "PCH_A2_1");
+            cp->state = 21;
+            cp->timer = 30;
+        case 21:
+            if (--cp->timer > 0) {
+                break;
+            }
+            partyChgPoseId(party, 1);
+            evtEntryType(msg_evt, 0, 0, 26);
+            cp->state = 22;
+            break;
+        case 23:
+            partyChgPoseId(party, 1);
+            cp->state = 80;
+            break;
     }
 
     switch (cp->state) {
-    case 80:
-        cp->flags &= ~0x100;
-        partyChgRunMode(party, 2);
-        cp->moveMode = 0;
-        marioChgMot(0);
-        marioStSystemLevel(0);
-        break;
+        case 80:
+            cp->flags &= ~0x100;
+            partyChgRunMode(party, 2);
+            cp->moveMode = 0;
+            marioChgMot(MARIO_MOTION_STAY);
+            marioStSystemLevel(0);
+            break;
     }
     partyChkGnd(party);
 }

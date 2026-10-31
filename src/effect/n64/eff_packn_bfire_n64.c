@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: Piranha Plant (packn) fire breath (bfire) from a point toward a target; types 0-2.
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,34 +7,31 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/n64/eff_packn_bfire_n64.h"
 #include <stdlib.h>
-
-double cos(double);
-double sin(double);
+#include "libc_decls.h"
 
 typedef struct EffPacknBfireWork {
-    s32 type;     // 0x0
-    Vec pos;      // 0x4
-    Vec tgt;      // 0x10
-    s32 frames;   // 0x1c
-    s32 life;     // 0x20
-    s32 frame;    // 0x24
-    s32 color[8]; // 0x28
-    f32 scaleArg; // 0x48
-    f32 uvx;      // 0x4c
-    f32 uvy;      // 0x50
-    f32 duvx;     // 0x54
-    f32 duvy;     // 0x58
+    s32 type;        // 0x0
+    Vec pos;         // 0x4
+    Vec tgt;         // 0x10
+    s32 frames;      // 0x1c
+    s32 life;        // 0x20
+    s32 frame;       // 0x24
+    s32 color[8];    // 0x28
+    f32 scaleArg;    // 0x48
+    f32 uvx;         // 0x4c
+    f32 uvy;         // 0x50
+    f32 duvx;        // 0x54
+    f32 duvy;        // 0x58
     f32 reserved_5c; // 0x5c, never read or written
-    Vec vel;      // 0x60
-    f32 sy;       // 0x6c
-    f32 sx;       // 0x70
-    f32 rot;      // 0x74
-    f32 drot;     // 0x78
+    Vec vel;         // 0x60
+    f32 sy;          // 0x6c
+    f32 sx;          // 0x70
+    f32 rot;         // 0x74
+    f32 drot;        // 0x78
 } EffPacknBfireWork;
 
-EffectEntry* effPacknBfireN64Entry(s32 type, s32 frames, s32 life, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz,
-                                   f32 scale);
 void effPacknBfireMain(EffectEntry* effect);
 void effPacknBfireDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -60,7 +58,7 @@ EffectEntry* effPacknBfireN64Entry(s32 type, s32 frames, s32 life, f32 x, f32 y,
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffPacknBfireWork));
     effect->userdata = work;
     effect->callback = effPacknBfireMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     if (life <= 0) {
         work->life = 1000;
     } else {
@@ -81,54 +79,54 @@ EffectEntry* effPacknBfireN64Entry(s32 type, s32 frames, s32 life, f32 x, f32 y,
     work->vel.z = (work->tgt.z - work->pos.z) / (f32)frames;
     work->scaleArg = scale;
     switch (type) {
-    case 0:
-        break;
-    case 1:
-        work->color[0] = 255;
-        work->color[1] = 88;
-        work->color[2] = 70;
-        work->color[3] = 55;
-        work->color[4] = 11;
-        work->color[5] = 51;
-        work->color[6] = 123;
-        work->color[7] = 255;
-        work->uvx = (f32)(rand() % 65);
-        work->uvy = (f32)(rand() % 65);
-        work->sx = 0.2f;
-        work->sy = 0.3f;
-        work->duvx = 0.0f;
-        work->duvy = 0.0f;
-        work->rot = 0.0f;
-        work->drot = -10.0f;
-        break;
-    default:
-        work->color[0] = 255;
-        work->color[1] = 88;
-        work->color[2] = 70;
-        work->color[3] = 55;
-        work->color[4] = 11;
-        work->color[5] = 51;
-        work->color[6] = 123;
-        work->color[7] = 255;
-        base = (f32)(rand() % 361);
-        for (i = 0; i < count; i++) {
-            work->pos.x = x;
-            work->pos.y = y;
-            work->pos.z = z;
-            angle = 6.2831855f * (base + (f32)((i * 360) / 8)) / 360.0f;
-            work->vel.x = 5.0f * (f32)sin(angle);
-            work->vel.y = 2.0f * (f32)cos(angle) + 3.0f;
+        case 0:
+            break;
+        case 1:
+            work->color[0] = 255;
+            work->color[1] = 88;
+            work->color[2] = 70;
+            work->color[3] = 55;
+            work->color[4] = 11;
+            work->color[5] = 51;
+            work->color[6] = 123;
+            work->color[7] = 255;
             work->uvx = (f32)(rand() % 65);
             work->uvy = (f32)(rand() % 65);
-            work->sx = 1.0f;
-            work->sy = 1.0f;
+            work->sx = 0.2f;
+            work->sy = 0.3f;
             work->duvx = 0.0f;
             work->duvy = 0.0f;
-            work->rot = -45.0f;
+            work->rot = 0.0f;
             work->drot = -10.0f;
-            work++;
-        }
-        break;
+            break;
+        default:
+            work->color[0] = 255;
+            work->color[1] = 88;
+            work->color[2] = 70;
+            work->color[3] = 55;
+            work->color[4] = 11;
+            work->color[5] = 51;
+            work->color[6] = 123;
+            work->color[7] = 255;
+            base = (f32)(rand() % 361);
+            for (i = 0; i < count; i++) {
+                work->pos.x = x;
+                work->pos.y = y;
+                work->pos.z = z;
+                angle = 6.2831855f * (base + (f32)((i * 360) / 8)) / 360.0f;
+                work->vel.x = 5.0f * (f32)sin(angle);
+                work->vel.y = 2.0f * (f32)cos(angle) + 3.0f;
+                work->uvx = (f32)(rand() % 65);
+                work->uvy = (f32)(rand() % 65);
+                work->sx = 1.0f;
+                work->sy = 1.0f;
+                work->duvx = 0.0f;
+                work->duvy = 0.0f;
+                work->rot = -45.0f;
+                work->drot = -10.0f;
+                work++;
+            }
+            break;
     }
     return effect;
 }
@@ -146,8 +144,8 @@ void effPacknBfireMain(EffectEntry* effect) {
     tmp.z = work->pos.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 16;
     }
     if (work->life < 1000) {
@@ -163,41 +161,41 @@ void effPacknBfireMain(EffectEntry* effect) {
     } else {
         s32 frame = work->frame;
         switch (type) {
-        case 0:
-            if ((frame & 3) == 0) {
-                effPacknBfireN64Entry(1, work->frames, work->frames, work->pos.x, work->pos.y, work->pos.z,
-                                      work->tgt.x, work->tgt.y, work->tgt.z, 1.0f);
-            }
-            break;
-        case 1:
-            work->vel.x *= 0.97f;
-            work->vel.z *= 0.97f;
-            work->vel.y += 0.02f * (1.0f - work->vel.y);
-            work->pos.x += work->vel.x;
-            work->pos.y += work->vel.y;
-            work->pos.z += work->vel.z;
-            work->sx += 0.05f * (1.0f - work->sx);
-            work->sy += 0.1f * (1.0f - work->sy);
-            work->rot += work->drot;
-            break;
-        case 2:
-            for (i = 0; i < effect->count; i++) {
-                work->vel.x *= 0.9f;
-                work->vel.y -= 0.2f;
+            case 0:
+                if ((frame & 3) == 0) {
+                    effPacknBfireN64Entry(1, work->frames, work->frames, work->pos.x, work->pos.y, work->pos.z,
+                                          work->tgt.x, work->tgt.y, work->tgt.z, 1.0f);
+                }
+                break;
+            case 1:
+                work->vel.x *= 0.97f;
+                work->vel.z *= 0.97f;
+                work->vel.y += 0.02f * (1.0f - work->vel.y);
                 work->pos.x += work->vel.x;
                 work->pos.y += work->vel.y;
-                if (work->pos.y < 0.0f) {
-                    work->pos.y = 0.0f;
-                    if (work->vel.y < 0.0f) {
-                        work->vel.y *= -0.6f;
-                    }
-                }
-                work->sx += 0.07f * -work->sx;
-                work->sy += 0.05f * -work->sy;
+                work->pos.z += work->vel.z;
+                work->sx += 0.05f * (1.0f - work->sx);
+                work->sy += 0.1f * (1.0f - work->sy);
                 work->rot += work->drot;
-                work++;
-            }
-            break;
+                break;
+            case 2:
+                for (i = 0; i < effect->count; i++) {
+                    work->vel.x *= 0.9f;
+                    work->vel.y -= 0.2f;
+                    work->pos.x += work->vel.x;
+                    work->pos.y += work->vel.y;
+                    if (work->pos.y < 0.0f) {
+                        work->pos.y = 0.0f;
+                        if (work->vel.y < 0.0f) {
+                            work->vel.y *= -0.6f;
+                        }
+                    }
+                    work->sx += 0.07f * -work->sx;
+                    work->sy += 0.05f * -work->sy;
+                    work->rot += work->drot;
+                    work++;
+                }
+                break;
         }
         dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effPacknBfireDisp, effect);
     }

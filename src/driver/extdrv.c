@@ -1,4 +1,7 @@
+// Ext driver: draws many copies of one paper animation as flat textured quads with shadows; the
+// animation frame is rendered to a texture first.
 #include "driver/extdrv.h"
+#include "system.h"
 #include "driver/dispdrv.h"
 #include "driver/camdrv.h"
 #include "mario/mariost.h"
@@ -9,19 +12,20 @@
 #include <dolphin/os.h>
 #include "gxsub.h"
 #include "driver/animdrv.h"
-
-void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj, void*** image, s32* x0, s32* y0, s32* x1, s32* y1);
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void qqsort(void* array, u32 num, u32 size, s32 (*compare)(const void*, const void*));
-double atan2(double y, double x);
-
+#include "eff/eff_n64.h"
+#include "version.h"
+#include "libc_decls.h"
+// FAKE: extdrv.c calls animPoseDisp_MakeExtTexture through this prototype (the types it was compiled with) instead of the one in driver/animdrv.h; same registers, behaviour-identical.
+typedef void (*AnimPoseDisp_MakeExtTextureLocalFn)(const char*, const char*, f32, f32, GXTexObj*, void***, s32*, s32*, s32*, s32*);
 
 static ExtdrvWork work[2];
 static u8 shadow_dl[32];
 static f32 shadow_vtx[16];
 static f32 shadow_coord[8];
 
-#define extGetWork() (gp->inBattle ? &work[1] : &work[0])
+static inline ExtdrvWork* extGetWork(void) {
+    return gp->inBattle ? &work[1] : &work[0];
+}
 
 void extMakeTexture(CameraId camId, void* param);
 static s32 compare(const void* a, const void* b);
@@ -87,9 +91,9 @@ static f32 sintbl[450] = {
 };
 
 void extInit(void) {
-	ExtdrvWork* wp = extGetWork();
-	wp->poseNum = 0;
-	wp->poses = NULL;
+    ExtdrvWork* wp = extGetWork();
+    wp->poseNum = 0;
+    wp->poses = NULL;
 }
 
 void extEntry(s32 poseNum, ExtdrvTexInfo* texInfo, void (*initFunc)(void), void (*mainFunc)(void), void (*mainFunc2)(void)) {
@@ -151,7 +155,7 @@ void extMakeTexture(CameraId camId, void* param) {
     queen_uv[3] = -1.0f / wp->texNum;
     for (i = 0; i < wp->texNum; i++, info++, tex++) {
         n = i * 12;
-        animPoseDisp_MakeExtTexture(info->group, info->anim, info->frame, 4.0f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
+        ((AnimPoseDisp_MakeExtTextureLocalFn)animPoseDisp_MakeExtTexture)(info->group, info->anim, info->frame, 4.0f, &tex->obj, &tex->image, &x0, &y0, &x1, &y1);
         wp->vtx[n++] = x0 / 2.0f;
         wp->vtx[n++] = -y0 / 2.0f;
         wp->vtx[n++] = 0.0f;
@@ -226,11 +230,10 @@ void extMain(void) {
     s32 i;
     ExtdrvPose* pose;
     ExtdrvSort* sort;
-    CameraEntry* cam;
     f32 ry, angle, diff, c, s;
     u32 flags;
 
-    if (((u32 (*)(void))marioStGetSystemLevel)() == 0 && wp->mainFunc != NULL) {
+    if (marioStGetSystemLevel() == 0 && wp->mainFunc != NULL) {
         wp->mainFunc();
     }
     if (wp->mainFunc2 != NULL) {
@@ -239,8 +242,8 @@ void extMain(void) {
     pose = wp->poses;
     sort = wp->sort;
     ry = camGetRy();
-    cam = camGetPtr(CAMERA_3D);
-    cam = camGetPtr(CAMERA_3D);
+    camGetPtr(CAMERA_3D); // fetched twice and never used
+    camGetPtr(CAMERA_3D);
     for (i = wp->poseNum - 1; i >= 0; i--, pose++, sort++) {
         flags = pose->flags;
         sort->index = i;
@@ -296,10 +299,10 @@ void extMain(void) {
 }
 
 static s32 compare(const void* a, const void* b) {
-    if (((ExtdrvSort*)a)->z > ((ExtdrvSort*)b)->z) {
+    if (((const ExtdrvSort*)a)->z > ((const ExtdrvSort*)b)->z) {
         return 1;
     }
-    if (((ExtdrvSort*)a)->z < ((ExtdrvSort*)b)->z) {
+    if (((const ExtdrvSort*)a)->z < ((const ExtdrvSort*)b)->z) {
         return -1;
     }
     return 0;
@@ -429,7 +432,7 @@ static u8 shadow_dl[32] ATTRIBUTE_ALIGN(32) = {
 };
 
 // The retail builds place shadow_vtx in small data; the demo keeps it in .data
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 static f32 shadow_vtx[16] = {
 #else
 __declspec(section ".sdata") static f32 shadow_vtx[16] = {

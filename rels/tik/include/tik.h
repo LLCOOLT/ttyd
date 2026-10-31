@@ -1,3 +1,5 @@
+// Rogueport Sewers (tik, chika: underground): declarations of the area's map init events, battle tables and the plane-
+// mode lecture.
 #pragma once
 
 #include "dolphin/types.h"
@@ -45,3 +47,13 @@ extern BattleUnitKind unit_togekuri;
 extern BattleUnitKind unit_togenoko;
 
 extern EvtWord evt_uranai_cap[];
+
+extern s32 R_defence_turn[];
+extern s32 R_defence_attr_turn[];
+extern s32 R_regist_turn[];
+extern PoseTableEntry gesso_pose_table_turn[];
+extern BattleUnitKind unit_boss_gesso;
+extern BattleUnitKind unit_boss_gesso_left_arm;
+extern BattleUnitKind unit_boss_gesso_right_arm;
+extern EvtWord gesso_arm_dead_event[];
+extern EvtWord gesso_arm_damage_pose_event[];

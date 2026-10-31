@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: cloud fragments (kumokumo: cloud) flying from a point toward a target.
+#include "eff/n64/eff_kumokumo_chip_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -9,20 +11,20 @@
 #include <math.h>
 
 typedef struct EffKumokumoChipN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    Vec velocity;  // 0x10
-    s32 lifetime;  // 0x1C
-    s32 frame;     // 0x20
-    s32 r1;        // 0x24
-    s32 g1;        // 0x28
-    s32 b1;        // 0x2C
-    s32 a1;        // 0x30
-    s32 r2;        // 0x34
-    s32 g2;        // 0x38
-    s32 b2;        // 0x3C
-    s32 a2;        // 0x40
-    f32 scale;     // 0x44
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    Vec velocity; // 0x10
+    s32 lifetime; // 0x1C
+    s32 frame;    // 0x20
+    s32 r1;       // 0x24
+    s32 g1;       // 0x28
+    s32 b1;       // 0x2C
+    s32 a1;       // 0x30
+    s32 r2;       // 0x34
+    s32 g2;       // 0x38
+    s32 b2;       // 0x3C
+    s32 a2;       // 0x40
+    f32 scale;    // 0x44
 } EffKumokumoChipN64Work;
 
 static effN64Vtx size32x32_tex32x32_vtx[] = {
@@ -48,14 +50,33 @@ EffectEntry* effKumokumoChipN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKumokumoChipN64Work));
     effect->userdata = work;
     effect->callback = effKumokumoChipMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     dx = tx - x;
     dy = ty - y;
     dz = tz - z;
     dist = dx * dx + dy * dy + dz * dz;
-    { f32 zero = 0.0f; if (dist != zero) { f32 r; if (dist > zero) { f64 guess = __frsqrte(dist); guess = 0.5 * guess * (3.0 - guess * guess * dist); guess = 0.5 * guess * (3.0 - guess * guess * dist); guess = 0.5 * guess * (3.0 - guess * guess * dist); r = dist * guess; } else if (dist < 0.0) { r = NAN; } else if (isnan(dist)) { r = NAN; } else { r = dist; } dist = r; } }
+    {
+        f32 zero = 0.0f;
+        if (dist != zero) {
+            f32 r;
+            if (dist > zero) {
+                f64 guess = __frsqrte(dist);
+                guess = 0.5 * guess * (3.0 - guess * guess * dist);
+                guess = 0.5 * guess * (3.0 - guess * guess * dist);
+                guess = 0.5 * guess * (3.0 - guess * guess * dist);
+                r = dist * guess;
+            } else if (dist < 0.0) {
+                r = NAN;
+            } else if (isnan(dist)) {
+                r = NAN;
+            } else {
+                r = dist;
+            }
+            dist = r;
+        }
+    }
     if (speed > 0.0f) {
         lifetime = dist / speed;
     } else {
@@ -118,8 +139,8 @@ void effKumokumoChipMain(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     type = work->type;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->lifetime = 16;
     }
     if (work->lifetime < 1000) {
@@ -194,4 +215,3 @@ void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect) {
     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
     tri2(0, 1, 2, 0, 0, 2, 3, 0);
 }
-

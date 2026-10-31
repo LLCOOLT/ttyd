@@ -1,3 +1,4 @@
+// Puni balloon (puni: the Punies): a wobbling balloon (type 0) that pops into a burst of small pieces (type 1).
 #include "driver/camdrv.h"
 #include "eff/eff_puniballoon.h"
 #include "driver/dispdrv.h"
@@ -7,11 +8,8 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "libc_decls.h"
 
-double sin(double);
-int rand(void);
-
-EffectEntry* effPuniBalloonEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void effPuniBalloonMain(EffectEntry* effect);
 void effPuniBalloonDisp(CameraId cameraId, EffectEntry* effect);
 static void balloon_1(CameraId cameraId, EffectEntry* effect);
@@ -27,19 +25,19 @@ EffectEntry* effPuniBalloonEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     effect = effEntry();
     n = 1;
     switch (type) {
-    case 0:
-        n = 1;
-        break;
-    case 1:
-        n = 11;
-        break;
+        case 0:
+            n = 1;
+            break;
+        case 1:
+            n = 11;
+            break;
     }
     effect->type = "PuniBalloon";
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(PuniBalloonWork));
     effect->userdata = work;
     effect->callback = effPuniBalloonMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -76,8 +74,8 @@ void effPuniBalloonMain(EffectEntry* effect) {
     pos = tmp;
     type = work->type;
 
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 16;
     }
     if (work->life < 1000) {
@@ -168,7 +166,6 @@ static void balloon_0(CameraId cameraId, EffectEntry* effect) {
     GXSetNumIndStages(0);
     GXSetTevDirect(GX_TEVSTAGE0);
 }
-
 
 static void balloon_1(CameraId cameraId, EffectEntry* effect) {
     PuniBalloonWork* work = effect->userdata;

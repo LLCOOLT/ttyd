@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: recovery heart: a heart sprite rises and fades, with the recovered count drawn as digits.
+#include "eff/n64/eff_recover_heart_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -5,35 +7,26 @@
 #include "memory.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffRecoverHeartN64Work {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    f32 velX;     // 0x10
-    f32 velY;     // 0x14
-    f32 velZ;     // 0x18
-    f32 rotZ;     // 0x1C
+    s32 type;        // 0x0
+    Vec position;    // 0x4
+    f32 velX;        // 0x10
+    f32 velY;        // 0x14
+    f32 velZ;        // 0x18
+    f32 rotZ;        // 0x1C
     f32 reserved_20; // 0x20, only cleared at entry
-    f32 offX;     // 0x24
-    s32 alpha;    // 0x28
-    s32 frame;    // 0x2C
-    s32 age;      // 0x30, counts up each frame; never read
-    s32 delay;    // 0x34
-    f32 scaleW;   // 0x38
-    f32 scaleH;   // 0x3C
-    s32 count;    // 0x40
-    s32 flag;     // 0x44
+    f32 offX;        // 0x24
+    s32 alpha;       // 0x28
+    s32 frame;       // 0x2C
+    s32 age;         // 0x30, counts up each frame; never read
+    s32 delay;       // 0x34
+    f32 scaleW;      // 0x38
+    f32 scaleH;      // 0x3C
+    s32 count;       // 0x40
+    s32 flag;        // 0x44
 } EffRecoverHeartN64Work;
-
-
-#ifdef __MWERKS__
-#endif
-
-#ifdef __MWERKS__
-#endif
 
 f32 scale_w_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 0.9f, 1.1f, 1.0f};
 f32 scale_h_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 1.2f, 0.9f, 1.0f};
@@ -103,7 +96,6 @@ EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     EffRecoverHeartN64Work* p;
     s32 i;
     s32 k;
-
 
     effect = effEntry();
     effect->type = "RecoverHeartN64";
@@ -355,4 +347,3 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-

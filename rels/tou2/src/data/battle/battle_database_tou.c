@@ -1,3 +1,6 @@
+// battle_database_tou: Glitz Pit battle data: arena stage layouts and the ranked match groups (tou_rank_N)
+// with their unit setups, plus the field battle selection tables.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_weapon_power.h"
@@ -6,10 +9,10 @@
 #include "battle/battle_stage.h"
 #include "battle/battle_stage_object.h"
 #include "driver/npcdrv.h"
+#include "evt/evt_map.h"
+#include "version.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(tou_gamen_screen_tev_init);
 extern s32 tou_gamen_screen_tev[];
 extern BattleUnitKind unit_jyugem;
 
@@ -111,10 +114,10 @@ BattleStageObjectData tou_btlobject_data[] = {
 
 BattleStageData tou_btlstage_data[] = {
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_03_0", // mSpecificStageDataDir
-        6, // mNumObjects
-        tou_btlobject_data, // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_03_0", // specificStageDataDir
+        6, // numObjects
+        tou_btlobject_data, // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgBEvt
@@ -125,10 +128,10 @@ BattleStageData tou_btlstage_data[] = {
         1, // disableBgBDestroy
     },
     {
-        "bti_01", // mGlobalStageDataDir
-        "stg_03_0", // mSpecificStageDataDir
-        8, // mNumObjects
-        &tou_btlobject_data[6], // mObjects
+        "bti_01", // globalStageDataDir
+        "stg_03_0", // specificStageDataDir
+        8, // numObjects
+        &tou_btlobject_data[6], // objects
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgAWeapon
         {NULL, 0, {0}, 0, NULL, 100, 0, 0, 2, 0.0f, 0, 0, 0, 0, weaponGetPowerDefault, {1, 0, 0, 0, 0, 0, 0, 0}, NULL, {0}, 0x2100060, 0x20000000, 0, 26, 3, 2, NULL, 0, 0x7FF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}}, // bgBWeapon
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgBEvt
@@ -142,50 +145,50 @@ BattleStageData tou_btlstage_data[] = {
 
 BattleUnitSetup btlparty_tou_tou_rank_19[] = {
     {
-        &unit_kurikuri, // mUnitKindParams
+        &unit_kurikuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {10.0f, 0.0f, -20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kurikuri, // itemDropTable
     },
     {
-        &unit_kurikuri, // mUnitKindParams
+        &unit_kurikuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kurikuri, // itemDropTable
     },
     {
-        &unit_kurikuri, // mUnitKindParams
+        &unit_kurikuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_kurikuri, // itemDropTable
     },
     {
-        &unit_kurikuri, // mUnitKindParams
+        &unit_kurikuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kurikuri, // itemDropTable
     },
     {
-        &unit_kurikuri, // mUnitKindParams
+        &unit_kurikuri, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {170.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -205,30 +208,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_19 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_18[] = {
     {
-        &unit_nokonoko_fighter, // mUnitKindParams
+        &unit_nokonoko_fighter, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko_fighter, // itemDropTable
     },
     {
-        &unit_nokonoko_fighter, // mUnitKindParams
+        &unit_nokonoko_fighter, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_nokonoko_fighter, // itemDropTable
     },
     {
-        &unit_patapata_fighter, // mUnitKindParams
+        &unit_patapata_fighter, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -248,30 +251,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_18 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_17[] = {
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_sambo, // itemDropTable
     },
     {
-        &unit_sambo, // mUnitKindParams
+        &unit_sambo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -291,30 +294,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_17 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_16[] = {
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_honenoko, // mUnitKindParams
+        &unit_honenoko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -334,30 +337,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_16 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_15[] = {
     {
-        &unit_togezo, // mUnitKindParams
+        &unit_togezo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kurokumorn, // itemDropTable
     },
     {
-        &unit_togezo, // mUnitKindParams
+        &unit_togezo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_dokugassun, // itemDropTable
     },
     {
-        &unit_jyugem, // mUnitKindParams
+        &unit_jyugem, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -377,30 +380,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_15 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_14[] = {
     {
-        &unit_monochrome_pakkun, // mUnitKindParams
+        &unit_monochrome_pakkun, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togezo, // itemDropTable
     },
     {
-        &unit_monochrome_kurokumorn, // mUnitKindParams
+        &unit_monochrome_kurokumorn, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_togezo, // itemDropTable
     },
     {
-        &unit_piders, // mUnitKindParams
+        &unit_piders, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 40.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -420,30 +423,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_14 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_13[] = {
     {
-        &unit_hyper_sinnosuke, // mUnitKindParams
+        &unit_hyper_sinnosuke, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_sinnosuke, // itemDropTable
     },
     {
-        &unit_hyper_sinnosuke, // mUnitKindParams
+        &unit_hyper_sinnosuke, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_sinnosuke, // itemDropTable
     },
     {
-        &unit_hyper_sinnosuke, // mUnitKindParams
+        &unit_hyper_sinnosuke, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -463,40 +466,40 @@ BattleGroupSetup btlgrp_tou_tou_rank_13 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_12[] = {
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_bomhei, // mUnitKindParams
+        &unit_bomhei, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -516,40 +519,40 @@ BattleGroupSetup btlgrp_tou_tou_rank_12 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_11[] = {
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_borodo, // mUnitKindParams
+        &unit_borodo, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo, // itemDropTable
     },
     {
-        &unit_borodo_king, // mUnitKindParams
+        &unit_borodo_king, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_borodo_king, // itemDropTable
     },
     {
-        &unit_borodo_king, // mUnitKindParams
+        &unit_borodo_king, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -569,20 +572,20 @@ BattleGroupSetup btlgrp_tou_tou_rank_11 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_10[] = {
     {
-        &unit_iron_sinemon, // mUnitKindParams
+        &unit_iron_sinemon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {80.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {50, 0, 0, 0}, // unitWork
         battle_item_iron_sinemon, // itemDropTable
     },
     {
-        &unit_iron_sinemon2, // mUnitKindParams
+        &unit_iron_sinemon2, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {130, 0, 0, 0}, // unitWork
@@ -602,20 +605,20 @@ BattleGroupSetup btlgrp_tou_tou_rank_10 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_9[] = {
     {
-        &unit_crimson_togemet, // mUnitKindParams
+        &unit_crimson_togemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hyper_togemet, // itemDropTable
     },
     {
-        &unit_crimson_togemet, // mUnitKindParams
+        &unit_crimson_togemet, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -635,20 +638,20 @@ BattleGroupSetup btlgrp_tou_tou_rank_9 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_8[] = {
     {
-        &unit_togedaruma, // mUnitKindParams
+        &unit_togedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_togedaruma, // mUnitKindParams
+        &unit_togedaruma, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -668,30 +671,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_8 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_7[] = {
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_ura_pata, // mUnitKindParams
+        &unit_ura_pata, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_ura_noko, // itemDropTable
     },
     {
-        &unit_ura_noko, // mUnitKindParams
+        &unit_ura_noko, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -711,30 +714,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_7 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_6[] = {
     {
-        &unit_chorobon, // mUnitKindParams
+        &unit_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_green_chorobon, // mUnitKindParams
+        &unit_green_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_kamec, // itemDropTable
     },
     {
-        &unit_flower_chorobon, // mUnitKindParams
+        &unit_flower_chorobon, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -754,30 +757,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_6 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_5[] = {
     {
-        &unit_kamec_red, // mUnitKindParams
+        &unit_kamec_red, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_hammer_bros, // itemDropTable
     },
     {
-        &unit_kamec_white, // mUnitKindParams
+        &unit_kamec_white, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_fire_bros, // itemDropTable
     },
     {
-        &unit_kamec_green, // mUnitKindParams
+        &unit_kamec_green, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -797,10 +800,10 @@ BattleGroupSetup btlgrp_tou_tou_rank_5 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_4[] = {
     {
-        &unit_dark_keeper, // mUnitKindParams
+        &unit_dark_keeper, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -820,30 +823,30 @@ BattleGroupSetup btlgrp_tou_tou_rank_4 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_3[] = {
     {
-        &unit_hammer_bros, // mUnitKindParams
+        &unit_hammer_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {50.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_fire_bros, // mUnitKindParams
+        &unit_fire_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_bomhei, // itemDropTable
     },
     {
-        &unit_boomerang_bros, // mUnitKindParams
+        &unit_boomerang_bros, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {130.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -863,20 +866,20 @@ BattleGroupSetup btlgrp_tou_tou_rank_3 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_2[] = {
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_burst_wanwan, // itemDropTable
     },
     {
-        &unit_burst_wanwan, // mUnitKindParams
+        &unit_burst_wanwan, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -896,10 +899,10 @@ BattleGroupSetup btlgrp_tou_tou_rank_2 = {
 
 BattleUnitSetup btlparty_tou_tou_rank_1[] = {
     {
-        &unit_togenoko_ace, // mUnitKindParams
+        &unit_togenoko_ace, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -919,40 +922,40 @@ BattleGroupSetup btlgrp_tou_tou_rank_1 = {
 
 BattleUnitSetup btlparty_tou_tou_add_1[] = {
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 130.0f, -10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa, // itemDropTable
     },
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 130.0f, 0.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa, // itemDropTable
     },
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 130.0f, 10.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
         battle_item_basabasa, // itemDropTable
     },
     {
-        &unit_basabasa, // mUnitKindParams
+        &unit_basabasa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 130.0f, 20.0f}, // position
         0, // hitOffsetX
         {1, 0, 0, 0}, // unitWork
@@ -972,40 +975,40 @@ BattleGroupSetup btlgrp_tou_tou_add_1 = {
 
 BattleUnitSetup btlparty_tou_tou_add_2[] = {
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {30.0f, 0.0f, -10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monban, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {70.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monban, // itemDropTable
     },
     {
-        &unit_hinnya, // mUnitKindParams
+        &unit_hinnya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {110.0f, 0.0f, 10.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_monban, // itemDropTable
     },
     {
-        &unit_hannya, // mUnitKindParams
+        &unit_hannya, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 0.0f, 20.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1025,10 +1028,10 @@ BattleGroupSetup btlgrp_tou_tou_add_2 = {
 
 BattleUnitSetup btlparty_tou_tou_boss[] = {
     {
-        &unit_boss_macho_gance, // mUnitKindParams
+        &unit_boss_macho_gance, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1048,10 +1051,10 @@ BattleGroupSetup btlgrp_tou_tou_boss = {
 
 BattleUnitSetup btlparty_tou_tou_champ[] = {
     {
-        &unit_boss_champion, // mUnitKindParams
+        &unit_boss_champion, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1071,10 +1074,10 @@ BattleGroupSetup btlgrp_tou_tou_champ = {
 
 BattleUnitSetup btlparty_tou_tou_koopa[] = {
     {
-        &unit_boss_koopa_tou, // mUnitKindParams
+        &unit_boss_koopa_tou, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {90.0f, 0.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -1235,7 +1238,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_01_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1247,7 +1250,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_02_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {10, 10}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1259,7 +1262,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_03_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1271,7 +1274,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_04_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1283,7 +1286,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_05_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1295,7 +1298,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_06_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1307,7 +1310,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_07_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1319,7 +1322,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_08_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1331,7 +1334,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_09_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1343,7 +1346,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_10_off, // select
-        0x20000040, // battleFlags
+        NPC_BATTLE_LOSS_OK | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_CHUBOSS_BATTLE1", // bgmName
@@ -1355,7 +1358,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_11_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1367,7 +1370,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_12_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1379,7 +1382,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_13_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {10, 10}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1391,7 +1394,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_14_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1403,7 +1406,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_15_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {10, 10}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1415,7 +1418,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_16_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1427,7 +1430,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_17_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1439,7 +1442,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_18_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1451,7 +1454,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_19_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {10, 10}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1463,7 +1466,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_20_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1475,7 +1478,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_21_off, // select
-        0x40, // battleFlags
+        NPC_BATTLE_LOSS_OK, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
@@ -1487,7 +1490,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_22_off, // select
-        0x20000040, // battleFlags
+        NPC_BATTLE_LOSS_OK | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         0, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG3_CHAMP1", // bgmName
@@ -1499,7 +1502,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_23_off, // select
-        0x20000010, // battleFlags
+        NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
         6, // randomMode
         {{4, 4}, {4, 4}, {0}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
         "BGM_BOSS_STG3_GANCE1", // bgmName
@@ -1511,10 +1514,10 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_tou_btlno_tou_01_24_off, // select
-#ifdef VERSION_G8ME01
-        0x20000040, // battleFlags
+#if VERSION >= VERSION_US
+        NPC_BATTLE_LOSS_OK | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
 #else
-        0x20000000, // battleFlags
+        NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
 #endif
         0, // randomMode
         {{0}, {0}, {0}, {0}, {4, 4}, {4, 4}, {0}, {0}, {4, 4}, {0}, {4, 4}, {4, 4}, {1, 1}, {1, 1}, {1, 1}, {1, 1}}, // randomRanges
@@ -1556,8 +1559,7 @@ EVT_BEGIN(bgset_tou_screen_evt)
     CALL(tou_gamen_screen_tev_init)
     WAIT_FRAMES(1)
     CALL(evt_map_set_tevcallback, 8, PTR(tou_gamen_screen_tev))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gamen"), 134217728)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("gamen"), 256)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gamen"), MAPOBJ_TEV_CALLBACK(8))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("gamen"), MAPOBJ_FLAG_DISPLAY_LIST)
     RETURN
 EVT_END()
-

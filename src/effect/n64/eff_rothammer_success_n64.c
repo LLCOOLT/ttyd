@@ -1,3 +1,5 @@
+// Paper Mario 64 effect: a ring of `count` yellow star sprites flying outward from a point and spinning;
+// the success counterpart of eff_rothammer_fail_n64.c.
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,9 +8,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "eff/n64/eff_rothammer_success_n64.h"
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffRotHammerSuccessWork {
     s16 type;     // 0x0

@@ -1,3 +1,5 @@
+// evt_yuuminigame: Pianta Parlor minigame framework: shared work alloc/free, main and display callbacks.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,34 +9,19 @@
 #include "string.h"
 #include "driver/dispdrv.h"
 #include "yuu.h"
+#include "eff/eff_minigame.h"
 
 static s32 dataadr[32];
 s32 stackt[4];
 s32 stackp;
-void* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z);
-s32 yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
-s32 yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_disp_1hikoki(CameraId camera, void* param);
-s32 yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
-s32 yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_disp_2fune(CameraId camera, void* param);
-s32 yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall);
-s32 yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_disp_3roll(CameraId camera, void* param);
-s32 yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall);
-s32 yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_disp_4slit(CameraId camera, void* param);
-void evt_yuuminigame_disp_func(CameraId camera, void* param);
-
-USER_FUNC(evt_yuuminigame_main_func);
-USER_FUNC(yuu_atai_init);
-USER_FUNC(yuu_atai_pop);
-USER_FUNC(yuu_atai_push);
-USER_FUNC(eff_call_minigame);
-USER_FUNC(yuuminigame_set_dataadr);
-USER_FUNC(yuuminigame_get_dataadr);
-USER_FUNC(evt_yuuminigame_free);
-USER_FUNC(evt_yuuminigame_alloc);
+void yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall);
 void evt_yuuminigame_disp_func(CameraId camera, void* param);
 
 static EvtWord main_evt[4];
@@ -105,9 +92,9 @@ USER_FUNC(evt_yuuminigame_free) {
         return EVT_RETURN_DONE;
     }
     if (isFirstCall) {
-        wp->flags |= 1;
+        wp->flags |= MINIGAME_FLAG_QUIT;
     }
-    if (!(wp->flags & 2)) {
+    if (!(wp->flags & MINIGAME_FLAG_STOPPED)) {
         return EVT_RETURN_BLOCK;
     }
     switch (wp->type) {
@@ -171,8 +158,8 @@ USER_FUNC(evt_yuuminigame_alloc) {
 USER_FUNC(evt_yuuminigame_main_func) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
 
-    if (wp->flags & 1) {
-        wp->flags |= 2;
+    if (wp->flags & MINIGAME_FLAG_QUIT) {
+        wp->flags |= MINIGAME_FLAG_STOPPED;
         return EVT_RETURN_DONE;
     }
     if (wp->subEvent != NULL) {
@@ -195,4 +182,3 @@ static EVT_BEGIN(main_evt)
     CALL(evt_yuuminigame_main_func)
     RETURN
 EVT_END()
-

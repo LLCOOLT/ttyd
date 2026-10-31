@@ -1,3 +1,5 @@
+// mri_17 (巨木の中, The Great Tree): the cage trap (trap_event) that Lord Crump and his X-Nauts spring on the
+// Punies, the guide Puni, his sister and the rival; also a strange statue and a switch.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -8,89 +10,29 @@
 #include "evt/evt_sub.h"
 #include "mri.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_img.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_offscreen.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "mri_puni.h"
 #include "data_tables.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
 
-USER_FUNC(evt_bero_exec_wait);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_img_alloc_capture);
-USER_FUNC(evt_img_clear_virtual_point);
-USER_FUNC(evt_img_entry);
-USER_FUNC(evt_img_free_capture);
-USER_FUNC(evt_img_onoff);
-USER_FUNC(evt_img_release);
-USER_FUNC(evt_img_set_paper);
-USER_FUNC(evt_img_set_paper_anim);
-USER_FUNC(evt_img_set_shadow);
-USER_FUNC(evt_img_wait_animend);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_clear_offscreen);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_set_offscreen);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_wait_landon);
-USER_FUNC(evt_mobj_breaking_floor);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_mri_get16bitdata);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_msg_toge);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_glide_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_sound_data_reset);
-USER_FUNC(evt_npc_sound_data_set);
-USER_FUNC(evt_offscreen_delete);
-USER_FUNC(evt_offscreen_entry);
-USER_FUNC(evt_offscreen_get_boundingbox);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_puni_all_fall_check);
-USER_FUNC(evt_puni_count_area);
-USER_FUNC(evt_puni_flag_onoff);
-USER_FUNC(evt_puni_get_flag);
-USER_FUNC(evt_puni_get_position);
-USER_FUNC(evt_puni_get_trap_index);
-USER_FUNC(evt_puni_init_puni);
-USER_FUNC(evt_puni_mem_init);
-USER_FUNC(evt_puni_set_anim);
-USER_FUNC(evt_puni_set_hamari);
-USER_FUNC(evt_puni_set_mode);
-USER_FUNC(evt_puni_set_position);
-USER_FUNC(evt_puni_set_trap_index);
-USER_FUNC(evt_puni_set_yuka);
-USER_FUNC(evt_puni_wait_systemmode);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_area_check);
-USER_FUNC(evt_target_flag_onoff);
-USER_FUNC(evt_target_set_position);
 static USER_FUNC(set_depthPlaneOffset);
 
 extern EvtWord bero_02_into_event[];
@@ -106,12 +48,11 @@ extern EvtWord trap_event[];
 extern EvtWord trap_check[];
 extern EvtWord strange_statue[];
 extern EvtWord switch_event[];
-extern EvtWord mri_17_init_evt[];
 
 EVT_BEGIN(bero_02_into_event)
-    IF_INT_EQUAL(GSWF(2872), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MRI17_STRANGE_STATUE_SEEN), 0)
         SPAWN_EVENT(PTR(strange_statue))
-        SET_VALUE(GSWF(2872), 1)
+        SET_VALUE(GSWF(GSWF_MRI17_STRANGE_STATUE_SEEN), 1)
     END_IF
     SET_VALUE(LW(0), 0)
     RETURN
@@ -121,8 +62,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -138,8 +79,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -154,8 +95,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan2", // hitName
         2, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)bero_02_into_event, // enterEvent
@@ -199,7 +140,7 @@ EVT_END()
 static NpcSetupInfo npcEnt[] = {
     {
         /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         guide_init, // initEvent
         NULL, // regularEvent
@@ -211,7 +152,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         sister_init, // initEvent
         NULL, // regularEvent
@@ -223,7 +164,7 @@ static NpcSetupInfo npcEnt[] = {
     },
     {
         /*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         rival_init, // initEvent
         NULL, // regularEvent
@@ -309,7 +250,7 @@ EVT_BEGIN(trap_main)
     RETURN
 EVT_END()
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 EVT_BEGIN(trap_restore)
     CALL(evt_puni_wait_systemmode, 2)
     SET_VALUE(LW(10), 1)
@@ -355,10 +296,10 @@ EVT_BEGIN(wana_offscreen)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF2_DOOR_GRID_SHUT1"), 50, 0, 0, 0)
         WAIT_MS(1750)
-        CALL(evt_snd_bgmoff, 512)
+        CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_DOOR_GRID_DOWN1"), 50, 0, 0, 0)
         SPAWN_EVENT(PTR(wana_kemuri))
-        CALL(evt_cam_shake, 4, FLOAT(0.029296875f), FLOAT(0.0f), 500)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.029296875f), FLOAT(0.0f), 500)
     END_INLINE_EVENT
     CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
     CALL(evt_img_onoff, STRING("capture_img"), 1)
@@ -368,7 +309,7 @@ EVT_BEGIN(wana_offscreen)
     CALL(evt_img_release, STRING("capture_img"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_hako"))
     CALL(evt_offscreen_delete, STRING("offscreen"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hako"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hako"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_hako"), 1, 1)
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_saku"))
@@ -388,7 +329,7 @@ EVT_BEGIN(wana_offscreen)
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF2_DOKAN_APPEAR2"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
     CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_2"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_dokan1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_dokan1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_img_onoff, STRING("capture_img"), 1)
     CALL(evt_img_wait_animend, STRING("capture_img"))
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
@@ -396,29 +337,29 @@ EVT_BEGIN(wana_offscreen)
     CALL(evt_img_release, STRING("capture_img"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_dokan1"))
     CALL(evt_offscreen_delete, STRING("offscreen"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_dokan1"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_dokan1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_dokan1"), 1, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(trap_event)
     WAIT_WHILE(GF(15))
-    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), 1073742368)
-    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ａ"), 1073742368)
-    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ｂ"), 1073742368)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ａ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ｂ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 80, 151, 555, 80, 56, 13, 500, 11)
     WAIT_MS(500)
     CALL_CHILD(PTR(wana_offscreen))
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL_CHILD(PTR(mri_guide_goryu))
 #endif
     CALL(evt_target_flag_onoff, 0, 1, 1)
     SET_VALUE(LW(10), 1)
     LOOP(0)
-        CALL(evt_puni_set_mode, LW(10), 24)
+        CALL(evt_puni_set_mode, LW(10), PUNI_MODE_TRAP)
         CALL(evt_puni_flag_onoff, LW(10), 0, 2097152)
         CALL(evt_puni_set_anim, LW(10), 0)
         ADD(LW(10), 1)
@@ -426,18 +367,18 @@ EVT_BEGIN(trap_event)
             BREAK_LOOP
         END_IF
     END_LOOP
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL_CHILD(PTR(mri_guide_goryu))
 #endif
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
-#ifndef VERSION_G8ME01_DEMO
-    CALL(evt_puni_set_mode, 1, 30)
+#if VERSION != VERSION_DEMO
+    CALL(evt_puni_set_mode, 1, PUNI_MODE_INERT)
     CALL(evt_puni_get_position, 1, LW(0), LW(1), LW(2))
     CALL(evt_npc_set_position, STRING("ガイド"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), 1073743392)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
 #endif
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), 1536)
+#if VERSION == VERSION_DEMO
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
 #endif
     CALL(evt_npc_set_ry, STRING("ガイド"), 270)
     SET_VALUE(LW(0), STRING("ガイド"))
@@ -448,7 +389,7 @@ EVT_BEGIN(trap_event)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_01"), 0, STRING("ガイド"))
     CALL(evt_msg_toge, 2, 5, 230, 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_3RD_ENEMY"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_3RD_ENEMY"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_02"), 0, 0)
     CALL(evt_cam3d_evt_set, 50, 164, 624, 50, 56, 7, 500, 11)
     WAIT_MS(500)
@@ -491,15 +432,15 @@ EVT_BEGIN(trap_event)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_LANDING1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_set_anim, STRING("第三勢力幹部"), STRING("S_1"))
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0068359375f), 500)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.0068359375f), 500)
     END_INLINE_EVENT
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_mov_pos2, 50, 8, FLOAT(120.0f))
     END_INLINE_EVENT
-    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), 1024)
-    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ａ"), 1024)
-    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ｂ"), 1024)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ａ"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ｂ"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_sound_data_reset, STRING("第三勢力部下Ａ"))
     CALL(evt_npc_sound_data_reset, STRING("第三勢力部下Ｂ"))
     CALL(evt_npc_sound_data_reset, STRING("第三勢力幹部"))
@@ -543,7 +484,7 @@ EVT_BEGIN(trap_event)
     CALL(evt_npc_set_position, LW(10), 0, -1000, 0)
     WAIT_WHILE(GF(0))
     WAIT_MS(2000)
-    CALL(evt_snd_bgmoff_f, 512, 1000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_cam3d_evt_set, 34, 122, 390, 34, 56, 14, 500, 11)
     WAIT_MS(500)
     CALL(evt_npc_set_ry, STRING("ガイド"), 90)
@@ -552,10 +493,10 @@ EVT_BEGIN(trap_event)
     CALL(evt_npc_get_position, STRING("ガイド"), LW(0), LW(1), LW(2))
     CALL(evt_puni_flag_onoff, 1, 1, 262144)
     CALL(evt_puni_set_position, 1, LW(0), LW(1), LW(2))
-#ifndef VERSION_G8ME01_DEMO
-    CALL(evt_puni_set_mode, 1, 24)
+#if VERSION != VERSION_DEMO
+    CALL(evt_puni_set_mode, 1, PUNI_MODE_TRAP)
 #endif
-    SET_VALUE(GSW(0), 102)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_PUNIES_VS_JABBIES_2)
     SET_VALUE(GF(1), 0)
     CALL(evt_cam3d_evt_off, 300, 11)
     WAIT_MS(500)
@@ -574,7 +515,7 @@ EVT_BEGIN(trap_event)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
     CALL(evt_msg_print_party, STRING("stg2_mri_e18_00_09"))
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_puni_get_position, 1, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
@@ -582,7 +523,7 @@ EVT_BEGIN(trap_event)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_12"), 0, STRING("ガイド"))
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
     RETURN
 EVT_END()
 
@@ -611,7 +552,7 @@ EVT_BEGIN(trap_check)
             SET_VALUE(LW(14), 0)
         END_IF
         IF_INT_GREATER_OR_EQUAL(LW(8), 10)
-            IF_INT_EQUAL(GSWF(2870), 1)
+            IF_INT_EQUAL(GSWF(GSWF_MRI17_ORB_ON_PEDESTAL), 1)
                 IF_INT_EQUAL(LW(9), 1)
                     IF_INT_EQUAL(LW(14), 1)
                         BREAK_LOOP
@@ -658,9 +599,9 @@ EVT_BEGIN(trap_check)
 EVT_END()
 
 static EVT_BEGIN(punipuni_ball00_init)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_sui_hikari"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
     CALL_CHILD(PTR(mri_punipuni_setup))
-    IF_INT_EQUAL(GSWF(2870), 1)
+    IF_INT_EQUAL(GSWF(GSWF_MRI17_ORB_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), 50, 30, -58)
         CALL(evt_target_flag_onoff, LW(11), 0, 3)
     END_IF
@@ -671,18 +612,18 @@ EVT_END()
 
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
-    IF_INT_EQUAL(GSWF(2870), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MRI17_ORB_ON_PEDESTAL), 0)
         CALL_CHILD(PTR(mri_punipuni_itemselect))
         IF_INT_EQUAL(LW(1), 0)
             GOTO(100)
         END_IF
-        SET_VALUE(GSWF(2870), 1)
+        SET_VALUE(GSWF(GSWF_MRI17_ORB_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), 50, 30, -58)
         SET_VALUE(GF(15), 1)
         CALL_CHILD(PTR(mri_punipuni_itemset))
         SET_VALUE(GF(15), 0)
-        ELSE
-        SET_VALUE(GSWF(2870), 0)
+    ELSE
+        SET_VALUE(GSWF(GSWF_MRI17_ORB_ON_PEDESTAL), 0)
         CALL_CHILD(PTR(mri_punipuni_itemremove))
     END_IF
     LABEL(100)
@@ -691,7 +632,7 @@ static EVT_BEGIN(punipuni_ball00)
 EVT_END()
 
 static EVT_BEGIN(breakyuka_init)
-    IF_INT_EQUAL(GSWF(2871), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MRI17_FLOOR_BROKEN), 0)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak_01"), 1, 0)
     END_IF
     RETURN
@@ -724,11 +665,11 @@ static EVT_BEGIN(breakyuka_main)
     LOOP(0)
         CALL(evt_puni_get_trap_index, LW(10), LW(12))
         IF_INT_EQUAL(LW(12), 1)
-            CALL(evt_puni_set_mode, LW(10), 16)
-#ifndef VERSION_G8ME01_DEMO
+            CALL(evt_puni_set_mode, LW(10), PUNI_MODE_HAGURE)
+#if VERSION != VERSION_DEMO
             CALL(evt_puni_flag_onoff, LW(10), 1, 2097152)
 #endif
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
             CALL(evt_puni_flag_onoff, LW(10), 1, 0xA00000)
             CALL(evt_puni_set_trap_index, LW(10), 0)
 #endif
@@ -738,9 +679,9 @@ static EVT_BEGIN(breakyuka_main)
             BREAK_LOOP
         END_IF
     END_LOOP
-    SET_VALUE(GSW(0), 106)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_04_ESCAPE)
     CALL(evt_mario_key_onoff, 1)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
     RETURN
 EVT_END()
 
@@ -770,17 +711,17 @@ EVT_BEGIN(switch_event)
     CALL(evt_mario_wait_landon)
     WAIT_MS(500)
     CALL(evt_snd_sfxon, STRING("SFX_STG2_SWITCH_QUAKE1"), LW(10))
-    CALL(evt_cam_shake, 4, FLOAT(0.0146484375f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0146484375f), FLOAT(0.0f), 1000)
     CALL(evt_snd_sfxoff, LW(10))
     WAIT_MS(500)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_msg_print_party, STRING("stg2_mri_e18_00_10"))
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_party_run, 0)
 #endif
-    SET_VALUE(GSW(0), 103)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_01_MYSTERY_PILLAR)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -808,49 +749,49 @@ EVT_BEGIN(mri_17_init_evt)
     SPAWN_EVENT(PTR(mri_countdown))
     SET_VALUE(LW(0), PTR(ueki_access_data))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
-    SWITCH(GSW(0))
-        CASE_BETWEEN(109, 110)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI4"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI4"))
     END_SWITCH
     SET_VALUE(LW(10), STRING("punipuni"))
     SET_VALUE(LW(11), 0)
     SPAWN_EVENT(PTR(punipuni_ball00_init))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball00), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball00), 0)
     SPAWN_EVENT(PTR(breakyuka_init))
-    CALL(evt_mobj_breaking_floor, STRING("mobj_bf00"), 0, 0, -35, 1, PTR(breakyuka_main), GSWF(2871))
-    IF_INT_LESS(GSW(0), 103)
+    CALL(evt_mobj_breaking_floor, STRING("mobj_bf00"), 0, 0, -35, 1, PTR(breakyuka_main), GSWF(GSWF_MRI17_FLOOR_BROKEN))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_01_MYSTERY_PILLAR)
         CALL(evt_mobj_switch_blue, 1, STRING("switch"), 60, -309, 53, PTR(switch_event), 0)
     END_IF
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, STRING("item_01"), 125, 168, -310, -44, 15, GSWF(5617), 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 168, -310, -44, 15, GSWF(GSWF_MRI17_STAR_PIECE), 0)
 #else
-    CALL(evt_item_entry, STRING("item_01"), 125, 168, -310, -44, 16, GSWF(5617), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 168, -310, -44, 16, GSWF(GSWF_MRI17_STAR_PIECE), 0)
 #endif
-    SWITCH(GSW(0))
-        CASE_LESS_OR_EQUAL(101)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_hako"), 1)
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_LESS_OR_EQUAL(STORY_STG2_20_PUNIO_AND_PETUNI)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hako"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_hako"), 1, 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_dokan1"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dokan1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_dokan1"), 1, 0)
         CALL(evt_paper_entry, STRING("OFF_d_batan"))
         CALL(evt_paper_entry, STRING("OFF_d_saku"))
         SPAWN_EVENT(PTR(trap_check))
-        CASE_BETWEEN(102, 105)
+        CASE_BETWEEN(STORY_STG2_21_PUNIES_VS_JABBIES_2, STORY_STG2_21_03_SUPER_BOOTS)
         SPAWN_EVENT(PTR(trap_main))
-#ifndef VERSION_G8ME01_DEMO
-        CASE_BETWEEN(106, 107)
+#if VERSION != VERSION_DEMO
+        CASE_BETWEEN(STORY_STG2_21_04_ESCAPE, STORY_STG2_21_06_WATER_SWITCH)
         SPAWN_EVENT(PTR(trap_restore))
-        CASE_GREATER_OR_EQUAL(106)
+        CASE_GREATER_OR_EQUAL(STORY_STG2_21_04_ESCAPE)
 #endif
-#ifdef VERSION_G8ME01_DEMO
-        CASE_GREATER_OR_EQUAL(105)
+#if VERSION == VERSION_DEMO
+        CASE_GREATER_OR_EQUAL(STORY_STG2_21_03_SUPER_BOOTS)
 #endif
     END_SWITCH
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hako_saku_mae"), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hako_saku_mae"), MAPOBJ_FLAG_BBOX_CULL)
     RETURN
 EVT_END()
 

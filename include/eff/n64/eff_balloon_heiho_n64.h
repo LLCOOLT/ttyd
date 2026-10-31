@@ -1,3 +1,4 @@
+// eff_balloon_heiho_n64.c: Paper Mario 64 BalloonHeiho effect entry (effBalloonHeihoN64Entry).
 #pragma once
 
 #include <dolphin/types.h>

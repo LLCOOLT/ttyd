@@ -1,11 +1,9 @@
+// Battle unit data for the invisible system unit (unit_system) that runs battle-wide scripts.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
-
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetMaxMoveCount);
-USER_FUNC(btlevtcmd_StartWaitEvent);
+#include "battle/battle_sub.h"
+#include "battle/battle_event_cmd.h"
+#include "version.h"
 
 static BattleUnitKindPart parts[1];
 BattleUnitKind unit_system;
@@ -19,10 +17,10 @@ static EvtWord attack_event[2];
 static EvtWord wait_event[2];
 
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_system", NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0, NULL},
+    {1, "btl_un_system", NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, 0, NULL},
 };
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // the demo defines regist here (it is .data there, small data in retail)
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
@@ -85,7 +83,7 @@ BattleUnitKind unit_system = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x52003000,
+    UNIT_ATTR_NO_GRAVITY_BOB | UNIT_ATTR_ACTS_IN_ZERO_GRAVITY | UNIT_ATTR_NO_HP_GAUGE | UNIT_ATTR_IGNORE_FOR_CLEAR | UNIT_ATTR_HP_LOCKED,
     &regist,
     1,
     parts,
@@ -94,11 +92,11 @@ BattleUnitKind unit_system = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetMaxMoveCount, -2, 0)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -110,7 +108,7 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
 
@@ -125,4 +123,3 @@ EVT_END()
 static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
-

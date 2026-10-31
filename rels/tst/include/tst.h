@@ -1,3 +1,4 @@
+// Declarations for the developer test REL (tst): __assert2, map init events, unit kinds, drop tables, battle setups.
 #pragma once
 
 #include "dolphin/types.h"
@@ -7,7 +8,9 @@
 
 // system.c. Retail builds strip every assert; tst.rel keeps them, with the original source file name and line.
 BOOL __assert2(const char* filename, s32 line, const char* assertion, const char* message, ...);
-#define TST_ASSERTMSG(file, line, cond, msg)     if (!(cond))                                  __assert2(file, line, #cond, msg)
+#define TST_ASSERTMSG(file, line, cond, msg) \
+    if (!(cond))                             \
+    __assert2(file, line, #cond, msg)
 
 // Map init events registered by tst.c's _prolog (relSetEvtAddr), all in evt_init.c.
 extern EvtWord tst_bt00_init_evt[];
@@ -171,9 +174,6 @@ extern ItemDropData battle_item_test_killer_cannon[];
 // Battle setups in battle_bgset_test.c, registered by tst.c's _prolog (relSetBtlAddr).
 extern NpcSetupBattleInfo btlsetup_tst_tbl[];
 extern NpcTerritoryInfo btl_tst_setup_no_tbl[];
-
-// The debug build keeps its asserts: __assert2(file, line, expression, message, ...) (system.c).
-BOOL __assert2(const char* filename, s32 line, const char* assertion, const char* message, ...);
 
 // tst.c: map user function that turns the Koopa mobjs on (mobjKoopaOn), called from evt_init.c's events.
 s32 tst_mobj_koopa_on(struct EventEntry* event, BOOL isFirstCall);

@@ -1,3 +1,4 @@
+// tik_11 (埋没した都市, Rogueport Sewers): the power-down shop (powerdownya), which lowers Mario's level or a partner's rank.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -9,10 +10,29 @@
 #include "driver/camdrv.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
+#include "driver/bgdrv.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_win.h"
+#include "evt/evt_window.h"
+#include "manager/winmgr.h"
+#include "party/party_motion.h"
+#include "pmario_sound.h"
+#include "tik.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "evt/evt_pouch.h"
 
 static s32 xlw[16];
-void bgTransOffsetOn(void);
-void bgTransOffsetOff(void);
 
 static USER_FUNC(bgScrollControll);
 static USER_FUNC(bgm_start_wait);
@@ -20,66 +40,9 @@ static USER_FUNC(effect_stardust);
 static USER_FUNC(enzan_cam_turn_keisan_f);
 static USER_FUNC(enzan_lw_load);
 static USER_FUNC(enzan_lw_save);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_softdelete);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_color);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_goodbye_party);
-USER_FUNC(evt_mario_hello_party);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_continue);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_print_insert);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_party_dispflg_onoff);
-USER_FUNC(evt_party_flg_onoff);
-USER_FUNC(evt_party_get_dispdir);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_breed_pose);
-USER_FUNC(evt_party_set_dir_pos);
-USER_FUNC(evt_party_set_dispdir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_set_pose);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_get_coin);
-USER_FUNC(evt_pouch_set_coin);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_win_coin_off);
-USER_FUNC(evt_win_coin_on);
-USER_FUNC(evt_win_coin_wait);
-USER_FUNC(evt_win_other_select);
 static USER_FUNC(setmertn);
-USER_FUNC(unitwin_getpartylank);
-USER_FUNC(unitwin_setmariolevel);
-USER_FUNC(unitwin_setpartylank);
-USER_FUNC(evt_mario_set_dir_pos);
-USER_FUNC(evt_win_party_lankdown_chk);
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
 USER_FUNC(evt_sub_get_language);
-USER_FUNC(evt_msg_fmt_int);
 #endif
 static USER_FUNC(wariai_enzan_1f);
 static USER_FUNC(enzan_set_f_i);
@@ -97,7 +60,6 @@ extern EvtWord powerdownya_direct_talk[];
 extern EvtWord powerdownya_init[];
 static NpcSetupInfo npcEnt[2];
 static BeroEntry bero_entry_data[2];
-extern EvtWord tik_11_init_evt[];
 
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -257,8 +219,6 @@ static USER_FUNC(bgScrollControll) {
     return EVT_RETURN_DONE;
 }
 
-BOOL psndBGMStartCheck(s32 id);
-
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
@@ -294,13 +254,13 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
             WAIT_MS(240)
             CONTINUE_LOOP
         END_IF
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         CALL(evt_sub_get_language, LW(15))
         SWITCH(LW(15))
             CASE_EQUAL(0)
 #endif
-        CALL(evt_msg_print_insert, 0, STRING("powerdown_06"), 0, STRING("me"), LW(2), LW(3), 39)
-#ifdef VERSION_G8ME01
+            CALL(evt_msg_print_insert, 0, STRING("powerdown_06"), 0, STRING("me"), LW(2), LW(3), 39)
+#if VERSION >= VERSION_US
             CASE_DEFAULT
             CALL(evt_msg_fmt_int, 0, LW(14), STRING("powerdown_06"), 39)
             CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("me"), LW(2), LW(3))
@@ -320,7 +280,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     CALL(evt_win_coin_off, LW(12))
     CALL(enzan_lw_save)
     SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
-    CALL(evt_snd_bgmoff_f, 1024, 2000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_HOLD, 2000)
     CALL(evt_msg_print_add, 0, STRING("powerdown_11"))
     CALL(bgScrollControll, 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, -20, 500)
@@ -333,12 +293,12 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
         END_IF
     END_LOOP
     WAIT_MS(500)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_POWERDOWN1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_POWERDOWN1"))
     CALL(bgm_start_wait)
     CALL(evt_eff64, STRING("aaax"), STRING("lensflare_n64"), 0, -9, 49, 0, FLOAT(1.0f), -1, 0, 0, 0, 0, 0, 0)
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("down_pira"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("down_pira"), MAPOBJ_FLAG_HIDE)
     WAIT_FRAMES(5)
     CALL(evt_msg_print, 0, STRING("powerdown_12"), 0, STRING("me"))
     BEGIN_INLINE_EVENT
@@ -369,7 +329,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 1600)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 1600)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -9, 212, 886, -9, 56, 0, 1600, 11)
     WAIT_MS(1600)
@@ -403,7 +363,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     END_INLINE_EVENT
     WAIT_MS(7000)
     CALL(evt_eff_softdelete, STRING("aaax"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("down_pira"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("down_pira"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(500)
     CALL(evt_eff64, STRING("dddx"), STRING("release_n64"), 65283, -9, 49, 0, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
     WAIT_MS(1500)
@@ -460,12 +420,12 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     CALL(evt_mario_dispflag_onoff, 0, 4)
     DELETE_EVENT(GW(1))
     CALL(enzan_lw_load)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(unitwin_setmariolevel, LW(5), LW(6), LW(7), LW(8))
     IF_INT_NOT_EQUAL(LW(8), 0)
         CALL(evt_msg_print, 0, STRING("powerdown_10"), 0, STRING("me"))
-        ELSE
+    ELSE
         CALL(evt_msg_print, 0, STRING("powerdown_13"), 0, STRING("me"))
     END_IF
     RETURN
@@ -498,13 +458,13 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
             WAIT_MS(240)
             CONTINUE_LOOP
         END_IF
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         CALL(evt_sub_get_language, LW(15))
         SWITCH(LW(15))
             CASE_EQUAL(0)
 #endif
-        CALL(evt_msg_print_insert, 0, STRING("powerdown_08"), 0, STRING("me"), LW(3), LW(4), 39)
-#ifdef VERSION_G8ME01
+            CALL(evt_msg_print_insert, 0, STRING("powerdown_08"), 0, STRING("me"), LW(3), LW(4), 39)
+#if VERSION >= VERSION_US
             CASE_DEFAULT
             CALL(evt_msg_fmt_int, 0, LW(14), STRING("powerdown_08"), 39)
             CALL(evt_msg_print_insert, 1, LW(14), 0, STRING("me"), LW(3), LW(4))
@@ -532,7 +492,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     CALL(bgScrollControll, 0)
     CALL(evt_mario_goodbye_party, 0)
     CALL(evt_mario_hello_party, 0, LW(2))
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_sub_intpl_msec_init, 11, 0, -20, 500)
@@ -545,12 +505,12 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         END_IF
     END_LOOP
     WAIT_MS(500)
-    CALL(evt_snd_bgmoff, 1024)
-    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_POWERDOWN1"))
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_POWERDOWN1"))
     CALL(bgm_start_wait)
     CALL(evt_eff64, STRING("aaax"), STRING("lensflare_n64"), 0, -9, 49, 0, FLOAT(1.0f), -1, 0, 0, 0, 0, 0, 0)
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("down_pira"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("down_pira"), MAPOBJ_FLAG_HIDE)
     SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
     CALL(evt_msg_print, 0, STRING("powerdown_12"), 0, STRING("me"))
     BEGIN_INLINE_EVENT
@@ -581,7 +541,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 1600)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 1600)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -9, 212, 886, -9, 56, 0, 1600, 11)
     WAIT_MS(1600)
@@ -625,7 +585,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         END_SWITCH
         WAIT_MS(500)
         DELETE_EVENT(GW(1))
-        CALL(evt_party_dispflg_onoff, 0, 16, 1)
+        CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 1)
         CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
         CALL(effect_stardust, 4, LW(3), LW(4), LW(5), FLOAT(50.0f), FLOAT(50.0f), 14, 60)
         CALL(evt_party_get_dispdir, 0, LW(9))
@@ -641,7 +601,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
             CALL(evt_party_set_dispdir, 0, LW(8))
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(evt_party_dispflg_onoff, 0, 16, 0)
+        CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 0)
         CALL(evt_party_flg_onoff, 0, 33554432, 0)
         CALL(evt_mario_goodbye_party, 0)
         CALL(evt_mario_hello_party, 0, LW(1))
@@ -674,7 +634,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     END_INLINE_EVENT
     WAIT_MS(7000)
     CALL(evt_eff_softdelete, STRING("aaax"))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("down_pira"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("down_pira"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(500)
     CALL(evt_eff64, STRING("dddx"), STRING("release_n64"), 65283, -9, 49, 0, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
     WAIT_MS(1500)
@@ -763,8 +723,8 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     CALL(evt_mario_dispflag_onoff, 0, 4)
     DELETE_EVENT(GW(1))
     CALL(enzan_lw_load)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(unitwin_getpartylank, LW(1), LW(0))
     ADD(LW(0), 1)
     CALL(unitwin_setpartylank, LW(1), LW(0))
@@ -780,26 +740,26 @@ EVT_BEGIN(powerdownya_table_talk)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
-    IF_INT_EQUAL(GSWF(1342), 0)
-#ifdef VERSION_G8ME01
+    IF_INT_EQUAL(GSWF(GSWF_TIK11_CHET_RIPPO_MET), 0)
+#if VERSION >= VERSION_US
         CALL(evt_sub_get_language, LW(15))
         SWITCH(LW(15))
             CASE_EQUAL(0)
 #endif
-        CALL(evt_msg_print_insert, 0, STRING("powerdown_00"), 0, STRING("me"), 39)
-#ifdef VERSION_G8ME01
+            CALL(evt_msg_print_insert, 0, STRING("powerdown_00"), 0, STRING("me"), 39)
+#if VERSION >= VERSION_US
             CASE_DEFAULT
             CALL(evt_msg_fmt_int, 0, LW(14), STRING("powerdown_00"), 39)
             CALL(evt_msg_print, 1, LW(14), 0, STRING("me"))
         END_SWITCH
 #endif
-        SET_VALUE(GSWF(1342), 1)
-        SET_VALUE(GSWF(1371), 1)
-        ELSE
-        IF_INT_EQUAL(GSWF(1371), 0)
+        SET_VALUE(GSWF(GSWF_TIK11_CHET_RIPPO_MET), 1)
+        SET_VALUE(GSWF(GSWF_TIK11_CHET_RIPPO_GREETED), 1)
+    ELSE
+        IF_INT_EQUAL(GSWF(GSWF_TIK11_CHET_RIPPO_GREETED), 0)
             CALL(evt_msg_print, 0, STRING("powerdown_00_01"), 0, STRING("me"))
-            SET_VALUE(GSWF(1371), 1)
-            ELSE
+            SET_VALUE(GSWF(GSWF_TIK11_CHET_RIPPO_GREETED), 1)
+        ELSE
             CALL(evt_msg_print, 0, STRING("powerdown_01"), 0, STRING("me"))
         END_IF
     END_IF
@@ -810,7 +770,7 @@ EVT_BEGIN(powerdownya_table_talk)
     END_IF
     IF_INT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(powerdownya_mario_level_rtn))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(powerdownya_party_lank_rtn))
     END_IF
     LABEL(0)
@@ -825,14 +785,14 @@ EVT_BEGIN(powerdownya_direct_talk)
 EVT_END()
 
 EVT_BEGIN(powerdownya_init)
-    CALL(evt_run_case_evt, 9, 1, STRING("A_power_down"), 0, PTR(powerdownya_table_talk), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_power_down"), 0, PTR(powerdownya_table_talk), 0)
     RETURN
 EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
         /*"パワーダウン屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x5F\x83\x45\x83\x93\x89\xAE", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         powerdownya_init, // initEvent
         NULL, // regularEvent
@@ -849,8 +809,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -866,15 +826,14 @@ static BeroEntry bero_entry_data[] = {
 };
 
 EVT_BEGIN(tik_11_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    SET_VALUE(GSWF(1371), 0)
+    SET_VALUE(GSWF(GSWF_TIK11_CHET_RIPPO_GREETED), 0)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_map_playanim, STRING("anm_kem"), 1, 0)
     RETURN
 EVT_END()
-

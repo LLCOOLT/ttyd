@@ -1,3 +1,4 @@
+// eff_breath_fire.c: fire-breath effect: effBreathFireEntry.
 #pragma once
 
 #include "driver/effdrv.h"

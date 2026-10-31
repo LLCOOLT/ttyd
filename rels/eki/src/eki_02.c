@@ -1,3 +1,4 @@
+// eki_02 (駅, Riverside Station): room with a contraption (sikake), a key item and a Star Piece; door to eki_01.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -7,17 +8,15 @@
 #include "system.h"
 #include "dolphin/mtx.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(hit_move);
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "party/party_motion.h"
+#include "eki.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "libc_decls.h"
 
 static BeroEntry bero_data[2];
-extern EvtWord eki_02_init_evt[];
 
 static EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
@@ -36,8 +35,8 @@ static BeroEntry bero_data[] = {
         "s_bero", // hitName
         1, // type
         3, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -52,9 +51,6 @@ static BeroEntry bero_data[] = {
     },
     {0},
 };
-
-double sin(double x);
-double cos(double x);
 
 USER_FUNC(hit_move) {
     MarioWork* mario = marioGetPtr();
@@ -101,7 +97,7 @@ USER_FUNC(hit_move) {
 }
 
 static EVT_BEGIN(evt_key)
-    SET_VALUE(GSW(0), 314)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_31_KEY)
     RETURN
 EVT_END()
 
@@ -109,22 +105,21 @@ EVT_BEGIN(eki_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI3"))
-#ifdef VERSION_G8ME01
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI3"))
+#if VERSION >= VERSION_US
     CALL(evt_map_playanim, STRING("anm_sikake_1"), 1, 1)
     CALL(evt_map_playanim, STRING("anm_sikake_2"), 1, 1)
 #else
     CALL(evt_map_playanim, STRING("anm_sikake_1"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_sikake_2"), 1, 0)
 #endif
-    IF_INT_LESS(GSW(0), 314)
-        CALL(evt_item_entry, STRING("key"), 25, 525, 220, 29, 16, -1, PTR(evt_key))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_31_KEY)
+        CALL(evt_item_entry, STRING("key"), ITEM_STATION_KEY_0x19, 525, 220, 29, 16, -1, PTR(evt_key))
     END_IF
     BEGIN_INLINE_EVENT
         CALL(hit_move)
     END_INLINE_EVENT
-    CALL(evt_item_entry, STRING("item"), 125, 540, 140, -40, 16, GSWF(5653), 0)
+    CALL(evt_item_entry, STRING("item"), ITEM_STAR_PIECE, 540, 140, -40, 16, GSWF(GSWF_EKI02_STAR_PIECE), 0)
     RETURN
 EVT_END()
-

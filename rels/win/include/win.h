@@ -1,5 +1,7 @@
 #pragma once
 
+// Declarations shared by the win.rel units (ふしぎの森, Boggly Woods).
+
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"
@@ -21,3 +23,7 @@ extern EvtWord win_04_init_evt[];
 extern EvtWord win_05_init_evt[];
 extern EvtWord win_06_init_evt[];
 extern EvtWord win_puni_walk_se[];
+
+extern BattleUnitKind unit_boss_majolyne;
+extern BattleUnitKind unit_boss_marilyn;
+extern BattleUnitKind unit_boss_vivian;

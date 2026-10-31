@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: Magikoopa (kameki) tornado of eight spinning, scrolling layers around a point.
 #include "eff/n64/eff_kameki_tornade_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -8,20 +9,16 @@
 #include <dolphin/os/OSFastCast.h>
 #include <stdlib.h>
 #include <string.h>
+#include "eff/eff_n64.h"
+#include "libc_decls.h"
 
-double sin(double);
-double cos(double);
+#define Vec2Vtx(v, o)                 \
+    do {                              \
+        OSf32tos16(&(v)->x, &(o)[0]); \
+        OSf32tos16(&(v)->y, &(o)[1]); \
+        OSf32tos16(&(v)->z, &(o)[2]); \
+    } while (0)
 
-#define Vec2Vtx(v, o) do { OSf32tos16(&(v)->x, &(o)[0]); OSf32tos16(&(v)->y, &(o)[1]); OSf32tos16(&(v)->z, &(o)[2]); } while (0)
-
-typedef struct effN64Vtx {
-    s16 x, y, z;   // 0x0
-    s16 s, t;      // 0x6
-    u8 r, g, b, a; // 0xA
-} effN64Vtx;
-
-void effGetTexObjN64(u32 id, GXTexObj* obj);
-void effSetVtxDescN64(effN64Vtx* vtx);
 void tri2();
 
 void effKamekiTornadeMain(EffectEntry* effect);
@@ -51,8 +48,6 @@ void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad);
 void PSMTXRotRad(Mtx m, char axis, f32 rad);
 void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
-void *memcpy(void *dest, const void *src, size_t num);
-int rand(void);
 EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffKamekiTornadeN64Work* work;
@@ -65,7 +60,7 @@ EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKamekiTornadeN64Work));
     effect->userdata = work;
     effect->callback = effKamekiTornadeMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->frame = 0;
     if (life <= 0) {
@@ -116,8 +111,8 @@ void effKamekiTornadeMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 16;
     }
     if (work->life < 1000) {
@@ -315,5 +310,3 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-
-

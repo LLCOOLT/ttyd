@@ -1,29 +1,28 @@
+// Script commands for the battle stage: stage and audience darkness, stage lights.
+#include "evt/evt_batstage.h"
 #include "battle/battle.h"
 #include "manager/evtmgr_cmd.h"
 #include <dolphin/mtx.h>
-
-s32 BattleStageGetLightNumberByName(const char* name);
-s32 BattleStageSysLightEntry(const char* name);
-void BattleStageLightRelease(s32 idx, s32 a, s32 b);
-void BattleStageLightSetLightColor(s32 idx, u8 r, u8 g, u8 b, s32 a, s32 c);
-void BattleStageLightSetWidth(s32 idx, s32 w, s32 a, s32 b);
-void BattleStageLightSetPosition(s32 idx, f32 x, f32 y, f32 z, s32 a, s32 b);
-void BattleStageLightSetUpVec(s32 idx, f32 x, f32 y, f32 z, s32 a, s32 b);
-void BattleStageLightSetTarget(s32 idx, f32 x, f32 y, f32 z, s32 a, s32 b);
-void BattleStageLightSetTargetByUnit(s32 idx, s32 unit, f32 x, f32 y, f32 z, s32 a, s32 b);
-void BattleStageReturnAudDarkBase(s32 a, s32 b);
-void BattleStageSetAudDarkBase(u8 a, s32 b, s32 c);
-void BattleStageSetAudDark(u8 a, s32 b, s32 c);
-void BattleStageReturnStgDarkBase(s32 a, s32 b);
-void BattleStageSetStgDarkBase(u8 a, s32 b, s32 c);
-void BattleStageSetStgDark(u8 a, s32 b, s32 c);
+#include "battle/battle_stage.h"
+// FAKE: evt_batstage.c calls BattleStageSetStgDarkBase through this prototype (the types it was compiled with) instead of the one in battle/battle_stage.h; same registers, behaviour-identical.
+typedef void (*BattleStageSetStgDarkBaseS32Fn)(u8, s32, s32);
+// FAKE: evt_batstage.c calls BattleStageSetStgDark through this prototype (the types it was compiled with) instead of the one in battle/battle_stage.h; same registers, behaviour-identical.
+typedef void (*BattleStageSetStgDarkS32Fn)(u8, s32, s32);
+// FAKE: evt_batstage.c calls BattleStageSetAudDarkBase through this prototype (the types it was compiled with) instead of the one in battle/battle_stage.h; same registers, behaviour-identical.
+typedef void (*BattleStageSetAudDarkBaseS32Fn)(u8, s32, s32);
+// FAKE: evt_batstage.c calls BattleStageSetAudDark through this prototype (the types it was compiled with) instead of the one in battle/battle_stage.h; same registers, behaviour-identical.
+typedef void (*BattleStageSetAudDarkS32Fn)(u8, s32, s32);
+// FAKE: evt_batstage.c calls BattleStageReturnStgDarkBase through this prototype (the types it was compiled with) instead of the one in battle/battle_stage.h; same registers, behaviour-identical.
+typedef void (*BattleStageReturnStgDarkBaseS32Fn)(s32, s32);
+// FAKE: evt_batstage.c calls BattleStageReturnAudDarkBase through this prototype (the types it was compiled with) instead of the one in battle/battle_stage.h; same registers, behaviour-identical.
+typedef void (*BattleStageReturnAudDarkBaseS32Fn)(s32, s32);
 
 USER_FUNC(evt_batstage_set_stg_dark) {
     EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
-    BattleStageSetStgDark(a, b, c);
+    ((BattleStageSetStgDarkS32Fn)BattleStageSetStgDark)(a, b, c);
     return EVT_RETURN_DONE;
 }
 
@@ -32,7 +31,7 @@ USER_FUNC(evt_batstage_set_stg_dark_base) {
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
-    BattleStageSetStgDarkBase(a, b, c);
+    ((BattleStageSetStgDarkBaseS32Fn)BattleStageSetStgDarkBase)(a, b, c);
     return EVT_RETURN_DONE;
 }
 
@@ -40,7 +39,7 @@ USER_FUNC(evt_batstage_return_stg_dark_base) {
     EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
-    BattleStageReturnStgDarkBase(a, b);
+    ((BattleStageReturnStgDarkBaseS32Fn)BattleStageReturnStgDarkBase)(a, b);
     return EVT_RETURN_DONE;
 }
 
@@ -49,7 +48,7 @@ USER_FUNC(evt_batstage_set_aud_dark) {
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
-    BattleStageSetAudDark(a, b, c);
+    ((BattleStageSetAudDarkS32Fn)BattleStageSetAudDark)(a, b, c);
     return EVT_RETURN_DONE;
 }
 
@@ -58,7 +57,7 @@ USER_FUNC(evt_batstage_set_aud_dark_base) {
     u8 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
-    BattleStageSetAudDarkBase(a, b, c);
+    ((BattleStageSetAudDarkBaseS32Fn)BattleStageSetAudDarkBase)(a, b, c);
     return EVT_RETURN_DONE;
 }
 
@@ -66,7 +65,7 @@ USER_FUNC(evt_batstage_return_aud_dark_base) {
     EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
     s32 b = evtGetValue(event, args[1]);
-    BattleStageReturnAudDarkBase(a, b);
+    ((BattleStageReturnAudDarkBaseS32Fn)BattleStageReturnAudDarkBase)(a, b);
     return EVT_RETURN_DONE;
 }
 
@@ -83,20 +82,20 @@ USER_FUNC(evt_batstage_light_set_player_on) {
     Vec upv[3] = {{0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}};
     u8 col[3][3] = {{120, 120, 120}, {120, 120, 120}, {120, 120, 120}};
     u8 en[3] = {0, 0, 0};
-    u8 en2[4] = {0, 0, 0, 0};
+    u8 en2[4] = {0, 0, 0, 0}; // FAKE: unused; its zero initialiser template stays in the unit's data
 
     switch (sel) {
-    case 1:
-        en[2] = 1;
-        col[2][0] = 255;
-        col[2][1] = 255;
-        col[2][2] = 255;
-        break;
-    default:
-        en[0] = 1;
-        en[1] = 1;
-        en[2] = 1;
-        break;
+        case 1:
+            en[2] = 1;
+            col[2][0] = 255;
+            col[2][1] = 255;
+            col[2][2] = 255;
+            break;
+        default:
+            en[0] = 1;
+            en[1] = 1;
+            en[2] = 1;
+            break;
     }
     for (i = 0; i < 3; i++) {
         if (en[i]) {

@@ -1,33 +1,26 @@
+// kpa_03 (クッパ編, Bowser's interludes): the second side-scrolling stage, by the sea; continues in kpa_04.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "kpa.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_bero.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_seq.h"
 #include "kpa_stage_data.h"
-
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_koopa_chk_dead);
-USER_FUNC(evt_koopa_get_level);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mario_cam_off);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_jumpstand);
-USER_FUNC(evt_mario_set_hosei_xyz);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(kpa_status_init);
+#include "version.h"
+#include "evt/evt_story.h"
 
 static EvtWord kpa_act_stg2_mobj[209];
 EvtWord kpa_act_stg2_item[85];
-extern EvtWord kairyu_evt[];
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
 static EvtWord jumpstand_evt[62];
 #else
 static EvtWord jumpstand_evt[60];
 #endif
 static NpcSetupInfo npcEnt[1];
-extern EvtWord kpa_03_init_evt[];
 
 static EvtWord kpa_act_stg2_mobj[] = {
     KPA_OBJ_SANGO(-1275.0f, 0.0f), KPA_OBJ_BRICK_2(-1100.0f, 200.0f), KPA_OBJ_SANGO(-1100.0f, 250.0f),
@@ -83,7 +76,7 @@ static EVT_BEGIN(kpa_fall)
     END_LOOP
     IF_INT_EQUAL(LF(0), 0)
         CALL_CHILD(PTR(kpa_fall_sub))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(kpa_dead))
     END_IF
     RETURN
@@ -110,12 +103,12 @@ EVT_END()
 
 static EVT_BEGIN(jumpstand_evt)
     DELETE_EVENT(GW(15))
-#ifdef VERSION_G8MP01
+#if VERSION == VERSION_EU
     CALL(kpa_cancel_attack_mode)
 #endif
     BEGIN_INLINE_EVENT
         WAIT_MS(600)
-        CALL(evt_koopa_get_level, GSW(1223))
+        CALL(evt_koopa_get_level, GSW(GSW_KPA_BOWSER_POWER))
         CALL(evt_bero_mapchange, STRING("kpa_04"), STRING("kpa_next_map"))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
@@ -131,7 +124,7 @@ static EVT_BEGIN(jumpstand_evt)
     CALL(evt_mobj_get_position, STRING("me"), LW(0), LW(1), LW(2))
     SET_VALUE(LW(3), LW(1))
     ADD(LW(3), 700)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_mario_jump_jumpstand, LW(0), LW(1), LW(2), LW(0), LW(3), LW(2), LW(0), LW(3), LW(2), 2000, 1)
 #else
     CALL(evt_mario_jump_jumpstand, LW(0), LW(1), LW(2), LW(0), LW(3), LW(2), LW(0), LW(3), LW(2), 4000, 3)
@@ -153,11 +146,10 @@ EVT_BEGIN(kpa_03_init_evt)
     CALL_CHILD(PTR(kpa_read_item))
     CALL(evt_map_playanim, STRING("anm_umi"), 1, 0)
     SPAWN_EVENT(PTR(kpa_fall))
-    CALL(kpa_status_init, 2, GSW(1221), GSW(1222))
+    CALL(kpa_status_init, 2, GSW(GSW_KPA_LIVES), GSW(GSW_KPA_TIME_LEFT))
     SET_VALUE(LSW(1), 1)
     SPAWN_EVENT(PTR(kpa_stage_start))
     SPAWN_EVENT(PTR(kairyu_evt))
     SPAWN_EVENT_GET_ID(PTR(kpa_time), GW(15))
     RETURN
 EVT_END()
-

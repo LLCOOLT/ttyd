@@ -1,3 +1,4 @@
+// eff_irekaeru.c: swap effect: effIrekaeruEntry, effIrekaeruMain and effIrekaeruDisp.
 #pragma once
 
 #include "driver/camdrv.h"

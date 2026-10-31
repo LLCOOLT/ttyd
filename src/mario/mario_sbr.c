@@ -1,3 +1,5 @@
+// Mario subroutines: stick and rub input, falling out of the map (bottomless respawn), move rate, gravity,
+// touched NPC, and the paper/plane/boat checks.
 #include "mario/mario_sbr.h"
 #include "mario/mario.h"
 #include "mario/mariost.h"
@@ -14,38 +16,43 @@
 #include "mot/mot_slit.h"
 #include "mot/mot_walk.h"
 #include "libc_decls.h"
+#include "version.h"
 
-#define REVISE360(a) while ((a) < 0.0f) { (a) += 360.0f; } while ((a) >= 360.0f) { (a) -= 360.0f; }
+#define REVISE360(a)        \
+    while ((a) < 0.0f) {    \
+        (a) += 360.0f;      \
+    }                       \
+    while ((a) >= 360.0f) { \
+        (a) -= 360.0f;      \
+    }
 
 typedef struct RubWork {
-    s32 state;      // 0x0, never used
-    s32 count;      // 0x4
-    s32 num;        // 0x8
-    s32 idx;        // 0xC
-    s32 dir;        // 0x10
-    s32 start;      // 0x14
-    s32 lastAngle;  // 0x18, never used
-    s32 stallFrames; // 0x1C, cleared on each turning step, never read
-    s32 revDir;     // 0x20
-    s32 idleTimer;  // 0x24
+    s32 state;              // 0x0, never used
+    s32 count;              // 0x4
+    s32 num;                // 0x8
+    s32 idx;                // 0xC
+    s32 dir;                // 0x10
+    s32 start;              // 0x14
+    s32 lastAngle;          // 0x18, never used
+    s32 stallFrames;        // 0x1C, cleared on each turning step, never read
+    s32 revDir;             // 0x20
+    s32 idleTimer;          // 0x24
     u8 pad_28[0x3C - 0x28]; // 0x28, never accessed
-    s16 hist[21];   // 0x3C
+    s16 hist[21];           // 0x3C
 } RubWork;
 
-void marioGetRubInit(void);
 void marioGetStick(f32* dir, f32* mag);
-f32 toMovedirSimple(f32 angle);
 
 RubWork rubwork;
 
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo has no respawn position in MarioWork: falling out of eki_04, gon_10 or muj_00 puts Mario at a fixed
 // spot for that map, and anywhere else at (0, 74, 0) with the partners.
 void marioBottomless(void) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     PartyEntry* party;
 
-    if (mp->position.y > -2000.0f) {
+    if (mario->position.y > -2000.0f) {
         return;
     }
     if (marioBgmodeChk() == TRUE) {
@@ -53,110 +60,110 @@ void marioBottomless(void) {
         return;
     }
     if (strcmp(gp->currentMapName, "eki_04") == 0) {
-        mp->position = (Vec){ 344.0f, 840.0f, 30.0f };
+        mario->position = (Vec){344.0f, 840.0f, 30.0f};
     } else if (strcmp(gp->currentMapName, "gon_10") == 0) {
-        mp->position = (Vec){ 980.0f, 74.0f, -17.0f };
+        mario->position = (Vec){980.0f, 74.0f, -17.0f};
     } else if (strcmp(gp->currentMapName, "muj_00") == 0) {
-        mp->position = (Vec){ -182.0f, 25.0f, -104.0f };
+        mario->position = (Vec){-182.0f, 25.0f, -104.0f};
     } else {
-        mp->position = (Vec){ 0.0f, 74.0f, 0.0f };
+        mario->position = (Vec){0.0f, 74.0f, 0.0f};
         party = partyGetPtr(marioGetPartyId());
         if (party) {
-            party->position = mp->position;
+            party->position = mario->position;
         }
         party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
-            party->position = mp->position;
+            party->position = mario->position;
         }
         if (marioBgmodeChk() == TRUE) {
-            mp->position.z = -450.0f;
+            mario->position.z = -450.0f;
         }
     }
     marioChgMot(MARIO_MOTION_FORCE_RESET);
 }
 #else
 void marioBottomless(void) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     PartyEntry* party;
 
-    if (mp->position.y > -2000.0f) {
+    if (mario->position.y > -2000.0f) {
         return;
     }
     if (marioBgmodeChk() == TRUE) {
         marioChgMot(MARIO_MOTION_BOTTOMLESS);
-    } else if (mp->bottomlessReload) {
+    } else if (mario->bottomlessReload) {
         seqSetSeq(SEQ_MAP_CHANGE, gp->currentMapName, gp->beroEnterName);
     } else {
-        mp->position = mp->bottomlessResetPosition;
+        mario->position = mario->bottomlessResetPosition;
         party = partyGetPtr(marioGetPartyId());
         if (party) {
-            party->position = mp->position;
+            party->position = mario->position;
         }
         party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
-            party->position = mp->position;
+            party->position = mario->position;
         }
         if (marioBgmodeChk() == TRUE) {
-            mp->position.z = -450.0f;
+            mario->position.z = -450.0f;
         }
         marioChgMot(MARIO_MOTION_FORCE_RESET);
     }
 }
 
 void N_marioSetBottomlessRespawnPosOnBeroEntry(f32 x, f32 y, f32 z) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     Vec position;
 
-    position = (Vec){ x, y + 37.0f, z };
-    wp->bottomlessResetPosition = position;
+    position = (Vec){x, y + 37.0f, z};
+    mario->bottomlessResetPosition = position;
 }
 
 void N_marioSetBottomlessRespawnPos(f32 x, f32 y, f32 z) {
-    MarioWork* wp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     Vec position;
 
-    position = (Vec){ x, y, z };
-    wp->bottomlessResetPosition = position;
+    position = (Vec){x, y, z};
+    mario->bottomlessResetPosition = position;
 }
 
 void N_marioReloadMapOnBottomlessOn(void) {
-    MarioWork* mp = marioGetPtr();
-    mp->bottomlessReload = 1;
+    MarioWork* mario = marioGetPtr();
+    mario->bottomlessReload = 1;
 }
 
 void N_marioReloadMapOnBottomlessOff(void) {
-    MarioWork* mp = marioGetPtr();
-    mp->bottomlessReload = 0;
+    MarioWork* mario = marioGetPtr();
+    mario->bottomlessReload = 0;
 }
 #endif
 
 BOOL marioSetDirEventMain(void) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     s32 frames;
     f32 target;
 
-    if (!(mp->dispFlags & 0x8000)) {
+    if (!(mario->dispFlags & MARIO_DISP_FLAG_DIR_EVENT)) {
         return TRUE;
     }
-    frames = sysMsec2Frame(mp->dirEvtMsec);
+    frames = sysMsec2Frame(mario->dirEvtMsec);
     if (frames > 0) {
-        target = revise360(270.0f - mp->dirEvtTargetDir);
-        target = (target - mp->dirEvtStartDir) * ((f32)mp->dirEvtFrame / (f32)frames);
-        mp->displayDirection = revise360(mp->dirEvtStartDir + target);
-        mp->displayDirectionTarget = mp->displayDirection;
-        mp->directionView = toMovedirSimple(mp->displayDirection);
-        mp->moveDirection = mp->directionView;
-        if (++mp->dirEvtFrame > frames) {
-            mp->dispFlags &= ~0x8000;
+        target = revise360(270.0f - mario->dirEvtTargetDir);
+        target = (target - mario->dirEvtStartDir) * ((f32)mario->dirEvtFrame / (f32)frames);
+        mario->displayDirection = revise360(mario->dirEvtStartDir + target);
+        mario->displayDirectionTarget = mario->displayDirection;
+        mario->directionView = toMovedirSimple(mario->displayDirection);
+        mario->moveDirection = mario->directionView;
+        if (++mario->dirEvtFrame > frames) {
+            mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_EVENT;
             return TRUE;
         }
         return FALSE;
     } else {
-        mp->displayDirection = revise360(270.0f - mp->dirEvtTargetDir);
-        mp->displayDirectionTarget = mp->displayDirection;
-        mp->directionView = toMovedirSimple(mp->displayDirection);
-        mp->moveDirection = mp->directionView;
-        mp->dispFlags &= ~0x8000;
+        mario->displayDirection = revise360(270.0f - mario->dirEvtTargetDir);
+        mario->displayDirectionTarget = mario->displayDirection;
+        mario->directionView = toMovedirSimple(mario->displayDirection);
+        mario->moveDirection = mario->directionView;
+        mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_EVENT;
         return TRUE;
     }
 }
@@ -174,7 +181,7 @@ void marioResetGravity(void) {
     marioSetGravity(1.0f);
 }
 
-void* marioGetTouchNpcPtr(void) {
+struct NpcEntry* marioGetTouchNpcPtr(void) {
     return marioGetPtr()->touchNpc;
 }
 
@@ -183,37 +190,37 @@ BOOL marioChkPlanePlace(HitEntry* hit) {
 }
 
 void marioSetPeakYpos(void) {
-    MarioWork* mp = marioGetPtr();
-    mp->jumpPeakY = mp->position.y;
+    MarioWork* mario = marioGetPtr();
+    mario->jumpPeakY = mario->position.y;
 }
 
 void marioAdjustMoveDir(void) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
 
-    if (mp->displayDirection >= 90.0f && mp->displayDirection <= 270.0f) {
-#ifdef VERSION_G8ME01
-        mp->moveDirection = toMovedir(180.0f);
+    if (mario->displayDirection >= 90.0f && mario->displayDirection <= 270.0f) {
+#if VERSION >= VERSION_US
+        mario->moveDirection = toMovedir(180.0f);
 #else
-        mp->moveDirection = toMovedir(90.0f);
+        mario->moveDirection = toMovedir(90.0f);
 #endif
-        mp->directionView = mp->moveDirection;
-        mp->displayDirection = 180.0f;
-        mp->displayDirectionTarget = 180.0f;
+        mario->directionView = mario->moveDirection;
+        mario->displayDirection = 180.0f;
+        mario->displayDirectionTarget = 180.0f;
     } else {
-#ifdef VERSION_G8ME01
-        mp->moveDirection = toMovedir(0.0f);
+#if VERSION >= VERSION_US
+        mario->moveDirection = toMovedir(0.0f);
 #else
-        mp->moveDirection = toMovedir(90.0f);
+        mario->moveDirection = toMovedir(90.0f);
 #endif
-        mp->directionView = mp->moveDirection;
-        mp->displayDirection = 0.0f;
-        mp->displayDirectionTarget = 0.0f;
+        mario->directionView = mario->moveDirection;
+        mario->displayDirection = 0.0f;
+        mario->displayDirectionTarget = 0.0f;
     }
 }
 
 f32 marioGetDispDir(void) {
-    MarioWork* mp = marioGetPtr();
-    return revise360(mp->displayDirection - 90.0f + mp->targetYaw);
+    MarioWork* mario = marioGetPtr();
+    return revise360(mario->displayDirection - 90.0f + mario->targetYaw);
 }
 
 f32 revise360(f32 angle) {
@@ -227,23 +234,23 @@ f32 revise360(f32 angle) {
 }
 
 f32 toMovedir(f32 angle) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
 
-    if (mp->flags & 0x100000) {
-        if (mp->displayDirection == 280.0f || mp->displayDirection == 460.0f) {
+    if (mario->flags & MARIO_FLAG_PAPER_MODE) {
+        if (mario->displayDirection == 280.0f || mario->displayDirection == 460.0f) {
             angle = 0.0f;
-        } else if (mp->displayDirection == 260.0f || mp->displayDirection == 440.0f) {
+        } else if (mario->displayDirection == 260.0f || mario->displayDirection == 440.0f) {
             angle = 180.0f;
-        } else if (revise360(mp->displayDirection) >= 180.0f) {
+        } else if (revise360(mario->displayDirection) >= 180.0f) {
             angle = 0.0f;
         } else {
             angle = 180.0f;
         }
     }
-#ifdef VERSION_G8ME01
-    angle = (s32)(1000.0f * (270.0f - angle + mp->targetYaw) + ((270.0f - angle + mp->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
+#if VERSION >= VERSION_US
+    angle = (s32)(1000.0f * (270.0f - angle + mario->targetYaw) + ((270.0f - angle + mario->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
 #else
-    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mario->targetYaw))) / 100.0f;
 #endif
     REVISE360(angle);
     return angle;
@@ -252,7 +259,7 @@ f32 toMovedir(f32 angle) {
 f32 partyToMovedir(PartyEntry* party, f32 angle) {
     void* cam = party->playerPtr;
 
-    if (party->flags & 0x1000) {
+    if (party->flags & PARTY_FLAG_PAPER_MODE) {
         if (party->displayDirection == 280.0f || party->displayDirection == 460.0f) {
             angle = 0.0f;
         } else if (party->displayDirection == 260.0f || party->displayDirection == 440.0f) {
@@ -263,7 +270,7 @@ f32 partyToMovedir(PartyEntry* party, f32 angle) {
             angle = 180.0f;
         }
     }
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     angle = (s32)(1000.0f * (270.0f - angle + ((MarioWork*)cam)->targetYaw) + ((270.0f - angle + ((MarioWork*)cam)->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
 #else
     angle = (s32)(100.0f * (0.05f + (270.0f - angle + ((MarioWork*)cam)->targetYaw))) / 100.0f;
@@ -273,11 +280,11 @@ f32 partyToMovedir(PartyEntry* party, f32 angle) {
 }
 
 f32 toMovedirSimple(f32 angle) {
-    MarioWork* mp = marioGetPtr();
-#ifdef VERSION_G8ME01
-    angle = (s32)(1000.0f * (270.0f - angle + mp->targetYaw) + ((270.0f - angle + mp->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
+    MarioWork* mario = marioGetPtr();
+#if VERSION >= VERSION_US
+    angle = (s32)(1000.0f * (270.0f - angle + mario->targetYaw) + ((270.0f - angle + mario->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
 #else
-    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mario->targetYaw))) / 100.0f;
 #endif
     while (angle < 0.0f) {
         angle += 360.0f;
@@ -289,168 +296,154 @@ f32 toMovedirSimple(f32 angle) {
 }
 
 f32 toMovedir2(f32 angle, f32 ofs) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
 
-    if (mp->flags & 0x100000) {
-        if (mp->displayDirection == 280.0f || mp->displayDirection == 460.0f) {
+    if (mario->flags & MARIO_FLAG_PAPER_MODE) {
+        if (mario->displayDirection == 280.0f || mario->displayDirection == 460.0f) {
             angle = 0.0f;
-        } else if (mp->displayDirection == 260.0f || mp->displayDirection == 440.0f) {
+        } else if (mario->displayDirection == 260.0f || mario->displayDirection == 440.0f) {
             angle = 180.0f;
-        } else if (revise360(mp->displayDirection) >= 180.0f) {
+        } else if (revise360(mario->displayDirection) >= 180.0f) {
             angle = 0.0f;
         } else {
             angle = 180.0f;
         }
     }
-#ifdef VERSION_G8ME01
-    angle = (s32)(1000.0f * (270.0f - angle + mp->targetYaw) + ((270.0f - angle + mp->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
+#if VERSION >= VERSION_US
+    angle = (s32)(1000.0f * (270.0f - angle + mario->targetYaw) + ((270.0f - angle + mario->targetYaw) >= 0.0f ? 0.5f : -0.5f)) / 1000.0f;
 #else
-    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mario->targetYaw))) / 100.0f;
 #endif
     REVISE360(angle);
-    angle += revise360(angle - mp->targetYaw) >= 180.0f ? -ofs : ofs;
+    angle += revise360(angle - mario->targetYaw) >= 180.0f ? -ofs : ofs;
     return revise360(angle);
 }
 
 void marioForceMoveMain(void) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
 
-    if (mp->flags & 0x20) {
-        if (--mp->forceMoveTimer <= 0) {
-            mp->forceMoveTimer = 0;
-            mp->flags &= ~0x20;
-            mp->baseSpeed = 0.0f;
-            if (mp->controlStickSensitivity > 1.0f) {
-                mp->baseSpeed = marioGetDashSpd();
-            } else if (mp->controlStickSensitivity > 0.0f) {
-                mp->baseSpeed = marioGetWalkSpd();
+    if (mario->flags & MARIO_FLAG_FORCED_MOVEMENT) {
+        if (--mario->forceMoveTimer <= 0) {
+            mario->forceMoveTimer = 0;
+            mario->flags &= ~MARIO_FLAG_FORCED_MOVEMENT;
+            mario->baseSpeed = 0.0f;
+            if (mario->controlStickSensitivity > 1.0f) {
+                mario->baseSpeed = marioGetDashSpd();
+            } else if (mario->controlStickSensitivity > 0.0f) {
+                mario->baseSpeed = marioGetWalkSpd();
             }
         }
     }
 }
 
 void marioSetForceMove(f32 dir, s32 time, f32 speed) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
 
-    mp->flags |= 0x20;
-    mp->moveDirection = dir;
-    mp->directionView = dir;
-    mp->forceMoveTimer = time;
-    mp->baseSpeed = speed;
-    if (mp->currMotionId == 0x19 || (mp->currMotionId == 0x15 || mp->currMotionId == 0x16) || mp->currMotionId == 0x1A) {
+    mario->flags |= MARIO_FLAG_FORCED_MOVEMENT;
+    mario->moveDirection = dir;
+    mario->directionView = dir;
+    mario->forceMoveTimer = time;
+    mario->baseSpeed = speed;
+    if (mario->currMotionId == MARIO_MOTION_SHIP || (mario->currMotionId == MARIO_MOTION_SLIT || mario->currMotionId == MARIO_MOTION_ROLL) || mario->currMotionId == MARIO_MOTION_YOSHI) {
         return;
     } else {
-#ifdef VERSION_G8ME01
-            marioChgMot(speed >= mp->mBaseDashSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
+#if VERSION >= VERSION_US
+        marioChgMot(speed >= mario->baseDashSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
 #else
-            marioChgMot(speed > mp->mBaseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
+        marioChgMot(speed > mario->baseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
 #endif
-#ifndef VERSION_G8ME01_DEMO
-            mp->moveDirection = dir;
-            mp->directionView = dir;
-            mp->forceMoveTimer = time;
-            mp->baseSpeed = speed;
+#if VERSION != VERSION_DEMO
+        mario->moveDirection = dir;
+        mario->directionView = dir;
+        mario->forceMoveTimer = time;
+        mario->baseSpeed = speed;
 #endif
     }
 }
 
 void marioUpdateKeyData(void) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     u32 mask = 0xFFFFFFFF;
     u16 btn;
 
-    mp->wStickDir1 = gp->stickX[0];
-    mp->wStickDir2 = -gp->stickY[0];
-    mp->substickX = gp->substickX[0];
-    mp->substickY = -gp->substickY[0];
-    mp->triggerL = gp->triggerLeft[0];
-    mp->triggerR = gp->triggerRight[0];
-    mp->analogA = 0;
-    mp->analogB = 0;
-    mask = mp->enableKeyMask ? mp->enableKeyMask : 0xFFFFFFFF;
-    mp->buttonHold = gp->button[0] & mask;
-    mp->buttonTrg = gp->buttonNew[0] & mask;
-    mp->buttonRepeat = gp->buttonRepeat[0] & mask;
-    mp->buttonUp = gp->buttonUp[0] & mask;
-#ifdef VERSION_G8ME01_DEMO
-    // The demo's input locks are trigFlags 0x80000000..0x10000000, and flag 4 does not lock the keys.
-    if (!(mp->flags & 0xA)) {
-        if (mp->trigFlags & 0x80000000) {
-            mp->wStickDir1 = 0;
-            mp->wStickDir2 = 0;
-        }
-        if (mp->trigFlags & 0x40000000) {
-            mp->substickX = 0;
-            mp->substickY = 0;
-        }
-        if (mp->trigFlags & 0x20000000) {
-            mp->triggerL = 0;
-            mp->triggerR = 0;
-        }
-        if (mp->trigFlags & 0x10000000) {
-            mp->analogA = 0;
-            mp->analogB = 0;
-        }
-    }
-    if ((mp->flags & 0xA) || !marioChkKey()) {
+    mario->wStickDir1 = gp->stickX[0];
+    mario->wStickDir2 = -gp->stickY[0];
+    mario->substickX = gp->substickX[0];
+    mario->substickY = -gp->substickY[0];
+    mario->triggerL = gp->triggerLeft[0];
+    mario->triggerR = gp->triggerRight[0];
+    mario->analogA = 0;
+    mario->analogB = 0;
+    mask = mario->enableKeyMask ? mario->enableKeyMask : 0xFFFFFFFF;
+    mario->buttonHold = gp->button[0] & mask;
+    mario->buttonTrg = gp->buttonNew[0] & mask;
+    mario->buttonRepeat = gp->buttonRepeat[0] & mask;
+    mario->buttonUp = gp->buttonUp[0] & mask;
+    // The demo has no CTRL_OFF_2 lock (and keeps its input lock bits elsewhere, see MarioTrigFlags).
+#if VERSION == VERSION_DEMO
+    if (!(mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF))) {
 #else
-    if (!(mp->flags & 0xE)) {
-        if (mp->trigFlags & 0x08000000) {
-            mp->wStickDir1 = 0;
-            mp->wStickDir2 = 0;
+    if (!(mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_CTRL_OFF_2 | MARIO_FLAG_KEY_OFF))) {
+#endif
+        if (mario->trigFlags & MARIO_TRIG_FLAG_DISABLE_STICK) {
+            mario->wStickDir1 = 0;
+            mario->wStickDir2 = 0;
         }
-        if (mp->trigFlags & 0x04000000) {
-            mp->substickX = 0;
-            mp->substickY = 0;
+        if (mario->trigFlags & MARIO_TRIG_FLAG_DISABLE_SUB_STICK) {
+            mario->substickX = 0;
+            mario->substickY = 0;
         }
-        if (mp->trigFlags & 0x02000000) {
-            mp->triggerL = 0;
-            mp->triggerR = 0;
+        if (mario->trigFlags & MARIO_TRIG_FLAG_DISABLE_TRIGGERS) {
+            mario->triggerL = 0;
+            mario->triggerR = 0;
         }
-        if (mp->trigFlags & 0x01000000) {
-            mp->analogA = 0;
-            mp->analogB = 0;
+        if (mario->trigFlags & MARIO_TRIG_FLAG_DISABLE_UNUSED_INPUT) {
+            mario->analogA = 0;
+            mario->analogB = 0;
         }
     }
-    if ((mp->flags & 0xE) || !marioChkKey()) {
+#if VERSION == VERSION_DEMO
+    if ((mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF)) || !marioChkKey()) {
+#else
+    if ((mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_CTRL_OFF_2 | MARIO_FLAG_KEY_OFF)) || !marioChkKey()) {
 #endif
-        mp->wStickDir1 = 0;
-        mp->wStickDir2 = 0;
-        mp->substickX = 0;
-        mp->substickY = 0;
-        mp->triggerL = 0;
-        mp->triggerR = 0;
-        mp->analogA = 0;
-        mp->analogB = 0;
-        if (!mp->enableKeyMask) {
-            mp->buttonHold = 0;
-            mp->buttonTrg = 0;
-            mp->buttonRepeat = 0;
-            mp->buttonUp = 0;
+        mario->wStickDir1 = 0;
+        mario->wStickDir2 = 0;
+        mario->substickX = 0;
+        mario->substickY = 0;
+        mario->triggerL = 0;
+        mario->triggerR = 0;
+        mario->analogA = 0;
+        mario->analogB = 0;
+        if (!mario->enableKeyMask) {
+            mario->buttonHold = 0;
+            mario->buttonTrg = 0;
+            mario->buttonRepeat = 0;
+            mario->buttonUp = 0;
         }
-        if (!marioGetMotSlitCancel3() && (mp->dispFlags & 0x01000000)) {
-            mp->buttonHold = 0x20;
+        if (!marioGetMotSlitCancel3() && (mario->dispFlags & MARIO_DISP_FLAG_SLIT)) {
+            mario->buttonHold = 0x20;
         }
     }
     btn = DemoPad[0].dirs;
-    mp->demoButtonNew = btn & (btn ^ mp->demoButtonPrev);
-    mp->demoButtonPrev = btn;
+    mario->demoButtonNew = btn & (btn ^ mario->demoButtonPrev);
+    mario->demoButtonPrev = btn;
 }
 
 void marioGetStick(f32* dir, f32* mag) {
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     s32 x;
     s32 y;
     f32 m;
     f32 a;
 
-    if (mp->flags & 0x20) {
-        *dir = mp->directionView;
-        *mag = mp->baseSpeed;
+    if (mario->flags & MARIO_FLAG_FORCED_MOVEMENT) {
+        *dir = mario->directionView;
+        *mag = mario->baseSpeed;
         return;
     }
-    x = mp->wStickDir1;
-    y = ((mp->flags & 0x02000000) || kpaGetStageViewType() == 0) ? 0 : -mp->wStickDir2;
+    x = mario->wStickDir1;
+    y = ((mario->flags & MARIO_FLAG_BG_MODE) || kpaGetStageViewType() == 0) ? 0 : -mario->wStickDir2;
     if (yoshiGetStatus() == 2) {
         y = 0;
     }
@@ -461,21 +454,21 @@ void marioGetStick(f32* dir, f32* mag) {
     }
     a = angleABf(0.0f, 0.0f, x, y);
     if (!m) {
-        a = mp->moveDirection;
+        a = mario->moveDirection;
     }
-    *dir = revise360(a + mp->targetYaw);
+    *dir = revise360(a + mario->targetYaw);
     *mag = m;
 }
 
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 s32 N_marioGetMovementSpeed(void) {
-    MarioWork* mp = marioGetPtr();
-    s8 x = mp->wStickDir1;
+    MarioWork* mario = marioGetPtr();
+    s8 x = mario->wStickDir1;
 
-    if (x == 0 && mp->wStickDir2 == 0) {
+    if (x == 0 && mario->wStickDir2 == 0) {
         return 0;
     }
-    if (x * x + mp->wStickDir2 * mp->wStickDir2 > 3025) {
+    if (x * x + mario->wStickDir2 * mario->wStickDir2 > 3025) {
         return 2;
     }
     return 1;
@@ -611,7 +604,7 @@ static inline void rubClearHist(s32 v) {
 
 s32 marioGetRub(u32 btn, s32* dirOut, s32* countOut, f32* magOut) {
     s32 ret = 0;
-    MarioWork* mp = marioGetPtr();
+    MarioWork* mario = marioGetPtr();
     RubWork* rw = &rubwork;
     f32 dir;
     f32 mag;
@@ -621,7 +614,7 @@ s32 marioGetRub(u32 btn, s32* dirOut, s32* countOut, f32* magOut) {
     s32 cw;
     s32 ccw;
 
-    if (btn && !(mp->buttonHold & btn)) {
+    if (btn && !(mario->buttonHold & btn)) {
         marioGetRubInit();
         *dirOut = -1;
         *countOut = 0;
@@ -639,7 +632,8 @@ s32 marioGetRub(u32 btn, s32* dirOut, s32* countOut, f32* magOut) {
     }
     rw->idleTimer = 0;
     rw->hist[rw->idx] = a;
-    j = rubwork.idx; j++;
+    j = rubwork.idx;
+    j++;
     while (j < 0) {
         j += 20;
     }

@@ -1,3 +1,6 @@
+// Battle unit for Mario (マリオ) acting in Flurrie's stage play in the epilogue (nok.rel); it only plays its
+// scripted part.
+
 #include "battle/battle_unit.h"
 #include "eff/n64/eff_kumokumo_n64.h"
 #include "evt/evt_cmd.h"
@@ -12,41 +15,14 @@
 #include "evt/evt_sub.h"
 #include "unit/party/unit_party_christine.h"
 #include "manager/evtmgr_cmd.h"
-
-EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 rot, f32 unused, f32 scale);
+#include "evt/evt_audience.h"
+#include "evt/evt_eff.h"
+#include "nok.h"
+#include "version.h"
 
 static USER_FUNC(_clauda_breath_effect_fire);
 static USER_FUNC(_clauda_breath_effect_ready);
 USER_FUNC(_status_window_off);
-USER_FUNC(btlevtcmd_AddPartsRotate);
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AnimeChangePoseType);
-USER_FUNC(btlevtcmd_AnimeWaitPlayComplete);
-USER_FUNC(btlevtcmd_DivePosition);
-USER_FUNC(btlevtcmd_FaceDirectionSub);
-USER_FUNC(btlevtcmd_GetBodyId);
-USER_FUNC(btlevtcmd_GetHitPos);
-USER_FUNC(btlevtcmd_GetHomePos);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_JumpSetting);
-USER_FUNC(btlevtcmd_SetAlpha);
-USER_FUNC(btlevtcmd_SetDispOffset);
-USER_FUNC(btlevtcmd_SetEventEntry);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetPartsRotate);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_StopWaitEvent);
-USER_FUNC(btlevtcmd_WaitEventEnd);
-USER_FUNC(evt_audience_joy_ending);
-USER_FUNC(evt_eff);
-USER_FUNC(evt_eff_delete_ptr);
-USER_FUNC(evt_sub_random);
-extern BattleUnitKind unit_act_atmic_teresa;
-extern BattleUnitKind unit_act_clauda;
-extern BattleUnitKind unit_act_kinopiko;
-extern BattleUnitKind unit_act_kinopio;
-extern BattleUnitKind unit_act_teresa;
 
 BattleUnitKind unit_act_mario;
 static BattleUnitDefense defence;
@@ -60,8 +36,6 @@ static EvtWord wait_event[6];
 BattleUnitSetup entry_unit_data[8];
 static EvtWord battle_entry_event[168];
 extern EvtWord _battle_event[];
-extern EvtWord _act_target_enemy[];
-extern EvtWord _act_target_mario[];
 extern EvtWord _act_mario_jump_attack[];
 extern EvtWord _act_clauda_press_attack[];
 extern EvtWord _act_clauda_breath_attack[];
@@ -146,7 +120,7 @@ static PoseTableEntry pose_table[] = {
     {39, "EM_D_1"},
     {42, "EM_R_1"},
     {40, "EM_W_1"},
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     {63, "EM_T_1"},
     {67, "EM_S_1"},
 #else
@@ -164,10 +138,10 @@ static BattleUnitKindPart parts[] = {
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventEntry, -2, PTR(battle_entry_event))
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(battle_entry_event))
     CALL(_status_window_off)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -183,91 +157,91 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
 BattleUnitSetup entry_unit_data[] = {
     {
-        &unit_act_clauda, // mUnitKindParams
+        &unit_act_clauda, // unitKindParams
         0, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {-140.0f, 0.0f, 5.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_act_teresa, // mUnitKindParams
+        &unit_act_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {45.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_act_teresa, // mUnitKindParams
+        &unit_act_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {85.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_act_atmic_teresa, // mUnitKindParams
+        &unit_act_atmic_teresa, // unitKindParams
         1, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {150.0f, 40.0f, 0.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_act_kinopio, // mUnitKindParams
+        &unit_act_kinopio, // unitKindParams
         2, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {-75.0f, 0.0f, -40.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_act_kinopio, // mUnitKindParams
+        &unit_act_kinopio, // unitKindParams
         2, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {-15.0f, 0.0f, -40.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unit_act_kinopiko, // mUnitKindParams
+        &unit_act_kinopiko, // unitKindParams
         2, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {-45.0f, 0.0f, -40.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
         NULL, // itemDropTable
     },
     {
-        &unitdata_Party_Christine, // mUnitKindParams
+        &unitdata_Party_Christine, // unitKindParams
         2, // alliance
         {0}, // pad_05
-        0x4000004, // attackPhase
+        BATTLE_PHASE_ENEMY, // attackPhase
         {0.0f, -50.0f, 110.0f}, // position
         0, // hitOffsetX
         {0}, // unitWork
@@ -277,39 +251,39 @@ BattleUnitSetup entry_unit_data[] = {
 
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
-    CALL(btlevtcmd_GetHomePos, -3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
-    CALL(btlevtcmd_GetStageSize, LW(6), -250000000, -250000000)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, 1)
+    CALL(btlevtcmd_GetStageSize, LW(6), EVT_NULLPTR, EVT_NULLPTR)
     MULTIPLY(LW(6), -1)
-    CALL(btlevtcmd_GetHomePos, -3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, -3, LW(6), LW(1), LW(2))
-    CALL(btlevtcmd_GetUnitId, -2, LW(0))
-    CALL(btlevtcmd_SetUnitWork, -2, 0, LW(0))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPos, BTL_UNIT_MARIO, LW(6), LW(1), LW(2))
+    CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[0]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[1]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 2, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[2]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 3, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[3]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 4, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[4]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 5, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[5]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 6, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[6]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 7, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[7]), 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 8, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     SPAWN_EVENT(_battle_event)
     WAIT_MS(2000)
-    CALL(evt_msg_print, 2, STRING("ep_39"), 0, -2)
+    CALL(evt_msg_print, 2, STRING("ep_39"), 0, BTL_UNIT_SELF)
     WAIT_MS(1000)
     CALL(btlevtcmd_onoff_battleflag, 1, 32)
     RETURN
@@ -319,20 +293,20 @@ EVT_BEGIN(_battle_event)
     LABEL(0)
     CALL_CHILD(PTR(_act_mario_jump_attack))
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
     CALL(evt_sub_random, 1, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(PTR(_act_clauda_press_attack))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(_act_clauda_breath_attack))
     END_IF
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("PWD_A_7"))
     WAIT_MS(1000)
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
 #else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
@@ -340,9 +314,9 @@ EVT_BEGIN(_battle_event)
     WAIT_MS(1000)
     CALL_CHILD(PTR(_act_teresa_attack))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, -2, 3, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
 #else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
@@ -350,9 +324,9 @@ EVT_BEGIN(_battle_event)
     WAIT_MS(1000)
     CALL_CHILD(PTR(_act_teresa_attack))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, -2, 4, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
 #else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
@@ -360,18 +334,18 @@ EVT_BEGIN(_battle_event)
     WAIT_MS(1000)
     CALL_CHILD(PTR(_act_atmic_teresa_press_attack))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, -2, 5, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
 #else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
 #endif
     WAIT_MS(1500)
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
 #else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
@@ -386,11 +360,11 @@ EVT_BEGIN(_act_target_enemy)
     CALL(evt_sub_random, 2, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_GetUnitWork, -2, 2, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
         CASE_EQUAL(1)
-        CALL(btlevtcmd_GetUnitWork, -2, 3, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(3))
         CASE_DEFAULT
-        CALL(btlevtcmd_GetUnitWork, -2, 4, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
     END_SWITCH
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     RETURN
@@ -400,39 +374,39 @@ EVT_BEGIN(_act_target_mario)
     CALL(evt_sub_random, 1, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
         CASE_DEFAULT
-        CALL(btlevtcmd_GetUnitWork, -2, 1, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
     END_SWITCH
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     RETURN
 EVT_END()
 
 EVT_BEGIN(_act_mario_jump_attack)
-    CALL(btlevtcmd_JumpSetting, -2, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-#ifdef VERSION_G8ME01_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 63)
+    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
+#if VERSION == VERSION_DEMO
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 63)
 #else
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 65)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 65)
 #endif
     WAIT_MS(1000)
     CALL_CHILD(_act_target_enemy)
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.69921875f))
-    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     SET_VALUE(LW(0), -20)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 0)
-    CALL(btlevtcmd_CalculateFaceDirection, -2, -1, LW(0), LW(2), 1, LW(6))
-    CALL(btlevtcmd_ChangeFaceDirection, -2, LW(6))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(3.0f))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("EM_J_1B"))
+    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(6))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(6))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(2), 5)
     SET_VALUE(LW(6), 36)
-    CALL(btlevtcmd_MarioJumpParam, -2, LW(0), LW(1), LW(2), LW(6))
-    CALL(btlevtcmd_MarioJumpPosition, -2, LW(0), LW(1), LW(2), LW(6), 3, -1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("EM_J_1D"))
+    CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6))
+    CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6), 3, -1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1D"))
     WAIT_MS(50)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         CALL(btlevtcmd_StopWaitEvent, LW(3))
@@ -444,28 +418,28 @@ EVT_BEGIN(_act_mario_jump_attack)
         WAIT_MS(1000)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_SIBLING_EVENT
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("EM_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, -2, -250000000, LW(1), -250000000)
-    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 27)
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 8, -1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("EM_R_1"))
-    CALL(btlevtcmd_SetMoveSpeed, -2, FLOAT(6.0f))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_R_1"))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_WaitEventEnd, LW(15))
     RETURN
 EVT_END()
 
 EVT_BEGIN(_act_clauda_press_attack)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
 #else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
@@ -483,7 +457,7 @@ EVT_BEGIN(_act_clauda_press_attack)
         CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
         CALL(evt_sub_intpl_init_float, 5, FLOAT(1.0f), FLOAT(0.14941406f), 10)
         LOOP(11)
-            CALL(evt_sub_intpl_get_float, LW(7), -250000000)
+            CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
             CALL(btlevtcmd_GetScale, LW(3), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, LW(3), LW(0), LW(7), LW(2))
             WAIT_FRAMES(1)
@@ -491,14 +465,14 @@ EVT_BEGIN(_act_clauda_press_attack)
         WAIT_MS(1500)
         CALL(evt_sub_intpl_init_float, 5, FLOAT(0.14941406f), FLOAT(1.25f), 10)
         LOOP(11)
-            CALL(evt_sub_intpl_get_float, LW(7), -250000000)
+            CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
             CALL(btlevtcmd_GetScale, LW(3), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, LW(3), LW(0), LW(7), LW(2))
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_sub_intpl_init_float, 7, FLOAT(1.25f), FLOAT(1.0f), 30)
         LOOP(31)
-            CALL(evt_sub_intpl_get_float, LW(7), -250000000)
+            CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
             CALL(btlevtcmd_GetScale, LW(3), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, LW(3), LW(0), LW(7), LW(2))
             WAIT_FRAMES(1)
@@ -510,14 +484,14 @@ EVT_BEGIN(_act_clauda_press_attack)
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         CALL(evt_sub_intpl_init_float, 11, FLOAT(1.0f), FLOAT(0.39941406f), 10)
         LOOP(10)
-            CALL(evt_sub_intpl_get_float, LW(7), -250000000)
+            CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
             CALL(btlevtcmd_GetScale, LW(5), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, LW(5), LW(0), LW(7), LW(2))
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_sub_intpl_init_float, 11, FLOAT(0.39941406f), FLOAT(1.0f), 6)
         LOOP(6)
-            CALL(evt_sub_intpl_get_float, LW(7), -250000000)
+            CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
             CALL(btlevtcmd_GetScale, LW(5), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, LW(5), LW(0), LW(7), LW(2))
             WAIT_FRAMES(1)
@@ -526,14 +500,14 @@ EVT_BEGIN(_act_clauda_press_attack)
     BEGIN_SIBLING_EVENT
         CALL(evt_sub_intpl_init_float, 11, FLOAT(1.0f), FLOAT(1.5f), 10)
         LOOP(10)
-            CALL(evt_sub_intpl_get_float, LW(7), -250000000)
+            CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
             CALL(btlevtcmd_GetScale, LW(5), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, LW(5), LW(7), LW(1), LW(2))
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_sub_intpl_init_float, 11, FLOAT(1.5f), FLOAT(1.0f), 6)
         LOOP(6)
-            CALL(evt_sub_intpl_get_float, LW(7), -250000000)
+            CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
             CALL(btlevtcmd_GetScale, LW(5), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, LW(5), LW(7), LW(1), LW(2))
             WAIT_FRAMES(1)
@@ -561,7 +535,7 @@ EVT_END()
 
 EVT_BEGIN(_act_clauda_breath_attack)
     CALL(btlevtcmd_JumpSetting, LW(5), 20, FLOAT(0.0f), FLOAT(0.69921875f))
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 63)
 #else
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 65)
@@ -574,7 +548,7 @@ EVT_BEGIN(_act_clauda_breath_attack)
     CALL(btlevtcmd_AnimeWaitPlayComplete, LW(5), LW(6))
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("PWD_A2_3"))
     CALL(_clauda_breath_effect_fire, LW(12))
-    CALL(btlevtcmd_GetUnitWork, -2, 2, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -590,7 +564,7 @@ EVT_BEGIN(_act_clauda_breath_attack)
         END_LOOP
         CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 28)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetUnitWork, -2, 3, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -606,7 +580,7 @@ EVT_BEGIN(_act_clauda_breath_attack)
         END_LOOP
         CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 28)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetUnitWork, -2, 4, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -682,7 +656,7 @@ EVT_BEGIN(_act_teresa_attack)
 EVT_END()
 
 EVT_BEGIN(_act_atmic_teresa_press_attack)
-    CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("R_1"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -691,7 +665,7 @@ EVT_BEGIN(_act_atmic_teresa_press_attack)
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("Z_1"))
     CALL(btlevtcmd_DivePosition, LW(5), -125, 0, LW(2), 30, 0, 1, 0, -1)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
         CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
         CALL(btlevtcmd_StopWaitEvent, LW(3))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -703,7 +677,7 @@ EVT_BEGIN(_act_atmic_teresa_press_attack)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_SIBLING_EVENT
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
-        CALL(btlevtcmd_GetUnitWork, -2, 1, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
         CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
         CALL(btlevtcmd_StopWaitEvent, LW(3))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -735,8 +709,8 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     unit = BattleGetUnitPtr(wp, id);
     var = args[0];
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    pos.x += unit->mSizeMultiplier * (unit->faceDirection * 25);
-    pos.y += 15.0f * unit->mSizeMultiplier;
+    pos.x += unit->sizeMultiplier * (unit->faceDirection * 25);
+    pos.y += 15.0f * unit->sizeMultiplier;
     eff = effKumokumoN64Entry(0, 0, pos.x, pos.y, pos.z, 0.0f, -2.0f, 1.0f);
     ((EffKumokumoN64Particle*)eff->userdata)->r1 = 76;
     ((EffKumokumoN64Particle*)eff->userdata)->g1 = 167;
@@ -759,8 +733,8 @@ static USER_FUNC(_clauda_breath_effect_ready) {
     id = BattleTransID(event, -2);
     unit = BattleGetUnitPtr(wp, id);
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    pos.x += unit->mSizeMultiplier * (unit->faceDirection * 20);
-    pos.y += 25.0f * unit->mSizeMultiplier;
+    pos.x += unit->sizeMultiplier * (unit->faceDirection * 20);
+    pos.y += 25.0f * unit->sizeMultiplier;
     eff = effKumokumoN64Entry(0, 60, pos.x, pos.y, pos.z, 0.0f, 2.0f, 1.0f);
     ((EffKumokumoN64Particle*)eff->userdata)->r1 = 76;
     ((EffKumokumoN64Particle*)eff->userdata)->g1 = 167;
@@ -775,4 +749,3 @@ USER_FUNC(_status_window_off) {
     _battleWorkPointer->statusWindowOff = 1;
     return EVT_RETURN_DONE;
 }
-

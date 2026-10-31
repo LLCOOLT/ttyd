@@ -1,3 +1,4 @@
+// evt_ext.c: script commands for the ext crowd/sprite renderer (extdrv).
 #pragma once
 
 #include "evt/evt_cmd.h"

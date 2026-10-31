@@ -1,3 +1,5 @@
+// unit_boomerang_bros: Boomerang Bro, battle unit.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -6,42 +8,13 @@
 #include "battle/battle_weapon_power.h"
 #include "party/party_motion.h"
 #include "battle/battle_database_common.h"
-
-USER_FUNC(btlevtcmd_AnimeChangePose);
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_AttackDeclareAll);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_CheckToken);
-USER_FUNC(btlevtcmd_ChoiceSamplingEnemy);
-USER_FUNC(btlevtcmd_EnemyItemUseCheck);
-USER_FUNC(btlevtcmd_GetEnemyBelong);
-USER_FUNC(btlevtcmd_GetFirstAttackTarget);
-USER_FUNC(btlevtcmd_GetHp);
-USER_FUNC(btlevtcmd_GetSelectEnemy);
-USER_FUNC(btlevtcmd_GetSelectNextEnemy);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_PayWeaponCost);
-USER_FUNC(btlevtcmd_PreCheckDamage);
-USER_FUNC(btlevtcmd_ResultACDefence);
-USER_FUNC(btlevtcmd_SamplingEnemy);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_StartAvoid);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(btlevtcmd_WaitGuardMove);
-USER_FUNC(btlevtcmd_WeaponAftereffect);
-USER_FUNC(btlevtcmd_check_battleflag);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(evt_sub_random);
+#include "battle/battle_sub.h"
+#include "evt/evt_sub.h"
 
 BattleUnitKind unit_boomerang_bros;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[4];
 BattleWeapon weapon_boomerang_bros_attack;
@@ -49,11 +22,9 @@ BattleWeapon weapon_boomerang_bros_renzoku_attack;
 static EvtWord init_event[21];
 static EvtWord damage_event[10];
 static EvtWord attack_event[71];
-extern EvtWord boomerang_move_event[];
 static EvtWord normal_attack_event[174];
 static EvtWord renzoku_attack_event[178];
 extern EvtWord normal_attack_event_confuse[];
-extern EvtWord renzoku_attack_event_confuse[];
 static EvtWord wait_event[6];
 
 BattleUnitKind unit_boomerang_bros = {
@@ -168,23 +139,23 @@ BattleWeapon weapon_boomerang_bros_attack = {
     0, 0, // baseFpCost..baseSpCost
     2, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -192,7 +163,7 @@ BattleWeapon weapon_boomerang_bros_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
@@ -204,23 +175,23 @@ BattleWeapon weapon_boomerang_bros_renzoku_attack = {
     0, 0, // baseFpCost..baseSpCost
     2, // superguardsAllowed
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x2101260, // targetClassFlags
-    0x20000000, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x7FF, // counterResistFlags
-    0x80000000, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -228,16 +199,16 @@ BattleWeapon weapon_boomerang_bros_renzoku_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(attack_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -249,19 +220,19 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_SetUnitWork, -2, 7, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(PTR(normal_attack_event))
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_EnemyItemUseCheck, -2, LW(0))
+    CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
-        CALL(btlevtcmd_StartWaitEvent, -2)
+        CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetHp, -2, LW(0))
+    CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 3)
         SET_VALUE(LW(0), 70)
         ADD(LW(0), 30)
@@ -275,13 +246,13 @@ static EVT_BEGIN(attack_event)
     CALL_CHILD(PTR(normal_attack_event))
     GOTO(99)
     LABEL(99)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(damage_check_sub)
     SET_VALUE(LW(0), 0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(6), 0, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -306,15 +277,15 @@ static EVT_BEGIN(damage_check_sub)
     LABEL(90)
     GOTO(99)
     LABEL(91)
-    CALL(btlevtcmd_GetUnitWork, -2, 7, LW(8))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
     IF_INT_EQUAL(LW(8), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(6))
-        CALL(btlevtcmd_SetUnitWork, -2, 7, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
     END_IF
     IF_INT_EQUAL(LW(7), 1)
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(6), 256, LW(5))
-        ELSE
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(6), 0, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
+    ELSE
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 0, LW(5))
     END_IF
     SET_VALUE(LW(0), 1)
     GOTO(99)
@@ -330,13 +301,13 @@ EVT_END()
 
 static EVT_BEGIN(damage_check_last)
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_GetUnitWork, -2, 7, LW(8))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
         IF_INT_EQUAL(LW(8), 0)
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(6))
-            CALL(btlevtcmd_SetUnitWork, -2, 7, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
         END_IF
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(6), 256, LW(5))
-        ELSE
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
+    ELSE
         SET_VALUE(LW(7), 1)
         CALL_CHILD(PTR(damage_check_sub))
     END_IF
@@ -344,27 +315,27 @@ static EVT_BEGIN(damage_check_last)
 EVT_END()
 
 EVT_BEGIN(boomerang_move_event)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, LW(15), STRING("BRO_A_1B"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
-    CALL(btlevtcmd_SetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsRotate, -2, LW(15), 0, 0, -180)
-    CALL(btlevtcmd_SetPartsRotateOffset, -2, LW(15), 0, 0, 0)
-    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 33554432)
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, -180)
+    CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, LW(15), 0, 0, 0)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
     SET_VALUE(LW(9), 0)
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetPartsPos, -2, LW(15), LW(10), LW(12), LW(13))
+            CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, LW(15), LW(10), LW(12), LW(13))
             IF_INT_EQUAL(LW(9), 2)
-                CALL(btlevtcmd_SetUnitWork, -2, 7, 0)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 0)
             END_IF
             SWITCH(LW(9))
                 CASE_EQUAL(0)
-                CALL(btlevtcmd_GetUnitWork, -2, 1, LW(3))
-                CALL(btlevtcmd_GetUnitWork, -2, 3, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 1)
                     BREAK_SWITCH
@@ -375,11 +346,11 @@ EVT_BEGIN(boomerang_move_event)
                 END_IF
                 CALL_CHILD(damage_check_no_last)
                 SET_VALUE(LW(9), 1)
-                CALL(btlevtcmd_SetUnitWork, -2, 5, LW(0))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
                 CASE_END
                 CASE_EQUAL(1)
-                CALL(btlevtcmd_GetUnitWork, -2, 2, LW(3))
-                CALL(btlevtcmd_GetUnitWork, -2, 4, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 2)
                     BREAK_SWITCH
@@ -390,11 +361,11 @@ EVT_BEGIN(boomerang_move_event)
                 END_IF
                 CALL_CHILD(damage_check_no_last)
                 SET_VALUE(LW(9), 2)
-                CALL(btlevtcmd_SetUnitWork, -2, 6, LW(0))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
                 CASE_END
                 CASE_EQUAL(2)
-                CALL(btlevtcmd_GetUnitWork, -2, 2, LW(3))
-                CALL(btlevtcmd_GetUnitWork, -2, 4, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 3)
                     BREAK_SWITCH
@@ -403,7 +374,7 @@ EVT_BEGIN(boomerang_move_event)
                 IF_INT_LESS(LW(10), LW(11))
                     BREAK_SWITCH
                 END_IF
-                CALL(btlevtcmd_GetUnitWork, -2, 6, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(0))
                 IF_INT_EQUAL(LW(14), 0)
                     CALL_CHILD(damage_check_no_last)
                 ELSE
@@ -412,8 +383,8 @@ EVT_BEGIN(boomerang_move_event)
                 SET_VALUE(LW(9), 3)
                 CASE_END
                 CASE_EQUAL(3)
-                CALL(btlevtcmd_GetUnitWork, -2, 1, LW(3))
-                CALL(btlevtcmd_GetUnitWork, -2, 3, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 4)
                     BREAK_SWITCH
@@ -422,7 +393,7 @@ EVT_BEGIN(boomerang_move_event)
                 IF_INT_LESS(LW(10), LW(11))
                     BREAK_SWITCH
                 END_IF
-                CALL(btlevtcmd_GetUnitWork, -2, 5, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
                 IF_INT_EQUAL(LW(14), 0)
                     CALL_CHILD(damage_check_no_last)
                 ELSE
@@ -440,19 +411,19 @@ EVT_BEGIN(boomerang_move_event)
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_AddPartsRotate, -2, LW(15), 0, 0, 64)
+            CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, 64)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK2"), -250000000, 0, LW(8))
-    CALL(btlevtcmd_DivePartsPosition, -2, LW(15), -200, LW(1), LW(2), 40, FLOAT(-20.0f), 4, 0, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK2"), EVT_NULLPTR, 0, LW(8))
+    CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), -200, LW(1), LW(2), 40, FLOAT(-20.0f), 4, 0, -1)
     CALL(evt_snd_sfxoff, LW(8))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK3"), -250000000, 0, LW(8))
-    CALL(btlevtcmd_DivePartsPosition, -2, LW(15), LW(0), LW(1), LW(2), 40, FLOAT(20.0f), 1, 0, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK3"), EVT_NULLPTR, 0, LW(8))
+    CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2), 40, FLOAT(20.0f), 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(8))
-    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK4"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AddUnitWork, -2, 0, 1)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 0, 1)
     RETURN
 EVT_END()
 
@@ -460,13 +431,13 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
-        ELSE
-        CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-        CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_boomerang_bros_attack))
+    ELSE
+        CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_boomerang_bros_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_boomerang_bros_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(PTR(subsetevt_confuse_flustered))
             RETURN
@@ -480,18 +451,18 @@ static EVT_BEGIN(normal_attack_event)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_attack))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_boomerang_bros_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_attack))
     SET_VALUE(LW(0), 1)
     SET_VALUE(LW(1), 3)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 6, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     LABEL(10)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(0), LW(3))
-    CALL(btlevtcmd_SetUnitWork, -2, LW(1), LW(4))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(1), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(20)
     END_IF
@@ -500,7 +471,7 @@ static EVT_BEGIN(normal_attack_event)
     ADD(LW(1), 1)
     GOTO(10)
     LABEL(20)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 1)
@@ -508,23 +479,23 @@ static EVT_BEGIN(normal_attack_event)
     SPAWN_EVENT(PTR(boomerang_move_event))
     LOOP(0)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_S_1"))
     WAIT_MS(500)
     LABEL(99)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(renzoku_attack_event)
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), PTR(&weapon_boomerang_bros_renzoku_attack))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_boomerang_bros_renzoku_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_boomerang_bros_renzoku_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(PTR(subsetevt_confuse_flustered))
             RETURN
@@ -538,18 +509,18 @@ static EVT_BEGIN(renzoku_attack_event)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_renzoku_attack))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_boomerang_bros_renzoku_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_renzoku_attack))
     SET_VALUE(LW(0), 1)
     SET_VALUE(LW(1), 3)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    CALL(btlevtcmd_SetUnitWork, -2, 5, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 6, 0)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     LABEL(10)
-    CALL(btlevtcmd_SetUnitWork, -2, LW(0), LW(3))
-    CALL(btlevtcmd_SetUnitWork, -2, LW(1), LW(4))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(1), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(20)
     END_IF
@@ -559,25 +530,25 @@ static EVT_BEGIN(renzoku_attack_event)
     GOTO(10)
     LABEL(20)
     SET_VALUE(LW(6), PTR(&weapon_boomerang_bros_renzoku_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 0)
     SPAWN_EVENT(PTR(boomerang_move_event))
     WAIT_MS(750)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 4)
     SET_VALUE(LW(14), 1)
     SPAWN_EVENT(PTR(boomerang_move_event))
     LOOP(0)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 2)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_S_1"))
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_S_1"))
     WAIT_MS(500)
     LABEL(99)
     RETURN
@@ -586,45 +557,45 @@ EVT_END()
 EVT_BEGIN(normal_attack_event_confuse)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_attack))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_boomerang_bros_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_attack))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
-    CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, 1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK1"), -250000000, 0, -250000000)
-    CALL(btlevtcmd_AnimeChangePose, -2, LW(15), STRING("BRO_A_1B"))
-    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
-    CALL(btlevtcmd_SetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPartsRotate, -2, LW(15), 0, 0, -180)
-    CALL(btlevtcmd_SetPartsRotateOffset, -2, LW(15), 0, 0, 0)
-    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 33554432)
+    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, -180)
+    CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, LW(15), 0, 0, 0)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_AddPartsRotate, -2, LW(15), 0, 0, 64)
+            CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, 64)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK2"), -250000000, 0, LW(8))
-    CALL(btlevtcmd_DivePartsPosition, -2, LW(15), 250, 40, 0, 15, FLOAT(-20.0f), 4, 0, -1)
-    CALL(btlevtcmd_ResetFaceDirection, -2)
-    CALL(btlevtcmd_DivePartsPosition, -2, LW(15), -30, 40, 0, 15, FLOAT(20.0f), 1, 0, -1)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK2"), EVT_NULLPTR, 0, LW(8))
+    CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), 250, 40, 0, 15, FLOAT(-20.0f), 4, 0, -1)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+    CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), -30, 40, 0, 15, FLOAT(20.0f), 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(8))
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK3"), -250000000, 0, LW(8))
-    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK3"), EVT_NULLPTR, 0, LW(8))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
-    CALL(btlevtcmd_DivePartsPosition, -2, LW(15), LW(0), LW(1), LW(2), 15, FLOAT(-10.0f), 1, 0, -1)
+    CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2), 15, FLOAT(-10.0f), 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(8))
-    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK4"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -650,19 +621,19 @@ EVT_BEGIN(normal_attack_event_confuse)
     GOTO(97)
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 7, LW(8))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
         IF_INT_EQUAL(LW(8), 0)
             CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_boomerang_bros_attack))
-            CALL(btlevtcmd_SetUnitWork, -2, 7, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
         END_IF
         ADD(LW(10), 1)
     END_IF
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 0, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 0, LW(5))
         CALL(evt_sub_random, 10, LW(0))
         ADD(LW(0), 30)
         WAIT_FRAMES(LW(0))
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 256, LW(5))
     END_SIBLING_EVENT
     GOTO(97)
     LABEL(97)
@@ -679,47 +650,47 @@ EVT_END()
 EVT_BEGIN(renzoku_attack_event_confuse)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_renzoku_attack))
-    CALL(btlevtcmd_AttackDeclareAll, -2)
+    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, PTR(&weapon_boomerang_bros_renzoku_attack))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_renzoku_attack))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(2)
-        CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
-        CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+        CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, 1)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
         WAIT_FRAMES(27)
         SET_VALUE(LW(15), 2)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK1"), -250000000, 0, -250000000)
-        CALL(btlevtcmd_AnimeChangePose, -2, LW(15), STRING("BRO_A_1B"))
-        CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 20)
-        CALL(btlevtcmd_SetPartsPos, -2, LW(15), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_SetPartsRotate, -2, LW(15), 0, 0, -180)
-        CALL(btlevtcmd_SetPartsRotateOffset, -2, LW(15), 0, 0, 0)
-        CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, -2, LW(15), 33554432)
+        CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, -180)
+        CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, LW(15), 0, 0, 0)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
         BEGIN_SIBLING_EVENT
             LOOP(0)
                 WAIT_FRAMES(1)
-                CALL(btlevtcmd_AddPartsRotate, -2, LW(15), 0, 0, 64)
+                CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, 64)
             END_LOOP
         END_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK2"), -250000000, 0, LW(8))
-        CALL(btlevtcmd_DivePartsPosition, -2, LW(15), 250, 40, 0, 15, FLOAT(-20.0f), 4, 0, -1)
-        CALL(btlevtcmd_ResetFaceDirection, -2)
-        CALL(btlevtcmd_DivePartsPosition, -2, LW(15), -30, 40, 0, 15, FLOAT(20.0f), 1, 0, -1)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK2"), EVT_NULLPTR, 0, LW(8))
+        CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), 250, 40, 0, 15, FLOAT(-20.0f), 4, 0, -1)
+        CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+        CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), -30, 40, 0, 15, FLOAT(20.0f), 1, 0, -1)
         CALL(evt_snd_sfxoff, LW(8))
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK3"), -250000000, 0, LW(8))
-        CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK3"), EVT_NULLPTR, 0, LW(8))
+        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 20)
-        CALL(btlevtcmd_DivePartsPosition, -2, LW(15), LW(0), LW(1), LW(2), 15, FLOAT(-10.0f), 1, 0, -1)
+        CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2), 15, FLOAT(-10.0f), 1, 0, -1)
         CALL(evt_snd_sfxoff, LW(8))
-        CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, -2, LW(15), 33554432)
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_ENM_BOOME_ATTACK4"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_LOOP
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -745,21 +716,21 @@ EVT_BEGIN(renzoku_attack_event_confuse)
     GOTO(97)
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
-        CALL(btlevtcmd_GetUnitWork, -2, 7, LW(8))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
         IF_INT_EQUAL(LW(8), 0)
             CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_boomerang_bros_renzoku_attack))
-            CALL(btlevtcmd_SetUnitWork, -2, 7, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
         END_IF
         ADD(LW(10), 1)
     END_IF
     BEGIN_SIBLING_EVENT
         LOOP(3)
-            CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 0, LW(5))
+            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 0, LW(5))
             CALL(evt_sub_random, 10, LW(0))
             ADD(LW(0), 30)
             WAIT_FRAMES(LW(0))
         END_LOOP
-        CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 256, LW(5))
     END_SIBLING_EVENT
     GOTO(97)
     LABEL(97)
@@ -774,7 +745,6 @@ EVT_BEGIN(renzoku_attack_event_confuse)
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

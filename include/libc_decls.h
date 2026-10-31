@@ -1,3 +1,4 @@
+// Declarations of the C library and compiler runtime routines (math, string, sprintf, rand) the code calls.
 #pragma once
 
 #include "libc/stdarg.h"
@@ -8,13 +9,17 @@ extern unsigned char __lower_map[];
 extern void _restfpr_28(void);
 extern void _savefpr_28(void);
 extern double asin(double);
+extern double atan(double);
 extern double atan2(double y, double x);
 extern double cos(double);
 extern double floor(double);
 extern double fmod(double x, double y);
+extern double hypot(double x, double y);
 extern void* memcpy(void*, const void*, unsigned long);
 extern void* memset(void*, int, unsigned long);
 extern int rand(void);
+extern double sin(double);
+extern double sqrt(double); // MSL's out-of-line double sqrt (math.h only has the inline sqrtf)
 extern int sprintf(char*, const char*, ...);
 extern int sscanf(const char* str, const char* format, ...);
 extern int strcmp(const char*, const char*);

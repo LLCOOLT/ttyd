@@ -1,54 +1,32 @@
+// las_22 (ラストダンジョン, Palace of Shadow): the room with the turntable (kaitendai).
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "las.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "driver/itemdrv.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_npc.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_hitobj_onoff);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mario_get_name_hitobj_ride);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_exec_cancel);
-USER_FUNC(evt_mobj_get_position);
-USER_FUNC(evt_mobj_itembox);
-USER_FUNC(evt_mobj_lock);
-USER_FUNC(evt_mobj_save_blk);
-USER_FUNC(evt_mobj_switch_red);
-USER_FUNC(evt_mobj_wait_animation_end);
-USER_FUNC(evt_npc_check_delete);
-USER_FUNC(evt_party_get_name_hitobj_ride);
-USER_FUNC(evt_party_get_pos);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_win_item_select);
-
-extern EvtWord door_dummy[];
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[13];
 static const char* haguruma_hontai2[7];
 static const char* haguruma_kage[11];
 static const char* haguruma_kage2[6];
-extern EvtWord kaitendai_evt[];
 static s32 key_tbl[2];
-extern EvtWord las_22_init_evt[];
 
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
@@ -91,8 +69,8 @@ static BeroEntry bero_entry_data[] = {
         "w_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -109,8 +87,8 @@ static BeroEntry bero_entry_data[] = {
         "e_bero", // hitName
         1, // type
         6, // sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -126,8 +104,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -360,12 +338,12 @@ static s32 key_tbl[] = {
 };
 
 static EVT_BEGIN(key_evt)
-    SET_VALUE(GSW(0), 393)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_09_KEY)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(key_check_evt)
-    CALL(evt_pouch_check_item, 47, LW(0))
+    CALL(evt_pouch_check_item, ITEM_PALACE_KEY_0x2F, LW(0))
     IF_INT_GREATER(LW(0), 0)
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
         IF_INT_EQUAL(LW(0), -1)
@@ -376,7 +354,7 @@ static EVT_BEGIN(key_check_evt)
 EVT_END()
 
 static EVT_BEGIN(unlock_evt)
-    SET_VALUE(GSW(0), 394)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_10_LOCK)
     SET_VALUE(LW(0), STRING("w_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
     RETURN
@@ -385,8 +363,8 @@ EVT_END()
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), 130, LW(0), LW(1), LW(2), 16, -1, 0)
-    CALL(evt_item_flag_on, STRING("item00"), 2)
+    CALL(evt_item_entry, STRING("item00"), ITEM_SHOOTING_STAR, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -394,39 +372,38 @@ static EVT_BEGIN(mobj_box00)
 EVT_END()
 
 EVT_BEGIN(las_22_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST3"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS6"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS6"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    IF_INT_LESS(GSW(0), 390)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_06_MOVING_PLANETS)
         CALL(evt_npc_check_delete, STRING("スーパーマホーン"))
     END_IF
-    IF_INT_GREATER_OR_EQUAL(GSW(0), 395)
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_11_STAR_PUZZLE)
         SPAWN_EVENT(PTR(kaitendai_evt))
     END_IF
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_hgm_01a"), 2)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_hgm_05a"), 2)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_hgm_08a"), 2)
-    CALL(evt_mapobj_flag_onoff, 0, 0, STRING("S_hgm_19a"), 2)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_01a"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_05a"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_08a"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_19a"), MAPOBJ_FLAG_BBOX_CULL)
     SPAWN_EVENT(PTR(haguruma_evt))
     CALL(evt_map_playanim, STRING("kusari"), 1, 0)
     CALL(evt_hit_bind_mapobj, STRING("A_move_dai"), STRING("S_move_dai"))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_move_dai"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_move_dai"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_move_dai"), 0, 0)
     CALL(evt_mobj_switch_red, 0, STRING("dai_switch"), 100, -409, -10, PTR(dai_evt), 0)
-    CALL(evt_mobj_itembox, STRING("mobj_box00"), -660, -500, 100, 0, 0, PTR(mobj_box00), GSWF(4377))
-    CALL(evt_mobj_badgeblk, STRING("mobj_hatena_gat"), -150, 220, -100, 151, 0, GSWF(4378), 0)
+    CALL(evt_mobj_itembox, STRING("mobj_box00"), -660, -500, 100, 0, 0, PTR(mobj_box00), GSWF(GSWF_LAS22_ITEMBOX_00))
+    CALL(evt_mobj_badgeblk, STRING("mobj_hatena_gat"), -150, 220, -100, ITEM_LIFE_SHROOM, 0, GSWF(GSWF_LAS22_LIFE_SHROOM_BLOCK_HIT), 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -650, 100, -100, 0, 0)
-    IF_INT_LESS(GSW(0), 393)
-        CALL(evt_item_entry, STRING("key"), 47, -25, -80, -100, 16, -1, PTR(key_evt))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_09_KEY)
+        CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2F, -25, -80, -100, 16, -1, PTR(key_evt))
     END_IF
-    IF_INT_LESS(GSW(0), 394)
-        CALL(evt_mobj_lock, STRING("lock"), 47, -695, 50, 0, 90, PTR(key_check_evt), PTR(unlock_evt), GSWF(4355))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_10_LOCK)
+        CALL(evt_mobj_lock, STRING("lock"), ITEM_PALACE_KEY_0x2F, -695, 50, 0, 90, PTR(key_check_evt), PTR(unlock_evt), GSWF(GSWF_LAS22_DOOR_UNLOCKED))
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
     END_IF
     RETURN
 EVT_END()
-

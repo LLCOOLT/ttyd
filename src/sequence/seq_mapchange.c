@@ -1,3 +1,5 @@
+// Map change sequence: unloads the old map, loads the next area REL and map, and starts its scripts.
+#include "version.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_seq.h"
 #include "manager/evtmgr.h"
@@ -25,39 +27,44 @@
 #include "database.h"
 #include "driver/mobjdrv.h"
 #include "cam_road.h"
+#include "system.h"
+#include "cam_shift.h"
+#include "statuswindow.h"
+#include "driver/casedrv.h"
+#include "driver/extdrv.h"
+#include "driver/icondrv.h"
+#include "driver/itemdrv.h"
+#include "driver/offscreendrv.h"
+#include "driver/swdrv.h"
+#include "manager/winmgr.h"
+#include "mario/mario_cam.h"
+#include "win/win_main.h"
+#include "libc_decls.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_mario.h"
+#include "mario/mario_sbr.h"
+#include "evt/evt_story.h"
+#include "driver/seqdrv.h"
 
 //.sbss
 char _next_area[0x20];
 char _next_map[0x20];
 char _next_bero[0x20];
 
-USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_mario_key_onoff);
 EVT_BEGIN(key_off)
-CALL(evt_seq_wait, 2)
-CALL(evt_fade_end_wait)
-CALL(evt_mario_key_onoff, 1)
-RETURN
+    CALL(evt_seq_wait, 2)
+    CALL(evt_fade_end_wait)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
 EVT_END()
 
 u8 rel_bss[0xF10];
-void _relUnLoad(void);
 void _load(const char*, const char*, const char*);
-void _unload(const char*, const char*, const char*);
 
-BOOL setupDataCheck(void);
-void setupDataBase(const char* area, const char* map);
-void psndMapChange(void);
-s32 psndGetFlag(void);
-s32 psndBGMPlayTime(s32 id);
 void evt_cam_road_reset(s32, s32);
-void N_marioSetBottomlessRespawnPos(f32, f32, f32);
-void npcExecAllInitEvt(void);
-BOOL npcWaitAllInitEvtEnd(void);
-void npcExecAllReglEvt(void);
-void statusWinForceUpdate(void);
 double cos(double);
-double sin(double);
+// sound.h is not included: it pulls in musyx.h and <math.h>, whose MSL inlines change this file's code
+void SoundSetOutputMode(s32 mode);
 
 static const char mc_tou[4];
 static const char mc_tou2[5];
@@ -69,7 +76,7 @@ static const char mc_jon[4];
 static inline const char* getAreaName(void) {
     const char* area_name = _next_area;
     if (!strcmp(_next_area, mc_tou)) {
-        if (seqGetSeq() == 1) {
+        if (seqGetSeq() == SEQ_TITLE) {
             area_name = mc_tou2;
         } else if (!strcmp(_next_map, mc_tou_03)) {
             area_name = mc_tou2;
@@ -89,19 +96,19 @@ void seq_mapChangeInit(SequenceWork* work) {
     if (work->beroName) {
         strncpy(_next_bero, work->beroName, 0x20);
     }
-    psndENVOff(0x200);
-    psndENVOff(0x201);
+    psndENVOff(PSND_FADE_OUT);
+    psndENVOff(PSND_FADE_OUT | PSND_CH(1));
     {
-    int c0 = strcmp(gp->currentMapName, "");
-    int c1 = strcmp(gp->currentMapName, "gor_01");
-    int c2 = strcmp(_next_map, "gor_01");
-    if (c0 && c1 && c2) {
-        bdsw->restockFlags |= 1;
-    } else if (!c2 && bdsw->restockFlags & 1) {
-        badgeShop_bargainGeneration();
-        badgeShop_bottakuruGeneration();
-        bdsw->restockFlags &= 0xFFFE;
-    }
+        int c0 = strcmp(gp->currentMapName, "");
+        int c1 = strcmp(gp->currentMapName, "gor_01");
+        int c2 = strcmp(_next_map, "gor_01");
+        if (c0 && c1 && c2) {
+            bdsw->restockFlags |= 1;
+        } else if (!c2 && bdsw->restockFlags & 1) {
+            badgeShop_bargainGeneration();
+            badgeShop_bottakuruGeneration();
+            bdsw->restockFlags &= 0xFFFE;
+        }
     }
 }
 
@@ -110,431 +117,286 @@ void seq_mapChangeExit(SequenceWork* work) {
     dbg_lotteryinfo = FALSE;
 }
 
-#ifdef VERSION_G8ME01
-typedef struct { const char* s[7]; } LangTbl;
+#if VERSION >= VERSION_US
+typedef struct {
+    const char* s[7];
+} LangTbl;
 static const LangTbl lang_tbl = {{"jp", "us", "ge", "fr", "sp", "it", "du"}};
 #else
-typedef struct { const char* s[2]; } LangTbl;
+typedef struct {
+    const char* s[2];
+} LangTbl;
 static const LangTbl lang_tbl = {{"jp", "us"}};
 #endif
-#ifdef VERSION_G8ME01_DEMO
-// The demo's map change: no SFX stop, the REL is unloaded inline and the sound mode is not set
-// in step 1, psndMapChange runs right after the unload, and the respawn point is not set.
+// The demo's map change differs in the DEMO blocks below: no SFX stop, the REL is unloaded inline and the
+// sound mode is not set in step 1, psndMapChange runs right after the unload, and the respawn point is not set.
 void seq_mapChangeMain(SequenceWork* work) {
+#if VERSION == VERSION_DEMO
     BOOL newarea = strcmp(_next_area, gp->currentAreaName) ? TRUE : FALSE;
-    const char* area_name;
-    EvtWord* evtCode;
-    u32 fres;
-    BOOL fok;
-    switch (work->state) {
-    case 0:
-        if (strcmp(_next_map, "sys_01") == 0) {
-            if (gp->areaFadeInType != FADE_OUT_BLACK) {
-                fadeEntry(gp->areaFadeInType, gp->areaFadeInDuration, (GXColor){0, 0, 0, 0xFF});
-            }
-            fadeEntry(FADE_OUT_WHITE, 2000, (GXColor){0, 0, 0, 0xFF});
-        } else if (!newarea) {
-            fadeEntry(gp->mapFadeInType, gp->mapFadeInDuration, (GXColor){0, 0, 0, 0xFF});
-        } else {
-            fadeEntry(gp->areaFadeInType, gp->areaFadeInDuration, (GXColor){0, 0, 0, 0xFF});
-        }
-        gp->mapFadeInType = FADE_OUT_BLACK;
-        gp->mapFadeInDuration = 300;
-        gp->areaFadeInType = FADE_OUT_BLACK;
-        gp->areaFadeInDuration = 300;
-        if (!newarea) {
-            gp->didAreaChange = FALSE;
-        } else {
-            gp->didAreaChange = TRUE;
-        }
-        area_name = getAreaName();
-        fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
-        ((BOOL (*)(const char*))mapPreLoad)(_next_map);
-        work->state++;
-        break;
-    case 1:
-        if (fadeIsFinish()) {
-            if (gp->relocationBase) {
-                ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->epilog)();
-                OSUnlink(gp->relocationBase);
-                if (gp->relocationBase != gp->mapAlloc) {
-                    _mapFree(gp->relocationBase);
-                }
-                gp->relocationBase = NULL;
-            }
-            _unload(gp->currentMapName, _next_map, _next_bero);
-            psndMapChange();
-            work->state++;
-        }
-        break;
-    case 2:
-        if (strcmp(_next_map, "title") == 0) {
-            strcpy(gp->currentAreaName + 0x10, gp->currentMapName);
-            strcpy(gp->currentAreaName, "");
-            strcpy(gp->currentMapName, "");
-            seqSetSeq(1, 0, 0);
-        } else {
-            area_name = getAreaName();
-            fres = fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
-            if (fres == 0) {
-                fok = FALSE;
-            } else if ((s32)fres == -1) {
-                fok = TRUE;
-            } else {
-                fok = TRUE;
-            }
-            if (fok) {
-                if (((BOOL (*)(const char*))mapPreLoad)(_next_map)) {
-                    FileEntry* file;
-                    area_name = getAreaName();
-                    file = fileAllocf(0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
-                    if (file) {
-                        if (!strncmp(area_name, mc_tst, 3)) {
-                            gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
-                        } else if (!strncmp(area_name, mc_jon, 3)) {
-                            gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
-                        } else {
-                            gp->relocationBase = gp->mapAlloc;
-                        }
-                        memcpy(gp->relocationBase, ((smartEntry*)file->data)->address, ((smartEntry*)file->data)->size);
-                        fileFree(file);
-                    }
-                    if (gp->relocationBase) {
-                        memset(rel_bss, 0, 0x3c4);
-                        OSLink(gp->relocationBase, rel_bss);
-                        ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->prolog)();
-                    }
-                    _load(gp->currentMapName, _next_map, _next_bero);
-                    work->state++;
-                }
-            }
-        }
-        break;
-    case 3:
-        if (setupDataCheck()) {
-            if (psndGetFlag() & 0x1000) {
-                if (psndBGMPlayTime(0) < 3000) break;
-                psndClearFlag(0x1000);
-            }
-            if (psndGetFlag() & 0x2000) {
-                if (psndBGMPlayTime(1) < 3000) break;
-                psndClearFlag(0x2000);
-            }
-            setupDataBase(_next_area, _next_map);
-            evtCode = mapDataPtr(_next_map)->eventAddr;
-            if (evtCode) {
-                gp->mapEventId = evtEntry(evtCode, 0, 0)->eventId;
-            } else {
-                gp->mapEventId = 0;
-            }
-            work->state++;
-        }
-        break;
-    case 4:
-        if (gp->mapEventId == 0) {
-            camCtrlOn(4);
-            work->state++;
-        } else if (!evtCheckID(gp->mapEventId)) {
-            camCtrlOn(4);
-            gp->mapEventId = 0;
-            work->state++;
-        }
-        break;
-    case 5:
-        npcExecAllInitEvt();
-        work->state++;
-        break;
-    case 6:
-        if (!(camGetPtr(8)->flags & 0x200) && !(bero_get_BeroEXEC() & 1) &&
-            (!marioChkKey() || !marioChkCtrl())) {
-            camGetPtr(8)->flags |= 0x500;
-        }
-        if (npcWaitAllInitEvtEnd()) {
-            npcExecAllReglEvt();
-            work->state++;
-        }
-        break;
-    case 7: {
-        MarioWork* mario;
-        PartyEntry* party;
-        PartyEntry* extraParty;
-        if (strncmp(_next_map, "dmo", 3) && strncmp(_next_map, "dig", 3) && strncmp(_next_map, "sys", 3)) {
-            {
-            LangTbl lang = lang_tbl;
-            fileAsyncf(4, 0, "%s/window/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
-            }
-            animGroupBaseAsync("p_jyabara", 0, 0);
-            animGroupBaseAsync("p_kaiten_h", 0, 0);
-            animGroupBaseAsync("p_b_st", 0, 0);
-            animGroupBaseAsync("OFF_d_maku_up_down", 0, 0);
-            effNiceAsync(0);
-            fileAsyncf(4, 0, "%s/battle/common/battle_common.tpl", getMarioStDvdRoot());
-            fileAsyncf(4, 0, "%s/battle/audience/audience_normal.tpl", getMarioStDvdRoot());
-            fileAsyncf(4, 0, "%s/battle/audience/audience_luigi.tpl", getMarioStDvdRoot());
-        }
-        if (gp->flags & 1) {
-            mario = marioGetPtr();
-            party = partyGetPtr(marioGetPartyId());
-            extraParty = partyGetPtr(marioGetExtraPartyId());
-            switch (swByteGet(4)) {
-            case 0:
-                mario->position = gp->savePlayerPos;
-                evt_cam_road_reset(0, 0);
-                if (party) {
-                    party->position = gp->savePlayerPos;
-                    party->position.x += 30.0f * (f32)cos(camGetPtr(4)->viewYaw);
-                    party->position.z += 30.0f * (f32)sin(camGetPtr(4)->viewYaw);
-                }
-                if (extraParty) {
-                    extraParty->position = gp->savePlayerPos;
-                    extraParty->position.x += -30.0f * (f32)cos(camGetPtr(4)->viewYaw);
-                    extraParty->position.z += 30.0f * (f32)sin(camGetPtr(4)->viewYaw);
-                }
-                if (!strcmp(gp->currentMapName, "dou_05") && party) {
-                    party->position = mario->position;
-                    party->position.x -= 30.0f;
-                    if (extraParty) {
-                        extraParty->position = party->position;
-                        extraParty->position.x -= 30.0f;
-                    }
-                }
-                marioKeyOff();
-                evtEntryType(key_off, 0, 0, 0);
-                break;
-            default:
-                fadeEntry(0x1a, 0, (GXColor){0, 0, 0, 0});
-                break;
-            }
-            statusWinForceUpdate();
-            gp->flags &= ~1;
-            marioStSystemLevel(0);
-        }
-        marioEntry();
-        seqSetSeq(2, 0, 0);
-        break;
-    }
-    }
-}
 #else
-void seq_mapChangeMain(SequenceWork* work) {
     BOOL newarea = strcmp(_next_area, gp->currentAreaName) != 0;
+#endif
     const char* area_name;
     EvtWord* evtCode;
-    u32 fres;
+    FileEntry* fres;
     BOOL fok;
     switch (work->state) {
-    case 0:
-        if (strcmp(_next_map, "sys_01") == 0) {
-            if (gp->areaFadeInType != 10) {
+        case 0:
+            if (strcmp(_next_map, "sys_01") == 0) {
+                if (gp->areaFadeInType != FADE_OUT_BLACK) {
+                    fadeEntry(gp->areaFadeInType, gp->areaFadeInDuration, (GXColor){0, 0, 0, 0xFF});
+                }
+                fadeEntry(FADE_OUT_WHITE, 2000, (GXColor){0, 0, 0, 0xFF});
+            } else if (!newarea) {
+                fadeEntry(gp->mapFadeInType, gp->mapFadeInDuration, (GXColor){0, 0, 0, 0xFF});
+            } else {
                 fadeEntry(gp->areaFadeInType, gp->areaFadeInDuration, (GXColor){0, 0, 0, 0xFF});
             }
-            fadeEntry(0x11, 2000, (GXColor){0, 0, 0, 0xFF});
-        } else if (!newarea) {
-            fadeEntry(gp->mapFadeInType, gp->mapFadeInDuration, (GXColor){0, 0, 0, 0xFF});
-        } else {
-            fadeEntry(gp->areaFadeInType, gp->areaFadeInDuration, (GXColor){0, 0, 0, 0xFF});
-        }
-        gp->mapFadeInType = 10;
-        gp->mapFadeInDuration = 300;
-        gp->areaFadeInType = 10;
-        gp->areaFadeInDuration = 300;
-        psndSFXAllOff();
-        if (!newarea) {
-            gp->didAreaChange = FALSE;
-        } else {
-            gp->didAreaChange = TRUE;
-        }
-        if (strcmp(_next_map, mc_tou_03)) {
+            gp->mapFadeInType = FADE_OUT_BLACK;
+            gp->mapFadeInDuration = 300;
+            gp->areaFadeInType = FADE_OUT_BLACK;
+            gp->areaFadeInDuration = 300;
+#if VERSION != VERSION_DEMO
+            psndSFXAllOff();
+#endif
+            if (!newarea) {
+                gp->didAreaChange = FALSE;
+            } else {
+                gp->didAreaChange = TRUE;
+            }
+#if VERSION == VERSION_DEMO
             area_name = getAreaName();
             fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
-        }
-        work->state++;
-        break;
-    case 1:
-        psndSFXAllOff();
-        if (fadeIsFinish()) {
-            _relUnLoad();
-            _unload(gp->currentMapName, _next_map, _next_bero);
-            if (strcmp(_next_map, "dmo_00") && strcmp(_next_map, "title")) {
-                if (OSGetSoundMode() == 0) {
-                    SoundSetOutputMode(0);
-                } else if (gp->soundMode == 0) {
-                    SoundSetOutputMode(1);
-                } else {
-                    SoundSetOutputMode(2);
-                }
-            }
-            work->state++;
-        }
-        break;
-    case 2:
-        if (strcmp(_next_map, "title") == 0) {
-            strcpy(gp->currentAreaName + 0x10, gp->currentMapName);
-            strcpy(gp->currentAreaName, "");
-            strcpy(gp->currentMapName, "");
-            seqSetSeq(1, 0, 0);
-        } else {
-            area_name = getAreaName();
-            fres = fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
-            if (fres == 0) {
-                fok = FALSE;
-            } else if ((s32)fres == -1) {
-                fok = TRUE;
-            } else {
-                fok = TRUE;
-            }
-            if (fok) {
-                if (((BOOL (*)(const char*))mapPreLoad)(_next_map)) {
-                    FileEntry* file;
-                    area_name = getAreaName();
-                    file = fileAllocf(0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
-                    if (file) {
-                        if (!strncmp(area_name, mc_tst, 3)) {
-                            gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
-                        } else if (!strncmp(area_name, mc_jon, 3)) {
-                            gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
-                        } else {
-                            gp->relocationBase = gp->mapAlloc;
-                        }
-                        memcpy(gp->relocationBase, ((smartEntry*)file->data)->address, ((smartEntry*)file->data)->size);
-                        fileFree(file);
-                    }
-                    if (gp->relocationBase) {
-                        // Not a bug for the shipped RELs, but fragile: rel_bss is a fixed 0xF10-byte buffer and only 0x3C4
-                        // bytes are cleared, the REL's bssSize and bssAlign are not checked against it, and OSLink's result is
-                        // ignored. A modified REL with a larger bss or a stricter bss/module alignment fails to link (or
-                        // overruns rel_bss) and its prolog is still called. gp->relocationBase itself is always 0x20-aligned.
-                        memset(rel_bss, 0, 0x3c4);
-                        OSLink(gp->relocationBase, rel_bss);
-                        ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->prolog)();
-                    }
-                    _load(gp->currentMapName, _next_map, _next_bero);
-                    work->state++;
-                }
-            }
-        }
-        break;
-    case 3:
-        if (setupDataCheck()) {
-            if (psndGetFlag() & 0x1000) {
-                if (psndBGMPlayTime(0) < 3000) break;
-                psndClearFlag(0x1000);
-            }
-            if (psndGetFlag() & 0x2000) {
-                if (psndBGMPlayTime(1) < 3000) break;
-                psndClearFlag(0x2000);
-            }
-            setupDataBase(_next_area, _next_map);
-            psndMapChange();
-            evtCode = mapDataPtr(_next_map)->eventAddr;
-            if (evtCode) {
-                gp->mapEventId = evtEntry(evtCode, 0, 0)->eventId;
-            } else {
-                gp->mapEventId = 0;
-            }
-            work->state++;
-        }
-        break;
-    case 4:
-        if (gp->mapEventId == 0) {
-            camCtrlOn(4);
-            work->state++;
-        } else if (!evtCheckID(gp->mapEventId)) {
-            camCtrlOn(4);
-            gp->mapEventId = 0;
-            work->state++;
-        }
-        break;
-    case 5:
-        npcExecAllInitEvt();
-        work->state++;
-        break;
-    case 6:
-        if (!(camGetPtr(8)->flags & 0x200) && !(bero_get_BeroEXEC() & 1) &&
-            (!marioChkKey() || !marioChkCtrl())) {
-            camGetPtr(8)->flags |= 0x500;
-        }
-        if (npcWaitAllInitEvtEnd()) {
-            npcExecAllReglEvt();
-            work->state++;
-        }
-        break;
-    case 7: {
-        MarioWork* mario;
-        PartyEntry* party;
-        PartyEntry* extraParty;
-        if (strncmp(_next_map, "dmo", 3) && strncmp(_next_map, "dig", 3) && strncmp(_next_map, "end", 3) &&
-            strncmp(_next_map, "sys", 3) && strncmp(_next_map, "gor_10", 6)) {
-            {
-            LangTbl lang = lang_tbl;
-#ifdef VERSION_G8ME01
-            fileAsyncf(4, 0, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
+            mapPreLoad(_next_map);
 #else
-            fileAsyncf(4, 0, "%s/window/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
-#endif
+            if (strcmp(_next_map, mc_tou_03)) {
+                area_name = getAreaName();
+                fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
             }
-#ifdef VERSION_G8ME01
-            animGroupBaseAsync("p_roll", 0, 0);
-            animGroupBaseAsync("p_slit", 0, 0);
 #endif
-            animGroupBaseAsync("p_jyabara", 0, 0);
-            animGroupBaseAsync("p_kaiten_h", 0, 0);
-            animGroupBaseAsync("p_b_st", 0, 0);
-            animGroupBaseAsync("OFF_d_maku_up_down", 0, 0);
-            effNiceAsync(0);
-            fileAsyncf(4, 0, "%s/battle/common/battle_common.tpl", getMarioStDvdRoot());
-            fileAsyncf(4, 0, "%s/battle/audience/audience_normal.tpl", getMarioStDvdRoot());
-            fileAsyncf(4, 0, "%s/battle/audience/audience_luigi.tpl", getMarioStDvdRoot());
-        }
-        if (gp->flags & 1) {
-            mario = marioGetPtr();
-            party = partyGetPtr(marioGetPartyId());
-            extraParty = partyGetPtr(marioGetExtraPartyId());
-            switch (swByteGet(4)) {
-            case 0:
-                mario->position = gp->savePlayerPos;
-                evt_cam_road_reset(0, 0);
-                if (party) {
-                    party->position = gp->savePlayerPos;
-                    party->position.x += 30.0f * (f32)cos(camGetPtr(4)->viewYaw);
-                    party->position.z += 30.0f * (f32)sin(camGetPtr(4)->viewYaw);
+            work->state++;
+            break;
+        case 1:
+#if VERSION == VERSION_DEMO
+            if (fadeIsFinish()) {
+                if (gp->relocationBase) {
+                    ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->epilog)();
+                    OSUnlink(gp->relocationBase);
+                    if (gp->relocationBase != gp->mapAlloc) {
+                        _mapFree(gp->relocationBase);
+                    }
+                    gp->relocationBase = NULL;
                 }
-                if (extraParty) {
-                    extraParty->position = gp->savePlayerPos;
-                    extraParty->position.x += -30.0f * (f32)cos(camGetPtr(4)->viewYaw);
-                    extraParty->position.z += 30.0f * (f32)sin(camGetPtr(4)->viewYaw);
-                }
-                if (!strcmp(gp->currentMapName, "dou_05") || !strcmp(gp->currentMapName, "gor_01") ||
-                    !strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "tik_07")) {
-                    mario->position.x -= 5.0f;
-                    if (party) {
-                        party->position = mario->position;
-                        party->position.x -= 30.0f;
-                        if (extraParty) {
-                            extraParty->position = party->position;
-                            extraParty->position.x -= 30.0f;
-                        }
+                _unload(gp->currentMapName, _next_map, _next_bero);
+                psndMapChange();
+                work->state++;
+            }
+#else
+            psndSFXAllOff();
+            if (fadeIsFinish()) {
+                _relUnLoad();
+                _unload(gp->currentMapName, _next_map, _next_bero);
+                if (strcmp(_next_map, "dmo_00") && strcmp(_next_map, "title")) {
+                    if (OSGetSoundMode() == 0) {
+                        SoundSetOutputMode(0);
+                    } else if (gp->soundMode == 0) {
+                        SoundSetOutputMode(1);
+                    } else {
+                        SoundSetOutputMode(2);
                     }
                 }
-                N_marioSetBottomlessRespawnPos(mario->position.x, 10.0f + mario->position.y, mario->position.z);
-                marioKeyOff();
-                evtEntryType(key_off, 0, 0, 0);
-                break;
-            default:
-                fadeEntry(0x1c, 0, (GXColor){0, 0, 0, 0});
-                break;
+                work->state++;
             }
-            statusWinForceUpdate();
-            gp->flags &= ~1;
-            marioStSystemLevel(0);
+#endif
+            break;
+        case 2:
+            if (strcmp(_next_map, "title") == 0) {
+                strcpy(gp->currentAreaName + 0x10, gp->currentMapName);
+                strcpy(gp->currentAreaName, "");
+                strcpy(gp->currentMapName, "");
+                seqSetSeq(SEQ_TITLE, NULL, NULL);
+            } else {
+                area_name = getAreaName();
+                fres = fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
+                if (fres == NULL) {
+                    fok = FALSE;
+                } else if (fileAsyncMissing(fres)) {
+                    fok = TRUE;
+                } else {
+                    fok = TRUE;
+                }
+                if (fok) {
+                    if (mapPreLoad(_next_map)) {
+                        FileEntry* file;
+                        area_name = getAreaName();
+                        file = fileAllocf(0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
+                        if (file) {
+                            if (!strncmp(area_name, mc_tst, 3)) {
+                                gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
+                            } else if (!strncmp(area_name, mc_jon, 3)) {
+                                gp->relocationBase = _mapAlloc(((smartEntry*)file->data)->size);
+                            } else {
+                                gp->relocationBase = gp->mapAlloc;
+                            }
+                            memcpy(gp->relocationBase, ((smartEntry*)file->data)->address, ((smartEntry*)file->data)->size);
+                            fileFree(file);
+                        }
+                        if (gp->relocationBase) {
+                            // Not a bug for the shipped RELs, but fragile: rel_bss is a fixed 0xF10-byte buffer and only 0x3C4
+                            // bytes are cleared, the REL's bssSize and bssAlign are not checked against it, and OSLink's result is
+                            // ignored. A modified REL with a larger bss or a stricter bss/module alignment fails to link (or
+                            // overruns rel_bss) and its prolog is still called. gp->relocationBase itself is always 0x20-aligned.
+                            memset(rel_bss, 0, 0x3c4);
+                            OSLink(gp->relocationBase, rel_bss);
+                            ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->prolog)();
+                        }
+                        _load(gp->currentMapName, _next_map, _next_bero);
+                        work->state++;
+                    }
+                }
+            }
+            break;
+        case 3:
+            if (setupDataCheck()) {
+                if (psndGetFlag() & PSND_FLAG_WAIT_BGM_0) {
+                    if (psndBGMPlayTime(0) < 3000)
+                        break;
+                    psndClearFlag(PSND_FLAG_WAIT_BGM_0);
+                }
+                if (psndGetFlag() & PSND_FLAG_WAIT_BGM_1) {
+                    if (psndBGMPlayTime(1) < 3000)
+                        break;
+                    psndClearFlag(PSND_FLAG_WAIT_BGM_1);
+                }
+                setupDataBase(_next_area, _next_map);
+#if VERSION != VERSION_DEMO
+                psndMapChange();
+#endif
+                evtCode = mapDataPtr(_next_map)->eventAddr;
+                if (evtCode) {
+                    gp->mapEventId = evtEntry(evtCode, 0, 0)->eventId;
+                } else {
+                    gp->mapEventId = 0;
+                }
+                work->state++;
+            }
+            break;
+        case 4:
+            if (gp->mapEventId == 0) {
+                camCtrlOn(4);
+                work->state++;
+            } else if (!evtCheckID(gp->mapEventId)) {
+                camCtrlOn(4);
+                gp->mapEventId = 0;
+                work->state++;
+            }
+            break;
+        case 5:
+            npcExecAllInitEvt();
+            work->state++;
+            break;
+        case 6:
+            if (!(camGetPtr(CAMERA_2D)->flags & CAM_FLAG_LETTER_BOX_DISABLE) && !(bero_get_BeroEXEC() & 1) &&
+                (!marioChkKey() || !marioChkCtrl())) {
+                camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX | CAM_FLAG_LETTER_BOX_SNAP;
+            }
+            if (npcWaitAllInitEvtEnd()) {
+                npcExecAllReglEvt();
+                work->state++;
+            }
+            break;
+        case 7: {
+            MarioWork* mario;
+            PartyEntry* party;
+            PartyEntry* extraParty;
+#if VERSION == VERSION_DEMO
+            if (strncmp(_next_map, "dmo", 3) && strncmp(_next_map, "dig", 3) && strncmp(_next_map, "sys", 3)) {
+#else
+            if (strncmp(_next_map, "dmo", 3) && strncmp(_next_map, "dig", 3) && strncmp(_next_map, "end", 3) &&
+                strncmp(_next_map, "sys", 3) && strncmp(_next_map, "gor_10", 6)) {
+#endif
+                {
+                    LangTbl lang = lang_tbl;
+#if VERSION >= VERSION_US
+                    fileAsyncf(4, 0, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
+#else
+                    fileAsyncf(4, 0, "%s/window/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
+#endif
+                }
+#if VERSION >= VERSION_US
+                animGroupBaseAsync("p_roll", 0, 0);
+                animGroupBaseAsync("p_slit", 0, 0);
+#endif
+                animGroupBaseAsync("p_jyabara", 0, 0);
+                animGroupBaseAsync("p_kaiten_h", 0, 0);
+                animGroupBaseAsync("p_b_st", 0, 0);
+                animGroupBaseAsync("OFF_d_maku_up_down", 0, 0);
+                effNiceAsync(0);
+                fileAsyncf(4, 0, "%s/battle/common/battle_common.tpl", getMarioStDvdRoot());
+                fileAsyncf(4, 0, "%s/battle/audience/audience_normal.tpl", getMarioStDvdRoot());
+                fileAsyncf(4, 0, "%s/battle/audience/audience_luigi.tpl", getMarioStDvdRoot());
+            }
+            if (gp->flags & GLOBAL_FLAG_LOADED) {
+                mario = marioGetPtr();
+                party = partyGetPtr(marioGetPartyId());
+                extraParty = partyGetPtr(marioGetExtraPartyId());
+                switch (swByteGet(GSW_SAVE_RESUME_KIND)) {
+                    case 0:
+                        mario->position = gp->savePlayerPos;
+                        evt_cam_road_reset(0, 0);
+                        if (party) {
+                            party->position = gp->savePlayerPos;
+                            party->position.x += 30.0f * (f32)cos(camGetPtr(CAMERA_3D)->viewYaw);
+                            party->position.z += 30.0f * (f32)sin(camGetPtr(CAMERA_3D)->viewYaw);
+                        }
+                        if (extraParty) {
+                            extraParty->position = gp->savePlayerPos;
+                            extraParty->position.x += -30.0f * (f32)cos(camGetPtr(CAMERA_3D)->viewYaw);
+                            extraParty->position.z += 30.0f * (f32)sin(camGetPtr(CAMERA_3D)->viewYaw);
+                        }
+#if VERSION == VERSION_DEMO
+                        if (!strcmp(gp->currentMapName, "dou_05") && party) {
+                            party->position = mario->position;
+                            party->position.x -= 30.0f;
+                            if (extraParty) {
+                                extraParty->position = party->position;
+                                extraParty->position.x -= 30.0f;
+                            }
+                        }
+#else
+                        if (!strcmp(gp->currentMapName, "dou_05") || !strcmp(gp->currentMapName, "gor_01") ||
+                            !strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "tik_07")) {
+                            mario->position.x -= 5.0f;
+                            if (party) {
+                                party->position = mario->position;
+                                party->position.x -= 30.0f;
+                                if (extraParty) {
+                                    extraParty->position = party->position;
+                                    extraParty->position.x -= 30.0f;
+                                }
+                            }
+                        }
+#endif
+#if VERSION != VERSION_DEMO
+                        N_marioSetBottomlessRespawnPos(mario->position.x, 10.0f + mario->position.y, mario->position.z);
+#endif
+                        marioKeyOff();
+                        evtEntryType(key_off, 0, 0, 0);
+                        break;
+                    default:
+                        fadeEntry(FADE_CURTAIN_SIDES_A2, 0, (GXColor){0, 0, 0, 0});
+                        break;
+                }
+                statusWinForceUpdate();
+                gp->flags &= ~GLOBAL_FLAG_LOADED;
+                marioStSystemLevel(0);
+            }
+            marioEntry();
+            seqSetSeq(SEQ_GAME, NULL, NULL);
+            break;
         }
-        marioEntry();
-        seqSetSeq(2, 0, 0);
-        break;
-    }
     }
 }
-#endif
 
 void _unload(const char* prevMap, const char* nextMap, const char* bero) {
     extern void* nanNPCWork;
@@ -563,10 +425,10 @@ void _unload(const char* prevMap, const char* nextMap, const char* bero) {
     statusWinReInit();
     bgReInit();
     winMgrReInit();
-    if (seqGetPrevSeq() != 6 && seqGetPrevSeq() != 1 && strcmp(prevMap, "sys_00") &&
+    if (seqGetPrevSeq() != SEQ_LOAD && seqGetPrevSeq() != SEQ_TITLE && strcmp(prevMap, "sys_00") &&
         strcmp(prevMap, "sys_01") && strcmp(prevMap, "dig_00")) {
         fadeReset(1);
-        gp->flags &= ~0x10;
+        gp->flags &= ~GLOBAL_FLAG_CURTAIN_OPEN;
     }
     for (i = 0; i < 4; i++) {
         padRumbleHardOff(i);
@@ -605,13 +467,13 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
         msgLoad(mapFile, 0);
     }
     setupDataLoad(map->mapName);
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     sprintf(mapFile, "./bg/%s.tpl", newMapName);
 #else
     sprintf(mapFile, "./b/%s.tpl", newMapName);
 #endif
     bgEntry(mapFile);
-    if (gp->flags & 1) {
+    if (gp->flags & GLOBAL_FLAG_LOADED) {
         MarioWork* mario;
         PartyEntry* party;
         PartyEntry* extraParty;
@@ -671,7 +533,7 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
         }
     }
     mw = marioGetPtr();
-    cam = camGetPtr(4);
+    cam = camGetPtr(CAMERA_3D);
     cam->marioPos.x = mw->position.x;
     cam->marioPos.y = 0.01f + mw->position.y;
     cam->marioPos.z = mw->position.z;
@@ -681,7 +543,7 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
     mw->camTarget = mw->position;
     camRoadReset();
     camShiftReset();
-    if (cam->flags & 4) {
+    if (cam->flags & CAM_FLAG_ROAD_LOADED) {
         camRoadMain(&roadOut, 1.0f + cam->marioPos.x, 1.0f + cam->marioPos.y, 1.0f + cam->marioPos.z,
                     1.0f + cam->marioAt.x, 1.0f + cam->marioAt.y, 1.0f + cam->marioAt.z, 0.0f);
     }

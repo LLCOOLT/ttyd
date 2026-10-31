@@ -1,3 +1,6 @@
+// Fire breath (gonbaba_breath, ファイアブレス): type % 10 picks the colour set in col_tbl (0 normal, 1 poison, 2 mega,
+// 3 cold, 4 confusion, 5 sleep, 6 mini, 7 Bowser); each type 0-7 also spawns its companion layer as type + 10.
+// Particles drift out along a yaw. Used by Hooktail, Bonetail and Bowser.
 #include "eff/eff_gonbaba_breath.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -9,11 +12,9 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 #include "version.h"
+#include "libc_decls.h"
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
-
-double sin(double);
-double cos(double);
 
 #define PI 3.1415927f
 #define HALF_PI 1.5707964f
@@ -40,12 +41,12 @@ static GXColor col_mini[] = {
     {0xAE, 0x69, 0xE0, 0xFF}, {0xBF, 0x7C, 0xF0, 0xFF}, {0xCD, 0x97, 0xF5, 0xFF}, {0xF3, 0xC0, 0xFA, 0xFF}, {0x81, 0x31, 0xBB, 0xFF},
 };
 static GXColor* col_tbl[] = {col_normal, col_poison, col_mega, col_cold, col_confu, col_sleep, col_mini, col_normal};
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
 #pragma force_active on
-#ifdef VERSION_G8ME01
-u32 gap_07_8041E0A4_sdata[7] = {0,0,0,0,0,0,0};
+#if VERSION >= VERSION_US
+u32 eff_gonbaba_breath_sdata_pad[7] = {0, 0, 0, 0, 0, 0, 0};
 #else
-u32 gap_07_80417E8C_sdata[5] = {0,0,0,0,0};
+u32 eff_gonbaba_breath_sdata_pad[5] = {0, 0, 0, 0, 0};
 #endif
 #pragma force_active reset
 #endif
@@ -64,24 +65,21 @@ static inline f32 _sinf(f32 x) {
             a = a * x2 - b;
             a = a * x2 + c;
             a = a * x;
-        }
-        else {
+        } else {
             y = HALF_PI - (x - HALF_PI);
             x2 = y * y;
             a = a * x2 - b;
             a = a * x2 + c;
             a = a * y;
         }
-    }
-    else if (x < 4.712389f) {
+    } else if (x < 4.712389f) {
         y = x - PI;
         x2 = y * y;
         a = a * x2 - b;
         a = a * x2 + c;
         a = a * y;
         a = -a;
-    }
-    else {
+    } else {
         y = HALF_PI - (x - 4.712389f);
         x2 = y * y;
         a = a * x2 - b;
@@ -104,23 +102,20 @@ static inline f32 _cosf(f32 x) {
             x2 = x * x;
             a = a * x2 - b;
             a = a * x2 + c;
-        }
-        else {
+        } else {
             y = HALF_PI - (x - HALF_PI);
             x2 = y * y;
             a = a * x2 - b;
             a = a * x2 + c;
             a = -a;
         }
-    }
-    else if (x < 4.712389f) {
+    } else if (x < 4.712389f) {
         y = x - PI;
         x2 = y * y;
         a = a * x2 - b;
         a = a * x2 + c;
         a = -a;
-    }
-    else {
+    } else {
         y = HALF_PI - (x - 4.712389f);
         x2 = y * y;
         a = a * x2 - b;
@@ -132,7 +127,9 @@ static inline f32 _cosf(f32 x) {
 void effGonbabaBreathMain(EffectEntry* effect);
 void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect);
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+// lifetimes optimisation off for init_breath: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {
     f32 ang;
@@ -175,8 +172,7 @@ void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {
         case 13:
         case 14:
         case 15:
-        case 16:
-            {
+        case 16: {
             f32 ang2, rad2, spd2;
             ang2 = 240.0f + irand(60);
             spd2 = (irand(50) + 10) / 10.0f;
@@ -197,8 +193,7 @@ void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {
             work->to[0] = col_tbl[type % 10][0].r;
             work->to[1] = col_tbl[type % 10][0].g;
             work->to[2] = col_tbl[type % 10][0].b;
-            }
-            break;
+        } break;
         case 17:
             ang = 225.0f + irand(90);
             spd = (irand(50) + 10) / 10.0f;
@@ -262,7 +257,7 @@ EffectEntry* effGonbabaBreathEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffGonbabaBreathWork));
     effect->userdata = work;
     effect->callback = effGonbabaBreathMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -301,8 +296,8 @@ void effGonbabaBreathMain(EffectEntry* effect) {
     v.y = work->position.y;
     v.z = work->position.z;
     position = v;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->life = 32;
         if (work->child) {
             effSoftDelete(work->child);
@@ -394,9 +389,9 @@ void effGonbabaBreathMain(EffectEntry* effect) {
                 work->velY *= 0.9f;
                 work->position.x += work->velX;
                 work->position.y += work->velY;
-                work->from[0] = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(work->from[0], work->to[0], 11, 30 - work->life, 30);
-                work->from[1] = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(work->from[1], work->to[1], 11, 30 - work->life, 30);
-                work->from[2] = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(work->from[2], work->to[2], 11, 30 - work->life, 30);
+                work->from[0] = intplGetValue(11, work->from[0], work->to[0], 30 - work->life, 30);
+                work->from[1] = intplGetValue(11, work->from[1], work->to[1], 30 - work->life, 30);
+                work->from[2] = intplGetValue(11, work->from[2], work->to[2], 30 - work->life, 30);
                 break;
             case 17:
                 if (work->life == 0) {
@@ -416,156 +411,141 @@ void effGonbabaBreathMain(EffectEntry* effect) {
                 work->velY *= 0.9f;
                 work->position.x += work->velX;
                 work->position.y += work->velY;
-                work->from[0] = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(work->from[0], work->to[0], 11, 60 - work->life, 60);
-                work->from[1] = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(work->from[1], work->to[1], 11, 60 - work->life, 60);
-                work->from[2] = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(work->from[2], work->to[2], 11, 60 - work->life, 60);
+                work->from[0] = intplGetValue(11, work->from[0], work->to[0], 60 - work->life, 60);
+                work->from[1] = intplGetValue(11, work->from[1], work->to[1], 60 - work->life, 60);
+                work->from[2] = intplGetValue(11, work->from[2], work->to[2], 60 - work->life, 60);
                 break;
         }
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effGonbabaBreathDisp, effect);
 }
 
-void effGonbabaBreathDisp(CameraId cameraId, EffectEntry *effect)
-{
-  EffGonbabaBreathWork *work = effect->userdata;
-  Mtx trans;
-  Mtx rot;
-  Mtx scale;
-  Mtx mtx;
-  GXTexObj texObj;
-  s32 i;
-  s32 j;
-  CameraEntry *cam;
-  s32 type;
-  s32 alpha;
-  f32 f4 = 4.0f;
-  cam = camGetPtr(cameraId);
-  type = work->type;
-  alpha = work->alpha;
-  if (type < 10)
-  {
-    PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
-  }
-  else
-  {
-    f32 c = cos((6.2831855f * camGetPtr(4)->viewYaw) / 360.0f);
-    f32 s = sin((6.2831855f * camGetPtr(4)->viewYaw) / 360.0f);
-    PSMTXTrans(trans, work->position.x - (2.0f * s), work->position.y, work->position.z + (2.0f * c));
-  }
-  PSMTXRotRad(rot, 'y', (work->yaw - camGetPtr(cameraId)->viewYaw) * 0.01745329252f);
-  if ((work->yaw > 90.0f) && (work->yaw < 270.0f))
-  {
-    PSMTXScale(scale, work->scale, work->scale, -work->scale);
-  }
-  else
-  {
-    PSMTXScale(scale, work->scale, work->scale, work->scale);
-  }
-  PSMTXConcat(trans, rot, trans);
-  PSMTXConcat(trans, scale, trans);
-  PSMTXConcat(cam->view, trans, mtx);
-  effGetTexObj(EFF_TEX(0x8e), &texObj);
-  GXLoadTexObj(&texObj, GX_TEXMAP0);
-  GXSetNumChans(1);
-  GXSetChanCtrl(GX_COLOR0A0, (GXBool) 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-  GXSetNumTexGens(1);
-  GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, (GXBool) 0, GX_PTIDENTITY);
-  GXSetNumTevStages(1);
-  GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-  GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
-  GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
-  GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, (((((((((GX_CC_RASC & 0xFFFFFFFFFFFFFFFF) & ((0, 0xFFFFFFFFFFFFFFFF))) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF) & 0xFFFFFFFFFFFFFFFF);
-  GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
-  GXSetCullMode(GX_CULL_NONE);
-  GXClearVtxDesc();
-  GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-  GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-  GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-  GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-  work++;
-  for (i = 1; i < effect->count; i++, work++)
-  {
-    if (work->delay != 0)
-    {
-      continue;
+void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect) {
+    EffGonbabaBreathWork* work = effect->userdata;
+    Mtx trans;
+    Mtx rot;
+    Mtx scale;
+    Mtx mtx;
+    GXTexObj texObj;
+    s32 i;
+    s32 j;
+    CameraEntry* cam;
+    s32 type;
+    s32 alpha;
+    f32 quadSize = 4.0f;
+    cam = camGetPtr(cameraId);
+    type = work->type;
+    alpha = work->alpha;
+    if (type < 10) {
+        PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
+    } else {
+        f32 c = cos((6.2831855f * camGetPtr(CAMERA_3D)->viewYaw) / 360.0f);
+        f32 s = sin((6.2831855f * camGetPtr(CAMERA_3D)->viewYaw) / 360.0f);
+        PSMTXTrans(trans, work->position.x - (2.0f * s), work->position.y, work->position.z + (2.0f * c));
     }
-    PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
-    PSMTXScale(scale, work->scale, work->scale, work->scale);
+    PSMTXRotRad(rot, 'y', (work->yaw - camGetPtr(cameraId)->viewYaw) * 0.01745329252f);
+    if ((work->yaw > 90.0f) && (work->yaw < 270.0f)) {
+        PSMTXScale(scale, work->scale, work->scale, -work->scale);
+    } else {
+        PSMTXScale(scale, work->scale, work->scale, work->scale);
+    }
+    PSMTXConcat(trans, rot, trans);
     PSMTXConcat(trans, scale, trans);
-    PSMTXConcat(mtx, trans, trans);
-    GXLoadPosMtxImm(trans, GX_PNMTX0);
-    GXSetCurrentMtx(GX_PNMTX0);
-    switch (work->type)
-    {
-      case 0:
-
-      case 1:
-
-      case 2:
-
-      case 3:
-
-      case 4:
-
-      case 5:
-
-      case 6:
-
-      case 7:
-        for (j = 0; j < 3; j++)
-      {
-        f32 w;
-        col_tbl[type % 10][j].a = (work->alpha * alpha) / 255;
-        GXSetChanMatColor(GX_COLOR0A0, col_tbl[type % 10][j]);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32((-(16.0f - (4.0f * j))) / 2.0f, (16.0f - (4.0f * j)) / 2.0f, 0.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32((16.0f - (4.0f * j)) / 2.0f, (16.0f - (4.0f * j)) / 2.0f, 0.0f);
-        GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32((16.0f - (4.0f * j)) / 2.0f, (-(16.0f - (4.0f * j))) / 2.0f, 0.0f);
-        GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32((-(16.0f - (4.0f * j))) / 2.0f, (-(16.0f - (4.0f * j))) / 2.0f, 0.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-      }
-
-        break;
-
-      case 10:
-
-      case 11:
-
-      case 12:
-
-      case 13:
-
-      case 14:
-
-      case 15:
-
-      case 16:
-
-      case 17:
-        {
-        GXColor c;
-        c.r = work->from[0];
-        c.g = work->from[1];
-        c.b = work->from[2];
-        c.a = (work->alpha * alpha) / 255;
-        GXSetChanMatColor(GX_COLOR0A0, c);
+    PSMTXConcat(cam->view, trans, mtx);
+    effGetTexObj(EFF_TEX(0x8e), &texObj);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, (GXBool)0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, (GXBool)0, GX_PTIDENTITY);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool)1, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool)1, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    work++;
+    for (i = 1; i < effect->count; i++, work++) {
+        if (work->delay != 0) {
+            continue;
         }
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32((-f4 / 2.0f), f4 * 0.5f, 0.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(f4 * 0.5f, f4 * 0.5f, 0.0f);
-        GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(f4 * 0.5f, (-f4 / 2.0f), 0.0f);
-        GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32((-f4 / 2.0f), (-f4 / 2.0f), 0.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        break;
+        PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
+        PSMTXScale(scale, work->scale, work->scale, work->scale);
+        PSMTXConcat(trans, scale, trans);
+        PSMTXConcat(mtx, trans, trans);
+        GXLoadPosMtxImm(trans, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+        switch (work->type) {
+            case 0:
 
+            case 1:
+
+            case 2:
+
+            case 3:
+
+            case 4:
+
+            case 5:
+
+            case 6:
+
+            case 7:
+                for (j = 0; j < 3; j++) {
+                    f32 w;
+                    col_tbl[type % 10][j].a = (work->alpha * alpha) / 255;
+                    GXSetChanMatColor(GX_COLOR0A0, col_tbl[type % 10][j]);
+                    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                    GXPosition3f32((-(16.0f - (4.0f * j))) / 2.0f, (16.0f - (4.0f * j)) / 2.0f, 0.0f);
+                    GXTexCoord2f32(0.0f, 0.0f);
+                    GXPosition3f32((16.0f - (4.0f * j)) / 2.0f, (16.0f - (4.0f * j)) / 2.0f, 0.0f);
+                    GXTexCoord2f32(1.0f, 0.0f);
+                    GXPosition3f32((16.0f - (4.0f * j)) / 2.0f, (-(16.0f - (4.0f * j))) / 2.0f, 0.0f);
+                    GXTexCoord2f32(1.0f, 1.0f);
+                    GXPosition3f32((-(16.0f - (4.0f * j))) / 2.0f, (-(16.0f - (4.0f * j))) / 2.0f, 0.0f);
+                    GXTexCoord2f32(0.0f, 1.0f);
+                }
+
+                break;
+
+            case 10:
+
+            case 11:
+
+            case 12:
+
+            case 13:
+
+            case 14:
+
+            case 15:
+
+            case 16:
+
+            case 17: {
+                GXColor c;
+                c.r = work->from[0];
+                c.g = work->from[1];
+                c.b = work->from[2];
+                c.a = (work->alpha * alpha) / 255;
+                GXSetChanMatColor(GX_COLOR0A0, c);
+            }
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                GXPosition3f32((-quadSize / 2.0f), quadSize * 0.5f, 0.0f);
+                GXTexCoord2f32(0.0f, 0.0f);
+                GXPosition3f32(quadSize * 0.5f, quadSize * 0.5f, 0.0f);
+                GXTexCoord2f32(1.0f, 0.0f);
+                GXPosition3f32(quadSize * 0.5f, (-quadSize / 2.0f), 0.0f);
+                GXTexCoord2f32(1.0f, 1.0f);
+                GXPosition3f32((-quadSize / 2.0f), (-quadSize / 2.0f), 0.0f);
+                GXTexCoord2f32(0.0f, 1.0f);
+                break;
+        }
     }
-
-  }
-
 }

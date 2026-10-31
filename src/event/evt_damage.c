@@ -1,3 +1,4 @@
+// Scripts and commands for the map damage hazard that moves toward Mario (Gazigazi).
 #include "evt/evt_cmd.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
@@ -10,11 +11,6 @@
 #include "system.h"
 #include <dolphin/os.h>
 
-USER_FUNC(evt_npc_pera_onoff);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_wait_anim);
-
 USER_FUNC(evt_gazigazi_move_position);
 USER_FUNC(camdir);
 
@@ -25,7 +21,7 @@ EVT_BEGIN(evt_gazigazi_entry)
     CALL(evt_npc_set_position, STRING(GAZIGAZI), 0, -1000, 0)
     CALL(evt_npc_pera_onoff, STRING(GAZIGAZI), 0)
     CALL(evt_npc_set_ry, STRING(GAZIGAZI), FLOAT(0.0f))
-    CALL(evt_npc_flag_onoff, 1, STRING(GAZIGAZI), 0x02000000)
+    CALL(evt_npc_flag_onoff, 1, STRING(GAZIGAZI), NPC_FLAG_NO_BILLBOARD)
     RETURN
 EVT_END()
 
@@ -51,7 +47,7 @@ EVT_BEGIN(evt_gazigazi_appear)
     ADD(LW(13), 0)
     ADD(LW(14), -10)
     ADD(LW(15), 0)
-    CALL(evt_npc_flag_onoff, 1, STRING(GAZIGAZI), 0x40000020)
+    CALL(evt_npc_flag_onoff, 1, STRING(GAZIGAZI), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_rotate_offset, STRING(GAZIGAZI), 0, 20, 0)
     CALL(camdir)
     CALL(evt_npc_set_rotate, STRING(GAZIGAZI), FLOAT(0.0f), LW(3), FLOAT(270.0f))
@@ -116,9 +112,9 @@ USER_FUNC(evt_gazigazi_move_position) {
     }
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - event->userdata[0]);
     if (elapsed < msec) {
-        x0 = intplGetValue(mode, (s32)elapsed, msec, x0, x1);
-        y0 = intplGetValue(mode, (s32)elapsed, msec, y0, y1);
-        z0 = intplGetValue(mode, (s32)elapsed, msec, z0, z1);
+        x0 = intplGetValue(mode, x0, x1, (s32)elapsed, msec);
+        y0 = intplGetValue(mode, y0, y1, (s32)elapsed, msec);
+        z0 = intplGetValue(mode, z0, z1, (s32)elapsed, msec);
         {
             Vec pos = {0.0f, 0.0f, 0.0f};
             pos.x = x0;

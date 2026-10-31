@@ -1,3 +1,5 @@
+// Paper Mario 64 smoke effect 4 (kemuri: smoke) at a point with an angle and a flip option.
+#include "eff/n64/eff_kemuri4_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -8,6 +10,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
+#include "libc_decls.h"
 
 typedef struct EffKemuri4N64Work {
     s32 active;      // 0x0
@@ -31,9 +34,6 @@ typedef struct EffKemuri4N64Work {
     f32 dirX;        // 0x80
     f32 dirZ;        // 0x84
 } EffKemuri4N64Work;
-
-double sin(double);
-double cos(double);
 
 effN64Vtx flowers_v[41] = {
     {-9, 8, -7, 0, 512, 255, 255, 255, 255},
@@ -95,33 +95,33 @@ EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 fl
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri4N64Work));
     effect->userdata = work;
     effect->callback = effKemuri4Main;
-    
+
     for (i = 0; i < 1; i++, work++) {
-    work->active = 1;
-    work->type = type;
-    work->reserved_6C = 0.0f;
-    work->position.x = x;
-    work->position.y = y;
-    work->position.z = z;
-    work->scale.x = 1.0f;
-    work->scale.y = 1.0f;
-    work->scale.z = 1.0f;
-    work->alpha = 255;
-    work->rising = 1.0f;
-    work->moveScale = 5.4f;
-    work->rotSpeed = (f32)(flip != zero ? -10 : 10);
-    work->velocity = 0.5f;
-    work->accel = -0.07f;
-    work->accel2 = 0.003f;
-    work->accel3 = 0.0f;
-    work->timer = 15;
-    work->rotation.y = angle;
-    work->rotation.x = 0.0f;
-    work->rotation.z = 0.0f;
-    work->texFlag = (rand() % 100 >> 4) & 1;
-    rad = 6.2831855f * reviseAngle(angle + (f32)(flip != zero ? -90 : 90)) / 360.0f;
-    work->dirX = (f32)sin(rad);
-    work->dirZ = (f32)cos(rad);
+        work->active = 1;
+        work->type = type;
+        work->reserved_6C = 0.0f;
+        work->position.x = x;
+        work->position.y = y;
+        work->position.z = z;
+        work->scale.x = 1.0f;
+        work->scale.y = 1.0f;
+        work->scale.z = 1.0f;
+        work->alpha = 255;
+        work->rising = 1.0f;
+        work->moveScale = 5.4f;
+        work->rotSpeed = (f32)(flip != zero ? -10 : 10);
+        work->velocity = 0.5f;
+        work->accel = -0.07f;
+        work->accel2 = 0.003f;
+        work->accel3 = 0.0f;
+        work->timer = 15;
+        work->rotation.y = angle;
+        work->rotation.x = 0.0f;
+        work->rotation.z = 0.0f;
+        work->texFlag = (rand() % 100 >> 4) & 1;
+        rad = 6.2831855f * reviseAngle(angle + (f32)(flip != zero ? -90 : 90)) / 360.0f;
+        work->dirX = (f32)sin(rad);
+        work->dirZ = (f32)cos(rad);
     }
     return effect;
 }

@@ -1,3 +1,4 @@
+// eff_fireworks_n64.c: Paper Mario 64 Fireworks effect entry (effFireworksN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

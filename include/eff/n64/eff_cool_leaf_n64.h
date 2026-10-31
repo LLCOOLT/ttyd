@@ -1,3 +1,4 @@
+// eff_cool_leaf_n64.c: Paper Mario 64 CoolLeaf effect entry (effCoolLeafN64Entry).
 #pragma once
 
 #include "driver/effdrv.h"

@@ -1,5 +1,8 @@
 #pragma once
 
+// Declarations shared by the moo.rel units (月, the Moon).
+
+#include "version.h"
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"
 #include "evt/evt_word.h"
@@ -16,5 +19,10 @@ extern EvtWord moo_06_init_evt[];
 extern EvtWord moo_07_init_evt[];
 extern BattleUnitKind unit_kuriboo;
 extern BattleUnitKind unit_sinemon;
+extern BattleUnitKind unit_barriern_z;
+extern BattleUnitKind unit_barriern_z_satellite;
 
-extern s32 rock_main[];
+#if VERSION >= VERSION_US
+// US and PAL share one rock_main (defined in moo_00); JP gives every map its own static copy.
+extern EvtWord rock_main[];
+#endif

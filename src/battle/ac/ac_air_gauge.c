@@ -1,3 +1,5 @@
+// Action command: air gauge (ac_air_gauge); press A repeatedly to fill a gauge that constantly drains.
+#include <dolphin/pad.h>
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
@@ -7,21 +9,18 @@
 #include "system.h"
 #include <string.h>
 #include "icon_ids.h"
+#include "version.h"
 
+// this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 
-void BattleAcDrawGauge(s32 x, s32 y, s32 icon, f32 ratio, s32 a, s32 b, s32 c, s32 d, s32 e);
-void BattleAcGaugeSeInit(void);
-void BattleAcGaugeSeUpdate(f32 value);
-void BattleAcGaugeSeDelete(void);
-
 typedef struct AirGaugeWork {
-    s32 frame;      // 0x0, frames since input started
-    f32 gauge;      // 0x4, 0..100, drained by _GetGaugeDecValue
-    u32 presses;    // 0x8, A presses (1 = success when auto)
-    s32 holdFrames; // 0xC, frames A held since the last press
+    s32 frame;         // 0x0, frames since input started
+    f32 gauge;         // 0x4, 0..100, drained by _GetGaugeDecValue
+    u32 presses;       // 0x8, A presses (1 = success when auto)
+    s32 holdFrames;    // 0xC, frames A held since the last press
     s32 releaseFrames; // 0x10, cleared at init, never read
-    s32 endWait;    // 0x14, frames before the result
+    s32 endWait;       // 0x14, frames before the result
 } AirGaugeWork;
 
 // static data from inlined header functions
@@ -33,7 +32,7 @@ typedef struct GaugeKey {
 } GaugeKey;
 
 #define GAUGE_TABLE {{0, 0.0f, 1}, {20, 1.0f, 1}, {40, 1.0f, 1}, {80, 0.0f, 0}, {-1, -1.0f, 0}}
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // the demo curve rises faster and falls off sooner; table 3 already has the retail one
 #define GAUGE_TABLE_DEMO {{0, 0.0f, 1}, {10, 1.2f, 1}, {30, 0.7f, 1}, {50, 0.0f, 0}, {-1, -1.0f, 0}}
 GaugeKey _table_0[5] = GAUGE_TABLE_DEMO;
@@ -69,7 +68,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
     AirGaugeWork* pw = (AirGaugeWork*)ac->work;
     BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
 
-    switch (ac->mAcState) {
+    switch (ac->acState) {
         case 0:
             memset(disp, 0, 0x2C);
             disp->iconX = -300.0f;
@@ -81,7 +80,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             ac->outputParams[0] = 0;
             ac->outputParams[2] = 0;
             ac->outputParams[1] = 0;
-            ac->mAcState = 99;
+            ac->acState = 99;
             ac->result = 1;
             pw->gauge = 0.0f;
             pw->presses = 0;
@@ -91,7 +90,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
+            if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
                 if (irand(100) >= 0) {
                     ac->setupParam = ac->params[3] / 2;
                     ac->outputParams[0] = 0;
@@ -116,16 +115,16 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                     }
                     ac->outputParams[2] = 100;
                 }
-                ac->mAcState = 1001;
+                ac->acState = 1001;
                 break;
             }
             BattleAcGaugeSeInit();
-            ac->mAcState = 1000;
+            ac->acState = 1000;
         case 1000:
             pw->frame++;
-            if (BattlePadCheckNow(0x100)) {
+            if (BattlePadCheckNow(PAD_BUTTON_A)) {
                 ac->outputParams[1] = 1;
-                if (((s32(*)(s32))BattlePadCheckTrigger)(0x100)) {
+                if (BattlePadCheckTrigger(PAD_BUTTON_A)) {
                     pw->presses++;
                     pw->holdFrames = 0;
                 }
@@ -135,7 +134,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                 pw->holdFrames = 0;
             }
             pw->gauge -= _GetGaugeDecValue();
-            if (ac->mAcUnit->badgesEquipped.AutoCommand) {
+            if (ac->acUnit->badgesEquipped.AutoCommand) {
                 pw->presses = 1;
                 pw->gauge = 100.0f;
             }
@@ -147,7 +146,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             }
             BattleAcGaugeSeUpdate(pw->gauge);
             if (pw->frame >= ac->params[1]) {
-                if (ac->mAcUnit->badgesEquipped.AutoCommand) {
+                if (ac->acUnit->badgesEquipped.AutoCommand) {
                     pw->presses = 1;
                     pw->gauge = 100.0f;
                 }
@@ -159,7 +158,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                     return 0;
                 }
                 ac->result = 2;
-                ac->mResultCount++;
+                ac->resultCount++;
                 if (pw->gauge < (f32)ac->params[3]) {
                     ac->outputParams[0] = 1;
                 } else if (ac->params[2] <= 2) {
@@ -178,7 +177,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                     ac->outputParams[0] = 5;
                 }
                 ac->outputParams[2] = (s32)pw->gauge;
-                ac->mAcState = 1002;
+                ac->acState = 1002;
             }
             break;
         case 1001:
@@ -186,7 +185,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             if (ac->setupParam < 0) {
                 if ((s32)ac->outputParams[0] > 0) {
                     ac->result = 2;
-                    ac->mResultCount++;
+                    ac->resultCount++;
                 } else {
                     ac->result = 0;
                 }
@@ -196,11 +195,11 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
         case 1002:
             BattleAcGaugeSeDelete();
             pw->endWait = 60;
-            ac->mAcState = 1003;
+            ac->acState = 1003;
         case 1003:
             pw->endWait--;
             if (pw->endWait <= 0) {
-                ac->mAcState = 1004;
+                ac->acState = 1004;
             }
             break;
         case 1004:
@@ -219,27 +218,68 @@ f32 _GetGaugeDecValue(void) {
     AirPw* pw = (AirPw*)ac->work;
     GaugeKey* t;
     f32 base;
-    u32 frame;
 
     switch ((u32)ac->params[7]) {
-#ifdef VERSION_G8ME01_DEMO
-        case 0: base = 0.0f; t = _table_0; break;
-        case 1: base = 0.2f; t = _table_1; break;
-        case 2: base = 0.3f; t = _table_2; break;
-        case 3: base = 0.4f; t = _table_3; break;
-        case 4: base = 0.45f; t = _table_4; break;
-        case 5: base = 0.45f; t = _table_5; break;
+#if VERSION == VERSION_DEMO
+        case 0:
+            base = 0.0f;
+            t = _table_0;
+            break;
+        case 1:
+            base = 0.2f;
+            t = _table_1;
+            break;
+        case 2:
+            base = 0.3f;
+            t = _table_2;
+            break;
+        case 3:
+            base = 0.4f;
+            t = _table_3;
+            break;
+        case 4:
+            base = 0.45f;
+            t = _table_4;
+            break;
+        case 5:
+            base = 0.45f;
+            t = _table_5;
+            break;
         case 6:
-        default: t = _table_6; base = 0.45f; break;
+        default:
+            t = _table_6;
+            base = 0.45f;
+            break;
 #else
-        case 0: base = 0.3f; t = _table_0; break;
-        case 1: base = 0.33f; t = _table_1; break;
-        case 2: base = 0.36f; t = _table_2; break;
-        case 3: base = 0.4f; t = _table_3; break;
-        case 4: base = 0.44f; t = _table_4; break;
-        case 5: base = 0.47f; t = _table_5; break;
+        case 0:
+            base = 0.3f;
+            t = _table_0;
+            break;
+        case 1:
+            base = 0.33f;
+            t = _table_1;
+            break;
+        case 2:
+            base = 0.36f;
+            t = _table_2;
+            break;
+        case 3:
+            base = 0.4f;
+            t = _table_3;
+            break;
+        case 4:
+            base = 0.44f;
+            t = _table_4;
+            break;
+        case 5:
+            base = 0.47f;
+            t = _table_5;
+            break;
         case 6:
-        default: t = _table_6; base = 0.5f; break;
+        default:
+            t = _table_6;
+            base = 0.5f;
+            break;
 #endif
     }
     while (pw->hold > t->frame) {
@@ -253,8 +293,7 @@ f32 _GetGaugeDecValue(void) {
         return base;
     }
     pw->flag = t->flag;
-    base -= ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(t[-1].value, t->value, 0, pw->hold - t[-1].frame,
-                                                              t->frame - t[-1].frame);
+    base -= intplGetValue(0, t[-1].value, t->value, pw->hold - t[-1].frame, t->frame - t[-1].frame);
     return base;
 }
 
@@ -266,9 +305,9 @@ void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleActions* ac = &work->actionCommands;
     BattleACDispParams* disp = &ac->disp;
-    switch (ac->mAcState) {
+    switch (ac->acState) {
         case 99:
-            disp->iconX = intplGetValue(4, 20 - disp->slideTimer, 20, -300.0f, 30.0f);
+            disp->iconX = intplGetValue(4, -300.0f, 30.0f, 20 - disp->slideTimer, 20);
         case 100:
         case 1000:
             actionCommandDisp(disp->iconX, disp->iconY);
@@ -279,7 +318,7 @@ void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
         case 1002:
         case 1003:
             if (disp->slideTimer >= 40) {
-                disp->iconX = intplGetValue(4, disp->slideTimer - 40, 20, 30.0f, -300.0f);
+                disp->iconX = intplGetValue(4, 30.0f, -300.0f, disp->slideTimer - 40, 20);
             } else {
                 disp->iconX = 30.0f;
             }
@@ -292,9 +331,10 @@ void battleAcDisp_AirGauge(CameraId cameraId, void* param) {
 }
 
 void battleAcDelete_AirGauge(BattleWork* work) {
-    work->actionCommands.mAcState = 1002;
+    work->actionCommands.acState = 1002;
 }
 
+// inlining off for actionCommandDisp, as in the original (the object differs without it)
 #pragma dont_inline on
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
@@ -302,9 +342,8 @@ static void actionCommandDisp(f32 x, f32 y) {
     BattleACDispParams* disp = &ac->disp;
     AirPw* pw;
     f32 ratio;
-    f32 cur;
 
-    camGetPtr(8);
+    camGetPtr(CAMERA_2D);
     pw = (AirPw*)ac->work;
     ratio = pw->gauge / 100.0f;
     if (disp->gaugeRatio <= ratio) {

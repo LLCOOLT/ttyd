@@ -1,28 +1,24 @@
+// tik_09 (埋没した都市, Rogueport Sewers): a small pipe room between tik_06 and tik_10.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_sub_intpl_get_value);
-USER_FUNC(evt_sub_intpl_init);
+#include "evt/evt_hit.h"
+#include "evt/evt_map.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "party/party_motion.h"
+#include "tik.h"
 
 static BeroEntry bero_entry_data[3];
 extern EvtWord evt_tik09_dokan[];
-extern EvtWord tik_09_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "dokan_1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -38,8 +34,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan_2", // hitName
         2, // type
         0, // sfxId
-        8, // directionId
-        100000, // centerPosition
+        BERO_DIR_UP, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -75,8 +71,8 @@ EVT_BEGIN(tik_09_init_evt)
     CALL(evt_hit_bind_mapobj, STRING("a_dokan_1"), STRING("dokan_1_s"))
     CALL(evt_mapobj_trans, 1, STRING("dokan_1_s"), 0, 30, 0)
     CALL(evt_hit_bind_update, STRING("a_dokan_1"))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -84,4 +80,3 @@ EVT_BEGIN(tik_09_init_evt)
     SPAWN_EVENT(PTR(evt_tik09_dokan))
     RETURN
 EVT_END()
-

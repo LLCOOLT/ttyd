@@ -1,3 +1,4 @@
+// eff_pokopi_pcharge_n64.c: pokopi charge effect entry (effPokopiPchargeN64Entry).
 #pragma once
 
 #include <dolphin/mtx.h>

@@ -1,3 +1,4 @@
+// The script-writing macros: EVT_BEGIN/EVT_END, the opcode macros and the operand helpers (PTR, FLOAT, LW...).
 #pragma once
 
 #include <dolphin/types.h>
@@ -12,11 +13,9 @@
 
 #define PTR(value) (EvtWord)(value)
 #define STRING(value) PTR(value)
-#define FLOAT(value) ((s32)(value * 1024.0f) - EVTDAT_FLOAT_BASE)
+#define FLOAT(value) ((s32)((value) * 1024.0f) - EVTDAT_FLOAT_BASE)
 
 #define EVT_CMD(param_count, opcode) (((param_count) << 16) | (opcode))
-
-#define EVT_DEF(name) EvtWord(name)[]
 
 #define EVT_BEGIN(name) EvtWord(name)[] = {
 
@@ -26,16 +25,16 @@
     ;
 
 // EVT_END plus one trailing zero pad word
-#define EVT_END_PAD() \
+#define EVT_END_PAD()  \
     OPCODE_END_SCRIPT, \
-    0                  \
+        0              \
     }                  \
     ;
 
 // EVT_END plus four trailing zero pad words
 #define EVT_END_PAD4() \
     OPCODE_END_SCRIPT, \
-    0, 0, 0, 0         \
+        0, 0, 0, 0     \
     }                  \
     ;
 
@@ -209,31 +208,36 @@
 #define END_SIBLING_EVENT EVT_CMD(0, OPCODE_END_BROTHER),
 
 // Data types
-#define EVTDAT_LW_MAX -20 * 1000000
-#define EVTDAT_GW_MAX -40 * 1000000
-#define EVTDAT_LF_MAX -60 * 1000000
-#define EVTDAT_GF_MAX -80 * 1000000
-#define EVTDAT_LSWF_MAX -100 * 1000000
-#define EVTDAT_GSWF_MAX -120 * 1000000
-#define EVTDAT_LSW_MAX -140 * 1000000
-#define EVTDAT_GSW_MAX -160 * 1000000
-#define EVTDAT_UW_MAX -180 * 1000000
-#define EVTDAT_UF_MAX -200 * 1000000
-#define EVTDAT_FLOAT_MAX -220 * 1000000
-#define EVTDAT_POINTER_MAX -250 * 1000000
-#define EVTDAT_ADDR_MAX -270 * 1000000
+#define EVTDAT_LW_MAX (-20 * 1000000)
+#define EVTDAT_GW_MAX (-40 * 1000000)
+#define EVTDAT_LF_MAX (-60 * 1000000)
+#define EVTDAT_GF_MAX (-80 * 1000000)
+#define EVTDAT_LSWF_MAX (-100 * 1000000)
+#define EVTDAT_GSWF_MAX (-120 * 1000000)
+#define EVTDAT_LSW_MAX (-140 * 1000000)
+#define EVTDAT_GSW_MAX (-160 * 1000000)
+#define EVTDAT_UW_MAX (-180 * 1000000)
+#define EVTDAT_UF_MAX (-200 * 1000000)
+#define EVTDAT_FLOAT_MAX (-220 * 1000000)
+#define EVTDAT_POINTER_MAX (-250 * 1000000)
+#define EVTDAT_ADDR_MAX (-270 * 1000000)
 
-#define EVTDAT_LW_BASE 30 * 1000000
-#define EVTDAT_GW_BASE 50 * 1000000
-#define EVTDAT_LF_BASE 70 * 1000000
-#define EVTDAT_GF_BASE 90 * 1000000
-#define EVTDAT_LSWF_BASE 110 * 1000000
-#define EVTDAT_GSWF_BASE 130 * 1000000
-#define EVTDAT_LSW_BASE 150 * 1000000
-#define EVTDAT_GSW_BASE 170 * 1000000
-#define EVTDAT_UW_BASE 190 * 1000000
-#define EVTDAT_UF_BASE 210 * 1000000
-#define EVTDAT_FLOAT_BASE 230 * 1000000
+// The "no value" word (-250000000): passed for an argument that should be left
+// unchanged or a pointer that is absent; script functions test their arguments
+// against it. Super Paper Mario's engine uses the same value under this name.
+#define EVT_NULLPTR EVTDAT_POINTER_MAX
+
+#define EVTDAT_LW_BASE (30 * 1000000)
+#define EVTDAT_GW_BASE (50 * 1000000)
+#define EVTDAT_LF_BASE (70 * 1000000)
+#define EVTDAT_GF_BASE (90 * 1000000)
+#define EVTDAT_LSWF_BASE (110 * 1000000)
+#define EVTDAT_GSWF_BASE (130 * 1000000)
+#define EVTDAT_LSW_BASE (150 * 1000000)
+#define EVTDAT_GSW_BASE (170 * 1000000)
+#define EVTDAT_UW_BASE (190 * 1000000)
+#define EVTDAT_UF_BASE (210 * 1000000)
+#define EVTDAT_FLOAT_BASE (230 * 1000000)
 
 #define LW(id) ((id) - EVTDAT_LW_BASE)
 #define GW(id) ((id) - EVTDAT_GW_BASE)

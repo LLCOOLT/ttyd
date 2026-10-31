@@ -1,5 +1,8 @@
+// tik_12 (埋没した都市, Rogueport Sewers): the charm-caster's (majinaishi) house: her charm cube (majinai_BOX) and trouble 14
+// (irai_14).
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#include "driver/animdrv.h"
 
 #include "eff/eff_stardust.h"
 #include "manager/evtmgr_cmd.h"
@@ -7,62 +10,26 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
 #include "mario/mario_pouch.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_snd.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_win.h"
+#include "evt/evt_window.h"
+#include "party/party_motion.h"
+#include "tik.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
 
 static USER_FUNC(effect_stardust);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_softdelete);
-USER_FUNC(evt_map_blend_off);
-USER_FUNC(evt_map_blend_set_flag);
-USER_FUNC(evt_map_checkanim);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_map_set_blend);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_exparty);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_jump_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_motion);
-USER_FUNC(evt_mario_set_pose);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_pouch_add_coin);
-USER_FUNC(evt_pouch_check_item);
-USER_FUNC(evt_pouch_get_coin);
-USER_FUNC(evt_pouch_majinai_set);
-USER_FUNC(evt_pouch_remove_item);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_set_dir_to_target);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_set_rev_mode);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_coin);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_unitwin_alloc);
-USER_FUNC(evt_unitwin_free);
-USER_FUNC(evt_win_item_select);
 USER_FUNC(majinaisi_ryokin_kaisu);
 static USER_FUNC(setmertn);
-USER_FUNC(unitwincoin_disp_onoff);
-USER_FUNC(unitwincoin_wait);
 
 s32 majinaisi_ryokin_kaisu_tbl[6];
 static BeroEntry bero_entry_data[2];
@@ -72,7 +39,6 @@ s32 iri_14_item_tbl[2];
 extern EvtWord majinaisi_direct_talk[];
 extern EvtWord majinaisi_init[];
 static NpcSetupInfo npcEnt[2];
-extern EvtWord tik_12_init_evt[];
 
 s32 majinaisi_ryokin_kaisu_tbl[] = {
     50, 20, 20, 10, 5, 5,
@@ -82,8 +48,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -180,14 +146,14 @@ EVT_BEGIN(majinaisi_table_talk)
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_INCANT_CUBE1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_map_playanim, STRING("anm_sen"), 0, 0)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("senn"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("senn"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_checkanim, STRING("anm_sen"), LW(0), LW(1))
     WAIT_MS(LW(1))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_INCANT_CUBE2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_map_playanim, STRING("anm_men"), 0, 0)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group4"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("group4"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_checkanim, STRING("anm_men"), LW(0), LW(1))
     WAIT_MS(LW(1))
     CALL(evt_npc_set_anim, STRING("me"), STRING("H_1"))
@@ -236,7 +202,7 @@ EVT_BEGIN(majinaisi_table_talk)
             ADD_FLOAT(LW(1), LW(3))
             IF_INT_GREATER(LW(3), LW(2))
                 ADD_FLOAT(LW(3), LW(4))
-                ELSE
+            ELSE
                 SET_FLOAT_VALUE(LW(3), LW(2))
             END_IF
             CASE_DEFAULT
@@ -302,15 +268,15 @@ EVT_BEGIN(majinaisi_table_talk)
     CALL(evt_eff_softdelete, STRING("aaax"))
     CALL(evt_snd_sfxoff, GW(1))
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group4"), 2048)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("senn"), 2048)
-        CALL(evt_map_blend_set_flag, 1, STRING("mario"), 2048)
-        CALL(evt_map_blend_set_flag, 1, STRING("party"), 2048)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("group4"), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("senn"), MAPOBJ_FLAG_NO_BLEND)
+        CALL(evt_map_blend_set_flag, 1, STRING("mario"), ANIM_MATERIAL_FLAG_NO_BLEND)
+        CALL(evt_map_blend_set_flag, 1, STRING("party"), ANIM_MATERIAL_FLAG_NO_BLEND)
         CALL(evt_mario_get_exparty, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(evt_map_blend_set_flag, 1, STRING("extparty"), 2048)
+            CALL(evt_map_blend_set_flag, 1, STRING("extparty"), ANIM_MATERIAL_FLAG_NO_BLEND)
         END_IF
-        CALL(evt_map_blend_set_flag, 1, STRING("まじない師"), 2048)
+        CALL(evt_map_blend_set_flag, 1, STRING("まじない師"), ANIM_MATERIAL_FLAG_NO_BLEND)
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 500)
         LABEL(4)
         CALL(evt_sub_intpl_msec_get_value)
@@ -334,24 +300,24 @@ EVT_BEGIN(majinaisi_table_talk)
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_INCANT_CUBE3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_map_playanim, STRING("anm_ten"), 0, 0)
     WAIT_FRAMES(1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("senn"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group4"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("BOX_tenkai"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("BOX_tenkai"), 2048)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("senn"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("group4"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("BOX_tenkai"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("BOX_tenkai"), MAPOBJ_FLAG_NO_BLEND)
     CALL(evt_map_checkanim, STRING("anm_ten"), LW(0), LW(1))
     WAIT_MS(LW(1))
     CALL(evt_msg_print, 0, STRING("majinaisi_08"), 0, STRING("me"))
     CALL(evt_mario_set_motion, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("majinai_BOX"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("majinai_BOX"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_blend_off, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("majinai_BOX"), 2048)
-    CALL(evt_map_blend_set_flag, 0, STRING("mario"), 2048)
-    CALL(evt_map_blend_set_flag, 0, STRING("party"), 2048)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("majinai_BOX"), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_map_blend_set_flag, 0, STRING("mario"), ANIM_MATERIAL_FLAG_NO_BLEND)
+    CALL(evt_map_blend_set_flag, 0, STRING("party"), ANIM_MATERIAL_FLAG_NO_BLEND)
     CALL(evt_mario_get_exparty, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(evt_map_blend_set_flag, 0, STRING("extparty"), 2048)
+        CALL(evt_map_blend_set_flag, 0, STRING("extparty"), ANIM_MATERIAL_FLAG_NO_BLEND)
     END_IF
-    CALL(evt_map_blend_set_flag, 0, STRING("まじない師"), 2048)
+    CALL(evt_map_blend_set_flag, 0, STRING("まじない師"), ANIM_MATERIAL_FLAG_NO_BLEND)
     CALL(evt_mapobj_trans, 1, STRING("majinai_BOX"), 0, 0, 0)
     WAIT_FRAMES(1)
     CALL(evt_party_run, 0)
@@ -365,31 +331,31 @@ s32 iri_14_item_tbl[] = {
 };
 
 EVT_BEGIN(majinaisi_direct_talk)
-    IF_INT_EQUAL(GSW(1420), 14)
-        IF_INT_EQUAL(GSWF(5405), 0)
+    IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 14)
+        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
             CALL(evt_msg_print, 0, STRING("irai_14_00"), 0, 0)
-            ELSE
-            IF_INT_EQUAL(GSWF(5406), 0)
+        ELSE
+            IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
                 CALL(evt_msg_print, 0, STRING("irai_14_01"), 0, 0)
                 CALL(evt_mario_set_pose, STRING("M_I_2"))
                 WAIT_MS(1000)
                 CALL(evt_mario_set_pose, STRING("M_S_1"))
                 CALL(evt_msg_print, 0, STRING("irai_14_02"), 0, 0)
-                SET_VALUE(GSWF(5406), 1)
-                ELSE
-                CALL(evt_pouch_check_item, 172, LW(0))
+                SET_VALUE(GSWF(GSWF_TROUBLE_WORK_1), 1)
+            ELSE
+                CALL(evt_pouch_check_item, ITEM_CAKE_MIX, LW(0))
                 IF_INT_GREATER(LW(0), 0)
                     CALL(evt_msg_print, 0, STRING("irai_14_04"), 0, 0)
                     CALL(evt_win_item_select, 0, PTR(iri_14_item_tbl), LW(0), 0)
                     IF_INT_NOT_EQUAL(LW(0), -1)
-                        CALL(evt_pouch_remove_item, 172, LW(0))
+                        CALL(evt_pouch_remove_item, ITEM_CAKE_MIX, LW(0))
                         CALL(evt_msg_print, 0, STRING("irai_14_05"), 0, 0)
                         CALL(evt_sub_get_coin, 30)
-                        SET_VALUE(GSW(1420), 0)
-                        SET_VALUE(GSWF(5388), 1)
+                        SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
+                        SET_VALUE(GSWF(GSWF_TROUBLE_14_SOLVED), 1)
                         CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
                     END_IF
-                    ELSE
+                ELSE
                     CALL(evt_msg_print, 0, STRING("irai_14_03"), 0, 0)
                 END_IF
             END_IF
@@ -401,14 +367,14 @@ EVT_BEGIN(majinaisi_direct_talk)
 EVT_END()
 
 EVT_BEGIN(majinaisi_init)
-    CALL(evt_run_case_evt, 9, 1, STRING("a_majinai"), 0, PTR(majinaisi_table_talk), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_majinai"), 0, PTR(majinaisi_table_talk), 0)
     RETURN
 EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
         /*"まじない師"*/"\x82\xDC\x82\xB6\x82\xC8\x82\xA2\x8E\x74", // name
-        0x600, // flags
+        NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         majinaisi_init, // initEvent
         NULL, // regularEvent
@@ -422,18 +388,18 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 EVT_BEGIN(tik_12_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_TIK1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG0_TIK1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e_yuka_s"), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group2"), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("ie_kakoi"), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("mad"), 2048)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("majinai_BOX"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("e_yuka_s"), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("group2"), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ie_kakoi"), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("mad"), MAPOBJ_FLAG_NO_BLEND)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("majinai_BOX"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("anm_kem"), 1, 0)
     RETURN
 EVT_END()

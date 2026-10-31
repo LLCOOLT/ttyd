@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: bush, four leaves at random offsets that spin and fall; types 0-1.
 #include "eff/n64/eff_bush_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -7,21 +8,19 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <stdlib.h>
-
-double sin(double);
-double cos(double);
+#include "libc_decls.h"
 
 typedef struct EffBushN64Work {
-    s32 type;      // 0x0
-    Vec position;  // 0x4
-    f32 vx;        // 0x10
-    f32 vy;        // 0x14
-    f32 angleZ;    // 0x18
-    f32 spin;      // 0x1C
-    f32 angleY;    // 0x20
-    s32 alpha;     // 0x24
-    s32 lifetime;  // 0x28
-    s32 frame;     // 0x2C
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    f32 vx;       // 0x10
+    f32 vy;       // 0x14
+    f32 angleZ;   // 0x18
+    f32 spin;     // 0x1C
+    f32 angleY;   // 0x20
+    s32 alpha;    // 0x24
+    s32 lifetime; // 0x28
+    s32 frame;    // 0x2C
     u8 pad[4];
 } EffBushN64Work;
 

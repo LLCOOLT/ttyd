@@ -1,3 +1,5 @@
+// mri_14 (巨木の中, The Great Tree): the deepest room: the Crystal Star appears and Lord Crump takes it
+// (dai3_kanbu), then leaves a time bomb (time_bomb); moving floor and planters.
 #include "battle/battle_unit.h"
 #include "eff/eff_starstone.h"
 #include "evt/evt_cmd.h"
@@ -12,86 +14,29 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_case.h"
+#include "evt/evt_eff.h"
+#include "evt/evt_fade.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_paper.h"
+#include "evt/evt_party.h"
+#include "evt/evt_seq.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "mri_puni.h"
 #include "mri.h"
 #include "data_tables.h"
+#include "version.h"
+#include "evt/evt_story.h"
+#include "driver/casedrv.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
 
-USER_FUNC(evt_bero_exec_onoff);
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_eff64);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_item_delete);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_flag_on);
-USER_FUNC(evt_item_get_position);
-USER_FUNC(evt_item_move_3d_position);
-USER_FUNC(evt_item_set_position);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_jump_position_nohit);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_anim_localtime);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_paper);
-USER_FUNC(evt_npc_set_paper_anim);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_rotate);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_paper_entry);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_puni_flag_onoff);
-USER_FUNC(evt_puni_get_flag);
-USER_FUNC(evt_puni_get_position);
-USER_FUNC(evt_puni_mem_init);
-USER_FUNC(evt_puni_set_anim);
-USER_FUNC(evt_puni_set_dir);
-USER_FUNC(evt_puni_set_hamari);
-USER_FUNC(evt_puni_set_mode);
-USER_FUNC(evt_puni_set_yuka);
-USER_FUNC(evt_puni_wait_systemmode);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmoff_f);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_area_check);
-USER_FUNC(evt_sub_countdown_start);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_get_value_para);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_target_flag_onoff);
-USER_FUNC(evt_target_set_position);
 static USER_FUNC(evtflash);
 USER_FUNC(starstone_rotate_func);
 
@@ -107,7 +52,6 @@ extern EvtWord npc_dokan[];
 extern EvtWord time_bomb[];
 extern EvtWord bomb_check[];
 static KusaAccess ueki_access_data[7];
-extern EvtWord mri_14_init_evt[];
 
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
@@ -115,11 +59,7 @@ static USER_FUNC(evtflash) {
     }
     switch (event->userdata[2]) {
         case 0:
-#ifdef VERSION_G8ME01_DEMO
-            fadeEntry(8, 20, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-#else
-            fadeEntry(10, 20, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-#endif
+            fadeEntry(FADE_OUT_BLACK, 20, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             event->userdata[2]++;
         case 1:
             if (fadeIsFinish() != TRUE) {
@@ -139,11 +79,7 @@ static USER_FUNC(evtflash) {
             event->userdata[2]++;
             return EVT_RETURN_BLOCK;
         case 3:
-#ifdef VERSION_G8ME01_DEMO
-            fadeEntry(7, 80, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-#else
-            fadeEntry(9, 80, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-#endif
+            fadeEntry(FADE_IN_BLACK, 80, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             event->userdata[2]++;
         case 4:
             if (fadeIsFinish() != TRUE) {
@@ -155,9 +91,9 @@ static USER_FUNC(evtflash) {
 }
 
 static EVT_BEGIN(first_time_w_bero)
-    IF_INT_EQUAL(GSW(0), 108)
-        IF_INT_EQUAL(GSWF(2864), 1)
-            SET_VALUE(GSWF(2864), 0)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_22_LORD_CRUMP_APPEARS)
+        IF_INT_EQUAL(GSWF(GSWF_MRI14_TIME_BOMB_SCENE_PENDING), 1)
+            SET_VALUE(GSWF(GSWF_MRI14_TIME_BOMB_SCENE_PENDING), 0)
             CALL(evt_mario_set_pos, -450, 0, 0)
             CALL(evt_party_set_pos, 0, -480, 0, 0)
             WAIT_MS(1000)
@@ -183,8 +119,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         (s32*)first_time_w_bero, // enterEvent
@@ -200,8 +136,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan", // hitName
         2, // type
         0, // sfxId
-        2, // directionId
-        100000, // centerPosition
+        BERO_DIR_E, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -262,12 +198,12 @@ EVT_BEGIN(dai3_kanbu)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     SET_VALUE(LW(10), STRING("第三勢力幹部"))
     CALL(evt_npc_set_ry, LW(10), 270)
-    CALL(evt_npc_flag_onoff, 1, LW(10), 1073743392)
+    CALL(evt_npc_flag_onoff, 1, LW(10), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_position, LW(10), 150, 0, -215)
     SET_VALUE(GF(0), 0)
     SET_VALUE(GF(1), 1)
     SPAWN_EVENT(PTR(kanbu_urouro))
-    CALL(evt_snd_bgmoff, 1024)
+    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_cam3d_evt_set, 0, 300, 1000, 0, 30, -1, 0, 11)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1000)
@@ -300,15 +236,11 @@ EVT_BEGIN(dai3_kanbu)
         CALL(evt_npc_move_position, LW(10), 200, -215, 0, FLOAT(120.0f), 0)
     END_INLINE_EVENT
     WAIT_MS(1000)
-    SET_VALUE(GSWF(2864), 1)
-    SET_VALUE(GSW(0), 108)
-    CALL(evt_snd_bgmoff, 513)
-    CALL(evt_snd_bgmon, 288, 0)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 7, 500)
-#else
-    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 9, 500)
-#endif
+    SET_VALUE(GSWF(GSWF_MRI14_TIME_BOMB_SCENE_PENDING), 1)
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_22_LORD_CRUMP_APPEARS)
+    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_BLACK, 500)
     CALL(evt_bero_mapchange, STRING("mri_14"), STRING("w_bero"))
     RETURN
 EVT_END()
@@ -331,7 +263,7 @@ USER_FUNC(starstone_rotate_func) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(evt_npc_set_anim_localtime) {
+static USER_FUNC(evt_npc_set_anim_localtime) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 time = evtGetFloat(event, args[1]);
@@ -489,18 +421,18 @@ EVT_END()
 
 EVT_BEGIN(time_bomb)
     CALL(evt_mario_key_onoff, 0)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_mario_normalize)
 #endif
     SET_VALUE(GF(10), 0)
     WAIT_WHILE(GF(15))
     WAIT_MS(1000)
-    CALL(evt_snd_bgmoff_f, 512, 3000)
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
     CALL(evt_npc_set_ry, STRING("第三勢力幹部"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), 1073743392)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     SET_VALUE(LW(10), 1)
     LOOP(0)
-        CALL(evt_puni_set_mode, LW(10), 30)
+        CALL(evt_puni_set_mode, LW(10), PUNI_MODE_INERT)
         CALL(evt_puni_set_anim, LW(10), 0)
         ADD(LW(10), 1)
         IF_INT_EQUAL(LW(10), 103)
@@ -512,50 +444,50 @@ EVT_BEGIN(time_bomb)
         CALL(evt_cam3d_evt_set, 555, 507, 846, 0, 50, 0, 2000, 11)
     END_INLINE_EVENT
     CALL(evt_snd_sfxon, STRING("SFX_STG2_QUAKE1"), LW(11))
-    CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.0029296875f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0009765625f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.001953125f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0029296875f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.00390625f), FLOAT(0.0f), 300)
     SET_VALUE(GF(0), 0)
     SPAWN_EVENT(PTR(flash_and_wait))
-    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.005859375f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.0068359375f), FLOAT(0.0f), 300)
-#ifndef VERSION_G8ME01
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.005859375f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0068359375f), FLOAT(0.0f), 300)
+#if VERSION <= VERSION_JP
     SPAWN_EVENT(PTR(flash2_and_wait))
 #endif
-    CALL(evt_cam_shake, 4, FLOAT(0.0078125f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.0087890625f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
-#ifndef VERSION_G8ME01
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0078125f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0087890625f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+#if VERSION <= VERSION_JP
     SPAWN_EVENT(PTR(flash2_and_wait))
 #endif
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
-#ifndef VERSION_G8ME01
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+#if VERSION <= VERSION_JP
     SPAWN_EVENT(PTR(flash_and_wait))
 #endif
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
-    CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 300)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 300)
     BEGIN_INLINE_EVENT
-        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.0087890625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0087890625f), FLOAT(0.0f), 200)
         SPAWN_EVENT(PTR(flash_and_wait))
-        CALL(evt_cam_shake, 4, FLOAT(0.0078125f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.0068359375f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.005859375f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.00390625f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.0029296875f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.0f), 200)
-        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0078125f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0068359375f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.005859375f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.00390625f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0029296875f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.001953125f), FLOAT(0.0f), 200)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0009765625f), FLOAT(0.0f), 200)
     END_INLINE_EVENT
     WAIT_MS(2000)
     CALL(evt_snd_sfxoff, LW(11))
     CALL(evt_cam3d_evt_set, 200, 305, -33, 0, 140, -338, 1000, 11)
     WAIT_MS(2000)
-#ifndef VERSION_G8ME01_DEMO
+#if VERSION != VERSION_DEMO
     CALL(evt_party_stop, 0)
     CALL(evt_mario_set_pos, 0, 0, -89)
     CALL(evt_mario_set_dir, 90, 0, 0)
@@ -571,12 +503,12 @@ EVT_BEGIN(time_bomb)
         WAIT_MS(400)
     END_INLINE_EVENT
     CALL(evt_snd_sfxon, STRING("SFX_STG2_STARSTONE_APPEAR1"), 0)
-#ifdef VERSION_G8ME01_DEMO
-    CALL(evt_item_entry, STRING("item00"), 115, 0, 120, -340, 15, -1, 0)
+#if VERSION == VERSION_DEMO
+    CALL(evt_item_entry, STRING("item00"), ITEM_EMERALD_STAR, 0, 120, -340, 15, -1, 0)
 #else
-    CALL(evt_item_entry, STRING("item00"), 115, 0, 120, -340, 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_EMERALD_STAR, 0, 120, -340, 16, -1, 0)
 #endif
-    CALL(evt_item_flag_on, STRING("item00"), 2)
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     SET_VALUE(LW(0), STRING("item00"))
     SET_VALUE(GW(10), 0)
     SPAWN_EVENT_GET_ID(PTR(starstone_rotate), LW(14))
@@ -588,7 +520,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_item_move_3d_position, STRING("item00"), 0, 400, -340, 750, 0)
     CALL(evt_item_set_position, STRING("item00"), 0, -1000, 0)
     WAIT_MS(500)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(0), 30)
     CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
@@ -605,7 +537,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_cam3d_evt_set, 0, 95, 283, 0, 55, -215, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_msg_print_party, STRING("stg2_mri_e23_00_00"))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_3RD_ENEMY"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_3RD_ENEMY"))
     CALL(evt_npc_set_position, STRING("第三勢力幹部"), 175, 0, -194)
     CALL(evt_npc_move_position, STRING("第三勢力幹部"), 0, -215, 0, FLOAT(180.0f), 0)
     BEGIN_INLINE_EVENT
@@ -634,7 +566,7 @@ EVT_BEGIN(time_bomb)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 248, 125, 212, -7, 38, -208, 500, 11)
     WAIT_MS(500)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
     CALL(evt_msg_print_party, STRING("stg2_mri_e23_00"))
     SET_VALUE(LW(10), STRING("第三勢力幹部"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_e23_01"), 0, LW(10))
@@ -671,7 +603,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e23_04"), 0, LW(10))
     CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_TIMER_SET1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
     CALL(evt_sub_countdown_start, 300000, 300000)
     CALL(evt_npc_set_anim, LW(10), STRING("I_7"))
     WAIT_MS(1000)
@@ -683,7 +615,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_npc_jump_position_nohit, LW(10), LW(0), LW(1), LW(2), 200, 27)
     BEGIN_INLINE_EVENT
         WAIT_MS(150)
-        CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 1000)
+        CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.01953125f), FLOAT(0.0f), 1000)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(350)
@@ -714,7 +646,7 @@ EVT_BEGIN(time_bomb)
     CALL_CHILD(PTR(npc_dokan))
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 0, 105, 269, 0, 45, -76, 0, 11)
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
     CALL(evt_party_set_dir, 0, 270, -1)
 #endif
     WAIT_MS(200)
@@ -722,15 +654,15 @@ EVT_BEGIN(time_bomb)
     CALL(evt_cam3d_evt_off, 300, 11)
     SET_VALUE(LW(10), 1)
     LOOP(0)
-        CALL(evt_puni_set_mode, LW(10), 1)
+        CALL(evt_puni_set_mode, LW(10), PUNI_MODE_JOIN)
         CALL(evt_puni_flag_onoff, LW(10), 1, 32768)
         ADD(LW(10), 1)
         IF_INT_EQUAL(LW(10), 103)
             BREAK_LOOP
         END_IF
     END_LOOP
-    SET_VALUE(GSW(0), 109)
-#ifndef VERSION_G8ME01_DEMO
+    SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_23_TIME_BOMB_ACTIVATED)
+#if VERSION != VERSION_DEMO
     CALL(evt_party_run, 0)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -749,8 +681,8 @@ EVT_BEGIN(bomb_check)
 EVT_END()
 
 static EVT_BEGIN(yuka_move)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isk_02_c"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isk_03_c"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_02_c"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_03_c"), MAPOBJ_FLAG_HIDE)
     LOOP(0)
         SET_VALUE(LW(2), GW(0))
         DIVIDE(LW(2), 100)
@@ -769,9 +701,9 @@ static EVT_BEGIN(yuka_move)
         CALL(evt_mapobj_rotate, 1, STRING("S_isk_03"), LW(11), 0, 0)
         CALL(evt_mapobj_rotate, 1, STRING("S_isk_04"), LW(12), 0, 0)
         IF_INT_GREATER_OR_EQUAL(GW(0), 10)
-            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isk_03_c"), 1)
-            ELSE
-            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_isk_03_c"), 1)
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_03_c"), MAPOBJ_FLAG_HIDE)
+        ELSE
+            CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_isk_03_c"), MAPOBJ_FLAG_HIDE)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
@@ -836,11 +768,11 @@ static KusaAccess ueki_access_data[] = {
 
 static EVT_BEGIN(punipuni_ball00_init)
     CALL_CHILD(PTR(mri_punipuni_setup))
-    IF_INT_EQUAL(GSWF(2863), 1)
+    IF_INT_EQUAL(GSWF(GSWF_MRI14_ORB_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), 0, 30, -100)
         CALL(evt_target_flag_onoff, LW(11), 0, 3)
-        ELSE
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_sui_hikari"), 1)
+    ELSE
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_target_set_position, LW(11), 0, 0, 0)
     SET_VALUE(GF(15), 0)
@@ -849,28 +781,28 @@ EVT_END()
 
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
-    IF_INT_EQUAL(GSWF(2863), 0)
+    IF_INT_EQUAL(GSWF(GSWF_MRI14_ORB_ON_PEDESTAL), 0)
         CALL_CHILD(PTR(mri_punipuni_itemselect))
         IF_INT_EQUAL(LW(1), 0)
             GOTO(100)
         END_IF
-        SET_VALUE(GSWF(2863), 1)
+        SET_VALUE(GSWF(GSWF_MRI14_ORB_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), 0, 30, -100)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_sui_hikari"), 1)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(GF(15), 1)
         CALL_CHILD(PTR(mri_punipuni_itemset))
         SET_VALUE(GF(15), 0)
-#ifdef VERSION_G8ME01_DEMO
-        IF_INT_EQUAL(GSW(0), 108)
-        CALL(evt_mario_key_onoff, 1)
-        SET_VALUE(GF(10), 1)
-        SPAWN_EVENT(PTR(punipuni_mario_halt))
-        RETURN
+#if VERSION == VERSION_DEMO
+        IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_22_LORD_CRUMP_APPEARS)
+            CALL(evt_mario_key_onoff, 1)
+            SET_VALUE(GF(10), 1)
+            SPAWN_EVENT(PTR(punipuni_mario_halt))
+            RETURN
         END_IF
 #endif
-        ELSE
-        SET_VALUE(GSWF(2863), 0)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_sui_hikari"), 1)
+    ELSE
+        SET_VALUE(GSWF(GSWF_MRI14_ORB_ON_PEDESTAL), 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
         CALL_CHILD(PTR(mri_punipuni_itemremove))
     END_IF
     LABEL(100)
@@ -886,9 +818,9 @@ EVT_BEGIN(mri_14_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    IF_INT_NOT_EQUAL(GSW(0), 107)
+    IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_06_WATER_SWITCH)
         CALL_CHILD(PTR(mri_puni_init))
-        ELSE
+    ELSE
         CALL_CHILD(PTR(mri_puni_init_none))
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -899,33 +831,33 @@ EVT_BEGIN(mri_14_init_evt)
     SET_VALUE(LW(0), PTR(ueki_access_data))
     CALL_CHILD(PTR(evt_sub_kusa_access_entry))
     CALL(evt_paper_entry, STRING("p_dokan_x"))
-    SWITCH(GSW(0))
-        CASE_BETWEEN(109, 110)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+    SWITCH(GSW(GSW_STORY_PROGRESS))
+        CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
         CASE_DEFAULT
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI1"))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_MRI1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI1"))
     END_SWITCH
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
     CALL(evt_map_playanim, STRING("sui_hikari"), 1, 0)
-    IF_INT_EQUAL(GSW(0), 107)
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_06_WATER_SWITCH)
         SPAWN_EVENT(PTR(dai3_kanbu))
     END_IF
     SET_VALUE(LW(10), STRING("punipuni"))
     SET_VALUE(LW(11), 0)
     SPAWN_EVENT(PTR(punipuni_ball00_init))
-    CALL(evt_run_case_evt, 9, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball00), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball00), 0)
     SET_VALUE(GW(0), 101)
     SPAWN_EVENT(PTR(yuka_check))
     SPAWN_EVENT(PTR(yuka_move))
-    IF_INT_LESS(GSW(0), 109)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_23_TIME_BOMB_ACTIVATED)
         SPAWN_EVENT(PTR(bomb_check))
     END_IF
-    IF_INT_LESS(GSW(0), 109)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_23_TIME_BOMB_ACTIVATED)
         CALL(evt_hit_bind_mapobj, STRING("A_dokan"), STRING("S_dokan"))
         CALL(evt_mapobj_trans, 1, STRING("S_dokan"), 0, 200, 0)
         CALL(evt_hit_bind_update, STRING("A_dokan"))
@@ -938,4 +870,3 @@ EVT_BEGIN(mri_14_init_evt)
     SPAWN_EVENT(PTR(mri_hikari_color))
     RETURN
 EVT_END()
-

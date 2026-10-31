@@ -1,5 +1,13 @@
+// win_party.c: the pause menu partner window (partner stats and moves): winPartyInit/Main/Disp and winPartyDt.
 #pragma once
 
 #include "win/win_main.h"
 
 extern WindowPartyDt winPartyDt[];
+
+void winPartyInit(WindowWork* wp);
+void winPartyInit2(WindowWork* wp);
+void winPartyExit(WindowWork* wp);
+s32 winPartyMain(WindowWork* wp);
+void winPartyMain2(WindowWork* wp);
+void winPartyDisp(s32 camId, void* param, s32 idx);

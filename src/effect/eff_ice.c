@@ -1,3 +1,4 @@
+// Ice block (Ice): appears for the given duration, then shrinks away dripping smoke puffs; used for the frozen status.
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -10,43 +11,6 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include "eff/eff_ice.h"
-
-typedef struct MayaPoly {
-    s32 keyCount;          // 0x0
-    MayaHermitKey* keys;   // 0x4
-    s32 count;
-    s16** strips;
-} MayaPoly;
-
-typedef struct MayaKeyList {
-    s32 count;
-    MayaPoly* polys;
-} MayaKeyList;
-
-typedef struct MayaAnimData {
-    u8 pad0[4];
-    f32 endTime;
-    MayaKeyList* lists;
-} MayaAnimData;
-
-typedef struct MayaJoint {
-    Mtx mtx;
-    f32 alpha;
-} MayaJoint;
-
-typedef struct MayaAnim {
-    u16 flags;
-    f32 time;
-    OSTime startTime;
-    MayaAnimData* data;
-    MayaJoint joints[1];
-} MayaAnim;
-
-MayaAnim* effMayaAnimAlloc(MayaAnimData* data);
-void effDeleteMayaAnim(MayaAnim* anim);
-void effPlayMayaAnim(MayaAnim* anim);
-void effCalcMayaAnim(MayaAnim* anim);
-void effDrawMayaPoly(MayaPoly* poly);
 
 typedef struct EffIceWork {
     s32 type;       // 0x0
@@ -886,8 +850,8 @@ MayaPoly ice_effAnimRST[] = {
     {3, ice_effHermit_16, 1, &ice_effFaceDt_pPlane16},
     {3, ice_effHermit_17, 1, &ice_effFaceDt_pPlane17},
 };
-MayaKeyList ice_effAnimRSTDt = {18, ice_effAnimRST};
-MayaAnimData ice_effAnimDt = { { 0 }, 119.0f, &ice_effAnimRSTDt };
+MayaPolyList ice_effAnimRSTDt = {18, ice_effAnimRST};
+MayaAnimData ice_effAnimDt = {{0}, 119.0f, &ice_effAnimRSTDt};
 
 static void effIceMain(EffectEntry* effect);
 static void effIceDisp(CameraId cameraId, EffectEntry* effect);
@@ -902,7 +866,7 @@ EffectEntry* effIceEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale)
     work = __memAlloc(HEAP_EFFECT, sizeof(EffIceWork));
     effect->userdata = work;
     effect->callback = effIceMain;
-    effect->flags |= 2;
+    effect->flags |= EFFECT_FLAG_SOFT_DELETE;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -926,15 +890,15 @@ EffectEntry* effIceEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale)
 static void effIceMain(EffectEntry* effect) {
     EffIceWork* work = effect->userdata;
     Vec calcPos;
-    Vec pos = { 0.0f, 0.0f, 0.0f };
+    Vec pos = {0.0f, 0.0f, 0.0f};
 
     pos.x = work->position.x;
     pos.y = work->position.y;
     pos.z = work->position.z;
     calcPos = pos;
 
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
+    if (effect->flags & EFFECT_FLAG_DELETE_REQUESTED) {
+        effect->flags &= ~EFFECT_FLAG_DELETE_REQUESTED;
         work->frame = 90;
         work->state = 1;
         {
@@ -944,50 +908,50 @@ static void effIceMain(EffectEntry* effect) {
     }
 
     switch (work->state) {
-    case 0:
-        if (work->duration < 1000) {
-            work->duration--;
-        }
-        if (work->duration == 0) {
-            work->state = 1;
-        }
-        if (work->frame < 90) {
+        case 0:
+            if (work->duration < 1000) {
+                work->duration--;
+            }
+            if (work->duration == 0) {
+                work->state = 1;
+            }
+            if (work->frame < 90) {
+                work->frame++;
+                effCalcMayaAnim(work->anim);
+            }
+            break;
+        case 1:
             work->frame++;
             effCalcMayaAnim(work->anim);
-        }
-        break;
-    case 1:
-        work->frame++;
-        effCalcMayaAnim(work->anim);
-        break;
-    case 2:
-        work->frame++;
-        if (work->frame % 30 == 0) {
-            effKemuTestEntry(1, work->position.x + (f32)(20 - irand((s32)(40.0f * work->scale))),
-                             work->position.y - 30.0f * (1.0f - work->scaleY), work->position.z, 1.0f);
-        }
-        work->scaleY *= 0.99f;
-        work->scaleX *= 1.005f;
-        work->alpha *= 0.99f;
-        break;
+            break;
+        case 2:
+            work->frame++;
+            if (work->frame % 30 == 0) {
+                effKemuTestEntry(1, work->position.x + (f32)(20 - irand((s32)(40.0f * work->scale))),
+                                 work->position.y - 30.0f * (1.0f - work->scaleY), work->position.z, 1.0f);
+            }
+            work->scaleY *= 0.99f;
+            work->scaleX *= 1.005f;
+            work->alpha *= 0.99f;
+            break;
     }
 
     switch (work->state) {
-    case 0:
-    case 1:
-        if ((f32)work->frame > work->anim->data->endTime) {
-            effDeleteMayaAnim(work->anim);
-            effDelete(effect);
-            return;
-        }
-        break;
-    case 2:
-        if (work->frame > 200) {
-            effDeleteMayaAnim(work->anim);
-            effDelete(effect);
-            return;
-        }
-        break;
+        case 0:
+        case 1:
+            if ((f32)work->frame > work->anim->data->endTime) {
+                effDeleteMayaAnim(work->anim);
+                effDelete(effect);
+                return;
+            }
+            break;
+        case 2:
+            if (work->frame > 200) {
+                effDeleteMayaAnim(work->anim);
+                effDelete(effect);
+                return;
+            }
+            break;
     }
     dispEntry(CAMERA_3D, dispCalcZ(&calcPos), 2, (DispCallback)effIceDisp, effect);
 }
@@ -1023,27 +987,27 @@ static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     GXSetCurrentMtx(GX_PNMTX0);
     {
-    for (i = 1; i < work->anim->data->lists->count; i++) {
-        id = 0x20;
-        if (i < work->anim->data->lists->count - 1) {
-            id = 0x1f;
-        }
-        effGetTexObj(id, &texObj);
-        GXLoadTexObj(&texObj, GX_TEXMAP0);
-        if (i < work->anim->data->lists->count - 1) {
-            effGetTexObj(0x1f, &texObj);
+        for (i = 1; i < work->anim->data->polyList->count; i++) {
+            id = 0x20;
+            if (i < work->anim->data->polyList->count - 1) {
+                id = 0x1f;
+            }
+            effGetTexObj(id, &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 255, 255, 255, (u8)(191.25f * work->alpha) });
-        } else {
-            effGetTexObj(0x20, &texObj);
-            GXLoadTexObj(&texObj, GX_TEXMAP0);
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 255, 255, 255, (u8)(127.5f * work->alpha) });
+            if (i < work->anim->data->polyList->count - 1) {
+                effGetTexObj(0x1f, &texObj);
+                GXLoadTexObj(&texObj, GX_TEXMAP0);
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){255, 255, 255, (u8)(191.25f * work->alpha)});
+            } else {
+                effGetTexObj(0x20, &texObj);
+                GXLoadTexObj(&texObj, GX_TEXMAP0);
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){255, 255, 255, (u8)(127.5f * work->alpha)});
+            }
+            PSMTXConcat(mtx, work->anim->joints[0].mtx, joint);
+            PSMTXConcat(joint, work->anim->joints[i].mtx, joint);
+            PSMTXConcat(camGetPtr(cameraId)->view, joint, joint);
+            GXLoadPosMtxImm(joint, GX_PNMTX0);
+            effDrawMayaPoly(&work->anim->data->polyList->polys[i]);
         }
-        PSMTXConcat(mtx, work->anim->joints[0].mtx, joint);
-        PSMTXConcat(joint, work->anim->joints[i].mtx, joint);
-        PSMTXConcat(camGetPtr(cameraId)->view, joint, joint);
-        GXLoadPosMtxImm(joint, GX_PNMTX0);
-        effDrawMayaPoly(&work->anim->data->lists->polys[i]);
-    }
     }
 }

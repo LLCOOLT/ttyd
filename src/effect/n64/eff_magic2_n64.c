@@ -1,3 +1,5 @@
+// Paper Mario 64 magic effect 2 at a point with a scale and life.
+#include "eff/n64/eff_magic2_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -6,18 +8,17 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 
 typedef struct EffMagic2N64Work {
-    s32 type;     // 0x0
-    Vec position; // 0x4
-    Vec offset;   // 0x10
-    f32 scale;    // 0x1C
+    s32 type;        // 0x0
+    Vec position;    // 0x4
+    Vec offset;      // 0x10
+    f32 scale;       // 0x1C
     f32 scaleTarget; // 0x20
-    s32 alpha;    // 0x24
-    s32 life;     // 0x28
-    s32 age;      // 0x2C
+    s32 alpha;       // 0x24
+    s32 life;        // 0x28
+    s32 age;         // 0x2C
     s32 a30;
     s32 a34;
     s32 a38;
@@ -31,7 +32,6 @@ typedef struct EffMagic2N64Work {
     f32 f58;
     f32 f5c;
 } EffMagic2N64Work;
-
 
 static u8 color_rotation_data[24] = {0xFF, 0xC5, 0x9C, 0xFF, 0x9C, 0xFF, 0xFF, 0x73, 0xD6, 0xFF, 0x9C, 0xFF,
                                      0xFF, 0xC5, 0x7B, 0xFF, 0xB4, 0xFF, 0xDE, 0x73, 0xFF, 0xFF, 0x94, 0x9C};
@@ -138,6 +138,7 @@ EffectEntry* effMagic2N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scal
     return effect;
 }
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_common_subs off
 void effMagic2Main(EffectEntry* effect) {
     EffMagic2N64Work* w = effect->userdata;
@@ -181,11 +182,11 @@ void effMagic2Main(EffectEntry* effect) {
         }
     }
     {
-    Vec tmp2 = {0.0f, 0.0f, 0.0f};
-    tmp2.x = w->position.x;
-    tmp2.y = w->position.y;
-    tmp2.z = w->position.z;
-    pos2 = tmp2;
+        Vec tmp2 = {0.0f, 0.0f, 0.0f};
+        tmp2.x = w->position.x;
+        tmp2.y = w->position.y;
+        tmp2.z = w->position.z;
+        pos2 = tmp2;
     }
     PSMTXMultVec(camGetPtr(CAMERA_3D)->view, &pos2, &pos2);
     PSMTX44MultVec(camGetPtr(CAMERA_3D)->projection, &pos2, &pos2);

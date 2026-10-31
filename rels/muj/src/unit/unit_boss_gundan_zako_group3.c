@@ -1,3 +1,5 @@
+// Keelhaul Key (muj) battle unit: X-Naut horde group 3 (gundan_zako_group3) in Lord Crump's fight: its parts,
+// defence/status tables, and attack events.
 #include "version.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -17,51 +19,17 @@
 #include "battle/battle_database_common.h"
 #include "driver/extdrv.h"
 #include "manager/evtmgr_cmd.h"
+#include "zakogun.h"
+#include "battle/battle_sub.h"
+#include "pmario_sound.h"
+#include "muj.h"
+#include "libc_decls.h"
 
-typedef struct ZakoGun { s8 flags; s8 state; s32 timer; s32 timerMax; Vec pos; Vec home; s32 poseBase; s32 poseNum; s32 poseDiv; s32 poseCount; Vec start; Vec target; Vec vel; Vec ofs; Vec rot; } ZakoGun;
-typedef struct ZakoGunWork { s32 flag; s32 targetId;
-#ifdef VERSION_G8ME01
-    u8 us_pad08[0xC]; // US: 12 more bytes here
-#endif
-    s32 state; s32 timer; Vec pos; u8 pad_1C[0x34 - 0x1c]; f32 radius; f32 angle; f32 speed; u8 pad_40[0x48 - 0x40]; Vec start; Vec end; s32 timer2; s32 steps; s32 count; s32 sfx; } ZakoGunWork;
-extern ZakoGun* zakogun;
-extern ZakoGunWork* work;
-BattleUnit* zakogun_get_ptr(void);
-s32 zakogun_get_kanbu_id(void);
-void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
-void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i);
-void psndSFXOff(s32 id);
-int rand(void);
-double sqrt(double x);
-
-USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
-USER_FUNC(btlevtcmd_CheckDamage);
-USER_FUNC(btlevtcmd_CheckStatus);
-USER_FUNC(btlevtcmd_GetDamage);
-USER_FUNC(btlevtcmd_GetSelectNextEnemy);
-USER_FUNC(btlevtcmd_GetUnitWork);
-USER_FUNC(btlevtcmd_PreCheckDamage);
-USER_FUNC(btlevtcmd_ResultACDefence);
-USER_FUNC(btlevtcmd_SetEventAttack);
-USER_FUNC(btlevtcmd_SetEventConfusion);
-USER_FUNC(btlevtcmd_SetEventDamage);
-USER_FUNC(btlevtcmd_SetEventWait);
-USER_FUNC(btlevtcmd_SetUnitWork);
-USER_FUNC(btlevtcmd_StartAvoid);
-USER_FUNC(btlevtcmd_StartWaitEvent);
-USER_FUNC(evt_btl_camera_set_mode);
-USER_FUNC(zakogun_damage_pose);
-USER_FUNC(zakogun_damage_pose_cancel);
-USER_FUNC(zakogun_set_target_id);
-USER_FUNC(zakogun_escape3);
 USER_FUNC(zakogun_dead3);
 USER_FUNC(zakogun_attack3_3);
 USER_FUNC(zakogun_attack3_2);
 USER_FUNC(zakogun_attack3_1);
 void zakogun_ext_main3(void);
-USER_FUNC(zakogun_ext_init3);
-USER_FUNC(zakogun_kanbu_on_ball);
-extern s32 zakogun_get_kanbu_id_evtcmd[];
 
 BattleUnitKind unit_boss_gundan_zako_group3;
 static BattleUnitDefense defence;
@@ -78,7 +46,7 @@ static EvtWord attack_event[287];
 static EvtWord hit_check_event[119];
 static EvtWord wait_event[6];
 
-USER_FUNC(zakogun_kanbu_on_ball) {
+static USER_FUNC(zakogun_kanbu_on_ball) {
     BattleUnit* kanbu = BattleGetUnitPtr(_battleWorkPointer, zakogun_get_kanbu_id());
     BtlUnit_SetPos(kanbu, work->pos.x, 45.0f + work->pos.y, work->pos.z);
     return EVT_RETURN_DONE;
@@ -99,9 +67,9 @@ USER_FUNC(zakogun_ext_init3) {
         zakogun[i].home.y = 0.0f;
         zakogun[i].home.z = -80.0f + 4.0f * (i / 12) + (5.0f * rand() / 32767.0f - 2.5f);
         kanbu = BattleGetUnitPtr(_battleWorkPointer, zakogun_get_kanbu_id());
-        dx = zakogun[i].home.x - kanbu->mHomePosition.x;
-        dy = zakogun[i].home.y - kanbu->mHomePosition.y;
-        dz = zakogun[i].home.z - kanbu->mHomePosition.z;
+        dx = zakogun[i].home.x - kanbu->homePosition.x;
+        dy = zakogun[i].home.y - kanbu->homePosition.y;
+        dz = zakogun[i].home.z - kanbu->homePosition.z;
         dist = sqrt(dx * dx + dy * dy + dz * dz);
         if (dist <= 30.0f) {
             zakogun[i].home.x += 30.0f * (dx / dist);
@@ -215,29 +183,29 @@ BattleWeapon weapon_gundan_zako_group3_attack = {
     0, NULL, // itemId..description
     100, // baseAccuracy
     0, 0, // baseFpCost..baseSpCost
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
     2, // superguardsAllowed
 #else
     0, // superguardsAllowed
 #endif
     1.0f, // reserved_14
-    1, // mStylishCommandMultiplier
+    1, // stylishCommandMultiplier
     1, // reserved_19
-    1, // mBingoSlotChance
+    1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-    0x1101260, // targetClassFlags
-    0x20004004, // targetPropertyFlags
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
     0, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-    0x87, // special
-    0x7FF, // counterResistFlags
-    4, // targetWeightFlags
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
@@ -245,51 +213,51 @@ BattleWeapon weapon_gundan_zako_group3_attack = {
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
-    NULL, // mAttackEvtScript
+    NULL, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
-    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
-    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_GetDamage, -2, LW(0))
+    CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         SET_VALUE(LW(15), 1)
-        ELSE
+    ELSE
         SET_VALUE(LW(15), 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, -2, 27, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 1, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 1, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 3, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 3, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 5, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 9, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 9, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 2, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 2, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 4, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 4, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 8, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 8, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 11, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 15, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 15, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 20, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 20, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, -2, 0, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 0, LW(14))
     OR(LW(15), LW(14))
     IF_INT_NOT_EQUAL(LW(15), 0)
         CALL(zakogun_damage_pose)
@@ -300,14 +268,14 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_SetUnitWork, -2, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
     CALL(zakogun_dead3)
-    CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_1"), -250000000, 0, -250000000)
+    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_ENEMY_DIE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(48)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se, -2, STRING("SFX_BTL_ENEMY_DIE1_2"), -250000000, 0, -250000000)
+        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
         LOOP(20)
-            CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             CALL(evt_sub_random, 300, LW(3))
             SUBTRACT(LW(3), 150)
             ADD(LW(0), LW(3))
@@ -318,31 +286,31 @@ static EVT_BEGIN(dead_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetCoin, -2, LW(0))
+    CALL(btlevtcmd_GetCoin, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_StoreCoin, LW(0))
-    CALL(btlevtcmd_GetExp, -2, LW(0))
+    CALL(btlevtcmd_GetExp, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_StoreExp, LW(0))
-    CALL(btlevtcmd_GetPos, -2, LW(3), LW(1), LW(2))
-    CALL(_add_star_point_disp_offset, -2, LW(3), LW(1), LW(2))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(1), LW(2))
+    CALL(_add_star_point_disp_offset, BTL_UNIT_SELF, LW(3), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("star_point"), 0, LW(3), LW(1), LW(2), LW(0), 0, 0, 0, 0, 0, 0, 0)
     WAIT_FRAMES(20)
-    CALL(btlevtcmd_CheckDamageCode, -2, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_KillUnit, -2, 0)
+        CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     ELSE
-        CALL(btlevtcmd_KillUnit, -2, 2)
+        CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 2)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group3_attack))
-    CALL(btlevtcmd_GetEnemyBelong, -2, LW(0))
-    CALL(btlevtcmd_SamplingEnemy, -2, LW(0), LW(9))
+    CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, -2, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -350,9 +318,9 @@ static EVT_BEGIN(attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
-    CALL(btlevtcmd_AttackDeclare, -2, LW(3), LW(4))
+    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_PayWeaponCost, -2, LW(9))
+    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
     CALL(btlevtcmd_CheckActStatus, LW(5), LW(12))
     IF_INT_NOT_EQUAL(LW(12), 0)
@@ -374,7 +342,7 @@ static EVT_BEGIN(attack_event)
     IF_INT_NOT_EQUAL(LW(12), 0)
         DELETE_EVENT(LW(15))
         CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("A_1A"))
-        CALL(btlevtcmd_snd_se, LW(5), STRING("SFX_BOSS_KANBU_JUMP1"), -250000000, 0, LW(13))
+        CALL(btlevtcmd_snd_se, LW(5), STRING("SFX_BOSS_KANBU_JUMP1"), EVT_NULLPTR, 0, LW(13))
         CALL(btlevtcmd_JumpSetting, LW(5), 0, FLOAT(6.0f), FLOAT(0.2998047f))
         CALL(btlevtcmd_JumpPosition, LW(5), 0, 100, 0, 0, -1)
         CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
@@ -420,7 +388,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_TEAM_3RD_ADHERE2"), 0)
     CALL(zakogun_attack3_3)
-    CALL(btlevtcmd_StartWaitEvent, -2)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
@@ -465,9 +433,9 @@ void zakogun_ext_main3(void) {
                 zako->state = 10;
                 zakogun_set_pose(zako, 0x16, 10, 1);
             case 10:
-                zako->pos.x = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.x, zako->home.x);
-                zako->pos.y = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.y, zako->home.y);
-                zako->pos.z = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.z, zako->home.z);
+                zako->pos.x = intplGetValue(0, zako->start.x, zako->home.x, zako->timerMax - zako->timer, zako->timerMax);
+                zako->pos.y = intplGetValue(0, zako->start.y, zako->home.y, zako->timerMax - zako->timer, zako->timerMax);
+                zako->pos.z = intplGetValue(0, zako->start.z, zako->home.z, zako->timerMax - zako->timer, zako->timerMax);
                 zako->timer--;
                 if (zako->timer < 0) {
                     zako->state = 15;
@@ -475,10 +443,10 @@ void zakogun_ext_main3(void) {
                 }
                 break;
             case 15:
-                zako->pos.x = zako->home.x + (unit->mPosition.x - unit->mHomePosition.x);
+                zako->pos.x = zako->home.x + (unit->position.x - unit->homePosition.x);
                 zako->pos.y = zako->home.y;
-                if (zako->pos.y < unit->mPosition.y) {
-                    zako->pos.y = unit->mPosition.y;
+                if (zako->pos.y < unit->position.y) {
+                    zako->pos.y = unit->position.y;
                 }
                 zako->pos.z = zako->home.z;
                 break;
@@ -516,8 +484,8 @@ void zakogun_ext_main3(void) {
                 }
                 break;
             case 30:
-                zako->pos.x = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.x, zako->target.x);
-                zako->pos.z = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.z, zako->target.z);
+                zako->pos.x = intplGetValue(0, zako->start.x, zako->target.x, zako->timerMax - zako->timer, zako->timerMax);
+                zako->pos.z = intplGetValue(0, zako->start.z, zako->target.z, zako->timerMax - zako->timer, zako->timerMax);
                 zako->pos.y += zako->vel.y;
                 zako->vel.y += -0.5f;
                 zako->timer--;
@@ -549,8 +517,8 @@ void zakogun_ext_main3(void) {
                 zako->timer = zako->timerMax = 20;
                 zakogun_set_pose(zako, 0x22, 1, 1);
             case 55:
-                zako->pos.x = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.x, zako->target.x);
-                zako->pos.z = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.z, zako->target.z);
+                zako->pos.x = intplGetValue(0, zako->start.x, zako->target.x, zako->timerMax - zako->timer, zako->timerMax);
+                zako->pos.z = intplGetValue(0, zako->start.z, zako->target.z, zako->timerMax - zako->timer, zako->timerMax);
                 zako->pos.y += zako->vel.y;
                 zako->vel.y += -0.5f;
                 zako->timer--;
@@ -567,8 +535,8 @@ void zakogun_ext_main3(void) {
                 zako->state = 65;
                 zakogun_set_pose(zako, 0x16, 10, 1);
             case 65:
-                zako->pos.x = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.x, zako->home.x);
-                zako->pos.z = intplGetValue(0, zako->timerMax - zako->timer, zako->timerMax, zako->start.z, zako->home.z);
+                zako->pos.x = intplGetValue(0, zako->start.x, zako->home.x, zako->timerMax - zako->timer, zako->timerMax);
+                zako->pos.z = intplGetValue(0, zako->start.z, zako->home.z, zako->timerMax - zako->timer, zako->timerMax);
                 zako->timer--;
                 if (zako->timer < 0) {
                     zako->state = 15;
@@ -679,7 +647,7 @@ USER_FUNC(zakogun_attack3_2) {
             work->speed -= 0.06f;
             if (work->targetId != -1) {
                 BattleUnit* target = BattleGetUnitPtr(_battleWorkPointer, work->targetId);
-                if (work->pos.x <= target->mPosition.x) {
+                if (work->pos.x <= target->position.x) {
                     unit->work[0] = 1;
                 }
             }
@@ -771,13 +739,13 @@ USER_FUNC(zakogun_escape3) {
 static EVT_BEGIN(hit_check_event)
     LABEL(10)
     LOOP(0)
-        CALL(btlevtcmd_GetUnitWork, -2, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             BREAK_LOOP
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(btlevtcmd_PreCheckDamage, -2, LW(3), LW(4), LW(9), 0, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -804,15 +772,15 @@ static EVT_BEGIN(hit_check_event)
     LABEL(91)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, -2, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     GOTO(98)
     LABEL(98)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-    CALL(btlevtcmd_SetUnitWork, -2, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     IF_INT_NOT_EQUAL(LW(3), -1)
         CALL(zakogun_set_target_id, LW(3))
         GOTO(10)
-        ELSE
+    ELSE
         CALL(zakogun_set_target_id, -1)
     END_IF
     LABEL(99)
@@ -820,7 +788,6 @@ static EVT_BEGIN(hit_check_event)
 EVT_END()
 
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
-

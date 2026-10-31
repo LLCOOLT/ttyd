@@ -1,7 +1,10 @@
+// Shared support for the Paper Mario 64 effects: texture loading, the effect set table and vertex/triangle helpers.
+// The demo build also stores a name, description and user list for each effect.
 #include "eff/eff_n64.h"
 #include "driver/arcdrv.h"
 #include "manager/dvdmgr.h"
-#ifdef VERSION_G8ME01
+#include "version.h"
+#if VERSION >= VERSION_US
 #include "mario/mariost.h"
 #endif
 #include "memory.h"
@@ -11,7 +14,7 @@
 #include "libc_decls.h"
 
 //.data
-#ifdef VERSION_G8ME01_DEMO
+#if VERSION == VERSION_DEMO
 // The demo table also names each effect and lists its users.
 static const char* eff_n64_users_00[] = {"\203}\203\212\203I:KAMECSMALL", "\203K\203\214\203L:KAMECBIG", "-----", "\203}\203\212\203I\202\307\202\301\202\265\202\361:KAMECBIG", "Block\202\307\202\301\202\265\202\361::KAMECBIG", "\203T\203\223\203{", "\203}\203~\201[", NULL};
 static const char* eff_n64_users_01[] = {"Mairo:KAMECSMALL", "KAMECBIG", "PINKYBOM", NULL};
@@ -75,253 +78,253 @@ static const char* eff_n64_users_56[] = {"\217\207\225\373\214\374", "\213t\225\
 static const char* eff_n64_users_57[] = {"\227\216\202\277\227t64-1", "\227\216\202\277\227t64-2", "\227\216\202\277\227t GC-1", "\227\216\202\277\227t GC-2", "\227\216\202\277\227t GC-3", NULL};
 
 eff_set eff_set_n64[] = {
-	{0, "expbom_n64", "\223G\202\252\202\265\202\361\202\266\202\341\202\244\202\306\202\253", NULL},
-	{1, "kemuri1_n64", "\223y\211\214\222\205\222n", eff_n64_users_00},
-	{2, "kemuri2_n64", "\223y\211\214\203_\203b\203V\203\205", eff_n64_users_01},
-	{3, "kemuri3_n64", "\211\324\211\214\203W\203\203\203\223\203v", NULL},
-	{4, "kemuri4_n64", "\211\324\211\214\203_\203b\203V\203\205", NULL},
-	{5, "kemuri5_n64", "\211_\211\214\222\205\222n", NULL},
-	{6, "kemuri6_n64", "\211_\211\214\225\340\202\253", NULL},
-	{7, "kemuri7_n64", "\220\341\202\240\202\265\202\240\202\306", NULL},
-	{8, "flower_n64", "\202\250\211\324\202\252\202\314\202\332\202\301\202\304\202\242\202\255", NULL},
-	{9, "snow_n64", "\220\341\202\314\214\213\217\273\202\252\215~\202\351", NULL},
-	{10, "sstar_n64", "\227\254\202\352\220\257", eff_n64_users_26},
-	{11, "stardust_n64", "\203X\203^\201[\203_\203X\203g", eff_n64_users_02},
-	{12, "magic1_n64", "\203J\203\201\203b\203N\202\314\226\202\226@\202P", NULL},
-	{13, "@Pymagic2_n64@Pw", "\203J\203\201\203b\203N\202\314\226\202\226@\202Q", eff_n64_users_03},
-	{14, "fall_leaf_n64", "\227\216\202\277\227t", eff_n64_users_57},
-	{15, "hokori_n64", "\203z\203R\203\212", eff_n64_users_04},
-	{16, "gareki_n64", "\202\252\202\352\202\253", NULL},
-	{17, "kemuri8_n64", "\202\257\202\336\202\350\203s\203\223\203L\201[\203{\203\200\227p", eff_n64_users_05},
-	{18, "small_star_n64", "\215\327\202\251\202\242\220\257", eff_n64_users_06},
-	{19, "bomb_n64", "bom", eff_n64_users_07},
-	{20, "wangflush_n64", "\203\217\203\223\203\217\203\223\203t\203\211\203b\203V\203\205", eff_n64_users_08},
-	{21, "magic3_n64", "\203}\203W\203b\203N\202R", NULL},
-	{22, "kemuri9_n64", "\203n\203\223\203}\201[\211\214", eff_n64_users_09},
-	{23, "kemuri10_n64", "\203J\203\201\203b\203N\202\331\202\244\202\253\202\257\202\336\202\350", NULL},
-	{24, "@Pyfire_n64@Pw", "\202\331\202\314\202\250", NULL},
-	{25, "rappa_n64", "\203\211\203b\203p\221\220", NULL},
-	{26, "stardust2_n64", "\203X\203^\201[\203_\203X\203g\202Q", eff_n64_users_10},
-	{27, "ripple_n64", "\202\250\202\325\202\255\202\314\224g\226\344", eff_n64_users_11},
-	{28, "@Pyexplosion_n64@Pw", "\224\232\224\255", NULL},
-	{29, "kemuri11_n64", "\203h\203K\203{\203\223\202\257\202\336\202\350", eff_n64_users_12},
-	{30, "onpu_n64", "\211\271\225\204", eff_n64_users_13},
-	{31, "kemuri12_n64", "\203R\203\215\203R\203Q\211\214", eff_n64_users_32},
-	{32, "sweat_n64", "\212\276", eff_n64_users_14},
-	{33, "balloon_n64", "\203h\203K\203{\203\223\225\227\221D", NULL},
-	{34, "cool_leaf_n64", "\202\263\202\324\202\301\201@\227\216\227t", NULL},
-	{35, "bush_n64", "\202\265\202\260\202\335", NULL},
-	{36, "rothammer_success_n64", "\211\361\223]\203n\203\223\203}\201[\220\254\214\367", NULL},
-	{37, "rothammer_fail_n64", "\211\361\223]\203n\203\223\203}\201[\216\270\224s", NULL},
-	{38, "guruguru_n64", "\202\256\202\351\202\256\202\351", NULL},
-	{39, "ice_n64", "\203A\203C\203X\203o\203b\203`", NULL},
-	{40, "stamp_n64", "\202\323\202\335\202\302\202\257", eff_n64_users_15},
-	{41, "@Pythruhammer_n64@Pw", "\202\251\202\361\202\302\202\244\203n\203\223\203}\201[", eff_n64_users_16},
-	{42, "radiation_n64", "\217W\222\206", eff_n64_users_17},
-	{43, "thunder_n64", "\202\251\202\335\202\310\202\350", eff_n64_users_28},
-	{44, "breath_fire_n64", "\211\316\202\360\223f\202\255", eff_n64_users_43},
-	{45, "broken_barrier_n64", "\203o\203\212\203A\224j\211\363", eff_n64_users_18},
-	{46, "fire_ring_n64", "\203I\201[\203v\203j\203\223\203O", NULL},
-	{47, "fire_dust_n64", "fire_ring \202\252\216g\227p\202\267\202\351", NULL},
-	{48, "@Pyflame_n64@Pw", "flame", eff_n64_users_19},
-	{49, "blow_n64", "\225\254\220\205", NULL},
-	{50, "bomhei_n64", "\203o\203g\203\213\202\314\223G\203{\203\200\203w\203C", NULL},
-	{51, "fireflower_n64", "\203t\203@\203C\203\204\201[\203t\203\211\203\217\201[", eff_n64_users_56},
-	{52, "recover_heart_n64", "\211\361\225\234\203n\201[\203g", eff_n64_users_27},
-	{53, "pturn_n64", "\215s\223\256\225s\224\\", eff_n64_users_54},
-	{54, "hit_n64", "\203q\203b\203g", eff_n64_users_24},
-	{55, "confetti_n64", "\216\206\202\323\202\324\202\253", eff_n64_users_25},
-	{56, "snowfall_n64", "\220\341\202\252\215~\202\351", NULL},
-	{57, "whirlwind_n64", "\203}\203\212\203I\201E\223G\202\314\227x\202\350\211\361\223]", eff_n64_users_30},
-	{58, "thunderflare_n64", "\226\202\226@\203J\203\201\203b\203N\217\361", eff_n64_users_29},
-	{59, "coin_n64", "\203R\203C\203\223\216\346\202\301\202\275\202\306\202\253", NULL},
-	{60, "shock_n64", "\203o\203g\203\213\227p", eff_n64_users_46},
-	{61, "balloon_heiho_n64", "\203o\203g\203\213\201E\203o\203\213\201[\203\223\203w\203C\203z\201[", eff_n64_users_33},
-	{62, "rubble_n64", "\203o\203g\203\213\201E\203z\203\211\203I\203E", eff_n64_users_34},
-	{63, "magic_horao_n64", "\203z\203\211\203I\203E\203o\203g\203\213", NULL},
-	{64, "lensflare_n64", "\203T\203\223\203f\201[\203\213\201E\203r\203b\203O\203J\203\223\203e\203\211", NULL},
-	{65, "crystal_n64", "\203N\203\212\203X\203^\203\213", eff_n64_users_39},
-	{66, "butterfly_n64", "\203W\203\203\203\223\203O\203\213\224\362\202\361\202\305\202\351", eff_n64_users_44},
-	{67, "akari_charge_n64", "\203A\203J\203\212\201E\202\255\202\340\202\255\202\340\226\202\220l\201E\203s\203J\203\212\203\223", NULL},
-	{68, "akaro_sflush_n64", "\203A\203J\203\212\202\314\213Z", NULL},
-	{69, "opuku_wgun_n64", "\203I\203v\203N\202\314\213Z", eff_n64_users_52},
-	{70, "opuku_wprotect_n64", "\203I\203v\203N\202\314\213Z", eff_n64_users_53},
-	{71, "opuku_wcurtain_n64", "\203I\203v\203N\202\314\213Z", NULL},
-	{72, "opuku_jetw_n64", "\203I\203v\203N\201E\203Q\203b\203\\\201[", eff_n64_users_48},
-	{73, "opuku_jetwrain_n64", "\203I\203v\203N", NULL},
-	{74, "pokopi_thunder_n64", "\203|\203R\203s\201[", eff_n64_users_49},
-	{75, "water_damage_n64", "\220\205\203_\203\201\201[\203W", eff_n64_users_50},
-	{76, "snowman_n64", "\202\344\202\253\202\342\202\261\202\361\202\261\202\361", NULL},
-	{77, "holography_n64", "\203z\203\215\203O\203\211\203t", NULL},
-	{78, "timestamp_n64", "\203o\203g\203\213", NULL},
-	{79, "packn_bfire_n64", "\203p\203b\203N\203\223\203t\203\211\203\217\201[", eff_n64_users_40},
-	{80, "pokopi_pipo_n64", "\203|\203R\203s\201[\203p\203C\203|", eff_n64_users_55},
-	{81, "cloud_n64", "\202\255\202\340", eff_n64_users_45},
-	{82, "dogabon_attack_n64", "\203h\203K\203{\203\223", eff_n64_users_51},
-	{83, "kameki_tornade_n64", "\203o\203g\203\213\203J\203\201\203L", NULL},
-	{84, "stone_smoke_n64", "\203~\203j\203~\203j\201E\203X\203g\201[\203\223\202\332\202\244\202\265", NULL},
-	{85, "pokopi_pcharge_n64", "\203|\203R\203s\201[\203`\203\203\201[\203W", eff_n64_users_47},
-	{86, "hagetaka_flush_n64", "\203o\203g\203\213\201E\203C\203\217\203n\203Q", NULL},
-	{87, "kumokumo_n64", "\202\255\202\340\202\255\202\340", eff_n64_users_41},
-	{88, "vapor_n64", "\202\344\202\260", eff_n64_users_37},
-	{89, "fire_spark_n64", "\203o\203g\203\213\201E\203t\203@\203C\203A\201[\203p\203b\203N\203\223", NULL},
-	{90, "horao_spell_n64", "\203o\203g\203\213\201E\203z\203\211\203I\203E", NULL},
-	{91, "snow_dust_n64", "\203\206\203L\202\314\211\214", eff_n64_users_35},
-	{92, "akari_pose_n64", "\202\240\202\251\202\350\203|\201[\203Y", eff_n64_users_42},
-	{93, "kumokumo_chip_n64", "\202\255\202\340\202\255\202\340\226\202\220l\201E\203|\203R\203s\201[\213Z", eff_n64_users_38},
-	{94, "fireworks_n64", "\211\324\211\316", eff_n64_users_36},
-	{95, "glass_n64", "\203K\203\211\203X", eff_n64_users_31},
-	{96, "booboo_n64", "\203u\201[\203u\201[\202\263\202\361", NULL},
-	{97, "pikkyolo_n64", "\202\322\202\301\202\253\202\345\202\353", NULL},
-	{98, "freeze_n64", "\203t\203\212\201[\203Y", NULL},
-	{99, "sunlight_n64", "\221\276\227z\214\365\220\374", eff_n64_users_20},
-	{100, "release_n64", "\211\360\225\372", eff_n64_users_21},
-	{101, "peach_dust_n64", "\203s\201[\203`\203_\203X\203g", eff_n64_users_22},
-	{102, "star_power_n64", "\203X\203^\201[\203p\203\217\201[", eff_n64_users_23},
-	{-1, NULL, NULL, NULL},
+    {0, "expbom_n64", "\223G\202\252\202\265\202\361\202\266\202\341\202\244\202\306\202\253", NULL},
+    {1, "kemuri1_n64", "\223y\211\214\222\205\222n", eff_n64_users_00},
+    {2, "kemuri2_n64", "\223y\211\214\203_\203b\203V\203\205", eff_n64_users_01},
+    {3, "kemuri3_n64", "\211\324\211\214\203W\203\203\203\223\203v", NULL},
+    {4, "kemuri4_n64", "\211\324\211\214\203_\203b\203V\203\205", NULL},
+    {5, "kemuri5_n64", "\211_\211\214\222\205\222n", NULL},
+    {6, "kemuri6_n64", "\211_\211\214\225\340\202\253", NULL},
+    {7, "kemuri7_n64", "\220\341\202\240\202\265\202\240\202\306", NULL},
+    {8, "flower_n64", "\202\250\211\324\202\252\202\314\202\332\202\301\202\304\202\242\202\255", NULL},
+    {9, "snow_n64", "\220\341\202\314\214\213\217\273\202\252\215~\202\351", NULL},
+    {10, "sstar_n64", "\227\254\202\352\220\257", eff_n64_users_26},
+    {11, "stardust_n64", "\203X\203^\201[\203_\203X\203g", eff_n64_users_02},
+    {12, "magic1_n64", "\203J\203\201\203b\203N\202\314\226\202\226@\202P", NULL},
+    {13, "@Pymagic2_n64@Pw", "\203J\203\201\203b\203N\202\314\226\202\226@\202Q", eff_n64_users_03},
+    {14, "fall_leaf_n64", "\227\216\202\277\227t", eff_n64_users_57},
+    {15, "hokori_n64", "\203z\203R\203\212", eff_n64_users_04},
+    {16, "gareki_n64", "\202\252\202\352\202\253", NULL},
+    {17, "kemuri8_n64", "\202\257\202\336\202\350\203s\203\223\203L\201[\203{\203\200\227p", eff_n64_users_05},
+    {18, "small_star_n64", "\215\327\202\251\202\242\220\257", eff_n64_users_06},
+    {19, "bomb_n64", "bom", eff_n64_users_07},
+    {20, "wangflush_n64", "\203\217\203\223\203\217\203\223\203t\203\211\203b\203V\203\205", eff_n64_users_08},
+    {21, "magic3_n64", "\203}\203W\203b\203N\202R", NULL},
+    {22, "kemuri9_n64", "\203n\203\223\203}\201[\211\214", eff_n64_users_09},
+    {23, "kemuri10_n64", "\203J\203\201\203b\203N\202\331\202\244\202\253\202\257\202\336\202\350", NULL},
+    {24, "@Pyfire_n64@Pw", "\202\331\202\314\202\250", NULL},
+    {25, "rappa_n64", "\203\211\203b\203p\221\220", NULL},
+    {26, "stardust2_n64", "\203X\203^\201[\203_\203X\203g\202Q", eff_n64_users_10},
+    {27, "ripple_n64", "\202\250\202\325\202\255\202\314\224g\226\344", eff_n64_users_11},
+    {28, "@Pyexplosion_n64@Pw", "\224\232\224\255", NULL},
+    {29, "kemuri11_n64", "\203h\203K\203{\203\223\202\257\202\336\202\350", eff_n64_users_12},
+    {30, "onpu_n64", "\211\271\225\204", eff_n64_users_13},
+    {31, "kemuri12_n64", "\203R\203\215\203R\203Q\211\214", eff_n64_users_32},
+    {32, "sweat_n64", "\212\276", eff_n64_users_14},
+    {33, "balloon_n64", "\203h\203K\203{\203\223\225\227\221D", NULL},
+    {34, "cool_leaf_n64", "\202\263\202\324\202\301\201@\227\216\227t", NULL},
+    {35, "bush_n64", "\202\265\202\260\202\335", NULL},
+    {36, "rothammer_success_n64", "\211\361\223]\203n\203\223\203}\201[\220\254\214\367", NULL},
+    {37, "rothammer_fail_n64", "\211\361\223]\203n\203\223\203}\201[\216\270\224s", NULL},
+    {38, "guruguru_n64", "\202\256\202\351\202\256\202\351", NULL},
+    {39, "ice_n64", "\203A\203C\203X\203o\203b\203`", NULL},
+    {40, "stamp_n64", "\202\323\202\335\202\302\202\257", eff_n64_users_15},
+    {41, "@Pythruhammer_n64@Pw", "\202\251\202\361\202\302\202\244\203n\203\223\203}\201[", eff_n64_users_16},
+    {42, "radiation_n64", "\217W\222\206", eff_n64_users_17},
+    {43, "thunder_n64", "\202\251\202\335\202\310\202\350", eff_n64_users_28},
+    {44, "breath_fire_n64", "\211\316\202\360\223f\202\255", eff_n64_users_43},
+    {45, "broken_barrier_n64", "\203o\203\212\203A\224j\211\363", eff_n64_users_18},
+    {46, "fire_ring_n64", "\203I\201[\203v\203j\203\223\203O", NULL},
+    {47, "fire_dust_n64", "fire_ring \202\252\216g\227p\202\267\202\351", NULL},
+    {48, "@Pyflame_n64@Pw", "flame", eff_n64_users_19},
+    {49, "blow_n64", "\225\254\220\205", NULL},
+    {50, "bomhei_n64", "\203o\203g\203\213\202\314\223G\203{\203\200\203w\203C", NULL},
+    {51, "fireflower_n64", "\203t\203@\203C\203\204\201[\203t\203\211\203\217\201[", eff_n64_users_56},
+    {52, "recover_heart_n64", "\211\361\225\234\203n\201[\203g", eff_n64_users_27},
+    {53, "pturn_n64", "\215s\223\256\225s\224\\", eff_n64_users_54},
+    {54, "hit_n64", "\203q\203b\203g", eff_n64_users_24},
+    {55, "confetti_n64", "\216\206\202\323\202\324\202\253", eff_n64_users_25},
+    {56, "snowfall_n64", "\220\341\202\252\215~\202\351", NULL},
+    {57, "whirlwind_n64", "\203}\203\212\203I\201E\223G\202\314\227x\202\350\211\361\223]", eff_n64_users_30},
+    {58, "thunderflare_n64", "\226\202\226@\203J\203\201\203b\203N\217\361", eff_n64_users_29},
+    {59, "coin_n64", "\203R\203C\203\223\216\346\202\301\202\275\202\306\202\253", NULL},
+    {60, "shock_n64", "\203o\203g\203\213\227p", eff_n64_users_46},
+    {61, "balloon_heiho_n64", "\203o\203g\203\213\201E\203o\203\213\201[\203\223\203w\203C\203z\201[", eff_n64_users_33},
+    {62, "rubble_n64", "\203o\203g\203\213\201E\203z\203\211\203I\203E", eff_n64_users_34},
+    {63, "magic_horao_n64", "\203z\203\211\203I\203E\203o\203g\203\213", NULL},
+    {64, "lensflare_n64", "\203T\203\223\203f\201[\203\213\201E\203r\203b\203O\203J\203\223\203e\203\211", NULL},
+    {65, "crystal_n64", "\203N\203\212\203X\203^\203\213", eff_n64_users_39},
+    {66, "butterfly_n64", "\203W\203\203\203\223\203O\203\213\224\362\202\361\202\305\202\351", eff_n64_users_44},
+    {67, "akari_charge_n64", "\203A\203J\203\212\201E\202\255\202\340\202\255\202\340\226\202\220l\201E\203s\203J\203\212\203\223", NULL},
+    {68, "akaro_sflush_n64", "\203A\203J\203\212\202\314\213Z", NULL},
+    {69, "opuku_wgun_n64", "\203I\203v\203N\202\314\213Z", eff_n64_users_52},
+    {70, "opuku_wprotect_n64", "\203I\203v\203N\202\314\213Z", eff_n64_users_53},
+    {71, "opuku_wcurtain_n64", "\203I\203v\203N\202\314\213Z", NULL},
+    {72, "opuku_jetw_n64", "\203I\203v\203N\201E\203Q\203b\203\\\201[", eff_n64_users_48},
+    {73, "opuku_jetwrain_n64", "\203I\203v\203N", NULL},
+    {74, "pokopi_thunder_n64", "\203|\203R\203s\201[", eff_n64_users_49},
+    {75, "water_damage_n64", "\220\205\203_\203\201\201[\203W", eff_n64_users_50},
+    {76, "snowman_n64", "\202\344\202\253\202\342\202\261\202\361\202\261\202\361", NULL},
+    {77, "holography_n64", "\203z\203\215\203O\203\211\203t", NULL},
+    {78, "timestamp_n64", "\203o\203g\203\213", NULL},
+    {79, "packn_bfire_n64", "\203p\203b\203N\203\223\203t\203\211\203\217\201[", eff_n64_users_40},
+    {80, "pokopi_pipo_n64", "\203|\203R\203s\201[\203p\203C\203|", eff_n64_users_55},
+    {81, "cloud_n64", "\202\255\202\340", eff_n64_users_45},
+    {82, "dogabon_attack_n64", "\203h\203K\203{\203\223", eff_n64_users_51},
+    {83, "kameki_tornade_n64", "\203o\203g\203\213\203J\203\201\203L", NULL},
+    {84, "stone_smoke_n64", "\203~\203j\203~\203j\201E\203X\203g\201[\203\223\202\332\202\244\202\265", NULL},
+    {85, "pokopi_pcharge_n64", "\203|\203R\203s\201[\203`\203\203\201[\203W", eff_n64_users_47},
+    {86, "hagetaka_flush_n64", "\203o\203g\203\213\201E\203C\203\217\203n\203Q", NULL},
+    {87, "kumokumo_n64", "\202\255\202\340\202\255\202\340", eff_n64_users_41},
+    {88, "vapor_n64", "\202\344\202\260", eff_n64_users_37},
+    {89, "fire_spark_n64", "\203o\203g\203\213\201E\203t\203@\203C\203A\201[\203p\203b\203N\203\223", NULL},
+    {90, "horao_spell_n64", "\203o\203g\203\213\201E\203z\203\211\203I\203E", NULL},
+    {91, "snow_dust_n64", "\203\206\203L\202\314\211\214", eff_n64_users_35},
+    {92, "akari_pose_n64", "\202\240\202\251\202\350\203|\201[\203Y", eff_n64_users_42},
+    {93, "kumokumo_chip_n64", "\202\255\202\340\202\255\202\340\226\202\220l\201E\203|\203R\203s\201[\213Z", eff_n64_users_38},
+    {94, "fireworks_n64", "\211\324\211\316", eff_n64_users_36},
+    {95, "glass_n64", "\203K\203\211\203X", eff_n64_users_31},
+    {96, "booboo_n64", "\203u\201[\203u\201[\202\263\202\361", NULL},
+    {97, "pikkyolo_n64", "\202\322\202\301\202\253\202\345\202\353", NULL},
+    {98, "freeze_n64", "\203t\203\212\201[\203Y", NULL},
+    {99, "sunlight_n64", "\221\276\227z\214\365\220\374", eff_n64_users_20},
+    {100, "release_n64", "\211\360\225\372", eff_n64_users_21},
+    {101, "peach_dust_n64", "\203s\201[\203`\203_\203X\203g", eff_n64_users_22},
+    {102, "star_power_n64", "\203X\203^\201[\203p\203\217\201[", eff_n64_users_23},
+    {-1, NULL, NULL, NULL},
 };
 #else
 eff_set eff_set_n64[] = {
-	{0, "expbom_n64"},
-	{1, "kemuri1_n64"},
-	{2, "kemuri2_n64"},
-	{3, "kemuri3_n64"},
-	{4, "kemuri4_n64"},
-	{5, "kemuri5_n64"},
-	{6, "kemuri6_n64"},
-	{7, "kemuri7_n64"},
-	{8, "flower_n64"},
-	{9, "snow_n64"},
-	{10, "sstar_n64"},
-	{11, "stardust_n64"},
-	{12, "magic1_n64"},
-	{13, "@Pymagic2_n64@Pw"},
-	{14, "fall_leaf_n64"},
-	{15, "hokori_n64"},
-	{16, "gareki_n64"},
-	{17, "kemuri8_n64"},
-	{18, "small_star_n64"},
-	{19, "bomb_n64"},
-	{20, "wangflush_n64"},
-	{21, "magic3_n64"},
-	{22, "kemuri9_n64"},
-	{23, "kemuri10_n64"},
-	{24, "@Pyfire_n64@Pw"},
-	{25, "rappa_n64"},
-	{26, "stardust2_n64"},
-	{27, "ripple_n64"},
-	{28, "@Pyexplosion_n64@Pw"},
-	{29, "kemuri11_n64"},
-	{30, "onpu_n64"},
-	{31, "kemuri12_n64"},
-	{32, "sweat_n64"},
-	{33, "balloon_n64"},
-	{34, "cool_leaf_n64"},
-	{35, "bush_n64"},
-	{36, "rothammer_success_n64"},
-	{37, "rothammer_fail_n64"},
-	{38, "guruguru_n64"},
-	{39, "ice_n64"},
-	{40, "stamp_n64"},
-	{41, "@Pythruhammer_n64@Pw"},
-	{42, "radiation_n64"},
-	{43, "thunder_n64"},
-	{44, "breath_fire_n64"},
-	{45, "broken_barrier_n64"},
-	{46, "fire_ring_n64"},
-	{47, "fire_dust_n64"},
-	{48, "@Pyflame_n64@Pw"},
-	{49, "blow_n64"},
-	{50, "bomhei_n64"},
-	{51, "fireflower_n64"},
-	{52, "recover_heart_n64"},
-	{53, "pturn_n64"},
-	{54, "hit_n64"},
-	{55, "confetti_n64"},
-	{56, "snowfall_n64"},
-	{57, "whirlwind_n64"},
-	{58, "thunderflare_n64"},
-	{59, "coin_n64"},
-	{60, "shock_n64"},
-	{61, "balloon_heiho_n64"},
-	{62, "rubble_n64"},
-	{63, "magic_horao_n64"},
-	{64, "lensflare_n64"},
-	{65, "crystal_n64"},
-	{66, "butterfly_n64"},
-	{67, "akari_charge_n64"},
-	{68, "akaro_sflush_n64"},
-	{69, "opuku_wgun_n64"},
-	{70, "opuku_wprotect_n64"},
-	{71, "opuku_wcurtain_n64"},
-	{72, "opuku_jetw_n64"},
-	{73, "opuku_jetwrain_n64"},
-	{74, "pokopi_thunder_n64"},
-	{75, "water_damage_n64"},
-	{76, "snowman_n64"},
-	{77, "holography_n64"},
-	{78, "timestamp_n64"},
-	{79, "packn_bfire_n64"},
-	{80, "pokopi_pipo_n64"},
-	{81, "cloud_n64"},
-	{82, "dogabon_attack_n64"},
-	{83, "kameki_tornade_n64"},
-	{84, "stone_smoke_n64"},
-	{85, "pokopi_pcharge_n64"},
-	{86, "hagetaka_flush_n64"},
-	{87, "kumokumo_n64"},
-	{88, "vapor_n64"},
-	{89, "fire_spark_n64"},
-	{90, "horao_spell_n64"},
-	{91, "snow_dust_n64"},
-	{92, "akari_pose_n64"},
-	{93, "kumokumo_chip_n64"},
-	{94, "fireworks_n64"},
-	{95, "glass_n64"},
-	{96, "booboo_n64"},
-	{97, "pikkyolo_n64"},
-	{98, "freeze_n64"},
-	{99, "sunlight_n64"},
-	{100, "release_n64"},
-	{101, "peach_dust_n64"},
-	{102, "star_power_n64"},
-	{-1, NULL}
+    {0, "expbom_n64"},
+    {1, "kemuri1_n64"},
+    {2, "kemuri2_n64"},
+    {3, "kemuri3_n64"},
+    {4, "kemuri4_n64"},
+    {5, "kemuri5_n64"},
+    {6, "kemuri6_n64"},
+    {7, "kemuri7_n64"},
+    {8, "flower_n64"},
+    {9, "snow_n64"},
+    {10, "sstar_n64"},
+    {11, "stardust_n64"},
+    {12, "magic1_n64"},
+    {13, "@Pymagic2_n64@Pw"},
+    {14, "fall_leaf_n64"},
+    {15, "hokori_n64"},
+    {16, "gareki_n64"},
+    {17, "kemuri8_n64"},
+    {18, "small_star_n64"},
+    {19, "bomb_n64"},
+    {20, "wangflush_n64"},
+    {21, "magic3_n64"},
+    {22, "kemuri9_n64"},
+    {23, "kemuri10_n64"},
+    {24, "@Pyfire_n64@Pw"},
+    {25, "rappa_n64"},
+    {26, "stardust2_n64"},
+    {27, "ripple_n64"},
+    {28, "@Pyexplosion_n64@Pw"},
+    {29, "kemuri11_n64"},
+    {30, "onpu_n64"},
+    {31, "kemuri12_n64"},
+    {32, "sweat_n64"},
+    {33, "balloon_n64"},
+    {34, "cool_leaf_n64"},
+    {35, "bush_n64"},
+    {36, "rothammer_success_n64"},
+    {37, "rothammer_fail_n64"},
+    {38, "guruguru_n64"},
+    {39, "ice_n64"},
+    {40, "stamp_n64"},
+    {41, "@Pythruhammer_n64@Pw"},
+    {42, "radiation_n64"},
+    {43, "thunder_n64"},
+    {44, "breath_fire_n64"},
+    {45, "broken_barrier_n64"},
+    {46, "fire_ring_n64"},
+    {47, "fire_dust_n64"},
+    {48, "@Pyflame_n64@Pw"},
+    {49, "blow_n64"},
+    {50, "bomhei_n64"},
+    {51, "fireflower_n64"},
+    {52, "recover_heart_n64"},
+    {53, "pturn_n64"},
+    {54, "hit_n64"},
+    {55, "confetti_n64"},
+    {56, "snowfall_n64"},
+    {57, "whirlwind_n64"},
+    {58, "thunderflare_n64"},
+    {59, "coin_n64"},
+    {60, "shock_n64"},
+    {61, "balloon_heiho_n64"},
+    {62, "rubble_n64"},
+    {63, "magic_horao_n64"},
+    {64, "lensflare_n64"},
+    {65, "crystal_n64"},
+    {66, "butterfly_n64"},
+    {67, "akari_charge_n64"},
+    {68, "akaro_sflush_n64"},
+    {69, "opuku_wgun_n64"},
+    {70, "opuku_wprotect_n64"},
+    {71, "opuku_wcurtain_n64"},
+    {72, "opuku_jetw_n64"},
+    {73, "opuku_jetwrain_n64"},
+    {74, "pokopi_thunder_n64"},
+    {75, "water_damage_n64"},
+    {76, "snowman_n64"},
+    {77, "holography_n64"},
+    {78, "timestamp_n64"},
+    {79, "packn_bfire_n64"},
+    {80, "pokopi_pipo_n64"},
+    {81, "cloud_n64"},
+    {82, "dogabon_attack_n64"},
+    {83, "kameki_tornade_n64"},
+    {84, "stone_smoke_n64"},
+    {85, "pokopi_pcharge_n64"},
+    {86, "hagetaka_flush_n64"},
+    {87, "kumokumo_n64"},
+    {88, "vapor_n64"},
+    {89, "fire_spark_n64"},
+    {90, "horao_spell_n64"},
+    {91, "snow_dust_n64"},
+    {92, "akari_pose_n64"},
+    {93, "kumokumo_chip_n64"},
+    {94, "fireworks_n64"},
+    {95, "glass_n64"},
+    {96, "booboo_n64"},
+    {97, "pikkyolo_n64"},
+    {98, "freeze_n64"},
+    {99, "sunlight_n64"},
+    {100, "release_n64"},
+    {101, "peach_dust_n64"},
+    {102, "star_power_n64"},
+    {-1, NULL}
 };
 #endif
 
 s32 _rand_table[] = {
-	0x100B2AF5, 0x45B59924, 0x35094B45, 0x4ABFA67A,
-	0x164F5371, 0x7B195845, 0x58562A56, 0x25733D41,
-	0x48008107, 0x0E004F28, 0x6963B8AD, 0x5B82AB71,
-	0x6BC1F51B, 0x3D947816, 0x39705175, 0x44409A59,
-	0x0ED99067, 0x5F70B6F8, 0x3225AEEE, 0x08B5E97C,
-	0x2CDE7594, 0x5E9E5B7D, 0x5B2A2888, 0x107F0F50,
-	0x58FBC53B, 0x65F69F19, 0x3AF6CEF3, 0x15C3894F,
-	0x4C931A2C, 0x39A897E9, 0x5945BB8C, 0x5C9E4521,
-	0x7F5E310D, 0x0E4F06D2, 0x275DEB9C, 0x15AD847F,
-	0x09685F17, 0x7FB415F2, 0x3B20C1C0, 0x5168E01E,
-	0x0DB4651A, 0x24847A6D, 0x2CEB8B8F, 0x79765A35,
-	0x6218F283, 0x665BDD04, 0x3DB6F48F, 0x70F282EB,
-	0x45CC93FC, 0x6FDCA37D, 0x79A86C67, 0x72AB0990,
-	0x4E7AFEFA, 0x54D294F0, 0x032A18E0, 0x2776C435,
-	0x3AC93409, 0x3E20E7D4, 0x3D3A4D85, 0x075C4E35,
-	0x77C97FBD, 0x16800911, 0x63FA9357, 0x7727B0CB,
-	0x24CF0FE3, 0x0B587EF3, 0x0CD5354A, 0x2E376EFA,
-	0x0B0C94E5, 0x47F5F70A, 0x7FA04F19, 0x18C0FA00,
-	0x6C7A7178, 0x2C8BDAA8, 0x12375435, 0x4E9363FB,
-	0x12E7B7AD, 0x4FEE48C4, 0x3F85E6E6, 0x58B44BA9,
-	0x3FCAEC41, 0x392E534E, 0x4B5F553A, 0x0E45EB3C,
-	0x0E00E83E, 0x4E896E1A, 0x35BCAF71, 0x48CA1C47,
-	0x0CAA55EE, 0x72F6FCF6, 0x50266A7D, 0x0473D5AC,
-	0x09770608, 0x3420FDD4, 0x7B9B8677, 0x2E4615EB,
-	0x3F797CC7, 0x0870BBC1, 0x5C7D84E6, 0x4A8611AC,
-	0x5066B2CB, 0x5C1DD3FF, 0x63470BAC, 0x3CE12443,
-	0x08A9AEA7, 0x757E5FE2, 0x0B74883F, 0x1B916654,
-	0x456CA8A6, 0x4AFA6F25, 0x7445B1FE, 0x053794E8,
-	0x0428C273, 0x3FA50738, 0x137D8024, 0x1229AAB1,
-	0x0E2E7552, 0x493A2F95, 0x5AF3C6F9, 0x1AD8CB41,
-	0x3C312C8C, 0x2B1A3176, 0x1F4CA0ED, 0x45A83294,
-	0x5F3B2F4A, 0x1AE82764, 0x73EE487F, 0x1EB4AC11
+    0x100B2AF5, 0x45B59924, 0x35094B45, 0x4ABFA67A,
+    0x164F5371, 0x7B195845, 0x58562A56, 0x25733D41,
+    0x48008107, 0x0E004F28, 0x6963B8AD, 0x5B82AB71,
+    0x6BC1F51B, 0x3D947816, 0x39705175, 0x44409A59,
+    0x0ED99067, 0x5F70B6F8, 0x3225AEEE, 0x08B5E97C,
+    0x2CDE7594, 0x5E9E5B7D, 0x5B2A2888, 0x107F0F50,
+    0x58FBC53B, 0x65F69F19, 0x3AF6CEF3, 0x15C3894F,
+    0x4C931A2C, 0x39A897E9, 0x5945BB8C, 0x5C9E4521,
+    0x7F5E310D, 0x0E4F06D2, 0x275DEB9C, 0x15AD847F,
+    0x09685F17, 0x7FB415F2, 0x3B20C1C0, 0x5168E01E,
+    0x0DB4651A, 0x24847A6D, 0x2CEB8B8F, 0x79765A35,
+    0x6218F283, 0x665BDD04, 0x3DB6F48F, 0x70F282EB,
+    0x45CC93FC, 0x6FDCA37D, 0x79A86C67, 0x72AB0990,
+    0x4E7AFEFA, 0x54D294F0, 0x032A18E0, 0x2776C435,
+    0x3AC93409, 0x3E20E7D4, 0x3D3A4D85, 0x075C4E35,
+    0x77C97FBD, 0x16800911, 0x63FA9357, 0x7727B0CB,
+    0x24CF0FE3, 0x0B587EF3, 0x0CD5354A, 0x2E376EFA,
+    0x0B0C94E5, 0x47F5F70A, 0x7FA04F19, 0x18C0FA00,
+    0x6C7A7178, 0x2C8BDAA8, 0x12375435, 0x4E9363FB,
+    0x12E7B7AD, 0x4FEE48C4, 0x3F85E6E6, 0x58B44BA9,
+    0x3FCAEC41, 0x392E534E, 0x4B5F553A, 0x0E45EB3C,
+    0x0E00E83E, 0x4E896E1A, 0x35BCAF71, 0x48CA1C47,
+    0x0CAA55EE, 0x72F6FCF6, 0x50266A7D, 0x0473D5AC,
+    0x09770608, 0x3420FDD4, 0x7B9B8677, 0x2E4615EB,
+    0x3F797CC7, 0x0870BBC1, 0x5C7D84E6, 0x4A8611AC,
+    0x5066B2CB, 0x5C1DD3FF, 0x63470BAC, 0x3CE12443,
+    0x08A9AEA7, 0x757E5FE2, 0x0B74883F, 0x1B916654,
+    0x456CA8A6, 0x4AFA6F25, 0x7445B1FE, 0x053794E8,
+    0x0428C273, 0x3FA50738, 0x137D8024, 0x1229AAB1,
+    0x0E2E7552, 0x493A2F95, 0x5AF3C6F9, 0x1AD8CB41,
+    0x3C312C8C, 0x2B1A3176, 0x1F4CA0ED, 0x45A83294,
+    0x5F3B2F4A, 0x1AE82764, 0x73EE487F, 0x1EB4AC11
 };
 
 //.sbss
@@ -330,123 +333,124 @@ static eff_n64_work work;
 //.sdata
 static eff_n64_work* wp = &work;
 
-//local prototypes
+// local prototypes
 static void _callback_tpl(s32 error, DVDFileInfo* info);
 
 static void _callback_tpl(s32 error, DVDFileInfo* info) {
-	DVDEntry* entry;
+    DVDEntry* entry;
 
-	entry = (DVDEntry*)info->cb.userData;
-	UnpackTexPalette(wp->effTexture);
-	DVDMgrClose(entry);
-	wp->effTextureLoaded = TRUE;
+    entry = (DVDEntry*)info->cb.userData;
+    UnpackTexPalette(wp->effTexture);
+    DVDMgrClose(entry);
+    wp->effTextureLoaded = TRUE;
 }
 
 void effInit64(void) {
-	memset(wp, 0, sizeof(eff_n64_work));
-	wp->effTextureLoaded = FALSE;
+    memset(wp, 0, sizeof(eff_n64_work));
+    wp->effTextureLoaded = FALSE;
 }
 
 void effTexSetupN64(void) {
-	const char* lang;
-	DVDEntry* entry;
-	char path[128];
-	u32 length;
+    const char* lang;
+    DVDEntry* entry;
+    char path[128];
+    u32 length;
 
-	wp->effTexture = NULL;
-	wp->effTextureLoaded = FALSE;
-	wp->effTexture = (TEXPalette*)arcOpen("effect_n64.tpl", 0, 0);
-	if (wp->effTexture == NULL) {
-#ifdef VERSION_G8ME01
-		lang = (u32)gp->language == 0 ? "jp" : "us";
-		sprintf(path, "%s/e/%s/effect_n64.tpl", getMarioStDvdRoot(), lang);
-#elif defined(VERSION_G8ME01_DEMO)
-		sprintf(path, "%s/eff/jp/effect_n64.tpl", getMarioStDvdRoot());
+    wp->effTexture = NULL;
+    wp->effTextureLoaded = FALSE;
+    wp->effTexture = (TEXPalette*)arcOpen("effect_n64.tpl", 0, 0);
+    if (wp->effTexture == NULL) {
+#if VERSION >= VERSION_US
+        lang = (u32)gp->language == 0 ? "jp" : "us";
+        sprintf(path, "%s/e/%s/effect_n64.tpl", getMarioStDvdRoot(), lang);
+#elif VERSION == VERSION_DEMO
+        sprintf(path, "%s/eff/jp/effect_n64.tpl", getMarioStDvdRoot());
 #else
-		sprintf(path, "%s/e/jp/effect_n64.tpl", getMarioStDvdRoot());
+        sprintf(path, "%s/e/jp/effect_n64.tpl", getMarioStDvdRoot());
 #endif
-		entry = DVDMgrOpen(path, 2, 0);
-		length = OSRoundUp32B(DVDMgrGetLength(entry));
-		wp->effTexture = (TEXPalette*)__memAlloc(HEAP_DEFAULT, length);
-		entry->info.cb.userData = entry;
-		DVDMgrReadAsync(entry, wp->effTexture, length, 0, _callback_tpl);
-	} else {
-		UnpackTexPalette(wp->effTexture);
-		wp->effTextureLoaded = TRUE;
-	}
+        entry = DVDMgrOpen(path, 2, 0);
+        length = OSRoundUp32B(DVDMgrGetLength(entry));
+        wp->effTexture = (TEXPalette*)__memAlloc(HEAP_DEFAULT, length);
+        entry->info.cb.userData = entry;
+        DVDMgrReadAsync(entry, wp->effTexture, length, 0, _callback_tpl);
+    } else {
+        UnpackTexPalette(wp->effTexture);
+        wp->effTextureLoaded = TRUE;
+    }
 }
 
 void effGetTexObjN64(u32 id, GXTexObj* obj) {
 #pragma explicit_zero_data on
-	static u8 dummy ATTRIBUTE_ALIGN(32) = 0;
+    static u8 dummy ATTRIBUTE_ALIGN(32) = 0;
 #pragma explicit_zero_data reset
 
-	if (!wp->effTextureLoaded) {
-		GXInitTexObj(obj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
-	} else {
-		TEXGetGXTexObjFromPalette(wp->effTexture, obj, id);
-	}
+    if (!wp->effTextureLoaded) {
+        GXInitTexObj(obj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    } else {
+        TEXGetGXTexObjFromPalette(wp->effTexture, obj, id);
+    }
 }
 
 eff_set* effGetSetN64(const char* name) {
-	int i;
+    int i;
 
-	for (i = 0; eff_set_n64[i].id != -1; i++) {
-		if (!strcmp(eff_set_n64[i].name, name)) {
-			return &eff_set_n64[i];
-		}
-	}
-	return NULL;
+    for (i = 0; eff_set_n64[i].id != -1; i++) {
+        if (!strcmp(eff_set_n64[i].name, name)) {
+            return &eff_set_n64[i];
+        }
+    }
+    return NULL;
 }
 
 u32 effTblRandN64(u32 rand, s32 index) {
-	s32 val = _rand_table[index % 128];
-	if (val < 0) val = -val;
-	return val % (s32)(rand + 1);
+    s32 val = _rand_table[index % 128];
+    if (val < 0)
+        val = -val;
+    return val % (s32)(rand + 1);
 }
 
 void effSetVtxDescN64(effN64Vtx* vtx) {
-	GXClearVtxDesc();
-	GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-	GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-	GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 5);
-	GXSetArray(GX_VA_POS, &vtx->x, sizeof(effN64Vtx));
-	GXSetArray(GX_VA_CLR0, &vtx->r, sizeof(effN64Vtx));
-	GXSetArray(GX_VA_TEX0, &vtx->s, sizeof(effN64Vtx));
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+    GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+    GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 5);
+    GXSetArray(GX_VA_POS, &vtx->x, sizeof(effN64Vtx));
+    GXSetArray(GX_VA_CLR0, &vtx->r, sizeof(effN64Vtx));
+    GXSetArray(GX_VA_TEX0, &vtx->s, sizeof(effN64Vtx));
 }
 
 void tri1(u16 x, u16 y, u16 z, u16 flag) {
-	GXWGFifo.u16 = x;
-	GXWGFifo.u16 = x;
-	GXWGFifo.u16 = x;
-	GXWGFifo.u16 = y;
-	GXWGFifo.u16 = y;
-	GXWGFifo.u16 = y;
-	GXWGFifo.u16 = z;
-	GXWGFifo.u16 = z;
-	GXWGFifo.u16 = z;
+    GXWGFifo.u16 = x;
+    GXWGFifo.u16 = x;
+    GXWGFifo.u16 = x;
+    GXWGFifo.u16 = y;
+    GXWGFifo.u16 = y;
+    GXWGFifo.u16 = y;
+    GXWGFifo.u16 = z;
+    GXWGFifo.u16 = z;
+    GXWGFifo.u16 = z;
 }
 
 void tri2(s32 x1, s32 y1, s32 z1, s32 flag1, s32 x2, s32 y2, s32 z2, s32 flag2) {
-	GXWGFifo.u16 = x1;
-	GXWGFifo.u16 = x1;
-	GXWGFifo.u16 = x1;
-	GXWGFifo.u16 = y1;
-	GXWGFifo.u16 = y1;
-	GXWGFifo.u16 = y1;
-	GXWGFifo.u16 = z1;
-	GXWGFifo.u16 = z1;
-	GXWGFifo.u16 = z1;
-	GXWGFifo.u16 = x2;
-	GXWGFifo.u16 = x2;
-	GXWGFifo.u16 = x2;
-	GXWGFifo.u16 = y2;
-	GXWGFifo.u16 = y2;
-	GXWGFifo.u16 = y2;
-	GXWGFifo.u16 = z2;
-	GXWGFifo.u16 = z2;
-	GXWGFifo.u16 = z2;
+    GXWGFifo.u16 = x1;
+    GXWGFifo.u16 = x1;
+    GXWGFifo.u16 = x1;
+    GXWGFifo.u16 = y1;
+    GXWGFifo.u16 = y1;
+    GXWGFifo.u16 = y1;
+    GXWGFifo.u16 = z1;
+    GXWGFifo.u16 = z1;
+    GXWGFifo.u16 = z1;
+    GXWGFifo.u16 = x2;
+    GXWGFifo.u16 = x2;
+    GXWGFifo.u16 = x2;
+    GXWGFifo.u16 = y2;
+    GXWGFifo.u16 = y2;
+    GXWGFifo.u16 = y2;
+    GXWGFifo.u16 = z2;
+    GXWGFifo.u16 = z2;
+    GXWGFifo.u16 = z2;
 }

@@ -1,3 +1,4 @@
+// Paper Mario 64 effect: a single snowflake that falls while tumbling for `lifetime` frames.
 #include "eff/n64/eff_snow_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -8,13 +9,13 @@
 #include <dolphin/mtx.h>
 
 typedef struct EffSnowN64Work {
-    Vec position;   // 0x0
-    Vec velocity;   // 0xC
-    f32 rotX;       // 0x18
-    f32 rotY;       // 0x1C
-    f32 rotSpeedX;  // 0x20
-    f32 rotSpeedY;  // 0x24
-    s32 timer;      // 0x28
+    Vec position;  // 0x0
+    Vec velocity;  // 0xC
+    f32 rotX;      // 0x18
+    f32 rotY;      // 0x1C
+    f32 rotSpeedX; // 0x20
+    f32 rotSpeedY; // 0x24
+    s32 timer;     // 0x28
 } EffSnowN64Work;
 
 void effSnowMain(EffectEntry* effect);

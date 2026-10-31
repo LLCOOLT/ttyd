@@ -1,3 +1,4 @@
+// unit_party_vivian.c: Vivian's battle weapons, pose table and unit kind as a partner, plus the majo display events.
 #pragma once
 
 #include "evt/evt_cmd.h"
@@ -11,6 +12,6 @@ extern BattleWeapon partyWeapon_VivianCharmKissAttack;
 extern BattleWeapon partyWeapon_VivianMagicalPowder;
 extern BattleWeapon partyWeapon_VivianNormalAttack;
 extern BattleWeapon partyWeapon_VivianShadowGuard;
-extern s32 pose_table_vivian_stay[];
+extern PoseTableEntry pose_table_vivian_stay[];
 extern BattleUnitKind unitdata_Party_Vivian;
 extern EvtWord vivian_shadow_tail_event[];

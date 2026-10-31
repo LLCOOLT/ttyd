@@ -1,3 +1,5 @@
+// Peach speech bubble (fukidashi: speech balloon) placed next to the speaker's head; types 0-2.
+// effSetPeachFukiBatu sets the name of the cross ("batu") mark.
 #include "eff/eff_peach_fukidashi.h"
 #include "driver/dispdrv.h"
 #include "driver/icondrv.h"
@@ -6,19 +8,19 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 #include "icon_ids.h"
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
+#include "version.h"
 
 #define fabsf(x) __fabsf(x)
 
 typedef struct EffPeachFukidashiWork {
-    u32 flags;      // 0x0, bits 0-1: icon, 0x80: show a cross
-    Vec position;   // 0x4
-    f32 angle;      // 0x10
-    f32 size;       // 0x14
-    f32 rot;        // 0x18
-    s32 timer;      // 0x1C
-    NpcEntry* npc;  // 0x20, NULL = Mario
+    u32 flags;     // 0x0, bits 0-1: icon, 0x80: show a cross
+    Vec position;  // 0x4
+    f32 angle;     // 0x10
+    f32 size;      // 0x14
+    f32 rot;       // 0x18
+    s32 timer;     // 0x1C
+    NpcEntry* npc; // 0x20, NULL = Mario
 } EffPeachFukidashiWork;
 
 // place the bubble next to the speaker's head, rotated around the camera's view axis
@@ -30,13 +32,12 @@ static inline void _setPosition(EffPeachFukidashiWork* work, f32 offset) {
     Mtx rot;
 
     camera = camGetPtr(CAMERA_3D);
-    axis = (Vec){ (f32)sin(MTXDegToRad(camera->viewYaw)), 0.0f, -(f32)cos(MTXDegToRad(camera->viewYaw)) };
+    axis = (Vec){(f32)sin(MTXDegToRad(camera->viewYaw)), 0.0f, -(f32)cos(MTXDegToRad(camera->viewYaw))};
     dist = 0.5f * (offset + work->size);
     if (work->npc) {
         base = work->npc->position;
         height = work->npc->height;
-    }
-    else {
+    } else {
         MarioWork* mario = marioGetPtr();
         base = mario->position;
         height = mario->wPlayerCollisionBox.y;
@@ -128,12 +129,12 @@ void effPeachFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
 
     // red cross over the icon
     if (work->flags & 0x80) {
-#ifdef VERSION_G8ME01
+#if VERSION >= VERSION_US
         char text[32] = "\xD7"; // US: Latin-1 multiplication sign
 #else
         char text[32] = "\x81\x7E";
 #endif
-        GXColor red = { 0xFF, 0x00, 0x00, 0xFF };
+        GXColor red = {0xFF, 0x00, 0x00, 0xFF};
 
         PSMTXScale(scale, 0.75f, 0.75f, 0.75f);
         PSMTXTrans(mtx, 6.0f + (work->position.x - 11.5f),

@@ -1,3 +1,4 @@
+// Paper Mario 64 magic effect 3 at a point for a given life.
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
@@ -7,7 +8,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "eff/n64/eff_magic3_n64.h"
-#include "eff/eff_magic1_n64.h"
 #include "libc_decls.h"
 #include <math.h>
 
@@ -25,7 +25,9 @@ typedef struct EffMagic3N64Work {
 void effMagic3Main(EffectEntry* effect);
 void effMagic3Disp(CameraId cameraId, EffectEntry* effect);
 
+// Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+// strength reduction optimisation off for effMagic3N64Entry: the original register allocation and scheduling need it
 #pragma opt_strength_reduction off
 EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
     s32 j;
@@ -106,7 +108,9 @@ EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
 
 #pragma opt_propagation reset
 #pragma opt_strength_reduction reset
-inline f32 magic3_scale(f32 a, f32 b) { return 3.0f * a + b; }
+inline f32 magic3_scale(f32 a, f32 b) {
+    return 3.0f * a + b;
+}
 
 void effMagic3Main(EffectEntry* effect) {
     s32 life;

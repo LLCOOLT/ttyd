@@ -1,46 +1,32 @@
+// win_02 (ウィンディん家周辺, Boggly Woods): the path between win_01 and win_03.
+
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_sub.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_hit.h"
+#include "evt/evt_item.h"
+#include "evt/evt_map.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
+#include "evt/evt_snd.h"
+#include "party/party_motion.h"
+#include "win.h"
 #include "data_tables.h"
-
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_shake);
-USER_FUNC(evt_hit_bind_mapobj);
-USER_FUNC(evt_hit_bind_update);
-USER_FUNC(evt_hit_get_position);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_map_entry_airport_harbor);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_scale);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mobj_badgeblk);
-USER_FUNC(evt_mobj_brick);
-USER_FUNC(evt_mobj_powerupblk);
-USER_FUNC(evt_mobj_switch_blue);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
+#include "evt/evt_story.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
 
 static BeroEntry bero_entry_data[5];
-extern EvtWord evt_hikou_nobiru_init[];
-extern EvtWord evt_hikou_nobiru[];
 static TreeAccess tree_access_data[3];
-extern EvtWord win_02_init_evt[];
 
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -55,8 +41,8 @@ static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
         0, 0, // type..sfxId
-        20000, // directionId
-        100000, // centerPosition
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -72,8 +58,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan2", // hitName
         2, // type
         0, // sfxId
-        6, // directionId
-        100000, // centerPosition
+        BERO_DIR_W, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -88,8 +74,8 @@ static BeroEntry bero_entry_data[] = {
         "dokan1", // hitName
         2, // type
         0, // sfxId
-        9, // directionId
-        100000, // centerPosition
+        BERO_DIR_DOWN, // directionId
+        BERO_POS_AUTO, // centerPosition
         0, 0, // centerPositionY..centerPositionZ
         -1, // length
         NULL, // enterEvent
@@ -131,11 +117,11 @@ EVT_END()
 
 EVT_BEGIN(evt_hikou_nobiru)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_tree_ha04"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_tree_ha04"), MAPOBJ_FLAG_HIDE)
     CALL(evt_cam3d_evt_set, -307, 220, 533, -307, 124, -7, 500, 11)
     WAIT_MS(1000)
     CALL(evt_snd_sfxon, STRING("SFX_STG2_SWITCH_QUAKE1"), LW(10))
-    CALL(evt_cam_shake, 4, FLOAT(0.0146484375f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0146484375f), FLOAT(0.0f), 1000)
     CALL(evt_snd_sfxoff, LW(10))
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, -307, 393, 533, -307, 297, -7, 3000, 0)
@@ -184,7 +170,7 @@ EVT_BEGIN(evt_hikou_nobiru)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_tree_ha04"), 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_tree_ha04"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -199,20 +185,19 @@ EVT_BEGIN(win_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN1"))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN1"))
     SET_VALUE(LW(0), PTR(tree_access_data))
     CALL_CHILD(PTR(evt_sub_tree_access_entry))
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi"))
-    CALL(evt_mobj_powerupblk, STRING("pblk00"), -470, 300, 50, 0, GSWF(5541), 0)
-    CALL(evt_mobj_brick, STRING("mobj_box01"), 67, 110, -130, 271, 12, 0, GSWF(2683))
-    CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), 600, 185, -75, 248, 0, GSWF(2677), 1)
-    CALL(evt_item_entry, STRING("item_00"), 125, -472, 50, -134, 16, GSWF(5608), 0)
-    IF_INT_EQUAL(GSWF(2678), 1)
+    CALL(evt_mobj_powerupblk, STRING("pblk00"), -470, 300, 50, 0, GSWF(GSWF_WIN02_SHINE_SPRITE), 0)
+    CALL(evt_mobj_brick, STRING("mobj_box01"), 67, 110, -130, ITEM_P_DOWN_D_UP_P, 12, 0, GSWF(GSWF_WIN02_HIDDEN_PDOWN_DUP_P_BLOCK_HIT))
+    CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), 600, 185, -75, ITEM_QUAKE_HAMMER, 0, GSWF(GSWF_WIN02_QUAKE_HAMMER_BLOCK_HIT), 1)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, -472, 50, -134, 16, GSWF(GSWF_WIN02_STAR_PIECE), 0)
+    IF_INT_EQUAL(GSWF(GSWF_WIN02_BLUE_SWITCH_PRESSED), 1)
         SPAWN_EVENT(PTR(evt_hikou_nobiru_init))
     END_IF
-    CALL(evt_mobj_switch_blue, 0, STRING("mobj_hashi0"), -415, 50, -125, PTR(evt_hikou_nobiru), GSWF(2678))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_hikou"), 2)
+    CALL(evt_mobj_switch_blue, 0, STRING("mobj_hashi0"), -415, 50, -125, PTR(evt_hikou_nobiru), GSWF(GSWF_WIN02_BLUE_SWITCH_PRESSED))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hikou"), MAPOBJ_FLAG_BBOX_CULL)
     RETURN
 EVT_END()
-
