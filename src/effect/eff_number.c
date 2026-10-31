@@ -10,6 +10,7 @@
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
+/** Unreferenced zero constant from the original source, first in this file's read-only data. */
 static const f32 padz = 0.0f;
 
 /** Draws `number` as digit textures with the colour pair chosen by `type`, transformed by mtx and faded by `alpha`. */

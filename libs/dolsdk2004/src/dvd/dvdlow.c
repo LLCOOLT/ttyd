@@ -6,6 +6,11 @@
 
 #define DVD_WATYPE_MAX 2
 
+/**
+ * Low-level drive state: first read pending, stop request, last read length,
+ * the callbacks of the running command and of a cover reset, reset and cover timing,
+ * and the read workaround type and seek offset.
+ */
 static BOOL FirstRead = TRUE;
 static volatile BOOL StopAtNextInt = FALSE;
 static u32 LastLength = 0;

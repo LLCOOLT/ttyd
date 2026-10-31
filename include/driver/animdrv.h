@@ -112,7 +112,7 @@ typedef struct AnimTexBind {
 
 struct AnimTexMtx {
     u8 texBindIdx; // 0x0
-    u8 align[3];   // 0x1, ???
+    u8 align[3];   // 0x1, padding before transS; never read (copied with the entry from the file)
     f32 transS;    // 0x4
     f32 transT;    // 0x8
     f32 scaleS;    // 0xC
@@ -375,6 +375,7 @@ void animPoseRelease(s32 poseId);
 // AnimationPose.materialLightFlag (animPoseSetMaterialLightFlagOn/Off), read by mapSetMaterialLight
 #define ANIM_MATERIAL_LIGHT_PAPER 0x1         // lit by the paper light (lightGetPaper) with the paper ambient colour
 #define ANIM_MATERIAL_LIGHT_CHARA 0x2         // lit by the nearby character lights (LIGHT_CHARA)
+#define ANIM_MATERIAL_LIGHT_NO_VTX_COLOR 0x4  // the lit material colour is white, not the vertex colours (icondrv's 3D icons)
 #define ANIM_MATERIAL_LIGHT_PAPER_CRAFT 0x8   // lit by the paper-craft light with its ambient colour
 #define ANIM_MATERIAL_LIGHT_PAPER_NO_AMB 0x10 // lit by the paper light with a black ambient colour
 

@@ -388,6 +388,10 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
     return ret;
 }
 
+/**
+ * Mario's animations in his first animation set: evt_mario_set_pose plays any other name from the second set.
+ * The EU release adds M_I_3.
+ */
 const char* a_mario_group[] = {
     "M_Z_1", "M_Z_9", "M_S_1", "M_S_3", "M_W_1", "M_R_1", "M_J_1A", "M_J_1B", "M_J_1C", "M_H_1",
     "M_H_2", "M_H_3", "M_H_3A", "M_H_3B", "M_H_4", "M_H_5", "M_H_6", "M_H_6A", "M_H_6B", "M_H_7",
@@ -719,6 +723,10 @@ USER_FUNC(evt_mario_set_dir_npc) {
 }
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo only: a full turn and a half turn in degrees, read by the Mario turn functions above
+ * (DIR_FULL_TURN wraps a facing angle, DIR_HALF_TURN picks the left or right sprite facing).
+ */
 const f32 evt_mario_full_turn = 360.0f;
 const f32 evt_mario_half_turn = 180.0f;
 #endif
@@ -984,6 +992,7 @@ USER_FUNC(evt_mario_get_motion) {
 
 /** Switches Mario to the motion id in arg 0 (MARIO_MOTION_*). */
 USER_FUNC(evt_mario_set_motion) {
+    // FAKE: s32 cast: the MarioMotion prototype narrows the value first (clrlwi) (FAKES.md)
     ((void (*)(s32))marioChgMot)(evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
@@ -1021,7 +1030,7 @@ USER_FUNC(evt_mario_cancel_roll_motion) {
         marioRollTryCancel();
 #endif
     }
-    if (marioGetPtr()->flags & 0x1000000) {
+    if (marioGetPtr()->flags & MARIO_FLAG_TUBE_MODE) {
         return EVT_RETURN_BLOCK;
     }
     return EVT_RETURN_DONE;
@@ -1669,7 +1678,7 @@ USER_FUNC(evt_mario_jump_pos) {
 /**
  * Launches Mario off a jump stand: to (args 3-5),
  * or to (args 6-8) when he fell onto it from high above (arg 1 sets the threshold); arg 10 = 3 forces the first.
- * Sets systemLevelFlags 0x10 until he lands.
+ * Sets SYSTEM_LEVEL_FLAG_NO_BATTLE until he lands.
  */
 USER_FUNC(evt_mario_jump_jumpstand) {
     EvtWord* args = event->args;
@@ -1705,7 +1714,7 @@ USER_FUNC(evt_mario_jump_jumpstand) {
         } else {
             event->userWork[3] = 1;
         }
-        gp->systemLevelFlags |= 0x10;
+        gp->systemLevelFlags |= SYSTEM_LEVEL_FLAG_NO_BATTLE;
     }
     if (event->userWork[3] & 1) {
         tx = x1;
@@ -1869,7 +1878,7 @@ USER_FUNC(evt_mario_jump_jumpstand) {
         mp->dispFlags &= ~MARIO_DISP_FLAG_FRONT_POSE;
         marioAdjustMoveDir();
         camFollowYOn();
-        gp->systemLevelFlags &= ~0x10;
+        gp->systemLevelFlags &= ~SYSTEM_LEVEL_FLAG_NO_BATTLE;
         return EVT_RETURN_YIELD;
     }
     return EVT_RETURN_BLOCK;
@@ -2016,16 +2025,18 @@ USER_FUNC(evt_koopa_chk_dead) {
 }
 
 /**
- * Guess: sets (arg 0 non-zero, taken literally) or clears Bowser's tired flag,
- * which koopa_motion checks when picking his stand poses; used in gor_01.
+ * Sets (arg 0 non-zero, taken literally) or clears KpaWork flag 0x1000000, which makes Bowser's stay and walk
+ * motions (koopa_motion) use KPA_S_2 and KPA_W_2 instead of KPA_S_1 and KPA_W_1;
+ * set for gor_01's chapter 6 interlude in the Rogueport plaza.
+ * Guess: those are tired poses, from the name.
  */
 USER_FUNC(evt_koopa_weary) {
     EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     if (args[0]) {
-        mp->kpaWork->flags |= 0x1000000;
+        mp->kpaWork->flags |= KPA_WORK_FLAG_WEARY;
     } else {
-        mp->kpaWork->flags &= ~0x1000000;
+        mp->kpaWork->flags &= ~KPA_WORK_FLAG_WEARY;
     }
     return EVT_RETURN_DONE;
 }
@@ -2037,7 +2048,7 @@ USER_FUNC(evt_mario_wait_move_end) {
 
 /** Blocks while Mario's input is off (MARIO_FLAG_KEY_OFF). */
 USER_FUNC(evt_mario_wait_movable) {
-    return (marioGetPtr()->flags & 8) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
+    return (marioGetPtr()->flags & MARIO_FLAG_KEY_OFF) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
 /**
@@ -2077,14 +2088,20 @@ USER_FUNC(evt_mario_set_mode) {
     return EVT_RETURN_DONE;
 }
 
-/** Guess: writes Bowser's Super Koopa Bros. power level to arg 0 (kpaGetLevel); used in kpa_03 and kpa_05. */
+/**
+ * Writes Bowser's power-up level (kpaGetLevel: 0 small to 3 giant) to arg 0;
+ * kpa_03 and kpa_05 save it in GSW_KPA_BOWSER_POWER before the next Super Koopa Bros. map.
+ */
 USER_FUNC(evt_koopa_get_level) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], kpaGetLevel());
     return EVT_RETURN_DONE;
 }
 
-/** Guess: sets Bowser's Super Koopa Bros. power level to arg 0; used in kpa_04 and kpa_06. */
+/**
+ * Sets Bowser's power-up level to arg 0 (kpaSetLevel);
+ * kpa_04 and kpa_06 restore it from GSW_KPA_BOWSER_POWER.
+ */
 USER_FUNC(evt_koopa_set_level) {
     kpaSetLevel(evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
@@ -2465,7 +2482,7 @@ USER_FUNC(evt_mario_clear_party) {
 
 /** Puts Mario in his pushing state (MARIO_FLAG_IS_PUSHING); used in jin_10. */
 USER_FUNC(evt_mario_push) {
-    marioGetPtr()->flags |= 0x8000;
+    marioGetPtr()->flags |= MARIO_FLAG_IS_PUSHING;
     return EVT_RETURN_DONE;
 }
 
@@ -2525,8 +2542,8 @@ USER_FUNC(L_evt_mario_keyon_wait) {
 #endif
 
 /**
- * Arg 0 non-zero turns Mario into a paper airplane and blocks until the plane status is 2 (Guess: landed);
- * 0 cancels it and blocks until he stands on the ground. Used by the evt_lect_tik lecture.
+ * Arg 0 non-zero turns Mario into a paper airplane and blocks until the plane status is 2 (gliding, past the
+ * take-off); 0 cancels it and blocks until he stands on the ground. Used by the evt_lect_tik lecture.
  */
 USER_FUNC(evt_mario_paper_plane) {
     s32 mode;
@@ -2543,7 +2560,7 @@ USER_FUNC(evt_mario_paper_plane) {
         }
     }
 #if VERSION <= VERSION_DEMO_US
-    // the demo clears the flag when the plane lands; the other versions when Mario stands still on the ground
+    // the demo clears the flag once the plane glides; the other versions when Mario stands still on the ground
     if (!mode) {
         if (mp->currMotionId == MARIO_MOTION_STAY && mp->hitobjStandOn) {
             return EVT_RETURN_DONE;

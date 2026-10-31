@@ -443,9 +443,9 @@ static USER_FUNC(effitemget_open_ptr) {
 }
 
 /**
- * Script helper: moves the camera 2016 units up (args[0] nonzero) or back down,
- * so the item-get picture can be drawn out of sight and returned.
- * Guess: the name is the Japanese word for tidying up what looks bad.
+ * Script helper: shifts the 3D camera (CAMERA_3D) and its target 2016 units up (args[0] nonzero) or back down
+ * at once (effitemget_cam_move). The lecture script moves Mario up by the same amount in between
+ * and captures the screen into a paper image ("img") there.
  */
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
@@ -610,10 +610,14 @@ EVT_BEGIN(boots_lv2_juyoitem_lecture)
     CALL(evt_npc_get_position, STRING("キノピコ"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(0), 85)
     CALL(evt_npc_move_position, STRING("キノピコ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
+    // Toadette introduces herself, congratulates Mario on the boots and explains how to press the button in
+    // mid-jump.
     CALL(evt_msg_print, 0, STRING("lecture_s_boots_04"), 0, STRING("キノピコ"))
     CALL(evt_msg_print_add, 0, STRING("lecture_s_boots_05"))
     LOOP(0)
         CALL(evt_msg_toge, 1, 0, 0, 0)
+        // The button icon blinks; Mario must do the move (with the menu and sticks locked) while Toadette
+        // repeats her hint now and then.
         CALL(evt_msg_print, 0, STRING("lecture_s_boots_06"), 0, 0)
         CALL(x_flag_set, 1, 1)
         BEGIN_INLINE_EVENT
@@ -713,6 +717,7 @@ EVT_BEGIN(boots_lv2_juyoitem_lecture)
         CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.0f), FLOAT(26.0f), FLOAT(30.0f), FLOAT(-100.0f), 1000, 0)
         WAIT_MS(1000)
         CALL(evt_npc_set_autotalkpose, STRING("キノピコ"), STRING("S_2"), STRING("T_2"))
+        // She praises him and asks whether he wants to try once more; if so the lesson loops.
         CALL(evt_msg_print, 0, STRING("lecture_s_boots_08"), 0, STRING("キノピコ"))
         CALL(evt_msg_select, 0, STRING("lecture_s_boots_09"))
         CALL(evt_npc_set_autotalkpose, STRING("キノピコ"), STRING("S_1"), STRING("T_1"))
@@ -722,6 +727,7 @@ EVT_BEGIN(boots_lv2_juyoitem_lecture)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // Mario has mastered it; Toadette steps aside and drops a black block that the boots can smash.
     CALL(evt_msg_print_add, 0, STRING("lecture_s_boots_11"))
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.0f), FLOAT(52.0f), FLOAT(30.0f), FLOAT(-100.0f), 1000, 11)
     CALL(evt_npc_get_position, STRING("キノピコ"), LW(0), LW(1), LW(2))
@@ -751,6 +757,7 @@ EVT_BEGIN(boots_lv2_juyoitem_lecture)
     WAIT_MS(400)
     CALL(evt_npc_set_anim, STRING("キノピコ"), STRING("A_2"))
     WAIT_MS(170)
+    // She says her closing lines about smashing such spots and leaves.
     CALL(evt_msg_print, 0, STRING("lecture_s_boots_12"), 0, STRING("キノピコ"))
     WAIT_MS(300)
     LOOP(6)

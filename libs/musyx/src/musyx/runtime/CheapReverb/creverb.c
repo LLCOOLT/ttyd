@@ -138,14 +138,16 @@ bool ReverbSTDModify(_SND_REVSTD_WORK* rv, float coloration, float time, float m
 }
 
 #ifdef __MWERKS__
+/** Constants for the cheap reverb: filter gains 0.3 and 0.6, and the integer-to-float conversion constant. */
 static const float value0_3 = 0.3f;
 static const float value0_6 = 0.6f;
 static const double i2fMagic = 4.503601774854144E15;
 /**
  * Assembly: processes one 160-sample frame of the three consecutive channel buffers (left, right, surround)
- * starting at sptr.
- * Guess: per channel it runs two comb filters, two all-pass filters
- * and a one-pole low-pass from the state in rv, and blends the result with the input using the mix level.
+ * starting at sptr. Per channel: optional pre-delay, two parallel comb filters summed, an all-pass, a 0.3 scale,
+ * a one-pole low-pass (damping) and a second all-pass,
+ * written back as 0.6 * level of that plus 0.6 * (1 - level)
+ * of the dry input (the same code as the SDK's standard reverb).
  */
 static asm void HandleReverb(long* sptr, struct _SND_REVSTD_WORK* rv) {
 #if 1
@@ -435,14 +437,9 @@ lbl_803B599C:
 #endif
 }
 #else
-/**
- * Assembly: processes one 160-sample frame of the three consecutive channel buffers (left, right, surround)
- * starting at sptr.
- * Guess: per channel it runs two comb filters, two all-pass filters
- * and a one-pole low-pass from the state in rv, and blends the result with the input using the mix level.
- */
+/** Empty placeholder for the assembly HandleReverb above, used only for compilers other than Metrowerks. */
 static void HandleReverb(s32* sptr, struct _SND_REVSTD_WORK* rv) {
-  // TODO: Reimplement this in C
+  // No C version: the original MusyX asm above stays asm (project rule).
 }
 #endif
 

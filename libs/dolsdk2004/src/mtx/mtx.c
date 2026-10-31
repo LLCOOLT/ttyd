@@ -1,6 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/mtx.h>
 
+/** The constants 0 and 1, loaded by the paired-single matrix routines. */
 static f32 Unit01[2] = {
     0.0f,
     1.0f
@@ -191,7 +192,7 @@ void C_MTXConcatArray(const Mtx a, const Mtx* srcBase, Mtx* dstBase, u32 count) 
 #if DEBUG
 #pragma push
 #pragma optimization_level 1
-/** This function will not compile at optimization level 0 */
+/** Debug builds only (not compiled here): upstream's setting, as this function will not compile at level 0. */
 #endif
 void PSMTXConcatArray(const register Mtx a, const register Mtx* srcBase, register Mtx* dstBase, register u32 count) {
     register f32 va0, va1, va2, va3, va4, va5;

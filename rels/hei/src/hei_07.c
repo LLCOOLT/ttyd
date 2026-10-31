@@ -48,6 +48,7 @@ extern EvtWord offscreen_to_quiz[];
 QuizEntry quiz_data[8];
 extern EvtWord a_sekizou_1[];
 
+/** Doors of this room: the west exit (w_bero) to hei_06 and the pipe (dokan) to hei_10. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -425,6 +426,10 @@ static EVT_BEGIN(offscreen_to_normal)
     RETURN
 EVT_END()
 
+/**
+ * The eight questions of the quiz statue in Shhwonk Fortress: for each, the statue animation, the question
+ * message, the answer choices message and the number of the correct choice.
+ */
 QuizEntry quiz_data[] = {
     {"anm_1mon", "stg1_hei_23", "stg1_hei_q_01", 0},
     {"anm_2mon", "stg1_hei_24", "stg1_hei_q_02", 2},
@@ -443,9 +448,12 @@ QuizEntry quiz_data[] = {
  * on no it goes back to sleep. Winning sets the story to "Quiz" and opens the statue's base.
  */
 EVT_BEGIN(a_sekizou_1)
+    // Mario freezes and the music stops.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     WAIT_FRAMES(1)
+    // On the first visit the statue wakes with a quake that startles Mario; later visits skip straight to
+    // the talk.
     IF_INT_EQUAL(GW(0), 0)
         BEGIN_INLINE_EVENT
             WAIT_MS(2000)
@@ -487,6 +495,7 @@ EVT_BEGIN(a_sekizou_1)
         WAIT_MS(1000)
     END_IF
     WAIT_MS(500)
+    // The statue greets Mario and asks whether he will take its quiz.
     SET_VALUE(LW(0), STRING("anm_dossun_1"))
     CALL_CHILD(animation_wait)
     WAIT_MS(500)
@@ -499,6 +508,7 @@ EVT_BEGIN(a_sekizou_1)
     END_IF
     SET_VALUE(GW(0), 1)
     CALL(evt_msg_select, 0, STRING("stg1_hei_yn_01"))
+    // If Mario declines, the statue scolds him and goes back to sleep.
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(0), STRING("anm_kaiten1"))
         CALL_CHILD(animation_wait)
@@ -515,6 +525,7 @@ EVT_BEGIN(a_sekizou_1)
 #endif
         RETURN
     END_IF
+    // If he accepts, the statue gets ready and the quiz music starts.
     SET_VALUE(LW(0), STRING("anm_kaiten1"))
     CALL_CHILD(animation_wait)
     CALL(evt_msg_print_add, 0, STRING("stg1_hei_22"))
@@ -527,6 +538,8 @@ EVT_BEGIN(a_sekizou_1)
     WAIT_MS(1500)
     WAIT_MS(500)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    // Quiz loop: each round reads a question from quiz_data and Mario picks an answer; sometimes the statue
+    // asks whether it is his real answer and lets him choose again.
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(12), 0)
     SET_VALUE(LW(13), 0)
@@ -586,6 +599,8 @@ EVT_BEGIN(a_sekizou_1)
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
         CALL(evt_msg_continue)
         CALL(evt_msg_toge, 2, 95, 65, 0)
+        // A right answer plays a jingle and the statue howls; the fifth right answer ends the quiz, the
+        // statue moves aside and the story advances.
         IF_INT_EQUAL(LF(1), 1)
             IF_INT_EQUAL(LW(12), 4)
                 CALL(evt_snd_sfxon, STRING("SFX_GOOD_SOUND2"), 0)
@@ -639,6 +654,8 @@ EVT_BEGIN(a_sekizou_1)
                 RETURN
             END_SWITCH
             CALL_CHILD(seikai_anime_stop)
+            // A wrong answer plays a buzzer; the third wrong answer summons four Clefts that attack, and after
+            // the fight the statue moves aside as well.
         ELSE
             IF_INT_EQUAL(LW(13), 2)
                 CALL(evt_snd_sfxon, STRING("SFX_BAD_SOUND2"), 0)

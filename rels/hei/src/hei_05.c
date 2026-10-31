@@ -18,6 +18,7 @@
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[3];
 
+/** Doors of this room: the west exit (w_bero) to hei_04 and the east exit (e_bero) to hei_06. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -78,6 +79,10 @@ static EVT_BEGIN(dead_evt2)
     RETURN
 EVT_END()
 
+/**
+ * The two Shinemon guards of the second gate (Goomba enemies that stand beside the pillars); defeating
+ * either marks both as beaten.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "シンエモン1", // name

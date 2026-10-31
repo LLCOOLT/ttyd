@@ -159,7 +159,7 @@ static USER_FUNC(memcard_file_existance) {
     EvtWord* args = event->args;
     s32 slot = evtGetValue(event, args[0]) - 1;
 
-    if (cardGetFilePtr()->saves[slot].data.flags & 1) {
+    if (cardGetFilePtr()->saves[slot].data.flags & CARD_SAVE_FLAG_EMPTY) {
         evtSetValue(event, args[1], 0);
     } else {
         evtSetValue(event, args[1], 1);
@@ -194,24 +194,33 @@ EVT_BEGIN(evt_memcard_nosave)
     RETURN
 EVT_END()
 
-/** The release versions watch for the card being pulled during the check and reset the card buffer first */
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo version of the boot-time card check: reads the card, offers to format it or create the save file, and sets
+ * GF(0) once the game may start. Unlike retail it does not watch for the card being pulled mid-prompt, and a
+ * failed format or create offers to play without saving instead of retrying.
+ */
 EVT_BEGIN(evt_memcard_check)
     SET_VALUE(GF(0), 0)
+    // Load the save data from the Memory Card in Slot A and act on the result.
     LOOP(0)
         CALL(evt_msg_print, 0, STRING("msg_mcard_fileload_warnning"), 0, 0)
         CALL(memcard_load)
         CALL(memcard_code, LW(0))
         SWITCH(LW(0))
+            // Loaded: the game may start.
             CASE_EQUAL(0)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_lord_finish"))
             SET_VALUE(GF(0), 1)
+            // No card, or some other device in Slot A: offer to play without saving.
             CASE_EQUAL(-3)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_nocard"))
             CALL_CHILD(evt_memcard_nosave)
             CASE_EQUAL(-2)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_card"))
             CALL_CHILD(evt_memcard_nosave)
+            // Corrupted card: offer to format it (asking twice), then to create a save file;
+            // any refusal or failure offers to play without saving.
             CASE_OR_EQUAL(-13)
             CASE_OR_EQUAL(-6)
             CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
@@ -254,6 +263,7 @@ EVT_BEGIN(evt_memcard_check)
                 CALL_CHILD(evt_memcard_nosave)
             END_IF
             CASE_END
+            // No save file on the card: offer to create one.
             CASE_EQUAL(-4)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
             CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
@@ -272,6 +282,7 @@ EVT_BEGIN(evt_memcard_check)
             ELSE
                 CALL_CHILD(evt_memcard_nosave)
             END_IF
+            // Not enough free space: offer to open the Memory Card Screen.
             CASE_OR_EQUAL(-8)
             CASE_OR_EQUAL(-9)
             CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
@@ -284,6 +295,7 @@ EVT_BEGIN(evt_memcard_check)
                 CALL_CHILD(evt_memcard_nosave)
             END_IF
             CASE_END
+            // Damaged card: it cannot be used.
             CASE_DEFAULT
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
             CALL_CHILD(evt_memcard_nosave)
@@ -302,6 +314,7 @@ EVT_END()
 EVT_BEGIN(evt_memcard_check)
     SET_VALUE(GF(0), 0)
     SET_VALUE(LF(10), 0)
+    // Load the save data from the Memory Card in Slot A (a retry only re-reads the result) and act on it.
     LOOP(0)
         IF_INT_EQUAL(LW(10), 0)
             CALL(evt_msg_print, 0, STRING("msg_mcard_fileload_warnning"), 0, 0)
@@ -312,15 +325,20 @@ EVT_BEGIN(evt_memcard_check)
             CALL(memcard_buf_reset)
         END_IF
         SWITCH(LW(0))
+            // Loaded: the game may start.
             CASE_EQUAL(0)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_lord_finish"))
             SET_VALUE(GF(0), 1)
+            // No card, or some other device in Slot A: offer to play without saving.
             CASE_EQUAL(-3)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_nocard"))
             CALL_CHILD(evt_memcard_nosave)
             CASE_EQUAL(-2)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_card"))
             CALL_CHILD(evt_memcard_nosave)
+            // Corrupted card: offer to format it (asking twice), then to create a save file.
+            // A pulled card is reported, a failed format or create retries,
+            // and any refusal offers to play without saving.
             CASE_OR_EQUAL(-13)
             CASE_OR_EQUAL(-6)
             CALL(memcard_watch_start)
@@ -376,6 +394,7 @@ EVT_BEGIN(evt_memcard_check)
                 CALL_CHILD(evt_memcard_nosave)
             END_IF
             CASE_END
+            // No save file on the card: offer to create one, with the same pulled-card check and retry.
             CASE_EQUAL(-4)
             CALL(memcard_watch_start)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data"))
@@ -401,6 +420,7 @@ EVT_BEGIN(evt_memcard_check)
             ELSE
                 CALL_CHILD(evt_memcard_nosave)
             END_IF
+            // Not enough free space: offer to open the Memory Card Screen.
             CASE_OR_EQUAL(-8)
             CASE_OR_EQUAL(-9)
             CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
@@ -413,6 +433,7 @@ EVT_BEGIN(evt_memcard_check)
                 CALL_CHILD(evt_memcard_nosave)
             END_IF
             CASE_END
+            // Not the original Memory Card, or damaged: offer to play without saving.
             CASE_EQUAL(-10)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_savedata_2"))
             CALL_CHILD(evt_memcard_nosave)
@@ -420,6 +441,8 @@ EVT_BEGIN(evt_memcard_check)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
             CALL_CHILD(evt_memcard_nosave)
         END_SWITCH
+        // A failed format or create sets the retry request LF(10); it becomes LW(10), so the next pass skips the
+        // reload and resets the card buffer before acting on the failure code again.
         CALL(memcard_watch_end, LW(0))
         IF_INT_EQUAL(LF(10), 1)
             SET_VALUE(LF(10), 0)
@@ -598,6 +621,7 @@ EVT_END()
 /** The release versions watch for a pulled card while saving, retry failed saves and add the ending prompts */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_memcard_save)
+    // Ask "Save all game progress up to this point?" (the new-file save skips the question).
     SET_VALUE(LW(10), LW(0))
     IF_INT_EQUAL(LW(10), 23)
         GOTO(1)
@@ -615,6 +639,7 @@ EVT_BEGIN(evt_memcard_save)
         CALL(evt_msg_continue)
         RETURN
     END_IF
+    // Remember the save kind and write the save file.
     LABEL(1)
     SET_VALUE(GSW(GSW_SAVE_RESUME_KIND), LW(10))
     IF_INT_EQUAL(LW(10), 23)
@@ -625,6 +650,9 @@ EVT_BEGIN(evt_memcard_save)
     CALL(memcard_header_write)
     CALL(memcard_write)
     CALL(memcard_code, LW(0))
+    // Saved, or explain why not: no card, wrong device, a corrupted card (offer to format
+    // and create a save file, then write again), no save file (offer to create one),
+    // not the original card, no space (offer the Memory Card Screen) or a damaged card.
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_finish"))
@@ -738,6 +766,8 @@ EVT_BEGIN(evt_memcard_save)
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
     END_SWITCH
+    // After a failure outside Save Blocks and the new-file save,
+    // warn that progress was not saved and offer to save again.
     IF_INT_EQUAL(LW(10), 0)
         CALL(evt_msg_continue)
         RETURN
@@ -764,6 +794,8 @@ EVT_END()
  * and on failure warns that the game was not saved and offers to try again.
  */
 EVT_BEGIN(evt_memcard_save)
+    // Ask "Save all game progress up to this point?" (the new-file save skips the question;
+    // the ending save uses its own yes/no prompt).
     SET_VALUE(LW(10), LW(0))
     IF_INT_EQUAL(LW(10), 23)
         GOTO(1)
@@ -785,6 +817,7 @@ EVT_BEGIN(evt_memcard_save)
         CALL(evt_msg_continue)
         RETURN
     END_IF
+    // Remember the save kind and write the save file; the new-file save shows "Saving settings" instead.
     LABEL(1)
     SET_VALUE(GSW(GSW_SAVE_RESUME_KIND), LW(10))
     IF_INT_EQUAL(LW(10), 23)
@@ -802,6 +835,9 @@ EVT_BEGIN(evt_memcard_save)
     LABEL(4)
     SET_VALUE(LF(11), 0)
     CALL(memcard_code, LW(0))
+    // Saved, or explain why not, as in the demo, but a pulled card is caught, a failed format,
+    // create or write tries again from the write, and the Memory Card Screen is offered only
+    // for the new-file save.
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_finish"))
@@ -936,6 +972,7 @@ EVT_BEGIN(evt_memcard_save)
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
         CALL(evt_msg_print_add, 0, STRING("msg_mcard_save_miss"))
     END_SWITCH
+    // Retry the write when asked to; a Save Block failure just closes the window.
     CALL(memcard_watch_end)
     IF_INT_EQUAL(LF(11), 1)
         GOTO(4)
@@ -944,6 +981,7 @@ EVT_BEGIN(evt_memcard_save)
         CALL(evt_msg_continue)
         RETURN
     END_IF
+    // Otherwise warn that progress was not saved and offer to save again.
     CALL(evt_msg_continue)
     CALL(evt_msg_print, 0, STRING("msg_savefile_nosave_warnning"), 0, 0)
     IF_INT_EQUAL(LW(10), 21)

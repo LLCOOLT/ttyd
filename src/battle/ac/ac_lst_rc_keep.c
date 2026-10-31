@@ -20,6 +20,10 @@ typedef struct LstRcWork {
 
 #define LR_WORK(ac) ((LstRcWork*)(ac)->work)
 
+/**
+ * Release window of the unused two-stick hammer charge command, by difficulty (80 frames at the easiest
+ * down to 5), and the names of the star icons it removes when it ends.
+ */
 s32 ac_lstrckeep_ok_frame[] = {0x50, 0x46, 0x3C, 0x28, 0x14, 0x0A, 0x05};
 const char* ac_lstrckeep_iconname[] = {"_AcSkl1", "_AcSkl2", "_AcSkl3", "_AcSkl4"};
 
@@ -67,8 +71,8 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 lw->held0 = 0;
                 lw->held1 = 0;
             case 1000:
-                if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
-                    if (ac->setupFlags & 2) {
+                if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+                    if (ac->setupFlags & AC_SETUP_FLAG_RETRIES) {
                         ac->setupParam--;
                         if (ac->setupParam >= 0) {
                             break;

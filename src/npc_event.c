@@ -25,12 +25,10 @@
 #include "npc_event.h"
 #include "version.h"
 #include "libc_decls.h"
+#include <dolphin/mtx.h>
 static void piders_draw_yarn_sub(CameraId cameraId, void* param);
 
-double __fabs(double);
 #define fabs(x) __fabs(x)
-
-void PSVECSubtract(const Vec* a, const Vec* b, Vec* ab);
 
 // functions are defined in reverse of target order (deferred inlining)
 
@@ -114,8 +112,8 @@ static USER_FUNC(_2d_dead_jump) {
     Vec d;
     npc = evtNpcNameToPtr(event, id);
     h = vy;
-    npc->jumpFlags |= 0x10;
-    npc->jumpFlags |= 0x1000;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
+    npc->jumpFlags |= NPC_STATUS_NO_FIND_EVENT;
     if (isFirstCall) {
         npc->flags |= NPC_FLAG_JUMPING;
         npc->flags &= ~(NPC_FLAG_NO_WALL_HIT | NPC_FLAG_LAND_ON_FLOOR);
@@ -254,8 +252,8 @@ extern EvtWord enemy_common_flag_init_event[];
 extern EvtWord wanwan_init_event_sub[];
 extern EvtWord zakoM2D_find_event[];
 
-// The enemy's dropped items: retail enters them as ITEM_ENTRY_DROP_8S_BADGE_RETURN, which returns a dropped badge to
-// the pouch when it vanishes; the demo has no such type and uses ITEM_ENTRY_DROP_8S.
+// The enemy's dropped items: retail enters them as ITEM_ENTRY_DROP_8S_BADGE_RETURN, which puts a dropped badge
+// on sale at the badge shop (pouchArriveBadge) when it vanishes; the demo has no such type (ITEM_ENTRY_DROP_8S).
 
 /**
  * Dead event of most field enemies, run when the enemy is beaten in battle or killed on the field:
@@ -366,6 +364,7 @@ EVT_END()
  * and falls off screen, or, when stomped flat on the ground, slides and sways down off screen like a leaf.
  */
 EVT_BEGIN(enemy_2d_common_dead_event)
+    // The enemy stops, puffs into smoke with the defeat sound and takes its hurt pose.
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 268435456)
     CALL(pressCheck, LW(15))
@@ -377,6 +376,7 @@ EVT_BEGIN(enemy_2d_common_dead_event)
     CALL(evt_npc_set_damage_anim, STRING("me"))
     CALL(evt_npc_get_kpencount_type, STRING("me"), LW(0))
     SWITCH(LW(0))
+        // Stomped: an enemy in mid-air scores and flips off screen.
         CASE_FLAG(1)
         IF_INT_EQUAL(LW(15), 0)
             CALL(evt_npc_calc_score, STRING("me"))
@@ -385,6 +385,8 @@ EVT_BEGIN(enemy_2d_common_dead_event)
             CALL(_2d_get_dead_jump_offset, STRING("me"), LW(3))
             ADD(LW(0), LW(3))
             CALL(_2d_dead_jump, STRING("me"), LW(0), LW(1), LW(2), 600, FLOAT(40.0f), FLOAT(0.0f), -300)
+            // Stomped flat on the ground: it lies squashed for half a second,
+            // then sways down off screen like a falling leaf.
         ELSE
             CALL(evt_npc_calc_score, STRING("me"))
             CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_JUMPING)
@@ -431,6 +433,7 @@ EVT_BEGIN(enemy_2d_common_dead_event)
                 END_IF
             END_LOOP
         END_IF
+        // Hit by fire: scores with the fire combo and flips off screen.
         CASE_FLAG(2)
         CALL(evt_npc_calc_score, STRING("me"))
         SPAWN_EVENT(_2d_dead_rotate_event)
@@ -439,6 +442,8 @@ EVT_BEGIN(enemy_2d_common_dead_event)
         CALL(_2d_get_dead_jump_offset, STRING("me"), LW(3))
         ADD(LW(0), LW(3))
         CALL(_2d_dead_jump, STRING("me"), LW(0), LW(1), LW(2), 600, FLOAT(40.0f), FLOAT(65.0f), -300)
+        // Every other way of defeat (8 is a block bumped from below, 16 is lava,
+        // 32 gives no score) flips it off screen too.
         CASE_FLAG(4)
         CALL(evt_npc_calc_score, STRING("me"))
         SPAWN_EVENT(_2d_dead_rotate_event)
@@ -467,6 +472,7 @@ EVT_BEGIN(enemy_2d_common_dead_event)
         CALL(_2d_get_dead_jump_offset, STRING("me"), LW(3))
         ADD(LW(0), LW(3))
         CALL(_2d_dead_jump, STRING("me"), LW(0), LW(1), LW(2), 600, FLOAT(40.0f), FLOAT(65.0f), -300)
+        // Anything else: a short pause only.
         CASE_DEFAULT
         WAIT_MS(500)
     END_SWITCH
@@ -886,8 +892,8 @@ EVT_END()
 
 /**
  * Ends a togenoko-tribe enemy's shell attack, as nokonoko_shell_return_event does for Koopa Troopas.
- * Guess: togenoko (toge = spike) is the spiked Koopa family, KP Koopa and Koopatrol (togenoko ace),
- * from the names.
+ * togenoko is the Koopatrol (btl_un_togenoko); トゲノコエース (c_togenoko_b) is the Dark Koopatrol
+ * (btl_un_togenoko_ace).
  */
 EVT_BEGIN(togenoko_shell_return_event)
     CALL(evt_npc_get_unitwork, STRING("me"), 1, LW(15))
@@ -1137,6 +1143,11 @@ EVT_BEGIN(patapata_return_event)
     RETURN
 EVT_END()
 
+/**
+ * Shared start of the Buzzy Beetle and Spike Top init events:
+ * enemy, script-driven and lands-on-floor flags and an upright rotation.
+ * met_init_event, met_init_event_ceil and the togemet init events call it.
+ */
 EvtWord met_init_event_common[] = {
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_ENEMY)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_LAND_ON_FLOOR)
@@ -3446,10 +3457,9 @@ EVT_BEGIN(hbom_return_event)
 EVT_END()
 
 /**
- * Init event of the X-Naut magician tribe (zakowiz):
- * enemy flags and a hidden 10x10 projectile helper slave_0 (c_zako_m, B_1A).
- * Guess: the X-Naut PhD and its thrown potion, from the tribe name (X-Naut magician)
- * and the researcher model c_zako_m.
+ * Init event of the X-Naut PhD tribe (zakowiz, 軍団ザコ魔法使い "X-Naut magician", btl_un_gundan_zako_magician):
+ * enemy flags and a hidden 10x10 projectile helper slave_0 (c_zako_m, B_1A),
+ * which zakowiz_find_event throws at Mario.
  */
 EVT_BEGIN(zakowiz_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -3579,7 +3589,7 @@ EVT_END()
 #if VERSION <= VERSION_DEMO_US
 /**
  * Init event of the hannya tribe: enemy flags with status 2 off. Demo position of the retail definition below.
- * Guess: hannya, hinnya and hennya are Spinia, Spania and Spunia, from the three names.
+ * hannya is Spania (btl_un_hannya); hinnya is Spinia and hennya Spunia.
  */
 EVT_BEGIN(hannya_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -4848,8 +4858,8 @@ static USER_FUNC(zakoEntryDokan) {
         if (zako->position.y <= -75.0f) {
             zako->flags |= NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR;
             zako->flags &= ~NPC_FLAG_INTANGIBLE;
-            zako->jumpFlags |= 0x1002;
-            zako->jumpFlags &= 0xEFAFFFFB;
+            zako->jumpFlags |= NPC_STATUS_NO_FIND_EVENT | NPC_STATUS_FACE_MOVE_DIR;
+            zako->jumpFlags &= ~(NPC_STATUS_DEAD | NPC_STATUS_IN_LAVA | NPC_STATUS_DIM_COLOR | NPC_STATUS_LAVA_NO_SLOW);
             {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = me->position.x;
@@ -4924,8 +4934,9 @@ static USER_FUNC(zakoEntryFall) {
         if (zako && zako->position.y <= -75.0f) {
             zako->flags |= NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR;
             zako->flags &= ~NPC_FLAG_INTANGIBLE;
-            zako->jumpFlags |= 0x1002;
-            zako->jumpFlags &= 0xEF8FFFFB;
+            zako->jumpFlags |= NPC_STATUS_NO_FIND_EVENT | NPC_STATUS_FACE_MOVE_DIR;
+            zako->jumpFlags &=
+                ~(NPC_STATUS_DEAD | NPC_STATUS_IN_LAVA | NPC_STATUS_WAS_IN_LAVA | NPC_STATUS_DIM_COLOR | NPC_STATUS_LAVA_NO_SLOW);
             {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = me->position.x;
@@ -4996,7 +5007,8 @@ USER_FUNC(npc_fire_eff_fadeout) {
 static USER_FUNC(set_bottle_flag_init) {
     NpcEntry* npc = evtNpcNameToPtr(event, "slave_0");
     npc->flags |= NPC_FLAG_NO_FIELD_ATTACK | NPC_FLAG_KOOPA_MODE | NPC_FLAG_JUMPING | NPC_FLAG_INTANGIBLE;
-    npc->hazardFlags |= 0x1f;
+    npc->hazardFlags |=
+        NPC_HAZARD_NO_STOMP | NPC_HAZARD_NO_FIRE | NPC_HAZARD_NO_STAR | NPC_HAZARD_NO_BUMP | NPC_HAZARD_NO_LAVA;
     return EVT_RETURN_DONE;
 }
 
@@ -5456,6 +5468,7 @@ EVT_END()
  * then swims 100 units up and forward toward him with its sound, stopping at a ceiling, and repeats.
  */
 EVT_BEGIN(gesso2D_move_event)
+    // Wait until the camera scrolls to within 250 units of the Blooper.
     CALL(evt_npc_set_anim, STRING("me"), STRING("S_1"))
     LABEL(0)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 4096)
@@ -5469,6 +5482,8 @@ EVT_BEGIN(gesso2D_move_event)
     GOTO(0)
     CALL(evt_npc_set_anim, STRING("me"), STRING("S_1"))
     LABEL(1)
+    // Sink, slowly speeding up, until the Blooper is below Mario or close to the floor;
+    // while Mario is far away it just keeps sinking.
     SET_FLOAT_VALUE(LW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(13), FLOAT(0.0f))
     LOOP(0)
@@ -5505,6 +5520,7 @@ EVT_BEGIN(gesso2D_move_event)
             CALL(evt_npc_set_position, STRING("me"), LW(0), LW(14), LW(2))
         END_IF
     END_LOOP
+    // Turn to Mario and aim 100 units ahead and 50 up (never above 350), still sinking for one more second.
     CALL(evt_get_target_dir, STRING("me"), STRING("mario"), LW(0))
     CALL(evt_npc_set_ry, STRING("me"), LW(0))
     CALL(evt_npc_get_position, STRING("me"), LW(10), LW(11), LW(12))
@@ -5527,6 +5543,7 @@ EVT_BEGIN(gesso2D_move_event)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Swim up to that point with the swim sound, stopping early at a ceiling, then start sinking again.
     CALL(evt_npc_set_anim, STRING("me"), STRING("A_1"))
     CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_GESSO_MOVE1"), LW(10), LW(11), LW(12), 0)
     CALL(evt_npc_set_unitwork, STRING("me"), 0, 0)

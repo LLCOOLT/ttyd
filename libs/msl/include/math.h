@@ -15,6 +15,8 @@ extern int __float_nan[];
 double fabs(double x);
 double sin(double x);
 double cos(double x);
+double acos(double x);
+double log(double x);
 
 float sinf(float x);
 float cosf(float x);

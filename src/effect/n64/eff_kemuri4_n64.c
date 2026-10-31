@@ -35,6 +35,7 @@ typedef struct EffKemuri4N64Work {
     f32 dirZ;        // 0x84
 } EffKemuri4N64Work;
 
+/** Dash puff mesh: the textured quad at 25 and the vertex-coloured flower shape at 35. */
 effN64Vtx flowers_v[41] = {
     {-9, 8, -7, 0, 512, 255, 255, 255, 255},
     {-9, 4, 2, 512, 512, 255, 255, 255, 255},

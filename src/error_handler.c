@@ -36,7 +36,8 @@ void N_setupErrorHandler(void) {
  * LR/CR/SRR0/SRR1/DSISR/DAR and a 16-frame stack back chain,
  * reinitialises the heap for the ROM font and draws the text to the frame buffer forever.
  * The US and PAL releases scroll the text upward, use a 0.8 horizontal scale instead of 0.5,
- * and halt once it has scrolled off. Guess: debug mode is set by a hidden title-screen input.
+ * and halt once it has scrolled off.
+ * Debug mode (-1) comes from the title-screen button code X, B, R, B, Y, L (seq_title.c).
  */
 void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
     // registers

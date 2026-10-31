@@ -14,8 +14,12 @@ static BattleUnitKindPart parts[1];
 static EvtWord init_event[15];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the `marco` placeholder unit: 10 HP, level 1, 1 part, with its sounds, init script and
+ * data table.
+ */
 BattleUnitKind unit_marco = {
-    215,
+    UNIT_UNUSED_FLAVIO,
     "btl_un_marco",
     10,
     0,
@@ -80,28 +84,44 @@ BattleUnitKind unit_marco = {
     data_table,
 };
 
+/** Defence of the `marco` placeholder unit: none, so it takes full damage from every kind of attack. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type modifiers of the `marco` placeholder unit: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the `marco` placeholder unit (100% is the normal chance): immune to Sleep, Stop,
+ * Dizzy, Poison, Confusion, Electrified, Burn, Freeze, Huge, Tiny, Attack Up, Attack Down, Defense Up,
+ * Defense Down, Allergic, Fright, Gale Force, Fast, Slow, Dodgy, Invisible and instant KO.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Pose table of the `marco` placeholder unit: its 7 battle poses (status, hurt and action) and the animation
+ * each one plays; the idle animation is `EM_S_1`.
+ */
 static PoseTableEntry pose_table[] = {
-    {28, "EM_S_1"},
+    {BTL_POSE_NORMAL, "EM_S_1"},
     {31, "KNP_S_1"},
-    {39, "EM_D_1"},
-    {42, "EM_R_1"},
-    {40, "EM_W_1"},
+    {BTL_POSE_DAMAGE, "EM_D_1"},
+    {BTL_POSE_RUN, "EM_R_1"},
+    {BTL_POSE_WALK, "EM_W_1"},
     {BTL_POSE_TALK, "EM_T_1"},
     {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
+/** Data table of the `marco` placeholder unit: no events. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Body of the `marco` placeholder unit: one targetable part, the model `c_mario`, with its hit box, defence
+ * tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_teresa", "c_mario", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_teresa", "c_mario", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /** Battle init script of the placeholder unit: installs only the wait handler and starts the wait event. */

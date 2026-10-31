@@ -3,6 +3,7 @@
 #include <dolphin/os.h>
 
 u8 DBStack[0x1000];
+/** Top of DBStack, the stack the debugger exception handler runs on (8 bytes below the end of the array). */
 u8* DBStackEnd = DBStack + (sizeof(DBStack) - 8);
 BOOL DBVerbose;
 DBInterface* __DBInterface;

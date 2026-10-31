@@ -61,7 +61,7 @@ EVT_BEGIN(kinoko_effect)
     CALL(btlevtcmd_AnimeChangePoseFromTable, LW(3), LW(4))
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(3))
     IF_INT_NOT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INSTANT_KILL, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
             CALL(btlevtcmd_GetMaxHp, LW(3), LW(5))
@@ -99,7 +99,7 @@ EVT_BEGIN(shine_effect)
     CALL(btlevtcmd_AnimeChangePoseFromTable, LW(3), LW(4))
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(3))
     IF_INT_NOT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INSTANT_KILL, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
             CALL(btlevtcmd_GetMaxHp, LW(3), LW(5))
@@ -121,6 +121,10 @@ EVT_BEGIN(shine_effect)
     RETURN
 EVT_END()
 
+/**
+ * Weapon for the Poison Mushroom BINGO! (doku_kinoko_effect): halves the HP of Mario and the partner;
+ * always hits, pierces defense and can't be guarded.
+ */
 BattleWeapon weapon_doku_kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -133,7 +137,7 @@ BattleWeapon weapon_doku_kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -150,6 +154,7 @@ BattleWeapon weapon_doku_kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon for the second half of the Poison Mushroom BINGO!: halves Mario's FP a second after the HP hit. */
 BattleWeapon weapon_doku_kinoko_fp = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -162,7 +167,7 @@ BattleWeapon weapon_doku_kinoko_fp = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -190,16 +195,16 @@ EVT_BEGIN(doku_kinoko_effect)
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), PTR(&weapon_doku_kinoko), 0, LW(5))
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(3))
     IF_INT_NOT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INSTANT_KILL, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-            CALL(btlevtcmd_CheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), PTR(&weapon_doku_kinoko), 256, LW(5))
+            CALL(btlevtcmd_CheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), PTR(&weapon_doku_kinoko), DAMAGE_FLAG_LAST_HIT, LW(5))
         END_IF
     END_IF
     WAIT_FRAMES(60)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_MARIO, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), PTR(&weapon_doku_kinoko_fp), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), PTR(&weapon_doku_kinoko_fp), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 
@@ -249,7 +254,7 @@ EVT_BEGIN(msg_fault)
     RETURN
 EVT_END()
 
-// inlining off for BattleBreakSlotGetPtr, BattleBreakSlotReelGetPtr, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it 8 functions change length, e.g. BattleBreakSlotReelGetPtr 15 -> 6 instructions
 #pragma dont_inline on
 /** Returns the battle's Bingo slot state. */
 BreakSlotWork* BattleBreakSlotGetPtr(void) {
@@ -262,6 +267,10 @@ BreakSlotReel* BattleBreakSlotReelGetPtr(s32 no) {
 }
 #pragma dont_inline reset
 
+/**
+ * Cards on each of the three Bingo reels in order (0 Mushroom, 1 Fire Flower, 2 Star, 3 Shine Sprite,
+ * 4 Poison Mushroom), copied into the reels by BattleBreakSlotInit.
+ */
 const SlotCards8 R_slot_1_cards = {{0, 1, 2, 1, 2, 0, 3, 4}};
 const SlotCards8 R_slot_2_cards = {{3, 1, 0, 1, 4, 2, 0, 2}};
 const SlotCards5 R_slot_3_cards = {{0, 1, 2, 3, 4}};
@@ -504,30 +513,30 @@ void BattleBreakSlot_Main(void) {
             if (slot->phaseTimer == count + 10) {
                 switch (BattleBreakSlotReelGetPtr(0)->item) {
                     case 0:
-                        evtEntry(kinoko_effect, 0, 0x20);
+                        evtEntry(kinoko_effect, 0, EVENT_START_NOW);
                         slot->breakTurn = 4;
                         slot->spMultiplier = 2.0f;
                         break;
                     case 1:
-                        evtEntry(flower_effect, 0, 0x20);
+                        evtEntry(flower_effect, 0, EVENT_START_NOW);
                         slot->breakTurn = 4;
                         slot->spMultiplier = 2.0f;
                         break;
                     case 2:
-                        evtEntry(star_effect, 0, 0x20);
+                        evtEntry(star_effect, 0, EVENT_START_NOW);
                         pouchSetAP(pouchGetMaxAP());
                         psndSFXOn("SFX_HP_RECOVER_BIG1");
                         slot->breakTurn = 4;
                         slot->spMultiplier = 2.0f;
                         break;
                     case 3:
-                        evtEntry(shine_effect, 0, 0x20);
+                        evtEntry(shine_effect, 0, EVENT_START_NOW);
                         pouchSetAP(pouchGetMaxAP());
                         slot->breakTurn = 6;
                         slot->spMultiplier = 3.0f;
                         break;
                     case 4:
-                        evtEntry(doku_kinoko_effect, 0, 0x20);
+                        evtEntry(doku_kinoko_effect, 0, EVENT_START_NOW);
                         ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() / 2);
                         break;
                 }
@@ -594,9 +603,9 @@ void BattleBreakSlot_Main(void) {
                 BattleAudienceAddTargetNum(0.0f, updown);
                 slot->phase = 8;
 #if VERSION <= VERSION_DEMO_US
-                slot->flags &= ~2;
+                slot->flags &= ~BREAK_SLOT_FLAG_QUEEN_FORCE_STAR;
 #else
-                slot->flags &= ~4;
+                slot->flags &= ~BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE;
 #endif
 #if VERSION >= VERSION_US
                 {
@@ -605,19 +614,19 @@ void BattleBreakSlot_Main(void) {
 #endif
                     switch (BattleBreakSlotReelGetPtr(0)->item) {
                         case 0:
-                            slot->evt = evtEntry(msg_hp_max, 0, 0x20);
+                            slot->evt = evtEntry(msg_hp_max, 0, EVENT_START_NOW);
                             break;
                         case 1:
-                            slot->evt = evtEntry(msg_fp_max, 0, 0x20);
+                            slot->evt = evtEntry(msg_fp_max, 0, EVENT_START_NOW);
                             break;
                         case 2:
-                            slot->evt = evtEntry(msg_star_max, 0, 0x20);
+                            slot->evt = evtEntry(msg_star_max, 0, EVENT_START_NOW);
                             break;
                         case 3:
-                            slot->evt = evtEntry(msg_super_max, 0, 0x20);
+                            slot->evt = evtEntry(msg_super_max, 0, EVENT_START_NOW);
                             break;
                         case 4:
-                            slot->evt = evtEntry(msg_fault, 0, 0x20);
+                            slot->evt = evtEntry(msg_fault, 0, EVENT_START_NOW);
                             break;
                     }
                 }
@@ -786,20 +795,20 @@ void BattleBreakSlot_Main(void) {
                         break;
                     }
 #if VERSION >= VERSION_JP
-                    if ((slot->flags & 2) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
+                    if ((slot->flags & BREAK_SLOT_FLAG_NO_POISON_BINGO) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
                         BattleBreakSlotReelGetPtr(1)->item == 4 && rr->item == 4) {
                         break;
                     }
 #endif
-                    if ((slot->flags & 1) && rr->item != 3) {
+                    if ((slot->flags & BREAK_SLOT_FLAG_LECTURE) && rr->item != 3) {
                         break;
                     }
 #if VERSION <= VERSION_DEMO_US
-                    if ((slot->flags & 2) && rr->item != 2) {
+                    if ((slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_STAR) && rr->item != 2) {
                         break;
                     }
 #else
-                    if ((slot->flags & 4) && rr->item != 3) {
+                    if ((slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE) && rr->item != 3) {
                         break;
                     }
 #endif
@@ -984,15 +993,15 @@ void BattleBreakSlot_PointInc(void) {
             if ((u32)dbg->flags & BATTLE_DEBUG_FORCE_SLOT_ITEM) {
                 item_appear_force(reel, dbg->slotItem);
             }
-            if (slot->flags & 1) {
+            if (slot->flags & BREAK_SLOT_FLAG_LECTURE) {
                 item_appear_force(reel, 3);
             }
 #if VERSION <= VERSION_DEMO_US
-            if (slot->flags & 2) {
+            if (slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_STAR) {
                 item_appear_force(reel, 2);
             }
 #else
-            if (slot->flags & 4) {
+            if (slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE) {
                 item_appear_force(reel, 3);
             }
 #endif
@@ -1006,15 +1015,15 @@ void BattleBreakSlot_PointInc(void) {
             if ((u32)dbg->flags & BATTLE_DEBUG_FORCE_SLOT_ITEM) {
                 item_appear_force(reel, dbg->slotItem);
             }
-            if (slot->flags & 1) {
+            if (slot->flags & BREAK_SLOT_FLAG_LECTURE) {
                 item_appear_force(reel, 3);
             }
 #if VERSION <= VERSION_DEMO_US
-            if (slot->flags & 2) {
+            if (slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_STAR) {
                 item_appear_force(reel, 2);
             }
 #else
-            if (slot->flags & 4) {
+            if (slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE) {
                 item_appear_force(reel, 3);
             }
 #endif
@@ -1029,7 +1038,7 @@ void BattleBreakSlot_PointInc(void) {
     }
 }
 
-// inlining off for BattleBreakSlot_Start, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleBreakSlot_Start is inlined into BattleBreakSlot_CheckReaction (38 -> 55 instructions)
 #pragma dont_inline on
 /** Starts the BINGO! spin once all three cards are filled. */
 void BattleBreakSlot_Start(void) {
@@ -1100,7 +1109,7 @@ void BattleBreakSlot_HideReel(void) {
     slot->reelNo = 0;
 }
 
-// inlining off for item_appear_force, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it item_appear_force is inlined into BattleBreakSlot_PointInc (126 -> 230 instructions)
 #pragma dont_inline on
 /** Makes the reel land on card item next by moving its index to just before that card (debug forcing). */
 static void item_appear_force(BreakSlotReel* reel, s32 item) {

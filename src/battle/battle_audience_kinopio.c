@@ -24,12 +24,10 @@ typedef u8 (*BattleAudience_GetEscapeChangeOKNoProtoFn)();
 
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-// inlining off for BattleAudienceCtrlProcessKinopio, BattleAudienceCtrlProcessKinopioWait, BattleAudienceCtrlProcessKinopioWaitHurimuki and 23 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 3 functions change length, e.g. BattleAudienceCtrlProcessKinopio 190 -> 844 instructions
 #pragma dont_inline on
 
 double fabs(double);
-double __fabs(double);
-BOOL BattleAudience_GetAnimEnd();
 
 static void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front);
 static void BattleAudienceCtrlProcessKinopioWaitHurimuki(s32 index, s32 front);
@@ -62,7 +60,7 @@ static void BattleAudienceCtrlProcessKinopioFireSub(s32 index);
 /**
  * Per-frame update of one audience member, whatever its kind (the "Kinopio" Toad routine is shared by all):
  * runs the handler for its status (0 idle, 1-3 idle fidgets, 4-6 cheering, 7-8 item throw, 9 booing, 10 hit,
- * 11 enter, 12 leave, 13 asleep, 14-20 the kind-specific phase events),
+ * 11 enter, 12 leave, 13 asleep, 14-20 the kind-specific phase events; 21-22 empty, demos only),
  * then integrates velocity and hop height and works out the draw position.
  * Boos bob up and down; Piranha Plants never hop.
  */
@@ -314,7 +312,7 @@ static void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
     if (m->flags & MEMBER_FLAG_ATTACKED) {
         m->flags &= ~(MEMBER_FLAG_TARGETED | MEMBER_FLAG_ATTACKED);
         BattleAudience_ChangeStatus(index, 10);
-        if (!(BattleAudienceItemGetPtr(0)->itemType >= 0xEC && BattleAudienceItemGetPtr(0)->itemType < 0xF0)) {
+        if (!(BattleAudienceItemGetPtr(0)->itemType >= ITEM_AUDIENCE_CAN && BattleAudienceItemGetPtr(0)->itemType < BADGE_MIN)) {
             BattleAudienceAddTargetNum(-0.14999999f * BattleAudienceBaseGetPtr()->audienceDeltaMultiplier, 0.0f);
         }
     } else if (!(m->flags & MEMBER_FLAG_TARGETED)) {
@@ -550,7 +548,7 @@ static void BattleAudienceCtrlProcessKinopioItemOn(s32 index, s32 front) {
         m->itemId = -1;
         item->flags = 0;
         BattleAudience_ChangeStatus(index, 10);
-        if (!(BattleAudienceItemGetPtr(0)->itemType >= 0xEC && BattleAudienceItemGetPtr(0)->itemType < 0xF0)) {
+        if (!(BattleAudienceItemGetPtr(0)->itemType >= ITEM_AUDIENCE_CAN && BattleAudienceItemGetPtr(0)->itemType < BADGE_MIN)) {
             BattleAudienceAddTargetNum(-0.14999999f * BattleAudienceBaseGetPtr()->audienceDeltaMultiplier, 0.0f);
         }
     } else if (!(m->flags & MEMBER_FLAG_TARGETED) && (bw->flags & BATTLE_FLAG_COMMAND_INPUT)) {
@@ -578,7 +576,7 @@ static void BattleAudienceCtrlProcessKinopioItemThrow(s32 index) {
     if (m->flags & MEMBER_FLAG_ATTACKED) {
         m->flags &= ~(MEMBER_FLAG_TARGETED | MEMBER_FLAG_ATTACKED);
         BattleAudience_ChangeStatus(index, 10);
-        if (!(BattleAudienceItemGetPtr(0)->itemType >= 0xEC && BattleAudienceItemGetPtr(0)->itemType < 0xF0)) {
+        if (!(BattleAudienceItemGetPtr(0)->itemType >= ITEM_AUDIENCE_CAN && BattleAudienceItemGetPtr(0)->itemType < BADGE_MIN)) {
             BattleAudienceAddTargetNum(-0.14999999f * BattleAudienceBaseGetPtr()->audienceDeltaMultiplier, 0.0f);
         }
     } else {
@@ -848,6 +846,7 @@ static void BattleAudienceCtrlProcessKinopioSleep(s32 index, s32 front) {
     }
 }
 
+/** Weapon a Boo in the audience uses to turn a unit invisible for two turns (always hits, can't be guarded). */
 static BattleWeapon weapon_teresa_trans = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -860,7 +859,7 @@ static BattleWeapon weapon_teresa_trans = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1540,7 +1539,7 @@ static void BattleAudienceCtrlProcessKinopioEat(s32 index) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-/** statuses 21 and 22 have no toad handler yet in the demo; retail drops the cases */
+/** Status 21, demos only: empty (Guess: a no-gravity state, from the name); retail drops the case. */
 static void BattleAudienceCtrlProcessKinopioNoGravity(s32 index, s32 front) {
 }
 

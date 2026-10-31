@@ -257,7 +257,7 @@ void mot_hip(void) {
 #endif
                 marioChgPose("M_A_1B");
                 attr = hitGetAttr(hit);
-                if (attr & 0x200) {
+                if (attr & HIT_ATTR_DEEP_WATER) {
                     set_damage_root_ypos(mario->position.y);
 #if VERSION >= VERSION_JP
                     d = -0.4f;
@@ -269,12 +269,12 @@ void mot_hip(void) {
                     marioChgMot(MARIO_MOTION_DAMAGE);
                     return;
                 }
-                if (attr & 0x400) {
+                if (attr & HIT_ATTR_DAMAGE_LIQUID) {
                     set_damage_root_ypos(mario->position.y);
                     marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
                     return;
                 }
-                if (attr & 0x800) {
+                if (attr & HIT_ATTR_SPIKES) {
                     set_damage_root_ypos(mario->position.y);
                     marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
                     return;
@@ -362,7 +362,7 @@ s32 U_chkground(void) {
         camFollowYOn();
 #endif
         attr = hitGetAttr(hit);
-        if (attr & 0x200) {
+        if (attr & HIT_ATTR_DEEP_WATER) {
             set_damage_root_ypos(mario->position.y);
 #if VERSION >= VERSION_JP
             v = -0.4f;
@@ -374,7 +374,7 @@ s32 U_chkground(void) {
             marioChgMot(MARIO_MOTION_DAMAGE);
             return 1;
         }
-        if (attr & 0xC00) {
+        if (attr & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES)) {
             set_damage_root_ypos(mario->position.y);
             marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
             return 1;

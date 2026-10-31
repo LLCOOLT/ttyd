@@ -1,6 +1,5 @@
-#pragma once
-
 // Wanawana (Pider-like trap unit): the paper texture capture shared by tou2 and its tst copy.
+#pragma once
 
 #include "battle/battle_unit.h"
 #include "memory.h"

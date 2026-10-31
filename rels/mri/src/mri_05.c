@@ -50,8 +50,9 @@ extern EvtWord mario_shabon_check[];
 extern EvtWord evt_shabon_s[];
 
 /**
- * Guess: puts Mario into the airborne state for the soap bubble ride:
- * clears the hit object he stands on, sets the air timer and switches to motion 8.
+ * Puts Mario into the airborne state for the soap bubble ride (called by mario_shabon_check):
+ * clears the hit object he stands on, sets the air timer to 1 and switches to motion 8 (MARIO_MOTION_JUMP_3,
+ * a jump that marioMain leaves to the script: no jump sound, no player input).
  */
 static USER_FUNC(mario_shabon_init) {
     MarioWork* mario = marioGetPtr();
@@ -106,6 +107,7 @@ EVT_BEGIN(puni_5_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the soap-bubble room: Punies 4 and 5. */
 static NpcSetupInfo npcEnt[] = {
     {
         "プニ族４", // name
@@ -150,6 +152,10 @@ static EVT_BEGIN(bero_s_doa_open)
     RETURN
 EVT_END()
 
+/**
+ * Exits of mri_05: west door w_bero to mri_01 (e_bero); dokan1 (scripted pipe); dokan2 (scripted pipe); pipe
+ * dokan3 to mri_02 (dokan2); pipe dokan4 to mri_19 (dokan1).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -289,6 +295,10 @@ static EVT_BEGIN(evt_ueki_04)
     RETURN
 EVT_END()
 
+/**
+ * Plants Mario can search in mri_05: A_ueki01, A_ueki02, A_ueki03, A_ueki04
+ * (runs evt_ueki_04 when searched), A_ueki05.
+ */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki01", "S_ueki01", NULL},
     {1, "A_ueki02", "S_ueki02", NULL},
@@ -448,6 +458,10 @@ EVT_BEGIN(mario_shabon_check)
     SET_VALUE(LW(2), 0)
     LOOP(0)
         CALL(evt_mario_get_name_hitobj_ride, LW(0))
+        // Each frame, count how long Mario has stood on the bubble spot; after 60 frames in a row the bubble
+        // takes him.
+        // Each frame, count how long Mario has stood on the bubble spot; after 60 frames in a row the bubble
+        // takes him.
         IF_STR_EQUAL(LW(0), STRING("A_syabon_yuka"))
             SET_VALUE(LW(1), 1)
         ELSE
@@ -466,6 +480,7 @@ EVT_BEGIN(mario_shabon_check)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Mario is swallowed by a soap bubble and floats up for two seconds with his partner held back.
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -512,6 +527,7 @@ EVT_BEGIN(mario_shabon_check)
     ADD(LW(2), 2)
     CALL(mario_shabon_eff, 1, LW(0), LW(1), LW(2))
     DELETE_EVENT(LW(9))
+    // The bubble pops, Mario drops back down and controls return; the watcher restarts.
     SPAWN_EVENT(mario_shabon_break_sound)
     CALL(evt_mario_set_pose, STRING("M_F_1"))
     WAIT_MS(500)
@@ -568,6 +584,10 @@ EVT_BEGIN(evt_shabon_s)
             CALL(evt_sub_random, 60, LW(2))
             ADD(LW(3), -80)
             ADD(LW(2), 55)
+            // First loop: a bubble effect rises from the bottom of the room at a random spot, then pops near
+            // the top.
+            // First loop: a bubble effect rises from the bottom of the room at a random spot, then pops near
+            // the top.
             CALL(evt_eff, STRING("shabon1eff"), STRING("puni_balloon"), 0, LW(3), -319, LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
             CALL(evt_sub_random, 280, LW(4))
             ADD(LW(4), -69)
@@ -601,6 +621,7 @@ EVT_BEGIN(evt_shabon_s)
             CALL(evt_sub_random, 20, LW(2))
             ADD(LW(3), -50)
             ADD(LW(2), 100)
+            // Second loop, running independently, does the same.
             CALL(evt_eff, STRING("shabon2eff"), STRING("puni_balloon"), 0, LW(3), -319, LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
             CALL(evt_sub_random, 280, LW(4))
             ADD(LW(4), -69)
@@ -633,6 +654,7 @@ EVT_BEGIN(evt_shabon_s)
         CALL(evt_sub_random, 160, LW(2))
         ADD(LW(3), 60)
         SUBTRACT(LW(2), 100)
+        // Third loop, again independent.
         CALL(evt_eff, STRING("shabon3eff"), STRING("puni_balloon"), 0, LW(3), -319, LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
         CALL(evt_sub_random, 280, LW(4))
         ADD(LW(4), -69)

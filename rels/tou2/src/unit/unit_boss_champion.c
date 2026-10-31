@@ -25,6 +25,11 @@
 #include "version.h"
 #include "evt/evt_story.h"
 
+// Unit work slots of this unit (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BOSS_CHAMPION_PHASE = 0, // fight phase: 0 start, 1 at 67% HP, 2 after the Flying Chop, 3 at 34% HP, 4 on the ceiling
+};
+
 static USER_FUNC(check_ceil);
 static USER_FUNC(down_ceil);
 
@@ -71,6 +76,10 @@ static USER_FUNC(ceil_exist) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit kind of the Rawk Hawk (HP 40, level 49):
+ * its size, offsets, damage sounds, status vulnerability, parts and init event.
+ */
 BattleUnitKind unit_boss_champion = {
     64,
     "btl_un_champion",
@@ -145,16 +154,27 @@ BattleUnitKind unit_boss_champion = {
     data_table,
 };
 
+/** Defence of the Rawk Hawk: no damage reduction. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of the Rawk Hawk: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Rawk Hawk (percent chance to take each status):
+ * immune to growing huge, fright, gale force and instant kill; resists most other statuses.
+ */
 static StatusVulnerability regist = {60, 60, 70, 70, 60, 70, 100, 40, 0, 60, 100, 60, 100, 60, 60, 0, 0, 100, 70, 100, 100, 0};
 #else
+/**
+ * Status vulnerability of the Rawk Hawk (percent chance to take each status):
+ * immune to growing huge, fright, gale force and instant kill; resists most other statuses.
+ */
 static StatusVulnerability regist = {60, 50, 60, 100, 60, 100, 100, 40, 0, 85, 100, 85, 100, 90, 60, 0, 0, 100, 70, 100, 100, 0};
 #endif
 
+/** Pose table of the Rawk Hawk: maps each battle pose to the animation it plays (N_* animations). */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -162,20 +182,21 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "K_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "D_1"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "Z_6"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Pose table (roof) of the Rawk Hawk: maps each battle pose to the animation it plays (N_* animations). */
 PoseTableEntry pose_table_roof[] = {
     {1, "N_2"},
     {2, "Y_2"},
@@ -183,27 +204,29 @@ PoseTableEntry pose_table_roof[] = {
     {5, "K_2"},
     {4, "X_2"},
     {3, "K_2"},
-    {28, "S_8"},
+    {BTL_POSE_NORMAL, "S_8"},
     {29, "Q_2"},
     {30, "Q_2"},
     {31, "D_2"},
-    {39, "D_2"},
+    {BTL_POSE_DAMAGE, "D_2"},
     {50, "Z_8"},
-    {42, "W_2"},
-    {40, "W_2"},
-    {56, "X_2"},
-    {57, "X_2"},
+    {BTL_POSE_RUN, "W_2"},
+    {BTL_POSE_WALK, "W_2"},
+    {BTL_POSE_DANGER, "X_2"},
+    {BTL_POSE_PERIL, "X_2"},
     {BTL_POSE_TALK, "T_8"},
     {BTL_POSE_STAY_DEFAULT, "S_8"},
 };
 
+/** Data table of the Rawk Hawk: event handlers for being defeated. */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/** Body part of the Rawk Hawk (model c_bred_h): hit position, defences, attributes and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_champion", "c_bred_h", 0.0f, 0.0f, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 55.0f, 0.0f, 35, 70, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_champion", "c_bred_h", 0.0f, 0.0f, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 55.0f, 0.0f, 35, 70, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /**
@@ -221,6 +244,7 @@ static USER_FUNC(init_ceil) {
     return EVT_RETURN_DONE;
 }
 
+/** Weapon of Rawk Hawk's Drop Kick: 4 damage, hammer-type contact attack. */
 BattleWeapon weapon_champion_drop_kick_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -239,7 +263,7 @@ BattleWeapon weapon_champion_drop_kick_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -257,6 +281,7 @@ BattleWeapon weapon_champion_drop_kick_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Rawk Hawk's Screw Attack: 4 damage, jump-type contact attack. */
 BattleWeapon weapon_champion_screw_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -275,7 +300,7 @@ BattleWeapon weapon_champion_screw_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -293,6 +318,7 @@ BattleWeapon weapon_champion_screw_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Rawk Hawk's Flying Chop: 6 damage, jump-type contact attack. */
 BattleWeapon weapon_champion_flying_chop_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -311,7 +337,7 @@ BattleWeapon weapon_champion_flying_chop_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -329,6 +355,7 @@ BattleWeapon weapon_champion_flying_chop_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Rawk Hawk's Foot Stamp: 3 damage, jump-type contact attack. */
 BattleWeapon weapon_champion_foot_stamp_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -347,7 +374,7 @@ BattleWeapon weapon_champion_foot_stamp_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -365,6 +392,7 @@ BattleWeapon weapon_champion_foot_stamp_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Rawk Hawk's healing move: its power value is 5. */
 BattleWeapon weapon_champion_healing = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -382,7 +410,7 @@ BattleWeapon weapon_champion_healing = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -400,6 +428,7 @@ BattleWeapon weapon_champion_healing = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Rawk Hawk's Roof Shake: 1 damage. */
 BattleWeapon weapon_champion_roof_shake_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -422,7 +451,7 @@ BattleWeapon weapon_champion_roof_shake_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -440,6 +469,7 @@ BattleWeapon weapon_champion_roof_shake_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Rawk Hawk's final Roof Shake: no HP damage. */
 BattleWeapon weapon_champion_roof_shake_last_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -462,7 +492,7 @@ BattleWeapon weapon_champion_roof_shake_last_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     27, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -504,9 +534,9 @@ EVT_BEGIN(to_ceiling)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_roof))
     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 16, 48, 10)
     CALL(btlevtcmd_SetCutBaseOffset, BTL_UNIT_SELF, -2, -38, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, -44, 0)
@@ -528,10 +558,10 @@ EVT_BEGIN(to_floor)
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 10, 48, 10)
     CALL(btlevtcmd_SetCutBaseOffset, BTL_UNIT_SELF, 0, 32, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
@@ -552,7 +582,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(entry_event))
     CALL(init_ceil)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CHAMPION_PHASE, 0)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_MOVE1L"), STRING("SFX_BOSS_BLED_MOVE1R"), 0, 15, 15)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_MOVE1L"), STRING("SFX_BOSS_BLED_MOVE1R"), 0, 8, 8)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -571,7 +601,10 @@ EVT_END()
  * It finishes by putting the partner and Rawk Hawk back in their idle poses.
  */
 static EVT_BEGIN(entry_event)
+    // The status window is hidden while Rawk Hawk and the partner trade words before the fight.
     CALL(btlevtcmd_StatusWindowOnOff, 0)
+    // Before Mario is the champion: on the first fight Rawk Hawk poses for a while,
+    // then the camera swings between the partner and Rawk Hawk as they trade lines.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_NEW_CHAMPION)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RAWK_HAWK_INTRO_SEEN), 0)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_6"))
@@ -606,6 +639,7 @@ static EVT_BEGIN(entry_event)
             CALL(evt_msg_print, 2, STRING("stg3_tou_435_02"), 0, BTL_UNIT_SELF)
             WAIT_MS(200)
         ELSE
+            // On later attempts Rawk Hawk gives a shorter greeting.
             WAIT_FRAMES(60)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
             WAIT_FRAMES(60)
@@ -620,6 +654,8 @@ static EVT_BEGIN(entry_event)
             WAIT_MS(200)
         END_IF
     ELSE
+        // After the return to Rogueport this is the rematch: Rawk Hawk has new lines,
+        // depending on whether Mario has already won it back.
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         ELSE
             SET_VALUE(GSWF(GSWF_TOU_RAWK_HAWK_PHASE1_SEEN), 0)
@@ -654,13 +690,14 @@ static EVT_BEGIN(entry_event)
             END_IF
         END_IF
     END_IF
+    // The partner and Rawk Hawk go back to their idle poses and the status window returns.
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_PARTNER, LW(0))
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(200)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     RETURN
 EVT_END()
@@ -675,7 +712,7 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(2), 0)
         CALL(btlevtcmd_GetDamageCode, BTL_UNIT_SELF, LW(0))
@@ -691,7 +728,7 @@ static EVT_BEGIN(damage_event)
             END_IF
             CASE_END
         END_SWITCH
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(2), 1)
         END_IF
@@ -721,7 +758,7 @@ EVT_END()
  * before the common no-spin death (subsetevt_dead_core_nospin_norotate).
  */
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(to_floor)
     END_IF
@@ -763,6 +800,7 @@ EVT_END()
  * The percentages are 67, 34 and 25 of max HP.
  */
 static EVT_BEGIN(phase_event)
+    // Only acts after the player's phase and while Rawk Hawk is able to act.
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
@@ -771,9 +809,10 @@ static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_CHAMPION_PHASE, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
+        // Phase 0: once Rawk Hawk is down to about two thirds of his HP he moves on to the next phase.
         CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         DEBUG_PUT_REG(LW(0))
         MULTIPLY(LW(0), 67)
@@ -783,7 +822,9 @@ static EVT_BEGIN(phase_event)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         DEBUG_PUT_REG(LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CHAMPION_PHASE, 1)
+            // In the first fight he stops, the camera pushes in and he taunts Mario with a flex
+            // and a blurred close-up.
             IF_INT_EQUAL(GSWF(GSWF_TOU_RAWK_HAWK_PHASE1_SEEN), 0)
                 SET_VALUE(GSWF(GSWF_TOU_RAWK_HAWK_PHASE1_SEEN), 1)
                 CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
@@ -808,13 +849,14 @@ static EVT_BEGIN(phase_event)
                     CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("S_2"))
                     CALL(evt_msg_print, 2, STRING("stg3_tou_436_03"), 0, BTL_UNIT_SELF)
                     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-                    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
+                    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
                     CALL(btlevtcmd_StatusWindowOnOff, 1)
                 END_IF
                 CALL(evt_btl_camera_set_mode, 0, 0)
             END_IF
         END_IF
         CASE_EQUAL(2)
+        // Phase 2: at about a third of his HP (unless he has been shrunk) he moves on to the ceiling phase.
         CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         DEBUG_PUT_REG(LW(0))
         MULTIPLY(LW(0), 34)
@@ -825,10 +867,11 @@ static EVT_BEGIN(phase_event)
         DEBUG_PUT_REG(LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
             SET_VALUE(LW(0), 0)
-            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(1))
+            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(1))
             IF_INT_EQUAL(LW(1), 0)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CHAMPION_PHASE, 3)
                 IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_NEW_CHAMPION)
+                    // In the first fight he says his line before the jump.
                     IF_INT_EQUAL(GSWF(GSWF_TOU_RAWK_HAWK_PHASE2_SEEN), 0)
                         SET_VALUE(GSWF(GSWF_TOU_RAWK_HAWK_PHASE2_SEEN), 1)
                         CALL(btlevtcmd_StatusWindowOnOff, 0)
@@ -841,6 +884,8 @@ static EVT_BEGIN(phase_event)
                         CALL(evt_btl_camera_set_mode, 0, 0)
                     END_IF
                 END_IF
+                // He crouches and leaps up, landing with a shake of the camera,
+                // then grabs the iron frame above the ring and lowers it.
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
                 WAIT_MS(200)
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3C"))
@@ -853,7 +898,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
                 BEGIN_INLINE_EVENT
                     WAIT_MS(600)
-                    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+                    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
                 END_INLINE_EVENT
                 CALL(evt_snd_sfxon, STRING("SFX_BOSS_BLED_MOVE_CAILING1"), LW(15))
                 CALL(down_ceil)
@@ -862,6 +907,7 @@ static EVT_BEGIN(phase_event)
             END_IF
         END_IF
         CASE_EQUAL(4)
+        // Phase 4: at a quarter of his HP, in the first fight, he gives his last taunt.
         CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
         DEBUG_PUT_REG(LW(0))
         MULTIPLY(LW(0), 25)
@@ -877,7 +923,7 @@ static EVT_BEGIN(phase_event)
                     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
                     CALL(evt_btl_camera_set_mode, 0, 3)
-                    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+                    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
                     IF_INT_EQUAL(LW(0), 0)
                         CALL(evt_btl_camera_set_moveto, 0, 73, 78, 322, 73, 57, 0, 30, 11)
                     ELSE
@@ -907,13 +953,15 @@ EVT_END()
  * LW(9) receives the weapon each sub-event uses.
  */
 static EVT_BEGIN(attack_event)
+    // Rawk Hawk may use an item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    // His move depends on his phase. At the start he picks between the Drop Kick and the Screw Attack.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_CHAMPION_PHASE, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(btlevtcmd_DrawLots, LW(0), 2, 10, 15)
@@ -926,10 +974,12 @@ static EVT_BEGIN(attack_event)
             CALL_CHILD(screw_attack_event)
         END_SWITCH
         CASE_EQUAL(1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
+        // Next he does the Flying Chop.
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CHAMPION_PHASE, 2)
         SET_VALUE(LW(9), PTR(&weapon_champion_flying_chop_attack))
         CALL_CHILD(flying_chop_attack_event)
         CASE_EQUAL(2)
+        // Then he picks freely among the three.
         CALL(btlevtcmd_DrawLots, LW(0), 3, 10, 15, 20)
         SWITCH(LW(0))
             CASE_EQUAL(0)
@@ -943,15 +993,18 @@ static EVT_BEGIN(attack_event)
             CALL_CHILD(flying_chop_attack_event)
         END_SWITCH
         CASE_EQUAL(3)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 4)
+        // At the ceiling phase he climbs to the ceiling and shakes it with the Roof Shake.
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CHAMPION_PHASE, 4)
         CALL_CHILD(to_ceiling)
         SET_VALUE(LW(9), PTR(&weapon_champion_roof_shake_attack))
         CALL_CHILD(roof_shake_attack_event)
         CASE_EQUAL(4)
-        CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+        // In the last phase, on the floor, he picks among his ground moves
+        // and the ceiling climb (the Roof Shake only if the frame is down and he is not shrunk).
+        CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LW(2), 30)
-            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(1))
+            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(1))
             IF_INT_NOT_EQUAL(LW(1), 0)
                 SET_VALUE(LW(2), 0)
             END_IF
@@ -976,6 +1029,7 @@ static EVT_BEGIN(attack_event)
                 CALL_CHILD(roof_shake_attack_event)
             END_SWITCH
         ELSE
+            // Hanging from the ceiling, he picks among the Foot Stamp, his healing move and the Roof Shake.
             CALL(btlevtcmd_DrawLots, LW(0), 3, 10, 20, 20)
             SWITCH(LW(0))
                 CASE_EQUAL(0)
@@ -996,15 +1050,16 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 /**
- * Guess: rawk Hawk's Drop Kick: he runs at the front-most target
- * and kicks it (power 4, hammer-like, action command level 3).
+ * Rawk Hawk's drop kick (weapon in LW(9), weapon_champion_drop_kick_attack: 4 damage to the front-most target,
+ * hammer-like, action command level 3): he runs to 150 units in front of the target,
+ * leaps at it with a kick and hits it once, then hops back and jumps home.
  */
 EVT_BEGIN(drop_kick_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
@@ -1030,7 +1085,7 @@ EVT_BEGIN(drop_kick_attack_event)
     ADD(LW(2), 5)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_DROP_KICK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1060,7 +1115,7 @@ EVT_BEGIN(drop_kick_attack_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(evt_btl_camera_shake_h, 0, 3, 0, 50, 13)
     WAIT_MS(60)
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(98)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_CHOP_ROUND1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1B"))
@@ -1080,18 +1135,25 @@ EVT_BEGIN(drop_kick_attack_event)
     RETURN
 EVT_END()
 
-/** Guess: rawk Hawk's Screw Attack: he jumps up, spins and drills into the whole party (all targets). */
+/**
+ * Rawk Hawk's screw attack (weapon in LW(9), weapon_champion_screw_attack: 4 damage, jump-like, every target):
+ * he spins up and jumps onto each selected target in turn,
+ * bouncing from one to the next and hitting each once (the guard result is taken on the first),
+ * then hops back and jumps home.
+ */
 EVT_BEGIN(screw_attack_event)
+    // Choose the targets; a confused Rawk Hawk with none is flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
+    // The attack is announced and the camera frames Rawk Hawk.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -1100,17 +1162,20 @@ EVT_BEGIN(screw_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Rawk Hawk crouches, then springs up spinning.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1A"))
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1F"))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(5.0f), FLOAT(0.39941406f))
+    // He spin-jumps onto each target in turn, bouncing from one to the next.
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(10)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_CHOP_ROUND1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Check how the target defends against the spin.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1132,15 +1197,17 @@ EVT_BEGIN(screw_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The target dodged: Rawk Hawk sails over it.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     WAIT_MS(150)
     GOTO(98)
+    // The spin hits: the damage is dealt (the guard timing counts once) and he bounces on to the next target.
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(1.5f), FLOAT(0.69921875f))
@@ -1148,6 +1215,7 @@ EVT_BEGIN(screw_attack_event)
         ADD(LW(10), 1)
         GOTO(10)
     END_IF
+    // After the last target he hops off to the side, lands, and jumps back home.
     LABEL(98)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_CHOP_ROUND1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1B"))
@@ -1167,22 +1235,29 @@ EVT_BEGIN(screw_attack_event)
     RETURN
 EVT_END()
 
-/** Guess: rawk Hawk's Flying Chop: he leaps and chops down on a single target. */
+/**
+ * Rawk Hawk's flying chop (weapon in LW(9), weapon_champion_flying_chop_attack: 6 damage to one target,
+ * jump-like): he leaps up and back toward the camera,
+ * then dives down onto the target with the chop and hits it once, then hops back and jumps home.
+ */
 EVT_BEGIN(flying_chop_attack_event)
+    // Choose a target; a confused Rawk Hawk with none is flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
+    // The attack is announced.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // Rawk Hawk crouches, then leaps up and back toward the camera.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1A"))
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1B"))
@@ -1197,6 +1272,7 @@ EVT_BEGIN(flying_chop_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_CHOP_ROUND1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_CHOP_LANDING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He lands in his chop pose, then winds up and flies at the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
@@ -1207,7 +1283,8 @@ EVT_BEGIN(flying_chop_attack_event)
     ADD(LW(2), 5)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_CHOP_FLY1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Check how the target defends against the chop.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1229,16 +1306,19 @@ EVT_BEGIN(flying_chop_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The target dodged: he sweeps past, then recovers.
     LABEL(90)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1C"))
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     WAIT_MS(150)
     GOTO(98)
+    // The chop hits: the damage is dealt and the camera shakes.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(evt_btl_camera_shake_h, 0, 3, 0, 50, 13)
     WAIT_MS(60)
+    // He hops off to the side, lands, and jumps back home.
     LABEL(98)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1257,22 +1337,33 @@ EVT_BEGIN(flying_chop_attack_event)
     RETURN
 EVT_END()
 
-/** Guess: rawk Hawk's Foot Stamp: he walks to a target and stamps on it. */
+/**
+ * Rawk Hawk's foot stamp from the ceiling (weapon in LW(9),
+ * weapon_champion_foot_stamp_attack: 3 damage to one target),
+ * picked while he hangs from the ceiling (UNIT_ATTR_CEILING):
+ * he moves above the target, drops onto it and stamps it three times in hops of growing height (the last hit
+ * shakes the camera with a smoke puff).
+ * The drop puts him back on the floor: his home Y becomes 0,
+ * the floor pose table and offsets return and UNIT_ATTR_CEILING is cleared. He then hops back and jumps home.
+ */
 EVT_BEGIN(foot_stamp_attack_event)
+    // Choose a target; a confused Rawk Hawk with none is flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
+    // The attack is announced.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // Hanging from the ceiling, Rawk Hawk creeps along it until he is right above the target and looks down.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("W_2"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
@@ -1280,6 +1371,8 @@ EVT_BEGIN(foot_stamp_attack_event)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("B_1"))
     WAIT_MS(700)
+    // He lets go and drops onto the target; the fall puts him back on the floor, so his floor poses
+    // and body offsets return.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3A"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.75f))
@@ -1291,13 +1384,14 @@ EVT_BEGIN(foot_stamp_attack_event)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 10, 48, 10)
     CALL(btlevtcmd_SetCutBaseOffset, BTL_UNIT_SELF, 0, 32, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_FUMI_STEPON1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Check how the target defends against the stomp.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -1320,11 +1414,14 @@ EVT_BEGIN(foot_stamp_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The target dodged: he lands beside it and pauses.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
     WAIT_MS(300)
     GOTO(98)
+    // The stomp hits: he stamps three times in hops of growing height, the damage is dealt each time,
+    // and the last stomp shakes the camera with a puff of smoke.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
@@ -1344,12 +1441,13 @@ EVT_BEGIN(foot_stamp_attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 35, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_FUMI_STEPON1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 14, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_btl_camera_shake_h, 0, 3, 0, 50, 13)
     WAIT_MS(300)
+    // He hops off to the side, lands, and jumps back home.
     LABEL(98)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1369,15 +1467,16 @@ EVT_BEGIN(foot_stamp_attack_event)
 EVT_END()
 
 /**
- * Guess: rawk Hawk's healing move: he shakes the ceiling three times, an item drops,
- * he eats it (HP recovery of 5) and a recovery sparkle plays. Used while he is hanging from the ceiling.
+ * Rawk Hawk's healing move, picked while he hangs from the ceiling (weapon_champion_healing, own side):
+ * he shakes the ceiling three times, a Mushroom (item 148) icon drops in front of him,
+ * he eats it and recovers 5 HP with the recovery sparkle.
  */
 EVT_BEGIN(healing_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
@@ -1462,9 +1561,9 @@ static USER_FUNC(check_ceil) {
 
 #if VERSION >= VERSION_JP
 /**
- * Guess: script helper (JP and later): spawns a falling-object effect.
- * arg0 receives the effect pointer; arg1 = type; arg2..4 = position; arg5..7 = fall parameters;
- * arg8/arg9 = timing values.
+ * Script helper (JP and later) for roof_shake_attack_event:
+ * spawns a falling stage object with effFallEntry (args[1] type, args[2..4] position, args[5] width,
+ * args[6] drop height, args[7] direction, args[8] count, args[9] duration) and stores the effect in args[0].
  */
 USER_FUNC(eff_fall_entry) {
     EvtWord* args = event->args;
@@ -1486,7 +1585,10 @@ USER_FUNC(eff_fall_entry) {
 #endif
 
 #if VERSION >= VERSION_JP
-/** Guess: script helper (JP and later): blocks until the falling-object effect in arg0 has hit the ground. */
+/**
+ * Script helper (JP and later): blocks until the falling object in args[0] has landed far enough for its hit to
+ * apply (effFallCheckHit); returns at once for NULL.
+ */
 USER_FUNC(eff_fall_hit_wait) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
 
@@ -1498,8 +1600,13 @@ USER_FUNC(eff_fall_hit_wait) {
 #endif
 
 /**
- * Guess: rawk Hawk's Roof Shake: hanging from the ceiling he shakes it
- * so that debris falls on the party (uses the falling-object effects and waits for each to hit).
+ * Rawk Hawk's roof shake while hanging from the ceiling (weapon in LW(9),
+ * weapon_champion_roof_shake_attack: 1 damage per object):
+ * ten times he picks a target, shakes the ceiling and drops a bucket,
+ * a tub or a light (fall types 4, 5, 8) on it, each hit or dodge resolving when the object lands.
+ * JP and later wait for all ten drops (event ids kept in parts work 0 to 9)
+ * before a final check with weapon_champion_roof_shake_last_attack on Mario, or the shell guarding him,
+ * and on the partner; the demos make that final check on Mario and the partner after a fixed 32 frames.
  */
 EVT_BEGIN(roof_shake_attack_event)
 #if VERSION >= VERSION_JP
@@ -1516,30 +1623,36 @@ EVT_BEGIN(roof_shake_attack_event)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 9, 0)
     SET_VALUE(LW(13), 0)
 #endif
+    // Ten times over, Rawk Hawk picks a target for a shake of the ceiling.
     LOOP(10)
 #if VERSION >= VERSION_JP
         SET_VALUE(LW(0), 0)
         ADD(LW(0), LW(13))
         CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, LW(0), 0)
 #endif
+        // Choose a target; a confused Rawk Hawk with none is flustered.
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
         IF_INT_EQUAL(LW(3), -1)
-            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
                 CALL_CHILD(subsetevt_confuse_flustered)
             END_IF
             RETURN
         END_IF
+        // The attack is announced.
         CALL(btlevtcmd_WeaponAftereffect, LW(9))
         CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
         CALL(btlevtcmd_WaitGuardMove)
         CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+        // He shakes the ceiling, the camera rumbling, and loosens an object above the target.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_4"))
         WAIT_FRAMES(16)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_SHAKE_CAILING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+        // A bucket, a tub or a light drops onto the target; if it lands on the target the damage is dealt,
+        // and otherwise the target hops out of the way.
 #if VERSION <= VERSION_DEMO_US
         CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
 #else
@@ -1622,9 +1735,11 @@ EVT_BEGIN(roof_shake_attack_event)
         ADD(LW(13), 1)
 #endif
     END_LOOP
+    // When the last object has landed, the shaking ends with a final hit on Mario (or the shell guarding him)
+    // and on the partner.
 #if VERSION <= VERSION_DEMO_US
     WAIT_FRAMES(32)
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_MARIO, 1, PTR(&weapon_champion_roof_shake_last_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_MARIO, 1, PTR(&weapon_champion_roof_shake_last_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
 #else
     WAIT_FRAMES(10)
     LABEL(92)
@@ -1645,12 +1760,12 @@ EVT_BEGIN(roof_shake_attack_event)
     END_IF
     CALL(btlevtcmd_GetGuardKouraId, BTL_UNIT_MARIO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(0), 1, PTR(&weapon_champion_roof_shake_last_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(0), 1, PTR(&weapon_champion_roof_shake_last_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     ELSE
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_MARIO, 1, PTR(&weapon_champion_roof_shake_last_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_MARIO, 1, PTR(&weapon_champion_roof_shake_last_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
 #endif
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_PARTNER, 1, PTR(&weapon_champion_roof_shake_last_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_PARTNER, 1, PTR(&weapon_champion_roof_shake_last_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(evt_btl_camera_set_mode, 0, 0)
     RETURN
 EVT_END()

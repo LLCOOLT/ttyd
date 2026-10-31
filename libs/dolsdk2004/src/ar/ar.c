@@ -5,8 +5,10 @@
 #include "__ar.h"
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __ARVersion = "<< Dolphin SDK - AR\tdebug build: Apr  5 2004 03:56:19 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __ARVersion = "<< Dolphin SDK - AR\trelease build: Apr  5 2004 04:15:03 (0x2301) >>";
 #endif
 

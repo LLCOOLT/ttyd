@@ -38,6 +38,7 @@ static EvtWord return_event[256];
 static EvtWord normal_attack_event[311];
 static EvtWord wait_event[6];
 
+/** Unit data of the Frost Piranha: 10 HP, level 26; the battle starts it from init_event. */
 BattleUnitKind unit_ice_pakkun = {
     113,
     "btl_un_ice_pakkun",
@@ -104,20 +105,37 @@ BattleUnitKind unit_ice_pakkun = {
     data_table,
 };
 
+/** Defence of the Frost Piranha: none against any element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Elemental reactions of the Frost Piranha: takes 1 extra damage from fire attacks; is healed by ice attacks.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Frost Piranha (percent, 100 is normal) in the demo builds: immune to freeze;
+ * resists most statuses (20-95%).
+ */
 static StatusVulnerability regist = {80, 80, 60, 100, 75, 100, 100, 0, 100, 70, 100, 70, 100, 70, 70, 20, 30, 100, 70, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Frost Piranha (percent, 100 is normal) in the retail builds: immune to freeze;
+ * resists most statuses (10-95%).
+ */
 static StatusVulnerability regist = {100, 70, 40, 100, 80, 100, 100, 0, 100, 85, 100, 85, 100, 85, 70, 10, 40, 100, 70, 100, 100, 95};
 #endif
 
+/** Body part of the Frost Piranha, model c_pakflwr_a: its one target part. */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_ice_pakkun", "c_pakflwr_a", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
 };
 
+/**
+ * Weapon data for the Frost Piranha's bite: 5 damage, a hammer-type hit, every target, may inflict freeze
+ * (30%).
+ */
 static BattleWeapon weapon_ice_pakkun_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -136,7 +154,7 @@ static BattleWeapon weapon_ice_pakkun_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -162,7 +180,7 @@ static BattleWeapon weapon_ice_pakkun_attack = {
  * otherwise lets an enemy item be used if ready, else uses the normal attack with weapon_ice_pakkun_attack.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_ice_pakkun_attack))
         CALL_CHILD(normal_attack_event)
@@ -181,6 +199,9 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Pose table of the Frost Piranha: the animation each battle pose (idle, hurt, walk, attack and so on) plays.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "PKF_N_1"},
     {2, "PKF_Y_1"},
@@ -188,20 +209,24 @@ static PoseTableEntry pose_table[] = {
     {5, "PKF_K_1"},
     {4, "PKF_X_1"},
     {3, "PKF_X_1"},
-    {28, "PKF_S_1"},
+    {BTL_POSE_NORMAL, "PKF_S_1"},
     {29, "PKF_Q_1"},
     {30, "PKF_Q_1"},
     {31, "PKF_S_2"},
-    {39, "PKF_D_1"},
+    {BTL_POSE_DAMAGE, "PKF_D_1"},
     {50, "PKF_A_1B"},
-    {40, "PKF_S_1"},
-    {42, "PKF_S_1"},
-    {56, "PKF_X_1"},
-    {57, "PKF_X_1"},
+    {BTL_POSE_WALK, "PKF_S_1"},
+    {BTL_POSE_RUN, "PKF_S_1"},
+    {BTL_POSE_DANGER, "PKF_X_1"},
+    {BTL_POSE_PERIL, "PKF_X_1"},
     {BTL_POSE_TALK, "PKF_T_1"},
     {BTL_POSE_STAY_DEFAULT, "PKF_S_1"},
 };
 
+/**
+ * Pose table of the Frost Piranha while it clings to the ceiling: the animation each battle pose (idle, hurt,
+ * walk, attack and so on) plays.
+ */
 static PoseTableEntry pose_table_ceil[] = {
     {1, "PKF_N_2"},
     {2, "PKF_Y_2"},
@@ -209,20 +234,25 @@ static PoseTableEntry pose_table_ceil[] = {
     {5, "PKF_K_2"},
     {4, "PKF_X_2"},
     {3, "PKF_X_2"},
-    {28, "PKF_S_3"},
+    {BTL_POSE_NORMAL, "PKF_S_3"},
     {29, "PKF_Q_2"},
     {30, "PKF_Q_2"},
     {31, "PKF_S_4"},
-    {39, "PKF_D_2"},
+    {BTL_POSE_DAMAGE, "PKF_D_2"},
     {50, "PKF_A_5"},
-    {40, "PKF_S_3"},
-    {42, "PKF_S_3"},
-    {56, "PKF_X_2"},
-    {57, "PKF_X_2"},
+    {BTL_POSE_WALK, "PKF_S_3"},
+    {BTL_POSE_RUN, "PKF_S_3"},
+    {BTL_POSE_DANGER, "PKF_X_2"},
+    {BTL_POSE_PERIL, "PKF_X_2"},
     {BTL_POSE_TALK, "PKF_S_3"},
     {BTL_POSE_STAY_DEFAULT, "PKF_S_3"},
 };
 
+/**
+ * Event table of the Frost Piranha: the spike counters (tag 37, dmg_avoid_counter_thorn_head_event), its
+ * counter-damage reactions (tags 25 to 36, all running counter_damage_event) and the First Strike reaction
+ * (does nothing).
+ */
 static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {26, counter_damage_event},
@@ -257,21 +287,21 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Reaction when an attack is avoided or countered by its thorny head:
- * it flinches, returns to pose PKF_S_1 and flashes the "toge_flush" spike effect above its head (higher when it
- * is large, lower when small).
+ * Data-table event 37, run by the default damage event when an attacker is hurt by the Frost Piranha's spiky head
+ * (damage code 31): it flinches (pose type 31, 250 ms), returns to its idle pose PKF_S_1 and flashes the
+ * "toge_flush" spike effect above its head, 50 units up (63 when Huge, 37 when Tiny).
  */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 63)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 37)
         GOTO(90)
@@ -299,9 +329,9 @@ EVT_END()
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -323,8 +353,8 @@ static EVT_BEGIN(ceil_fall_ready_event)
     END_SIBLING_EVENT
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_4"))
     WAIT_MS(300)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
@@ -333,16 +363,16 @@ static EVT_BEGIN(ceil_fall_ready_event)
     BEGIN_SIBLING_EVENT
         CALL(shadow_scale_return, BTL_UNIT_SELF)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_1"))
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 50, 0)
     CALL(btlevtcmd_SetStatusIconOffset, BTL_UNIT_SELF, 4, 48)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 16, 32, 0)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_S_1"))
@@ -369,8 +399,8 @@ static EVT_BEGIN(return_event)
     END_SIBLING_EVENT
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_2"))
     WAIT_MS(300)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     IF_INT_EQUAL(LW(15), 0)
         CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
         CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -381,16 +411,16 @@ static EVT_BEGIN(return_event)
         BEGIN_SIBLING_EVENT
             CALL(shadow_scale_return, BTL_UNIT_SELF)
         END_SIBLING_EVENT
-        CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+        CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_1"))
         CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
         CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 50, 0)
         CALL(btlevtcmd_SetStatusIconOffset, BTL_UNIT_SELF, 4, 48)
         CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 16, 32, 0)
-        CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+        CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
         WAIT_MS(500)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_S_1"))
@@ -404,16 +434,16 @@ static EVT_BEGIN(return_event)
         BEGIN_SIBLING_EVENT
             CALL(shadow_scale_return, BTL_UNIT_SELF)
         END_SIBLING_EVENT
-        CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+        CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_3"))
         CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, -80, 0)
         CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, -50, 0)
         CALL(btlevtcmd_SetStatusIconOffset, BTL_UNIT_SELF, 4, 10)
         CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 16, -32, 0)
-        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 2)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_ceil))
         WAIT_MS(500)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_S_3"))
@@ -428,7 +458,8 @@ EVT_END()
  * a miss makes the target dodge, a hit applies it with guard flag 256; then it returns via return_event.
  */
 static EVT_BEGIN(normal_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // Choose the target: the First Strike victim, otherwise a sampled opposing unit.
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -437,57 +468,65 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No valid target: a confused Frost Piranha is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // It sinks out of sight, its shadow shrinking (on the ceiling it retracts the other way).
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         CALL(shadow_scale_small, BTL_UNIT_SELF)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(15))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(15))
     IF_INT_EQUAL(LW(15), 0)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_2"))
     ELSE
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_4"))
     END_IF
     WAIT_MS(300)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+    // Out of sight it moves to a spot beside the target and turns to face it.
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 45)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(500)
+    // The camera follows it.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
+    // It shoots up in front of the target, its shadow growing back.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         CALL(shadow_scale_return, BTL_UNIT_SELF)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_E_1"))
     WAIT_MS(150)
+    // The bite: its head swings through the bite poses (PKF_A_1A to 1C).
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_A_1A"))
     WAIT_MS(200)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_A_1B"))
     WAIT_MS(200)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_A_1C"))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Hit check: a miss or dodge ends the bite, a hit goes on to the damage.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -512,13 +551,15 @@ static EVT_BEGIN(normal_attack_event)
     LABEL(90)
     GOTO(98)
     LABEL(91)
+    // Hit: the camera shakes and the damage is dealt with the action-command result.
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
     LABEL(98)
+    // Retreat: it returns to its hole (return_event).
     WAIT_MS(500)
     CALL_CHILD(return_event)
     LABEL(99)
@@ -535,7 +576,8 @@ EVT_END()
 /**
  * Script helper (args[0] is a battle unit): grows part 1's shadow back from zero to the scale saved by
  * shadow_scale_memory over 15 frames; blocks until done.
- * Guess: used when the Frost Piranha comes back out of the ceiling.
+ * return_event, ceil_fall_ready_event and normal_attack_event run it as the Frost Piranha pops back out
+ * (on the ground or hanging from the ceiling) after ducking out of sight.
  */
 static USER_FUNC(shadow_scale_return) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
@@ -555,7 +597,8 @@ static USER_FUNC(shadow_scale_return) {
 
 /**
  * Script helper (args[0] is a battle unit): shrinks part 1's shadow from the saved scale to zero over 15 frames;
- * blocks until done. Guess: used while the Frost Piranha pulls back into the ceiling.
+ * blocks until done. return_event, ceil_fall_ready_event and normal_attack_event run it as the Frost Piranha
+ * ducks out of sight (poses PKF_E_2 or PKF_E_4) before it moves between the ground and the ceiling.
  */
 static USER_FUNC(shadow_scale_small) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));

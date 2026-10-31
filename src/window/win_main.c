@@ -36,7 +36,6 @@
 #include "evt/evt_story.h"
 #include "win/win_root.h"
 #if VERSION >= VERSION_US
-char* strstr(const char* str, const char* sub);
 #endif
 #include "driver/msgdrv.h"
 #include "mario/mario_pouch.h"
@@ -86,9 +85,9 @@ static WindowWork* wp;
 #include "mario/mario_party.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
+#include "icon_ids.h"
 #include "data/party_data.h"
 #include "manager/evtmgr_cmd.h"
-void FontDrawStringVecPitch(Vec* pos, const char* msg, f32 pitch);
 static void winLectureKeyMask(void);
 // FAKE: the prototype this file was compiled with (u16 icon id; icondrv.h has s16/s32), so callers zero-extend the id
 void iconGetTexObj(GXTexObj* obj, u16 iconId);
@@ -122,7 +121,7 @@ BOOL winCheck(void) {
         return FALSE;
     }
 
-    if (wp->flags & 0x1000) {
+    if (wp->flags & WIN_FLAG_LECTURE) {
         return FALSE;
     }
 
@@ -133,17 +132,17 @@ BOOL winCheck(void) {
     return FALSE;
 }
 
-/** Allows the pause menu to be opened again (clears flag 1); called from the evt_window script helpers. */
+/** Allows the pause menu to be opened again (clears WIN_FLAG_OPEN_DISABLED); called from the evt_window script helpers. */
 void winOpenEnable(void) {
     if (wp) {
-        wp->flags &= ~1;
+        wp->flags &= ~WIN_FLAG_OPEN_DISABLED;
     }
 }
 
-/** Blocks the pause menu from opening or running (sets flag 1, which winMain checks first). */
+/** Blocks the pause menu from opening or running (sets WIN_FLAG_OPEN_DISABLED, which winMain checks first). */
 void winOpenDisable(void) {
     if (wp) {
-        wp->flags |= 1;
+        wp->flags |= WIN_FLAG_OPEN_DISABLED;
     }
 }
 
@@ -173,7 +172,7 @@ void winMain(void) {
 #endif
 
     mario = marioGetPtr();
-    if (!(wp->flags & 1) && seqGetSeq() == SEQ_GAME && !seqCheckSeq()) {
+    if (!(wp->flags & WIN_FLAG_OPEN_DISABLED) && seqGetSeq() == SEQ_GAME && !seqCheckSeq()) {
         wp->buttonTrg = keyGetButtonTrg(0);
         wp->buttonRep = keyGetButtonRep(0);
         wp->dirTrg = keyGetDirTrg(0);
@@ -209,7 +208,7 @@ void winMain(void) {
 
         switch (wp->menuState) {
             case 0:
-                if (!(wp->flags & 0x1000)) {
+                if (!(wp->flags & WIN_FLAG_LECTURE)) {
                     if (marioStGetSystemLevel() != 0U) {
                         break;
                     }
@@ -268,7 +267,7 @@ void winMain(void) {
                 if (gp->flags & GLOBAL_FLAG_KIOSK) {
                     wp->menuSel = 1;
                 }
-                if (!(wp->flags & 0x1000)) {
+                if (!(wp->flags & WIN_FLAG_LECTURE)) {
                     marioStSystemLevel(4);
                 } else {
                     npcStopForEvent();
@@ -293,9 +292,9 @@ void winMain(void) {
                     kpaPauseSE2();
                 }
                 if (mario->flags & MARIO_FLAG_IS_8_BIT) {
-                    wp->flags |= 0x2000;
+                    wp->flags |= WIN_FLAG_8BIT_MARIO;
                 } else {
-                    wp->flags &= ~0x2000;
+                    wp->flags &= ~WIN_FLAG_8BIT_MARIO;
                 }
                 for (i = 0; i < 4; i++) {
                     padRumbleHardOff(i);
@@ -347,7 +346,7 @@ void winMain(void) {
                             wp->menuState = 100;
                             break;
                         case -3:
-                            if (wp->item.useItem == 0x4E) {
+                            if (wp->item.useItem == ITEM_RAGGED_DIARY) {
                                 wp->menuState = 300;
                             } else {
                                 wp->menuState = 200;
@@ -379,7 +378,7 @@ void winMain(void) {
                 fbatChangeMode(1);
                 psndClearFlag(PSND_FLAG_MUTE_SFX);
                 statusWinForceUpdate();
-                if (!(wp->flags & 0x1000)) {
+                if (!(wp->flags & WIN_FLAG_LECTURE)) {
                     marioStSystemLevel(0);
                 } else {
                     npcStartForEvent();
@@ -428,8 +427,8 @@ void winMain(void) {
                 }
                 // PAL lists only the other partners that have joined (flag 1) and are not away (flag 2)
                 for (i = 0; i < 7; i++) {
-                    if (partyId != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 1) &&
-                        !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 2)) {
+                    if (partyId != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_JOINED) &&
+                        !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_AWAY)) {
                         list[n++] = &winPartyDt[i];
                     }
                 }
@@ -499,7 +498,7 @@ void winMain(void) {
         if (wp->menuState == 2) {
             switch (marioGetPtr()->characterId) {
                 case 0:
-                    if (!(wp->flags & 0x1000)) {
+                    if (!(wp->flags & WIN_FLAG_LECTURE)) {
                         dispEntry(CAMERA_2D, 250.0f, 0, winDisp, NULL);
                     } else {
                         dispEntry(CAMERA_2D, 500.0f, 0, winDisp, NULL);
@@ -525,8 +524,13 @@ static void winDispKoopa(CameraId camId, void* param) {
 }
 
 #if VERSION >= VERSION_US
+/**
+ * Language folders of the menu graphics (win.tpl), indexed by the game language;
+ * the menu loads its textures from them.
+ */
 static const WinLangTbl winLangTbl = {{"jp", "us", "ge", "fr", "sp", "it"}};
 #else
+/** Language folders of the menu graphics (win.tpl), indexed by the game language: Japanese and English. */
 static const WinLangTbl winLangTbl = {{"jp", "us"}};
 #endif
 
@@ -742,6 +746,7 @@ EVT_END()
  */
 EVT_BEGIN(evt_diary_read)
     SET_TYPE(0)
+    // "Read the diary?" Saying no ends it here.
     CALL(evt_party_cont_onoff, 0, 1)
     WAIT_FRAMES(1)
     CALL(evt_mario_normalize)
@@ -752,6 +757,7 @@ EVT_BEGIN(evt_diary_read)
         CALL(evt_party_cont_onoff, 0, 0)
         RETURN
     END_IF
+    // "You may be cursed by the ghost!" Saying no ends it here.
     CALL(evt_msg_print_add, 0, STRING("stg6_rsh_diary_02"))
     CALL(evt_msg_select, 0, STRING("stg6_rsh_diary_01_yn"))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -759,6 +765,7 @@ EVT_BEGIN(evt_diary_read)
         CALL(evt_party_cont_onoff, 0, 0)
         RETURN
     END_IF
+    // "This could be really, REALLY bad." Saying no ends it here.
     CALL(evt_msg_print_add, 0, STRING("stg6_rsh_diary_03"))
     CALL(evt_msg_select, 0, STRING("stg6_rsh_diary_01_yn"))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -767,6 +774,7 @@ EVT_BEGIN(evt_diary_read)
         RETURN
     END_IF
     CALL(evt_msg_continue)
+    // The music fades and Mario reads the first lines of the diary.
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
 #if VERSION >= VERSION_JP
     CALL(evt_mario_dispflag_onoff, 1, 2)
@@ -775,6 +783,7 @@ EVT_BEGIN(evt_diary_read)
     CALL(evt_mario_set_pose, STRING("M_L_2"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_04"), 0, 0)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // The ghost is brought in (once) and starts pulsing between faint and solid.
     CALL(evt_npc_check, STRING("ゆうれい"), LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_npc_entry, STRING("ゆうれい"), STRING("c_ghost_k"))
@@ -804,6 +813,7 @@ EVT_BEGIN(evt_diary_read)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+    // The ghost music plays and the ghost appears right behind Mario: "YOU LOOKED!"
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
@@ -818,6 +828,7 @@ EVT_BEGIN(evt_diary_read)
     CALL(evt_mario_set_pose, STRING("M_I_O"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_05"), 0, STRING("ゆうれい"))
     WAIT_MS(300)
+    // Silence, then the screen blurs with a shaking sound and the camera rolls.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     BEGIN_INLINE_EVENT
         CALL(evt_env_blur_on, 0, 0)
@@ -831,6 +842,7 @@ EVT_BEGIN(evt_diary_read)
     BEGIN_INLINE_EVENT
         CALL(cam_r)
     END_INLINE_EVENT
+    // Four seconds later: Game Over.
     WAIT_MS(4000)
     CALL(evt_fade_set_mapchange_type, 1, -1, 600, -1, -1)
     CALL(evt_seq_set_seq, SEQ_GAME_OVER, 0, 0)
@@ -1005,11 +1017,11 @@ static USER_FUNC(itemUseFunc2) {
     return EVT_RETURN_DONE;
 }
 
-/** Sets args[0] to 1 if Mario is in his 8-bit form (menu flag 0x2000), else 0; picks the partner pose script. */
+/** Sets args[0] to 1 if Mario is in his 8-bit form (WIN_FLAG_8BIT_MARIO), else 0; picks the partner pose script. */
 static USER_FUNC(famicom_check) {
     EvtWord* args = event->args;
 
-    if (wp->flags & 0x2000) {
+    if (wp->flags & WIN_FLAG_8BIT_MARIO) {
         evtSetValue(event, args[0], 1);
     } else {
         evtSetValue(event, args[0], 0);
@@ -1308,7 +1320,9 @@ void winFontSetPitch(f32 pitch, Vec pos, Vec scale, GXColor color, const char* f
     vsprintf(buf, fmt, args);
     FontDrawColor(color);
     FontDrawScaleVec(scale);
-    FontDrawStringVecPitch(&pos, buf, pitch);
+    // FAKE: called through a cast that passes the address of this function's own pos (the same registers as
+    // fontmgr.h's by-value Vec): the plain call first copies pos to a temporary, which the target does not.
+    ((void (*)(Vec*, const char*, f32))FontDrawStringVecPitch)(&pos, buf, pitch);
 }
 #endif
 
@@ -1567,7 +1581,7 @@ void winIconGrayInit(void) {
 
 /**
  * Draws item/menu icon iconId centred at translate, scaled and tinted, with linear filtering.
- * One icon id is remapped to its neighbour (0x11C to 0x11B; 0x115 to 0x114 before the US release).
+ * One icon id is remapped to its neighbour (ICON_115 to ICON_114).
  */
 void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
     Mtx trans;
@@ -1576,15 +1590,9 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
     GXTexObj obj;
     f32 sy;
 
-#if VERSION >= VERSION_US
-    if (iconId == 0x11C) {
-        iconId = 0x11B;
+    if (iconId == ICON_115) {
+        iconId = ICON_114;
     }
-#else
-    if (iconId == 0x115) {
-        iconId = 0x114;
-    }
-#endif
     iconGetTexObj(&obj, iconId);
     GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&obj, GX_TEXMAP0);
@@ -1623,7 +1631,7 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
 
 /**
  * evt_lecture_msg step: blocks until the tutorial has reached step args[0].
- * While waiting it lets input through (clears flag 0x800), and masks it again once the step is reached.
+ * While waiting it lets input through (clears WIN_FLAG_LECTURE_KEY_MASK), and masks it again once the step is reached.
  */
 static USER_FUNC(wait) {
     s32 n = evtGetValue(event, event->args[0]);
@@ -1636,33 +1644,34 @@ static USER_FUNC(wait) {
     return EVT_RETURN_DONE;
 #else
     if (isFirstCall) {
-        wp->flags &= ~0x800;
+        wp->flags &= ~WIN_FLAG_LECTURE_KEY_MASK;
     }
     if (wp->lectureStep < n) {
         return EVT_RETURN_BLOCK;
     }
-    wp->flags |= 0x800;
+    wp->flags |= WIN_FLAG_LECTURE_KEY_MASK;
     return EVT_RETURN_DONE;
 #endif
 }
 
-/** End of the badge tutorial text: clears the key mask flag 0x800 so the player has full control of the menu. */
+/** End of the badge tutorial text: clears WIN_FLAG_LECTURE_KEY_MASK so the player has full control of the menu. */
 #if VERSION >= VERSION_JP
 USER_FUNC(lecture_key_mask_off) {
-    wp->flags &= ~0x800;
+    wp->flags &= ~WIN_FLAG_LECTURE_KEY_MASK;
     return EVT_RETURN_DONE;
 }
 #endif
 
 /**
  * Badge tutorial input filter, run by winMain each frame:
- * while the tutorial is on, only the input the current step asks for gets through (A, then Right, then A, then
- * Start) and doing it advances lectureStep.
+ * while the tutorial is on, only the input the current step asks for gets through and doing it advances lectureStep:
+ * steps 0-1 take A (read from the pad and swallowed), 2-4 Right, 5-8 A, 9 Start. In JP and later nothing gets
+ * through while WIN_FLAG_LECTURE_KEY_MASK is set (outside the script's wait steps).
  */
 static void winLectureKeyMask(void) {
-    if (wp->flags & 0x1000) {
+    if (wp->flags & WIN_FLAG_LECTURE) {
 #if VERSION >= VERSION_JP
-        if (wp->flags & 0x800) {
+        if (wp->flags & WIN_FLAG_LECTURE_KEY_MASK) {
             wp->buttonTrg = 0;
             wp->buttonRep = 0;
             wp->dirTrg = 0;
@@ -1722,9 +1731,9 @@ static void winLectureKeyMask(void) {
  * sets the tutorial flag, which opens the menu straight away, and starts evt_lecture_msg.
  */
 void winLectureOn(void) {
-    wp->flags |= 0x1000;
+    wp->flags |= WIN_FLAG_LECTURE;
 #if VERSION >= VERSION_JP
-    wp->flags |= 0x800;
+    wp->flags |= WIN_FLAG_LECTURE_KEY_MASK;
 #endif
     wp->lectureStep = 0;
     wp->lectureEvent = evtEntry(evt_lecture_msg, 0, 0);
@@ -1733,10 +1742,10 @@ void winLectureOn(void) {
 /** TRUE while the badge tutorial's text script is still running; once it ends, clears the tutorial flag. */
 BOOL winLectureCheck(void) {
 
-    if ((wp->flags & 0x1000) && evtCheckID(wp->lectureEvent->eventId)) {
+    if ((wp->flags & WIN_FLAG_LECTURE) && evtCheckID(wp->lectureEvent->eventId)) {
         return TRUE;
     }
-    wp->flags &= ~0x1000;
+    wp->flags &= ~WIN_FLAG_LECTURE;
     return FALSE;
 }
 

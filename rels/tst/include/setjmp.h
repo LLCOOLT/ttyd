@@ -1,3 +1,4 @@
+// setjmp/longjmp declarations for the SGI GLU tessellator (libtess) in tst.rel.
 #pragma once
 
 /* MSL setjmp/longjmp (Runtime: __setjmp, longjmp), as tst.rel's GLU tessellator uses them. The buffer holds the

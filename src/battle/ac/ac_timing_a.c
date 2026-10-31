@@ -22,6 +22,11 @@ typedef struct TimingAEntry {
 
 #define TA_WORK(ac) ((TimingAWork*)(ac)->work)
 
+/**
+ * Width of the A-press window for Mario's jumps and Goombella's Headbonk, one list per difficulty:
+ * pairs of (up to this many bounces, frames). The first entry is the normal window;
+ * Power Bounce and Multibonk walk the list, so it narrows as the bounces go on.
+ */
 TimingAEntry _ac_timing_a_timing_lv_0[] = {
     {4, 10}, {5, 9}, {6, 8}, {7, 7}, {8, 6}, {9, 5}, {99999, 1},
 };
@@ -44,13 +49,14 @@ TimingAEntry _ac_timing_a_timing_lv_6[] = {
     {0, 5}, {1, 4}, {2, 3}, {3, 2}, {8, 1}, {9, 1}, {99999, 1},
 };
 
+/** The window lists above by difficulty, read by battleAcTimingA_GetSuccessFrame. */
 TimingAEntry* _ac_timing_a_timing_tbl[] = {
     _ac_timing_a_timing_lv_0, _ac_timing_a_timing_lv_1, _ac_timing_a_timing_lv_2,
     _ac_timing_a_timing_lv_3, _ac_timing_a_timing_lv_4, _ac_timing_a_timing_lv_5,
     _ac_timing_a_timing_lv_6,
 };
 
-// inlining off for actionCommandDisp, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it actionCommandDisp is inlined into battleAcDisp_TimingA (62 -> 166 instructions)
 #pragma dont_inline on
 /**
  * Draws the A icon, shown pressed while the jump script sets timing flag bit 0 (btlevtcmd_ac_timing_flag_onoff)
@@ -126,7 +132,7 @@ s32 battleAcResult_TimingA(BattleWork* work) {
     s32 successFrame = battleAcTimingA_GetSuccessFrame(work);
     s32 count = 0;
     s32 i;
-    if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+    if ((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
         if (irand(100) >= 0) {
             work->actionCommands.result = 0;
         } else {

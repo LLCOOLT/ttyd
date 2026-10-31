@@ -132,6 +132,7 @@ extern EvtWord zonbaba_first_event[];
  * Plays BGM_STG0_100DN1 (the boss floor has ambience only).
  */
 EVT_BEGIN(jon_init_evt)
+    // When map events are skipped (a debug warp), the floor number is derived from the name of the map.
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_SKIP_MAP_EVENTS)
         CALL(evt_sub_get_mapname, LW(0))
@@ -157,6 +158,8 @@ EVT_BEGIN(jon_init_evt)
             SET_VALUE(GSW(GSW_JON_FLOOR), 99)
         END_IF
     END_IF
+    // Remember the deepest floor reached, then set up the signboard, the mover, the trader and the enemies of
+    // this floor.
     SET_VALUE(LSW(0), GSW(GSW_JON_FLOOR))
     SET_VALUE(LW(0), LSW(0))
     ADD(LW(0), 1)
@@ -167,6 +170,8 @@ EVT_BEGIN(jon_init_evt)
     CALL_CHILD(idouya_setup)
     CALL_CHILD(gyousyou_setup)
     CALL_CHILD(enemy_setup)
+    // Choose the floor layout from the floor number: the boss floor, a rest-room floor, the floor before one,
+    // or a plain floor.
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
     ADD(LW(0), 1)
     SET_VALUE(LW(1), LW(0))
@@ -218,8 +223,11 @@ EVT_BEGIN(jon_init_evt)
         END_IF
 #endif
     END_SWITCH
+    // Trouble Center job 12 is set up on every floor map.
     CALL_CHILD(iri_12_init)
     CALL(evt_sub_get_mapname, LW(0))
+    // On floor 50 the graffiti wall of Trouble Center job 30 shows its before or after state and reacts to
+    // Bobbery.
     IF_STR_EQUAL(LW(0), STRING("jon_04"))
         IF_INT_EQUAL(GSW(GSW_JON_FLOOR), 49)
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_30_SOLVED), 0)
@@ -276,6 +284,10 @@ EVT_BEGIN(jon_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Enemy number for each of the 100 floors of the Pit of 100 Trials: every group of twenty floors cycles through five
+ * numbers twice and then the next five twice, so the number grows by ten every twenty floors.
+ */
 u8 enemy_100[] = {
     1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 10,
     11, 12, 13, 14, 15, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 16, 17, 18, 19, 20,
@@ -284,6 +296,10 @@ u8 enemy_100[] = {
     41, 42, 43, 44, 45, 41, 42, 43, 44, 45, 46, 47, 48, 49, 46, 47, 48, 49, 46, 51,
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Goomba that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_kuriboo[] = {
     {
         "敵", // name
@@ -313,6 +329,10 @@ NpcSetupInfo npcEnt_kuriboo[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Paragoomba that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_patakuri[] = {
     {
         "敵", // name
@@ -342,6 +362,10 @@ NpcSetupInfo npcEnt_patakuri[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Spania that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_hannya[] = {
     {
         "敵", // name
@@ -371,6 +395,10 @@ NpcSetupInfo npcEnt_hannya[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Fuzzy that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_chorobon[] = {
     {
         "敵", // name
@@ -400,6 +428,10 @@ NpcSetupInfo npcEnt_chorobon[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Bald Cleft that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_sinnosuke[] = {
     {
         "敵", // name
@@ -429,6 +461,10 @@ NpcSetupInfo npcEnt_sinnosuke[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Moon Cleft that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_sinemon[] = {
     {
         "敵", // name
@@ -458,6 +494,10 @@ NpcSetupInfo npcEnt_sinemon[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Koopa Troopa that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_nokonoko[] = {
     {
         "敵", // name
@@ -487,6 +527,10 @@ NpcSetupInfo npcEnt_nokonoko[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Paratroopa that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_patapata[] = {
     {
         "敵", // name
@@ -516,6 +560,10 @@ NpcSetupInfo npcEnt_patapata[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Buzzy Beetle that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_met[] = {
     {
         "敵", // name
@@ -545,6 +593,10 @@ NpcSetupInfo npcEnt_met[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Parabuzzy that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_patamet[] = {
     {
         "敵", // name
@@ -574,6 +626,10 @@ NpcSetupInfo npcEnt_patamet[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Pokey that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_sambo[] = {
     {
         "敵", // name
@@ -603,6 +659,10 @@ NpcSetupInfo npcEnt_sambo[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Dull Bones that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_honenoko[] = {
     {
         "敵", // name
@@ -632,6 +692,10 @@ NpcSetupInfo npcEnt_honenoko[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Dry Bones that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_karon[] = {
     {
         "敵", // name
@@ -661,6 +725,10 @@ NpcSetupInfo npcEnt_karon[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Poison Puff that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_dokugassun[] = {
     {
         "敵", // name
@@ -690,6 +758,10 @@ NpcSetupInfo npcEnt_dokugassun[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Pider that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_piders[] = {
     {
         "敵", // name
@@ -718,6 +790,10 @@ NpcSetupInfo npcEnt_piders[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Boo that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_teresa[] = {
     {
         "敵", // name
@@ -747,6 +823,10 @@ NpcSetupInfo npcEnt_teresa[] = {
     {0},
 };
 
+/**
+ * Guess: floor enemy setup of the Pit of 100 Trials for the Bob-omb species, a wandering enemy that starts a
+ * battle on contact (picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_hbom[] = {
     {
         "敵", // name
@@ -776,6 +856,10 @@ NpcSetupInfo npcEnt_hbom[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Lava Bubble that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_bubble[] = {
     {
         "敵", // name
@@ -805,6 +889,10 @@ NpcSetupInfo npcEnt_bubble[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Chain-Chomp that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_wanwan[] = {
     {
         "敵", // name
@@ -833,6 +921,10 @@ NpcSetupInfo npcEnt_wanwan[] = {
     {0},
 };
 
+/**
+ * Guess: floor enemy setup of the Pit of 100 Trials for the Wizzerd species, a wandering enemy that starts a
+ * battle on contact (picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_mahoon[] = {
     {
         "敵", // name
@@ -862,6 +954,10 @@ NpcSetupInfo npcEnt_mahoon[] = {
     {0},
 };
 
+/**
+ * Guess: floor enemy setup of the Pit of 100 Trials for the Piranha Plant species, a wandering enemy that
+ * starts a battle on contact (picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_pakkun[] = {
     {
         "敵", // name
@@ -891,6 +987,10 @@ NpcSetupInfo npcEnt_pakkun[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Koopatrol that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_togenoko[] = {
     {
         "敵", // name
@@ -920,6 +1020,10 @@ NpcSetupInfo npcEnt_togenoko[] = {
     {0},
 };
 
+/**
+ * Guess: floor enemy setup of the Pit of 100 Trials for the Swooper species, a wandering enemy that starts a
+ * battle on contact (picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_basabasa2[] = {
     {
         "敵", // name
@@ -949,6 +1053,10 @@ NpcSetupInfo npcEnt_basabasa2[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Bristle that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_togedaruma[] = {
     {
         "敵", // name
@@ -978,6 +1086,10 @@ NpcSetupInfo npcEnt_togedaruma[] = {
     {0},
 };
 
+/**
+ * Floor enemy setup of the Pit of 100 Trials: a wandering Crazee Dayzee that starts a battle on contact
+ * (the species picked by enemy_info from enemy_100).
+ */
 NpcSetupInfo npcEnt_pansy[] = {
     {
         "敵", // name
@@ -1007,6 +1119,10 @@ NpcSetupInfo npcEnt_pansy[] = {
     {0},
 };
 
+/**
+ * Setup of Bonetail, the boss of floor 100 of the Pit of 100 Trials; his first appearance runs
+ * zonbaba_first_event.
+ */
 NpcSetupInfo npcEnt_zonbaba[] = {
     {
         "敵", // name
@@ -1042,6 +1158,8 @@ NpcSetupInfo npcEnt_zonbaba[] = {
  * Also notifies the sailor job (iri_12_enemy_dead_event).
  */
 EVT_BEGIN(enemy_setup)
+    // No enemy on a floor where the mover is, nor on the rest-room floors (every tenth floor except floor
+    // 100).
     CALL(evt_npc_check, STRING("移動屋"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
@@ -1054,6 +1172,8 @@ EVT_BEGIN(enemy_setup)
             RETURN
         END_IF
     END_IF
+    // Look up this floor's species and battle, create the enemy NPC and pick a random spot for it on the left
+    // or right half of the room.
     CALL(enemy_info, GSW(GSW_JON_FLOOR), LW(0), LW(1), LW(2))
     CALL(evt_npc_entry, STRING("敵"), LW(0))
     CALL(evt_npc_set_tribe, STRING("敵"), LW(1))
@@ -1069,6 +1189,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_sub_random, 200, LW(4))
         ADD(LW(4), -100)
     END_IF
+    // Goomba family and their Hyper and Dark versions: one setup, placed on the ground.
     IF_STR_EQUAL(LW(1), STRING("クリボー"))
         CALL(evt_npc_setup, PTR(npcEnt_kuriboo))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1093,6 +1214,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_kuriboo))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
     END_IF
+    // Paragoomba family: flying, so placed above the ground.
     IF_STR_EQUAL(LW(1), STRING("パタクリ"))
         CALL(evt_npc_setup, PTR(npcEnt_patakuri))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 50, LW(4))
@@ -1105,6 +1227,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_patakuri))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 50, LW(4))
     END_IF
+    // Spania family (Spania, Hyper Spania and the like).
     IF_STR_EQUAL(LW(1), STRING("ヒンニャー"))
         CALL(evt_npc_setup, PTR(npcEnt_hannya))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1117,6 +1240,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_hannya))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
     END_IF
+    // Fuzzy family and the Green and Flower Fuzzies.
     IF_STR_EQUAL(LW(1), STRING("チョロボン"))
         CALL(evt_npc_setup, PTR(npcEnt_chorobon))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1129,6 +1253,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_chorobon))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
     END_IF
+    // Moon Cleft and Bald Cleft families.
     IF_STR_EQUAL(LW(1), STRING("シンエモン"))
         CALL(evt_npc_setup, PTR(npcEnt_sinemon))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1149,6 +1274,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_sinnosuke))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
     END_IF
+    // Koopa Troopa and Paratroopa families.
     IF_STR_EQUAL(LW(1), STRING("ノコノコ敵"))
         CALL(evt_npc_setup, PTR(npcEnt_nokonoko))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1169,6 +1295,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_patapata))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 50, LW(4))
     END_IF
+    // Buzzy Beetle and Parabuzzy families.
     IF_STR_EQUAL(LW(1), STRING("メット"))
         CALL(evt_npc_setup, PTR(npcEnt_met))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1181,6 +1308,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_patamet))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 50, LW(4))
     END_IF
+    // Pokey and Bone/Mummy Pokey, then the bony enemies.
     IF_STR_EQUAL(LW(1), STRING("サンボ"))
         CALL(evt_npc_setup, PTR(npcEnt_sambo))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1197,6 +1325,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_karon))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
     END_IF
+    // Poison Puff family (the other puffy clouds share this setup).
     IF_STR_EQUAL(LW(1), STRING("ドクガッスン"))
         CALL(evt_npc_setup, PTR(npcEnt_dokugassun))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 10, LW(4))
@@ -1213,6 +1342,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_dokugassun))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 10, LW(4))
     END_IF
+    // Pider family: the spiders hang high above the floor and keep that height as their home position.
     IF_STR_EQUAL(LW(1), STRING("パイダース"))
         CALL(evt_npc_setup, PTR(npcEnt_piders))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 140, LW(4))
@@ -1227,6 +1357,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_set_home_position, STRING("敵"), LW(3), 140, LW(4))
 #endif
     END_IF
+    // Bandit-type thieves share the Goomba setup.
     IF_STR_EQUAL(LW(1), STRING("ボロドー"))
         CALL(evt_npc_setup, PTR(npcEnt_kuriboo))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1239,6 +1370,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_dokugassun))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 10, LW(4))
     END_IF
+    // Bob-omb, Boo, bubble and Chain-Chomp style enemies.
     IF_STR_EQUAL(LW(1), STRING("ボムへい"))
         CALL(evt_npc_setup, PTR(npcEnt_kuriboo))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1297,6 +1429,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_mahoon))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 20, LW(4))
     END_IF
+    // Piranha Plants, Koopatrols, the Swoopers, Bristles and Crazee Dayzees.
     IF_STR_EQUAL(LW(1), STRING("パックンフラワー"))
         CALL(evt_npc_setup, PTR(npcEnt_pakkun))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
@@ -1345,6 +1478,8 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_setup, PTR(npcEnt_pansy))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 0, LW(4))
     END_IF
+    // Bonetail on floor 100: an invisible-to-billboard NPC at the room centre whose appearance is scripted by
+    // zonbaba_first_event.
     IF_STR_EQUAL(LW(1), STRING("ゾンババ"))
         CALL(evt_npc_setup, PTR(npcEnt_zonbaba))
         CALL(evt_npc_set_position, STRING("敵"), 0, 0, 0)
@@ -1354,6 +1489,7 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_set_ry, STRING("敵"), 0)
         SPAWN_EVENT(zonbaba_first_event)
     END_IF
+    // Make the chosen spot the enemy's home, then arm its battle and watch for its defeat.
     CALL(evt_npc_get_position, STRING("敵"), LW(3), LW(4), LW(5))
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_npc_set_home_position, STRING("敵"), LW(3), LW(4), LW(5))
@@ -1361,6 +1497,7 @@ EVT_BEGIN(enemy_setup)
     CALL(evt_npc_set_battle_info, STRING("敵"), LW(2))
     CALL(setup_npc_ex_para, STRING("敵"))
     CALL(yattukeFlag)
+    // Wait until the enemy is dead, then open the exit pipe and report the kill to Trouble Center job 12.
     BEGIN_INLINE_EVENT
         LABEL(1)
         WAIT_FRAMES(1)
@@ -1380,6 +1517,10 @@ EVT_BEGIN(enemy_setup)
     RETURN
 EVT_END()
 
+/**
+ * Item ids of the rest-room chest rewards in the Pit of 100 Trials, one for every tenth floor
+ * (read by evt_open_box).
+ */
 s32 treasure_tbl[] = {
     245, 252, 287, 306, 1, 254, 255, 322,
     303, 291,
@@ -1600,6 +1741,10 @@ EVT_BEGIN(talk_idouya)
 EVT_END()
 #endif
 
+/**
+ * The mover (idouya) that stands at the rest rooms and warps Mario to floors he has already reached;
+ * talk_idouya handles the conversation.
+ */
 NpcSetupInfo npcEnt_idouya[] = {
     {
         "移動屋", // name
@@ -1646,6 +1791,7 @@ EVT_END()
  * non-English).
  */
 EVT_BEGIN(talk_gyousyou)
+    // The trader pitches his "hot products" to Mario and asks whether he wants to see them (yes or no).
     CALL(evt_msg_print, 0, STRING("100kai_item_01"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("100kai_item_00"))
     IF_INT_EQUAL(LW(0), 1)
@@ -1653,6 +1799,7 @@ EVT_BEGIN(talk_gyousyou)
         RETURN
     END_IF
     CALL(evt_msg_continue)
+    // Show the coin window and the list of goods; closing it ends the sale with a goodbye.
     LABEL(0)
     CALL(evt_win_coin_on, 0, LW(12))
     CALL(evt_win_other_select, 15)
@@ -1661,12 +1808,15 @@ EVT_BEGIN(talk_gyousyou)
         CALL(evt_msg_print, 0, STRING("100kai_item_10"), 0, STRING("me"))
         RETURN
     END_IF
+    // Not enough coins for the chosen item: the trader says so and the list comes back.
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_LESS(LW(0), LW(3))
         CALL(evt_win_coin_off, LW(12))
         CALL(evt_msg_print, 0, STRING("100kai_item_03"), 0, STRING("me"))
         GOTO(0)
     END_IF
+    // The trader names the item and its price and asks Mario to confirm (the English text swaps the order of
+    // name and price for some languages).
     IF_INT_GREATER_OR_EQUAL(LW(1), 240)
 #if VERSION <= VERSION_DEMO_US
         CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3), LW(4))
@@ -1720,6 +1870,7 @@ EVT_BEGIN(talk_gyousyou)
         CALL(evt_msg_print_add, 0, STRING("100kai_item_05"))
         RETURN
     END_IF
+    // Mario agrees: the item goes into his pouch, or the trader sighs that he cannot carry any more.
     CALL(evt_pouch_add_item, LW(1), LW(0))
     IF_INT_EQUAL(LW(0), -1)
         CALL(evt_win_coin_off, LW(12))
@@ -1730,6 +1881,7 @@ EVT_BEGIN(talk_gyousyou)
         END_IF
         RETURN
     END_IF
+    // Take the price in coins, thank Mario and offer the list again.
     MULTIPLY(LW(3), -1)
     CALL(evt_pouch_add_coin, LW(3))
     CALL(evt_win_coin_wait, LW(12))
@@ -1763,6 +1915,10 @@ EVT_BEGIN(talk_gyousyou)
     RETURN
 EVT_END()
 
+/**
+ * The traveling trader (gyousyou) of the Pit of 100 Trials, who sells items to Mario; talk_gyousyou runs the
+ * shop.
+ */
 NpcSetupInfo npcEnt_gyousyou[] = {
     {
         "行商人", // name
@@ -1801,11 +1957,13 @@ EVT_BEGIN(gyousyou_setup)
 EVT_END()
 
 /**
- * Guess: a floor trap ("shikake") that is never started in this tree.
+ * Floor "device" (shikake) set-up; nothing in the tree starts it.
  * 20% of the time, when the floor has an enemy,
- * it would flash the screen white on arrival and show one of four trick messages,
- * each setting a battle restriction on the enemy (no partner change, no hammer, no jump,
- * or first-strike bonus) via shikakeFlag.
+ * it would flash the screen white on arrival and show one of four system messages (msg_jon_trick_1 to 4, "the
+ * device
+ * on this level is now active"), each setting a battle rule on the enemy via shikakeFlag:
+ * no ally change, no hammer,
+ * no jump, or double coins after the battle.
  */
 EVT_BEGIN(shikake_setup)
     IF_INT_EQUAL(GSW(GSW_JON_FLOOR), 99)
@@ -1966,6 +2124,10 @@ EVT_BEGIN(floor_clear)
     RETURN
 EVT_END()
 
+/**
+ * Pipes of floor 100: the entrance pipe at the top (dokan_2, filled in by script) and the exit pipe to
+ * Rogueport (tik_06).
+ */
 BeroEntry bero_boss[] = {
     {
         "dokan_2", // hitName
@@ -2013,6 +2175,10 @@ EVT_BEGIN(setup_boss)
     RETURN
 EVT_END()
 
+/**
+ * Pipes of a rest-room floor: the entrance above (dokan_2, set by script), the exit to Rogueport (tik_06)
+ * and the pipe down to the next floor map (jon_00).
+ */
 BeroEntry bero_return[] = {
     {
         "dokan_2", // hitName
@@ -2066,6 +2232,7 @@ BeroEntry bero_return[] = {
     {0},
 };
 
+/** Replacement for the rest-room floor pipe down (dokan_3) from floor 50 on: it leads to jon_01. */
 BeroEntry bero_return2[] = {
     {
         "dokan_3", // hitName
@@ -2087,6 +2254,7 @@ BeroEntry bero_return2[] = {
     {0},
 };
 
+/** Replacement for the rest-room floor pipe down (dokan_3) from floor 70 on: it leads to jon_02. */
 BeroEntry bero_return3[] = {
     {
         "dokan_3", // hitName
@@ -2162,6 +2330,10 @@ EVT_BEGIN(setup_return)
     RETURN
 EVT_END()
 
+/**
+ * Pipes of the floor before a rest room: the entrance above (dokan_2, set by script) and the pipe down to
+ * jon_03.
+ */
 BeroEntry bero_prev_return[] = {
     {
         "dokan_2", // hitName
@@ -2198,6 +2370,7 @@ BeroEntry bero_prev_return[] = {
     {0},
 };
 
+/** Replacement for the pipe down (dokan_1) of the floor before a rest room in the 50s: it leads to jon_04. */
 BeroEntry bero_prev_return2[] = {
     {
         "dokan_1", // hitName
@@ -2219,6 +2392,9 @@ BeroEntry bero_prev_return2[] = {
     {0},
 };
 
+/**
+ * Replacement for the pipe down (dokan_1) of the floor before a rest room from the 70s: it leads to jon_05.
+ */
 BeroEntry bero_prev_return3[] = {
     {
         "dokan_1", // hitName
@@ -2240,6 +2416,9 @@ BeroEntry bero_prev_return3[] = {
     {0},
 };
 
+/**
+ * Replacement for the pipe down (dokan_1) of the floor before a rest room from the 90s: it leads to jon_06.
+ */
 BeroEntry bero_prev_return4[] = {
     {
         "dokan_1", // hitName
@@ -2296,6 +2475,7 @@ EVT_BEGIN(setup_prev_return)
     RETURN
 EVT_END()
 
+/** Pipes of an ordinary floor: the entrance above (dokan_2, set by script) and the pipe down to jon_00. */
 BeroEntry bero_normal[] = {
     {
         "dokan_2", // hitName
@@ -2332,6 +2512,7 @@ BeroEntry bero_normal[] = {
     {0},
 };
 
+/** Replacement for the pipe down (dokan_1) of an ordinary floor from floor 50 on: it leads to jon_01. */
 BeroEntry bero_normal2[] = {
     {
         "dokan_1", // hitName
@@ -2353,6 +2534,7 @@ BeroEntry bero_normal2[] = {
     {0},
 };
 
+/** Replacement for the pipe down (dokan_1) of an ordinary floor from floor 70 on: it leads to jon_02. */
 BeroEntry bero_normal3[] = {
     {
         "dokan_1", // hitName
@@ -3004,6 +3186,8 @@ EVT_END()
  * With the sailor's job active he leaves via iri_12_makkino_return_zonbaba.
  */
 EVT_BEGIN(zonbaba_first_event)
+    // Arriving on floor 100 for the first time: Bonetail is hidden underground and the chest is not placed
+    // yet; if he was already beaten the room is set up with only the chest.
     IF_INT_EQUAL(GSWF(GSWF_JON_BONETAIL_DEFEATED), 1)
         CALL(evt_npc_set_position, STRING("敵"), 0, -1000, 0)
         CALL(evt_npc_flag_onoff, 0, STRING("敵"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -3011,6 +3195,7 @@ EVT_BEGIN(zonbaba_first_event)
         CALL(evt_hitobj_onoff, STRING("baba"), 1, 0)
         RETURN
     END_IF
+    // Fog closes in and control is taken from Mario while Bonetail is placed in front of him, asleep.
     CALL(evt_map_set_fog, 2, 400, 1000, 0, 10, 40)
     CALL(evt_map_fog_onoff, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -3020,6 +3205,7 @@ EVT_BEGIN(zonbaba_first_event)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oFF_jon_06"), MAPOBJ_FLAG_HIDE)
     CALL(evt_seq_wait, 2)
 #if VERSION <= VERSION_DEMO_US
+    // Mario and his partner are startled by the sleeping dragon and step back.
     WAIT_MS(4000)
 #else
     WAIT_MS(3500)
@@ -3040,6 +3226,7 @@ EVT_BEGIN(zonbaba_first_event)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_mario_set_dir_npc, STRING("敵"))
     CALL(evt_party_set_dir_npc, 0, STRING("敵"))
+    // Bonetail wakes with a roar and stands up while the ground shakes.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_GONBABA_FLY2"))
     BEGIN_INLINE_EVENT
         CALL(evt_snd_sfxon_3d_ex, STRING("SFX_STG1_GNB_ROAR2"), 0, 0, 0, 255, 255, 4300, 16, 0)
@@ -3049,6 +3236,7 @@ EVT_BEGIN(zonbaba_first_event)
     END_INLINE_EVENT
     SPAWN_EVENT(gonbaba_standup_shake)
     SPAWN_EVENT(gonbaba_fog_change)
+    // The camera pulls back to show his size; the screen shakes.
     CALL(evt_cam3d_evt_set, -755, 24, 376, -84, 114, -22, 4500, 11)
     WAIT_MS(4000)
     LOOP(30)
@@ -3058,10 +3246,12 @@ EVT_BEGIN(zonbaba_first_event)
         WAIT_MS(15)
     END_LOOP
     WAIT_MS(3000)
+    // The Bonetail battle starts and the script waits for it to end.
     CALL(evt_npc_set_battle_info, STRING("敵"), 51)
     CALL(evt_npc_battle_start, STRING("敵"))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_cam3d_evt_set, -769, 50, 527, -22, 114, 7, 1, 11)
+    // Bonetail is beaten: he collapses where he stood, shaking the room as he falls.
     CALL(evt_npc_set_anim, STRING("敵"), STRING("GNB_H_1"))
     CALL(evt_map_fog_onoff, 0)
     CALL(evt_npc_set_position, STRING("敵"), 0, 60, 0)
@@ -3099,6 +3289,7 @@ EVT_BEGIN(zonbaba_first_event)
     WAIT_MS(600)
     CALL(evt_cam3d_evt_set, -145, 80, 882, 104, 114, 81, 1000, 11)
     WAIT_MS(1000)
+    // His mouth opens and the treasure chest tumbles out, bouncing across the floor.
     CALL(evt_mobj_itembox, STRING("box"), 250, 60, 0, 1, 0, PTR(evt_open_box), GSWF(GSWF_JON_FLOOR100_CHEST_OPENED))
     CALL(evt_mobj_flag_onoff, 0, STRING("box"), MOBJ_FLAG_FALL)
     BEGIN_INLINE_EVENT
@@ -3154,6 +3345,7 @@ EVT_BEGIN(zonbaba_first_event)
         CALL(evt_mobj_set_y_position, STRING("box"), 0)
     END_INLINE_EVENT
     WAIT_MS(1000)
+    // Mario and his partner react to the chest; the room returns to normal.
     CALL(evt_npc_set_anim, STRING("敵"), STRING("GNB_H_3"))
     WAIT_MS(200)
     CALL(evt_cam3d_evt_set, 255, 105, 648, 255, 55, 150, 500, 11)
@@ -3236,7 +3428,9 @@ static USER_FUNC(iri_12_paper_init) {
 
 /**
  * Script helper: args[0] = 0..3 picks the battle restriction put on the floor's enemy:
- * 0 no party change, 1 no hammer, 2 no jump, 3 first-strike bonus.
+ * 0 no party change, 1 no hammer, 2 no jump, 3 NPC_BATTLE_FIRST_STRIKE_BONUS,
+ * which adds 1 to the coin multiplier
+ * (msg_jon_trick_4 announces double coins).
  */
 static USER_FUNC(shikakeFlag) {
     s32 type = evtGetValue(event, event->args[0]);

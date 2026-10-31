@@ -734,6 +734,7 @@ EVT_END()
  * LW(0) is the DoorParam; LW(15) bits: 2 = no darkening, 4 = start the wall event early.
  */
 EVT_BEGIN(evt_door_open)
+    // Lock the controls and run the door's own open script, if it has one.
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     POKE_INT(1, PTR(&DoorFLAG))
@@ -742,6 +743,8 @@ EVT_BEGIN(evt_door_open)
         SET_VALUE(LF(0), 0)
         SPAWN_EVENT(LW(1))
     END_IF
+    // Set up the rooms: the outside stops culling and fading, the camera heads for the door,
+    // the door itself stays solid, and the inside is revealed with its collision switched on.
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_save_mapflag, LW(1))
@@ -771,11 +774,14 @@ EVT_BEGIN(evt_door_open)
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
     END_IF
+    // Hide the door's NPCs if it asks for that,
+    // and keep Mario, partners and NPCs lit while the outside darkens.
     CALL(evt_door_param, LW(0), 9, LW(1))
     IF_BITS_SET(LW(1), 1)
         CALL(npc_hide_onoff, LW(0), 0)
     END_IF
     CALL(door_dark_flag, LW(0), 1)
+    // With bit 4 the house wall swings open early, half a second in.
     IF_BITS_SET(LW(15), 4)
         CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
         IF_INT_NOT_EQUAL(LW(9), 0)
@@ -802,6 +808,8 @@ EVT_BEGIN(evt_door_open)
 #if VERSION >= VERSION_JP
     CALL(N_evt_mario_party_door_halve_hitbox)
 #endif
+    // Mario walks to the spot outside the door with the partners beside him,
+    // and the outside starts to darken.
     CALL(evt_door_param, LW(0), 5, LW(1), LW(2), LW(3))
     CALL(evt_mario_mov_pos2, LW(1), LW(3), FLOAT(135.0f))
     CALL(evt_party_move_beside_mario, 0)
@@ -809,6 +817,7 @@ EVT_BEGIN(evt_door_open)
     IF_BITS_CLEAR(LW(15), 2)
         SPAWN_EVENT(door_dark)
     END_IF
+    // The door swings open with its sound.
     SPAWN_EVENT(door_open_se)
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
     IF_INT_NOT_EQUAL(LW(7), 0)
@@ -827,6 +836,7 @@ EVT_BEGIN(evt_door_open)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // The party walks in to the inside spot while the door swings shut behind them.
     WAIT_MS(500)
     CALL(evt_door_param, LW(0), 4, LW(1), LW(2), LW(3))
     CALL(evt_mario_party_door_move, LW(1), LW(3), FLOAT(135.0f))
@@ -850,6 +860,7 @@ EVT_BEGIN(evt_door_open)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // Otherwise the house wall swings open now.
     IF_BITS_CLEAR(LW(15), 4)
         CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
         IF_INT_NOT_EQUAL(LW(9), 0)
@@ -872,6 +883,7 @@ EVT_BEGIN(evt_door_open)
             END_INLINE_EVENT
         END_IF
     END_IF
+    // The outside finishes darkening, and the door's out-piece, if any, swings down with its sound.
     WAIT_MS(500)
     IF_BITS_CLEAR(LW(15), 2)
         SPAWN_EVENT(door_dark2)
@@ -895,6 +907,7 @@ EVT_BEGIN(evt_door_open)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // The camera is released, the controls come back and the indoor sound takes over.
     WAIT_MS(500)
     CALL(evt_cam3d_evt_xyz_off, 0, 11)
     POKE_INT(0, PTR(&DoorFLAG))
@@ -910,6 +923,7 @@ EVT_END()
  * sets GF(0) and holds the door open until the map's script clears it, then closes it and darkens the outside.
  */
 EVT_BEGIN(evt_door_open_bom_01)
+    // Run the door's open script, then set up the rooms as evt_door_open does, without moving the camera.
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         SPAWN_EVENT(LW(1))
@@ -938,6 +952,7 @@ EVT_BEGIN(evt_door_open_bom_01)
         CALL(evt_hitobj_onoff, LW(2), 1, 1)
     END_IF
     CALL(door_dark_flag, LW(0), 1)
+    // The door swings open with its sound.
     SPAWN_EVENT(door_open_se)
 #if VERSION == VERSION_JP
     CALL(N_evt_mario_party_door_halve_hitbox)
@@ -958,6 +973,7 @@ EVT_BEGIN(evt_door_open_bom_01)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // Hold the door open until the map's cutscene clears GF(0).
     WAIT_MS(500)
     SET_VALUE(GF(0), 1)
     LOOP(0)
@@ -966,6 +982,7 @@ EVT_BEGIN(evt_door_open_bom_01)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The outside darkens and the door swings shut.
     SPAWN_EVENT(door_dark)
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
     IF_INT_NOT_EQUAL(LW(7), 0)
@@ -986,6 +1003,7 @@ EVT_BEGIN(evt_door_open_bom_01)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // The house wall swings open, the outside finishes darkening and the out-piece swings down.
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
     IF_INT_NOT_EQUAL(LW(9), 0)
         BEGIN_INLINE_EVENT
@@ -1025,14 +1043,18 @@ EVT_BEGIN(evt_door_open_bom_01)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // The indoor sound takes over.
     WAIT_MS(500)
     CALL(snd_door_in)
     RETURN
 EVT_END()
 
 /**
- * Guess: opens a door for a cutscene in Rogueport (gor_02/gor_03) without the door swing or Mario walking in:
- * shows the inside, darkens the outside and runs the wall events.
+ * Opens a house without the door swing or Mario walking in: shows the inside, darkens the outside
+ * and runs the wall events.
+ * Run by the case events of Rogueport houses with unusual entrances: gor_02 house 03, after Mario rolls in
+ * (SFX_STG4_MARIO_ROLL_DOWN1/2), and gor_03 house 3, entered through a chest of drawers.
+ * Guess: "roll" refers to that rolling entrance.
  */
 EVT_BEGIN(evt_door_open_roll)
     CALL(evt_mario_key_onoff, 0)
@@ -1113,6 +1135,7 @@ EVT_END()
  * 16 = use the exit spot measured from Mario (evt_door_param 11).
  */
 EVT_BEGIN(evt_door_close)
+    // Lock the controls, run the door's close script and send the camera to the spot outside the door.
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     POKE_INT(1, PTR(&DoorFLAG))
@@ -1131,6 +1154,7 @@ EVT_BEGIN(evt_door_close)
         ADD(LW(5), 2)
         CALL(evt_cam3d_evt_set_xyz, LW(1), LW(5), LW(3), 0, 150, 11)
     END_INLINE_EVENT
+    // The outside starts to light up again and the out-piece swings back up with its sound.
     IF_BITS_CLEAR(LW(15), 2)
         SPAWN_EVENT(door_light2)
     END_IF
@@ -1150,6 +1174,7 @@ EVT_BEGIN(evt_door_close)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // The house wall swings shut with its sound.
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
     IF_INT_NOT_EQUAL(LW(9), 0)
         BEGIN_INLINE_EVENT
@@ -1173,6 +1198,7 @@ EVT_BEGIN(evt_door_close)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // The outside finishes lighting up and the door swings open.
     WAIT_MS(500)
     IF_BITS_CLEAR(LW(15), 2)
         SPAWN_EVENT(door_light)
@@ -1195,6 +1221,7 @@ EVT_BEGIN(evt_door_close)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // The party walks out (unless bit 8) and the door swings shut behind them.
     WAIT_MS(500)
     IF_BITS_CLEAR(LW(15), 16)
         CALL(evt_door_param, LW(0), 5, LW(1), LW(2), LW(3))
@@ -1225,6 +1252,7 @@ EVT_BEGIN(evt_door_close)
         END_INLINE_EVENT
         WAIT_MS(500)
     END_IF
+    // The camera returns to normal, the door's NPCs show again and the inside is hidden (kept with bit 1).
     CALL(evt_cam3d_evt_xyz_off, 100, 11)
     CALL(door_dark_flag, LW(0), 0)
     CALL(evt_door_param, LW(0), 9, LW(1))
@@ -1242,6 +1270,7 @@ EVT_BEGIN(evt_door_close)
     IF_INT_NOT_EQUAL(LW(2), 0)
         CALL(evt_hitobj_onoff, LW(2), 1, 0)
     END_IF
+    // The outside and the door are drawn as before, and the outside's saved culling state is restored.
     CALL(evt_door_param, LW(0), 2, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_NO_BLEND)
@@ -1255,6 +1284,7 @@ EVT_BEGIN(evt_door_close)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_door_load_mapflag, LW(1))
     END_IF
+    // The controls come back and the outdoor sound returns.
     POKE_INT(0, PTR(&DoorFLAG))
     WAIT_FRAMES(2)
     CALL(evt_mario_key_onoff, 1)
@@ -1264,8 +1294,8 @@ EVT_BEGIN(evt_door_close)
 EVT_END()
 
 /**
- * Guess: cutscene counterpart of evt_door_open_roll (gor_03):
- * restores the outside and hides the inside without the door swing or Mario walking out.
+ * Counterpart of evt_door_open_roll: restores the outside and hides the inside without the door swing
+ * or Mario walking out. gor_03's case script for house 4 runs it.
  */
 EVT_BEGIN(evt_door_close_roll)
     CALL(evt_mario_key_onoff, 0)

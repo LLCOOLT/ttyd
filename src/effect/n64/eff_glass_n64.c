@@ -10,6 +10,7 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 
+/** 16x16 glass shard sprite. */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, 1024, 0, 0, 0, 0, 255},
@@ -17,6 +18,7 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 1024, 0, 0, 0, 255},
 };
 
+/** 48x48 four-point flash the odd shard types add at the end of their glint cycle; its edges fade out. */
 static effN64Vtx size48x48_tex32x32_vtx[5] = {
     {-32, 0, 0, 0, 0, 255, 255, 255, 0},
     {0, -32, 0, 1024, 0, 255, 255, 255, 0},

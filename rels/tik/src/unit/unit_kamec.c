@@ -18,9 +18,18 @@
 #include "battle/battle_database_common.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
+#include "eff/n64/eff_pokopi_pcharge_n64.h"
+#include "eff/n64/eff_thunderflare_n64.h"
 
-EffectEntry* effPokopiPchargeN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
-EffectEntry* effThunderflareN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
+// Unit work slots of this unit (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_KAMEC_FLYING = 0,       // nonzero while it rides its broom (sky pose and data tables); clones copy it
+    UW_KAMEC_IS_CLONE = 1,     // 1 for a clone (unit_kamec_bunsin), 0 for the real Magikoopa
+    UW_KAMEC_KILL_CLONES = 2,  // 1 when the real one is hit while clones exist: they vanish after the damage
+    UW_KAMEC_VANISHING = 3,    // 1 once a clone is being removed (it fades out only once)
+    UW_KAMEC_STAFF_EFFECT = 4, // EffectEntry of the wand-charge effect (eff_staff1/eff_staff2)
+    UW_KAMEC_MAGIC_EFFECT = 5, // EffectEntry of the current spell effect (eff_magic)
+};
 
 static USER_FUNC(eff_magic);
 static USER_FUNC(kamec_copy_status);
@@ -90,10 +99,14 @@ static USER_FUNC(eff_magic_get_posX) {
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
-    evtSetFloat(event, args[1], ((EffMagic1N64Work*)((EffectEntry*)unit->work[5])->userdata)->offset.x);
+    evtSetFloat(event, args[1], ((EffMagic1N64Work*)((EffectEntry*)unit->work[UW_KAMEC_MAGIC_EFFECT])->userdata)->offset.x);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit kind of the Magikoopa (HP 7, level 25): its size, offsets, damage sounds, status vulnerability,
+ * parts and init event.
+ */
 BattleUnitKind unit_kamec = {
     12,
     "btl_un_kamec",
@@ -160,6 +173,10 @@ BattleUnitKind unit_kamec = {
     data_table,
 };
 
+/**
+ * Unit kind of the Magikoopa (HP 7, level 0): its size, offsets, damage sounds, status vulnerability,
+ * parts and init event.
+ */
 BattleUnitKind unit_kamec_bunsin = {
     13,
     "btl_un_kamec_bunsin",
@@ -218,7 +235,7 @@ BattleUnitKind unit_kamec_bunsin = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x400000,
+    UNIT_ATTR_NO_DAMAGE_NUMBER,
     &regist,
     2,
     parts,
@@ -226,18 +243,24 @@ BattleUnitKind unit_kamec_bunsin = {
     data_table_bunsin,
 };
 
+/** Defence of the Magikoopa: no damage reduction. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of the Magikoopa: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Magikoopa (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {70, 70, 60, 100, 60, 100, 100, 60, 100, 50, 100, 50, 100, 50, 50, 40, 70, 100, 60, 100, 100, 95};
 #else
+/** Status vulnerability of the Magikoopa (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {70, 75, 80, 100, 70, 100, 100, 70, 100, 90, 100, 90, 100, 95, 80, 70, 80, 100, 80, 100, 100, 95};
 #endif
 
+/** Status vulnerability of the Magikoopa (clone) (percent chance to take each status): immune to sleep. */
 static StatusVulnerability regist_bunsin = {0};
 
+/** Pose table of the Magikoopa: maps each battle pose to the animation it plays (KMK_* animations). */
 static PoseTableEntry pose_table[] = {
     {1, "KMK_N_1"},
     {2, "KMK_Y_1"},
@@ -245,19 +268,20 @@ static PoseTableEntry pose_table[] = {
     {5, "KMK_K_1"},
     {4, "KMK_X_1"},
     {3, "KMK_X_1"},
-    {28, "KMK_S_1"},
+    {BTL_POSE_NORMAL, "KMK_S_1"},
     {29, "KMK_Q_1"},
     {30, "KMK_Q_1"},
     {31, "KMK_S_1"},
-    {39, "KMK_D_1"},
-    {42, "KMK_R_1"},
-    {40, "KMK_W_1"},
-    {56, "KMK_X_1"},
-    {57, "KMK_X_1"},
+    {BTL_POSE_DAMAGE, "KMK_D_1"},
+    {BTL_POSE_RUN, "KMK_R_1"},
+    {BTL_POSE_WALK, "KMK_W_1"},
+    {BTL_POSE_DANGER, "KMK_X_1"},
+    {BTL_POSE_PERIL, "KMK_X_1"},
     {BTL_POSE_TALK, "KMK_T_1"},
     {BTL_POSE_STAY_DEFAULT, "KMK_S_1"},
 };
 
+/** Pose table (sky) of the Magikoopa: maps each battle pose to the animation it plays (KMK_* animations). */
 static PoseTableEntry pose_table_sky[] = {
     {1, "KMK_N_2"},
     {2, "KMK_Y_2"},
@@ -265,19 +289,23 @@ static PoseTableEntry pose_table_sky[] = {
     {5, "KMK_K_2"},
     {4, "KMK_X_2"},
     {3, "KMK_X_2"},
-    {28, "KMK_S_2"},
+    {BTL_POSE_NORMAL, "KMK_S_2"},
     {29, "KMK_Q_2"},
     {30, "KMK_Q_2"},
     {31, "KMK_S_2"},
-    {39, "KMK_D_2"},
-    {42, "KMK_R_2"},
-    {40, "KMK_W_2"},
-    {56, "KMK_X_2"},
-    {57, "KMK_X_2"},
+    {BTL_POSE_DAMAGE, "KMK_D_2"},
+    {BTL_POSE_RUN, "KMK_R_2"},
+    {BTL_POSE_WALK, "KMK_W_2"},
+    {BTL_POSE_DANGER, "KMK_X_2"},
+    {BTL_POSE_PERIL, "KMK_X_2"},
     {BTL_POSE_TALK, "KMK_T_2"},
     {BTL_POSE_STAY_DEFAULT, "KMK_S_2"},
 };
 
+/**
+ * Data table of the Magikoopa: event handlers for dodging, a First Strike on it (no reaction),
+ * being defeated and being blown away dead.
+ */
 static BattleDataEntry data_table[] = {
     {49, kamec_subset_dead_event},
     {58, kamec_subset_blow_dead_event},
@@ -286,6 +314,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Data table of the airborne Magikoopa: its defeat, blown-away defeat, dodge,
+ * fall out of the air and First Strike reactions.
+ */
 static BattleDataEntry data_table_sky[] = {
     {49, kamec_subset_dead_event},
     {58, kamec_subset_blow_dead_event},
@@ -295,12 +327,17 @@ static BattleDataEntry data_table_sky[] = {
     {0},
 };
 
+/** Data table of a Magikoopa clone: its dodge reaction; a First Strike on it is ignored. */
 static BattleDataEntry data_table_bunsin[] = {
     {46, avoid_miss_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/**
+ * Data table of an airborne Magikoopa clone: its dodge reaction,
+ * the fall when knocked out of the air and its First Strike reaction.
+ */
 static BattleDataEntry data_table_sky_bunsin[] = {
     {46, avoid_miss_event},
     {14, dmg_fall_event},
@@ -308,11 +345,13 @@ static BattleDataEntry data_table_sky_bunsin[] = {
     {0},
 };
 
+/** Parts of the Magikoopa (2 parts): hit positions, defences, attributes and pose tables. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_kamec", "c_kamek", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
-    {2, "btl_un_kamec", "c_kamek", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_kamec", "c_kamek", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
+    {2, "btl_un_kamec", "c_kamek", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Weapon of the Magikoopa's attack spell: 4 damage. */
 static BattleWeapon weapon_kamec_attack_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -331,7 +370,7 @@ static BattleWeapon weapon_kamec_attack_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -353,6 +392,7 @@ static BattleWeapon weapon_kamec_attack_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Magikoopa's Huge spell: no HP damage; may inflict size change. */
 static BattleWeapon weapon_kamec_dekadeka_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -370,7 +410,7 @@ static BattleWeapon weapon_kamec_dekadeka_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -391,6 +431,7 @@ static BattleWeapon weapon_kamec_dekadeka_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Magikoopa's Electric spell: no HP damage; may inflict electric shock. */
 static BattleWeapon weapon_kamec_biribiri_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -408,7 +449,7 @@ static BattleWeapon weapon_kamec_biribiri_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -429,6 +470,7 @@ static BattleWeapon weapon_kamec_biribiri_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Magikoopa's Invisible spell: no HP damage; may inflict invisibility. */
 static BattleWeapon weapon_kamec_trans_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -446,7 +488,7 @@ static BattleWeapon weapon_kamec_trans_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -466,6 +508,7 @@ static BattleWeapon weapon_kamec_trans_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Magikoopa's defence-up spell: no HP damage; may inflict defence change. */
 static BattleWeapon weapon_kamec_katikati_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -483,7 +526,7 @@ static BattleWeapon weapon_kamec_katikati_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -505,6 +548,7 @@ static BattleWeapon weapon_kamec_katikati_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Magikoopa's heal spell: no HP damage. */
 static BattleWeapon weapon_kamec_recover_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -522,7 +566,7 @@ static BattleWeapon weapon_kamec_recover_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, // acHelpMsg..special
@@ -539,6 +583,7 @@ static BattleWeapon weapon_kamec_recover_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Magikoopa's heal-all spell: no HP damage. */
 static BattleWeapon weapon_kamec_all_recover_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -556,7 +601,7 @@ static BattleWeapon weapon_kamec_all_recover_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, // acHelpMsg..special
@@ -572,6 +617,7 @@ static BattleWeapon weapon_kamec_all_recover_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Spawn setup for a Magikoopa clone: starts far off-screen until the Magikoopa places it. */
 static BattleUnitSetup entry_kamec = {
     &unit_kamec_bunsin, // unitKindParams
     1, // alliance
@@ -585,9 +631,9 @@ static BattleUnitSetup entry_kamec = {
 
 /** Init script of the real Magikoopa. Registers its wait, attack, damage and other scripts and starts it waiting. */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KAMEC_VANISHING, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KAMEC_STAFF_EFFECT, 0)
     CALL_CHILD(init_event2)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -599,19 +645,19 @@ static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_FLYING, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_sky))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_sky))
         ELSE
             CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_sky_bunsin))
         END_IF
-        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 4)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 2048)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
+        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_FLOATING)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_WINGED)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 40, LW(2))
         CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 40, LW(2))
@@ -620,15 +666,16 @@ static EVT_BEGIN(init_event2)
 EVT_END()
 
 /**
- * Guess: Fades the Magikoopa out (alpha from 254 down to 0) when it vanishes;
- * used when it teleports or the clones appear.
+ * Fades the unit in LW(0) (part 1) out, alpha 254 to 0 over 30 frames, and turns on its part's no-shadow
+ * attribute; does nothing for unit -1. Used by bunsin_kill_event when a clone vanishes and by bunsin_magic_event
+ * when the caster disappears before its clones appear.
  */
 static EVT_BEGIN(alpha_down_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
     CALL(btlevtcmd_SetAlpha, LW(0), 1, 254)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     CALL(evt_sub_intpl_init, 0, 254, 0, 30)
     LOOP(30)
@@ -636,21 +683,26 @@ static EVT_BEGIN(alpha_down_event)
         CALL(btlevtcmd_SetAlpha, LW(0), 1, LW(1))
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(btlevtcmd_OnPartsAttribute, LW(0), 1, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, LW(0), 1, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetAlpha, LW(0), 1, 0)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     RETURN
 EVT_END()
 
-/** Guess: Fades the Magikoopa in (alpha from 0 up to 255) when it appears again. */
+/**
+ * Fades the unit in LW(0) (part 1) back in: turns the no-shadow attribute off
+ * and raises alpha from 0 to 254 over
+ * 30 frames, ending at 255; does nothing for unit -1.
+ * bunsin_magic_event spawns it for the caster and each clone.
+ */
 static EVT_BEGIN(alpha_up_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
-    CALL(btlevtcmd_OffPartsAttribute, LW(0), 1, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, LW(0), 1, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetAlpha, LW(0), 1, 0)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     CALL(evt_sub_intpl_init, 0, 0, 254, 30)
     LOOP(30)
@@ -659,7 +711,7 @@ static EVT_BEGIN(alpha_up_event)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(btlevtcmd_SetAlpha, LW(0), 1, 255)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     RETURN
 EVT_END()
@@ -672,12 +724,12 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KAMEC_KILL_CLONES, 0)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(kamec_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KAMEC_KILL_CLONES, 1)
         END_IF
     ELSE
         SET_VALUE(LW(0), -2)
@@ -687,7 +739,7 @@ static EVT_BEGIN(damage_event)
     CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_KILL_CLONES, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL_CHILD(kamec_subset_bunsin_all_kill)
         END_IF
@@ -700,7 +752,7 @@ EVT_END()
  * and spawns bunsin_kill_event for each existing one.
  */
 static EVT_BEGIN(kamec_subset_bunsin_all_kill)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(kamec_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -727,9 +779,13 @@ static EVT_BEGIN(kamec_subset_bunsin_all_kill)
 EVT_END()
 
 /**
- * Guess: Death script of the Magikoopa: plays the death sounds, clears its statuses,
- * kills all its clones and then removes the unit (normally,
- * or the special variant when the damage code says it was blown away).
+ * Death script of the Magikoopa (data event 49), for the unit in LW(10): runs its data event 50 if it has one,
+ * spins with the death sounds, puffs smoke, banks its coins, experience and star points, tips over,
+ * drops its held item, clears its statuses, hides itself,
+ * kills all its clones (kamec_subset_bunsin_all_kill) and
+ * removes the unit: fully (KillUnit 0) when the damage code has DAMAGE_FLAG_DEFEATED,
+ * otherwise it is only marked
+ * inactive (KILL_UNIT_INACTIVE). Being blown away is handled by kamec_subset_blow_dead_event instead.
  */
 static EVT_BEGIN(kamec_subset_dead_event)
     CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
@@ -737,7 +793,7 @@ static EVT_BEGIN(kamec_subset_dead_event)
         CALL(btlevtcmd_RunDataEventChild, LW(10), 50)
     END_IF
     SET_VALUE(LW(0), 48)
-    CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), UNIT_FLAG_HIDE_HELD_ITEM)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LABEL(10)
     WAIT_FRAMES(1)
@@ -775,10 +831,10 @@ static EVT_BEGIN(kamec_subset_dead_event)
     END_IF
     CALL(btlevtcmd_GetBackItem, LW(10))
     CALL(btlevtcmd_ClearAllStatus, LW(10))
-    CALL(btlevtcmd_OnAttribute, LW(10), 16777216)
-    CALL(btlevtcmd_OnAttribute, LW(10), 536870912)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_NO_SHADOW)
     CALL_CHILD(kamec_subset_bunsin_all_kill)
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_KillUnit, LW(10), 0)
     ELSE
@@ -794,7 +850,7 @@ EVT_END()
 static EVT_BEGIN(kamec_subset_blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), BTL_POSE_DAMAGE)
     BEGIN_SIBLING_EVENT
         LABEL(0)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 20, 0)
@@ -816,11 +872,13 @@ static EVT_BEGIN(kamec_subset_blow_dead_event)
 EVT_END()
 
 /**
- * Runs when an attack misses the Magikoopa; kills the clones (bunsin_kill_event) so the player sees
- * which one was real. Guess.
+ * Data event 46, run by the default damage event for avoid code 40 (a plain miss: an evasive part or the
+ * accuracy
+ * roll): when this unit is a clone (unit work 1 set at its spawn), it removes itself (bunsin_kill_event on
+ * BTL_UNIT_SELF); the real Magikoopa does nothing.
  */
 static EVT_BEGIN(avoid_miss_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(0), -2)
         CALL_CHILD(bunsin_kill_event)
@@ -834,11 +892,11 @@ static EVT_BEGIN(bunsin_kill_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, LW(0), 3, LW(1))
+    CALL(btlevtcmd_GetUnitWork, LW(0), UW_KAMEC_VANISHING, LW(1))
     IF_INT_EQUAL(LW(1), 1)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_SetUnitWork, LW(0), 3, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(0), UW_KAMEC_VANISHING, 1)
     CALL_CHILD(alpha_down_event)
     LABEL(10)
     CALL(btlevtcmd_WaitAttackEnd)
@@ -852,31 +910,33 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 /**
- * Fall reaction when a Magikoopa is hit while floating:
- * it switches to the clone data table, fades, falls with SFX_ENM_FALL1 and lands. Guess.
+ * Data event 14 of the flying tables, run when a hit knocks the Magikoopa down (DAMAGE_FLAG_GROUNDED): it takes
+ * the ground data table (data_table, or data_table_bunsin for a clone), shows part 2 (KMK_H_1) at its position
+ * and fades it out, falls to the ground with SFX_ENM_FALL1, makes the landing spot its home, clears unit work 0
+ * and reruns init_event2.
  */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 4)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2048)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_FLOATING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_WINGED)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
     ELSE
         CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_bunsin))
     END_IF
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
     BEGIN_INLINE_EVENT
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KMK_H_1"))
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
         WAIT_FRAMES(20)
         CALL(evt_sub_intpl_init, 0, 255, 0, 30)
         LOOP(30)
@@ -884,7 +944,7 @@ static EVT_BEGIN(dmg_fall_event)
             CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(1))
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
     END_INLINE_EVENT
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -892,13 +952,17 @@ static EVT_BEGIN(dmg_fall_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 10, -1)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     WAIT_MS(500)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KAMEC_FLYING, 0)
     CALL_CHILD(init_event2)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
     RETURN
 EVT_END()
 
-/** Position the Magikoopa takes for a first-strike reaction (the pre-battle attack by Mario). Guess. */
+/**
+ * Data event 48 of the flying Magikoopa (data_table_sky), run by the default damage event when the battle opens
+ * with Mario's or the partner's First Strike on it (damage code 0x39): sets its Y to 10 and waits for the attack
+ * to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -914,13 +978,16 @@ EVT_END()
  * clones exist and on random chances.
  */
 static EVT_BEGIN(attack_event)
+    // In a confused or forced turn it simply fires its attack spell.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_kamec_attack_magic))
         CALL_CHILD(attack_magic_event)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    // A clone (not the real Magikoopa) does nothing on its own turn;
+    // the real one may use an item instead of casting.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF
@@ -929,6 +996,8 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(LW(0))
         GOTO(99)
     END_IF
+    // Only one Magikoopa is left: it casts its attack spell most of the time, sometimes heals an ally,
+    // or else splits into clones.
     CALL(kamec_get_live_num, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         LABEL(10)
@@ -956,9 +1025,10 @@ static EVT_BEGIN(attack_event)
             GOTO(99)
         END_IF
     ELSE
+        // Clones are out: the real one shoots its attack spell (a confused one is flustered).
         CALL(kamec_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
                 CALL_CHILD(subsetevt_confuse_flustered)
                 GOTO(99)
@@ -967,6 +1037,9 @@ static EVT_BEGIN(attack_event)
             CALL_CHILD(attack_magic_event)
             GOTO(99)
         ELSE
+            // Otherwise it picks a spell at random: the attack spell most often, or else the Huge,
+            // defence-up, Electric, Invisible and heal spells,
+            // trying again when no ally needs the chosen one.
             LABEL(20)
             SET_VALUE(LW(1), 50)
             ADD(LW(1), 10)
@@ -1036,22 +1109,27 @@ static EVT_BEGIN(attack_event)
             END_IF
         END_IF
     END_IF
+    // The spell is done and the Magikoopa returns to waiting.
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
- * Guess: Spell wind-up on the ground: the staff is raised with SFX_ENM_KAMEKU_MAGIC1,
- * 4 and 8 while the clones copy the pose (kamec_get_bunsin).
+ * Spell-casting animation on the ground at another unit: the KMK_A_1A to A_1E wand poses with
+ * SFX_ENM_KAMEKU_MAGIC1, 4 and 8, copied by every clone (kamec_get_bunsin); with LW(15) = 0 the caster and its
+ * clones show the thunder-flare staff effect (eff_staff1), otherwise only the caster shows the charge light
+ * (eff_staff2).
  */
 static EVT_BEGIN(ground_magic_common_event1)
+    // The magic hum plays twice while the Magikoopa and its clones prepare.
     BEGIN_SIBLING_EVENT
         LOOP(2)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KAMEKU_MAGIC1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             WAIT_FRAMES(40)
         END_LOOP
     END_SIBLING_EVENT
+    // A flare of light gathers on the staff (the real one's, and every clone's).
     CALL(kamec_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
     IF_INT_EQUAL(LW(15), 0)
         BEGIN_SIBLING_EVENT
@@ -1082,6 +1160,7 @@ static EVT_BEGIN(ground_magic_common_event1)
             CALL(eff_staff2, BTL_UNIT_SELF)
         END_SIBLING_EVENT
     END_IF
+    // The Magikoopa and its clones raise their wands.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_1A"))
     IF_INT_NOT_EQUAL(LW(11), -1)
         CALL(btlevtcmd_AnimeChangePose, LW(11), 1, STRING("KMK_A_1A"))
@@ -1096,6 +1175,7 @@ static EVT_BEGIN(ground_magic_common_event1)
         CALL(btlevtcmd_AnimeChangePose, LW(14), 1, STRING("KMK_A_1A"))
     END_IF
     WAIT_FRAMES(60)
+    // The wands glow with a rising sound.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KAMEKU_MAGIC4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_1B"))
     IF_INT_NOT_EQUAL(LW(11), -1)
@@ -1111,6 +1191,7 @@ static EVT_BEGIN(ground_magic_common_event1)
         CALL(btlevtcmd_AnimeChangePose, LW(14), 1, STRING("KMK_A_1B"))
     END_IF
     WAIT_FRAMES(20)
+    // They swing the wands up and hold them.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_1C"))
     IF_INT_NOT_EQUAL(LW(11), -1)
         CALL(btlevtcmd_AnimeChangePose, LW(11), 1, STRING("KMK_A_1C"))
@@ -1125,6 +1206,7 @@ static EVT_BEGIN(ground_magic_common_event1)
         CALL(btlevtcmd_AnimeChangePose, LW(14), 1, STRING("KMK_A_1C"))
     END_IF
     WAIT_FRAMES(30)
+    // A last magic sound, then they thrust the wands forward.
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(10)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KAMEKU_MAGIC8"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1143,6 +1225,7 @@ static EVT_BEGIN(ground_magic_common_event1)
         CALL(btlevtcmd_AnimeChangePose, LW(14), 1, STRING("KMK_A_1D"))
     END_IF
     WAIT_FRAMES(20)
+    // The wand poses finish, ready for the spell itself.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_1E"))
     IF_INT_NOT_EQUAL(LW(11), -1)
         CALL(btlevtcmd_AnimeChangePose, LW(11), 1, STRING("KMK_A_1E"))
@@ -1159,7 +1242,11 @@ static EVT_BEGIN(ground_magic_common_event1)
     RETURN
 EVT_END()
 
-/** Guess: Spell finish on the ground: the casting pose with SFX_ENM_KAMEKU_MAGIC6 and 7. */
+/**
+ * Spell-casting animation on the ground for a spell on itself or the whole party:
+ * the caster alone plays KMK_A_1A
+ * and then KMK_A_2A to A_2C with SFX_ENM_KAMEKU_MAGIC6 and 7 and the thunder-flare staff effect.
+ */
 static EVT_BEGIN(ground_magic_common_event2)
     BEGIN_SIBLING_EVENT
         LOOP(2)
@@ -1182,14 +1269,20 @@ static EVT_BEGIN(ground_magic_common_event2)
     RETURN
 EVT_END()
 
-/** Guess: The same casting scene for a Magikoopa flying in the air, including its clones. */
+/**
+ * Spell-casting animation for a flying Magikoopa (unit work 0 set): the KMK_A_3A to A_3D poses with
+ * SFX_ENM_KAMEKU_MAGIC1, 8 and 7, copied by every clone, with the staff effect chosen by LW(15) as in
+ * ground_magic_common_event1.
+ */
 static EVT_BEGIN(sky_magic_common_event)
+    // The magic hum plays twice while the flying Magikoopa and its clones prepare.
     BEGIN_SIBLING_EVENT
         LOOP(2)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KAMEKU_MAGIC1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             WAIT_FRAMES(40)
         END_LOOP
     END_SIBLING_EVENT
+    // A flare of light gathers on the staff (the real one's, and every clone's).
     CALL(kamec_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
     IF_INT_EQUAL(LW(15), 0)
         BEGIN_SIBLING_EVENT
@@ -1220,6 +1313,7 @@ static EVT_BEGIN(sky_magic_common_event)
             CALL(eff_staff2, BTL_UNIT_SELF)
         END_SIBLING_EVENT
     END_IF
+    // The Magikoopa and its clones raise their wands in the air.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_3A"))
     IF_INT_NOT_EQUAL(LW(11), -1)
         CALL(btlevtcmd_AnimeChangePose, LW(11), 1, STRING("KMK_A_3A"))
@@ -1233,6 +1327,7 @@ static EVT_BEGIN(sky_magic_common_event)
     IF_INT_NOT_EQUAL(LW(14), -1)
         CALL(btlevtcmd_AnimeChangePose, LW(14), 1, STRING("KMK_A_3A"))
     END_IF
+    // The wands glow with a rising sound.
     WAIT_FRAMES(60)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KAMEKU_MAGIC8"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_3B"))
@@ -1248,6 +1343,7 @@ static EVT_BEGIN(sky_magic_common_event)
     IF_INT_NOT_EQUAL(LW(14), -1)
         CALL(btlevtcmd_AnimeChangePose, LW(14), 1, STRING("KMK_A_3B"))
     END_IF
+    // They sweep the wands forward as the spell sound peaks.
     WAIT_FRAMES(35)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KAMEKU_MAGIC7"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_3C"))
@@ -1263,6 +1359,7 @@ static EVT_BEGIN(sky_magic_common_event)
     IF_INT_NOT_EQUAL(LW(14), -1)
         CALL(btlevtcmd_AnimeChangePose, LW(14), 1, STRING("KMK_A_3C"))
     END_IF
+    // The wand poses finish, ready for the spell itself.
     WAIT_FRAMES(15)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KMK_A_3D"))
     IF_INT_NOT_EQUAL(LW(11), -1)
@@ -1281,11 +1378,12 @@ static EVT_BEGIN(sky_magic_common_event)
 EVT_END()
 
 /**
- * Guess: Chooses the ground or sky wind-up (ground_magic_common_event1 or sky_magic_common_event) depending on
- * whether the Magikoopa is floating.
+ * Plays the casting animation for a spell at the target LW(3):
+ * when flying (unit work 0 set) sky_magic_common_event,
+ * else ground_magic_common_event1, or ground_magic_common_event2 when the target is the caster itself.
  */
 static EVT_BEGIN(magic_common_event1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_FLYING, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(13))
         IF_INT_NOT_EQUAL(LW(3), LW(13))
@@ -1299,9 +1397,13 @@ static EVT_BEGIN(magic_common_event1)
     RETURN
 EVT_END()
 
-/** Guess: Chooses the ground or sky finish (ground_magic_common_event2 or the sky equivalent). */
+/**
+ * Plays the casting animation for the party-wide heal (all_recover_magic_event):
+ * ground_magic_common_event2 on the
+ * ground, sky_magic_common_event when flying (unit work 0 set).
+ */
 static EVT_BEGIN(magic_common_event2)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_FLYING, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL_CHILD(ground_magic_common_event2)
     ELSE
@@ -1328,12 +1430,16 @@ static EVT_BEGIN(start_avoid)
 EVT_END()
 
 /**
- * Guess: The Magikoopa's attack spell (magic blast):
- * it fires the shot with SFX_ENM_KAMEKU_MAGIC3_2 at the target, checks the pre-damage result,
- * and either misses (attack_magic_event_sub_no_hit) or hits (attack_magic_event_sub_hit)
- * while the clones cast with it.
+ * The Magikoopa's attack spell (weapon in LW(9)): takes the first-attack target or samples one, casts
+ * (magic_common_event1) with SFX_ENM_KAMEKU_MAGIC3_2, and fires a shot from itself and from every clone.
+ * On a miss the shots fly past to the stage edge (attack_magic_event_sub_no_hit)
+ * and the target's avoid starts as
+ * the caster's shot passes it; on a hit they fly to the target (attack_magic_event_sub_hit)
+ * and the action-command
+ * result and damage are applied once. All of them then return to their stand pose.
  */
 static EVT_BEGIN(attack_magic_event)
+    // Choose the target: the First Strike target if the battle opened with one, otherwise a normal pick.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -1342,14 +1448,16 @@ static EVT_BEGIN(attack_magic_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No target left: a confused Magikoopa is flustered; either way it ends its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is announced and the guard timing is awaited, and the Magikoopa turns to face its target.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
@@ -1357,9 +1465,11 @@ static EVT_BEGIN(attack_magic_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     SET_VALUE(LW(15), 0)
+    // The Magikoopa (and its clones) wave their wands and charge the spell.
     CALL_CHILD(magic_common_event1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KAMEKU_MAGIC3_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_set_mode, 0, 0)
+    // Check how the target defends against the blast.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -1378,6 +1488,8 @@ static EVT_BEGIN(attack_magic_event)
         CASE_DEFAULT
         GOTO(98)
         CASE_END
+        // Missed: the magic bolts fly past the target to the edge of the stage,
+        // and the target hops out of the way as the real Magikoopa's bolt passes.
         LABEL(90)
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(1)
@@ -1414,6 +1526,7 @@ static EVT_BEGIN(attack_magic_event)
         CALL_CHILD(attack_magic_event_sub_no_hit)
         WAIT_FRAMES(60)
         GOTO(98)
+        // Hit: every bolt flies in, the target is blasted and the damage is dealt once.
         LABEL(91)
         CALL(kamec_get_bunsin, LW(6), LW(7), LW(8), LW(13), LW(0))
         SET_VALUE(LW(14), -2)
@@ -1428,30 +1541,35 @@ static EVT_BEGIN(attack_magic_event)
         CALL_CHILD(attack_magic_event_sub_hit)
         WAIT_FRAMES(45)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         GOTO(98)
+        // All the casters lower their wands and return to their stand pose.
         LABEL(98)
         WAIT_FRAMES(30)
         CALL(kamec_get_bunsin, LW(6), LW(7), LW(8), LW(9), LW(0))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
         IF_INT_NOT_EQUAL(LW(6), -1)
-            CALL(btlevtcmd_AnimeChangePoseType, LW(6), 1, 43)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(6), 1, BTL_POSE_STAY)
         END_IF
         IF_INT_NOT_EQUAL(LW(7), -1)
-            CALL(btlevtcmd_AnimeChangePoseType, LW(7), 1, 43)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(7), 1, BTL_POSE_STAY)
         END_IF
         IF_INT_NOT_EQUAL(LW(8), -1)
-            CALL(btlevtcmd_AnimeChangePoseType, LW(8), 1, 43)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(8), 1, BTL_POSE_STAY)
         END_IF
         IF_INT_NOT_EQUAL(LW(9), -1)
-            CALL(btlevtcmd_AnimeChangePoseType, LW(9), 1, 43)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(9), 1, BTL_POSE_STAY)
         END_IF
         LABEL(99)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
         RETURN
 EVT_END()
 
-/** Guess: The miss case of the attack spell: the shot passes by the avoiding target. */
+/**
+ * Fires a missing shot from the unit in LW(14) (-2 = the caster, -1 = no clone: nothing):
+ * the magic effect flies at
+ * the target's height to the stage edge in the unit's facing direction over 60 frames.
+ */
 static EVT_BEGIN(attack_magic_event_sub_no_hit)
     IF_INT_EQUAL(LW(14), -1)
         RETURN
@@ -1467,7 +1585,10 @@ static EVT_BEGIN(attack_magic_event_sub_no_hit)
     RETURN
 EVT_END()
 
-/** Guess: The hit case of the attack spell: applies the action-command result and the damage. */
+/**
+ * Fires a hitting shot from the unit in LW(14) (-2 = the caster, -1 = no clone: nothing): the magic effect flies
+ * to the target's hit position over 45 frames. The damage is applied by attack_magic_event.
+ */
 static EVT_BEGIN(attack_magic_event_sub_hit)
     IF_INT_EQUAL(LW(14), -1)
         RETURN
@@ -1480,16 +1601,18 @@ static EVT_BEGIN(attack_magic_event_sub_hit)
 EVT_END()
 
 /**
- * Guess: Common part of the support spells (Huge, Electrified, Invisible, Defence up):
- * it checks the target's current status (types 10, 14, 6 and 18) so it does not cast what is already active,
- * then applies the status and the damage code result.
+ * Common part of the support spells (Huge, Defence up, Electrified, Invisible), with the status type in LW(15)
+ * (10, 14, 6 or 18): samples an ally with the weapon in LW(9); if it already has that status nothing is cast and
+ * LW(0) returns 0 (so the caller can pick something else);
+ * otherwise it casts (magic_common_event1) and applies the
+ * weapon to the ally, and LW(0) returns 1.
  */
 static EVT_BEGIN(support_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             SET_VALUE(LW(0), 1)
@@ -1498,16 +1621,16 @@ static EVT_BEGIN(support_magic_event)
         GOTO(99)
     END_IF
     IF_INT_EQUAL(LW(15), 10)
-        CALL(btlevtcmd_CheckStatus, LW(3), 10, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_HUGE, LW(0))
     END_IF
     IF_INT_EQUAL(LW(15), 14)
-        CALL(btlevtcmd_CheckStatus, LW(3), 14, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_DEFENSE_UP, LW(0))
     END_IF
     IF_INT_EQUAL(LW(15), 6)
-        CALL(btlevtcmd_CheckStatus, LW(3), 6, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_ELECTRIC, LW(0))
     END_IF
     IF_INT_EQUAL(LW(15), 18)
-        CALL(btlevtcmd_CheckStatus, LW(3), 18, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INVISIBLE, LW(0))
     END_IF
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(0), 0)
@@ -1524,7 +1647,7 @@ static EVT_BEGIN(support_magic_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(30)
     LABEL(99)
     SET_VALUE(LW(0), 1)
@@ -1566,7 +1689,7 @@ static EVT_BEGIN(recover_magic_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             SET_VALUE(LW(0), 1)
@@ -1613,7 +1736,7 @@ static EVT_BEGIN(all_recover_magic_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             SET_VALUE(LW(0), 1)
@@ -1671,8 +1794,12 @@ static EVT_BEGIN(all_recover_magic_event)
 EVT_END()
 
 /**
- * Guess: The Magikoopa's clone spell (bunsin = split):
- * it shoots out up to four copies with SFX_ENM_KAMEKU_OFFSHOOT1 and 2, then shuffles them with the real one.
+ * The Magikoopa's clone spell (bunsin = split): casts with only its own staff light, fades out
+ * (SFX_ENM_KAMEKU_OFFSHOOT1), spawns a clone (spawn_event) on each free spot found in 40-unit steps on both
+ * sides
+ * of it (down to x 0 and up to x 170), shuffles the real one's position with the clones' (kamec_shuffle)
+ * and fades
+ * them all in with SFX_ENM_KAMEKU_OFFSHOOT2.
  */
 static EVT_BEGIN(bunsin_magic_event)
     SET_VALUE(LW(3), -2)
@@ -1730,8 +1857,8 @@ static EVT_BEGIN(bunsin_magic_event)
 EVT_END()
 
 /**
- * Script helper that starts a Magikoopa spell effect (effMagic1N64) at the tip of the unit's wand.
- * args[0] is the unit, args[1] to args[3] are floats passed to the effect, args[4] the effect type.
+ * Script helper that fires a Magikoopa's magic shot (effMagic1N64, type 0) from the tip of the unit's wand.
+ * args[0] is the unit, args[1] to args[3] the target point and args[4] the shot's lifetime in frames.
  * The effect is stored in the unit's work slot 5 and scaled to its size.
  */
 static USER_FUNC(eff_magic) {
@@ -1753,7 +1880,7 @@ static USER_FUNC(eff_magic) {
     y += 20.0f * unit->sizeMultiplier;
     z += 5.0f;
     eff = effMagic1N64Entry(0, type, x, y, z, a, b, c);
-    unit->work[5] = (EvtWord)eff;
+    unit->work[UW_KAMEC_MAGIC_EFFECT] = (EvtWord)eff;
     ((EffMagic1N64Work*)eff->userdata)->scale = unit->sizeMultiplier;
     return EVT_RETURN_DONE;
 }
@@ -1772,12 +1899,12 @@ static USER_FUNC(eff_staff2) {
     f32* wk;
 
     if (isFirstCall) {
-        unit->work[4] = (EvtWord)effPokopiPchargeN64Entry(0, 0.0f, -1000.0f, 0.0f, 1.0f, 60);
+        unit->work[UW_KAMEC_STAFF_EFFECT] = (EvtWord)effPokopiPchargeN64Entry(0, 60, 0.0f, -1000.0f, 0.0f, 1.0f);
     }
-    if (!(((EffectEntry*)unit->work[4])->flags & 1)) {
+    if (!(((EffectEntry*)unit->work[UW_KAMEC_STAFF_EFFECT])->flags & EFFECT_FLAG_IN_USE)) {
         return EVT_RETURN_DONE;
     }
-    wk = ((EffectEntry*)unit->work[4])->userdata;
+    wk = ((EffectEntry*)unit->work[UW_KAMEC_STAFF_EFFECT])->userdata;
     wk[13] = unit->sizeMultiplier;
     BtlUnit_GetPos(unit, &x, &y, &z);
     wk[1] = x + 22.5f * unit->sizeMultiplier * unit->faceDirection;
@@ -1796,12 +1923,12 @@ static USER_FUNC(eff_staff1) {
     f32* wk;
 
     if (isFirstCall) {
-        unit->work[4] = (EvtWord)effThunderflareN64Entry(0, 0.0f, -1000.0f, 0.0f, 1.0f, 60);
+        unit->work[UW_KAMEC_STAFF_EFFECT] = (EvtWord)effThunderflareN64Entry(0, 60, 0.0f, -1000.0f, 0.0f, 1.0f);
     }
-    if (!(((EffectEntry*)unit->work[4])->flags & 1)) {
+    if (!(((EffectEntry*)unit->work[UW_KAMEC_STAFF_EFFECT])->flags & EFFECT_FLAG_IN_USE)) {
         return EVT_RETURN_DONE;
     }
-    wk = ((EffectEntry*)unit->work[4])->userdata;
+    wk = ((EffectEntry*)unit->work[UW_KAMEC_STAFF_EFFECT])->userdata;
     wk[10] = unit->sizeMultiplier;
     BtlUnit_GetPos(unit, &x, &y, &z);
     wk[2] = x + 22.5f * unit->sizeMultiplier * unit->faceDirection;
@@ -1918,7 +2045,7 @@ static USER_FUNC(kamec_get_live_num) {
 
     for (i = 0; i < 64; i++) {
         unit = wp->units[i];
-        if (unit != NULL && unit->alliance == 1 && !BtlUnit_CheckStatus(unit, 0x1B)) {
+        if (unit != NULL && unit->alliance == 1 && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
             num++;
         }
     }
@@ -1927,33 +2054,35 @@ static USER_FUNC(kamec_get_live_num) {
 }
 
 /**
- * Guess: Spawns one Magikoopa clone at the caster's position:
- * invisible at first, sharing the original's HP and status (kamec_copy_status),
- * with the clone's attack script and resistances.
+ * Spawns one Magikoopa clone (into LW(3)) at the free spot LW(0..2) chosen by bunsin_magic_event: fully
+ * transparent at first, with the caster's flying flag (unit work 0), its HP and statuses (kamec_copy_status),
+ * the clone mark (unit work 1 = 1), the attack event,
+ * an all-zero status table (regist_bunsin) and the evasive part
+ * attribute (PART_ATTR_EVASIVE).
  */
 static EVT_BEGIN(spawn_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_kamec), 0)
     CALL(btlevtcmd_SetAlpha, LW(3), 1, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
-    CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(10))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_FLYING, LW(10))
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_KAMEC_FLYING, LW(10))
     WAIT_FRAMES(2)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(13))
     CALL(kamec_copy_status, LW(13), LW(3))
 #if VERSION >= VERSION_JP
-    CALL(btlevtcmd_OffAttribute, LW(3), 33554432)
+    CALL(btlevtcmd_OffAttribute, LW(3), UNIT_ATTR_NO_HP_GAUGE)
 #endif
-    CALL(btlevtcmd_SetUnitWork, LW(3), 1, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_KAMEC_IS_CLONE, 1)
     CALL(btlevtcmd_SetEventAttack, LW(3), PTR(attack_event))
     CALL(btlevtcmd_SetRegistStatus, LW(3), PTR(&regist_bunsin))
-    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 16384)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, PART_ATTR_EVASIVE)
     RETURN
 EVT_END()
 
 /** Wait script of the Magikoopa: shows its idle pose (and the clones' poses) from the pose table. */
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KAMEC_IS_CLONE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF

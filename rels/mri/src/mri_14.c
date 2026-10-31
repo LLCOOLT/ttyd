@@ -124,6 +124,7 @@ static EVT_BEGIN(first_time_w_bero)
     RETURN
 EVT_END()
 
+/** Exits of mri_14: west road w_bero to mri_13 (e_bero); pipe dokan to mri_15 (dokan). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -467,6 +468,7 @@ EVT_END()
  * Sets the story to STORY_STG2_23_TIME_BOMB_ACTIVATED.
  */
 EVT_BEGIN(time_bomb)
+    // Controls off, the music fades out and the room begins to shake.
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
     CALL(evt_mario_normalize)
@@ -496,6 +498,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0029296875f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.00390625f), FLOAT(0.0f), 300)
     SET_VALUE(GF(0), 0)
+    // The quakes grow stronger and the room flashes.
     SPAWN_EVENT(flash_and_wait)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0f), 300)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.005859375f), FLOAT(0.0f), 300)
@@ -549,6 +552,7 @@ EVT_BEGIN(time_bomb)
         CALL(evt_eff64, STRING("ripple02"), STRING("ripple_n64"), 0, 0, 150, -340, 0, 0, 0, 0, 0, 0, 0, 0)
         WAIT_MS(400)
     END_INLINE_EVENT
+    // The Crystal Star appears in a ripple of light and spins above the floor.
     CALL(evt_snd_sfxon, STRING("SFX_STG2_STARSTONE_APPEAR1"), 0)
     CALL(evt_item_entry, STRING("item00"), ITEM_EMERALD_STAR, 0, 120, -340, ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
@@ -580,6 +584,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_cam3d_evt_set, 0, 95, 283, 0, 55, -215, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_msg_print_party, STRING("stg2_mri_e23_00_00"))
+    // Lord Crump grabs the Crystal Star to the Third Force's theme.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_3RD_ENEMY"))
     CALL(evt_npc_set_position, STRING("第三勢力幹部"), 175, 0, -194)
     CALL(evt_npc_move_position, STRING("第三勢力幹部"), 0, -215, 0, FLOAT(180.0f), 0)
@@ -612,6 +617,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI9"))
     CALL(evt_msg_print_party, STRING("stg2_mri_e23_00"))
     SET_VALUE(LW(10), STRING("第三勢力幹部"))
+    // He gloats, then reveals a remote time bomb switch to bury Mario and the Punies.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e23_01"), 0, LW(10))
     WAIT_MS(500)
     CALL(evt_eff_fukidashi, 1, STRING(""), LW(10), 0, 0, 0, 0, 0, 0, 0, 60)
@@ -646,6 +652,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e23_04"), 0, LW(10))
     CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_TIMER_SET1"), LW(0), LW(1), LW(2), 0)
+    // He sets the timer, the danger music begins and Crump flees down a pipe.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
     CALL(evt_sub_countdown_start, 300000, 300000)
     CALL(evt_npc_set_anim, LW(10), STRING("I_7"))
@@ -813,6 +820,7 @@ static EVT_BEGIN(yuka_check)
     RETURN
 EVT_END()
 
+/** Plants Mario can search in mri_14: A_ueki01, A_ueki03, A_ueki04, A_ueki06, A_ueki07, A_ueki08. */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki01", "S_ueki01", NULL},
     {1, "A_ueki03", "S_ueki03", NULL},

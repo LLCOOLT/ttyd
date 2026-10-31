@@ -44,6 +44,10 @@ static void resha_tev(MapTevCallbackInfo* info);
 static EvtWord peach_mail[235];
 NpcSetupInfo screamEnt[2];
 
+/**
+ * Train wheels of the station: for each wheel map object, its radius class, the speed that drives it and its
+ * turning direction.
+ */
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},
     {"sha_1_2", 0, 0, FLOAT(1.0f)},
@@ -134,6 +138,10 @@ static EVT_BEGIN(evt_sharin)
     RETURN
 EVT_END()
 
+/**
+ * Connecting rods of the train: for each rod map object, its wheel class, driving speed, crank radius and
+ * turning direction.
+ */
 static ClankData clankDt[] = {
     {"bou_1", 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
     {"bou_2", 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
@@ -285,14 +293,17 @@ EVT_END()
  * plays the engine sounds and ramps the wheel speeds GW(0) and GW(1) up to -15 (leftward).
  */
 static EVT_BEGIN(hom_10_evt_resha_start)
+    // The train is marked as moving and no longer at any station.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
+    // The departure bell rings twice.
     CALL(evt_mapobj_get_position, STRING("ranpu"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    // The engine sound for the current map starts.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("gor_04"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
@@ -307,6 +318,7 @@ static EVT_BEGIN(hom_10_evt_resha_start)
     IF_STR_EQUAL(LW(0), STRING("pik_00"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_3"), 0)
     END_IF
+    // The train model slides along the track at the current speed.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
         BEGIN_INLINE_EVENT
@@ -328,6 +340,7 @@ static EVT_BEGIN(hom_10_evt_resha_start)
             END_LOOP
         END_INLINE_EVENT
     END_IF
+    // The train accelerates over 20 seconds to its cruising speed.
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
         CALL(evt_sub_intpl_msec_init, 11, 0, -1500, 20000)
@@ -344,6 +357,7 @@ static EVT_BEGIN(hom_10_evt_resha_start)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
+    // After 1.5 seconds the cars start to sway for a moment, then settle.
     BEGIN_INLINE_EVENT
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
         LOOP(0)
@@ -387,14 +401,17 @@ EVT_END()
  * but ramps the speeds up to +15 (rightward).
  */
 static EVT_BEGIN(hom_10_evt_resha_start2)
+    // The train is marked as moving and no longer at any station.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
+    // The departure bell rings twice.
     CALL(evt_mapobj_get_position, STRING("ranpu"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    // The engine sound for the current map starts.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("gor_04"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
@@ -409,6 +426,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
         BEGIN_INLINE_EVENT
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+            // The train model slides along the track at the current speed.
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
                 CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
@@ -430,6 +448,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
         BEGIN_INLINE_EVENT
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
             LOOP(0)
+                // The train accelerates over 20 seconds to its cruising speed.
                 ADD_FLOAT(LW(0), GW(0))
                 CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
                 WAIT_FRAMES(1)
@@ -446,6 +465,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 1)
             GOTO(0)
+            // After 1.5 seconds the cars start to sway for a moment, then settle.
         END_IF
         LOOP(0)
             SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
@@ -617,6 +637,10 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
+/**
+ * Map object groups of the train (pika_*) that hom_10_evt_resha_sub hooks to the TEV callback resha_tev,
+ * which adds environment effect 7 (an env.tpl reflection or shine texture) to them; NULL ends the list.
+ */
 static const char* pika_tbl[] = {
     "pika_1_1",
     "pika_1_2",
@@ -635,6 +659,7 @@ static const char* pika_tbl[] = {
     NULL,
 };
 
+/** The shorter list used instead on the map rsh_06_a: the same groups without the *_c ones. */
 static const char* pika_tbl_rsh_06[] = {
     "pika_1_1",
     "pika_1_2",
@@ -872,6 +897,7 @@ EVT_END()
  * Sets the train arrival flags and starts Peach's mail scene (peach_mail) until STORY_STG6_57_A_MAIL_FROM_PEACH.
  */
 EVT_BEGIN(evt_train2)
+    // Control is taken away and Mario and the partners are hidden while the train pulls in.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_party_stop, 1)
@@ -881,11 +907,13 @@ EVT_BEGIN(evt_train2)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
+    // The camera looks at the platform and the station attendant takes his spot.
     CALL(evt_cam3d_evt_set, -360, 232, 603, -360, 137, 62, 0, 11)
     CALL(evt_npc_flag_onoff, 1, STRING("駅員"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_position, STRING("駅員"), -400, 80, 100)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1000)
+    // Wait for the train to come to a stop.
     LOOP(0)
         IF_INT_EQUAL(GW(0), 0)
             BREAK_LOOP
@@ -893,6 +921,7 @@ EVT_BEGIN(evt_train2)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_npc_flag_onoff, 0, STRING("駅員"), NPC_FLAG_INSTANT_TURN)
+    // Mario and the partners appear inside the train car, facing the door.
     CALL(evt_mario_set_pos, -350, 80, 30)
     CALL(evt_party_set_pos, 0, -370, 80, 30)
     CALL(evt_party_set_pos, 1, -360, 80, 20)
@@ -903,6 +932,7 @@ EVT_BEGIN(evt_train2)
     CALL(evt_party_set_dir, 0, 270, 0)
     CALL(evt_party_set_dir, 1, 270, 0)
     WAIT_MS(1000)
+    // The train door slides open.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_SLIDE1_3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, -40, 500)
@@ -914,11 +944,13 @@ EVT_BEGIN(evt_train2)
         GOTO(0)
     END_IF
     WAIT_MS(500)
+    // Mario and the partners step out onto the platform.
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, -345, 85, FLOAT(80.0f))
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, -330, 100, FLOAT(80.0f))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    // The door slides shut behind them.
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_SLIDE1_3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_sub_intpl_msec_init, 11, -40, 0, 500)
     LABEL(1)
@@ -930,15 +962,18 @@ EVT_BEGIN(evt_train2)
     END_IF
     WAIT_MS(500)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    // Story progress moves to Rogueport Station if it was earlier.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
     END_IF
 #if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
+    // The partners follow Mario and he gets control back.
     CALL(evt_party_run, 1)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
+    // Wait until Mario moves, then free the camera.
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
         IF_INT_NOT_EQUAL(LW(0), LW(3))
@@ -953,11 +988,13 @@ EVT_BEGIN(evt_train2)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_cam3d_evt_off, 1000, 11)
+    // The train is marked as arrived and standing at Rogueport.
     SET_VALUE(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
 #if VERSION >= VERSION_JP
     SET_VALUE(GSWF(GSWF_TRAIN_ARRIVED_POSHLEY), 0)
 #endif
     SET_VALUE(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 1)
+    // Until Mario reads it, Peach's mail scene plays.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_57_A_MAIL_FROM_PEACH)
         SPAWN_EVENT(peach_mail)
     END_IF
@@ -1044,6 +1081,10 @@ static EVT_BEGIN(peach_mail)
     RETURN
 EVT_END()
 
+/**
+ * Exits (beros) of this room: s_bero to gor_03, dokan_1 (script only), A_dokan_h00 (script only) and n_bero
+ * to rsh_01_a.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName
@@ -1323,13 +1364,13 @@ EVT_BEGIN(jugemu_a_talk)
     RETURN
 EVT_END()
 
-/** Init event of the Toad b (キノピオ b): places him at (-575, 80, 120). */
+/** Init event of the Toad woman B (キノピオ女Ｂ): places her at (-575, 80, 120). */
 static EVT_BEGIN(kinopiko_b_init)
     CALL(evt_npc_set_position, STRING("me"), -575, 80, 120)
     RETURN
 EVT_END()
 
-/** Talk event of the Toad b: one line per chapter (gor_04_008 to 015), chosen by story progress. */
+/** Talk event of the Toad woman B: one line per chapter (gor_04_008 to 015), chosen by story progress. */
 static EVT_BEGIN(kinopiko_b_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
@@ -1352,13 +1393,13 @@ static EVT_BEGIN(kinopiko_b_talk)
     RETURN
 EVT_END()
 
-/** Init event of Baba (ババ): sets NPC status bit 2 on himself. */
+/** Init event of Kammy Koopa (ババ): sets NPC_STATUS_FACE_MOVE_DIR (2): she turns the way she moves. */
 static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-/** Init event of the Flying Koopa (飛クッパ): sets NPC status bit 2 on himself. */
+/** Init event of the flying Bowser (飛クッパ): sets NPC_STATUS_FACE_MOVE_DIR (2): he turns the way he moves. */
 static EVT_BEGIN(hkoopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
@@ -1383,6 +1424,7 @@ static EVT_BEGIN(luigi_talk)
     RETURN
 EVT_END()
 
+/** NPC setup of Luigi at the station. */
 static NpcSetupInfo luigiEnt[] = {
     {
         "ルイージ", // name
@@ -1430,6 +1472,7 @@ EVT_BEGIN(scream_talk)
     RETURN
 EVT_END()
 
+/** NPC setup of Su Creamy, Luigi's companion at the station. */
 NpcSetupInfo screamEnt[] = {
     {
         "ス・クリーミ", // name
@@ -1446,6 +1489,10 @@ NpcSetupInfo screamEnt[] = {
     {0},
 };
 
+/**
+ * NPC setup of the station: the blimp attendant, the station clerk, the Lakitu, the Toad woman, Baba and the
+ * flying Koopa.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "飛行船係員", // name
@@ -1645,6 +1692,7 @@ EVT_END()
  * Sets the city music back to the Rogueport tune.
  */
 EVT_BEGIN(evt_hikousen_return)
+    // The blimp scene starts: the ship is set up, Mario is hidden and the partners are removed.
     SPAWN_EVENT(hikosenkakari_init_ship)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1657,6 +1705,7 @@ EVT_BEGIN(evt_hikousen_return)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gondora_1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("hako_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gondora_2"), MAPOBJ_FLAG_HIDE)
+    // The camera looks at the blimp's mooring and the letterbox bars slide in.
     CALL(evt_cam3d_evt_set, 446, 181, 658, 446, 86, -117, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_snd_sfxon, STRING("SFX_STG3_AIR_SHIP_DRIVE5"), 0)
@@ -1665,6 +1714,7 @@ EVT_BEGIN(evt_hikousen_return)
     SET_VALUE(GF(0), 0)
     SET_FLOAT_VALUE(GW(2), FLOAT(3000.0f))
     SET_FLOAT_VALUE(GW(3), FLOAT(1000.0f))
+    // The blimp flies in from the right with its engine sounding, slowing down as it arrives.
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_get_position, STRING("hikousen"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_AIR_SHIP_DRIVE1"), LW(0), LW(1), LW(2), LW(10))
@@ -1714,6 +1764,7 @@ EVT_BEGIN(evt_hikousen_return)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The blimp turns around in a paper flip to face the dock.
     CALL(evt_paper_entry, STRING("OFF_d_kaiten"))
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_kaiten"))
@@ -1738,6 +1789,7 @@ EVT_BEGIN(evt_hikousen_return)
     CALL(evt_mapobj_rotate, 1, STRING("hikousen"), 0, 0, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("gondora_1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hako_2"), MAPOBJ_FLAG_HIDE)
+    // The mooring poles rise one after the other to catch the ship.
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bou_10"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bou_9"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bou_7"), MAPOBJ_FLAG_HIDE)
@@ -1757,11 +1809,13 @@ EVT_BEGIN(evt_hikousen_return)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("bou_9"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("bou_10"), MAPOBJ_FLAG_HIDE)
     END_INLINE_EVENT
+    // The city music fades out and the Rogueport tune comes back.
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
         WAIT_MS(2000)
         CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_GOR1"), 2000)
     END_INLINE_EVENT
+    // Mario appears on the gondola, which lowers to the ground over 3 seconds.
     CALL(evt_mario_set_pos, 350, 135, -352)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_mapobj_get_position, STRING("gondora_1"), LW(10), LW(11), LW(12))
@@ -1781,6 +1835,7 @@ EVT_BEGIN(evt_hikousen_return)
     END_IF
     CALL(evt_snd_sfxoff, LW(6))
     WAIT_MS(300)
+    // Mario walks off the gondola and the camera is released.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(0), 30)
     CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(80.0f))
@@ -1790,12 +1845,14 @@ EVT_BEGIN(evt_hikousen_return)
 EVT_END()
 
 /**
- * Interlude when the story is at STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT:
- * Kammy Koopa (ババ, on her broom "houki") talks to the airship attendant, scares him away,
- * Bowser's flying airship (飛クッパ) arrives and they talk (kpa_stg4_000 to kpa_stg4_006)
- * before the map changes to tou_00. Guess: the Bowser chapter 4 to 5 transition scene.
+ * Bowser interlude at STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT (the map init switches the player to Bowser,
+ * mode 2):
+ * Kammy Koopa (ババ, with her broom "houki") wants to ride the Cheep Blimp to Glitzville, where she has heard of a
+ * great secret, and asks the blimp attendant for tickets; he flees, Bowser flies off on his own (飛クッパ, "I'll be
+ * riding THIS") and Kammy is left behind (kpa_stg4_000 to 006). The map then changes to tou_00 (Glitzville).
  */
 EVT_BEGIN(gor_04_koopa_evt)
+    // Bowser stands at the station, with Kammy Koopa hovering nearby; the screen fades in.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 425, 250, 340, 425, 214, 112, 0, 11)
     CALL(evt_mario_set_pos, 75, 0, 154)
@@ -1805,8 +1862,10 @@ EVT_BEGIN(gor_04_koopa_evt)
     CALL(evt_seq_wait, 2)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
+    // The camera pulls back as Kammy speaks.
     CALL(evt_cam3d_evt_set, 128, 163, 666, 128, 71, 113, 2000, 11)
     WAIT_MS(2000)
+    // Kammy tells Bowser she heard of a great secret in Glitzville and proposes riding the Cheep Blimp.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_000"), 0, STRING("ババ"))
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
@@ -1819,12 +1878,15 @@ EVT_BEGIN(gor_04_koopa_evt)
             WAIT_FRAMES(10)
         END_LOOP
     END_INLINE_EVENT
+    // Kammy flies to the ticket booth.
     CALL(evt_cam3d_evt_set, 280, 153, 657, 280, 57, 116, 1600, 11)
     CALL(evt_npc_kamek_move_position, STRING("ババ"), 251, 128, 5, 1600, 0, 0)
     SET_VALUE(GF(0), 1)
     CALL(evt_cam3d_evt_zoom_in, 20, 800, 0, 11)
     WAIT_MS(800)
+    // Kammy demands two tickets for the Great and Evil King and the Sweet, Young Thing.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_001"), 0, STRING("ババ"))
+    // The blimp attendant panics, trembling in fear.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_002"), 0, STRING("飛行船係員"))
     CALL(evt_npc_get_position, STRING("飛行船係員"), LW(0), LW(1), LW(2))
     SET_VALUE(LW(3), LW(0))
@@ -1838,6 +1900,7 @@ EVT_BEGIN(gor_04_koopa_evt)
         WAIT_MS(50)
     END_LOOP
     CALL(evt_npc_set_position, STRING("飛行船係員"), LW(0), LW(1), LW(2))
+    // He bolts off and escapes.
     CALL(evt_cam3d_evt_set, 337, 134, 549, 337, 58, 116, 500, 11)
     CALL(evt_npc_sound_data_set, STRING("飛行船係員"), STRING("SFX_FLD_NPC_PUKUPUKUI_MOVE1"), STRING("SFX_FLD_NPC_PUKUPUKUI_MOVE1"), 12000, EVT_NULLPTR, EVT_NULLPTR)
     CALL(evt_npc_get_position, STRING("飛行船係員"), LW(0), LW(1), LW(2))
@@ -1852,6 +1915,7 @@ EVT_BEGIN(gor_04_koopa_evt)
     CALL(evt_npc_flag_onoff, 0, STRING("飛行船係員"), NPC_FLAG_NO_WALL_HIT)
     CALL(evt_cam3d_evt_set, 273, 134, 549, 273, 58, 116, 500, 11)
     WAIT_MS(500)
+    // Kammy grumbles about the impudent attendant and flies back toward Bowser.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_003"), 0, STRING("ババ"))
     CALL(evt_npc_set_ry, STRING("ババ"), 270)
     CALL(evt_mario_set_pos, -222, 80, 137)
@@ -1871,6 +1935,7 @@ EVT_BEGIN(gor_04_koopa_evt)
     SET_VALUE(GF(0), 1)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("ババ"), 1, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
+    // Bowser is nowhere to be seen; Kammy asks where he went.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_004"), 0, STRING("ババ"))
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
@@ -1883,6 +1948,7 @@ EVT_BEGIN(gor_04_koopa_evt)
             WAIT_FRAMES(10)
         END_LOOP
     END_INLINE_EVENT
+    // Kammy looks around, spinning left and right.
     CALL(evt_npc_kamek_move_position, STRING("ババ"), 105, 154, 5, 0, FLOAT(30.0f), 0)
     SET_VALUE(GF(0), 1)
     WAIT_FRAMES(1)
@@ -1902,10 +1968,12 @@ EVT_BEGIN(gor_04_koopa_evt)
     WAIT_FRAMES(1)
     CALL(evt_npc_wait_pera, STRING("ババ"))
     WAIT_MS(100)
+    // An airship engine is heard approaching.
     CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_AIRSHIP_MOVE1"), 200, 50, 100, LW(15))
     WAIT_MS(1000)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("ババ"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
+    // Bowser's airship (飛クッパ, with the SFX_KUPPA_AIRSHIP_MOVE1 engine sound) appears, swaying as it flies.
     CALL(evt_npc_set_position, STRING("飛クッパ"), 200, 115, 500)
     SET_VALUE(GF(1), 0)
     BEGIN_INLINE_EVENT
@@ -1959,6 +2027,7 @@ EVT_BEGIN(gor_04_koopa_evt)
         END_LOOP
         CALL(evt_snd_sfxoff, LW(15))
     END_INLINE_EVENT
+    // Bowser swoops in from the side and laughs.
     CALL(evt_npc_move_position, STRING("飛クッパ"), -80, 550, 0, FLOAT(120.0f), 0)
     WAIT_MS(1000)
     CALL(evt_npc_set_position, STRING("飛クッパ"), -80, 50, 154)
@@ -1969,6 +2038,8 @@ EVT_BEGIN(gor_04_koopa_evt)
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 65, 214, 670, 65, 125, 115, 500, 11)
     WAIT_MS(500)
+    // Bowser says he will ride this instead, since he has snuck into Glitzville before, and tells Kammy to
+    // take the slow ride on the blimp; the airship rises.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_005"), 0, STRING("飛クッパ"))
     SET_VALUE(GF(1), 1)
     CALL(evt_npc_get_position, STRING("飛クッパ"), LW(2), LW(3), LW(4))
@@ -1993,6 +2064,7 @@ EVT_BEGIN(gor_04_koopa_evt)
         GOTO(0)
     END_IF
     CALL(evt_snd_sfxoff, LW(9))
+    // Kammy spins round and round on her broom while Bowser leaves.
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
@@ -2026,6 +2098,7 @@ EVT_BEGIN(gor_04_koopa_evt)
         CALL(evt_snd_sfxoff, LW(7))
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
+    // Bowser flies off toward Glitzville.
     CALL(evt_npc_get_position, STRING("飛クッパ"), LW(2), LW(3), LW(4))
     CALL(evt_sub_get_sincos, 90, LW(0), GW(0))
     BEGIN_INLINE_EVENT
@@ -2062,12 +2135,14 @@ EVT_BEGIN(gor_04_koopa_evt)
     CALL(evt_snd_sfxoff, LW(9))
     CALL(evt_npc_flag_onoff, 1, STRING("飛クッパ"), NPC_FLAG_HIDDEN)
     CALL(evt_cam3d_evt_set, 102, 163, 666, 102, 71, 113, 500, 11)
+    // Kammy waits for her spin to finish.
     LOOP(0)
         IF_INT_NOT_EQUAL(GF(0), 0)
             BREAK_LOOP
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Kammy loses her broom, which flickers, then she falls to the ground.
     CALL(evt_npc_get_position, STRING("ババ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_get_dir, STRING("ババ"), LW(3))
     ADD(LW(2), 5)
@@ -2105,7 +2180,9 @@ EVT_BEGIN(gor_04_koopa_evt)
     CALL(evt_npc_set_ry, STRING("ババ"), 90)
     WAIT_MS(300)
     CALL(evt_npc_set_autotalkpose, STRING("ババ"), STRING("P_1"), STRING("T_6"))
+    // Kammy calls after Bowser, then wails that her special lunch will go to waste.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_006"), 0, STRING("ババ"))
+    // The map changes to Glitzville (tou_00).
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING("tou_00"), STRING(""))
     CALL(evt_mario_key_onoff, 1)
@@ -2122,6 +2199,8 @@ EVT_END()
  * heals Mario and his partners.
  */
 EVT_BEGIN(gor_04_init_evt)
+    // Pick the music: Bowser's tune during the Bowser interlude, otherwise the Rogueport tune (unless Mario
+    // arrived by blimp).
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
         CALL(evt_snd_bgm_scope, 0, 1)
@@ -2134,19 +2213,24 @@ EVT_BEGIN(gor_04_init_evt)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
     END_IF
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    // Set up the exits, Luigi, and the NPCs of the station.
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
     CALL_CHILD(luigi_npcEnt)
     CALL(evt_npc_setup, PTR(npcEnt))
+    // A save block is placed, except during the Bowser interlude.
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
         CALL(evt_mobj_save_blk, STRING("mobj_save"), 140, 60, 85, 0, 0)
     END_IF
+    // The spinning panel with a Star Piece, and another Star Piece on the floor, are placed.
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), -510, 80, 120, STRING("S_ground"), 125, GSWF(GSWF_GOR04_STAR_PIECE_PANEL))
     CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 475, 0, 100, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR04_STAR_PIECE), 0)
     SPAWN_EVENT(evt_wing)
+    // Stepping on the blimp platform starts the blimp ride.
     CALL(evt_run_case_evt, CASE_COND_STAND_ON_A, 1, STRING("A_noriba"), 0, PTR(evt_hikousen), 0)
     CALL(evt_bero_get_entername, LW(0))
+    // Arriving back by blimp starts the blimp-landing scene; otherwise the second gondola is hidden.
     IF_STR_EQUAL(LW(0), STRING("hikousen_return"))
         SPAWN_EVENT(evt_hikousen_return)
     ELSE
@@ -2155,6 +2239,7 @@ EVT_BEGIN(gor_04_init_evt)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_bero"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_bero_get_entername, LW(0))
+    // Entering through the train door means this is the return trip, and the train is at Rogueport.
     IF_STR_EQUAL(LW(0), STRING("n_bero"))
         SET_VALUE(GSWF(GSWF_TRAIN_RETURN_TRIP), 1)
         SET_VALUE(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
@@ -2165,6 +2250,7 @@ EVT_BEGIN(gor_04_init_evt)
     ELSE
         SET_VALUE(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
     END_IF
+    // Arriving from Poshley Heights on the train plays the station-arrival scene.
     IF_STR_EQUAL(LW(0), STRING("resha_return"))
         SET_VALUE(GSWF(GSWF_TRAIN_RETURN_TRIP), 1)
         CALL_CHILD(hom_10_evt_resha_left)
@@ -2173,6 +2259,7 @@ EVT_BEGIN(gor_04_init_evt)
         SET_VALUE(LW(0), STRING("n_bero"))
         CALL_CHILD(bero_case_switch_on)
     ELSE
+        // Otherwise, the train sits at the platform in the correct state for the trip direction.
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 1)
             CALL_CHILD(hom_10_evt_resha_left)
             SET_VALUE(LW(0), STRING("n_bero"))
@@ -2184,9 +2271,11 @@ EVT_BEGIN(gor_04_init_evt)
             CALL_CHILD(bero_case_switch_off)
         END_IF
     END_IF
+    // After the train ride, Peach's mail scene begins.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
         SPAWN_EVENT(peach_mail)
     END_IF
+    // Bowser interlude: Bowser is the player character, Kammy's broom is placed, and her story scene starts.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
         CALL(evt_mario_set_mode, 2)
         CALL(evt_mario_kill_party, 0)
@@ -2196,6 +2285,7 @@ EVT_BEGIN(gor_04_init_evt)
         CALL(evt_npc_flag_onoff, 1, STRING("houki"), NPC_FLAG_INTANGIBLE)
         SPAWN_EVENT(gor_04_koopa_evt)
     END_IF
+    // At this story stage Mario and his partners are fully healed.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_04_BOWSER_RAWK_HAWK)
         CALL(evt_mario_get_party, LW(15))
         IF_INT_EQUAL(LW(15), 0)
@@ -2212,6 +2302,7 @@ EVT_BEGIN(gor_04_init_evt)
         END_IF
 #endif
     END_IF
+    // The mail event runs in the background.
     SPAWN_EVENT(evt_sub_mail_event)
 #if VERSION >= VERSION_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("train_2"), MAPOBJ_FLAG_BBOX_CULL)

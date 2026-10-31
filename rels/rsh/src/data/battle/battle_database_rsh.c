@@ -24,6 +24,9 @@ NpcSetupBattleInfo btlsetup_rsh_tbl[3];
 NpcTerritoryInfo btl_rsh_setup_no_tbl[3];
 extern EvtWord bgset_rsh_bg_event[];
 
+/**
+ * Scenery props of the Excess Express battle stage (stg_06_0): rocks and scenery hills with their positions.
+ */
 BattleStageObjectData rsh_btlobject_data[] = {
     {"r_mae", 2, 1, {170.0f, 0.0f, -50.0f}, 0, 60, {0}},
     {"r_oku", 2, 1, {170.0f, -1000.0f, -50.0f}, 10, 50, {0}},
@@ -34,6 +37,9 @@ BattleStageObjectData rsh_btlobject_data[] = {
     {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
+/**
+ * The Excess Express battle stage (bti_01 backdrop, stg_06_0 scenery) with its scrolling background script.
+ */
 BattleStageData rsh_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -48,6 +54,7 @@ BattleStageData rsh_btlstage_data[] = {
     },
 };
 
+/** Enemies of the rsh_06_01_off_1 fight: Smorg. */
 BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[] = {
     {
         &unit_boss_moamoa, // unitKindParams
@@ -61,6 +68,10 @@ BattleUnitSetup btlparty_rsh_rsh_06_01_off_1[] = {
     },
 };
 
+/**
+ * Battle group of the rsh_06_01_off_1 fight (btlparty_rsh_rsh_06_01_off_1): never drops an item;
+ * heart drop table default, flower drop table battle_heart_drop_param_default (the heart table).
+ */
 BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1 = {
     1, // numEnemies
     btlparty_rsh_rsh_06_01_off_1, // enemyData
@@ -71,16 +82,22 @@ BattleGroupSetup btlgrp_rsh_rsh_06_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemy group of the rsh_test1_off encounter: btlgrp_rsh_rsh_06_01_off_1. */
 NpcBattleSelect btlgrpsel_rsh_btlno_rsh_test1_off[] = {
     {50, &btlgrp_rsh_rsh_06_01_off_1, rsh_btlstage_data},
     {0},
 };
 
+/** Enemy group of the rsh_06_01_off encounter: btlgrp_rsh_rsh_06_01_off_1. */
 NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[] = {
     {50, &btlgrp_rsh_rsh_06_01_off_1, rsh_btlstage_data},
     {0},
 };
 
+/**
+ * Encounter table of the Excess Express: the ordinary train fight and the Smorg boss fight, with their enemy
+ * pools and battle music.
+ */
 NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
     {
         "マップstg_06_0", // name
@@ -106,6 +123,7 @@ NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
     {0},
 };
 
+/** Maps the BTLNO_RSH battle names to their positions in btlsetup_rsh_tbl. */
 NpcTerritoryInfo btl_rsh_setup_no_tbl[] = {
     {"BTLNO_RSH_TEST1", 0},
     {"BTLNO_RSH_06_01", 1},

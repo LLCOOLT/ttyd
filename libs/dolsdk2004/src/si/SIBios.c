@@ -6,11 +6,14 @@
 #define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __SIVersion = "<< Dolphin SDK - SI\tdebug build: Apr  5 2004 03:55:31 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __SIVersion = "<< Dolphin SDK - SI\trelease build: Apr  5 2004 04:14:16 (0x2301) >>";
 #endif
 
+/** The transfer in progress: channel (-1: none), poll setting, input buffer and callback. */
 static SIControl Si = {
     /* chan */       -1,
     /* poll */        0,
@@ -21,6 +24,7 @@ static SIControl Si = {
 
 static SIPacket Packet[4];
 static OSAlarm Alarm[4];
+/** Last device type read from each port (no response until probed). */
 static u32 Type[4] = { SI_ERROR_NO_RESPONSE, SI_ERROR_NO_RESPONSE, SI_ERROR_NO_RESPONSE, SI_ERROR_NO_RESPONSE };
 static OSTime TypeTime[4];
 static OSTime XferTime[4];

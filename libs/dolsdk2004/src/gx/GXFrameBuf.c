@@ -3,6 +3,9 @@
 
 #include "__gx.h"
 
+/**
+ * Predefined NTSC render mode: 240-line double-strike (non-interlaced) picture from a 640x240 frame buffer.
+ */
 GXRenderModeObj GXNtsc240Ds = {
     1,
     640, 240, 240,
@@ -15,42 +18,55 @@ GXRenderModeObj GXNtsc240Ds = {
     { 0, 0, 21, 22, 21, 0, 0 }
 };
 
+/** As GXNtsc240Ds, with anti-aliasing. */
 GXRenderModeObj GXNtsc240DsAa = {
     1, 640, 240, 240, 40, 0, 640, 480, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 }
 };
 
+/** NTSC interlaced with field rendering: each 240-line field is drawn on its own. */
 GXRenderModeObj GXNtsc240Int = {
     0, 640, 240, 240, 40, 0, 640, 480, 0, 1, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 }
 };
 
+/** As GXNtsc240Int, with anti-aliasing. */
 GXRenderModeObj GXNtsc240IntAa = {
     0, 640, 240, 240, 40, 0, 640, 480, 0, 1, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 }
 };
 
+/** NTSC 480-line interlaced frame with the deflicker filter. */
 GXRenderModeObj GXNtsc480IntDf = {
     0, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 }
 };
 
+/** NTSC 480-line interlaced frame without the deflicker filter. */
 GXRenderModeObj GXNtsc480Int = {
     0, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 }
 };
 
+/** NTSC 480-line interlaced with anti-aliasing (the frame is drawn in two halves of 242 lines). */
 GXRenderModeObj GXNtsc480IntAa = {
     0, 640, 242, 480, 40, 0, 640, 480, 1, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 }
 };
 
+/** NTSC 480-line progressive scan, no vertical filter. */
 GXRenderModeObj GXNtsc480Prog = {
     2, 640, 480, 480, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 }
 };
 
+/** NTSC 480-line progressive scan with a soft vertical filter. */
 GXRenderModeObj GXNtsc480ProgSoft = {
     2, 640, 480, 480, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 8, 8, 10, 12, 10, 8, 8 }
 };
 
+/** NTSC 480-line progressive scan with anti-aliasing. */
 GXRenderModeObj GXNtsc480ProgAa = {
     2, 640, 242, 480, 40, 0, 640, 480, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 }
 };
 
+/**
+ * The same render modes for MPAL, for 50 Hz PAL (264 and 528 lines, 524 with anti-aliasing)
+ * and for EURGB60 (PAL at 60 Hz), then GXRmHW, a 320-wide double-strike mode.
+ */
 GXRenderModeObj GXMpal240Ds = {9, 640, 240, 240, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
 GXRenderModeObj GXMpal240DsAa = {9, 640, 240, 240, 40, 0, 640, 480, 0, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 0, 0, 21, 22, 21, 0, 0 } };
 GXRenderModeObj GXMpal240Int = {8, 640, 240, 240, 40, 0, 640, 480, 0, 1, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };

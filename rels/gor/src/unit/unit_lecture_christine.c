@@ -18,6 +18,11 @@
 #include "battle/battle_database_common.h"
 #include "gor.h"
 
+// Unit work slots of Goombella in the tutorial battle.
+enum {
+    UW_LECTURE_CHRISTINE_FRANKLI_ID = 0, // unit id of Professor Frankly, spawned at init
+};
+
 static USER_FUNC(_battle_set_lecture_unit_id);
 static USER_FUNC(_set_lecture_mode);
 static USER_FUNC(_krb_get_dir);
@@ -83,6 +88,10 @@ static USER_FUNC(_config_key_record) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit kind of Goombella:
+ * 10 HP, level 1, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 BattleUnitKind unit_lecture_christine = {
     177,
     "btl_un_christine",
@@ -141,7 +150,7 @@ BattleUnitKind unit_lecture_christine = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x2000000,
+    UNIT_ATTR_NO_HP_GAUGE,
     &regist,
     1,
     parts,
@@ -149,21 +158,29 @@ BattleUnitKind unit_lecture_christine = {
     data_table,
 };
 
+/** Defence of Goombella's body per damage type: 0 against every damage type. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Goombella's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Status vulnerability of Goombella: immune to every status. */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Event table of Goombella in the tutorial battle: tag 36 is her reaction when she is hurt while attacking.
+ */
 static BattleDataEntry data_table[] = {
     {36, lecture_christine_ac_counter_damage_event},
     {0, NULL},
 };
 
+/** Body part of Goombella: a single part using the model "c_pkr". */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_christine", "c_pkr", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x880009, 0, pose_table_christine_stay},
+    {1, "btl_un_christine", "c_pkr", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_UNTATTLEABLE | PART_ATTR_NO_HP_LOSS, 0, pose_table_christine_stay},
 };
 
+/** Setup entry that adds Prof. Frankly at (0, 0, -45) when the tutorial battle starts. */
 BattleUnitSetup entry_lecture_frankli = {
     &unit_lecture_frankli, // unitKindParams
     2, // alliance
@@ -192,12 +209,12 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), STRING("SFX_PARTY_BATTLE_LANDING1"))
     CALL(_set_lecture_mode)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_lecture_frankli), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_LECTURE_CHRISTINE_FRANKLI_ID, LW(3))
     CALL(_battle_set_lecture_unit_id, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), -1)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(0))
-    CALL(btlevtcmd_onoff_battleflag, 1, 4096)
+    CALL(btlevtcmd_onoff_battleflag, 1, BATTLE_FLAG_NO_OBJECT_FALL)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -211,13 +228,13 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Guess: damage event of Goombella in the tutorial after the counter lesson:
- * she is knocked into the air, lands, hops twice,
+ * Counter-damage event (data table tag 36) of Goombella in the tutorial's Superguard lesson, run when Mario's
+ * Superguard turns her Headbonk back on her: she is knocked into the air, lands, hops twice,
  * says mac_0_b_t2_015 and advances the lecture's unit work (to 8 if it was 7,
  * otherwise sets 7 on the other slot).
  */
 EVT_BEGIN(lecture_christine_ac_counter_damage_event)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(2), 25)
@@ -273,6 +290,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Goombella's headbutt 1: 1 damage to a single target, a jump-style hit. */
 BattleWeapon lec_weapon_zutsuki_1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -290,7 +308,7 @@ BattleWeapon lec_weapon_zutsuki_1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -308,6 +326,7 @@ BattleWeapon lec_weapon_zutsuki_1 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Goombella's headbutt 2: 1 damage to a single target, a jump-style hit. */
 BattleWeapon lec_weapon_zutsuki_2 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -326,7 +345,7 @@ BattleWeapon lec_weapon_zutsuki_2 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -345,9 +364,11 @@ BattleWeapon lec_weapon_zutsuki_2 = {
 };
 
 /**
- * Guess: attack event of the tutorial's Headbonk (ずつき):
- * picks the first or second lecture weapon by the lecture progress, then runs the normal enemy attack sequence:
- * jump to Mario, hit, return home.
+ * Goombella's Headbonk (ずつき) in the guard lessons: picks lec_weapon_zutsuki_1 at lecture progress 3, else
+ * lec_weapon_zutsuki_2, and jumps at Mario.
+ * Mid-jump, Professor Frankly freezes the action: at progress 3 for the
+ * A guard (mac_0_b_t2_006), at progress 7 for the B Superguard (mac_0_b_t2_014), and waits for the button. After
+ * the hit it stores the guard result in the lecture's unit work 3 (4, 5 or 6) and returns home.
  */
 EVT_BEGIN(lecture_zutsuki_attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 1, LW(0))
@@ -358,11 +379,13 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
     END_IF
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: Mario, for the guard lesson.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -371,7 +394,8 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // She runs to a spot in front of Mario.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -381,6 +405,7 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     SET_VALUE(LW(10), 0)
+    // Wind-up: she crouches and jumps at him with a Goomba jump cry.
     LABEL(10)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_A_2B"))
     WAIT_FRAMES(20)
@@ -406,12 +431,14 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
     END_SIBLING_EVENT
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(2), 5)
+    // Mid-jump, Professor Frankly freezes the action and explains how to guard.
     CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 0, -1)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 1, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(3)
         CALL(btlevtcmd_SetTalkPose, BTL_UNIT_LECTURE, STRING("T_1"))
         CALL(btlevtcmd_SetStayPose, BTL_UNIT_LECTURE, STRING("S_1"))
+        // Guard lesson: he asks Mario to press the A button as she lands, and waits for it.
         CALL(evt_msg_print, 2, STRING("mac_0_b_t2_006"), 0, BTL_UNIT_LECTURE)
 #if VERSION >= VERSION_JP
         WAIT_FRAMES(1)
@@ -437,6 +464,7 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
         CASE_EQUAL(7)
         CALL(btlevtcmd_SetTalkPose, BTL_UNIT_LECTURE, STRING("T_1"))
         CALL(btlevtcmd_SetStayPose, BTL_UNIT_LECTURE, STRING("S_1"))
+        // Superguard lesson: he asks for the B button instead, and waits for it.
         CALL(evt_msg_print, 2, STRING("mac_0_b_t2_014"), 0, BTL_UNIT_LECTURE)
 #if VERSION >= VERSION_JP
         WAIT_FRAMES(1)
@@ -470,10 +498,12 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 1, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(3)
+        // The pressed buttons are recorded for the lecture.
         CALL(_config_key_record, 256)
         CASE_EQUAL(7)
         CALL(_config_key_record, 512)
     END_SWITCH
+    // The hit is resolved with the lesson's guard result and stored for Frankly.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
     CALL(_get_defence_ac_result, LW(0))
@@ -487,6 +517,7 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_LECTURE, 3, 6)
     END_SWITCH
     ADD(LW(10), 1)
+    // She bounces off Mario in three small hops.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
         IF_INT_LESS(LW(6), 0)
@@ -515,11 +546,12 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    // She walks back to her home position.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)

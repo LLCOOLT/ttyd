@@ -23,6 +23,10 @@
 #include "mario/mario_hit.h"
 #include "mot/mot_jump.h"
 
+/**
+ * Jump curves (speed, acceleration, jerk, snap): Mario's launch off a blue jump stand (mot_jumpStand), with its
+ * fall and easing values; then the jump off a red switch, rising then falling (marioSetJumpPara).
+ */
 static f32 marioJumpStandData[] = {1.52f, -0.188f, 2.925f, -0.847f, -0.1f, -0.4f, 0.024f, -0.004f, 0.125f, 0.7f};
 f32 marioJumpSwData[] = {2.5f, -0.1f, 0.02f, -0.01f, -0.08f, -0.4f, 0.0f, -0.002f};
 
@@ -176,7 +180,7 @@ void mot_jumpSw(void) {
         marioPreJump();
         chgPoseB(mario);
         if (mario->hitobjJumpFrom != NULL) {
-            if (hitGetAttr(mario->hitobjJumpFrom) & 0x80000000) {
+            if (hitGetAttr(mario->hitobjJumpFrom) & HIT_ATTR_MOBJ) {
                 mobj = mobjHitObjPtrToPtr(mario->hitobjJumpFrom);
                 mario->mot.jump.standSpeed = ((MapObjectEntry*)mobj)->position.x;
                 mario->mot.jump.standHeight = ((MapObjectEntry*)mobj)->position.z;
@@ -241,8 +245,9 @@ void mot_jumpSw(void) {
 }
 
 /**
- * Guess: bounce off an enemy after stomping it, like mot_jumpSw but from the hit object;
- * Bowser runs kpa_jumpNpc (his field stage switches here when he lands on an enemy).
+ * Bounce off an enemy after stomping it in the field, like mot_jumpSw but from the hit object:
+ * entered from marioChgMotJump2 (npcdrv's first-strike jump hits)
+ * and from koopa_hit when Bowser lands on an enemy; Bowser runs kpa_jumpNpc instead.
  */
 void mot_jumpNpc(void) {
     MarioWork* mario = marioGetPtr();
@@ -275,7 +280,7 @@ void mot_jumpNpc(void) {
         }
         chgPoseB(mario);
         if (mario->hitobjJumpFrom != NULL) {
-            if (hitGetAttr(mario->hitobjJumpFrom) & 0x80000000) {
+            if (hitGetAttr(mario->hitobjJumpFrom) & HIT_ATTR_MOBJ) {
                 mobj = mobjHitObjPtrToPtr(mario->hitobjJumpFrom);
                 mario->mot.jump.standSpeed = ((MapObjectEntry*)mobj)->position.x;
                 mario->mot.jump.standHeight = ((MapObjectEntry*)mobj)->position.z;
@@ -486,7 +491,7 @@ void mot_upstairs(void) {
 #if VERSION <= VERSION_DEMO_US
                     motSlitContinue2();
 #else
-                    marioChgMot2(0x15);
+                    marioChgMot2(MARIO_MOTION_SLIT);
 #endif
                 } else {
                     marioChgMotAuto();

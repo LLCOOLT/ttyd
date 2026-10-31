@@ -30,6 +30,7 @@ extern EvtWord puniinfo_talk[];
 static NpcSetupInfo npcEnt[4];
 static BeroEntry bero_entry_data[2];
 
+/** The six item models and hit areas on the shop shelf (S_item_NN with A_item_NN). */
 static ShopObj obj_list[] = {
     {"S_item_01", "A_item_01"},
     {"S_item_02", "A_item_02"},
@@ -39,6 +40,10 @@ static ShopObj obj_list[] = {
     {"S_item_06", "A_item_06"},
 };
 
+/**
+ * What the Puni clerk sells and at what price in coins: HP Drain item, Ice Storm, Mystery, Mini Mr. Mini,
+ * Honey Syrup and Mushroom.
+ */
 static ShopItem goods_list[] = {
     {ITEM_HP_DRAIN_ITEM, 10},
     {ITEM_ICE_STORM, 15},
@@ -48,6 +53,7 @@ static ShopItem goods_list[] = {
     {ITEM_MUSHROOM, 3},
 };
 
+/** What the clerk buys from Mario and at what price (the trade-in list of the shop). */
 static ShopDb trade_list[] = {
 #if VERSION <= VERSION_DEMO_US
     {ITEM_HP_DRAIN_BADGE, 5, 0},
@@ -67,6 +73,7 @@ static ShopDb trade_list[] = {
     {0},
 };
 
+/** The Puni clerk (プニ店員) and his 35 shop messages (stg2_shop_00 and up). */
 static ShopperData35 shopper_data = {
     "プニ店員", // name
     NULL, NULL, // fook_evt..buy_evt
@@ -236,6 +243,7 @@ EVT_BEGIN(puniinfo_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the Puni shop: Jabble (ちびトゲ), the Puni clerk (プニ店員) and the information seller (プニ情報屋). */
 static NpcSetupInfo npcEnt[] = {
     {
         "ちびトゲ", // name
@@ -276,6 +284,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Exit of mri_07: east road e_bero to mri_06 (w_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName

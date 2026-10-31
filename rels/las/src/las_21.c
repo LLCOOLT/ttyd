@@ -108,6 +108,10 @@ static EVT_BEGIN(e2_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Exits of las_21: west door w_bero to las_19 (e_bero_1); east door e_bero_1 to las_23 (w_bero); east door
+ * e_bero_2 to las_23 (w_bero); north road n_bero to las_20 (s_bero_2).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -182,6 +186,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Exit of las_21: west door w_bero to las_19 (e_bero_2). */
 static BeroEntry w_bero_mapchg[] = {
     {
         "w_bero", // hitName
@@ -264,9 +269,11 @@ EVT_BEGIN(floatblk_evt)
         SET_FLOAT_VALUE(LW(9), FLOAT(-0.049804688f))
         SET_VALUE(LF(1), 1)
     END_IF
+    // The block starts moving toward its other height and the camera shakes.
     SPAWN_EVENT(floatblk_shake)
     WAIT_MS(500)
     CALL(evt_mobj_get_position, LW(15), LW(0), LW(1), LW(2))
+    // The block's colour decides whether the large or the small float sound plays.
     CALL(evt_mobj_get_kindname, LW(15), LW(3))
     SET_VALUE(LF(0), 0)
     IF_STR_EQUAL(LW(3), STRING("MOBJ_green_big02_FlowBlock"))
@@ -292,9 +299,12 @@ EVT_BEGIN(floatblk_evt)
         END_IF
         SET_VALUE(LW(8), -1)
     END_IF
+    // Each frame the block speeds up to 2 units per frame and carries Mario and his partner if they stand on
+    // it.
     CALL(evt_mobj_get_y_position, LW(15), LW(7))
     LOOP(0)
         SET_VALUE(LF(0), 0)
+        // If the block is coming down and one of them is under it, it reverses.
         IF_INT_EQUAL(LF(1), 1)
             CALL(evt_mario_get_name_hitobj_head, LW(0))
             IF_STR_EQUAL(LW(0), LW(14))
@@ -367,6 +377,7 @@ EVT_BEGIN(floatblk_evt)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // It lands at the end height; the move sound stops and the landing sound plays.
     CALL(evt_snd_sfxoff, LW(8))
     SPAWN_EVENT(floatblk_stop_se)
     IF_INT_EQUAL(LF(1), 1)

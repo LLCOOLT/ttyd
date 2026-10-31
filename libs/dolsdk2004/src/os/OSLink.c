@@ -112,7 +112,7 @@ const void* __OSStringTable AT_ADDRESS(OS_BASE_CACHED | 0x30D0);
     else                                \
       __prev->link.next = __next;       \
   } while (0)
-
+// dont_inline as in the original SDK source (dolsdk2001 and upstream have it); not a fake.
 #pragma dont_inline on
 /** Hook called after a relocatable module is linked, so a debugger can load its symbols. Empty here. */
 void OSNotifyLink(OSModuleInfo* module) {}

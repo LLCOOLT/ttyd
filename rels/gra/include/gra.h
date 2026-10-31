@@ -1,6 +1,5 @@
-#pragma once
-
 // Declarations shared by the gra.rel units (ウスグラの道, Twilight Trail).
+#pragma once
 
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"

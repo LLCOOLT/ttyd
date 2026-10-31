@@ -1,4 +1,4 @@
-// unit_dark_keeper: dark_keeper battle unit (a gatekeeper-type enemy sharing Gus's sounds).
+// unit_dark_keeper: Dark Craw (`dark_keeper`) battle unit (a gatekeeper-type enemy sharing Gus's sounds).
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -30,6 +30,10 @@ static EvtWord normal_attack_event[391];
 static EvtWord throw_attack_event[343];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Dark Craw: 20 HP and level 28, with its parts, status vulnerability, init event and
+ * event data table.
+ */
 BattleUnitKind unit_dark_keeper = {
     55,
     "btl_un_dark_keeper",
@@ -96,16 +100,30 @@ BattleUnitKind unit_dark_keeper = {
     data_table,
 };
 
+/**
+ * Defense of the Dark Craw against normal, fire, ice, explosion and electric attacks: none, so it takes
+ * full damage from every element.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type reactions of the Dark Craw: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Dark Craw (both demos), as the percent chance each status takes hold: immune
+ * to Fright; resists 12 statuses (down to 60% of the normal chance).
+ */
 static StatusVulnerability regist = {70, 70, 60, 100, 60, 100, 100, 60, 100, 60, 100, 60, 100, 60, 60, 0, 60, 100, 60, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Dark Craw (the retail releases), as the percent chance each status takes
+ * hold: immune to Fright; resists 12 statuses (down to 60% of the normal chance).
+ */
 static StatusVulnerability regist = {90, 80, 80, 100, 90, 100, 100, 70, 100, 90, 100, 90, 100, 95, 70, 0, 60, 100, 70, 100, 100, 95};
 #endif
 
+/** Pose table of the Dark Craw: maps each battle pose (idle, hurt, attacking and so on) to its animation. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -113,31 +131,40 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_2"},
+    {BTL_POSE_NORMAL, "S_2"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_1"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
+/**
+ * Event data table of the Dark Craw: scripts that replace the standard handling for an attacker being hurt
+ * by its spiked head (tag 37).
+ */
 static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/**
+ * Parts of the Dark Craw: 2 parts: parts 1 and 2 (model c_monban_t), each with its defense tables,
+ * attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_dark_keeper", "c_monban_t", 0.0f, 0.0f, 0.0f, 8.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
-    {2, "btl_un_dark_keeper", "c_monban_t", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_dark_keeper", "c_monban_t", 0.0f, 0.0f, 0.0f, 8.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_TOP_SPIKY, pose_table},
+    {2, "btl_un_dark_keeper", "c_monban_t", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Weapon record of the Dark Craw's charge: 6 damage and counts as a hammer-type hit. */
 static BattleWeapon weapon_monban_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -156,7 +183,7 @@ static BattleWeapon weapon_monban_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -174,6 +201,7 @@ static BattleWeapon weapon_monban_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon record of the Dark Craw's thrown-weapon attack: 6 damage. */
 static BattleWeapon weapon_monban_throw_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -192,7 +220,7 @@ static BattleWeapon weapon_monban_throw_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -210,6 +238,10 @@ static BattleWeapon weapon_monban_throw_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Sound cues for the animations of the Dark Craw: each entry plays a sound effect at a set time within a
+ * pose, such as SFX_ENM_MONBAN_WAIT1.
+ */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"S_2", 0.6666667f, NULL, "SFX_ENM_MONBAN_WAIT1", 0, 1},
     {NULL, 0.0f, NULL, NULL, 0, 1},
@@ -233,19 +265,20 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Data event 37 (the thorn-head counter): after 30 frames flashes the "toge_flush" spike effect near its head,
+ * Data event 37 (damage code 31, run when an attacker is hurt by its spiked head):
+ * after 30 frames flashes the "toge_flush" spike effect near its head,
  * placed 60 units up (Huge, status 10), 33 (Tiny, status 11) or 48 otherwise.
  */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 18)
         ADD(LW(1), 60)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 10)
         ADD(LW(1), 33)
@@ -308,6 +341,7 @@ EVT_END()
  * Afterwards it walks home and laughs three times before going back to its stance.
  */
 static EVT_BEGIN(normal_attack_event)
+    // Use the target of the opening first attack if there was one, otherwise choose a target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -317,7 +351,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -325,6 +359,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack is announced; Dark Craw turns to face its target.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -334,6 +369,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
+    // Dark Craw crouches and stomps its feet, then breaks into a run toward the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MONBAN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1"))
     WAIT_FRAMES(20)
@@ -355,6 +391,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), LW(5))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
+    // Find out how the target reacts to the charge.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -377,18 +414,20 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The charge missed: Dark Craw runs on past the target.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_FRAMES(60)
     GOTO(98)
+    // The charge connects: the damage is applied, then Dark Craw hops back twice with a step sound each time.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(1.0f), FLOAT(1.0f))
@@ -399,6 +438,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MONBAN_MOVE2L"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // Dark Craw walks back to its home position and laughs three times.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -416,12 +456,14 @@ static EVT_BEGIN(normal_attack_event)
 EVT_END()
 
 /**
- * Guess: the Dark Keeper's throw (weapon in LW(9)):
- * winds up, then hurls its second part (part 2, which it makes visible and spins) along an arc at the target,
- * checking damage on arrival. A miss lets the thrown part keep flying; the part is hidden again afterwards.
- * Then it laughs three times and returns to its stance.
+ * The Dark Craw's spear throw (weapon in LW(9)):
+ * it picks a target (the first-strike target during a first strike), winds up and throws its spear,
+ * part 2 (otherwise hidden), spinning along an arc to the target's hit position.
+ * A dodge plays the avoid reaction and the spear flies on; a hit takes the guard result and deals the damage;
+ * either way the spear is hidden again. Then it laughs three times and returns to its stance.
  */
 static EVT_BEGIN(throw_attack_event)
+    // Use the target of the opening first attack if there was one, otherwise choose a target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -431,7 +473,7 @@ static EVT_BEGIN(throw_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -439,6 +481,7 @@ static EVT_BEGIN(throw_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack is announced; Dark Craw turns to face its target.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -448,12 +491,13 @@ static EVT_BEGIN(throw_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
+    // Dark Craw winds up and throws the weapon in its hand; the weapon becomes a spinning projectile.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MONBAN_THROW1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_FRAMES(28)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MONBAN_THROW2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("A_3"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 5)
@@ -471,6 +515,7 @@ static EVT_BEGIN(throw_attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // The thrown weapon spins through the air toward the target.
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 2, 30, 0, FLOAT(0.5f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 30, -1)
@@ -496,19 +541,22 @@ static EVT_BEGIN(throw_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The throw missed: the weapon flies on and is restored to Dark Craw.
     LABEL(90)
     CALL(btlevtcmd_JumpPartsContinue, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     GOTO(98)
+    // The throw hits: the damage is applied.
     LABEL(91)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(2)
     GOTO(98)
+    // Dark Craw laughs three times and returns to its idle pose.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("T_1"))

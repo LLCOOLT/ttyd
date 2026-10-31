@@ -33,6 +33,10 @@ static EvtWord return_event[24];
 static EvtWord drain_attack_event[911];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Flower Fuzzy: 6 HP, 28x32 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_flower_chorobon = {
     87,
     "btl_un_flower_chorobon",
@@ -91,7 +95,7 @@ BattleUnitKind unit_flower_chorobon = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -99,20 +103,36 @@ BattleUnitKind unit_flower_chorobon = {
     data_table,
 };
 
+/** Defence of the Flower Fuzzy: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of the Flower Fuzzy: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Flower Fuzzy (percent chance each status takes hold):
+ * resists freeze (65%), Tiny (70%), Attack Down (70%), Defense Down (65%), allergic (65%), Slow (65%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {90, 90, 80, 100, 80, 100, 100, 65, 100, 70, 100, 70, 100, 65, 65, 85, 85, 100, 65, 100, 100, 95};
 #else
+/**
+ * Retail builds: Status vulnerability of the Flower Fuzzy (percent chance each status takes hold):
+ * resists freeze (70%), allergic (60%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {85, 85, 80, 100, 85, 100, 100, 70, 100, 90, 100, 90, 100, 95, 60, 85, 80, 100, 80, 100, 100, 95};
 #endif
 
+/** Parts of the Flower Fuzzy: 1 part (model c_chorobon_f). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_flower_chorobon", "c_chorobon_f", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_flower_chorobon", "c_chorobon_f", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/**
+ * Weapon of the Flower Fuzzy (drain attack): targets one unit for 3 damage, ignores Defense;
+ * used by drain_attack_event.
+ */
 static BattleWeapon weapon_chorobon_drain_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -131,7 +151,7 @@ static BattleWeapon weapon_chorobon_drain_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -149,6 +169,10 @@ static BattleWeapon weapon_chorobon_drain_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of the Flower Fuzzy (drain attack fp): targets one unit, drains FP, ignores Defense;
+ * used by drain_attack_event.
+ */
 static BattleWeapon weapon_chorobon_drain_attack_fp = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -167,7 +191,7 @@ static BattleWeapon weapon_chorobon_drain_attack_fp = {
     {3, 0, 0, 0, 0, 0, 0, 0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -185,6 +209,10 @@ static BattleWeapon weapon_chorobon_drain_attack_fp = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of the Flower Fuzzy (magic attack): targets every unit for 3 damage, ignores Defense;
+ * used by magic_attack_event.
+ */
 static BattleWeapon weapon_chorobon_magic_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -207,7 +235,7 @@ static BattleWeapon weapon_chorobon_magic_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -278,7 +306,7 @@ static EVT_BEGIN(magic_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_magic_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_chorobon_magic_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -309,7 +337,7 @@ static EVT_BEGIN(magic_attack_event)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_magic_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_magic_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -337,7 +365,7 @@ static EVT_BEGIN(magic_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_chorobon_magic_attack))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_magic_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_magic_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -350,6 +378,9 @@ static EVT_BEGIN(magic_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Weapon of the Flower Fuzzy (drain attack biribiri counterd): targets one unit; used by drain_attack_event.
+ */
 static BattleWeapon weapon_chorobon_drain_attack_biribiri_counterd = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -367,7 +398,7 @@ static BattleWeapon weapon_chorobon_drain_attack_biribiri_counterd = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, 0, // acHelpMsg..counterResistFlags
@@ -383,6 +414,7 @@ static BattleWeapon weapon_chorobon_drain_attack_biribiri_counterd = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Flower Fuzzy: maps its battle poses to its animations (CBN_*). */
 static PoseTableEntry pose_table[] = {
     {1, "CBN_N_1"},
     {2, "CBN_Y_1"},
@@ -390,20 +422,24 @@ static PoseTableEntry pose_table[] = {
     {5, "CBN_K_1"},
     {4, "CBN_X_1"},
     {3, "CBN_X_1"},
-    {28, "CBN_S_1"},
+    {BTL_POSE_NORMAL, "CBN_S_1"},
     {29, "CBN_Q_1"},
     {30, "CBN_Q_1"},
     {31, "CBN_S_1"},
-    {39, "CBN_D_1"},
+    {BTL_POSE_DAMAGE, "CBN_D_1"},
     {50, "CBN_A_1"},
-    {42, "CBN_R_1"},
-    {40, "CBN_W_1"},
-    {56, "CBN_X_1"},
-    {57, "CBN_X_1"},
+    {BTL_POSE_RUN, "CBN_R_1"},
+    {BTL_POSE_WALK, "CBN_W_1"},
+    {BTL_POSE_DANGER, "CBN_X_1"},
+    {BTL_POSE_PERIL, "CBN_X_1"},
     {BTL_POSE_TALK, "CBN_T_1"},
     {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
+/**
+ * Event table of the Flower Fuzzy: counter_damage_event (tags 26, 25, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+ * 36).
+ */
 static BattleDataEntry data_table[] = {
     {26, counter_damage_event},
     {25, counter_damage_event},
@@ -468,6 +504,10 @@ static EVT_BEGIN(rabbit_move)
     RETURN
 EVT_END()
 
+/**
+ * Sound cues of the Flower Fuzzy: SFX_ENM_CHORO2_MOVE1, SFX_ENM_CHORO2_WAIT1,
+ * SFX_ENM_CHORO2_WAIT2 plays at fixed points of the animations CBN_S_1.
+ */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"CBN_S_1", 0.5833333f, NULL, "SFX_ENM_CHORO2_MOVE1", 0, 1},
     {"CBN_S_1", 0.8333333f, NULL, "SFX_ENM_CHORO2_WAIT2", 0, 1},
@@ -513,9 +553,9 @@ static EVT_BEGIN(counter_damage_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
     CALL_CHILD(subsetevt_counter_damage)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -526,7 +566,7 @@ EVT_END()
 
 /** Makes the Fuzzy hop back to its home position with rabbit_move (up to 40 units per hop). */
 static EVT_BEGIN(return_event)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
     SET_VALUE(LW(8), 40)
@@ -547,7 +587,7 @@ static EVT_BEGIN(drain_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_drain_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_chorobon_drain_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -564,24 +604,26 @@ static EVT_BEGIN(drain_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(5), LW(6), LW(7))
     SET_VALUE(LW(6), 0)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(5), 50)
     SET_VALUE(LW(8), 50)
+    // It hops over toward its target in bounds.
     CALL_CHILD(rabbit_move)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 350)
+    // The camera pulls back and the Flower Fuzzy crouches, then leaps high up onto its target.
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 60, 0, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 5)
     SUBTRACT(LW(1), 10)
     SUBTRACT(LW(2), 2)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_drain_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_drain_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -603,6 +645,8 @@ static EVT_BEGIN(drain_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The leap misses or is blocked: it bounces off in two hops, lands in front of the target and waits a
+    // moment.
     LABEL(90)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
@@ -618,6 +662,7 @@ static EVT_BEGIN(drain_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("CBN_N_1"))
     WAIT_MS(1000)
     GOTO(98)
+    // The leap lands. First it checks whether the target is protected by a shock counter.
     LABEL(91)
     SET_VALUE(LF(0), 0)
     CALL(btlevtcmd_PreCheckCounter, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_drain_attack), 256, LW(5))
@@ -627,13 +672,15 @@ static EVT_BEGIN(drain_attack_event)
     IF_INT_EQUAL(LW(5), 14)
         SET_VALUE(LF(0), 1)
     END_IF
+    // If the target shocks it, the Flower Fuzzy takes the counter damage instead and the attack ends there.
     IF_INT_EQUAL(LF(0), 1)
         CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_chorobon_drain_attack))
         SET_VALUE(LW(9), PTR(&weapon_chorobon_drain_attack_biribiri_counterd))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
+    // It clings to the target, which shakes while the Flower Fuzzy latches on.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_CHORO2_ATTACK1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetBodyId, LW(3), LW(0))
     CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(0), 37)
@@ -660,6 +707,7 @@ static EVT_BEGIN(drain_attack_event)
         END_IF
         CALL(btlevtcmd_SetDispOffset, LW(3), 0, 0, 0)
     END_INLINE_EVENT
+    // It drains the target for about 90 frames (CBN_A_2), then squashes down.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_CHORO2_ATTACK1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(15))
     SET_VALUE(LW(14), 20)
@@ -689,18 +737,21 @@ static EVT_BEGIN(drain_attack_event)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_CHORO2_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+    // The Action Command defence result is applied and it takes FP from the target if it has any, otherwise
+    // HP.
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_chorobon_drain_attack))
     CALL(btlevtcmd_GetFp, LW(3), LW(0))
     IF_INT_GREATER(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_chorobon_drain_attack_fp))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_GetFpDamage, LW(3), LW(10))
     ELSE
         SET_VALUE(LW(9), PTR(&weapon_chorobon_drain_attack))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_GetHpDamage, LW(3), LW(10))
     END_IF
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
+    // If it drained anything it swells up, and then it heals itself by that amount with a recovery effect.
     IF_INT_GREATER_OR_EQUAL(LW(10), 1)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.5f), FLOAT(0.5f), 0)
     END_IF
@@ -751,6 +802,7 @@ static EVT_BEGIN(drain_attack_event)
     LOOP(2)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 30)
+        // It hops home in two bounces.
         CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_CHORO2_ATTACK3"), 0, 0, -1, -1, 0, 0)
         LOOP(2)
             CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -776,6 +828,7 @@ static EVT_BEGIN(drain_attack_event)
         WAIT_FRAMES(1)
     END_LOOP
     GOTO(98)
+    // The camera resets and the Flower Fuzzy gets back to its starting spot.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)

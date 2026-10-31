@@ -3,6 +3,7 @@
 
 #include "__ax.h"
 
+/** Lookup table the AX audio compressor uses to scale the mixed output; 3360 16-bit gain values. */
 u16 __AXCompressorTable[3360] = {
     0x7FA1, 0x7F43, 0x7EE6, 0x7E88, 0x7E2B, 0x7DCE,
 	0x7D72, 0x7D16, 0x7CBA, 0x7C5E, 0x7C02, 0x7BA7,

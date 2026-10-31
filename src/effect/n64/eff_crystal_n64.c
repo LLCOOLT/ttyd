@@ -208,6 +208,7 @@ static void effCrystalMain(EffectEntry* effect) {
     dispEntry(work->camera, dispCalcZ(&position), 2, (DispCallback)effCrystalDisp, effect);
 }
 
+/** Outer 108x108 glint quad of the crystal shine, spun slowly with texture 0x6D (types below 3). */
 effN64Vtx size108x108_tex32x32_vtx[] = {
     {-54, -54, 1, 0, 0, 0, 0, 0, 255},
     {54, -54, 1, 1024, 0, 0, 0, 0, 255},
@@ -215,6 +216,7 @@ effN64Vtx size108x108_tex32x32_vtx[] = {
     {-54, 54, 1, 0, 1024, 0, 0, 0, 255},
 };
 
+/** Inner 100x100 glint quad: spun fast against the outer one for types below 3, drawn alone for the rest. */
 effN64Vtx size100x100_tex32x32_vtx[] = {
     {-50, -50, -1, 0, 0, 0, 0, 0, 255},
     {50, -50, -1, 1024, 0, 0, 0, 0, 255},

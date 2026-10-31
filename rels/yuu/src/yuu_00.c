@@ -68,6 +68,10 @@ USER_FUNC(evt_sub_get_language);
 #endif
 BOOL yuuminigame1_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, HikokiWork* data);
 
+/**
+ * Where fall_rtn scatters the Plane Mode coins: three stretches of the flight path (x range, then height range)
+ * holding 2, 2 and 1 coins. US and later spread the coins over a wider, lower band of heights.
+ */
 static MonteTable montetable[] = {
 #if VERSION <= VERSION_DEMO_US
     {-1200.0f, -800.0f, 450.0f, 400.0f, 2},
@@ -131,6 +135,7 @@ EVT_END()
  */
 EVT_BEGIN(light_sub_event)
     SET_VALUE(GF(0), 1)
+    // The first pair of spotlights (light01, light_b) sweeps back and forth until GF(0) is cleared.
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 96)
         LOOP(0)
@@ -188,6 +193,7 @@ EVT_BEGIN(light_sub_event)
             ADD(LW(0), 1)
             ADD(LW(2), 1)
         END_LOOP
+        // Once the show stops, the lights swing back to rest.
         WAIT_MS(300)
         SET_VALUE(LW(2), 0)
         SET_VALUE(LW(5), LW(3))
@@ -209,6 +215,7 @@ EVT_BEGIN(light_sub_event)
         CALL(evt_mapobj_rotate, 1, STRING("light01"), 0, 0, LW(3))
         CALL(evt_mapobj_rotate, 1, STRING("light_b"), 0, 0, LW(3))
     END_INLINE_EVENT
+    // The second pair (light02, light_c) does the same, 30 frames out of step with the first.
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 30)
         LOOP(0)
@@ -361,6 +368,8 @@ EVT_BEGIN(minigame01_start)
     CALL(yuu_atai_init)
     CALL(yuu_atai_push, LW(0))
     CALL(evt_map_playanim, STRING("neon_01"), 1, 0)
+    // Platform 1 (S_dai_01) slides back and forth along X. US and later pick one of six motions at random
+    // (1, 1.5 or 2 seconds a leg, from either end); the demo and JP always use the slow one.
 #if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
@@ -411,6 +420,7 @@ EVT_BEGIN(minigame01_start)
         SET_VALUE(LW(12), 0)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
 #if VERSION >= VERSION_US
+        // Motions 3 to 5: the same three speeds, starting from the other end.
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_01"))
         SET_VALUE(LW(1), STRING("A_dai_01"))
@@ -459,6 +469,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 1, LW(15))
+    // Platform 2 (S_dai_02) slides along Z, with the same choice of motions.
 #if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
@@ -509,6 +520,7 @@ EVT_BEGIN(minigame01_start)
         SET_VALUE(LW(12), 0)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
 #if VERSION >= VERSION_US
+        // Motions 3 to 5: the same three speeds, starting from the other end.
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_02"))
         SET_VALUE(LW(1), STRING("A_dai_02"))
@@ -557,6 +569,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 2, LW(15))
+    // Platform 3 (S_dai_03) moves on X and Z at once, with the same choice of motions.
 #if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
@@ -611,6 +624,7 @@ EVT_BEGIN(minigame01_start)
         SET_VALUE(LW(12), 0)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
 #if VERSION >= VERSION_US
+        // Motions 3 to 5: the same three speeds, starting from the other end.
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_03"))
         SET_VALUE(LW(1), STRING("A_dai_03"))
@@ -659,6 +673,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 3, LW(15))
+    // Platform 4 (S_dai_04) also moves on X and Z at once.
 #if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
@@ -709,6 +724,7 @@ EVT_BEGIN(minigame01_start)
         SET_VALUE(LW(12), 0)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
 #if VERSION >= VERSION_US
+        // Motions 3 to 5: the same three speeds, starting from the other end.
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_04"))
         SET_VALUE(LW(1), STRING("A_dai_04"))
@@ -757,6 +773,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 4, LW(15))
+    // Platform 5 (S_dai_05), the last and highest-scoring one, also moves on X and Z at once.
 #if VERSION >= VERSION_US
     CALL(evt_sub_random, 5, LW(0))
     SWITCH(LW(0))
@@ -807,6 +824,7 @@ EVT_BEGIN(minigame01_start)
         SET_VALUE(LW(12), 0)
         SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
 #if VERSION >= VERSION_US
+        // Motions 3 to 5: the same three speeds, starting from the other end.
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("S_dai_05"))
         SET_VALUE(LW(1), STRING("A_dai_05"))
@@ -855,6 +873,7 @@ EVT_BEGIN(minigame01_start)
     END_SWITCH
 #endif
     CALL(yuuminigame_set_dataadr, 5, LW(15))
+    // The platforms are ready. On the first round the camera flies over the course; A or B skips it.
     CALL(yuu_atai_pop, LW(0))
 #if VERSION >= VERSION_US
     CALL(yuuminigame1_floor_on_off, LW(0), 1)
@@ -883,6 +902,7 @@ EVT_BEGIN(minigame01_start)
         CALL(evt_cam3d_evt_off, 0, 11)
         WAIT_FRAMES(1)
     END_IF
+    // The music starts, Mario poses, the spotlights stop and the start signal plays.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MINIGAME1"))
     WAIT_MS(200)
     CALL(evt_mario_set_pose, STRING("M_I_1"))
@@ -894,6 +914,7 @@ EVT_BEGIN(minigame01_start)
     SET_VALUE(GF(0), 0)
     CALL(eff_call_minigame, 0, 0, 0, 500)
     WAIT_MS(3000)
+    // Mario becomes a paper airplane, the controls come back and the coin counter appears.
     CALL(evt_change_plane)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_key_onoff, 1)
@@ -917,6 +938,7 @@ EVT_END()
  * playing again charges 10 medals and resets the stage.
  */
 EVT_BEGIN(minigame01_end)
+    // The landing is over: the crowd reacts and the moving platforms are removed.
 #if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_onoff, 1, 0)
     CALL(evt_cam_letter_box_disable, 0)
@@ -943,6 +965,8 @@ EVT_BEGIN(minigame01_end)
     CALL(yuuminigame_get_dataadr, 5, LW(15))
     CALL(evt_moving_floor_delete, LW(15))
 #endif
+    // Crashing on the ground (a negative score) plays the failure effect;
+    // landing on a platform plays the success effect and Mario poses by how well he did.
     CALL(evt_mario_adjust_dir)
     IF_INT_LESS(LW(0), 0)
         CALL(eff_call_minigame, 2, 0, 0, 500)
@@ -964,6 +988,7 @@ EVT_BEGIN(minigame01_end)
         END_IF
         WAIT_MS(3500)
     END_IF
+    // The tally screen shows the score and Mario receives his piantas, then the ranking screen records it.
     CALL(evt_yuucounter_free)
     CALL(yuugijou_montemedal_disp_onoff, 1)
     CALL(evt_yuuranking_alloc, 0, 0, 0, 0, LW(0), LW(2), LW(1), 0)
@@ -978,6 +1003,7 @@ EVT_BEGIN(minigame01_end)
     WAIT_FRAMES(1)
     CALL(yuuranking_wait_button)
     CALL(evt_yuuranking_free)
+    // With fewer than 10 piantas the game ends; otherwise the player picks Continue (10 piantas) or Quit.
     SET_VALUE(LW(1), 10)
     CALL(yuugijou_get_montemedal, LW(0))
     IF_INT_LESS(LW(0), LW(1))
@@ -985,6 +1011,7 @@ EVT_BEGIN(minigame01_end)
     ELSE
         CALL(evt_msg_select, 0, STRING("sysyuu_00_00"))
     END_IF
+    // Quitting sends Mario back through the pipe to gor_03.
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GSWF(GSWF_YUU_MINIGAME_QUIT), 1)
         CALL(evt_mario_set_prev_party_pos, 0, 0, -1000, 0)
@@ -993,6 +1020,7 @@ EVT_BEGIN(minigame01_end)
         CALL(evt_bero_mapchange, STRING("gor_03"), STRING("A_dokan_02"))
         RETURN
     END_IF
+    // Continuing pays 10 piantas; the stage fades out, Mario returns to the start and the lights come back on.
     MULTIPLY(LW(1), -1)
     CALL(yuugijou_add_montemedal, 0, LW(1))
     CALL(yuugijou_montemedal_wait)
@@ -1019,10 +1047,13 @@ EVT_END()
  * and (US and later) hides all but the current game-language sign graphics on the stage.
  */
 EVT_BEGIN(yuu_00_init_evt)
+    // The neon sign lights up, the game is set up and the audience appears.
     CALL(evt_map_playanim, STRING("neon_02"), 1, 0)
     SPAWN_EVENT(minigame01_main)
     CALL_CHILD(evt_yuunpc_minigame1)
 #if VERSION >= VERSION_US
+    // US and later: the sign graphics come in one set per language; hide them all, then show the set
+    // for the current language (Japanese, English, German, French, Spanish or Italian).
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_1"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_2"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_3"), MAPOBJ_FLAG_DISABLE)
@@ -1112,6 +1143,10 @@ USER_FUNC(yuu_00_cam_shift_reset) {
 }
 #endif
 
+/**
+ * Names of the floor areas below the course for yuuminigame1_gamerule;
+ * landing on one scores -5 (02, 05), -10 (03), -15 (06) or -20 (04).
+ */
 static const char yuu00_gnd_02[] = "A_ground_02";
 static const char yuu00_gnd_05[] = "A_ground_05";
 static const char yuu00_gnd_03[] = "A_ground_03";
@@ -1394,7 +1429,7 @@ void yuuminigame_disp_1hikoki(CameraId camera, void* param) {
     monteCountDisp();
 }
 
-// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
+// FAKE: dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 /**
  * Rule check run each frame during Plane Mode: once Mario lands on a hit object other than in plane motion,

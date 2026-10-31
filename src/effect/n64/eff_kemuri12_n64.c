@@ -7,6 +7,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+/** Camera-facing 32x32 smoke puff, used by types 0-2. */
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
     {16, -16, 0, -1024, 0, 0, 0, 0, 255},
@@ -14,6 +15,7 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, 16, 0, 0, 1024, 0, 0, 0, 255},
 };
 
+/** Lava-coloured (yougan) smoke mesh with extra quads, used by types above 2. */
 effN64Vtx size32x32_tex32x32_yougan_vtx[] = {
     {-16, -16, 15, 0, 0, 0, 0, 0, 255},
     {16, -16, 15, -1024, 0, 0, 0, 0, 255},
@@ -99,11 +101,12 @@ static void effKemuri12Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri12Disp, effect);
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 
 /**
- * Draws the smoke with texture 0xE using two texture windows (Guess: the current and next animation frame);
+ * Draws the smoke with texture 0xE, cross-fading two 32-pixel texture windows,
+ * the current animation frame and the next, by the fraction of progress (TEV register 1 alpha);
  * types above 2 use the lava-coloured (yougan) mesh with extra quads.
  */
 static void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {

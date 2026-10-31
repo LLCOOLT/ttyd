@@ -40,6 +40,7 @@ extern EvtWord slot03_event[];
 extern EvtWord slot_event[];
 extern EvtWord get_blue_jail_key[];
 
+/** Exit of mri_09: west road w_bero to mri_03. */
 BeroEntry bero_bluejail[] = {
     {
         "w_bero", // hitName
@@ -59,6 +60,10 @@ BeroEntry bero_bluejail[] = {
     },
 };
 
+/**
+ * Exits of mri_09: west road w_bero to mri_08 (e_bero); north road n_bero to mri_10 (s_bero); dokan2
+ * (scripted pipe); dokan3 (scripted pipe).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -279,6 +284,7 @@ static EVT_BEGIN(breakyuka_main)
     RETURN
 EVT_END()
 
+/** Plants Mario can search in mri_09: A_ueki_01, A_ueki_02, A_ueki_03, A_ueki_04, A_ueki_05. */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki_01", "S_ueki_01", NULL},
     {1, "A_ueki_02", "S_ueki_02", NULL},

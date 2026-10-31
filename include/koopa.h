@@ -28,11 +28,11 @@ struct HitEntry;
  * kpaPreInit allocates it once (0x154) and marioReset keeps the pointer.
  * Same layout on JP and US. */
 typedef enum KpaWorkFlags {
-    KPA_WORK_FLAG_NO_HIP_ATTACK = (1 << 4), // 0x10, kpaHipAttackOk returns FALSE
-    KPA_WORK_FLAG_100 = (1 << 8),           // 0x100, koopa_motion sets/clears
-    KPA_WORK_FLAG_MUTEKI = (1 << 16),       // 0x10000, kpaMutekiOn/Off/Check
-    KPA_WORK_FLAG_WEARY = (1 << 24),        // 0x1000000, evt_koopa_weary
-    KPA_WORK_FLAG_DEAD = (1 << 28),         // 0x10000000, evt_koopa_chk_dead
+    KPA_WORK_FLAG_NO_HIP_ATTACK = (1 << 4),  // 0x10, kpaHipAttackOk returns FALSE
+    KPA_WORK_FLAG_SPLASH_PENDING = (1 << 8), // 0x100, entered the water: kpa_swim plays the splash SFX when he sinks
+    KPA_WORK_FLAG_MUTEKI = (1 << 16),        // 0x10000, kpaMutekiOn/Off/Check
+    KPA_WORK_FLAG_WEARY = (1 << 24),         // 0x1000000, evt_koopa_weary
+    KPA_WORK_FLAG_DEAD = (1 << 28),          // 0x10000000, evt_koopa_chk_dead
 } KpaWorkFlags;
 
 typedef struct KpaWork {

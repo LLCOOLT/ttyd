@@ -278,13 +278,15 @@ EVT_END()
 #endif
 
 /**
- * Guess: Chet Rippo's offer to lower Mario's level. Refuses if Mario has fewer than 39 coins (powerdown_04).
- * Otherwise shows the coin window and a stat choice (HP, FP or BP)
- * and asks for confirmation (powerdown_06, powerdown_09);
- * on yes it takes the 39 coins and lowers Mario's level,
- * giving the chosen stat boost (powerdown_10 to powerdown_13).
+ * Chet Rippo's stat trade for Mario. Refuses if Mario has fewer than 39 coins (powerdown_04).
+ * Otherwise shows the coin window and two choices (evt_win_other_select 9 and 10: the stat to boost and the stat
+ * to decrease) and asks whether that trade sounds good for 39 coins (powerdown_06, powerdown_09);
+ * on yes it takes the 39 coins, chants (powerdown_11, powerdown_12) over the light and house effects,
+ * sets the new HP, FP and BP (unitwin_setmariolevel), and says it removed all badges because BP ran low
+ * (powerdown_10) when that happened, else that it is finished (powerdown_13).
  */
 EVT_BEGIN(powerdownya_mario_level_rtn)
+    // Chet Rippo turns Mario away if he cannot pay 39 coins.
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_LESS(LW(0), 39)
 #if VERSION <= VERSION_DEMO_US
@@ -294,6 +296,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
 #endif
         RETURN
     END_IF
+    // Mario picks the stat to raise and the stat to lower, and confirms the trade.
     CALL(evt_msg_continue)
     CALL(evt_win_coin_on, 0, LW(12))
     LOOP(0)
@@ -328,6 +331,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
         END_IF
         CALL(evt_msg_continue)
     END_LOOP
+    // Mario pays 39 coins, the music stops and Chet Rippo starts his chant.
     CALL(evt_pouch_get_coin, LW(0))
     SUBTRACT(LW(0), 39)
     CALL(evt_pouch_set_coin, LW(0))
@@ -351,6 +355,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
         END_IF
     END_LOOP
     WAIT_MS(500)
+    // The power-down music plays, the walls of the house fold open and the camera pulls back over the light.
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_POWERDOWN1"))
     CALL(bgm_start_wait)
@@ -391,6 +396,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -9, 212, 886, -9, 56, 0, 1600, 11)
     WAIT_MS(1600)
+    // For seven seconds the camera turns around Mario while crystal waves pulse and he glows.
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, 0, 100, 7000)
         LOOP(0)
@@ -420,6 +426,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
         CALL(evt_mario_set_pose, STRING("M_I_Z"))
     END_INLINE_EVENT
     WAIT_MS(7000)
+    // The light fades, the house closes up again and the camera returns.
     CALL(evt_eff_softdelete, STRING("aaax"))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("down_pira"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(500)
@@ -472,6 +479,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // Mario poses, the music comes back and the new HP, FP and BP are set; Chet Rippo says if badges came off.
     CALL(evt_mario_set_pose, STRING("M_V_2"))
     WAIT_MS(1500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
@@ -492,13 +500,18 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
 EVT_END()
 
 /**
- * Guess: Chet Rippo's offer to lower a partner's rank.
- * Refuses if Mario has fewer than 39 coins (powerdown_04) or no partner can be ranked down (powerdown_07).
- * Otherwise it lets Mario pick a partner and a bonus,
- * asks for confirmation (powerdown_08, powerdown_09) and on yes takes 39 coins,
- * lowers the partner's rank and applies the bonus (powerdown_13).
+ * Chet Rippo's rank trade between two partners.
+ * Refuses if Mario has fewer than 39 coins (powerdown_04) or, in JP and later, if no partner can be ranked down
+ * (evt_win_party_lankdown_chk, powerdown_07).
+ * Otherwise Mario picks the partner to boost and the partner to drop (evt_win_other_select 7 and 8) and confirms
+ * the trade for 39 coins (powerdown_08, powerdown_09);
+ * on yes it takes the coins, brings out the boosted partner,
+ * chants (powerdown_11, powerdown_12), raises that partner's rank by one,
+ * lowers the other's by one and says it is
+ * finished (powerdown_13).
  */
 EVT_BEGIN(powerdownya_party_lank_rtn)
+    // Chet Rippo turns Mario away if he cannot pay 39 coins (or, from JP on, if no partner can lose a rank).
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_LESS(LW(0), 39)
         CALL(evt_msg_print_add, 0, STRING("powerdown_04"))
@@ -511,6 +524,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         RETURN
     END_IF
 #endif
+    // Mario picks the partner to rank up and the partner to rank down, and confirms the trade.
     CALL(evt_msg_continue)
     CALL(evt_win_coin_on, 0, LW(12))
     LOOP(0)
@@ -545,6 +559,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         END_IF
         CALL(evt_msg_continue)
     END_LOOP
+    // Mario pays 39 coins, the partner losing a rank is brought out and Chet Rippo starts his chant.
     CALL(evt_pouch_get_coin, LW(0))
     SUBTRACT(LW(0), 39)
     CALL(evt_pouch_set_coin, LW(0))
@@ -564,6 +579,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
 #if VERSION >= VERSION_US
     CALL(evt_party_stop, 0)
 #endif
+    // The house walls fold open and the camera pulls back over the light (power-down music from JP on).
     CALL(evt_sub_intpl_msec_init, 11, 0, -20, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(5))
@@ -618,6 +634,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -9, 212, 886, -9, 56, 0, 1600, 11)
     WAIT_MS(1600)
+    // For seven seconds the camera turns: the partner losing a rank spins away, then the other one glows.
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, 0, 100, 7000)
         LOOP(0)
@@ -709,6 +726,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         WAIT_MS(2000)
         CALL(evt_party_set_breed_pose, 0, 1)
     END_INLINE_EVENT
+    // The light fades, the house closes up again and the camera returns, and the partner cheers.
     WAIT_MS(7000)
     CALL(evt_eff_softdelete, STRING("aaax"))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("down_pira"), MAPOBJ_FLAG_HIDE)
@@ -801,6 +819,7 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
 #if VERSION >= VERSION_JP
     DELETE_EVENT(GW(1))
 #endif
+    // The music comes back and the two partners' ranks change by one each.
     CALL(enzan_lw_load)
 #if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
@@ -820,8 +839,8 @@ EVT_END()
  * Talk script at Chet Rippo's counter.
  * The first visit sets GSWF_TIK11_CHET_RIPPO_MET and greets Mario (powerdown_00),
  * later visits use powerdown_00_01 and powerdown_01.
- * Offers the menu (powerdown_02): lower Mario's level (powerdownya_mario_level_rtn),
- * lower a partner's rank (powerdownya_party_lank_rtn), or leave.
+ * Offers the menu (powerdown_02): trade Mario's stats (powerdownya_mario_level_rtn),
+ * trade ranks between partners (powerdownya_party_lank_rtn), or leave.
  */
 EVT_BEGIN(powerdownya_table_talk)
     CALL(setmertn, STRING("パワーダウン屋"))
@@ -879,6 +898,7 @@ EVT_BEGIN(powerdownya_init)
     RETURN
 EVT_END()
 
+/** NPCs of this room: Chet Rippo, whose counter talk is registered on the A_power_down area. */
 static NpcSetupInfo npcEnt[] = {
     {
         "パワーダウン屋", // name
@@ -895,6 +915,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Doors of this room: the west exit back to tik_01. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName

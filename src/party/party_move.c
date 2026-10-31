@@ -56,11 +56,11 @@ static inline void partyModeTail(PartyEntry* party) {
         party->splashTimer = 0;
     }
     if (party->runMode != 13) {
-        if (party->hitobjStandOn && (hitGetAttr(party->hitobjStandOn) & 0x800)) {
+        if (party->hitobjStandOn && (hitGetAttr(party->hitobjStandOn) & HIT_ATTR_SPIKES)) {
             partyChgRunMode(party, 13);
-        } else if (party->hitobjFront && (hitGetAttr(party->hitobjFront) & 0x800)) {
+        } else if (party->hitobjFront && (hitGetAttr(party->hitobjFront) & HIT_ATTR_SPIKES)) {
             partyChgRunMode(party, 13);
-        } else if (party->hitobjHead && (hitGetAttr(party->hitobjHead) & 0x800)) {
+        } else if (party->hitobjHead && (hitGetAttr(party->hitobjHead) & HIT_ATTR_SPIKES)) {
             partyChgRunMode(party, 13);
         }
     }
@@ -71,6 +71,10 @@ s32 writeId[2];
 s32 readId[2];
 
 #if VERSION >= VERSION_JP
+/**
+ * Map objects a partner must not stand on when following Mario:
+ * chests, jump stands, Save and Heart blocks, switches and the eki_06 objects.
+ */
 static const char* objNames[] = {
     "MOBJ_TreasureBox",
     "MOBJ_BigTreasureBox",
@@ -360,7 +364,7 @@ static inline void partyPutFootmark(s32 id, Vec pos, u32 flags) {
     MarioWork* mario = marioGetPtr();
     PartyFootmark* fm = &footmarkBuf[id][writeId[id]];
 
-    if ((fm->flags & 1) && (flags & 1)) {
+    if ((fm->flags & PARTY_FOOTMARK_JUMP) && (flags & PARTY_FOOTMARK_JUMP)) {
         return;
     }
     if (fm->pos.x == pos.x && fm->pos.y == pos.y && fm->pos.z == pos.z) {
@@ -375,22 +379,22 @@ static inline void partyPutFootmark(s32 id, Vec pos, u32 flags) {
     }
     fm = &footmarkBuf[id][writeId[id]];
     fm->pos = pos;
-    if (flags & 1) {
-        fm->flags |= 1;
+    if (flags & PARTY_FOOTMARK_JUMP) {
+        fm->flags |= PARTY_FOOTMARK_JUMP;
     } else {
-        fm->flags &= ~1;
+        fm->flags &= ~PARTY_FOOTMARK_JUMP;
     }
-    if (flags & 2) {
-        fm->flags |= 4;
+    if (flags & PARTY_FOOTMARK_DEMO_ARG_SLIT) {
+        fm->flags |= PARTY_FOOTMARK_SLIT;
     } else {
-        fm->flags &= ~4;
+        fm->flags &= ~PARTY_FOOTMARK_SLIT;
     }
 }
 
 /** TRUE while the other party member is jumping (PARTY_FLAG_IS_JUMPING); its footmarks then get the jump bit. */
 static inline BOOL partyChkOtherFlag(PartyEntry* other) {
     BOOL ret = FALSE;
-    if (other->flags & 0x10) {
+    if (other->flags & PARTY_FLAG_IS_JUMPING) {
         ret = TRUE;
     }
     return ret;
@@ -408,10 +412,10 @@ void partyRecordFootmark(PartyEntry* party) {
 
     if (party->currentSlotId == 0) {
         if (partyChkMarioJumpFlag()) {
-            flags |= 1;
+            flags |= PARTY_FOOTMARK_JUMP;
         }
         if (marioChkSlitThrouh()) {
-            flags |= 2;
+            flags |= PARTY_FOOTMARK_DEMO_ARG_SLIT;
         }
         partyPutFootmark(partyGetFootmarkId(party), marioGetPtr()->position, flags);
     } else {
@@ -428,19 +432,20 @@ void partyRecordFootmark(PartyEntry* party) {
                 partyClearFootmark();
             }
             if (partyChkOtherFlag(other)) {
-                flags |= 1;
+                flags |= PARTY_FOOTMARK_JUMP;
             }
             partyPutFootmark(partyGetFootmarkId(party), other->position, flags);
         } else {
             if (party->footmarkMode == 1) {
                 party->footmarkMode = 0;
+                // FAKE: called through a cast so deferred codegen does not inline partyClearFootmark2 (FAKES.md)
                 ((void (*)(void))partyClearFootmark2)();
             }
             if (partyChkMarioJumpFlag()) {
-                flags |= 1;
+                flags |= PARTY_FOOTMARK_JUMP;
             }
             if (marioChkSlitThrouh()) {
-                flags |= 2;
+                flags |= PARTY_FOOTMARK_DEMO_ARG_SLIT;
             }
             partyPutFootmark(partyGetFootmarkId(party), marioGetPtr()->position, flags);
         }
@@ -770,7 +775,7 @@ static inline void partyPutFootmark(s32 id, Vec pos, u32 flags) {
     MarioWork* mario = marioGetPtr();
     PartyFootmark* fm = &footmarkBuf[id][writeId[id]];
 
-    if ((fm->flags & 1) && (flags & 1)) {
+    if ((fm->flags & PARTY_FOOTMARK_JUMP) && (flags & PARTY_FOOTMARK_JUMP)) {
         return;
     }
     if (fm->pos.x == pos.x && fm->pos.y == pos.y && fm->pos.z == pos.z) {
@@ -785,22 +790,22 @@ static inline void partyPutFootmark(s32 id, Vec pos, u32 flags) {
     }
     fm = &footmarkBuf[id][writeId[id]];
     fm->pos = pos;
-    if (flags & 1) {
-        fm->flags |= 1;
+    if (flags & PARTY_FOOTMARK_JUMP) {
+        fm->flags |= PARTY_FOOTMARK_JUMP;
     } else {
-        fm->flags &= ~1;
+        fm->flags &= ~PARTY_FOOTMARK_JUMP;
     }
-    if (flags & 4) {
-        fm->flags |= 4;
+    if (flags & PARTY_FOOTMARK_SLIT) {
+        fm->flags |= PARTY_FOOTMARK_SLIT;
     } else {
-        fm->flags &= ~4;
+        fm->flags &= ~PARTY_FOOTMARK_SLIT;
     }
 }
 
 /** TRUE while the other party member is jumping (PARTY_FLAG_IS_JUMPING); its footmarks then get the jump bit. */
 static inline BOOL partyChkOtherFlag(PartyEntry* other) {
     BOOL ret = FALSE;
-    if (other->flags & 0x10) {
+    if (other->flags & PARTY_FLAG_IS_JUMPING) {
         ret = TRUE;
     }
     return ret;
@@ -820,10 +825,10 @@ void partyRecordFootmark(PartyEntry* party) {
 
     if (party->currentSlotId == 0) {
         if (partyChkMarioJumpFlag()) {
-            flags |= 1;
+            flags |= PARTY_FOOTMARK_JUMP;
         }
         if (marioChkSlitThrouh()) {
-            flags |= 4;
+            flags |= PARTY_FOOTMARK_SLIT;
         }
         partyPutFootmark(partyGetFootmarkId(party), mario->position, flags);
     } else {
@@ -839,19 +844,20 @@ void partyRecordFootmark(PartyEntry* party) {
                 partyClearFootmark();
             }
             if (partyChkOtherFlag(other)) {
-                flags |= 1;
+                flags |= PARTY_FOOTMARK_JUMP;
             }
             partyPutFootmark(partyGetFootmarkId(party), other->position, flags);
         } else {
             if (party->footmarkMode == 1) {
                 party->footmarkMode = 0;
+                // FAKE: called through a cast so deferred codegen does not inline partyClearFootmark2 (FAKES.md)
                 ((void (*)(void))partyClearFootmark2)();
             }
             if (partyChkMarioJumpFlag()) {
-                flags |= 1;
+                flags |= PARTY_FOOTMARK_JUMP;
             }
             if (marioChkSlitThrouh()) {
-                flags |= 4;
+                flags |= PARTY_FOOTMARK_SLIT;
             }
             partyPutFootmark(partyGetFootmarkId(party), mario->position, flags);
         }
@@ -1131,7 +1137,7 @@ BOOL partyChkNoStandMobj(HitEntry* hit) {
     if (!hit) {
         return FALSE;
     }
-    if (!(hitGetAttr(hit) & 0x80000000)) {
+    if (!(hitGetAttr(hit) & HIT_ATTR_MOBJ)) {
         return FALSE;
     }
     names = objNames;
@@ -1247,7 +1253,7 @@ static s32 partyMoveMain(PartyEntry* party, s32 hosei) {
         pos.y = party->groundY;
 #endif
         if (hit) {
-            if (hitGetAttr(hit) & 0x200) {
+            if (hitGetAttr(hit) & HIT_ATTR_DEEP_WATER) {
                 party->hitobjStandOn = hit;
                 party->flags &= ~PARTY_FLAG_IS_GROUNDED;
                 if (!(party->flags & PARTY_FLAG_IS_FALLING)) {
@@ -1308,7 +1314,7 @@ void partyChgMoveMode(PartyEntry* party, s32 mode) {
     PartyEntry* p = party;
     switch (p->moveMode) {
         case 6:
-            p->flags &= ~0x8000;
+            p->flags &= ~PARTY_FLAG_MOVE_MODE_HOLD;
             break;
         case 4:
         case 5:
@@ -1415,7 +1421,7 @@ void partyMoveCheckWall(PartyEntry* party) {
     hit = _partySearchGround(party, 10.0f, 10.0f);
     pos.y = party->groundY;
 #endif
-    if (hit && (hitGetAttr(hit) & 0x200)) {
+    if (hit && (hitGetAttr(hit) & HIT_ATTR_DEEP_WATER)) {
         hit = NULL;
     }
     party->hitobjStandOn = hit;
@@ -1727,16 +1733,16 @@ void partyWalkMain(PartyEntry* party) {
 
     if (party->currentSlotId == 0) {
         if (partyChkMarioJumpFlag()) {
-            flags |= 1;
+            flags |= PARTY_FOOTMARK_JUMP;
         }
 #if VERSION <= VERSION_DEMO_US
         if (marioChkSlitThrouh()) {
-            flags |= 2;
+            flags |= PARTY_FOOTMARK_DEMO_ARG_SLIT;
         }
         partyPutFootmark(0, marioGetPtr()->position, flags);
 #else
         if (marioChkSlitThrouh()) {
-            flags |= 4;
+            flags |= PARTY_FOOTMARK_SLIT;
         }
         partyPutFootmark(0, mario->position, flags);
 #endif
@@ -1753,7 +1759,7 @@ void partyWalkMain(PartyEntry* party) {
                 partyPutFootmark(1, marioGetPtr()->position, flags);
             } else {
                 flags = FALSE;
-                if (other->flags & 0x10) {
+                if (other->flags & PARTY_FLAG_IS_JUMPING) {
                     flags = TRUE;
                 }
                 partyPutFootmark(1, other->position, flags);
@@ -1947,14 +1953,14 @@ void partyForceWalk(PartyEntry* party) {
             party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
 #if VERSION <= VERSION_DEMO_US
             hit = _partySearchGround(party, &gy, &depth, 10.0f, 10.0f);
-            if (hit && (hitGetAttr(hit) & 0x200)) {
+            if (hit && (hitGetAttr(hit) & HIT_ATTR_DEEP_WATER)) {
                 hit = NULL;
             }
             party->hitobjStandOn = hit;
             if (!hit) {
                 partyChgMot(party, 3);
                 party->accelY = -1.0f;
-            } else if (hitGetAttr(hit) & 0x100) {
+            } else if (hitGetAttr(hit) & HIT_ATTR_SHALLOW_WATER) {
                 party->flags |= PARTY_FLAG_IN_SHALLOW_WATER;
             } else {
                 party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
@@ -1963,14 +1969,14 @@ void partyForceWalk(PartyEntry* party) {
 #else
             hit = _partySearchGround(party, 10.0f, 10.0f);
             attr = 0;
-            if (hit && ((attr = hitGetAttr(hit)) & 0x200)) {
+            if (hit && ((attr = hitGetAttr(hit)) & HIT_ATTR_DEEP_WATER)) {
                 hit = NULL;
             }
             party->hitobjStandOn = hit;
             if (!hit) {
                 partyChgMot(party, 3);
                 party->accelY = -1.0f;
-            } else if (attr & 0x100) {
+            } else if (attr & HIT_ATTR_SHALLOW_WATER) {
                 party->flags |= PARTY_FLAG_IN_SHALLOW_WATER;
             } else {
                 party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
@@ -2052,7 +2058,7 @@ void partyFlyMain(PartyEntry* party) {
         p = partyGetPtr(0);
         if (p) {
             flags = FALSE;
-            if (p->flags & 0x10) {
+            if (p->flags & PARTY_FLAG_IS_JUMPING) {
                 flags = TRUE;
             }
             partyPutFootmark(1, p->position, flags);
@@ -2151,7 +2157,7 @@ static inline BOOL partyAppearChkFloor(HitEntry* hit) {
     if (!hit) {
         return FALSE;
     }
-    if (hitGetAttr(hit) & 0xa00) {
+    if (hitGetAttr(hit) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_SPIKES)) {
         return FALSE;
     }
     if (partyChkNoStandMobj(hit)) {
@@ -2642,9 +2648,11 @@ BOOL partyGetAppearPos4(PartyEntry* party, Vec* out) {
     return FALSE;
 }
 
+/** Zero vectors among the partner movement constants; nothing reads them. */
 const Vec party_move_unused_zero_vec0 = {0.0f, 0.0f, 0.0f};
 const Vec party_move_unused_zero_vec1 = {0.0f, 0.0f, 0.0f};
 
+// FAKE: uncalled stand-in for a stripped function; puts 90.0f and 20.0f in their .sdata2 slots
 /** Stand-in for a function the original linker dead-stripped; it created 90.0f and 20.0f in the .sdata2 pool here. */
 static void partyMoveStrippedPool(f32* f) {
     f[0] = 90.0f;
@@ -2652,9 +2660,10 @@ static void partyMoveStrippedPool(f32* f) {
 }
 
 /**
- * Guess: where to hop a partner off a map object it must not stand on (partyChkNoStandMobj):
- * 12 directions from targetDir around the object, the first with no wall within 50 units and no water below.
- * Returns FALSE when there is none.
+ * Where to hop a partner off a map object it must not stand on (partyChkNoStandMobj):
+ * party_motion makes it her moveTarget and jumps her off (PARTY_TRIG_FLAG_JUMP_OFF_MOBJ).
+ * Tries 12 directions from targetDir around the object and takes the first with no wall within 50 units
+ * and no hazard-water floor (0x200) 50 units out. Returns FALSE when there is none.
  */
 BOOL partyGetAppearPos5(PartyEntry* party, HitEntry* hit, Vec* out) {
     s32 angles[12] = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180};
@@ -2671,7 +2680,7 @@ BOOL partyGetAppearPos5(PartyEntry* party, HitEntry* hit, Vec* out) {
     if (!hit) {
         return FALSE;
     }
-    if (!(hitGetAttr(hit) & 0x80000000)) {
+    if (!(hitGetAttr(hit) & HIT_ATTR_MOBJ)) {
         return FALSE;
     }
     mobj = &((MapObjectEntry*)mobjHitObjPtrToPtr(hit))->position;
@@ -2692,7 +2701,7 @@ BOOL partyGetAppearPos5(PartyEntry* party, HitEntry* hit, Vec* out) {
             pos.z = c * r + mobj->z;
             dir = (Vec){0.0f, -1.0f, 0.0f};
             floor = partyHitCheck(party, &pos, &dir, &hitPos, &hitNrm, &dist);
-            if (!floor || !(hitGetAttr(floor) & 0x200)) {
+            if (!floor || !(hitGetAttr(floor) & HIT_ATTR_DEEP_WATER)) {
                 break;
             }
         }

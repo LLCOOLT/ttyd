@@ -1,4 +1,4 @@
-// Dark Puff (kurokumorn): enemy battle unit (thunder attack); Riverside Station's copy of the unit data and scripts.
+// Ruff Puff (kurokumorn): enemy battle unit (thunder attack); Riverside Station's copy of the unit data and scripts.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -12,6 +12,12 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
 #include "version.h"
+
+// Unit work slots of the Ruff Puff.
+enum {
+    UW_KUROKUMORN_LOW = 0,    // 1 while it hovers low (y 10), in reach of hammers and shell tosses; 0 while high (y 40)
+    UW_KUROKUMORN_UNUSED = 1, // cleared by init_event; nothing reads it
+};
 
 BattleUnitKind unit_kurokumorn;
 static BattleUnitDefense defence;
@@ -33,8 +39,9 @@ static EvtWord normal_attack_event[386];
 static EvtWord charge_event[58];
 static EvtWord wait_event[12];
 
+/** Unit data of the Ruff Puff: 7 HP, level 23; the battle starts it from init_event. */
 BattleUnitKind unit_kurokumorn = {
-    103,
+    UNIT_RUFF_PUFF,
     "btl_un_kurokumorn",
     7,
     0,
@@ -91,7 +98,7 @@ BattleUnitKind unit_kurokumorn = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     1,
     parts,
@@ -99,20 +106,32 @@ BattleUnitKind unit_kurokumorn = {
     data_table,
 };
 
+/** Defence of the Ruff Puff: none against any element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Elemental reactions of the Ruff Puff: is healed by electric attacks. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 3}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Ruff Puff (percent, 100 is normal) in the demo builds: immune to electric;
+ * resists most statuses (70-95%).
+ */
 static StatusVulnerability regist = {80, 80, 90, 100, 70, 0, 100, 70, 100, 70, 100, 70, 100, 70, 70, 70, 90, 100, 70, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Ruff Puff (percent, 100 is normal) in the retail builds: immune to electric;
+ * resists most statuses (60-95%).
+ */
 static StatusVulnerability regist = {75, 75, 100, 100, 70, 0, 100, 100, 100, 90, 100, 90, 100, 90, 60, 70, 95, 100, 70, 100, 100, 95};
 #endif
 
+/** Body part of the Ruff Puff, model c_kmoon: its one target part. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_kurokumorn", "c_kmoon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
+    {1, "btl_un_kurokumorn", "c_kmoon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 };
 
+/** Weapon data for the Ruff Puff's body slam: 4 damage, one target. */
 static BattleWeapon weapon_kurokumorn_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -131,7 +150,7 @@ static BattleWeapon weapon_kurokumorn_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -149,6 +168,7 @@ static BattleWeapon weapon_kurokumorn_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the Ruff Puff's thunder blast: 4 damage, electric element, every target. */
 static BattleWeapon weapon_kurokumorn_thunder_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -171,7 +191,7 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    4, // element
+    ELEMENT_ELECTRIC, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -193,11 +213,11 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
 };
 
 /**
- * Turn script of the Dark Puff.
- * After an item-use check, if its thunder barrier is up (counter attribute 1024 on part 1) it fires the
+ * Turn script of the Ruff Puff.
+ * After an item-use check, if it is charged (electric counter attribute 1024 on part 1) it fires the
  * lightning attack through thunder_event.
  * Otherwise it rolls 0 to 99: below 60 it makes a normal attack,
- * otherwise it charges up the barrier through charge_event.
+ * otherwise it charges up through charge_event.
  */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -206,7 +226,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_kurokumorn_thunder_attack))
         CALL_CHILD(thunder_event)
@@ -230,25 +250,28 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 /**
- * The Dark Puff's lightning attack, used while its thunder barrier is up.
+ * The Ruff Puff's lightning attack, used while it is charged.
  * It samples a target, declares an attack on every opponent,
  * plays the charge sound and the A_2B/A_3A/A_3B animations,
- * drops the barrier (clears counter attribute 1024)
+ * drops its charge (clears counter attribute 1024)
  * and rains pokopi_thunder_n64 lightning bolts on the player's side,
  * with the damage decided by the pre-damage check and CheckDamage per target.
  */
 static EVT_BEGIN(thunder_event)
+    // The thunder reaches every opposing unit: a target is chosen only to aim at.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    // No valid target: a confused Ruff Puff is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared on all targets and the guard window opens.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -256,6 +279,7 @@ static EVT_BEGIN(thunder_event)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Charge-up: the charge sound and poses play while it faces the first target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     WAIT_FRAMES(30)
@@ -263,7 +287,9 @@ static EVT_BEGIN(thunder_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024)
+    // It lets its charge go and fires.
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC)
+    // Four pairs of lightning bolts rain down on the opposing side one after another.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
         IF_INT_EQUAL(LW(10), 0)
@@ -320,11 +346,13 @@ static EVT_BEGIN(thunder_event)
         CALL(evt_eff64, STRING(""), STRING("pokopi_thunder_n64"), 0, LW(0), 210, LW(2), LW(0), 0, LW(2), FLOAT(4.0f), 20, 0, 0, 0)
         WAIT_FRAMES(12)
     END_SIBLING_EVENT
+    // The camera shakes as the bolts land.
     WAIT_FRAMES(10)
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 30, 0)
     SET_VALUE(LW(6), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Each target in turn gets the hit check and then the damage; the action-command result is read once.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -353,7 +381,7 @@ static EVT_BEGIN(thunder_event)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -362,6 +390,7 @@ static EVT_BEGIN(thunder_event)
     END_IF
     GOTO(0)
     LABEL(98)
+    // It settles back into its idle pose.
     WAIT_FRAMES(30)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     WAIT_MS(250)
@@ -370,26 +399,31 @@ static EVT_BEGIN(thunder_event)
     RETURN
 EVT_END()
 
+/** Pose table of the Ruff Puff: the animation each battle pose (idle, hurt, walk, attack and so on) plays. */
 static PoseTableEntry pose_table[] = {
-    {1, "N_1"},
-    {2, "Y_1"},
-    {9, "Y_1"},
-    {5, "K_1"},
-    {4, "X_1"},
-    {3, "X_1"},
-    {28, "S_1"},
+    {STATUS_SLEEP, "N_1"},
+    {STATUS_STOP, "Y_1"},
+    {STATUS_FREEZE, "Y_1"},
+    {STATUS_CONFUSE, "K_1"},
+    {STATUS_POISON, "X_1"},
+    {STATUS_DIZZY, "X_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_1"},
-    {39, "D_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Event table of the Ruff Puff: the attacker being shocked by its charge (counter_event, tag 42) and the First
+ * Strike reaction (dmg_first_attack_pos, tag 48).
+ */
 static BattleDataEntry data_table[] = {
     {42, counter_event},
     {48, dmg_first_attack_pos},
@@ -397,7 +431,7 @@ static BattleDataEntry data_table[] = {
 };
 
 /**
- * Init script of the Poison Puff: installs the wait, unison-phase, attack, damage and confusion handlers,
+ * Init script of the Ruff Puff: installs the wait, unison-phase, attack, damage and confusion handlers,
  * clears its unit work 0 and 1, and starts barrier_event.
  */
 static EVT_BEGIN(init_event)
@@ -406,15 +440,15 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KUROKUMORN_LOW, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KUROKUMORN_UNUSED, 0)
     SPAWN_EVENT(barrier_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
- * Background loop on the Dark Puff: every 31 frames, while its thunder barrier is up,
+ * Background loop on the Ruff Puff (barrier_event): every 31 frames, while it is charged,
  * spawns the akari_charge_n64 spark effect above it; ends when the unit is gone.
  */
 static EVT_BEGIN(barrier_event)
@@ -424,7 +458,7 @@ static EVT_BEGIN(barrier_event)
     IF_INT_EQUAL(LW(0), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 20)
@@ -436,7 +470,10 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
-/** Position the Magikoopa takes for a first-strike reaction (the pre-battle attack by Mario). Guess. */
+/**
+ * Data-table event 48, run when the battle opens with Mario's or his partner's First Strike on the Ruff Puff:
+ * puts it at height 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -445,7 +482,7 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
-/** Guess: damage event of a sword: runs the default damage reaction. */
+/** Damage event of the Ruff Puff: runs the default damage reaction (btldefaultevt_Damage) for itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -453,15 +490,17 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-/** Counter handler of the Poison Puff: empty, it does nothing. */
+/** Counter handler of the Ruff Puff: empty, it does nothing. */
 static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 
 /**
- * Guess: before the player's phase, if the Puff can act and its barrier is down,
- * it has a 50 percent chance to swoop between the ground (height 10) and the air (height 40),
- * toggling unit work 0 and part attribute bits 6291456, with a movement sound.
+ * Before the player's phase, if the Ruff Puff can act
+ * and it is not charged (no COUNTER_ATTR_ELECTRIC),
+ * it has a 50 percent chance to swap between low (height 10, unit work 0 = 1) and high (height 40, work 0 = 0)
+ * with a movement sound; while high its part cannot be targeted by hammer-like or shell-toss-like attacks
+ * (part attributes 0x600000).
  */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
@@ -472,29 +511,29 @@ static EVT_BEGIN(unison_phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
     CALL(evt_sub_random, 99, LW(0))
     IF_INT_LESS(LW(0), 50)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KUROKUMORN_LOW, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE4"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 40)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KUROKUMORN_LOW, 0)
         ELSE
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE5"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 10)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KUROKUMORN_LOW, 1)
         END_IF
     END_IF
     LABEL(99)
@@ -502,10 +541,12 @@ static EVT_BEGIN(unison_phase_event)
 EVT_END()
 
 /**
- * Guess: the Poison Puff's regular attack: picks a target (or the first-strike target), floats over and attacks,
- * handles guard and miss results and returns home.
+ * The Ruff Puff's body slam with the weapon in LW(9): picks a target (the first-attack target on a pre-emptive
+ * strike), shakes and squashes itself as a wind-up, lunges back and then dives into the target, which dodges,
+ * guards or takes the hit (pre-damage check and action-command defence); then it bounces off and floats home.
  */
 static EVT_BEGIN(normal_attack_event)
+    // Choose the target: the First Strike victim, otherwise a sampled opposing unit.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -514,24 +555,28 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No valid target: a confused unit is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // It turns to the target while the camera follows.
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
+    // Wind-up: it rattles from side to side while shrinking.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         LOOP(10)
@@ -548,6 +593,7 @@ static EVT_BEGIN(normal_attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // It springs up and back, swelling to full size again.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -556,11 +602,13 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, 0, 4, 0, -1)
     WAIT_FRAMES(10)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    // It dives at the target in a swooping arc.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE2"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 40, -40, 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(15))
+    // Hit check: a miss or dodge goes on to the fly-by, a hit to the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -587,13 +635,15 @@ static EVT_BEGIN(normal_attack_event)
     LABEL(90)
     GOTO(98)
     LABEL(91)
+    // Hit: the camera shakes and the damage is dealt with the action-command result.
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
     LABEL(98)
+    // It rebounds up off the target and floats back to its home position.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
@@ -614,7 +664,7 @@ EVT_END()
 
 /**
  * Charge-up: the camera zooms on the Puff, a charge sound plays
- * and the thunder barrier is raised (counter attribute 1024 on part 1) with its A_2A/A_2B charge animations.
+ * and it becomes charged (electric counter attribute 1024 on part 1) with its A_2A/A_2B charge animations.
  */
 static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -622,7 +672,7 @@ static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 300)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -634,7 +684,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
-/** Wait script of the Dark Puff: shows its idle pose from the pose table and resets its scale to 1. */
+/** Wait script of the Ruff Puff: shows its idle pose from the pose table and resets its scale to 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)

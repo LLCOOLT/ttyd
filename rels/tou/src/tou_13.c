@@ -18,6 +18,7 @@
 #include "driver/mapdrv.h"
 #include "driver/camdrv.h"
 
+/** Exits of this passage: east to the champion's room tou_07 and west to Grubba's office tou_05. */
 static BeroEntry bero_data[] = {
     {
         "e_bero_", // hitName
@@ -74,8 +75,12 @@ static EVT_BEGIN(evt_dakuto)
 EVT_END()
 
 /**
- * Guess: scene where Mario catches a thief (nusumi) in the passage:
- * the camera pans, Mario and the partner react (stg3_tou_455_01, 455_02 and following).
+ * Eavesdropping scene, run before STORY_STG3_30_03_EAVESDROPPING once Mario walks past x 75:
+ * muffled talk comes through the wall (stg3_tou_455_01) and Mario and the partner step closer.
+ * Grubba's voice gloats that "that baby" keeps his body from ever getting weak (455_02),
+ * the partner recognizes Grubba and suspects him of the fighters' disappearances (455_05),
+ * and Grubba says he will lock the room up, hide the paper about it in his desk drawer (455_03)
+ * and that the new champ may have to disappear (455_04). The story advances to STORY_STG3_30_03_EAVESDROPPING.
  */
 EVT_BEGIN(evt_nusumi)
     LABEL(0)

@@ -11,6 +11,7 @@
 static BeroEntry bero_entry_data[3];
 extern EvtWord evt_tik09_dokan[];
 
+/** Doors of this room: the pipes to tik_10 and to tik_06. */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan_1", // hitName

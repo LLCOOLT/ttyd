@@ -1,4 +1,4 @@
-// Battle unit Swoopula (`basabasa_green`): tst.rel's copy of rels/jon/src/unit/unit_basabasa_green.c.
+// Battle unit Swampire (`basabasa_green`): tst.rel's copy of rels/jon/src/unit/unit_basabasa_green.c.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -10,6 +10,11 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "battle/battle_sub.h"
+
+// Unit work slots of the Green Swoopula.
+enum {
+    UW_BASABASA_GREEN_ON_CEILING = 0, // set by the battle setup: 1 when it starts hanging from the ceiling
+};
 
 BattleUnitKind unit_basabasa_green;
 static BattleUnitDefense defence;
@@ -35,8 +40,12 @@ static EvtWord ceil_fall_ready_event[23];
 static EvtWord attack_event[683];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of Swampire: 20 max HP, level 46. The battle engine reads it when the unit spawns:
+ * size, offsets, sounds, status vulnerability, parts, init script and event table.
+ */
 BattleUnitKind unit_basabasa_green = {
-    167,
+    UNIT_SWAMPIRE,
     "btl_un_basabasa_green",
     20,
     0,
@@ -101,7 +110,7 @@ BattleUnitKind unit_basabasa_green = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4040002,
+    UNIT_ATTR_CEILING | UNIT_ATTR_REQUIRED_FOR_CLEAR | UNIT_ATTR_BILLBOARD,
     &regist,
     1,
     parts,
@@ -109,10 +118,16 @@ BattleUnitKind unit_basabasa_green = {
     data_table,
 };
 
+/**
+ * Defence of Swampire per element (normal, fire, ice, explosion, electric), subtracted from each hit:
+ * none.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of Swampire: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Attack data of Swampire's basabasa drain attack biribiri counterd attack: no damage, 100% accuracy. */
 static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -134,7 +149,7 @@ static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, 0, // acHelpMsg..counterResistFlags
@@ -150,48 +165,60 @@ static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Pose table of Swampire: maps its battle pose types (stay, walk, hurt, dead, talk and so on) to
+ * animation names, 18 entries such as BSA_N_1, BSA_Y_1, BSA_K_1, BSA_X_1.
+ */
 static PoseTableEntry pose_table[] = {
-    {1, "BSA_N_1"},
-    {2, "BSA_Y_1"},
-    {9, "BSA_Y_1"},
-    {5, "BSA_K_1"},
-    {4, "BSA_X_1"},
-    {3, "BSA_X_1"},
-    {28, "BSA_S_1"},
+    {STATUS_SLEEP, "BSA_N_1"},
+    {STATUS_STOP, "BSA_Y_1"},
+    {STATUS_FREEZE, "BSA_Y_1"},
+    {STATUS_CONFUSE, "BSA_K_1"},
+    {STATUS_POISON, "BSA_X_1"},
+    {STATUS_DIZZY, "BSA_X_1"},
+    {BTL_POSE_NORMAL, "BSA_S_1"},
     {29, "BSA_Q_1"},
     {30, "BSA_Q_1"},
     {31, "BSA_S_1"},
-    {39, "BSA_D_1"},
+    {BTL_POSE_DAMAGE, "BSA_D_1"},
     {50, "BSA_A_1"},
-    {42, "BSA_R_1"},
-    {40, "BSA_W_1"},
-    {56, "BSA_X_1"},
-    {57, "BSA_X_1"},
+    {BTL_POSE_RUN, "BSA_R_1"},
+    {BTL_POSE_WALK, "BSA_W_1"},
+    {BTL_POSE_DANGER, "BSA_X_1"},
+    {BTL_POSE_PERIL, "BSA_X_1"},
     {BTL_POSE_TALK, "BSA_T_1"},
     {BTL_POSE_STAY_DEFAULT, "BSA_S_1"},
 };
 
+/**
+ * Pose table of Swampire hanging from the ceiling: maps its battle pose types (stay, walk, hurt, dead,
+ * talk and so on) to animation names, 18 entries such as BSA_N_2, BSA_Y_2, BSA_K_2, BSA_X_2.
+ */
 static PoseTableEntry pose_table_ceil[] = {
-    {1, "BSA_N_2"},
-    {2, "BSA_Y_2"},
-    {9, "BSA_Y_2"},
-    {5, "BSA_K_2"},
-    {4, "BSA_X_2"},
-    {3, "BSA_X_2"},
-    {28, "BSA_S_2"},
+    {STATUS_SLEEP, "BSA_N_2"},
+    {STATUS_STOP, "BSA_Y_2"},
+    {STATUS_FREEZE, "BSA_Y_2"},
+    {STATUS_CONFUSE, "BSA_K_2"},
+    {STATUS_POISON, "BSA_X_2"},
+    {STATUS_DIZZY, "BSA_X_2"},
+    {BTL_POSE_NORMAL, "BSA_S_2"},
     {29, "BSA_Q_2"},
     {30, "BSA_Q_2"},
     {31, "BSA_S_2"},
-    {39, "BSA_D_2"},
+    {BTL_POSE_DAMAGE, "BSA_D_2"},
     {50, "BSA_A_1"},
-    {42, "BSA_S_1"},
-    {40, "BSA_S_1"},
-    {56, "BSA_X_2"},
-    {57, "BSA_X_2"},
+    {BTL_POSE_RUN, "BSA_S_1"},
+    {BTL_POSE_WALK, "BSA_S_1"},
+    {BTL_POSE_DANGER, "BSA_X_2"},
+    {BTL_POSE_PERIL, "BSA_X_2"},
     {BTL_POSE_TALK, "BSA_T_2"},
     {BTL_POSE_STAY_DEFAULT, "BSA_S_2"},
 };
 
+/**
+ * Event table of Swampire: maps event tags to the scripts that react to them (counter_damage_event and
+ * dmg_first_attack_pos); tag 0 ends it. Tag 48 is a First Strike.
+ */
 static BattleDataEntry data_table[] = {
     {26, counter_damage_event},
     {25, counter_damage_event},
@@ -209,16 +236,33 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Body parts of Swampire: a single part (model c_basabasa_g) holding its hit box.
+ * Each part names its defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_basabasa_green", "c_basabasa_g", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table_ceil},
+    {1, "btl_un_basabasa_green", "c_basabasa_g", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table_ceil},
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of Swampire (the demos), as the percent chance a status takes hold:
+ * always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;
+ * otherwise Sleep 40, Stop 55, Dizzy 70, Confuse 50, Freeze 50, Tiny 50, Attack Down 50, Defense Down 50,
+ * Allergic 50, Fright 50, Gale Force 80, Slow 50 and instant KO 20.
+ */
 static StatusVulnerability regist = {40, 55, 70, 100, 50, 100, 100, 50, 100, 50, 100, 50, 100, 50, 50, 50, 80, 100, 50, 100, 100, 20};
 #else
+/**
+ * Status vulnerability of Swampire (the final versions), as the percent chance a status takes hold:
+ * always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;
+ * otherwise Sleep 50, Stop 55, Dizzy 90, Confuse 50, Freeze 50, Tiny 75, Attack Down 75, Defense Down 80,
+ * Allergic 50, Fright 50, Gale Force 75, Slow 50 and instant KO 20.
+ */
 static StatusVulnerability regist = {50, 55, 90, 100, 50, 100, 100, 50, 100, 75, 100, 75, 100, 80, 50, 50, 75, 100, 50, 100, 100, 20};
 #endif
 
+/** Attack data of Swampire's basabasa attack: base damage 6, 100% accuracy. */
 static BattleWeapon weapon_basabasa_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -237,7 +281,7 @@ static BattleWeapon weapon_basabasa_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -255,6 +299,10 @@ static BattleWeapon weapon_basabasa_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Sound cues of Swampire's animations: for each of its 9 animation names,
+ * the sound effect that plays with it (SFX_ENM_BASA_WAIT1 and SFX_ENM_BASA_MOVE1).
+ */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"BSA_S_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
     {"BSA_W_1", 0.01f, NULL, "SFX_ENM_BASA_MOVE1", 0, 1},
@@ -276,16 +324,16 @@ static PoseSoundTiming pose_sound_timing_table[] = {
  * Leaves the home position in LW(0) to LW(2).
  */
 static EVT_BEGIN(ceil_sky_event)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_FLOATING)
     CALL(btlevtcmd_SetPossessionItemOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_AddPos, BTL_UNIT_SELF, 0, -30, 0)
     CALL(btlevtcmd_AddHomePos, BTL_UNIT_SELF, 0, -30, 0)
@@ -322,7 +370,7 @@ static EVT_BEGIN(init_event)
 #if VERSION >= VERSION_JP // the demos have no kiss move offsets
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 16, -18, 0)
 #endif
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BASABASA_GREEN_ON_CEILING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(ceil_sky_event)
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -363,9 +411,9 @@ static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -394,7 +442,7 @@ static EVT_BEGIN(counter_damage_event)
 EVT_END()
 
 /**
- * Runs when the ceiling falls on the bat (an attack that drops the ceiling):
+ * Ceiling-fall event, run when the stage's overhead iron frame falls (_fall_frame_event):
  * default damage handling, then it comes down from the ceiling (ceil_sky_event)
  * and glides to its home position over 60 frames.
  */
@@ -408,14 +456,14 @@ static EVT_BEGIN(ceil_fall_ready_event)
 EVT_END()
 
 /**
- * The Swoopula's draining bite: like the Swooper's swoop,
+ * The Swampire's draining bite: like the Swooper's swoop,
  * but when the hit lands it tilts into the target (SFX_ENM_BASA_SUCK1, pose BSA_A_2)
  * and heals itself with the recovery effect for the damage it dealt.
- * When the pre- check counter result is 17 or 14 (Guess: the target shocks attackers,
- * from the weapon name biribiri_counterd) it uses weapon_basabasa_drain_attack_biribiri_counterd for the damage
- * instead.
+ * When the target would counter the bite (btlevtcmd_PreCheckCounter result 14, Electrified, or 17, Hold Fast)
+ * it applies weapon_basabasa_drain_attack_biribiri_counterd instead and drains nothing.
  */
 static EVT_BEGIN(attack_event)
+    // The Swampire first checks whether to use a held item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -423,16 +471,18 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // It picks a target; with none, it ends the turn (or flusters when confused).
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_basabasa_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_basabasa_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared, the camera follows the Swampire toward its target, and the cost is paid.
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_basabasa_attack))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
@@ -443,9 +493,10 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    // If it is hanging from the ceiling it drops down first, then turns toward the target.
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_AddPos, BTL_UNIT_SELF, 0, -30, 0)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(2.5f))
@@ -453,11 +504,12 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
         SUBTRACT(LW(1), 40)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -16, 0, 0, -1)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     END_IF
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), -6)
+    // It swoops in, dipping up and down twice before the final dive at the target's position.
     LOOP(2)
         ADD(LW(1), 13)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, 10, 0, 0, -1)
@@ -470,7 +522,8 @@ static EVT_BEGIN(attack_event)
     SUBTRACT(LW(1), 10)
     SUBTRACT(LW(2), 10)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -16, 0, 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
+    // The damage check decides between a miss (it sails past) and a hit.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -492,6 +545,7 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // On a miss, it flies past the target and out the other side.
     LABEL(90)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.5f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -501,6 +555,7 @@ static EVT_BEGIN(attack_event)
     WAIT_MS(200)
     GOTO(98)
     LABEL(91)
+    // On a hit, it checks whether the target would counter the bite (Electrified or Hold Fast); if so, the counter damage is dealt instead and nothing is drained.
     SET_VALUE(LF(0), 0)
     CALL(btlevtcmd_PreCheckCounter, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
     IF_INT_EQUAL(LW(5), 17)
@@ -513,10 +568,11 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_basabasa_attack))
         SET_VALUE(LW(9), PTR(&weapon_basabasa_drain_attack_biribiri_counterd))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, -45)
+    // The Swampire latches on with a sucking sound and its BSA_A_2 pose, pulsing in size as it drinks, while the camera shakes and the bite damage lands.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BASA_SUCK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BSA_A_2"))
     LOOP(2)
@@ -533,14 +589,15 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_basabasa_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 15)
     ADD(LW(2), 10)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0)
+    // If the bite did damage, it recovers that much HP and squashes and stretches happily; the recovery number pops up.
     CALL(btlevtcmd_GetDamage, LW(3), LW(10))
     IF_INT_GREATER_OR_EQUAL(LW(10), 1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BSA_N_1"))
@@ -582,18 +639,20 @@ static EVT_BEGIN(attack_event)
     END_IF
     WAIT_MS(500)
     GOTO(98)
+    // The Swampire flies back to its home position (up to the ceiling if it came from there).
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(7))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(7))
     IF_INT_EQUAL(LW(7), 1)
         SUBTRACT(LW(1), 30)
     END_IF
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -10, 0, 0, -1)
     LABEL(99)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    // It goes back to its idle pose, hanging (BSA_S_2) if it started on the ceiling, and returns to waiting.
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BSA_S_2"))
         WAIT_FRAMES(1)

@@ -60,6 +60,7 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/** Exit of this room: the west door to aji_10. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -83,7 +84,7 @@ static BeroEntry bero_entry_data[] = {
 };
 
 /**
- * Script function that attaches the two arm frame NPCs (腕 and 腕２) of the Magnus von Grapple 2.0 robots to the
+ * Script function that attaches the two frame NPCs (枠 and 枠２) of the Magnus von Grapple 2.0 robots to the
  * robots' locator17 bone each frame, or hides them below the floor while the robot is below ground level,
  * and then moves all the robot's bone world positions out of sight (y = -1000). Blocks forever.
  */
@@ -102,11 +103,11 @@ static USER_FUNC(waku) {
             s32 idx = animPoseGetGroupIdx(npc->poseId, "locator17");
 
             if (npc->position.y >= 0.0f) {
-                // 腕
+                // 枠
                 npcNameToPtr("\x98\x67")->position = positions[idx];
             } else {
                 Vec hidden = {0.0f, -1000.0f, 0.0f};
-                // 腕
+                // 枠
                 npcNameToPtr("\x98\x67")->position = hidden;
             }
             positions = *pose->worldPositions;
@@ -126,11 +127,11 @@ static USER_FUNC(waku) {
             s32 idx = animPoseGetGroupIdx(npc->poseId, "locator17");
 
             if (npc->position.y >= 0.0f) {
-                // 腕2
+                // 枠２
                 npcNameToPtr("\x98\x67\x82\x51")->position = positions[idx];
             } else {
                 Vec hidden = {0.0f, -1000.0f, 0.0f};
-                // 腕2
+                // 枠２
                 npcNameToPtr("\x98\x67\x82\x51")->position = hidden;
             }
             positions = *pose->worldPositions;
@@ -144,8 +145,8 @@ static USER_FUNC(waku) {
 
 /**
  * Creates the two frame NPCs 枠 and 枠２ (model c_mb_robo_2a, no shadow, animation L_1)
- * and starts the script that keeps the robots' arm NPCs attached (waku).
- * Guess: the frames are decoration or placeholders for the Magnus von Grapple 2.0 robots.
+ * and starts waku, which keeps them on the locator17 bone of the robots ロボット and ロボット２.
+ * Guess: c_mb_robo_2a is a part of the Magnus von Grapple 2.0 model that is drawn as its own NPC.
  */
 EVT_BEGIN(evt_robot_waku)
     CALL(evt_npc_entry, STRING("枠"), STRING("c_mb_robo_2a"))
@@ -163,7 +164,9 @@ EVT_END()
 
 /**
  * Cutscene before the Magnus von Grapple 2.0 fight:
- * the X-Naut executive (幹部, Guess: Lord Crump) and the robot (ロボット) are placed, BGM_EVT_MAGNUM_APP1 plays,
+ * Lord Crump (幹部, "executive", with his "Buh huh huh" laugh;
+ * the story after this fight is STORY_STG7_20_LORD_CRUMP_DEFEATED)
+ * and the robot (ロボット) are placed, BGM_EVT_MAGNUM_APP1 plays,
  * dialogue stg7_aji_36 to 41 plays with the partner, then the robot's battle (battle info 5) starts.
  * After the fight the partner talks (stg7_aji_42)
  * and the map changes to moo_04 at the evt_aji_14 entrance with a white fade.
@@ -184,6 +187,7 @@ static EVT_BEGIN(evt_boss)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_mov_pos2, -420, 0, FLOAT(80.0f))
     WAIT_MS(1000)
+    // Lord Crump waits in the boss room, laughing, as the boss music starts.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MAGNUM_APP1"))
     CALL(evt_msg_print, 0, STRING("stg7_aji_36"), 0, STRING("幹部"))
     WAIT_MS(300)
@@ -196,6 +200,7 @@ static EVT_BEGIN(evt_boss)
     WAIT_MS(1000)
     CALL(evt_npc_flag_onoff, 1, STRING("幹部"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), NPC_FLAG_INSTANT_TURN)
+    // He says he has been waiting for Mario and lured him here with the Crystal Star (stg7_aji_37 to 39).
     CALL(evt_msg_print, 0, STRING("stg7_aji_37"), 0, STRING("幹部"))
     WAIT_MS(300)
 #if VERSION >= VERSION_JP
@@ -222,6 +227,7 @@ static EVT_BEGIN(evt_boss)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 140, 100, 295, 140, 110, -105, 0, 11)
     WAIT_FRAMES(1)
+    // He laughs off Mario's questions and refuses to explain the plan.
     CALL(evt_msg_print, 0, STRING("stg7_aji_39"), 0, STRING("幹部"))
     WAIT_MS(300)
     WAIT_MS(500)
@@ -263,6 +269,8 @@ static EVT_BEGIN(evt_boss)
 #if VERSION >= VERSION_JP
     CALL(evt_npc_flag_onoff, 1, STRING("ロボット"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
 #endif
+    // Crump brags that his machine is raw horsepower; the robot walks in, jumps and lands with a shake of the
+    // camera.
     CALL(evt_msg_print, 0, STRING("stg7_aji_41"), 0, STRING("ロボット"))
 #if VERSION >= VERSION_JP
     CALL(evt_npc_flag_onoff, 0, STRING("ロボット"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
@@ -309,6 +317,7 @@ static EVT_BEGIN(evt_boss)
 #if VERSION >= VERSION_JP
     CALL(evt_snd_envoff, PSND_FADE_OUT)
 #endif
+    // The fight against Magnus von Grapple 2.0 begins.
     CALL(evt_npc_set_battle_info, STRING("ロボット"), 5)
     CALL(evt_npc_battle_start, STRING("ロボット"))
     CALL(evt_npc_wait_battle_end)
@@ -359,6 +368,7 @@ static EVT_BEGIN(evt_boss)
         CALL(evt_npc_jump_position_nohit, STRING("幹部"), -200, 200, 100, 1000, FLOAT(80.0f))
     END_INLINE_EVENT
     CALL(evt_msg_toge, 1, 0, 0, 0)
+    // After the fight a cry of "Grodus!" is heard and the scene whites out to the Moon.
     CALL(evt_msg_print, 0, STRING("stg7_aji_42"), 0, STRING("ロボット"))
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 900, FADE_IN_WHITE, 900)
     BEGIN_INLINE_EVENT
@@ -426,6 +436,7 @@ EVT_BEGIN(evt_boss2)
     RETURN
 EVT_END()
 
+/** The two actors of the boss room: Lord Crump (kanbu) and the Magnus von Grapple 2.0 robot. */
 static NpcSetupInfo npcEnt[] = {
     {
         "幹部", // name

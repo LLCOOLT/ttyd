@@ -5,6 +5,7 @@
 
 #include "__syn.h"
 
+/** One cycle of a sine wave in 64 steps, the shape of the synth's LFO. */
 static f32 __SYNLfo[64] = {
     0.000000f,
     0.098020f,

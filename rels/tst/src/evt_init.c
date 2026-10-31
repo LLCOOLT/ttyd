@@ -120,8 +120,10 @@ EVT_BEGIN(tst_02_init_evt)
 EVT_END()
 
 /**
- * Talk interrupt of the test NPC: plays its PAN_D_1 animation for half a second,
- * then hands control back to the NPC's normal behaviour.
+ * Test NPC script: plays its PAN_D_1 animation for half a second, then hands control back to the NPC's normal
+ * behaviour.
+ * Despite the name, tst_npc_init_evt installs it as NPC_01's defeat interrupt (type 8, deadEvent), not the talk
+ * one (type 6).
  */
 EVT_BEGIN(tst_npc_talk_evt)
     CALL(evt_npc_set_anim, STRING("me"), STRING("PAN_D_1"))
@@ -141,8 +143,10 @@ EvtWord tst_npc_env_evt[] = {
 };
 
 /**
- * Guess: init event of the NPC test map: sets up NPC_01 with a movement script and the talk interrupt,
- * plays move/talk animations, switches to the field-battle mode and starts the ambient sound loop.
+ * Init event of the NPC test map: gives NPC_01 the Goomba-style testnpc_move_event as its move interrupt and
+ * tst_npc_talk_evt as its defeat interrupt (type 8), sets its reaction flag 2 and NPC_FLAG_MOVE_ANIM and
+ * NPC_FLAG_TALK_ANIM, sets the field-battle (fbat) mode to 1
+ * and starts the ambient sound loop (tst_npc_env_evt).
  */
 EVT_BEGIN(tst_npc_init_evt)
     CALL(evt_npc_change_interrupt, STRING("NPC_01"), 1, PTR(testnpc_move_event))

@@ -36,10 +36,10 @@ extern EvtWord witchtrio_lose[];
 static TreeAccess tree_access_data[10];
 
 /**
- * Guess: init script of Vivian in Boggly Woods:
- * clears her battle-info flag and, between STORY_STG2_01 and STORY_STG2_05_02,
- * places her at (-535, 0, -30) with the sulking idle pose "PTR_S_3" and talk pose "PTR_T_3";
- * during the sketch scenes she is only placed.
+ * Init script of Vivian in Boggly Woods: clears her battle-info flag.
+ * From STORY_STG2_01 (after Beldam takes her necklace in witchtrio_momeru) to STORY_STG2_05_02 she stands at
+ * (-535, 0, -30) in the pose PTR_S_3 (talk pose PTR_T_3), the pose she is left in at the end of that scene;
+ * from STORY_STG2_06 to STORY_STG2_07 she is only placed there.
  */
 static EVT_BEGIN(vivian_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
@@ -158,6 +158,10 @@ static EVT_BEGIN(kizayarou_init)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of this map: the Shadow Sirens Vivian, Marilyn and Beldam, who appear here during chapter 2,
+ * and Fabio, the client of trouble 28.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "ビビアン", // name
@@ -210,6 +214,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Exits of this map: west to win_06 (the pipe from Rogueport Sewers) and east to win_01. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -247,11 +252,16 @@ static BeroEntry bero_entry_data[] = {
 };
 
 /**
- * Guess: cutscene at the entry from the Great Tree side:
- * the Shadow Sirens argue over a necklace (Vivian, Marilyn and Beldam stand at x -535 to -455,
- * Beldam spawns the necklace item) with the Siren theme playing.
+ * The Shadow Sirens' first scene, spawned by the init script up to STORY_STG2_00:
+ * once Mario has entered, he and both partners walk in
+ * and spot the Sirens (Vivian, Marilyn and Beldam at x -535 to -455) as their theme plays.
+ * Beldam names their goals (find Mario, steal the map), Vivian shows a necklace she found by a tree,
+ * they bicker over who lost the sketch, Marilyn points out a mustached man,
+ * and Beldam snatches the necklace as punishment, leaving Vivian in tears (stg2_win_e01_00 to 14).
+ * The story becomes STORY_STG2_01_A_SIREN_ARGUMENT.
  */
 EVT_BEGIN(witchtrio_momeru)
+    // The three Sirens stand in the clearing, turned toward each other.
     CALL(evt_npc_set_position, STRING("ビビアン"), -535, 0, -30)
     CALL(evt_npc_set_position, STRING("マリリン"), -495, 0, -60)
     CALL(evt_npc_set_position, STRING("マジョリン"), -455, 0, -30)
@@ -261,6 +271,7 @@ EVT_BEGIN(witchtrio_momeru)
     CALL(evt_npc_flag_onoff, 1, STRING("ビビアン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("マリリン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("マジョリン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    // Mario's controls are locked until he has finished entering the map.
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_normalize)
@@ -271,6 +282,7 @@ EVT_BEGIN(witchtrio_momeru)
 #endif
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
+    // Mario, his partner and Punio walk in and spot the Sirens.
     SET_VALUE(GF(0), 1)
     SET_VALUE(GF(1), 1)
     BEGIN_INLINE_EVENT
@@ -292,6 +304,8 @@ EVT_BEGIN(witchtrio_momeru)
     CALL(evt_eff_fukidashi, 3, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
     CALL(evt_eff_fukidashi, 4, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(500)
+    // The camera turns to the Sirens and their theme plays; Beldam quizzes Vivian on their goals:
+    // find Mario and steal the map to the Crystal Stars.
     CALL(evt_cam3d_evt_set, FLOAT(-497.5f), 115, FLOAT(325.7998f), FLOAT(-497.5f), 45, -68, 500, 11)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     WAIT_MS(1000)
@@ -309,6 +323,7 @@ EVT_BEGIN(witchtrio_momeru)
     WAIT_MS(200)
     CALL(evt_cam3d_evt_set, -465, 85, 227, -465, 37, -68, 500, 0)
     WAIT_MS(1000)
+    // Beldam notices Vivian fawning over something: a necklace Vivian found near a tree.
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_02_01"), 0, STRING("マジョリン"))
     WAIT_MS(200)
     CALL(evt_cam3d_evt_set, -520, 85, 227, -520, 37, -68, 500, 11)
@@ -336,6 +351,8 @@ EVT_BEGIN(witchtrio_momeru)
     WAIT_MS(300)
     CALL(evt_npc_set_ry, STRING("マリリン"), 90)
     WAIT_MS(300)
+    // Beldam scolds her for picking up scraps and asks for the sketch of Mario;
+    // Vivian insists Beldam took it, and Beldam blames her.
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_04"), 0, STRING("マジョリン"))
     WAIT_MS(200)
     CALL(evt_npc_get_position, STRING("ビビアン"), LW(0), LW(1), LW(2))
@@ -358,6 +375,7 @@ EVT_BEGIN(witchtrio_momeru)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_08"), 0, STRING("ビビアン"))
     WAIT_MS(200)
+    // Marilyn tries to point out Mario, who is puzzled; Beldam brushes her off.
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("マリリン"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set_rel, 0, 70, 393, 0, 45, FLOAT(-20.799805f), 500, 11)
@@ -382,6 +400,7 @@ EVT_BEGIN(witchtrio_momeru)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_10"), 0, STRING("マジョリン"))
     WAIT_MS(200)
+    // Beldam accuses Vivian of losing the sketch and shouts her down.
     CALL(evt_cam3d_evt_set, FLOAT(-497.5f), 115, FLOAT(325.7998f), FLOAT(-497.5f), 45, -68, 500, 11)
     WAIT_MS(800)
     CALL(evt_npc_get_position, STRING("マジョリン"), LW(0), LW(1), LW(2))
@@ -398,6 +417,7 @@ EVT_BEGIN(witchtrio_momeru)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_13"), 0, STRING("マジョリン"))
     WAIT_MS(200)
+    // As punishment Beldam snatches the necklace from Vivian, who is left in tears.
     CALL(evt_npc_set_anim, STRING("マジョリン"), STRING("MJR_I_1"))
     CALL(evt_npc_get_position, STRING("マジョリン"), LW(3), LW(4), LW(5))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_MAJO_NECKLACE_STEAL2"), LW(3), LW(4), LW(5), 0)
@@ -452,6 +472,7 @@ EVT_BEGIN(witchtrio_momeru)
     WAIT_MS(200)
     CALL(evt_npc_set_ry, STRING("マリリン"), 90)
     WAIT_MS(300)
+    // The field music returns, the story advances and Mario's party can move again.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_npc_flag_onoff, 0, STRING("ビビアン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -483,11 +504,14 @@ EVT_BEGIN(majorin_have_picture)
 EVT_END()
 
 /**
- * Guess: cutscene where the Sirens show the Mario poster ("stg2_win_e06_00" and on):
- * Beldam and Marilyn tease Vivian, a poster item appears in Beldam's hands
- * and the story moves on to the sketch scene.
+ * Sirens-only scene at STORY_STG2_05_02 (Mario and the partners are moved off the map):
+ * Vivian complains that Beldam had the sketch all along,
+ * Beldam holds up the Mario poster (majorin_have_picture keeps it in her hands) and they study it,
+ * then Beldam blames Vivian, refuses to give back the necklace and orders her to find Mario
+ * (stg2_win_e06_00 to 12). The story becomes STORY_STG2_06_THE_SKETCH.
  */
 EVT_BEGIN(witchtrio_picture)
+    // Mario and his party are moved off the map: the scene shows the three Sirens alone.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, -495, 165, 582, -495, 45, -108, 0, 11)
     CALL(evt_mario_cont_onoff, 0)
@@ -509,6 +533,7 @@ EVT_BEGIN(witchtrio_picture)
     WAIT_MS(1000)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
+    // Vivian protests that Beldam had the sketch all along; Beldam tells her to study it instead.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_WITCH1"))
     CALL(evt_npc_get_position, STRING("ビビアン"), LW(0), LW(1), LW(2))
     CALL(evt_npc_jump_position_nohit, STRING("ビビアン"), LW(0), LW(1), LW(2), 225, 30)
@@ -525,6 +550,8 @@ EVT_BEGIN(witchtrio_picture)
     CALL(evt_cam3d_evt_set, -495, 90, 237, -495, 30, -108, 500, 11)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_02"), 0, STRING("マリリン"))
+    // Beldam holds up the sketch of Mario and the three gather round;
+    // Beldam admires the mustached man and thinks she has seen him before.
     CALL(evt_item_entry, STRING("picture"), ITEM_MARIO_POSTER, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("picture"), ITEM_FLAG_NO_TOUCH)
     SPAWN_EVENT_GET_ID(PTR(majorin_have_picture), LW(10))
@@ -552,6 +579,7 @@ EVT_BEGIN(witchtrio_picture)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("マジョリン"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_03"), 0, STRING("マジョリン"))
+    // Marilyn realizes they already met him; Beldam blames Vivian and promises punishment.
     BEGIN_INLINE_EVENT
         CALL(evt_npc_get_position, STRING("マリリン"), LW(0), LW(1), LW(2))
         CALL(evt_npc_jump_position_nohit, STRING("マリリン"), LW(0), LW(1), LW(2), 225, 30)
@@ -579,12 +607,14 @@ EVT_BEGIN(witchtrio_picture)
     CALL(evt_npc_set_ry, STRING("マリリン"), 270)
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_08"), 0, STRING("ビビアン"))
     CALL(evt_npc_set_ry, STRING("マリリン"), 90)
+    // Beldam refuses to give the necklace back and orders Vivian to find Mario.
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_09"), 0, STRING("マジョリン"))
     CALL(evt_npc_set_autotalkpose, STRING("ビビアン"), STRING("PTR_S_3"), STRING("PTR_T_3"))
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_10"), 0, STRING("ビビアン"))
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_11"), 0, STRING("マジョリン"))
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_12"), 0, STRING("マリリン"))
+    // The camera pulls back, the story advances and the scene ends with a change to win_03.
     CALL(evt_cam3d_evt_set, -495, 165, 582, -495, 45, -108, 1500, 11)
     WAIT_MS(1200)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_06_THE_SKETCH)
@@ -595,10 +625,14 @@ EVT_BEGIN(witchtrio_picture)
 EVT_END()
 
 /**
- * Guess: trigger cutscene: when Mario crosses x <= -325 the Shadow Sirens challenge him ("stg2_win_e07_00" and
- * on) before the boss battle.
+ * Trigger spawned at STORY_STG2_06: when Mario reaches x <= -325 the Shadow Sirens confront him;
+ * the partner reacts, Vivian botches their name ("Shadow Beauties") and Beldam scolds her
+ * (stg2_win_e07_00 to 08).
+ * Then the fight starts (Beldam's battle info 4);
+ * afterwards the story becomes STORY_STG2_07_MARIO_VS_SHADOW_SIRENS and witchtrio_lose starts.
  */
 EVT_BEGIN(mario_vs_witchtrio)
+    // The Sirens wait here until Mario walks west past x -325.
     CALL(evt_npc_set_ry, STRING("マジョリン"), 270)
     CALL(evt_npc_flag_onoff, 1, STRING("ビビアン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("マリリン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -610,6 +644,7 @@ EVT_BEGIN(mario_vs_witchtrio)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Everyone stops; Mario and his party face west as the Sirens notice them.
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_key_onoff, 0)
@@ -632,6 +667,7 @@ EVT_BEGIN(mario_vs_witchtrio)
     WAIT_MS(500)
     CALL(evt_npc_set_ry, STRING("マジョリン"), 90)
     WAIT_MS(500)
+    // Beldam taunts Mario, the partner recognizes the Sirens, and Beldam says she will take the map.
     CALL(evt_cam3d_evt_set, -495, 93, 252, -495, 45, -19, 500, 11)
     WAIT_MS(600)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_WITCH1"))
@@ -652,6 +688,7 @@ EVT_BEGIN(mario_vs_witchtrio)
     WAIT_FRAMES(1)
     CALL(evt_msg_print_party, STRING("stg2_win_e07_02_01"))
     WAIT_MS(200)
+    // Beldam introduces the trio, but Vivian finishes the line as "Shadow Beauties".
     CALL(evt_cam3d_evt_set, -451, FLOAT(88.59961f), FLOAT(274.0f), -451, FLOAT(35.5f), FLOAT(-19.0f), 0, 0)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg2_win_e07_02_02"), 0, STRING("マジョリン"))
@@ -670,6 +707,7 @@ EVT_BEGIN(mario_vs_witchtrio)
     WAIT_MS(300)
     CALL(evt_msg_print_party, STRING("stg2_win_e07_02_05"))
     WAIT_MS(500)
+    // Beldam corrects her (Shadow SIRENS), calls her ugly and promises punishment; Vivian sulks.
     CALL(evt_npc_set_ry, STRING("マジョリン"), 270)
     WAIT_MS(300)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -695,6 +733,7 @@ EVT_BEGIN(mario_vs_witchtrio)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg2_win_e07_02_10"), 0, STRING("ビビアン"))
     WAIT_MS(200)
+    // Beldam rallies her sisters to deal with Mario first.
     CALL(evt_npc_set_ry, STRING("マジョリン"), 90)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg2_win_e07_06"), 0, STRING("マジョリン"))
@@ -707,6 +746,7 @@ EVT_BEGIN(mario_vs_witchtrio)
     CALL(evt_msg_print, 0, STRING("stg2_win_e07_07"), 0, STRING("マリリン"))
     WAIT_MS(200)
     CALL(evt_mario_set_pose, STRING("M_I_Y"))
+    // The three Sirens charge at Mario and the battle against them starts.
     BEGIN_INLINE_EVENT_GET_ID(LW(10))
         WAIT_MS(400)
         CALL(evt_npc_get_position, STRING("マジョリン"), LW(0), LW(1), LW(2))
@@ -732,6 +772,7 @@ EVT_BEGIN(mario_vs_witchtrio)
     CALL(evt_npc_set_battle_info, STRING("マジョリン"), 4)
     CALL(evt_npc_battle_start, STRING("マジョリン"))
     CALL(evt_npc_wait_battle_end)
+    // After the battle Mario can move again, and witchtrio_lose plays the Sirens' defeat.
     DELETE_EVENT(LW(10))
     DELETE_EVENT(LW(11))
     DELETE_EVENT(LW(12))
@@ -743,9 +784,10 @@ EVT_BEGIN(mario_vs_witchtrio)
 EVT_END()
 
 /**
- * Guess: pickup callback of the necklace item: waits until the item is not in use, stops NPCs,
- * turns Mario and his partner toward each other and plays "stg2_win_e08_03" (spoken by the extra partner)
- * when Mario takes it.
+ * Pickup script of the necklace the Sirens drop (placed by the init script at STORY_STG2_08):
+ * waits until the item's pickup is over (ITEM_FLAG_USED clears), stops the NPCs,
+ * turns Mario and the partner toward Punio, the Puni guide (the second partner, "extparty"),
+ * who recognizes Flurrie's necklace and says to take it to her (stg2_win_e08_03).
  */
 EVT_BEGIN(get_necklace)
     CALL(item_check_necklace_exist)
@@ -817,6 +859,8 @@ EVT_END()
  * BGM returns to the Boggly Woods theme and the story becomes STORY_STG2_08_SHADOW_SIRENS_LOSE.
  */
 EVT_BEGIN(witchtrio_lose)
+    // The Sirens and Mario's party are placed for the aftermath,
+    // with a hidden stand-in Beldam that will carry the necklace.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_set_position, STRING("ビビアン"), -438, 0, -10)
     CALL(evt_npc_set_position, STRING("マリリン"), -425, 0, -60)
@@ -838,6 +882,7 @@ EVT_BEGIN(witchtrio_lose)
     CALL(evt_npc_flag_onoff, 1, STRING("ダミー"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("ダミー"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_set_autotalkpose, STRING("ビビアン"), STRING("PTR_S_4"), STRING("PTR_T_4"))
+    // The necklace is created out of sight; Marilyn and Vivian are left dizzy.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_WITCH1"))
     CALL(evt_cam3d_evt_set, -375, 144, 533, -375, 40, -58, 0, 11)
     CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, 0, -1000, 0, ITEM_ENTRY_FIXED, GSWF(GSWF_WIN00_NECKLACE_TAKEN), PTR(get_necklace))
@@ -850,6 +895,7 @@ EVT_BEGIN(witchtrio_lose)
     CALL(evt_eff_fukidashi, 1, STRING("effvivian"), STRING("ビビアン"), 2, 0, 0, 0, 0, 0, 0, -1)
     CALL(evt_seq_wait, 2)
     WAIT_MS(500)
+    // Beldam blames her sisters and flees west; the necklace falls from her and bounces toward Mario.
     CALL(evt_npc_get_position, STRING("マジョリン"), LW(0), LW(1), LW(2))
     CALL(evt_npc_jump_position_nohit, STRING("マジョリン"), LW(0), LW(1), LW(2), 225, 30)
     CALL(evt_msg_print, 0, STRING("stg2_win_e08_00"), 0, STRING("マジョリン"))
@@ -885,6 +931,7 @@ EVT_BEGIN(witchtrio_lose)
         CALL(evt_item_flag_off, STRING("necklace"), ITEM_FLAG_NO_TOUCH)
         CALL(evt_item_set_position, STRING("necklace"), LW(13), 0, LW(2))
     END_INLINE_EVENT
+    // Marilyn comes to and runs off after her.
     BEGIN_INLINE_EVENT
         CALL(evt_eff_softdelete, STRING("effmaririn"))
         CALL(evt_npc_get_position, STRING("マリリン"), LW(0), LW(1), LW(2))
@@ -897,6 +944,7 @@ EVT_BEGIN(witchtrio_lose)
         CALL(evt_npc_move_position, STRING("マリリン"), LW(0), LW(2), 0, FLOAT(240.0f), 0)
         CALL(evt_npc_set_position, STRING("マリリン"), 0, -1000, 0)
     END_INLINE_EVENT
+    // Vivian comes to, starts to run, stops to look back at Mario, then flees too.
     WAIT_MS(425)
     SET_VALUE(GF(0), 1)
     BEGIN_INLINE_EVENT
@@ -929,6 +977,7 @@ EVT_BEGIN(witchtrio_lose)
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
     WAIT_WHILE(GF(0))
+    // Once all three are gone the Boggly Woods music returns, the story advances and Mario can move again.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_08_SHADOW_SIRENS_LOSE)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -952,6 +1001,7 @@ static EVT_BEGIN(ki_data_evt_01)
     RETURN
 EVT_END()
 
+/** Trees of this map that shake when Mario hammers them; the first drops a Sleepy Sheep once. */
 static TreeAccess tree_access_data[] = {
     {4, "A_tree_01", "S_tree_mki_01", "S_tree_ha01", 0, ki_data_evt_01},
     {4, "A_tree_02", "S_tree_mki_02", "S_tree_ha02", 0, NULL},
@@ -1080,9 +1130,11 @@ EVT_BEGIN(iri_28_init)
 EVT_END()
 
 /**
- * Guess: map init script of Boggly Woods entrance (win_00):
- * registers exits, BGM and ambience, spawns NPCs, trees, the necklace and Honey Syrup items,
- * Fabio and the Shadow Sirens scenes depending on story progress.
+ * Map init script of win_00, the first Boggly Woods map: registers exits, BGM and ambience, NPCs and trees;
+ * with the necklace taken (up to STORY_STG2_25) it runs kizayarou_init;
+ * it spawns the Sirens' scenes by story progress (witchtrio_momeru, witchtrio_picture, mario_vs_witchtrio,
+ * witchtrio_lose),
+ * places the necklace at STORY_STG2_08 and the Honey Syrup, and sets up trouble 28 (iri_28_init).
  */
 EVT_BEGIN(win_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))

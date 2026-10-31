@@ -18,7 +18,8 @@ static USER_FUNC(camdir);
 
 /**
  * Creates the Gazigazi biter NPC (model c_gazigazi) out of sight at y -1000, not billboarded.
- * Guess: run by map setup on maps with the hazard; nothing in the tree references it.
+ * The init scripts of the maps with hazard water run it (CALL_CHILD in dou, tik, las, muj, pik and others),
+ * next to their evt_hit_damage_return_set, so evt_gazigazi_appear has its NPC.
  */
 EVT_BEGIN(evt_gazigazi_entry)
     CALL(evt_npc_entry, STRING(GAZIGAZI), STRING("c_gazigazi"))

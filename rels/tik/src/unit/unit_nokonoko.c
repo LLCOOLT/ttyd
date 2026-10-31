@@ -10,6 +10,12 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 
+// Unit work slots of the Koopa Troopa (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_NOKONOKO_SPIN_STOP = 0,  // 1 ends the side event that spins the shell during the shell attack
+    UW_NOKONOKO_SPIN_SPEED = 1, // degrees the shell turns per frame in that side event
+};
+
 BattleUnitKind unit_nokonoko;
 static PoseTableEntry pose_table[18];
 #if VERSION <= VERSION_DEMO_US
@@ -30,6 +36,10 @@ static EvtWord dmg_turn_event[78];
 static EvtWord attack_event[548];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the Koopa Troopa (HP 4, level 8):
+ * its size, offsets, damage sounds, status vulnerability, parts and init event.
+ */
 BattleUnitKind unit_nokonoko = {
     14,
     "btl_un_nokonoko",
@@ -88,7 +98,7 @@ BattleUnitKind unit_nokonoko = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -96,6 +106,7 @@ BattleUnitKind unit_nokonoko = {
     data_table,
 };
 
+/** Pose table of the Koopa Troopa: maps each battle pose to the animation it plays (NKT_* animations). */
 static PoseTableEntry pose_table[] = {
     {1, "NKT_N_1"},
     {2, "NKT_Y_1"},
@@ -103,20 +114,24 @@ static PoseTableEntry pose_table[] = {
     {5, "NKT_K_1"},
     {4, "NKT_X_1"},
     {3, "NKT_X_1"},
-    {28, "NKT_S_1"},
+    {BTL_POSE_NORMAL, "NKT_S_1"},
     {29, "NKT_Q_1"},
     {30, "NKT_Q_1"},
     {31, "NKT_S_1"},
-    {39, "NKT_D_1"},
+    {BTL_POSE_DAMAGE, "NKT_D_1"},
     {50, "NKT_A_1"},
-    {42, "NKT_R_1"},
-    {40, "NKT_W_1"},
-    {56, "NKT_X_1"},
-    {57, "NKT_X_1"},
+    {BTL_POSE_RUN, "NKT_R_1"},
+    {BTL_POSE_WALK, "NKT_W_1"},
+    {BTL_POSE_DANGER, "NKT_X_1"},
+    {BTL_POSE_PERIL, "NKT_X_1"},
     {BTL_POSE_TALK, "NKT_T_1"},
     {BTL_POSE_STAY_DEFAULT, "NKT_S_1"},
 };
 
+/**
+ * Pose table (flipped over) of the Koopa Troopa:
+ * maps each battle pose to the animation it plays (NKT_* animations).
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "NKT_N_2"},
     {2, "NKT_B_1"},
@@ -124,43 +139,53 @@ static PoseTableEntry pose_table_turn[] = {
     {5, "NKT_K_2"},
     {4, "NKT_K_2"},
     {3, "NKT_K_2"},
-    {28, "NKT_S_2"},
+    {BTL_POSE_NORMAL, "NKT_S_2"},
     {29, "NKT_Q_1"},
     {30, "NKT_Q_1"},
     {31, "NKT_D_1"},
-    {39, "NKT_D_1"},
+    {BTL_POSE_DAMAGE, "NKT_D_1"},
 #if VERSION >= VERSION_JP
-    {42, "NKT_R_1"},
-    {40, "NKT_W_1"},
+    {BTL_POSE_RUN, "NKT_R_1"},
+    {BTL_POSE_WALK, "NKT_W_1"},
 #endif
-    {56, "NKT_K_2"},
-    {57, "NKT_K_2"},
+    {BTL_POSE_DANGER, "NKT_K_2"},
+    {BTL_POSE_PERIL, "NKT_K_2"},
     {BTL_POSE_TALK, "NKT_S_2"},
     {BTL_POSE_STAY_DEFAULT, "NKT_S_2"},
 };
 
+/**
+ * Data table of the Koopa Troopa: event handlers for being flipped over and a First Strike on it (no reaction).
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/** Defence of the Koopa Troopa: 1 damage points off every hit. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element reactions of the Koopa Troopa: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Defence of the Koopa Troopa (flipped over): no damage reduction. */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Koopa Troopa (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {100, 100, 90, 100, 95, 100, 100, 95, 100, 95, 100, 95, 100, 95, 95, 100, 90, 100, 95, 100, 100, 100};
 #else
+/** Status vulnerability of the Koopa Troopa (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {95, 100, 90, 100, 90, 100, 100, 90, 100, 95, 100, 95, 100, 95, 90, 95, 90, 100, 90, 100, 100, 100};
 #endif
 
+/** Body part of the Koopa Troopa (model c_nokoteki): hit position, defences, attributes and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_nokonoko", "c_nokoteki", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x1009, 0, pose_table},
+    {1, "btl_un_nokonoko", "c_nokoteki", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_SHELLED, 0, pose_table},
 };
 
+/** Weapon of the Koopa Troopa's attack: 2 damage, hammer-type contact attack. */
 static BattleWeapon weapon_nokonoko_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -179,7 +204,7 @@ static BattleWeapon weapon_nokonoko_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -199,9 +224,10 @@ static BattleWeapon weapon_nokonoko_attack = {
 };
 
 /**
- * Guess: init event of the Koopa Troopa: registers its wait, attack, damage and confusion events,
- * clears the flipped-over counter and sets the shell-walk and shell-run footstep sounds,
- * then starts the wait event.
+ * Init event of the Koopa Troopa: registers its wait, attack,
+ * damage and confusion events (the confusion event is
+ * the attack event too), clears the over-turn counter, sets its run and walk footstep sounds
+ * (SFX_ENM_NOKO_MOVE3L / 3R), then starts the wait event.
  */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -235,7 +261,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("NKT_D_1"))
     WAIT_FRAMES(2)
@@ -249,7 +275,7 @@ static EVT_BEGIN(dmg_turn_event)
 EVT_END()
 
 /**
- * Guess: runs in place of a flipped Koopa's attack: counts the over-turn counter down by one;
+ * Runs in place of a flipped Koopa's attack (attack_event calls it): counts the over-turn counter down by one;
  * while turns remain it only wriggles ("NKT_S_3") for 400 ms and passes.
  * At zero it restores the upright defence and pose tables, clears STATUS_FLAG_FLIPPED and hops back on its feet.
  */
@@ -266,7 +292,7 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("NKT_S_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -279,10 +305,11 @@ static EVT_BEGIN(wakeup_event)
 EVT_END()
 
 /**
- * Guess: the Koopa Troopa's pre-emptive strike variant of its shell attack:
- * takes the first-attack target, curls into its shell,
- * spins up its rotation in three steps and rushes at the target, hits for weapon_nokonoko_attack,
- * then bounces off in two hops and walks home. Nothing in this file points at it.
+ * A first-strike version of the Koopa Troopa's shell attack:
+ * takes the first-attack target, hops and curls into its shell,
+ * spins up (0, then 20, then 40 degrees per frame) and slides into the target, applying weapon_nokonoko_attack
+ * without a pre-damage check (so it cannot miss), then bounces off in two hops and walks home.
+ * Nothing in this file points at it.
  */
 static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -303,24 +330,24 @@ static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("NKT_A_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_STOP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 0)
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_STOP, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 20)
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 40)
     WAIT_MS(100)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -328,8 +355,8 @@ static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_nokonoko_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), 256, LW(5))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 10)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
@@ -340,9 +367,9 @@ static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_STOP, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -362,11 +389,14 @@ EVT_END()
  * A confused unit with no target runs subsetevt_confuse_flustered.
  */
 static EVT_BEGIN(attack_event)
+    // A Koopa flipped onto its back spends its turn getting back on its feet instead of attacking.
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // Choose the target: the First Strike target if the battle opened with one,
+    // otherwise it may use an item or pick a normal target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -382,14 +412,16 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_nokonoko_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_nokonoko_attack), LW(3), LW(4))
     END_IF
+    // No target left: a confused Koopa is flustered; either way it ends its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera frames the Koopa and its target, and the attack is announced.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -401,31 +433,33 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(100)
+    // The Koopa hops and curls into its shell.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("NKT_A_1"))
+    // It spins up in three steps, kicking up smoke.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_STOP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 0)
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_STOP, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 20)
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 40)
     WAIT_MS(100)
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         LOOP(0)
@@ -435,12 +469,14 @@ static EVT_BEGIN(attack_event)
             WAIT_FRAMES(3)
         END_LOOP
     END_SIBLING_EVENT
+    // It slides along the floor into the target.
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 1)
     DELETE_EVENT(LW(13))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), 256, LW(5))
+    // Check how the target defends against the shell slam.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -462,27 +498,29 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The target dodged: the shell slides past, slows to a stop and hops back upright.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 100)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0, 1)
     WAIT_MS(250)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 10)
     WAIT_MS(250)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_STOP, 1)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 40)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     GOTO(98)
+    // The slam hits: the camera shakes, the damage is dealt and the Koopa bounces off in two hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_nokonoko_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), 256, LW(5))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 10)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_SPEED, 10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
@@ -493,11 +531,12 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_NOKONOKO_SPIN_STOP, 1)
     GOTO(98)
+    // It walks back home and returns to waiting.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)

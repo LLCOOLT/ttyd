@@ -5,6 +5,11 @@
 #include "evt/evt_cmd.h"
 #include "version.h"
 
+// BadgeShopWork.restockFlags bits.
+enum BadgeShopRestockFlags {
+    BADGESHOP_RESTOCK_PENDING = 0x1, // regenerate the bargain and bottakuru stock on the next entry to gor_01
+};
+
 typedef struct BadgeShopWork {
     u8 special_table[0x19];    // 0x0, Lovely Howz of Badges
     u8 bargain_table[0x19];    // 0x19, Lovely Howz of Badges Discount

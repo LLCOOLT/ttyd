@@ -343,6 +343,7 @@ static void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
     GXPosition3f32(lo, lo, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
     for (i = 0; i < work->count + 5; i++) {
+        // FAKE: s32-id cast: the JP prototype takes an s16, which narrows the u16 icon_id (FAKES.md)
         ((void (*)(GXTexObj*, s32))iconGetTexObj)(&texObj, itemDataTable[work->list[i % work->count]].icon_id);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         PSMTXTrans(mT, 0.0f, -40.0f * (f32)i + work->offset, 0.0f);

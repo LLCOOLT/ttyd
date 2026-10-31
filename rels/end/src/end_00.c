@@ -116,25 +116,16 @@ static inline f32 end_tanf(f32 x) {
     return tan(x);
 }
 
-// Forward declaration of evt_end_npc_silhouette_on (defined below).
+// Script helpers defined further down.
 USER_FUNC(evt_end_npc_silhouette_on);
-// Forward declaration of evt_end_font_restore (defined below).
 USER_FUNC(evt_end_font_restore);
-// Forward declaration of end_bgm_wait_stop (defined below).
 USER_FUNC(end_bgm_wait_stop);
-// Forward declaration of evt_end_staff_roll_init (defined below).
 USER_FUNC(evt_end_staff_roll_init);
-// Forward declaration of evt_end_staff_roll_msg_main (defined below).
 USER_FUNC(evt_end_staff_roll_msg_main);
-// Forward declaration of evt_end_image_set_blend (defined below).
 USER_FUNC(evt_end_image_set_blend);
-// Forward declaration of evt_end_image_set_mode (defined below).
 USER_FUNC(evt_end_image_set_mode);
-// Forward declaration of evt_end_image_set_overlay_alpha (defined below).
 USER_FUNC(evt_end_image_set_overlay_alpha);
-// Forward declaration of evt_end_image_set_alpha (defined below).
 USER_FUNC(evt_end_image_set_alpha);
-// Forward declaration of evt_end_image_disp_entry (defined below).
 USER_FUNC(evt_end_image_disp_entry);
 void end_ext_moamoa_dispent(void);
 void end_ext_disp(CameraId cameraId, void* param);
@@ -285,6 +276,7 @@ USER_FUNC(evt_end_credit_npc_get_wait_type) {
     return 2;
 }
 
+/** Pointer to the ending's work data (end_work), used by the ending callbacks. */
 EndWork* end_wp = &end_work;
 
 #if VERSION == VERSION_EU
@@ -533,6 +525,10 @@ CreditMsg end_staff_roll_msg_tbl[] = {
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Parade of the ending: for each silhouette, the NPC model, its animation and the script it runs. Version for
+ * the demo releases (151 entries).
+ */
 CreditNpc R_credits_npc_info[] = {
     "c_luigi", "W_1", 0, "c_pkr", "PKR_W_1", 0, "c_kuri_h", "W_1",
     0, "c_kino_ji", "W_1", 0, "c_cook", "W_1", 0, "c_deale",
@@ -593,6 +589,10 @@ CreditNpc R_credits_npc_info[] = {
     "M_W_1", 0, "c_peach", "P_W_1", 0,
 };
 #else
+/**
+ * Parade of the ending: for each silhouette, the NPC model, its animation and the script it runs. Version for
+ * the other releases (152 entries).
+ */
 CreditNpc R_credits_npc_info[] = {
     "c_luigi", "W_1", 0, "c_pkr", "PKR_W_1", 0, "c_kuri_h", "W_1",
     0, "c_kino_ji", "W_1", 0, "c_cook", "W_1", 0, "c_deale",
@@ -869,6 +869,7 @@ USER_FUNC(evt_end_credit_npc_preload) {
 #endif
 
 #if VERSION >= VERSION_US
+/** Texture numbers of the overlay pictures shown during the ending, in the order they appear. */
 s32 end_overlay_tex_tbl[6] = {52, 52, 54, 55, 55, 56};
 #endif
 
@@ -1201,6 +1202,8 @@ void end_image_disp(CameraId cameraId, void* param) {
  */
 EVT_BEGIN(end_image_main_evt)
     LOOP(0)
+        // Loop once per credits picture; stop if the credits have already ended, otherwise wait until the roll
+        // asks for the next picture.
         IF_INT_EQUAL(GF(10), 1)
             RETURN
         END_IF
@@ -1210,6 +1213,7 @@ EVT_BEGIN(end_image_main_evt)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
+        // The picture appears and fades in.
         BEGIN_INLINE_EVENT_GET_ID(LW(9))
             CALL(evt_end_image_disp_entry)
         END_INLINE_EVENT
@@ -1223,6 +1227,7 @@ EVT_BEGIN(end_image_main_evt)
             END_IF
         END_LOOP
         LOOP(0)
+            // The picture stays up until the roll asks to remove it.
             IF_INT_EQUAL(GW(10), 2)
                 BREAK_LOOP
             END_IF
@@ -1230,6 +1235,7 @@ EVT_BEGIN(end_image_main_evt)
         END_LOOP
 #if VERSION >= VERSION_JP
         IF_INT_EQUAL(GW(11), 49)
+            // The very last picture: a second overlay picture fades in over it.
             WAIT_MS(500)
             CALL(evt_sub_intpl_msec_init, 11, 0, 255, 500)
             LOOP(0)
@@ -1241,6 +1247,7 @@ EVT_BEGIN(end_image_main_evt)
                 END_IF
             END_LOOP
             WAIT_MS(3000)
+            // The credits music fades out, and after a pause the closing music begins.
             SET_VALUE(GF(0), 0)
             BEGIN_INLINE_EVENT
                 CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 5000)
@@ -1250,6 +1257,7 @@ EVT_BEGIN(end_image_main_evt)
                 END_IF
             END_INLINE_EVENT
             WAIT_MS(500)
+            // The final pictures blend back and forth until the player presses a button.
             SPAWN_EVENT_GET_ID(PTR(end_image_blend_loop), LW(10))
             LOOP(0)
                 CALL(evt_key_get_buttontrg, 0, LW(0))
@@ -1259,6 +1267,8 @@ EVT_BEGIN(end_image_main_evt)
                 WAIT_FRAMES(1)
             END_LOOP
             SET_VALUE(GF(0), 1)
+            // The player pressed a button: the screen fades to black, the pictures are cleared and the title
+            // return starts.
             DELETE_EVENT(LW(10))
             CALL(evt_fade_entry, FADE_OUT_BLACK, 500, 0, 0, 0)
             CALL(evt_fade_end_wait)
@@ -1272,6 +1282,7 @@ EVT_BEGIN(end_image_main_evt)
             RETURN
         END_IF
 #endif
+        // Any other picture fades out and the wait starts over.
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
@@ -1413,8 +1424,8 @@ EVT_END()
 
 /**
  * Demo parade script for the first Magnus von Grapple robot model (c_mb_robo_1b):
- * rises up through the middle of the screen as a silhouette.
- * Guess: batten is the robot's name from the model name.
+ * rises up through the middle of the screen as a silhouette. batten is short for magnum_battender, the
+ * internal name of Magnus von Grapple (btl_un_magnum_battender).
  */
 EVT_BEGIN(end_credit_batten_evt)
     CALL(evt_npc_entry, STRING("batten"), STRING("c_mb_robo_1b"))
@@ -1633,8 +1644,8 @@ EVT_BEGIN(end_credit_korutesu_evt)
 EVT_END()
 
 /**
- * Parade script (releases) for the c_bom_sen model, a Bob-omb character: falls down the screen.
- * Guess: this is Admiral Bobbery, from the model name.
+ * Parade script (releases) for the c_bom_sen model, the Bob-omb crowd sprite of Fahr Outpost's cannon scene
+ * (bom_01's evt_bom1000), in pose S_2: falls down the screen as a silhouette.
  */
 EVT_BEGIN(end_credit_para_evt)
     WAIT_MS(1000)
@@ -1728,8 +1739,10 @@ EVT_END()
 #endif
 
 #if VERSION >= VERSION_JP
+/** Model name of the Smorg silhouette used in the ending's closing pictures. */
 const char* end_moa_ext_anim = "c_n_moa_a";
 
+/** Animation name of the Smorg silhouette used in the ending's closing pictures. */
 const char* end_moa_ext_pose = "S_1";
 #endif
 
@@ -1747,8 +1760,10 @@ USER_FUNC(evt_end_image_set_alpha) {
 
 #if VERSION >= VERSION_JP
 /**
- * Script helper: sets args[0] as the second alpha value (alpha2) of the ending pictures.
- * Guess: the opacity of the overlay picture drawn over the main one.
+ * Script helper: sets args[0] as alpha2, the opacity of the overlay picture end_image_disp draws over the
+ * picture while it is above 0 (image 52 in JP, end_overlay_tex_tbl by language later).
+ * The staff roll fades it in
+ * over the last picture (49) before end_image_blend_loop starts.
  */
 USER_FUNC(evt_end_image_set_overlay_alpha) {
     end_wp->alpha2 = evtGetValue(event, event->args[0]);
@@ -1756,8 +1771,8 @@ USER_FUNC(evt_end_image_set_overlay_alpha) {
 }
 
 /**
- * Guess: selects which of the two alternating ending pictures end_image_disp shows (args[0]: 0 neither, 1 the
- * first, 2 the second); end_image_blend_loop switches it.
+ * Script helper: selects what end_image_disp draws (args[0]): 0 the current picture, 1 images 49 and 50 blended,
+ * 2 images 50 and 51 blended; end_image_blend_loop switches between 1 and 2.
  */
 USER_FUNC(evt_end_image_set_mode) {
     end_wp->mode = evtGetValue(event, event->args[0]);
@@ -1765,8 +1780,9 @@ USER_FUNC(evt_end_image_set_mode) {
 }
 
 /**
- * Script helper: sets args[0] (0 to 255) as the TEV blend alpha of the ending pictures.
- * Guess: the cross-fade amount between the two alternating pictures.
+ * Script helper: sets args[0] (0 to 255) as the TEV blend alpha of the ending pictures:
+ * in modes 1 and 2 it is the
+ * cross-fade amount between the two blended images, which end_image_blend_loop ramps over 4 seconds.
  */
 USER_FUNC(evt_end_image_set_blend) {
     end_wp->tevAlpha = evtGetValue(event, event->args[0]);
@@ -2336,29 +2352,39 @@ EVT_END()
 #if VERSION >= VERSION_JP
 f32 fd_end_00_negone_one_374[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
+/** Float constant -1 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00_neg_one_382 = -1.0f;
 
+/** Float constant pi used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00___local_PI_383 = 3.1415927f;
 
+/** Float constant 3 pi / 2 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00___local_3PIO2_385 = 4.712389f;
 
 f32 fd_end_00_one_negone_373[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
+/** Float constant pi / 2 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00___local_PIO2_384 = 1.5707964f;
 
+/** Float constant 1 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00_one_381 = 1.0f;
 
 f32 fd_end_00_negone_one_360[2] __attribute__((aligned(8))) = {-1.0f, 1.0f};
 
+/** Float constant -1 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00_neg_one_365 = -1.0f;
 
+/** Float constant pi used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00___local_PI_366 = 3.1415927f;
 
+/** Float constant 3 pi / 2 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00___local_3PIO2_368 = 4.712389f;
 
 f32 fd_end_00_one_negone_359[2] __attribute__((aligned(8))) = {1.0f, -1.0f};
 
+/** Float constant pi / 2 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00___local_PIO2_367 = 1.5707964f;
 
+/** Float constant 1 used by the ending's trigonometric code, placed here by the compiler. */
 f32 fd_end_00_one_364 = 1.0f;
 #endif

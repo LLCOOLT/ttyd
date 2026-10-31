@@ -11,6 +11,10 @@
 #include "libc_decls.h"
 
 //.sbss
+/**
+ * State of the system-font cache: the language of the font
+ * and the glyph table built by romFontMake; wp points to it.
+ */
 static RomFontWork work;
 
 //.sdata
@@ -18,6 +22,10 @@ static RomFontWork* wp = &work;
 
 //.rodata string, .sdata table
 #if VERSION >= VERSION_US
+/**
+ * Japanese system messages of the retail release: the progressive-scan prompt and its replies, the disc-cover
+ * and disc-read errors, the fatal error text and the language names. romFontGetMessage indexes every msg_ table alike.
+ */
 const char* msg_jp[21] = {
     "\203v\203\215\203O\203\214\203b\203V\203u\203\202\201[\203h\202\305\225\\\216\246\202\265\202\334\202\267\202\251\201H",
     "\202\315\201@\202\242\201@\201@\201@\201@\201@\201@\202\242\202\242\202\246",
@@ -42,6 +50,10 @@ const char* msg_jp[21] = {
     NULL,
 };
 
+/**
+ * English system messages, laid out like msg_jp
+ * (the progressive prompt wording differs in the PAL release).
+ */
 const char* msg_us[21] = {
 #if VERSION == VERSION_EU
     "Would you like to display\nin progressive scan mode?",
@@ -82,6 +94,7 @@ const char* msg_us[21] = {
     NULL,
 };
 
+/** German system messages, laid out like msg_jp. */
 const char* msg_ge[21] = {
     "",
     "",
@@ -114,6 +127,7 @@ const char* msg_ge[21] = {
     NULL,
 };
 
+/** French system messages, laid out like msg_jp. */
 const char* msg_fr[21] = {
     "",
     "",
@@ -146,6 +160,7 @@ const char* msg_fr[21] = {
     NULL,
 };
 
+/** Spanish system messages, laid out like msg_jp. */
 const char* msg_sp[21] = {
     "",
     "",
@@ -170,6 +185,7 @@ const char* msg_sp[21] = {
     NULL,
 };
 
+/** Italian system messages, laid out like msg_jp. */
 const char* msg_it[21] = {
     "",
     "",
@@ -194,11 +210,20 @@ const char* msg_it[21] = {
     NULL,
 };
 
+/**
+ * The system message tables by language number (gp->language):
+ * Japanese, English, German, French, Spanish, Italian.
+ */
 static const char** msg_tbl[6] = {msg_jp, msg_us, msg_ge, msg_fr, msg_sp, msg_it};
 #else
 #if VERSION <= VERSION_DEMO_US
+/** Japanese system messages: progressive-scan prompt and replies, disc-cover and disc-read errors. */
 const char* msg_jp[9] = {
 #else
+/**
+ * Japanese system messages: progressive-scan prompt and replies,
+ * disc-cover and disc-read errors, fatal error text.
+ */
 const char* msg_jp[10] = {
 #endif
     "プログレッシブモードで表示しますか？",
@@ -215,6 +240,7 @@ const char* msg_jp[10] = {
     NULL
 };
 
+/** English system messages, laid out like msg_jp. */
 const char* msg_us[9] = {
     "Would you like to display in progressive scan mode?",
     "Yes              N o",
@@ -227,6 +253,7 @@ const char* msg_us[9] = {
     NULL
 };
 
+/** The system message tables by language number: Japanese, then English. */
 static const char** msg_tbl[2] = { msg_jp, msg_us };
 #endif
 

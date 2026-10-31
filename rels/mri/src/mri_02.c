@@ -40,6 +40,10 @@ extern EvtWord punipuni_switch[];
 extern EvtWord dokan_event[];
 extern EvtWord dokan_init[];
 
+/**
+ * Exits of mri_02: pipe dokan1 to mri_01 (dokan); pipe dokan2 to mri_05 (dokan3); pipe dokan3 to mri_20
+ * (dokan2).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan1", // hitName
@@ -107,6 +111,10 @@ static EVT_BEGIN(evt_ueki_04)
     RETURN
 EVT_END()
 
+/**
+ * Plants Mario can search in mri_02: A_ueki01, A_ueki02, A_ueki03, A_ueki04
+ * (runs evt_ueki_04 when searched), A_ueki05.
+ */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki01", "S_ueki01", NULL},
     {1, "A_ueki02", "S_ueki02", NULL},

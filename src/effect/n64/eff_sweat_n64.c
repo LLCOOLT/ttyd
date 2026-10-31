@@ -146,7 +146,7 @@ static void effSweatMain(EffectEntry* effect) {
     }
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_loop_invariants off
 /**
  * Draws each started drop as a camera-facing 6.4 x 9.6 white quad of the TTYD sweat-drop texture 93,

@@ -12,6 +12,10 @@
 GXColor shock_zero_color0;
 GXColor shock_zero_color1;
 
+/**
+ * The jagged shock-flash mesh: white-edged spikes around a dark inner rim,
+ * drawn textured and then plain for types 1-3.
+ */
 effN64Vtx testsrc_shock_v[] = {
     {242, -140, 0, 1800, 576, 0xFF, 0xFF, 0xFF, 0xFF},
     {189, -51, 0, 1630, 862, 0x00, 0x00, 0x00, 0xFF},

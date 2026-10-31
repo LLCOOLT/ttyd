@@ -23,6 +23,10 @@
 
 BattleWork* _battleWorkPointer;
 
+/**
+ * Battle entries Btl_UnitSetup makes at the start of every fight: Mario at his home spot (-100, 0, -5),
+ * and before him the invisible system unit (unit_system) that runs battle-wide events.
+ */
 BattleUnitSetup entryunit_mario = {&unitdata_Mario, 0, {0}, BATTLE_PHASE_PLAYER, {-100.0f, 0.0f, -5.0f}};
 BattleUnitSetup entryunit_system = {&unit_system, 0, {0}, BATTLE_PHASE_PLAYER};
 
@@ -220,7 +224,7 @@ BOOL Btl_UnitSetup(BattleWork* wp) {
 
     partyId = wp->fbatInfo->party;
     if (partyId) {
-        party = BtlUnit_Entry(&entryunit_party[partyId - 0xE0]);
+        party = BtlUnit_Entry(&entryunit_party[partyId - UNIT_GOOMBELLA]);
         BtlUnit_GetHomePos(party, &x, &y, &z);
         BtlUnit_SetHomePos(party, -140.0, y, 5.0);
         BtlUnit_SetPos(party, -140.0, y, 5.0);
@@ -261,37 +265,37 @@ BOOL Btl_UnitSetup(BattleWork* wp) {
     for (j = 0; j < 200; j++) {
         switch (pouch->equippedBadges[j]) {
             case ITEM_QUICK_CHANGE:
-                wp->badgeEquippedFlags |= 1 << 0;
+                wp->badgeEquippedFlags |= BADGE_FLAG_QUICK_CHANGE;
                 break;
             case ITEM_PEEKABOO:
-                wp->badgeEquippedFlags |= 1 << 1;
+                wp->badgeEquippedFlags |= BADGE_FLAG_PEEKABOO;
                 break;
             case ITEM_TIMING_TUTOR:
-                wp->badgeEquippedFlags |= 1 << 2;
+                wp->badgeEquippedFlags |= BADGE_FLAG_TIMING_TUTOR;
                 break;
             case ITEM_HEART_FINDER:
-                wp->badgeEquippedFlags |= 1 << 3;
+                wp->badgeEquippedFlags |= BADGE_FLAG_HEART_FINDER;
                 break;
             case ITEM_FLOWER_FINDER:
-                wp->badgeEquippedFlags |= 1 << 4;
+                wp->badgeEquippedFlags |= BADGE_FLAG_FLOWER_FINDER;
                 break;
             case ITEM_MONEY_MONEY:
-                wp->badgeEquippedFlags |= 1 << 7;
+                wp->badgeEquippedFlags |= BADGE_FLAG_MONEY_MONEY;
                 break;
             case ITEM_ATTACK_FX_R:
-                wp->badgeEquippedFlags |= 1 << 8;
+                wp->badgeEquippedFlags |= BADGE_FLAG_ATTACK_FX_R;
                 break;
             case ITEM_ATTACK_FX_B:
-                wp->badgeEquippedFlags |= 1 << 10;
+                wp->badgeEquippedFlags |= BADGE_FLAG_ATTACK_FX_B;
                 break;
             case ITEM_ATTACK_FX_G:
-                wp->badgeEquippedFlags |= 1 << 11;
+                wp->badgeEquippedFlags |= BADGE_FLAG_ATTACK_FX_G;
                 break;
             case ITEM_ATTACK_FX_Y:
-                wp->badgeEquippedFlags |= 1 << 9;
+                wp->badgeEquippedFlags |= BADGE_FLAG_ATTACK_FX_Y;
                 break;
             case ITEM_ATTACK_FX_P:
-                wp->badgeEquippedFlags |= 1 << 12;
+                wp->badgeEquippedFlags |= BADGE_FLAG_ATTACK_FX_P;
                 break;
             default:
                 break;
@@ -477,7 +481,7 @@ BattleUnit* BattleGetPartnerPtr(BattleWork* wp, BattleUnit* unit) {
  * so a partner switch is quick.
  */
 void BattlePartyAnimeLoad(s32 partyId) {
-    BattleUnitSetup* setup = &entryunit_party[partyId - 0xE0];
+    BattleUnitSetup* setup = &entryunit_party[partyId - UNIT_GOOMBELLA];
 
     animEffectAsync(setup->unitKindParams->parts->modelName, 1);
 }
@@ -495,10 +499,10 @@ BattleUnit* BattleChangeParty(BattleWork* wp) {
     s32 i;
     f32 dummy, x, y, z;
 
-    if (kind < 0xE0 || kind >= 0xE7) {
+    if (kind < UNIT_GOOMBELLA || kind >= UNIT_MAX) {
         return NULL;
     }
-    unit = BtlUnit_Spawn(&entryunit_party[kind - 0xE0], 1);
+    unit = BtlUnit_Spawn(&entryunit_party[kind - UNIT_GOOMBELLA], 1);
     for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         s32 id = wp->movePriorityQueue[i];
         if (id != -1) {
@@ -534,57 +538,57 @@ BattleUnit* BattleChangeParty(BattleWork* wp) {
  */
 s32 BattleTransPartyId(BattleUnitType kind) {
     switch (kind) {
-        case 0x50:
-        case 0x89:
-        case 0xE0:
-            return 1;
-        case 0x51:
-        case 0x8A:
-        case 0xE1:
-            return 2;
-        case 0x52:
-        case 0x8B:
-        case 0xE2:
-            return 4;
-        case 0x53:
-        case 0x8C:
-        case 0xE3:
-            return 5;
-        case 0x8D:
-        case 0xE4:
-            return 6;
-        case 0x8E:
-        case 0xE5:
-            return 3;
-        case 0x8F:
-        case 0xE6:
-            return 7;
-        case 0:
-            return 0;
+        case UNIT_GOOMBELLA_CHAPTER4:
+        case UNIT_DOOPLISS_CHAPTER8_GOOMBELLA:
+        case UNIT_GOOMBELLA:
+            return PARTNER_GOOMBELLA;
+        case UNIT_KOOPS_CHAPTER4:
+        case UNIT_DOOPLISS_CHAPTER8_KOOPS:
+        case UNIT_KOOPS:
+            return PARTNER_KOOPS;
+        case UNIT_YOSHI_CHAPTER4:
+        case UNIT_DOOPLISS_CHAPTER8_YOSHI:
+        case UNIT_YOSHI:
+            return PARTNER_YOSHI;
+        case UNIT_FLURRIE_CHAPTER4:
+        case UNIT_DOOPLISS_CHAPTER8_FLURRIE:
+        case UNIT_FLURRIE:
+            return PARTNER_FLURRIE;
+        case UNIT_DOOPLISS_CHAPTER8_VIVIAN:
+        case UNIT_VIVIAN:
+            return PARTNER_VIVIAN;
+        case UNIT_DOOPLISS_CHAPTER8_BOBBERY:
+        case UNIT_BOBBERY:
+            return PARTNER_BOBBERY;
+        case UNIT_DOOPLISS_CHAPTER8_MS_MOWZ:
+        case UNIT_MS_MOWZ:
+            return PARTNER_MSMOWZ;
+        case UNIT_NULL:
+            return PARTNER_NONE;
         default:
-            return 0;
+            return PARTNER_NONE;
     }
 }
 
 /** Converts a pouch party id back to the partner's battle unit kind (0xE0-0xE6). */
 BattleUnitType BattleTransPartyIdToUnitKind(s32 partyId) {
     switch (partyId) {
-        case 1:
-            return 0xE0;
-        case 2:
-            return 0xE1;
-        case 4:
-            return 0xE2;
-        case 5:
-            return 0xE3;
-        case 6:
-            return 0xE4;
-        case 3:
-            return 0xE5;
-        case 7:
-            return 0xE6;
+        case PARTNER_GOOMBELLA:
+            return UNIT_GOOMBELLA;
+        case PARTNER_KOOPS:
+            return UNIT_KOOPS;
+        case PARTNER_YOSHI:
+            return UNIT_YOSHI;
+        case PARTNER_FLURRIE:
+            return UNIT_FLURRIE;
+        case PARTNER_VIVIAN:
+            return UNIT_VIVIAN;
+        case PARTNER_BOBBERY:
+            return UNIT_BOBBERY;
+        case PARTNER_MSMOWZ:
+            return UNIT_MS_MOWZ;
         default:
-            return 0;
+            return UNIT_NULL;
     }
 }
 
@@ -1008,9 +1012,9 @@ BOOL battleDisableHResetCheck(void) {
 
 /**
  * Merlee ("majinai", charm) check each turn while she has charms left:
- * counts down a random 6-10 turn delay, then picks the charm type (1 attack, 2 defence,
- * 3 and 4 the end-of-battle bonuses; only 1-3 for battles flagged NPC_BATTLE_MERLEE_NO_CURSE_4) and returns it,
- * 0 meanwhile.
+ * counts down a random 6-10 turn delay, then picks the charm type (1 attack, 2 defence, 3 the Star Point bonus
+ * after the battle (battle_seq_end.c), 4 the coin bonus after a won battle (npcdrv.c); only 1-3 for battles flagged
+ * NPC_BATTLE_MERLEE_NO_CURSE_4) and returns it, 0 meanwhile.
  */
 u8 BattleMajinaiCheck(void) {
     PouchData* pouch = pouchGetPtr();

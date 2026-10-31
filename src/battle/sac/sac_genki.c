@@ -314,6 +314,7 @@ static void main_base(void) {
                     w->objTimer = 18;
                 }
                 if (w->timeLeft > 0) {
+                    // FAKE: called through a cast so deferred codegen does not inline object_entry here (FAKES.md)
                     ((void (*)(void))object_entry)();
                 }
             }
@@ -357,6 +358,7 @@ static void main_mario(void) {
     EffectEntry* eff;
 
     if (w->marioState >= 1 && w->marioState <= 4 && w->timeLeft <= 0 &&
+        // FAKE: object_get_num through a cast so it is not inlined into main_mario (FAKES.md)
         ((s32 (*)(void))object_get_num)() == 0) {
         w->marioState = 5;
         w->targetState = 4;
@@ -414,7 +416,7 @@ static void main_mario(void) {
     }
 }
 
-// inlining off for main_target, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it main_target is inlined into main_genki (144 -> 233 instructions)
 #pragma dont_inline on
 /**
  * Swings the aim reticle between 0 and 60 degrees and back, 1.25 degrees a frame;
@@ -758,7 +760,7 @@ static void main_object(s32 idx) {
     }
 }
 
-// inlining off for main_star, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it main_star is inlined into main_genki (144 -> 155 instructions)
 #pragma dont_inline on
 /** Animates the stars that drop the items: seven small stars in Sweet Treat, one big star in Sweet Feast. */
 static void main_star(void) {
@@ -1230,12 +1232,14 @@ static GenkiWork* get_ptr(void);
  * the partner's HP and FP by the three scores, cures both of bad statuses and slides the enemies back.
  */
 EVT_BEGIN(genki_evt_common)
+    // A knocked-out partner is left out of the healing.
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(13))
     CALL(btlevtcmd_GetBodyId, LW(13), LW(14))
-    CALL(btlevtcmd_CheckStatus, LW(13), 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(13), STATUS_INSTANT_KILL, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(13), -1)
     END_IF
+    // Mario pays the Star Power, the minigame work starts and the enemies slide off to the side.
     CALL(btlevtcmd_reset_move_color_lv_all)
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
     BEGIN_SIBLING_EVENT
@@ -1244,6 +1248,7 @@ EVT_BEGIN(genki_evt_common)
     CALL_CHILD(sac_start_camera_evt)
     WAIT_MS(500)
     CALL(sac_enemy_slide_go)
+    // Crystal Star opening: Mario holds up the star item; Sweet Treat sends up small stars, Sweet Feast one.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL_CHILD(sac_mario_item_on_evt)
     WAIT_MS(500)
@@ -1261,13 +1266,15 @@ EVT_BEGIN(genki_evt_common)
     CALL(evt_snd_sfxoff, LW(11))
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(40)
+    // Mario puts the item away and walks left to make room for the shooting game.
     CALL_CHILD(sac_mario_item_on_end_evt)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -75, LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
     WAIT_FRAMES(40)
+    // The shooting game runs with the help shown; it scores Mario's HP, the partner's HP and FP.
     CALL(evt_snd_sfxoff, LW(10))
     CALL(sac_ac_help_on)
     CALL(start_game)
@@ -1275,14 +1282,15 @@ EVT_BEGIN(genki_evt_common)
     CALL(sac_ac_help_off)
     CALL(get_score, LW(10), LW(11), LW(12))
     WAIT_FRAMES(70)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // Mario walks back home, the HP/FP window opens and the camera closes in on him.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
 #if VERSION <= VERSION_JP
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
 #else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
 #endif
     CALL(status_on)
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -1290,12 +1298,14 @@ EVT_BEGIN(genki_evt_common)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoomSpeedLv, 0, 2)
+    // The crowd reacts if anything was won.
     SET_VALUE(LW(15), LW(10))
     ADD(LW(15), LW(11))
     ADD(LW(15), LW(12))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
         CALL(sac_wao)
     END_IF
+    // Both are cured of bad statuses and healed by their scores, then FP is restored (Mario only if alone).
     IF_INT_NOT_EQUAL(LW(13), -1)
         CALL(evt_snd_sfxon, STRING("SFX_HP_RECOVER_SHINE2"), 0)
         SET_VALUE(LW(9), -2)
@@ -1320,6 +1330,7 @@ EVT_BEGIN(genki_evt_common)
         CALL(btlevtcmd_RecoverFp, BTL_UNIT_SELF, 1, LW(12))
     END_IF
     WAIT_MS(1000)
+    // The enemies slide back and the camera returns to normal.
     CALL(sac_enemy_slide_return)
     WAIT_MS(1000)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -1348,55 +1359,55 @@ EVT_END()
  * defense down and slow, then clears the command-blocking turns (recover_cmd_disable).
  */
 EVT_BEGIN(status_recover_evt)
-    CALL(btlevtcmd_CheckStatus, LW(9), 1, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_SLEEP, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 1, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_SLEEP, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 2, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_STOP, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 2, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_STOP, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 3, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_DIZZY, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 3, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_DIZZY, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 4, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_POISON, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 4, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_POISON, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 5, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_CONFUSE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 5, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_CONFUSE, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 8, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_BURN, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 8, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_BURN, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 9, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_FREEZE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 9, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_FREEZE, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 13, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_ATTACK_DOWN, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 13, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_ATTACK_DOWN, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 11, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_TINY, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 11, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_TINY, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 15, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_DEFENSE_DOWN, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 15, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_DEFENSE_DOWN, 0, 0, 0)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(9), 20, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(9), STATUS_SLOW, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnOffStatus, LW(9), 20, 0, 0, 0)
+        CALL(btlevtcmd_OnOffStatus, LW(9), STATUS_SLOW, 0, 0, 0)
     END_IF
     CALL(recover_cmd_disable)
     RETURN
 EVT_END()
 
-// inlining off for get_ptr, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it get_ptr is inlined into its callers (15 shrink, e.g. object_get_num 20 -> 14 instructions)
 #pragma dont_inline on
 /** The minigame's work area, kept in the battle's shared action-command work buffer. */
 static GenkiWork* get_ptr(void) {

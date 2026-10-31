@@ -18,44 +18,13 @@
 #include "libc_decls.h"
 #include "version.h"
 #include "evt/evt_story.h"
-
-extern USER_FUNC(evt_eff);
-extern USER_FUNC(evt_eff_fukidashi);
-extern USER_FUNC(evt_fade_end_wait);
-extern USER_FUNC(evt_fade_set_spot_pos);
-extern USER_FUNC(evt_mario_adjust_dir);
-extern USER_FUNC(evt_mario_dispflag_onoff);
-extern USER_FUNC(evt_mario_flag_onoff);
-extern USER_FUNC(evt_mario_get_exparty);
-extern USER_FUNC(evt_mario_get_party);
-extern USER_FUNC(evt_mario_get_pos);
-extern USER_FUNC(evt_mario_goodbye_party);
-extern USER_FUNC(evt_mario_jump_pos);
-extern USER_FUNC(evt_mario_key_onoff);
-extern USER_FUNC(evt_mario_mov_pos2);
-extern USER_FUNC(evt_mario_set_dir_npc);
-extern USER_FUNC(evt_mario_set_party_pos);
-extern USER_FUNC(evt_mario_set_pos);
-extern USER_FUNC(evt_msg_print);
-extern USER_FUNC(evt_msg_print_add);
-extern USER_FUNC(evt_msg_print_insert);
-extern USER_FUNC(evt_msg_select);
-extern USER_FUNC(evt_npc_set_tribe);
-extern USER_FUNC(evt_party_run);
-extern USER_FUNC(evt_party_set_dir_npc);
-extern USER_FUNC(evt_party_set_pos);
-extern USER_FUNC(evt_pouch_add_coin);
-extern USER_FUNC(evt_pouch_all_party_recovery);
-extern USER_FUNC(evt_pouch_check_item);
-extern USER_FUNC(evt_pouch_mario_recovery);
-extern USER_FUNC(evt_pouch_remove_item);
-extern USER_FUNC(evt_set_dir_to_target);
-extern USER_FUNC(evt_snd_bgmoff);
-extern USER_FUNC(evt_snd_sfxon);
-extern USER_FUNC(evt_sub_get_coin);
-extern USER_FUNC(evt_sub_get_mapname);
-extern USER_FUNC(evt_win_coin_off);
-extern USER_FUNC(evt_win_coin_on);
+#include "evt/evt_eff.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
+#include "evt/evt_party.h"
+#include "evt/evt_pouch.h"
+#include "evt/evt_sub.h"
+#include "evt/evt_window.h"
 
 typedef struct KinopioParty {
     u16 flags;
@@ -126,7 +95,7 @@ static USER_FUNC(power_chk) {
     KinopioParty* pouch = (KinopioParty*)pouchGetPtr();
     ok = 1;
     for (i = 0; i < 8; i++) {
-        if ((pouch[i].flags & 1) && pouch[i].currentHP != pouch[i].maximumHP) {
+        if ((pouch[i].flags & POUCH_PARTY_FLAG_JOINED) && pouch[i].currentHP != pouch[i].maximumHP) {
             ok = 0;
             break;
         }
@@ -318,6 +287,8 @@ USER_FUNC(N_cameraman_on) {
  * places breakfast and counts GSW_INN_STAY_COUNT (max 100).
  */
 EVT_BEGIN(kinopio_house_talk_evt)
+    // The innkeeper greets Mario with the night's price in the coin window and asks if he will stay;
+    // "no" ends it.
     CALL(evt_mario_key_onoff, 0)
     CALL(get_ryoukin, LW(10))
     CALL(get_npcname, LW(11))
@@ -333,6 +304,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
         CALL(evt_win_coin_off, LW(12))
         RETURN
     END_IF
+    // If Mario and the party are already fully rested, the innkeeper asks whether he wants a bed anyway.
     CALL(power_chk, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(msg_no, 1, LW(0))
@@ -347,6 +319,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
             RETURN
         END_IF
     END_IF
+    // With an Inn Coupon, offer to use it instead of paying.
     SET_VALUE(LF(0), 0)
     CALL(evt_pouch_check_item, ITEM_INN_COUPON, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -359,6 +332,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
             CALL(evt_pouch_remove_item, ITEM_INN_COUPON, LW(0))
         END_IF
     END_IF
+    // Otherwise pay the price, or turn Mario away if he is short of coins.
     IF_INT_EQUAL(LF(0), 0)
         CALL(coin_chk, LW(0))
         IF_INT_EQUAL(LW(0), 1)
@@ -373,6 +347,8 @@ EVT_BEGIN(kinopio_house_talk_evt)
         CALL(evt_pouch_add_coin, LW(10))
         WAIT_MS(1000)
     END_IF
+    // "Enjoy your stay!": the partners step away and Mario walks to the bedside (or the inn's own walk-to-bed
+    // script runs) while the camera moves to the bed view.
     CALL(evt_win_coin_off, LW(12))
     CALL(msg_no, 3, LW(0))
     CALL(evt_msg_print_add, 0, LW(0))
@@ -411,6 +387,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
         CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 0, 11)
         WAIT_MS(500)
     END_IF
+    // Mario jumps into bed with a yelp and lies down flat with sleeping sounds.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP2"), LW(0), LW(1), LW(2), 0)
@@ -443,6 +420,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
         CALL(evt_snd_sfxon_3d, 132027, LW(0), LW(1), LW(2), 0)
 #endif
     END_INLINE_EVENT
+    // Sound effects mute, the sleep tune plays and a spotlight closes in on Mario until the screen is black.
     CALL(snd_off)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_GO_SLEEPING1"))
@@ -456,6 +434,8 @@ EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_fade_end_wait)
     CALL(evt_fade_entry, FADE_OUT_BLACK_2D, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
+    // In the dark, HP, FP and the partners are restored, breakfast is set out, and the party is put
+    // back on its feet beside the bed facing the innkeeper.
     CALL(evt_pouch_mario_recovery)
     CALL(evt_pouch_all_party_recovery)
     CALL(breakfast)
@@ -500,6 +480,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(snd_on)
 #endif
+    // Count the stay (up to 100); the 50th stay runs the celebration instead of the usual morning.
     ADD(GSW(GSW_INN_STAY_COUNT), 1)
     IF_INT_GREATER(GSW(GSW_INN_STAY_COUNT), 100)
         SET_VALUE(GSW(GSW_INN_STAY_COUNT), 100)
@@ -521,6 +502,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     END_IF
     CALL(evt_mario_adjust_dir)
 #endif
+    // Morning: fade in, run the inn's wake-up script if it has one, and Mario walks back to the innkeeper.
     CALL(evt_fade_entry, FADE_IN_BLACK_2D, 1000, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(get_from_bed_evt, LW(0))
@@ -549,6 +531,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_mario_set_dir_npc, LW(11))
     CALL(evt_party_set_dir_npc, 0, LW(11))
 #endif
+    // The innkeeper asks how he slept and sees him off; Mario gets control back.
     CALL(get_npcname, LW(11))
     CALL(msg_no, 5, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, LW(11))
@@ -607,6 +590,7 @@ EVT_END()
 #else
 /** Retail 50th-stay celebration with the Lakitu cameraman's photo and the 200-coin gift; see the demo version above. */
 EVT_BEGIN(evt_50)
+    // The Lakitu cameraman appears at a spot that depends on which inn this is.
     CALL(get_npcname, LW(10))
     CALL(evt_npc_get_position, LW(10), LW(13), LW(14), LW(15))
     CALL(evt_npc_entry, STRING("宿屋のカメラマン"), STRING("c_jugem_c"))
@@ -637,6 +621,7 @@ EVT_BEGIN(evt_50)
     CALL(evt_set_dir_to_target, LW(10), STRING("mario"))
     CALL(evt_mario_set_dir_npc, STRING("宿屋のカメラマン"))
     CALL(evt_party_set_dir_npc, 0, STRING("宿屋のカメラマン"))
+    // "Congratulations!" in the dark; Mario and his partner are placed by the bed and the screen fades in.
     CALL(msg_no, 9, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, LW(10))
     CALL(get_bed, LW(0), LW(1), LW(2))
@@ -646,6 +631,7 @@ EVT_BEGIN(evt_50)
     CALL(evt_fade_entry, FADE_IN_BLACK, 1000, 0, 0, 0)
     CALL(evt_fade_end_wait)
     WAIT_MS(500)
+    // Confetti falls and Mario looks around, startled.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 100)
     CALL(evt_eff, 0, STRING("confetti"), 3, LW(0), LW(1), LW(2), 600, 0, 0, 0, 0, 0, 0, 0)
@@ -656,6 +642,7 @@ EVT_BEGIN(evt_50)
     CALL(evt_eff_fukidashi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff_fukidashi, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(1000)
+    // The innkeeper announces the 50th-stay party and Mario walks back to the counter.
     CALL(msg_no, 10, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, LW(10))
     CALL(get_bedside, LW(0), LW(1), LW(2))
@@ -663,6 +650,7 @@ EVT_BEGIN(evt_50)
     CALL(get_npctalk, LW(0), LW(1), LW(2))
     CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(90.0f))
     CALL(evt_mario_set_dir_npc, LW(10))
+    // "Say cheese!": everyone faces the cameraman and the shutter flashes.
     CALL(msg_no, 11, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, LW(10))
     CALL(evt_mario_set_dir_npc, STRING("宿屋のカメラマン"))
@@ -676,6 +664,7 @@ EVT_BEGIN(evt_50)
     CALL(evt_fade_end_wait)
     CALL(evt_fade_entry, FADE_IN_SPOT2, 150, 255, 255, 255)
     CALL(evt_fade_end_wait)
+    // The innkeeper hands over a present of 200 coins and thanks Mario.
     CALL(msg_no, 12, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, LW(10))
     CALL(evt_mario_set_dir_npc, LW(10))
@@ -684,6 +673,7 @@ EVT_BEGIN(evt_50)
     CALL(evt_sub_get_coin, 200)
     CALL(msg_no, 13, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, LW(10))
+    // Fade out while the cameraman leaves and the innkeeper returns to his spot; Mario gets control back.
     CALL(evt_fade_entry, FADE_OUT_BLACK, 1000, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_npc_check_delete, STRING("宿屋のカメラマン"))

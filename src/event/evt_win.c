@@ -55,6 +55,29 @@ typedef struct UnitWinEntry {
     void* evt;           // 0x8
 } UnitWinEntry;
 
+// UnitWinWork.flags bits.
+enum UnitWinFlags {
+    UNITWIN_FLAG_ITEM_SELECTED = 0x1, // an item's name and description are shown
+    UNITWIN_FLAG_CHILD_RUNNING = 0x2, // retail: the row's buy script is running
+    UNITWIN_FLAG_COUNTER = 0x80,      // retail: counter mode (evt_unitwin_alloc argument): three windows, no main loop
+    UNITWIN_FLAG_LOTTERY = 0x100,     // retail: the lottery ticket number is shown (unitwin_lottery_disp_onoff)
+    UNITWIN_FLAG_COIN = 0x1000,       // the coin counter is shown (unitwincoin_disp_onoff)
+    UNITWIN_FLAG_SHINE = 0x2000,      // the Shine Sprite counter is shown
+    UNITWIN_FLAG_SUPER_COIN = 0x4000, // the counter shows pouchGetSuperCoin instead of coins
+    UNITWIN_FLAG_STAR_PIECE = 0x8000, // the counter shows Star Pieces instead of coins
+};
+
+// UnitWinWork.flags2 bits: the stop handshake between evt_unitwin_free and the main loop.
+enum UnitWinFlags2 {
+    UNITWIN_FLAG2_STOP = 0x1,    // evt_unitwin_free asks the loop to stop
+    UNITWIN_FLAG2_STOPPED = 0x2, // the loop has stopped
+};
+
+// UnitWinWork.itemFlags bits (retail).
+enum UnitWinItemFlags {
+    UNITWIN_ITEM_FLAG_SOLD = 0x1, // bought: hidden and not selectable
+};
+
 #if VERSION <= VERSION_DEMO_US
 // demo: no help/name/point windows; the list windows (mode 2..18) are run by unitwin_window_select_func here
 typedef struct UnitWinWork {
@@ -92,7 +115,13 @@ static USER_FUNC(evt_unitwin_main_func);
 static USER_FUNC(select_func);
 static void evt_unitwin_disp_func(CameraId cameraId, void* param);
 
-static s32 party_id_table[8] = {1, 2, 5, 4, 6, 3, 7, 0};
+/**
+ * Tables of the unit window (partner and Mario lists): the partner ids in menu order (Goombella, Koops, Flurrie,
+ * Yoshi, Vivian, Bobbery, Ms. Mowz, ended by 0), their icons and name labels, and the HP, FP and BP rows
+ * (icon, label, name and the amount a level-up adds: 5, 5 and 3).
+ */
+static s32 party_id_table[8] = {PARTY_MEMBER_GOOMBELLA, PARTY_MEMBER_KOOPS, PARTY_MEMBER_FLURRIE, PARTY_MEMBER_YOSHI,
+                                PARTY_MEMBER_VIVIAN, PARTY_MEMBER_BOBBERY, PARTY_MEMBER_MS_MOWZ, PARTY_MEMBER_NONE};
 static s32 party_icon_table[7] = {ICON_155, ICON_156, ICON_15F, ICON_158, ICON_160, ICON_157, ICON_161};
 static const char* party_labelname_table[7] = {("_kur"), ("_nok"), ("_win"), ("_yos"), ("_viv"), ("_bom"), ("_chu")};
 static s32 mario_status_icon_table[3] = {ICON_19F, ICON_1A0, ICON_1A1};
@@ -188,8 +217,8 @@ USER_FUNC(evt_unitwin_alloc) {
     wp->mode = 0;
     _wp = wp;
     iconEntry2D("yubicursor_2", ICON_1F0);
-    iconFlagOn("yubicursor_2", 2);
-    iconFlagOn("yubicursor_2", 8);
+    iconFlagOn("yubicursor_2", ICON_FLAG_HIDDEN);
+    iconFlagOn("yubicursor_2", ICON_FLAG_FLIP_X);
     wp->evt = evtEntry(main_evt, 0, 0);
     wp->evt->lwData[0] = (EvtWord)wp;
     mario_status_point_table[0] = &pouchGetPtr()->baseMaxHP;
@@ -212,13 +241,13 @@ USER_FUNC(evt_unitwin_free) {
         return EVT_RETURN_DONE;
     }
     if (isFirstCall) {
-        wp->flags2 |= 1;
+        wp->flags2 |= UNITWIN_FLAG2_STOP;
     }
-    if (!(wp->flags2 & 2)) {
+    if (!(wp->flags2 & UNITWIN_FLAG2_STOPPED)) {
         return EVT_RETURN_BLOCK;
     }
     for (i = 0; i < wp->goodsMax; i++) {
-        mapObjFlagOff(wp->entries[i].mapObj, 0x4000);
+        mapObjFlagOff(wp->entries[i].mapObj, MAPOBJ_FLAG_DISABLE);
         sprintf(name, "uwn%d", i);
         iconDelete(name);
         entry = caseIdToPtr(wp->caseId[i]);
@@ -253,12 +282,12 @@ USER_FUNC(evt_unitwin_selltable_setup) {
     for (i = 0; wp->entries[i].mapObj != NULL; i++) {
         wp->goodsMax++;
         mapObjGetPos(wp->entries[i].mapObj, &pos);
-        mapObjFlagOn(wp->entries[i].mapObj, 0x4000);
+        mapObjFlagOn(wp->entries[i].mapObj, MAPOBJ_FLAG_DISABLE);
         if (wp->goods[i] != 0) {
             sprintf(name, "uwn%d", i);
             iconEntry(name, itemDataTable[wp->goods[i]].icon_id);
             iconSetPos(name, pos.x, pos.y + 6.0f, pos.z);
-            iconFlagOn(name, 0x80);
+            iconFlagOn(name, ICON_FLAG_NO_MAP_BLEND);
         }
         caseWork[0] = (EvtWord)wp;
         caseWork[1] = i;
@@ -279,7 +308,7 @@ static USER_FUNC(select_func) {
         wp->goodsIdx = event->lwData[1];
         if (wp->goods[wp->goodsIdx] != 0) {
             wp->timer = 1;
-            wp->flags |= 1;
+            wp->flags |= UNITWIN_FLAG_ITEM_SELECTED;
             if (keyGetButtonTrg(0) & PAD_BUTTON_A) {
                 marioKeyOff();
                 wp->childEvt = evtEntry(wp->entries[wp->goodsIdx].evt, 0, 0);
@@ -310,9 +339,9 @@ USER_FUNC(unitwincoin_disp_onoff) {
     wp->coin = pouchGetCoin();
     wp->coinFrame = 0;
     if (on) {
-        wp->flags |= 0x1000;
+        wp->flags |= UNITWIN_FLAG_COIN;
     } else {
-        wp->flags &= ~0x1000;
+        wp->flags &= ~UNITWIN_FLAG_COIN;
     }
     return EVT_RETURN_DONE;
 }
@@ -814,16 +843,16 @@ USER_FUNC(unitwin_window_select_func) {
  */
 static USER_FUNC(evt_unitwin_main_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
-    if (wp->flags2 & 1) {
-        wp->flags2 |= 2;
+    if (wp->flags2 & UNITWIN_FLAG2_STOP) {
+        wp->flags2 |= UNITWIN_FLAG2_STOPPED;
         return EVT_RETURN_DONE;
     }
     if (wp->timer > 0) {
         wp->timer--;
     } else {
-        wp->flags &= ~1;
+        wp->flags &= ~UNITWIN_FLAG_ITEM_SELECTED;
     }
-    dispEntry((CameraId)8, 1000.0f, 0, evt_unitwin_disp_func, wp);
+    dispEntry(CAMERA_2D, 1000.0f, 0, evt_unitwin_disp_func, wp);
     return EVT_RETURN_BLOCK;
 }
 #else
@@ -871,13 +900,20 @@ void unitwin_help_disp(WinMgrEntry* entry);
 void unitwin_point_disp(WinMgrEntry* entry);
 void unitwin_name_disp(WinMgrEntry* entry);
 
+/** The three windows of the unit window: the name plate, the help text box and the points counter. */
 WinMgrDesc unitwin_desc[3] = {
     {0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, unitwin_name_disp},
     {0, 0, 8, -240, -130, 500, 80, {0xF0, 0xF0, 0xF0, 0xFF}, unitwin_help_main, unitwin_help_disp},
     {2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, unitwin_point_disp},
 };
 
-static s32 party_id_table[8] = {1, 2, 5, 4, 6, 3, 7, 0};
+/**
+ * Tables of the unit window (partner and Mario lists): the partner ids in menu order (Goombella, Koops, Flurrie,
+ * Yoshi, Vivian, Bobbery, Ms. Mowz, ended by 0), their icons and name labels, and the HP, FP and BP rows
+ * (icon, label, name and the amount a level-up adds: 5, 5 and 3).
+ */
+static s32 party_id_table[8] = {PARTY_MEMBER_GOOMBELLA, PARTY_MEMBER_KOOPS, PARTY_MEMBER_FLURRIE, PARTY_MEMBER_YOSHI,
+                                PARTY_MEMBER_VIVIAN, PARTY_MEMBER_BOBBERY, PARTY_MEMBER_MS_MOWZ, PARTY_MEMBER_NONE};
 static s32 party_icon_table[7] = {ICON_155, ICON_156, ICON_15F, ICON_158, ICON_160, ICON_157, ICON_161};
 static const char* party_labelname_table[7] = {("_kur"), ("_nok"), ("_win"), ("_yos"), ("_viv"), ("_bom"), ("_chu")};
 static s32 mario_status_icon_table[3] = {ICON_19F, ICON_1A0, ICON_1A1};
@@ -912,7 +948,7 @@ void unitwin_name_disp(WinMgrEntry* entry) {
         FontDrawEdgeOff();
     }
     for (i = 0; i < wp->goodsMax; i++) {
-        if (!(wp->itemFlags[i] & 1)) {
+        if (!(wp->itemFlags[i] & UNITWIN_ITEM_FLAG_SOLD)) {
             Mtx mtx;
             char buf[64];
             Vec pos;
@@ -930,6 +966,7 @@ void unitwin_name_disp(WinMgrEntry* entry) {
 }
 
 /** unused (dead-stripped): only its "%s_%04d" string survives */
+// FAKE: uncalled stand-in for a stripped function; keeps its "%s_%04d" string in .rodata
 static void unitwin_fmt(char* buf, const char* name, s32 n) {
     sprintf(buf, "%s_%04d", name, n);
 }
@@ -965,11 +1002,11 @@ void unitwin_point_disp(WinMgrEntry* entry) {
         if ((u32)gp->language == 0) {
             PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
             PSMTXConcat(trans, scale, trans);
-            iconDispGx2(trans, 0x10, VERSION_PICK(0x1F1, 0x226));
+            iconDispGx2(trans, ICON_DISP_2D, VERSION_PICK(0x1F1, 0x226));
         } else {
             PSMTXScale(scale, 0.8f, 1.1f, 1.1f);
             PSMTXConcat(trans, scale, trans);
-            iconDispGx2(trans, 0x10, VERSION_PICK(0x20A, 0x227));
+            iconDispGx2(trans, ICON_DISP_2D, VERSION_PICK(0x20A, 0x227));
         }
         PSMTXTrans(trans, 124.0f + entry->x, entry->y - 38.0f, 0.0f);
         {
@@ -1000,14 +1037,14 @@ USER_FUNC(evt_unitwin_alloc) {
     wp->mode = 0;
     _wp = wp;
     if (arg) {
-        wp->flags |= 0x80;
+        wp->flags |= UNITWIN_FLAG_COUNTER;
     } else {
-        wp->flags &= ~0x80;
+        wp->flags &= ~UNITWIN_FLAG_COUNTER;
     }
     iconEntry2D("yubicursor_2", ICON_1F0);
-    iconFlagOn("yubicursor_2", 2);
-    iconFlagOn("yubicursor_2", 4);
-    if (!(wp->flags & 0x80)) {
+    iconFlagOn("yubicursor_2", ICON_FLAG_HIDDEN);
+    iconFlagOn("yubicursor_2", ICON_FLAG_FLIP_X);
+    if (!(wp->flags & UNITWIN_FLAG_COUNTER)) {
         wp->evt = evtEntry(main_evt, 0, 0);
         wp->evt->lwData[0] = (EvtWord)wp;
     }
@@ -1029,17 +1066,17 @@ USER_FUNC(evt_unitwin_free) {
         return EVT_RETURN_DONE;
     }
     if (isFirstCall) {
-        wp->flags2 |= 1;
+        wp->flags2 |= UNITWIN_FLAG2_STOP;
     }
-    if (!(wp->flags2 & 2)) {
+    if (!(wp->flags2 & UNITWIN_FLAG2_STOPPED)) {
         return EVT_RETURN_BLOCK;
     }
     for (i = 0; i < wp->goodsMax; i++) {
-        mapObjFlagOff(wp->entries[i].mapObj, 0x4000);
+        mapObjFlagOff(wp->entries[i].mapObj, MAPOBJ_FLAG_DISABLE);
         sprintf(name, "uwn%d", i);
         iconDelete(name);
     }
-    if (wp->flags & 0x80) {
+    if (wp->flags & UNITWIN_FLAG_COUNTER) {
         for (i = 0; i < 3; i++) {
             winMgrDelete(wp->winId[i]);
         }
@@ -1069,14 +1106,14 @@ USER_FUNC(evt_unitwin_selltable_setup) {
     for (i = 0; wp->entries[i].mapObj != NULL; i++) {
         wp->goodsMax++;
         mapObjGetPos(wp->entries[i].mapObj, &pos);
-        mapObjFlagOn(wp->entries[i].mapObj, 0x4000);
+        mapObjFlagOn(wp->entries[i].mapObj, MAPOBJ_FLAG_DISABLE);
         if (wp->goods[i] != 0) {
             sprintf(name, "uwn%d", i);
             iconEntry(name, itemDataTable[wp->goods[i]].icon_id);
             iconSetPos(name, pos.x, pos.y + 6.0f, pos.z);
-            iconFlagOn(name, 0x40);
+            iconFlagOn(name, ICON_FLAG_NO_MAP_BLEND);
         } else {
-            wp->itemFlags[i] |= 1;
+            wp->itemFlags[i] |= UNITWIN_ITEM_FLAG_SOLD;
         }
     }
     wp->evt = evtEntryType(select_evt, 0, 0x20, 0);
@@ -1100,9 +1137,9 @@ USER_FUNC(unitwincoin_disp_onoff) {
     wp->coin = pouchGetCoin();
     wp->coinFrame = 0;
     if (on) {
-        wp->flags |= 0x1000;
+        wp->flags |= UNITWIN_FLAG_COIN;
     } else {
-        wp->flags &= ~0x1000;
+        wp->flags &= ~UNITWIN_FLAG_COIN;
     }
     return EVT_RETURN_DONE;
 }
@@ -1125,9 +1162,9 @@ USER_FUNC(unitwin_lottery_disp_onoff) {
     s32 on = evtGetValue(event, event->args[0]);
     UnitWinWork* wp = _wp;
     if (on) {
-        wp->flags |= 0x100;
+        wp->flags |= UNITWIN_FLAG_LOTTERY;
     } else {
-        wp->flags &= ~0x100;
+        wp->flags &= ~UNITWIN_FLAG_LOTTERY;
     }
     return EVT_RETURN_DONE;
 }
@@ -1168,11 +1205,11 @@ static USER_FUNC(select_func) {
     s32 i;
     char name[32];
     MapObject* obj;
-    if (wp->flags2 & 1) {
-        wp->flags2 |= 2;
+    if (wp->flags2 & UNITWIN_FLAG2_STOP) {
+        wp->flags2 |= UNITWIN_FLAG2_STOPPED;
         return EVT_RETURN_DONE;
     }
-    wp->flags &= ~1;
+    wp->flags &= ~UNITWIN_FLAG_ITEM_SELECTED;
     btn = keyGetButtonTrg(0);
     if ((marioChkCtrl() ? FALSE : TRUE) || (marioChkKey() ? FALSE : TRUE)) {
         btn = 0;
@@ -1185,7 +1222,7 @@ static USER_FUNC(select_func) {
         unitwinClose(wp);
         return EVT_RETURN_BLOCK;
     }
-    if (!(wp->flags & 2)) {
+    if (!(wp->flags & UNITWIN_FLAG_CHILD_RUNNING)) {
         if (hit != NULL) {
             for (i = 0; i < wp->goodsMax; i++) {
                 const char* hitName = hitGetName(hit);
@@ -1193,7 +1230,7 @@ static USER_FUNC(select_func) {
                     break;
                 }
             }
-            if (!(wp->itemFlags[i] & 1) && i < wp->goodsMax) {
+            if (!(wp->itemFlags[i] & UNITWIN_ITEM_FLAG_SOLD) && i < wp->goodsMax) {
                 if (wp->selected != i) {
                     if (wp->selected == -1) {
                         winMgrOpen(wp->winId[0]);
@@ -1210,12 +1247,12 @@ static USER_FUNC(select_func) {
             unitwinClose(wp);
         }
         if (wp->selected != -1) {
-            wp->flags |= 1;
+            wp->flags |= UNITWIN_FLAG_ITEM_SELECTED;
             if (btn & PAD_BUTTON_A) {
                 marioKeyOff();
                 wp->childEvt = evtEntry(wp->entries[wp->goodsIdx].evt, 0, 0);
                 wp->childEvt->lwData[0] = (EvtWord)wp;
-                wp->flags |= 2;
+                wp->flags |= UNITWIN_FLAG_CHILD_RUNNING;
                 winMgrClose(wp->winId[0]);
                 winMgrClose(wp->winId[1]);
                 wp->selected = -1;
@@ -1223,22 +1260,22 @@ static USER_FUNC(select_func) {
             }
         }
     } else if (!evtCheckID(wp->childEvt->eventId)) {
-        wp->flags &= ~2;
+        wp->flags &= ~UNITWIN_FLAG_CHILD_RUNNING;
         marioKeyOn();
         if (wp->bought) {
-            wp->itemFlags[wp->goodsIdx] |= 1;
+            wp->itemFlags[wp->goodsIdx] |= UNITWIN_ITEM_FLAG_SOLD;
         }
     }
     for (i = 0; i < wp->goodsMax; i++) {
         obj = mapGetMapObj(wp->entries[i].mapObj);
         if (obj != NULL) {
             sprintf(name, "uwn%d", i);
-            if (wp->itemFlags[i] & 1) {
-                iconFlagOn(name, 2);
-            } else if (obj->flags & 1) {
-                iconFlagOn(name, 2);
+            if (wp->itemFlags[i] & UNITWIN_ITEM_FLAG_SOLD) {
+                iconFlagOn(name, ICON_FLAG_HIDDEN);
+            } else if (obj->flags & MAPOBJ_FLAG_HIDE) {
+                iconFlagOn(name, ICON_FLAG_HIDDEN);
             } else {
-                iconFlagOff(name, 2);
+                iconFlagOff(name, ICON_FLAG_HIDDEN);
             }
         }
     }
@@ -1252,16 +1289,16 @@ static USER_FUNC(select_func) {
  */
 static USER_FUNC(evt_unitwin_main_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
-    if (wp->flags2 & 1) {
-        wp->flags2 |= 2;
+    if (wp->flags2 & UNITWIN_FLAG2_STOP) {
+        wp->flags2 |= UNITWIN_FLAG2_STOPPED;
         return EVT_RETURN_DONE;
     }
     if (wp->timer > 0) {
         wp->timer--;
     } else {
-        wp->flags &= ~1;
+        wp->flags &= ~UNITWIN_FLAG_ITEM_SELECTED;
     }
-    dispEntry((CameraId)8, 1000.0f, 0, evt_unitwin_disp_func, wp);
+    dispEntry(CAMERA_2D, 1000.0f, 0, evt_unitwin_disp_func, wp);
     return EVT_RETURN_BLOCK;
 }
 #endif
@@ -1353,7 +1390,7 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
     s32 lv;
 
     flag = 0; // FAKE: dead store, moves flag's variable record before i so the case 5-7 flag web is a split temp coloured before i's (target r21)
-    if (wp->flags & 1) {
+    if (wp->flags & UNITWIN_FLAG_ITEM_SELECTED) {
         const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
         const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
 
@@ -1398,7 +1435,7 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
         }
     }
 
-    if (wp->flags & 0xD000) {
+    if (wp->flags & (UNITWIN_FLAG_COIN | UNITWIN_FLAG_SUPER_COIN | UNITWIN_FLAG_STAR_PIECE)) {
         Mtx mtx;
         Mtx scale;
         s32 coin;
@@ -1408,10 +1445,10 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
         PSMTXTrans(mtx, -220.0f, -113.0f, 0.0f);
         PSMTXScale(scale, 0.7f, 0.7f, 0.7f);
         PSMTXConcat(mtx, scale, mtx);
-        if (wp->flags & 0x1000) {
+        if (wp->flags & UNITWIN_FLAG_COIN) {
             iconDispGx2(mtx, ICON_DISP_2D, ICON_18B);
             coin = pouchGetCoin();
-        } else if (wp->flags & 0x4000) {
+        } else if (wp->flags & UNITWIN_FLAG_SUPER_COIN) {
             iconDispGx2(mtx, ICON_DISP_2D, ICON_102);
             coin = pouchGetSuperCoin();
         } else {
@@ -1450,7 +1487,7 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 #endif
     }
 
-    if (wp->flags & 0x2000) {
+    if (wp->flags & UNITWIN_FLAG_SHINE) {
         Mtx mtx;
         Mtx scale;
         s32 delta;
@@ -1474,13 +1511,13 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
     }
 
 #if VERSION >= VERSION_JP
-    if ((wp->flags & 0x100) && (lotteryGetPtr()->flags & 2)) {
+    if ((wp->flags & UNITWIN_FLAG_LOTTERY) && (lotteryGetPtr()->flags & LOTTERY_FLAG_TICKET)) {
         Mtx mtx;
         char buf[32];
 
         windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -130.0f, 150.0f, 45.0f, 20.0f);
         PSMTXTrans(mtx, -220.0f, -172.0f, 0.0f);
-        iconDispGx2(mtx, 0x10, ICON_140);
+        iconDispGx2(mtx, ICON_DISP_2D, ICON_140);
         sprintf(buf, "%04d", lotteryGetPtr()->number);
         for (i = 0; i < 4; i++) {
             PSMTXTrans(mtx, 20.0f * i + -126.0f - 60.0f, -168.0f, 0.0f);
@@ -2250,10 +2287,10 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
         if (line2) {
             FontDrawString(k - 274, 66.0f, line2);
         }
-        iconFlagOff("yubicursor_2", 2);
+        iconFlagOff("yubicursor_2", ICON_FLAG_HIDDEN);
         iconSetPos("yubicursor_2", wp->cursorX, wp->cursorY, 0.0f);
     } else {
-        iconFlagOn("yubicursor_2", 2);
+        iconFlagOn("yubicursor_2", ICON_FLAG_HIDDEN);
     }
 }
 
@@ -2298,7 +2335,9 @@ USER_FUNC(unitwin_getpartylank) {
 
 /**
  * Sets partner args[0] to rank args[1] (HP, attack and tech levels together),
- * recomputes its stats and refills its HP. Guess: Chet Rippo's partner rank trade in Rogueport.
+ * recomputes its stats and refills its HP.
+ * Used by Merlon's partner rank-up (gor_02)
+ * and by Chet Rippo's Adjustment House in the Rogueport Sewers (tik_11), which lowers ranks.
  */
 USER_FUNC(unitwin_setpartylank) {
     EvtWord* args = event->args;
@@ -2314,7 +2353,7 @@ USER_FUNC(unitwin_setpartylank) {
 /**
  * Sets Mario's base HP, FP and BP to args[0..2], refills HP and FP,
  * and if the BP no longer covers the equipped badges takes them all off; args[3] returns 1 when that happened.
- * Guess: Chet Rippo's stat trade.
+ * Used by Chet Rippo's Adjustment House (tik_11), which boosts one of Mario's stats by lowering another.
  */
 USER_FUNC(unitwin_setmariolevel) {
     EvtWord* args = event->args;

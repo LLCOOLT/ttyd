@@ -24,8 +24,9 @@ static BeroEntry bero_entry_data[6];
 static TreeAccess tree_access_data[5];
 
 /**
- * Guess: cutscene after Mario comes out of the pipe in Flurrie's direction:
- * the partners step up, an extra party member says "stg2_win_e04_01",
+ * Spawned by evt_dokan1 at STORY_STG2_03_04: once Mario's pipe exit finishes, he and the partner turn east,
+ * Punio, the Puni guide (the second partner, "extparty") steps forward
+ * and says Flurrie's place is straight ahead (stg2_win_e04_01),
  * and the story becomes STORY_STG2_03_05_TO_FLURRIES_PLACE.
  */
 EVT_BEGIN(evt_dokan1_message)
@@ -58,6 +59,10 @@ EVT_BEGIN(evt_dokan1)
     RETURN
 EVT_END()
 
+/**
+ * Exits of this map: west to win_00, east to win_02, the pipe pair dokan1/dokan_2 within this map,
+ * and the way into the Great Tree (mri_00).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -145,8 +150,11 @@ static BeroEntry bero_entry_data[] = {
 };
 
 /**
- * Guess: trigger: when Mario walks past x = -50 on the way to the Great Tree, the Puni guide's party stops him,
- * Mario reacts (exclamation mark, pose), the extra partner speaks "stg2_win_e02_00" and "e02_01",
+ * Trigger spawned by the init script up to STORY_STG2_01: when Mario reaches x >= -50 he stops with a "!",
+ * and Punio, the Puni guide travelling with him as the second partner ("extparty"),
+ * shows him the Great Tree (the camera
+ * pans to it), says the Punies live there and tells him to follow (stg2_win_e02_00, 01).
+ * She then leaves the party; a stand-in NPC ("ガイド") comes up out of the pipe and hops away east,
  * and the story becomes STORY_STG2_02_TO_THE_GREAT_TREE.
  */
 EVT_BEGIN(guide_bigtree)
@@ -232,11 +240,16 @@ EVT_BEGIN(guide_bigtree)
 EVT_END()
 
 /**
- * Guess: cutscene when a mail from Peach arrives while Mario is on the map:
- * the mail jingle plays and the phone vibrates, the party says "stg2_mri_00",
- * and the camera and poses follow the reading.
+ * Peach's mail, spawned by the init script at STORY_STG2_26_PRAISE_FROM_THE_PUNI:
+ * once Mario walks to z >= -200 with x beyond -200 or 200,
+ * the mail jingle plays and the mail vibrates, the partner announces mail (stg2_mri_00) and Mario shows a "!"
+ * until A is pressed.
+ * The camera moves in, Mario reads Peach's letter (stg2_mri_01: she is fine and worried about him),
+ * the partner reacts (stg2_mri_02), the story becomes STORY_STG2_27_A_MAIL_FROM_PEACH and mail 1 is received
+ * and opened.
  */
 static EVT_BEGIN(peach_mail)
+    // Wait until Mario walks to the back of the path, left or right of the middle.
     LABEL(0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     IF_INT_LESS(LW(2), -200)
@@ -254,6 +267,7 @@ static EVT_BEGIN(peach_mail)
     WAIT_FRAMES(1)
     GOTO(0)
     LABEL(1)
+    // The mail jingle plays and the partner points out that mail has arrived; Mario waits for A.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
@@ -275,6 +289,7 @@ static EVT_BEGIN(peach_mail)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The field music returns and the camera moves in on Mario.
     CALL(evt_mario_balloon_off)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
@@ -303,6 +318,7 @@ static EVT_BEGIN(peach_mail)
 #endif
     END_IF
     WAIT_MS(1000)
+    // Mario reads Peach's letter, the partner reacts, and Mario can move again.
     CALL(evt_mario_set_pose, STRING("M_N_9"))
     WAIT_MS(500)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -323,6 +339,7 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_party_run, 0)
     CALL(evt_cam_shift_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
+    // The story advances and the letter is added to the mail list and opened.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_27_A_MAIL_FROM_PEACH)
     CALL(evt_pouch_receive_mail, 1)
     CALL(evt_pouch_open_mail, 1)
@@ -338,6 +355,7 @@ EVT_BEGIN(ki_data_evt_03)
     RETURN
 EVT_END()
 
+/** Trees of this map that shake when Mario hammers them; the third drops a coin once. */
 static TreeAccess tree_access_data[] = {
     {4, "A_tree_01", "S_tree_mki_01", "S_tree_ha01", 0, NULL},
     {4, "A_tree_02", "S_tree_mki_02", "S_tree_ha02", 0, NULL},
@@ -347,9 +365,9 @@ static TreeAccess tree_access_data[] = {
 };
 
 /**
- * Guess: map init script of Boggly Woods' second map (win_01):
- * registers exits and trees, plays the Boggly Woods BGM, starts the guide scene early in the story,
- * the post-boss mail event, and places the Inn Coupon item.
+ * Map init script of Boggly Woods' win_01: registers exits and trees, plays the Boggly Woods BGM and ambience,
+ * spawns guide_bigtree up to STORY_STG2_01 and peach_mail at STORY_STG2_26,
+ * starts the mail event and places the Inn Coupon.
  */
 EVT_BEGIN(win_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))

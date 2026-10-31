@@ -1,6 +1,5 @@
-#pragma once
-
 // Koopa (Bowser) boss: types shared between the las battle and the tou2 (Glitz Pit) copy.
+#pragma once
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>

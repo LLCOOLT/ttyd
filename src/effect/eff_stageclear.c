@@ -16,8 +16,7 @@
 #include "evt/evt_cmd.h"
 #include "version.h"
 #include "libc_decls.h"
-
-EffectEntry* effMiniGameEntry(s32);
+#include "eff/eff_minigame.h"
 
 typedef struct StageClearWork {
     s32 type;          // 0x0
@@ -35,14 +34,20 @@ static void effStageClearMain(EffectEntry* effect);
 static void effStageClearDisp(CameraId cameraId, EffectEntry* effect);
 
 #if VERSION <= VERSION_JP
+/** Letter textures of the stage-clear banner, Japanese then English, each with a matching shadow list. */
 static s32 tex_jp[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3};
 s32 tex_shadow_jp[] = {0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB};
 static s32 tex_us[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA0, 0x9E, 0xA3, 0xA0, 0xA4, 0xA5};
 s32 tex_shadow_us[] = {0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAA, 0xA8, 0xAD, 0xAA, 0xAE, 0xAF};
 static s32* texid_tbl[] = {tex_jp, tex_shadow_jp, tex_us, tex_shadow_us};
+/** Rainbow (niji) texture laid over the banner letters, Japanese then English. */
 static u32 niji_tbl[] = {0xAC, 0xB0};
 #endif
 #if VERSION >= VERSION_US
+/**
+ * Letter textures of the stage-clear banner for each language, each with a matching shadow list;
+ * -1 is a gap between words.
+ */
 static s16 tex_jp[] = {128, 129, 130, 131, 132, 133, 134, 135};
 s16 tex_shadow_jp[] = {136, 137, 138, 139, 140, 141, 142, 143};
 static s16 tex_us[] = {132, 133, 134, -1, 135, 136, -1, 137, 138, 139, 140, 141, 132, 142};
@@ -60,7 +65,9 @@ typedef struct TexSet {
     s16* shadow;
     s32 count;
 } TexSet;
+/** Banner letters, shadows and letter count for each language. */
 static TexSet texid_tbl[6] = {{tex_jp, tex_shadow_jp, 8}, {tex_us, tex_shadow_us, 14}, {tex_lang3, tex_shadow_lang3, 12}, {tex_lang4, tex_shadow_lang4, 16}, {tex_lang5, tex_shadow_lang5, 12}, {tex_lang6, tex_shadow_lang6, 8}};
+/** Rainbow (niji) texture laid over each language's banner letters. */
 u32 niji_tbl[] = {144, 154, 150, 156, 158, 144};
 /** Shakes the camera when a banner letter lands: 50 frames lightly, or 100 frames harder for the last letter (LW 1). */
 static EVT_BEGIN(evt_shake)
@@ -72,7 +79,9 @@ static EVT_BEGIN(evt_shake)
     RETURN
 EVT_END()
 #endif
+/** Shake pattern handed to an ordinary letter's camera-shake event in LW 0; evt_shake does not read it. */
 s32 shake_dt[] = {2, 6, 2, 0, -1};
+/** Stronger shake pattern handed to the last letter's shake event; also unread. */
 s32 shake_dt2[] = {12, 36, 12, 0, -1};
 #if VERSION <= VERSION_JP
 /** Shakes the camera when a banner letter lands: 50 frames lightly, or 100 frames harder for the last letter (LW 1). */
@@ -86,8 +95,10 @@ static EVT_BEGIN(evt_shake)
 EVT_END()
 #endif
 #if VERSION >= VERSION_US
+/** Size percentages per frame as a banner letter pops in: it overshoots to 120% and settles near 100%. */
 static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66}; /* US: trailing pad byte kept in the table */
 #else
+/** Size percentages per frame as a banner letter pops in: it overshoots to 120% and settles near 100%. */
 static u8 scale_dt[] = {0x00, 0x00, 0x16, 0x2E, 0x47, 0x5D, 0x6E, 0x78, 0x77, 0x6E, 0x66};
 #endif
 
@@ -112,7 +123,7 @@ EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
 #endif
 
     if (type == 1 && gp->language != 0U) {
-        return effMiniGameEntry(1);
+        return effMiniGameEntry(1, x, y, z);
     }
     effect = effEntry();
 #if VERSION >= VERSION_US

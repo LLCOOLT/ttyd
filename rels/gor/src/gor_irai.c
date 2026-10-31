@@ -86,6 +86,7 @@ EvtWord* irai_end_event[30];
 extern EvtWord gor_irai_main[];
 extern EvtWord gor_irai_tenshu_main[];
 
+/** Message keys of the client names, one for each Trouble Center job. */
 const char* irai_msg_client[] = {
     "irai_client_01", "irai_client_02", "irai_client_03", "irai_client_04", "irai_client_05", "irai_client_06",
     "irai_client_07", "irai_client_08", "irai_client_09", "irai_client_10", "irai_client_11", "irai_client_12",
@@ -94,6 +95,7 @@ const char* irai_msg_client[] = {
     "irai_client_25", "irai_client_26", "irai_client_27", "irai_client_28", "irai_client_29", "irai_client_30",
 };
 
+/** Message keys of the job descriptions, one for each Trouble Center job. */
 const char* irai_msg_contents[] = {
     "irai_contents_01", "irai_contents_02", "irai_contents_03", "irai_contents_04", "irai_contents_05",
     "irai_contents_06", "irai_contents_07", "irai_contents_08", "irai_contents_09", "irai_contents_10",
@@ -103,6 +105,7 @@ const char* irai_msg_contents[] = {
     "irai_contents_26", "irai_contents_27", "irai_contents_28", "irai_contents_29", "irai_contents_30",
 };
 
+/** Message keys of the help text that explains a job. */
 const char* irai_msg_exposition[] = {
     "irai_help_01",
     "irai_help_02",
@@ -136,12 +139,14 @@ const char* irai_msg_exposition[] = {
     "irai_help_30",
 };
 
+/** Message keys of the confirmation prompts shown before a job is taken. */
 const char* irai_msg_kakunin[] = {
     "irai_43", "irai_44", "irai_45", "irai_46", "irai_47", "irai_48", "irai_49", "irai_50", "irai_51", "irai_52",
     "irai_53", "irai_54", "irai_55", "irai_56", "irai_57", "irai_58", "irai_59", "irai_60", "irai_61", "irai_62",
     "irai_63", "irai_64", "irai_65", "irai_66", "irai_67", "irai_68", "irai_69", "irai_70", "irai_71", "irai_72",
 };
 
+/** Message keys shown when a job has already been taken. */
 const char* irai_msg_hikiukechu[] = {
     "irai_13",
     "irai_14",
@@ -175,46 +180,57 @@ const char* irai_msg_hikiukechu[] = {
     "irai_42",
 };
 
+/** Item the player hands over to finish Trouble Center job 1: the House Key. */
 s32 irai_item_data01[] = {
     ITEM_HOUSE_KEY, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 2: the Box. */
 s32 irai_item_data02[] = {
     ITEM_BOX, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 13: the Battle Trunks. */
 s32 irai_item_data13[] = {
     ITEM_BATTLE_TRUNKS, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 16: Attack FX B. */
 s32 irai_item_data16[] = {
     ITEM_ATTACK_FX_B_KEY_ITEM, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 17: the Routing Slip. */
 s32 irai_item_data17[] = {
     ITEM_ROUTING_SLIP, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 19: the Wedding Ring. */
 s32 irai_item_data19[] = {
     ITEM_WEDDING_RING, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 23: the Wrestling Mag. */
 s32 irai_item_data23[] = {
     ITEM_WRESTLING_MAG, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 25: the Package. */
 s32 irai_item_data25[] = {
     ITEM_PACKAGE, -1,
 };
 
+/** Item the player hands over to finish Trouble Center job 29: the Present. */
 s32 irai_item_data29[] = {
     ITEM_PRESENT, -1,
 };
 
+/** Empty item list for the Trouble Center jobs that ask for no item. */
 s32 irai_item_null[] = {
     -1,
 };
 
+/** Item lists for each Trouble Center job: the items the player can hand over to finish it. */
 s32* irai_item_table[] = {
     irai_item_data01, irai_item_data02, irai_item_null, irai_item_null, irai_item_null, irai_item_null,
     irai_item_null, irai_item_null, irai_item_null, irai_item_null, irai_item_null, irai_item_null,
@@ -248,6 +264,7 @@ EVT_BEGIN(irai_start_event04)
     RETURN
 EVT_END()
 
+/** Start scripts for each Trouble Center job, run when the job is taken; most do nothing. */
 EvtWord* irai_start_event[] = {
     irai_start_event01, irai_start_event_null, irai_start_event_null, irai_start_event04, irai_start_event_null,
     irai_start_event_null, irai_start_event_null, irai_start_event_null, irai_start_event_null,
@@ -298,6 +315,7 @@ EVT_BEGIN(irai_end_event19)
 EVT_END()
 #endif
 
+/** End scripts for each Trouble Center job, run when it is finished; most do nothing. */
 EvtWord* irai_end_event[] = {
     irai_end_event01, irai_end_event_null, irai_end_event_null, irai_end_event04, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
     irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
@@ -407,6 +425,7 @@ EVT_END()
  * takes back its items and runs its end event).
  */
 EVT_BEGIN(gor_irai_tenshu_main)
+    // Count how many of the 30 trouble requests are solved.
     SET_VALUE(LW(0), GSWF(GSWF_TROUBLE_01_SOLVED))
     ADD(LW(0), GSWF(GSWF_TROUBLE_02_SOLVED))
     ADD(LW(0), GSWF(GSWF_TROUBLE_03_SOLVED))
@@ -437,6 +456,7 @@ EVT_BEGIN(gor_irai_tenshu_main)
     ADD(LW(0), GSWF(GSWF_TROUBLE_28_SOLVED))
     ADD(LW(0), GSWF(GSWF_TROUBLE_29_SOLVED))
     ADD(LW(0), GSWF(GSWF_TROUBLE_30_SOLVED))
+    // All 30 are solved: the manager says there is no more trouble.
     IF_INT_EQUAL(LW(0), 30)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_msg_toge, 2, 150, 12, -156)
@@ -444,22 +464,27 @@ EVT_BEGIN(gor_irai_tenshu_main)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+    // The first time, the manager gives his lecture on how the Trouble Center works.
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
         CALL_CHILD(gor_irai_lecture)
         RETURN
     END_IF
     CALL(evt_mario_key_onoff, 0)
+    // No request is active: he tells Mario to look at the board.
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 0)
         CALL(evt_msg_toge, 2, 150, 12, -156)
         CALL(evt_msg_print, 0, STRING("irai_06"), 0, 0)
     ELSE
         CALL(evt_msg_toge, 2, 150, 12, -156)
+        // A request is active: he asks what Mario wants to know (about the trouble, cancel it, or what the
+        // place is).
         CALL(evt_msg_print, 0, STRING("irai_07"), 0, 0)
         CALL(evt_msg_select, 0, STRING("irai_08"))
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_msg_continue)
             DEBUG_PUT_MSG(STRING("依頼メニューキャンセル"))
         END_IF
+        // About this trouble: he reminds Mario of the status of the current request.
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LW(10), GSW(GSW_TROUBLE_ACTIVE))
             SET_INT_READ_ADDR(PTR(&irai_msg_hikiukechu))
@@ -467,10 +492,13 @@ EVT_BEGIN(gor_irai_tenshu_main)
             READ_INT_INDEXED(LW(11), LW(10))
             CALL(evt_msg_print_add, 0, LW(11))
         END_IF
+        // Cancel: he asks for a 30-coin fee.
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_msg_print_add, 0, STRING("irai_09"))
             CALL(evt_msg_select, 0, STRING("irai_01"))
             IF_INT_EQUAL(LW(0), 0)
+                // Mario can pay: the coins are taken, the request is cleared and its items return to their
+                // owners.
                 CALL(evt_pouch_get_coin, LW(10))
                 IF_INT_GREATER_OR_EQUAL(LW(10), 30)
                     CALL(evt_msg_print_add, 0, STRING("irai_10"))
@@ -484,15 +512,18 @@ EVT_BEGIN(gor_irai_tenshu_main)
                     READ_INT_INDEXED(LW(1), LW(0))
                     SPAWN_EVENT(LW(1))
                 ELSE
+                    // Not enough coins: the request stays.
                     CALL(evt_msg_print_add, 0, STRING("irai_11"))
                 END_IF
             ELSE
+                // Mario declined to cancel.
                 CALL(evt_msg_print_add, 0, STRING("irai_12"))
             END_IF
 #if VERSION >= VERSION_US
             SET_VALUE(LW(0), 1)
 #endif
         END_IF
+        // What is this place: the manager explains the Trouble Center.
         IF_INT_EQUAL(LW(0), 2)
             CALL(evt_msg_print_add, 0, STRING("irai_04"))
         END_IF

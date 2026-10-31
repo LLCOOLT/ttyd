@@ -20,6 +20,7 @@ typedef struct EffBomheiN64Work {
     f32 rotSpeed; // 0x28
 } EffBomheiN64Work;
 
+/** Camera-facing 32x32 Bob-omb sprite, cross-faded between frames of its texture sheet. */
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
     {16, -16, 0, 1024, 0, 0, 0, 0, 255},

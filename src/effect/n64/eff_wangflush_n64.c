@@ -32,6 +32,7 @@ static u8 color_rotation_data[] = {
 };
 #endif
 
+/** 16x16 quad drawn for both the colour-cycling flash and the spinning white sprite. */
 static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, -8, 0, 0, 1024, 0, 0, 0, 255},
     {8, -8, 0, 2048, 1024, 0, 0, 0, 255},
@@ -40,6 +41,7 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
 };
 
 #if VERSION >= VERSION_JP
+/** Yellow, brown and cream colours the flash behind the sprite cycles through, three bytes per step. */
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
     0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,

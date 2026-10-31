@@ -26,6 +26,15 @@ typedef enum GlobalWorkFlags {
     GLOBAL_FLAG_NO_LETTER_BOX = 0x8000 // nothing in the game sets it (presumably a debug switch): camLetterBoxDraw skips the letter box
 } GlobalWorkFlags;
 
+// GlobalWork.systemLevelFlags bits. marioStSystemLevel(n) sets the low n bits; each one stops one play-time clock.
+enum SystemLevelFlags {
+    SYSTEM_LEVEL_FLAG_STOP_LV0 = 0x1,   // systemLv0Time stops (level 1 and up)
+    SYSTEM_LEVEL_FLAG_STOP_LV1 = 0x2,   // systemLv1Time stops (level 2 and up)
+    SYSTEM_LEVEL_FLAG_STOP_LV2 = 0x4,   // systemLv2Time stops (level 3 and up)
+    SYSTEM_LEVEL_FLAG_STOP_LV3 = 0x8,   // systemLv3Time stops (level 4)
+    SYSTEM_LEVEL_FLAG_NO_BATTLE = 0x10, // Mario is launched by a jump stand or spring (evt_mario, evt_mobj): a field battle does not start; seq_game clears it
+};
+
 typedef struct GlobalWork {
     s32 flags;                      // 0x0, GlobalWorkFlags
     s32 framerate;                  // 0x4

@@ -48,8 +48,8 @@ static void __SYNSetupAdpcm(SYNVOICE* voice) {
         ASSERTLINE(80, (sampleLoop & 0x000f) > 1);
         ASSERTLINE(81, (sampleEnd & 0x000f) > 1);
 
-        // the hell? why not just write the members??? what is this doing???
-        // why not just write to the members directly?
+        // Writes pb.addr and pb.adpcm as consecutive 32-bit words: loopFlag 1 / format 0 (0x10000), the loop, end
+        // and current nibble addresses, then the 10 words of ADPCM coefficients and gain/predictor state.
         sampleStart = sampleStart + 2;
         p = (u32*)&axvpb->pb.addr;
         *(p) = 0x10000; p += 1;
@@ -88,7 +88,7 @@ static void __SYNSetupAdpcm(SYNVOICE* voice) {
         ASSERTLINE(135, (sampleStart & 0x000f) == 0);
         ASSERTLINE(136, (sampleEnd & 0x000f) > 1);
 
-        // same wtf writes here
+        // The same word-by-word block for a one-shot sample: loopFlag 0, loop address at the zero buffer.
         sampleStart = sampleStart + 2;
         p = (void*)&axvpb->pb.addr;
         *(p) = 0; p += 1;

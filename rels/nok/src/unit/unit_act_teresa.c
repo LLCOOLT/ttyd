@@ -17,8 +17,12 @@ static BattleUnitKindPart parts[1];
 static EvtWord init_event[9];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the Boo actor (HP 10, level 1): its size, offsets, damage sounds, status vulnerability,
+ * parts and init event.
+ */
 BattleUnitKind unit_act_teresa = {
-    183,
+    UNIT_EPILOGUE_BOO,
     "btl_un_act_teresa",
     10,
     0,
@@ -83,28 +87,39 @@ BattleUnitKind unit_act_teresa = {
     data_table,
 };
 
+/** Defence of the Boo actor: no damage reduction. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of the Boo actor: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the Boo actor (percent chance to take each status):
+ * immune to sleep, stop, dizzy, poison, confusion, electric shock, burn, freeze, growing huge, shrinking,
+ * attack up, attack down, defence up, defence down, allergy, fright, gale force, speed up, slow, dodgy,
+ * invisibility and instant kill.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/** Pose table of the Boo actor: maps each battle pose to the animation it plays (S_* animations). */
 static PoseTableEntry pose_table[] = {
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {31, "A_2"},
-    {39, "D_1"},
-    {40, "W_1"},
-    {42, "R_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Data table of the Boo actor: empty; it has no event hooks. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body part of the Boo actor (model c_teresa): hit position, defences, attributes and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_teresa", "c_teresa", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_teresa", "c_teresa", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /**

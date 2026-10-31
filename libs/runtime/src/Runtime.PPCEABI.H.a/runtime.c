@@ -71,6 +71,7 @@ void _restgpr_29(void);
 void _restgpr_30(void);
 void _restgpr_31(void);
 
+/** Constants for integer-to-float conversion: 0, 2^32 and 2^31. */
 static const double __constants[] = {0.0, 4294967296.0, 2147483648.0};
 
 /**

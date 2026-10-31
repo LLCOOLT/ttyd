@@ -18,14 +18,17 @@
 #endif
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __GXVersion = "<< Dolphin SDK - GX\tdebug build: "BUILD_DATE" "DBUILD_TIME" (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: "BUILD_DATE" "RBUILD_TIME" (0x2301) >>";
 #endif
 
 static GXFifoObj FifoObj;
 
 static GXData gxData;
+/** The GX state block (shadow registers, texture regions and so on) every GX function works on. */
 GXData* const __GXData = &gxData;
 
 // These are static locals in the SDK (the Japanese demo's map: peCount$35, time$36 and calledOnce$37 of
@@ -50,6 +53,10 @@ static u16 DefaultTexData[] __attribute__((aligned(32))) = {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
 };
 
+/**
+ * Default vertex attribute formats GXInit sets for every vertex format:
+ * float positions, normals and texture coordinates, RGBA8 colours.
+ */
 static GXVtxAttrFmtList GXDefaultVATList[] = {
     {GX_VA_POS, GX_POS_XYZ, GX_F32, 0},
     {GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0},
@@ -66,8 +73,16 @@ static GXVtxAttrFmtList GXDefaultVATList[] = {
     {GX_VA_NULL, 0, 0, 0},
 };
 
+/**
+ * Default projection GXInit sets, in the GXSetProjectionv layout:
+ * an orthographic type flag, then the six projection values.
+ */
 static f32 GXDefaultProjData[] = {1.0f, 0.0f, 1.0f, 0.0f, -1.0f, -2.0f, 0.0f};
 
+/**
+ * TMEM addresses for the default texture cache regions GXInit sets up:
+ * for each of the three region sets, eight even-region addresses followed by eight odd-region addresses.
+ */
 static u32 GXTexRegionAddrTable[] = {
     0x00000, 0x10000, 0x20000, 0x30000, 0x40000, 0x50000, 0x60000, 0x70000, 0x08000, 0x18000,
     0x28000, 0x38000, 0x48000, 0x58000, 0x68000, 0x78000, 0x00000, 0x90000, 0x20000, 0xB0000,
@@ -79,6 +94,7 @@ static u32 GXTexRegionAddrTable[] = {
 // prototypes
 static int __GXShutdown(int final);
 
+/** Registers __GXShutdown (priority 0x7F) with the OS so the graphics pipe is drained before a reset. */
 static OSResetFunctionInfo GXResetFuncInfo = {__GXShutdown, 0x7F, NULL, NULL};
 
 /**

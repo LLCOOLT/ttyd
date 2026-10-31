@@ -24,6 +24,10 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[407];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Bombshell Bill: 3 HP, 32x26 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_super_killer = {
     126,
     "btl_un_super_killer",
@@ -82,7 +86,7 @@ BattleUnitKind unit_super_killer = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     1,
     parts,
@@ -90,20 +94,34 @@ BattleUnitKind unit_super_killer = {
     data_table,
 };
 
+/** Defence of the Bombshell Bill: 2 against every kind of hit. */
 static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
+/** Defence attributes of the Bombshell Bill: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Bombshell Bill (percent chance each status takes hold):
+ * immune to sleep, stop, poison, fright; resists confusion (40%), freeze (65%), Tiny (65%),
+ * Attack Down (65%), Defense Down (65%), allergic (65%), Slow (65%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 0, 100, 0, 40, 150, 100, 65, 100, 65, 100, 65, 100, 65, 65, 0, 90, 100, 65, 100, 100, 90};
 #else
+/**
+ * Retail builds: Status vulnerability of the Bombshell Bill (percent chance each status takes hold):
+ * immune to sleep, stop, poison, fright; resists confusion (40%), freeze (60%), allergic (65%), Slow (65%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 0, 100, 0, 40, 150, 100, 60, 100, 85, 100, 85, 100, 95, 65, 0, 90, 100, 65, 100, 100, 90};
 #endif
 
+/** Parts of the Bombshell Bill: 1 part (model c_kilr_g). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_super_killer", "c_kilr_g", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_super_killer", "c_kilr_g", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Weapon of the Bombshell Bill (charge attack): targets one unit for 6 damage; used by attack_event. */
 static BattleWeapon weapon_killer_charge_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -122,7 +140,7 @@ static BattleWeapon weapon_killer_charge_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -140,6 +158,7 @@ static BattleWeapon weapon_killer_charge_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Bombshell Bill: maps its battle poses to its animations (KIL_*). */
 static PoseTableEntry pose_table[] = {
     {1, "KIL_N_1"},
     {2, "KIL_D_1"},
@@ -147,20 +166,21 @@ static PoseTableEntry pose_table[] = {
     {5, "KIL_K_1"},
     {4, "KIL_X_1"},
     {3, "KIL_X_1"},
-    {28, "KIL_S_1"},
+    {BTL_POSE_NORMAL, "KIL_S_1"},
     {29, "KIL_Q_1"},
     {30, "KIL_Q_1"},
     {31, "KIL_A_1"},
-    {39, "KIL_D_1"},
+    {BTL_POSE_DAMAGE, "KIL_D_1"},
     {50, "KIL_A_1"},
-    {40, "KIL_W_1"},
-    {42, "KIL_R_1"},
-    {56, "KIL_X_1"},
-    {57, "KIL_X_1"},
+    {BTL_POSE_WALK, "KIL_W_1"},
+    {BTL_POSE_RUN, "KIL_R_1"},
+    {BTL_POSE_DANGER, "KIL_X_1"},
+    {BTL_POSE_PERIL, "KIL_X_1"},
     {BTL_POSE_TALK, "KIL_T_1"},
     {BTL_POSE_STAY_DEFAULT, "KIL_S_1"},
 };
 
+/** Event table of the Bombshell Bill: it has no special event scripts. */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
@@ -217,11 +237,12 @@ EVT_END()
  * the Bill removes itself (KillUnit): one shot per Bill.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
+        // If the AI wants to use a held item, the Bill does that instead and ends its turn.
         CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(LW(0))
@@ -233,7 +254,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_killer_charge_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -250,11 +271,12 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_killer_charge_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // The Bill charges up with a rumble (pose type 50), then rockets forward (SFX_ENM_KILLER_MOVE1).
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_killer_charge_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_killer_charge_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -273,8 +295,10 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The Bill misses or is blocked: it flies past the target, the target dodges, and it speeds off past the
+    // edge of the screen.
     LABEL(90)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 10, LW(2), 0, -1)
@@ -285,26 +309,28 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_shake_w, 0, 5, 0, 15, 0)
     WAIT_MS(300)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
     WAIT_MS(500)
     GOTO(98)
+    // The Bill hits: it slams into the target and the screen shakes, then it explodes in a puff of smoke.
     LABEL(91)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 10, LW(2), 0, -1)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_killer_charge_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_killer_charge_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_killer_charge_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(evt_btl_camera_shake_w, 0, 5, 0, 15, 0)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(2), 10)
     ADD(LW(1), 20)
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 17, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
+    // It pays out its coins and Star Points, shown over the spot where it blew up.
     CALL(btlevtcmd_GetCoin, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_StoreCoin, LW(0))
     CALL(btlevtcmd_GetExp, BTL_UNIT_SELF, LW(0))
@@ -320,9 +346,11 @@ static EVT_BEGIN(attack_event)
     END_IF
     WAIT_MS(500)
     GOTO(98)
+    // The camera resets.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(200)
+    // The Bill has spent its single shot, so it removes itself from the battle.
     LABEL(99)
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN

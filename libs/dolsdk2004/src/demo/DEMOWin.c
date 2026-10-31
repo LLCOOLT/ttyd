@@ -3,6 +3,10 @@
 #include <demo.h>
 
 
+/**
+ * Button auto-repeat for DEMOWin menus: a held button starts repeating after this many frames,
+ * then repeats every repeat_rate frames.
+ */
 static u32 __DEMOWIN_PAD_repeat_threshold = 0x0000000F;
 static u32 __DEMOWIN_PAD_repeat_rate = 0x00000002;
 
@@ -11,6 +15,7 @@ DEMOWindow* __last_node;
 DEMOWindow* __curr_node;
 GXRenderModeObj* __rmp;
 
+/** Offset added to the s and t texture coordinates of each character when printing with the window font. */
 s32 fontShift = 0;
 
 // functions

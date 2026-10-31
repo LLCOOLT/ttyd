@@ -64,6 +64,7 @@ EVT_BEGIN(erumosu_dead)
     RETURN
 EVT_END()
 
+/** NPC setup of dou_07: the Ember (Elmos) that appears in the room. */
 static NpcSetupInfo npcEnt[] = {
     {
         "エルモス", // name
@@ -88,6 +89,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Exits (beros) of this room: s_bero to dou_08. */
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName
@@ -108,6 +110,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Items offered in the item menu at the Black Key chest: only the Black Key. */
 static s32 key_tbl[] = {
     ITEM_BLACK_KEY_0x24, -1,
 };
@@ -137,6 +140,7 @@ EVT_END()
  * choosing the key removes it from the pouch so the chest can open.
  */
 EVT_BEGIN(peramajin_before)
+    // The Ember has already appeared (Black Key stage): the chest now wants the key.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_21_GROTTO_KEY)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_normalize)
@@ -152,6 +156,7 @@ EVT_BEGIN(peramajin_before)
                 CALL(evt_mario_set_dir, 270, 200, 0)
             END_IF
         END_INLINE_EVENT
+        // Mario has no Black Key: the chest tells him to beat the ghost and get it, then stays shut.
         CALL(evt_pouch_check_item, ITEM_BLACK_KEY_0x24, LW(10))
         IF_INT_LESS_OR_EQUAL(LW(10), 0)
             CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
@@ -161,6 +166,7 @@ EVT_BEGIN(peramajin_before)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
+        // Mario has the key: the chest asks him to pick it from the item menu.
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
         CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_09"), PTR(majin_callback), 0)
 #if VERSION <= VERSION_DEMO_US
@@ -168,6 +174,7 @@ EVT_BEGIN(peramajin_before)
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(10), 0)
 #endif
+        // Mario cancels the menu: the chest sulks and stays shut.
         IF_INT_EQUAL(LW(10), -1)
             CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
             CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_10"), PTR(majin_callback), 0)
@@ -176,6 +183,8 @@ EVT_BEGIN(peramajin_before)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
+        // Mario picks the key: the partner steps aside and the chest says it will start its curse; the key is
+        // used up.
         BEGIN_INLINE_EVENT
             CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
             ADD(LW(3), 35)
@@ -198,6 +207,7 @@ EVT_BEGIN(peramajin_before)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+    // First visit (before the Ember has appeared): Mario faces the chest, which shouts and wobbles.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
@@ -219,6 +229,7 @@ EVT_BEGIN(peramajin_before)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_snd_sfxoff, LW(15))
     WAIT_MS(300)
+    // The chest rejoices that someone finally came, then asks to be left to its spiel as Mario reacts.
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
     CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_02"), PTR(majin_callback), 0)
     CALL(evt_mario_set_pose, STRING("M_I_2"))
@@ -239,6 +250,7 @@ EVT_BEGIN(peramajin_before)
     CALL(evt_mario_set_pose, STRING("M_I_2"))
     WAIT_MS(800)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // It grumbles that this is the fourth cursing chest Mario has met and gives in.
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
     CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_06"), PTR(majin_callback), 0)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
@@ -246,6 +258,7 @@ EVT_BEGIN(peramajin_before)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
     CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_07"), PTR(majin_callback), 0)
+    // The Ember ghost appears from the chest and the story advances to the Grotto key stage.
     CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_APPEAR1"), 0)
     CALL_CHILD(apper_elmos)
     CALL(evt_mobj_exec_cancel, STRING("mobj_box00"))
@@ -262,6 +275,7 @@ EVT_END()
  * Sets STORY_STG5_21_01_BOAT_MOD_OBTAINED.
  */
 EVT_BEGIN(peramajin_after)
+    // The chest has opened: Mario receives the Boat Curse and the music changes.
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_normalize)
@@ -273,6 +287,7 @@ EVT_BEGIN(peramajin_after)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_PERAMAJIN1"))
     CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(bgm_start_wait)
+    // The wooden room fades and the paper genie unfolds from the chest.
     SET_VALUE(LW(1), 60)
     LOOP(LW(1))
         SET_VALUE(LW(0), 255)
@@ -298,6 +313,7 @@ EVT_BEGIN(peramajin_after)
         WAIT_MS(1000)
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PERAMAJIN_COME1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
+    // The genie floats in and the boat-mode lecture runs.
     CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
     CALL(evt_mario_set_camid, 7)
     CALL(evt_img_wait_animend, STRING("img"))
@@ -313,6 +329,7 @@ EVT_BEGIN(peramajin_after)
 #if VERSION >= VERSION_JP
     CALL(evt_party_stop, 0)
 #endif
+    // Mario flickers while the lecture ends and he returns to his spot.
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)
         WAIT_MS(100)
@@ -331,6 +348,7 @@ EVT_BEGIN(peramajin_after)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PERAMAJIN_GOOUT1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
+    // The genie leaves and the music fades.
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 2000)
     CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_2"))
     CALL(evt_img_wait_animend, STRING("img"))
@@ -340,6 +358,7 @@ EVT_BEGIN(peramajin_after)
     END_INLINE_EVENT
     CALL(evt_img_release, STRING("img"))
     CALL(evt_paper_delete, STRING("OFF_d_kusya"))
+    // The partner comments, the story flag for the Boat Curse is set and the normal music returns.
 #if VERSION >= VERSION_JP
     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)

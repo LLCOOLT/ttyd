@@ -26,12 +26,14 @@ typedef struct EffConfettiN64Work {
 static void effConfettiMain(EffectEntry* effect);
 static void effConfettiDisp(CameraId cameraId, EffectEntry* effect);
 
+/** Twelve pastel RGB colours for the confetti pieces, one per piece in turn. */
 u8 color_table[] = {
     0xE8, 0xA0, 0xA8, 0xA8, 0x50, 0x58, 0xA0, 0xA8, 0xE8, 0x48, 0x48, 0xE8,
     0xA0, 0xE8, 0xA0, 0x60, 0xB0, 0x78, 0xE0, 0xE0, 0x58, 0xB0, 0xA0, 0x38,
     0xE8, 0xA0, 0xE8, 0xB0, 0x40, 0xA0, 0xA0, 0xD8, 0xD8, 0x58, 0xA8, 0xA8,
 };
 
+/** Single 6x6 confetti piece quad, used by every type except the type 3 shower. */
 effN64Vtx size6x6_tex16x16_vtx[] = {
     {-3, -3, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF},
     {3, -3, 0, 0x200, 0, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -39,6 +41,7 @@ effN64Vtx size6x6_tex16x16_vtx[] = {
     {-3, 3, 0, 0, 0x200, 0xFF, 0xFF, 0xFF, 0xFF},
 };
 
+/** Four small 6x6 quads per confetti piece, used by the type 3 falling shower. */
 effN64Vtx size6x6_tex16x16_2_vtx[] = {
     {-3, -3, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF},
     {3, -3, 0, 0x200, 0, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -58,6 +61,7 @@ effN64Vtx size6x6_tex16x16_2_vtx[] = {
     {-14, 12, -50, 0, 0x1A00, 0xFF, 0xFF, 0xFF, 0xFF},
 };
 
+/** Flutter cycle of a confetti piece: the texture frame on each of six steps, forward and back. */
 u8 anm_seq[] = {0, 1, 2, 3, 2, 1};
 
 /** Chooses which camera the confetti is drawn on (default 4); effConfettiMain only uses it for types below 10. */

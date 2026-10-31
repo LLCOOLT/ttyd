@@ -154,11 +154,11 @@ static USER_FUNC(_steal_item) {
                 return EVT_RETURN_DONE;
             }
             unit->heldItem = item;
-            if (item >= 240 && item < 339) {
-                if (target->currentKind == 222) {
-                    BtlUnit_EquipItem(target, 3, 0);
-                } else if (target->currentKind >= 224 && target->currentKind < 231) {
-                    BtlUnit_EquipItem(target, 5, 0);
+            if (item >= BADGE_MIN && item < BADGE_MAX) {
+                if (target->currentKind == UNIT_MARIO) {
+                    BtlUnit_EquipItem(target, EQUIP_RESET | EQUIP_MARIO, 0);
+                } else if (target->currentKind >= TYPE_PARTNER_MIN && target->currentKind < TYPE_PARTNER_MAX) {
+                    BtlUnit_EquipItem(target, EQUIP_RESET | EQUIP_PARTNER, 0);
                 }
                 pouchReviseMarioParam();
                 pouchRevisePartyParam();
@@ -170,6 +170,7 @@ static USER_FUNC(_steal_item) {
     return EVT_RETURN_DONE;
 }
 
+/** Unit data of the Badge Bandit: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_badge_borodo = {
     158,
     "btl_un_badge_borodo",
@@ -236,6 +237,7 @@ BattleUnitKind unit_badge_borodo = {
     data_table,
 };
 
+/** Attack data for the Badge Bandit's charging dash (also used for the steal): 5 damage. */
 static BattleWeapon weapon_borodo_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -254,7 +256,7 @@ static BattleWeapon weapon_borodo_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -272,16 +274,27 @@ static BattleWeapon weapon_borodo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Damage reduction of the Badge Bandit: none, every attack type does full damage. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element response of the Badge Bandit: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Badge Bandit (percent, 0 is immune): every status effect can land. Demo
+ * values.
+ */
 static StatusVulnerability regist = {70, 70, 60, 100, 70, 100, 100, 50, 100, 70, 100, 70, 100, 70, 80, 75, 60, 100, 70, 100, 100, 60};
 #else
+/**
+ * Status vulnerability of the Badge Bandit (percent, 0 is immune): every status effect can land. Released
+ * game values.
+ */
 static StatusVulnerability regist = {80, 70, 50, 100, 80, 100, 100, 50, 100, 85, 100, 85, 100, 90, 80, 75, 60, 100, 70, 100, 100, 60};
 #endif
 
+/** Pose table of the Badge Bandit: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -289,27 +302,28 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_1"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
     {51, "A_2"},
-    {42, "R_1"},
+    {BTL_POSE_RUN, "R_1"},
     {41, "R_1"},
-    {40, "W_1"},
+    {BTL_POSE_WALK, "W_1"},
 #if VERSION <= VERSION_DEMO_US
-    {56, "I_1"},
-    {57, "I_1"},
+    {BTL_POSE_DANGER, "I_1"},
+    {BTL_POSE_PERIL, "I_1"},
 #else
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
 #endif
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Pose table of the Badge Bandit: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_item_have[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -322,16 +336,16 @@ static PoseTableEntry pose_table_item_have[] = {
     {4, "X_1"},
     {3, "X_1"},
 #endif
-    {28, "S_2"},
+    {BTL_POSE_NORMAL, "S_2"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_2"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
     {51, "A_2"},
-    {42, "R_2"},
+    {BTL_POSE_RUN, "R_2"},
     {41, "R_2"},
-    {40, "W_2"},
+    {BTL_POSE_WALK, "W_2"},
     {BTL_POSE_TALK, "S_2"},
     {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
@@ -339,6 +353,7 @@ static PoseTableEntry pose_table_item_have[] = {
 #if VERSION >= VERSION_US
 extern EvtWord _badge_borodo_emergency_revival_event[];
 #endif
+/** Data table of the Badge Bandit: event handlers keyed by tag (_badge_borodo_emergency_revival_event). */
 static BattleDataEntry data_table[] = {
 #if VERSION >= VERSION_US
     {51, _badge_borodo_emergency_revival_event},
@@ -346,8 +361,9 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body part of the Badge Bandit: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_badge_borodo", "c_borodo_t", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_badge_borodo", "c_borodo_t", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /**
@@ -363,7 +379,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_MOVE1L"), STRING("SFX_ENM_BORODO_MOVE1R"), 0, 6, 6)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_MOVE1L"), STRING("SFX_ENM_BORODO_MOVE1R"), 0, 10, 10)
-    CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
+    CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_HOLDING_STOLEN_ITEM, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     ELSE
@@ -393,7 +409,7 @@ EVT_END()
  * and else draws a random number to choose between the plain attack (about 70 in 209) and the steal attack.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
+    CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_HOLDING_STOLEN_ITEM, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(escape_event)
         RETURN
@@ -404,7 +420,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+    CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(_borodo_normal_attack)
         RETURN
@@ -428,11 +444,12 @@ EVT_END()
  * When confused with no target it is flustered.
  */
 static EVT_BEGIN(_borodo_normal_attack)
+    // Pick a target; a confused Badge Bandit with nobody to hit gets flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_borodo_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -444,10 +461,11 @@ static EVT_BEGIN(_borodo_normal_attack)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_borodo_attack))
+    // Declare the attack, then run past the target to the far side of it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_borodo_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 60)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
@@ -457,7 +475,8 @@ static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // It turns around and stamps its feet, winding up the charge.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(evt_btl_camera_set_zoom, 0, 350)
     LOOP(8)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_MOVE1L"), EVT_NULLPTR, 0, LW(14))
@@ -466,7 +485,8 @@ static EVT_BEGIN(_borodo_normal_attack)
         WAIT_FRAMES(3)
     END_LOOP
     CALL(evt_btl_camera_set_mode, 0, 3)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
+    // Find out whether the charge connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
         MULTIPLY_FLOAT(LW(6), 40)
@@ -475,12 +495,13 @@ static EVT_BEGIN(_borodo_normal_attack)
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
         CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+        // The dash back into the target.
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_ATT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(evt_snd_sfxoff, LW(14))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_ATT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -512,6 +533,7 @@ static EVT_BEGIN(_borodo_normal_attack)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss or dodge: the Badge Bandit hops away twice.
     LABEL(90)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.39941406f))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
@@ -522,9 +544,10 @@ static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_MOVE1R"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(20)
     GOTO(98)
+    // Hit: the damage is dealt and the Badge Bandit is sent spinning backward in a flip, landing flat (X_1).
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_borodo_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.25f))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 40)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("O_1"))
@@ -548,9 +571,10 @@ static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, -1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("X_1"))
     WAIT_MS(1000)
+    // Walk back home.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -568,11 +592,12 @@ EVT_END()
  * If nothing was taken it just bows, then returns home.
  */
 static EVT_BEGIN(_borodo_steal_attack)
+    // Pick a target; a confused Badge Bandit with nobody to hit gets flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_borodo_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -584,10 +609,11 @@ static EVT_BEGIN(_borodo_steal_attack)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_borodo_attack))
+    // Declare the attack, then run past the target to the far side of it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_borodo_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 60)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
@@ -597,7 +623,8 @@ static EVT_BEGIN(_borodo_steal_attack)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // It turns around and stamps its feet, winding up the charge.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(evt_btl_camera_set_zoom, 0, 350)
     LOOP(8)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_MOVE1L"), EVT_NULLPTR, 0, LW(14))
@@ -606,7 +633,8 @@ static EVT_BEGIN(_borodo_steal_attack)
         WAIT_FRAMES(3)
     END_LOOP
     CALL(evt_btl_camera_set_mode, 0, 3)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
+    // Find out whether the charge connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
         MULTIPLY_FLOAT(LW(6), 40)
@@ -615,12 +643,13 @@ static EVT_BEGIN(_borodo_steal_attack)
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
         CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+        // The dash back into the target.
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_ATT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(evt_snd_sfxoff, LW(14))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_ATT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -652,6 +681,7 @@ static EVT_BEGIN(_borodo_steal_attack)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss or dodge: the Badge Bandit hops away twice.
     LABEL(90)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.39941406f))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
@@ -662,14 +692,18 @@ static EVT_BEGIN(_borodo_steal_attack)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_MOVE1R"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(20)
     GOTO(98)
+    // Hit: the damage is dealt, and if the defence command went badly enough the Badge Bandit tries to steal
+    // something.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_borodo_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SET_VALUE(LW(8), 0)
     CALL(btlevtcmd_GetResultACDefence, LW(7))
     IF_INT_LESS_OR_EQUAL(LW(7), 3)
         CALL(_steal_item, BTL_UNIT_SELF, LW(3), LW(8), LW(9), LW(7))
         IF_INT_NOT_EQUAL(LW(8), 0)
+            // Something was taken: the "item lost" message appears and the loot flies off toward the Badge
+            // Bandit, which now carries it.
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_SUCCESS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             BEGIN_INLINE_EVENT
                 WAIT_FRAMES(20)
@@ -684,7 +718,7 @@ static EVT_BEGIN(_borodo_steal_attack)
                 CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
                 CALL(btlevtcmd_BtlIconJumpPosition, LW(10), LW(0), LW(1), LW(2), 20)
                 CALL(btlevtcmd_BtlIconDelete, LW(10))
-                CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 1073741824)
+                CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_HOLDING_STOLEN_ITEM)
             END_INLINE_EVENT
         END_IF
     END_IF
@@ -695,6 +729,7 @@ static EVT_BEGIN(_borodo_steal_attack)
     WAIT_FRAMES(10)
     IF_INT_EQUAL(LW(8), 0)
         WAIT_FRAMES(20)
+        // Nothing was taken: it bows apologetically (B_1, R_4) and heads home.
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_INCLINE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("B_1"))
         WAIT_FRAMES(52)
@@ -705,15 +740,17 @@ static EVT_BEGIN(_borodo_steal_attack)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         GOTO(99)
     END_IF
+    // It laughs over its loot and switches to the loot-carrying poses.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("O_2"))
     WAIT_FRAMES(14)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_LAUGH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_item_have))
     GOTO(98)
+    // Walk back home.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -737,13 +774,13 @@ static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_JUMP1"), 0, 0, -1, -1, 0, 0)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), FLOAT(20.0f), -2)
     CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, 1, 255, 255, 255, 255, 100, 100, 100, 50, 0)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 67108864)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_ESCAPE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(9.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, 300, LW(1), LW(2), 0, 0, 0)
     CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     WAIT_FRAMES(40)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 67108864)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN
@@ -751,7 +788,7 @@ EVT_END()
 
 /** Wait script: plays the Badge Bandit's idle pose, using the loot-holding pose table once it has stolen something. */
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
+    CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_HOLDING_STOLEN_ITEM, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     ELSE
@@ -764,10 +801,11 @@ EVT_END()
 /**
  * Reaction event when the Badge Bandit is knocked out:
  * spins in place, shows a Life Shroom icon, is revived with 10 HP, then jumps back to its pose and resumes.
- * Guess: it consumes a reserve Life Shroom (item id 151) that it carries.
+ * It runs (data table tag 51) when a KO hit finds the Life Shroom (item id 151) in its held item, and
+ * ConsumeItemReserve uses that held Life Shroom up.
  */
 EVT_BEGIN(_badge_borodo_emergency_revival_event)
-    CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), UNIT_FLAG_HIDE_HELD_ITEM)
     SET_VALUE(LW(0), 48)
     LABEL(5)
     WAIT_FRAMES(1)
@@ -802,19 +840,19 @@ EVT_BEGIN(_badge_borodo_emergency_revival_event)
     IF_INT_GREATER(LW(0), 0)
         GOTO(7)
     END_IF
-    CALL(btlevtcmd_OnOffStatus, LW(10), 27, 0, 0, 0)
+    CALL(btlevtcmd_OnOffStatus, LW(10), STATUS_INSTANT_KILL, 0, 0, 0)
     CALL(btlevtcmd_SetHp, LW(10), 0)
     CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 10)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     ADD(LW(1), 30)
     CALL(evt_eff, 0, STRING("recovery"), 0, LW(0), LW(1), LW(2), 10, 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(2000)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 42)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_RUN)
     CALL(btlevtcmd_JumpSetting, LW(10), 0, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_OffUnitFlag, LW(10), 134217728)
-    CALL(btlevtcmd_OffUnitFlag, LW(10), 1073741824)
+    CALL(btlevtcmd_OffUnitFlag, LW(10), UNIT_FLAG_HIDE_HELD_ITEM)
+    CALL(btlevtcmd_OffUnitFlag, LW(10), UNIT_FLAG_HOLDING_STOLEN_ITEM)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN

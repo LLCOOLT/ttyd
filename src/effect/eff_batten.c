@@ -15,7 +15,8 @@ static void effBattenDisp(CameraId cameraId, EffectEntry* effect);
 static void effBattenDisp2(CameraId cameraId, EffectEntry* effect);
 
 /**
- * Spawns a Magnus von Grapple 2.0 part: type 0 allocates four X-mark layers, types 1-3 a single animated pose.
+ * Spawns a Magnus von Grapple 2.0 part: type 0 allocates a header and three X-mark layers,
+ * types 1-3 a single animated pose.
  * duration <= 0 keeps it until soft-deleted. Spawned by the Magnus von Grapple boss units (aji, mri).
  */
 EffectEntry* effBattenEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
@@ -171,7 +172,11 @@ static void effBattenMain(EffectEntry* effect) {
     }
 }
 
-/** Draws the pose-animated variants (types 1-3) with animPoseDrawMtx. */
+/**
+ * Draws type 0: its three layers as camera-facing 32x32 quads of effect texture 0x56 (the X mark).
+ * As effBattenMain steps them, each layer starts 10 frames after the one before, shrinks from scale 3 to 1
+ * while fading in to half alpha, and then all three grow to scale 10 and fade out together.
+ */
 static void effBattenDisp(CameraId cameraId, EffectEntry* effect) {
     EffBattenWork* work;
     s32 i;
@@ -235,7 +240,10 @@ static void effBattenDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-/** Draws the four layered X-mark quads of type 0. Guess: the layers start 10 frames apart to look like a pulse. */
+/**
+ * Draws the pose-animated variants (types 1-3: EFF_batten_x, EFF_batten_rocket) facing the camera
+ * with animPoseDrawMtx.
+ */
 static void effBattenDisp2(CameraId cameraId, EffectEntry* effect) {
     EffBattenWork* work;
     Mtx mtx;

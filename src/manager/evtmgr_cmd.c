@@ -138,8 +138,6 @@ inline EvtWord* evtSearchEndSwitch(EventEntry* entry);
 inline EvtWord* evtSearchCase(EventEntry* entry);
 inline EvtWord* evtSearchWhile(EventEntry* entry);
 inline EvtWord* evtSearchJustBeforeWhile(EventEntry* entry);
-inline EvtWord* evtSearchBreakLoop(EventEntry* entry);
-inline EvtWord* evtSearchContinueLoop(EventEntry* entry);
 
 /**
  * Decodes a script number to a float: values in the FLOAT() range are stored as (x * 1024) - 230000000,
@@ -1941,7 +1939,7 @@ s32 evt_debug_msg_clear(EventEntry* entry) { // 114
 /**
  * DEBUG_PUT_REG(var): formats the variable's kind,
  * index and value into a static buffer that is never shown in the release game.
- * The GSW/LSW address branches pass too few printf arguments.
+ * Its address-value branches print the wrong numbers (see the BUG notes); nothing shows the buffer.
  */
 s32 evt_debug_put_reg(EventEntry* entry) { // 115
     static char str[0x100];
@@ -1969,7 +1967,7 @@ s32 evt_debug_put_reg(EventEntry* entry) { // 115
         reg += 190000000;
         val = entry->uwBase[reg];
         if (val <= EVTDAT_ADDR_MAX) {
-            sprintf(str, "UW(%3d)  [%08X]", val, val);
+            sprintf(str, "UW(%3d)  [%08X]", val, val); // BUG: the value is printed as the index. Fix: reg, val.
         } else if (val <= -220000000) {
             sprintf(str, "UW(%3d)  [%4.2f]", reg, check_float(val));
         } else {
@@ -1979,7 +1977,7 @@ s32 evt_debug_put_reg(EventEntry* entry) { // 115
         reg += 170000000;
         val = swByteGet(reg);
         if (val <= EVTDAT_ADDR_MAX) {
-            sprintf(str, "GSW(%3d) [%08X]", val); // wtf
+            sprintf(str, "GSW(%3d) [%08X]", val); // BUG: no argument for the value. Fix: reg, val.
         } else if (val <= -220000000) {
             sprintf(str, "GSW(%3d) [%4.2f]", reg, check_float(val));
         } else {
@@ -1989,7 +1987,7 @@ s32 evt_debug_put_reg(EventEntry* entry) { // 115
         reg += 150000000;
         val = _swByteGet(reg);
         if (val <= EVTDAT_ADDR_MAX) {
-            sprintf(str, "LSW(%3d) [%08X]", val); // wtf
+            sprintf(str, "LSW(%3d) [%08X]", val); // BUG: no argument for the value. Fix: reg, val.
         } else if (val <= -220000000) {
             sprintf(str, "LSW(%3d)  [%4.2f]", reg, check_float(val));
         } else {

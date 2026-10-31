@@ -48,7 +48,7 @@ static void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
     __AXFXFree(dl->inputs);
 }
 
-/** NONMATCHING RELEASE - regalloc */
+/** Not built in TTYD (no AXFX here); upstream notes a register-allocation difference in its release build. */
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
     u8 k;
@@ -182,9 +182,9 @@ const static double i2fMagic = 4503601774854144.0;
 
 /**
  * Assembly inner loop of the standard reverb: for each of three outputs it runs a 160-sample buffer through
- * pre-delay, comb and all-pass delay lines and a damping low-pass, mixed with the dry signal,
- * advancing through the buffers from sptr (the left buffer). Guess: the exact filter topology.
- * Original assembly.
+ * optional pre-delay, two parallel comb filters summed, an all-pass, a 0.3 scale, a one-pole low-pass (damping)
+ * and a second all-pass, then writes 0.6 * level of that plus 0.6 * (1 - level) of the dry input,
+ * advancing through the buffers from sptr (the left buffer). Original assembly.
  */
 asm static void HandleReverb(register s32* sptr, register AXFX_REVSTD_WORK* rv) {
     nofralloc

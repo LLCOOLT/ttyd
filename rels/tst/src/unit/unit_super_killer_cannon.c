@@ -47,6 +47,10 @@ static USER_FUNC(killer_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit definition of the B. Bill Blaster: its HP, level, sizes, sounds, status vulnerability,
+ * parts and init script.
+ */
 BattleUnitKind unit_super_killer_cannon = {
     125,
     "btl_un_super_killer_cannon",
@@ -129,22 +133,42 @@ BattleUnitKind unit_super_killer_cannon = {
     data_table,
 };
 
+/** Defence of the B. Bill Blaster: 4 against every kind of hit. */
 static BattleUnitDefense defence = {{4, 4, 4, 4, 4}};
 
+/** Element modifiers of the B. Bill Blaster: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the B. Bill Blaster in the demo builds:
+ * immune to sleep, stop, dizzy, poison, confusion and fright; extra prone to electric;
+ * resists most other statuses.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 5, 100, 40, 100, 100, 90};
 #else
+/**
+ * Status vulnerability of the B. Bill Blaster in the retail builds:
+ * immune to sleep, stop, dizzy, poison, confusion and fright; extra prone to electric;
+ * resists most other statuses.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 90, 100, 80, 100, 80, 100, 95, 40, 0, 5, 100, 40, 100, 100, 90};
 #endif
 
+/**
+ * Parts of the B. Bill Blaster: the Blaster (part 1) and two untargetable parts (2 and 3) that replace it,
+ * barrel raised, when it fires into the air.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_super_killer_cannon", "c_killtai_g", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 35, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
-    {2, "btl_un_super_killer_cannon", "c_killtai_g", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, 0x10000, 0, pose_table},
-    {3, "btl_un_super_killer_cannon", "c_killtai_g", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, 0x10000, 0, pose_table},
+    {1, "btl_un_super_killer_cannon", "c_killtai_g", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 35, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
+    {2, "btl_un_super_killer_cannon", "c_killtai_g", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE, 0, pose_table},
+    {3, "btl_un_super_killer_cannon", "c_killtai_g", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE, 0, pose_table},
 };
 
+/**
+ * Spawn setup for a Bombshell Bill, which the B. Bill Blaster calls into the battle:
+ * enemy side, acting in the enemy phase, placed far off-screen until the calling script moves it into position.
+ */
 static BattleUnitSetup entry_killer = {
     &unit_super_killer, // unitKindParams
     1, // alliance
@@ -156,6 +180,10 @@ static BattleUnitSetup entry_killer = {
     NULL, // itemDropTable
 };
 
+/**
+ * Pose table of the B. Bill Blaster: maps each battle pose (waiting, hurt, running...) to one of its KTA_*
+ * animations.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "KTA_N_1"},
     {2, "KTA_Y_1"},
@@ -175,6 +203,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "KTA_S_1"},
 };
 
+/** Data table of the B. Bill Blaster: it has no special reaction scripts. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
@@ -194,10 +223,10 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_AddHomePos, BTL_UNIT_SELF, 20, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_Z_3"))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KTA_Z_2"))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_NO_SHADOW)
     RETURN
 EVT_END()
 
@@ -217,6 +246,7 @@ EVT_END()
  * The charged-Bill variants (LW(12) = 1) have weight 0 and are never picked.
  */
 static EVT_BEGIN(attack_event)
+    // If the B. Bill Blaster holds an item, it uses that instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -230,6 +260,7 @@ static EVT_BEGIN(attack_event)
     ADD(LW(0), 0)
     ADD(LW(0), 10)
     SUBTRACT(LW(0), 1)
+    // Roll the dice (0 to 54): the weights decide which kind of salvo the Blaster fires.
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 15)
     IF_INT_LESS(LW(1), LW(0))
@@ -243,10 +274,12 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
             MULTIPLY(LW(4), LW(5))
             IF_INT_LESS(LW(4), LW(5))
+                // It looks for a free spot in front of it: first 160 units away, then 120, then 80.
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
+                    // One Bombshell Bill is fired from the ground (weight 15).
                     CALL_CHILD(friend_event)
                     GOTO(99)
                 END_IF
@@ -276,6 +309,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 1)
+                    // The charged ground Bill (weight 0, never chosen).
                     CALL_CHILD(friend_event)
                     GOTO(99)
                 END_IF
@@ -305,6 +339,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
+                    // A ground Bill at every free spot (weight 10).
                     CALL_CHILD(friend_event)
                 END_IF
             END_IF
@@ -322,9 +357,9 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -337,6 +372,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
+                    // One Bill is fired up into the air (weight 20).
                     CALL_CHILD(friend_event_sky)
                     CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
                     LOOP(0)
@@ -347,9 +383,9 @@ static EVT_BEGIN(attack_event)
                         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
                         WAIT_FRAMES(1)
                     END_LOOP
-                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
                     GOTO(99)
                 END_IF
             END_IF
@@ -367,9 +403,9 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -382,6 +418,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 1)
+                    // The charged air Bill (weight 0, never chosen).
                     CALL_CHILD(friend_event_sky)
                     CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
                     LOOP(0)
@@ -392,9 +429,9 @@ static EVT_BEGIN(attack_event)
                         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
                         WAIT_FRAMES(1)
                     END_LOOP
-                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
                     GOTO(99)
                 END_IF
             END_IF
@@ -412,9 +449,9 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -427,6 +464,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
+                    // An air Bill at every free spot (weight 10).
                     CALL_CHILD(friend_event_sky)
                 END_IF
             END_IF
@@ -446,11 +484,12 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         GOTO(99)
     END_IF
+    // Turn finished: the B. Bill Blaster goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -481,7 +520,7 @@ static EVT_BEGIN(friend_event)
     ELSE
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 70)
@@ -489,7 +528,7 @@ static EVT_BEGIN(friend_event)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 50, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 28)
@@ -513,7 +552,7 @@ static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_JumpPosition, LW(3), LW(0), 10, LW(2), FLOAT(7.0f), -1)
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), 10, LW(2))
     IF_INT_EQUAL(LW(12), 1)
-        CALL(btlevtcmd_OnOffStatus, LW(3), 16, 1, 1, 1)
+        CALL(btlevtcmd_OnOffStatus, LW(3), STATUS_CHARGE, 1, 1, 1)
     END_IF
     RETURN
 EVT_END()
@@ -559,7 +598,7 @@ static EVT_BEGIN(friend_event_sky)
     ELSE
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 60)
@@ -567,7 +606,7 @@ static EVT_BEGIN(friend_event_sky)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 75, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 28)
@@ -593,10 +632,10 @@ static EVT_BEGIN(friend_event_sky)
     CALL(btlevtcmd_SetPartsRotate, LW(3), LW(4), 0, 0, 0)
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), 40, LW(2))
     IF_INT_EQUAL(LW(12), 1)
-        CALL(btlevtcmd_OnOffStatus, LW(3), 16, 1, 1, 1)
+        CALL(btlevtcmd_OnOffStatus, LW(3), STATUS_CHARGE, 1, 1, 1)
     END_IF
-    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 4194304)
-    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 2097152)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     RETURN
 EVT_END()
 
@@ -605,7 +644,7 @@ double atan(double x);
 /**
  * Script helper: args[0]-args[1] and args[2]-args[3] are two points;
  * args[4] receives the angle of the line between them in degrees (atan of the slope),
- * used to aim the Bullet Bill.
+ * used to aim the Bombshell Bill.
  */
 static USER_FUNC(killer_get_angle) {
     EvtWord* args = event->args;

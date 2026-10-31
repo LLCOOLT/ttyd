@@ -1,6 +1,7 @@
 #include "dolphin/PPCArch.h"
 #include "musyx/musyx_priv.h"
 
+/** Callback the application registered to receive sound profiling data. */
 SND_PROF_USERCALLBACK sndProfUserCallback = NULL;
 
 /**

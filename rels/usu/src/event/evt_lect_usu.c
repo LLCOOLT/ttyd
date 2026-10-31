@@ -540,8 +540,10 @@ static USER_FUNC(lect_party_ido_sum) {
 }
 
 /**
- * Guess: script helper: stores the vector (args[0], args[1], args[2]) in the static daiv,
- * a scratch position shared by the lecture scripts (the name suggests a stand's move target).
+ * Script helper: stores the vector (args[0], args[1], args[2]) in the static daiv,
+ * the position of a moving platform ("dai").
+ * Nothing in this file calls it; the copy in evt_lect_dou.c moves the S_Ship_Change_01 platform by it every
+ * frame.
  */
 static USER_FUNC(dai_moveti_set) {
     EvtWord* args = event->args;
@@ -553,7 +555,9 @@ static USER_FUNC(dai_moveti_set) {
     return EVT_RETURN_DONE;
 }
 
-/** Guess: script helper: reads back the vector stored by dai_moveti_set into args[0..2]. */
+/**
+ * Script helper: reads back the vector stored by dai_moveti_set into args[0..2]. Nothing in this file calls it.
+ */
 static USER_FUNC(dai_moveti_get) {
     EvtWord* args = event->args;
 
@@ -702,9 +706,14 @@ EVT_BEGIN(vivian_party_lecture_init)
 EVT_END()
 
 /**
- * Guess: vivian's tutorial after she joins ("lecture_friends_12" to 14):
- * messages explain her shadow ability while the camera zooms,
- * then Vivian is made to hold Mario's position and the scene is cleaned up.
+ * Vivian's tutorial after she joins (system messages lecture_friends_12_0_1, 12_1, 13 and 14):
+ * the primer says X makes her pull Mario into the shadows to hide;
+ * the camera moves in and Vivian holds Mario in the shadow (evt_party_vivian_hold)
+ * while a Boo (テレサ) floats in from the right with a speech bubble, looks around twice and floats away,
+ * unable to find them.
+ * Then the message says X brings them back out, Vivian lets go, moves beside Mario,
+ * and the last message explains Shade Fist (sets enemies on fire) and Veil (hide to avoid damage)
+ * before she strikes a pose (PTR_O_1).
  */
 EVT_BEGIN(vivian_party_lecture)
     CALL(evt_msg_print, 0, STRING("lecture_friends_12_0_1"), 0, 0)
@@ -774,10 +783,11 @@ EVT_END()
 /**
  * Shared "partner joins" cutscene run by each partner's pickup scene (LW(8) the partner NPC, LW(9) the partner
  * id): the partner joins the party with a fanfare,
- * an "itemget" background appears and the lecture message for that partner plays, then the game is restored.
- * For Koops the extra kick tutorial runs inside it.
+ * an "itemget" background appears with that partner's joining message, the partner's lesson runs
+ * (this map area's copy has only Vivian's) and the game is restored.
  */
 EVT_BEGIN(all_party_lecture)
+    // The partner NPC steps out of the scene and joins the party at its spot.
     CALL(evt_mario_normalize)
     IF_INT_NOT_EQUAL(LW(9), 1)
         IF_INT_NOT_EQUAL(LW(9), 5)
@@ -795,6 +805,7 @@ EVT_BEGIN(all_party_lecture)
     ELSE
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     END_IF
+    // The joining jingle plays over the item-get backdrop with this partner's "has joined your party!" line.
     CALL(evt_party_set_camid, 0, 7)
     SPAWN_EVENT_GET_ID(PTR(all_party_lecture_otosub), LW(11))
     CALL(lect_itemget_kesan, 0, FLOAT(600.0f), LW(0), LW(1), LW(2))
@@ -819,6 +830,7 @@ EVT_BEGIN(all_party_lecture)
         CASE_EQUAL(7)
         CALL(evt_msg_print, 0, STRING("lecture_friends_17"), 0, 0)
     END_SWITCH
+    // Stop the jingle, then fold the scene into the lecture frame with the lecture music.
     IS_EVENT_RUNNING(LW(11), LW(12))
     IF_INT_EQUAL(LW(12), 1)
         DELETE_EVENT(LW(11))
@@ -858,6 +870,7 @@ EVT_BEGIN(all_party_lecture)
     WAIT_FRAMES(1)
     CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_cont_onoff, 0, 1)
+    // The lesson: Mario blinks out of sight, Vivian's lesson plays, then Mario and the partner blink back in.
     CALL(lect_test_systemlevel)
     SWITCH(LW(9))
         CASE_EQUAL(6)
@@ -888,6 +901,7 @@ EVT_BEGIN(all_party_lecture)
         CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 0)
         WAIT_MS(100)
     END_LOOP
+    // Back to the normal camera, music and sounds; the lecture frame folds away.
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     CALL(evt_mario_init_camid)
@@ -912,8 +926,9 @@ EVT_BEGIN(all_party_lecture)
 EVT_END()
 
 /**
- * Guess: setup of the black-chest ("Roll") lecture in Twilight Town:
- * raises the system level, sets the camera from the side 1 second and turns Mario to face east.
+ * Setup of the Tube Curse lecture, run by usu_01's black-chest scene (evt_majin2) before roll_majin_lecture:
+ * sets the system level to 0 (lect_set_systemlevel),
+ * moves the event camera into place over 1 second and turns Mario to face right.
  */
 EVT_BEGIN(roll_majin_lecture_init)
     CALL(lect_set_systemlevel, 0)
@@ -972,12 +987,18 @@ EVT_BEGIN(roll_majin_lecture_sub02)
 EVT_END()
 
 /**
- * Guess: tutorial scene run after the black chest's curse is received (the chest spirit "pera majin" talks,
- * messages stg4_usu_majin3_12 and up): the button icons are shown,
- * Mario practices the new move with the status bar hidden and R-trigger/stick prompts,
- * an item menu choice repeats it, and the spirit leaves.
+ * The Tube Curse lecture after Mario opens Twilight Town's black chest:
+ * the chest spirit (ペラ魔人) appears by the camera
+ * and curses him (stg4_usu_majin3_12 to 14, flashing light on Mario),
+ * telling him to hold R and rotate the stick.
+ * Mario then practices with the status bar and main menu off, only R and the stick enabled,
+ * and R and stick prompts (roll_majin_lecture_sub01 and sub02) until he rolls into a tube (motion 22).
+ * The spirit gloats (stg4_usu_majin3_18) and asks whether he got it (stg4_usu_majin3_19);
+ * "I don't get it" repeats the practice, and once he understands the spirit signs off (20_1 and 21)
+ * and disappears.
  */
 EVT_BEGIN(roll_majin_lecture)
+    // The chest spirit appears at the camera's focus and follows it.
     BEGIN_SIBLING_EVENT
         CALL(lecture_button_rtn)
     END_SIBLING_EVENT
@@ -1002,6 +1023,7 @@ EVT_BEGIN(roll_majin_lecture)
     CALL(evt_npc_set_camid, STRING("ペラ魔人"), 7)
     CALL(evt_npc_set_anim, STRING("ペラ魔人"), STRING("P_1"))
     WAIT_MS(200)
+    // The spirit mocks Mario, curses him with flashes of light and tells him to hold R and rotate the stick.
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_12"), 0, STRING("ペラ魔人"))
     CALL(evt_mario_set_pose, STRING("M_N_H"))
@@ -1019,6 +1041,7 @@ EVT_BEGIN(roll_majin_lecture)
 #else
     CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_14"))
 #endif
+    // Practice: only R and the stick work, with button prompts, until Mario rolls into a tube.
     LOOP(0)
         CALL(lecture_button_flag_on_off, 0, 2, 1)
         CALL(lecture_button_set_icon_id, 0, ICON_080)
@@ -1079,6 +1102,7 @@ EVT_BEGIN(roll_majin_lecture)
         CALL(lecture_button_seq_wait, 0, 1)
         CALL(lecture_button_seq_wait, 1, 1)
         WAIT_MS(300)
+        // The spirit gloats and asks if Mario got it; "I don't get it!" explains again and repeats the practice.
 #if VERSION <= VERSION_DEMO_US
         CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_18"))
 #else
@@ -1101,6 +1125,7 @@ EVT_BEGIN(roll_majin_lecture)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // Once he understands, the spirit tells him B turns him back to normal, signs off and vanishes.
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_20_1"), 0, STRING("ペラ魔人"))

@@ -22,6 +22,14 @@
 #include "version.h"
 #include <dolphin/pad.h>
 
+// Bits of MarioWork.mot.hammer2.flags (the charged hammer; cleared when it starts).
+enum MotHammer2Flag {
+    HAMMER2_FLAG_LEVEL_HELD = 0x1,  // the wind-up to the charge level is done; the animation now rocks
+    HAMMER2_FLAG_ROCK_BACK = 0x10,  // rocking back from midTime towards minTime
+    HAMMER2_FLAG_LEVEL_UP = 0x1000, // a charge level was just reached; mot_hammer2 handles it once
+    HAMMER2_FLAG_POSE_SET = 0x2000, // the charged pose for the hammer level has been set
+};
+
 // FAKE: the US/JP code calls cos with a float constant (loaded with lfs, as a `double cos(float)` prototype
 // gives); the casts at the four calls keep that form.
 typedef double (*CosFloatArgFn)(f32);
@@ -30,6 +38,10 @@ typedef EffectEntry* (*EffUltraHammerEntryArgOrderFn)(f32, f32, f32, f32, BOOL, 
 static HitEntry* hitEstimate(s32* out);
 static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz);
 
+/**
+ * Hammer hit sounds of the Attack FX badges: pairs of badge (R, B, G, Y, P) and the sound it swaps in;
+ * with several equipped, each swing moves on to the next one worn.
+ */
 s32 se_data[] = {315, 357, 316, 359, 317, 358, 318, 360, 319, 361};
 
 /** Light camera shake when a level-1 (plain Hammer) swing hits something solid. */
@@ -193,7 +205,7 @@ void mot_hammer(void) {
             mario->directionView = r;
             mario->mot.hammer.dir = hamDir(mario);
         }
-        if (hitGetAttr(hit) & 0x80000000) {
+        if (hitGetAttr(hit) & HIT_ATTR_MOBJ) {
             s32 ok = chkBlock((HamMobj*)mobjHitObjPtrToPtr(hit));
             if (ok) {
                 kind = 0;
@@ -423,7 +435,7 @@ s32 marioChkHammer2(void) {
             marioVoiceGlareOn();
         }
     }
-    if (marioGetRub(0x200, &a, &b, &c) != 1) {
+    if (marioGetRub(PAD_BUTTON_B, &a, &b, &c) != 1) {
         return 0;
     }
     mario->baseSpeed = 0.0f;
@@ -446,7 +458,7 @@ static inline void mot_ham(f32 camShiftZ, f32 camZoom) {
 /** Charge level reached: zoom the camera in and mark the level as new (the 0x1000 flag is handled below). */
 static inline void hammer2ChargeLvUp(MarioWork* mario, f32 camShiftZ, f32 camZoom) {
     mot_ham(camShiftZ, camZoom);
-    mario->mot.hammer2.flags |= 0x1000;
+    mario->mot.hammer2.flags |= HAMMER2_FLAG_LEVEL_UP;
 }
 
 /**
@@ -456,25 +468,25 @@ static inline void hammer2ChargeLvUp(MarioWork* mario, f32 camShiftZ, f32 camZoo
 static inline void hammer2ChargeRamp(MarioWork* mario, f32 maxTime, f32 midTime, f32 minTime, s32 lv, f32 camShiftZ,
                                      f32 camZoom) {
     marioChgPaper("P_H_1A");
-    if (!(mario->mot.hammer2.flags & 1)) {
+    if (!(mario->mot.hammer2.flags & HAMMER2_FLAG_LEVEL_HELD)) {
         mario->mot.hammer2.animTime += 6.0f;
         if (mario->mot.hammer2.animTime >= maxTime) {
             mario->mot.hammer2.animTime = maxTime;
-            mario->mot.hammer2.flags |= 1;
+            mario->mot.hammer2.flags |= HAMMER2_FLAG_LEVEL_HELD;
             mario->hammerChargeLv = lv;
             hammer2ChargeLvUp(mario, camShiftZ, camZoom);
         }
-    } else if (!(mario->mot.hammer2.flags & 0x10)) {
+    } else if (!(mario->mot.hammer2.flags & HAMMER2_FLAG_ROCK_BACK)) {
         mario->mot.hammer2.animTime += 1.0f;
         if (mario->mot.hammer2.animTime >= midTime) {
             mario->mot.hammer2.animTime = midTime;
-            mario->mot.hammer2.flags |= 0x10;
+            mario->mot.hammer2.flags |= HAMMER2_FLAG_ROCK_BACK;
         }
     } else {
         mario->mot.hammer2.animTime -= 1.0f;
         if (mario->mot.hammer2.animTime <= minTime) {
             mario->mot.hammer2.animTime = minTime;
-            mario->mot.hammer2.flags &= ~0x10;
+            mario->mot.hammer2.flags &= ~HAMMER2_FLAG_ROCK_BACK;
         }
     }
 }
@@ -567,8 +579,8 @@ void mot_hammer2(void) {
             mario->currSubMotionId = 10;
             mario->multiTimer = 30;
         case 10:
-            if (marioGetRub(0x200, &a, &b, &c) == 1) {
-                mario->mot.hammer2.flags &= ~1;
+            if (marioGetRub(PAD_BUTTON_B, &a, &b, &c) == 1) {
+                mario->mot.hammer2.flags &= ~HAMMER2_FLAG_LEVEL_HELD;
                 mario->hammerChargeTimer++;
                 if (mario->hammerChargeTimer >= 20) {
                     mario->hammerChargeTimer = 20;
@@ -590,10 +602,10 @@ void mot_hammer2(void) {
             } else {
                 hammer2ChargeRamp(mario, 18.0f, 24.0f, 18.0f, 1, 0.2f, 1.5f);
             }
-            if (mario->mot.hammer2.flags & 0x1000) {
-                mario->mot.hammer2.flags &= ~0x1000;
-                if (!(mario->mot.hammer2.flags & 0x2000)) {
-                    mario->mot.hammer2.flags |= 0x2000;
+            if (mario->mot.hammer2.flags & HAMMER2_FLAG_LEVEL_UP) {
+                mario->mot.hammer2.flags &= ~HAMMER2_FLAG_LEVEL_UP;
+                if (!(mario->mot.hammer2.flags & HAMMER2_FLAG_POSE_SET)) {
+                    mario->mot.hammer2.flags |= HAMMER2_FLAG_POSE_SET;
                     switch (pouchGetHammerLv()) {
                         case 1:
                             marioChgPose("M_H_3A");
@@ -658,7 +670,7 @@ void mot_hammer2(void) {
             mario->dispFlags |= MARIO_DISP_FLAG_DIR_LOCK;
             ang2 = revise360(270.0f - mario->displayDirection);
             hit = hammerHitWall(ang2, &s, &co, &len, &hx, &hy, &hz, &nx, &ny, &nz);
-            if (hit && (hitGetAttr(hit) & 0x800005)) {
+            if (hit && (hitGetAttr(hit) & (HIT_ATTR_HAMMER_PASS | HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS))) {
                 ang = ang; // FAKE: self-assignment keeps the branch; removing it (or the if) changes codegen
             }
             if (hit) {
@@ -811,7 +823,7 @@ static HitEntry* hitEstimate(s32* out) {
         q.targetDir = dir1;
         q.targetDistance = 14.0f;
         hit = hitCheckVecFilter(&q, NULL);
-        if (hit && (!(hitGetAttr(hit) & 0x800005))) {
+        if (hit && (!(hitGetAttr(hit) & (HIT_ATTR_HAMMER_PASS | HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS)))) {
             *out = 7;
             return hit;
         }
@@ -834,7 +846,7 @@ static HitEntry* hitEstimate(s32* out) {
         q.targetDir = dir2;
         q.targetDistance = 26.0f;
         hit = hitCheckVecFilter(&q, NULL);
-        if (hit && (!(hitGetAttr(hit) & 0x800005))) {
+        if (hit && (!(hitGetAttr(hit) & (HIT_ATTR_HAMMER_PASS | HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS)))) {
             *out = ((q.hitPos.y - mario->position.y) > 30.0f) ? (4) : (5);
             return hit;
         }
@@ -857,7 +869,7 @@ static HitEntry* hitEstimate(s32* out) {
         q.targetDir = dir3;
         q.targetDistance = 30.0f;
         hit = hitCheckVecFilter(&q, NULL);
-        if (hit && (!(hitGetAttr(hit) & 0x800005))) {
+        if (hit && (!(hitGetAttr(hit) & (HIT_ATTR_HAMMER_PASS | HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS)))) {
             *out = 5;
             return hit;
         }
@@ -895,7 +907,7 @@ static HitEntry* hitEstimate(s32* out) {
                 q.targetDir = dir4b;
                 q.targetDistance = d;
                 hit = hitCheckVecFilter(&q, NULL);
-                if (hit && (!(hitGetAttr(hit) & 0x800005))) {
+                if (hit && (!(hitGetAttr(hit) & (HIT_ATTR_HAMMER_PASS | HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS)))) {
                     *out = ((q.hitPos.y - mario->position.y) > 13.0f) ? (5) : (6);
                     return hit;
                 }
@@ -934,6 +946,7 @@ const char* not_fullswing_mobj[] = {
 };
 #endif
 
+/** Names of the small and big blocks that only a level 1, 2 or 3 hammer (Hammer, Super, Ultra) can break. */
 static const char isS1_str[] = "MOBJ_Lv1Block";
 static const char isB1_str[] = "MOBJ_Lv1BigBlock";
 static const char isS2_str[] = "MOBJ_Lv2Block";

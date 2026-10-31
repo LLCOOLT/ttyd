@@ -35,6 +35,11 @@ extern EvtWord tik04_wall_blow_evt[];
 extern EvtWord kaidan_pera[];
 extern EvtWord tik_04_switch_evt[];
 
+/**
+ * Doors of this room: the west exit to the Thousand-Year Door room (tik_05), the exits down to tik_03 (four of
+ * them in the demo builds, one in the later releases), the exit to the black chest room (tik_19) and the pipe
+ * to tik_15.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName

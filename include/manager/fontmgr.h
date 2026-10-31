@@ -112,6 +112,7 @@ void FontDrawCode(f32 x, f32 y, u16 code);
 void FontDrawCodeMtx(Mtx mtx, u16 code);
 void FontDrawString(f32 x, f32 y, const char* msg);
 void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg);
+void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg);
 void JUTFont_Free(void);
 void JUTFontSetup(u16 font);
 void FontDrawStringCenterMtx(Mtx mtx, const s8* msg);

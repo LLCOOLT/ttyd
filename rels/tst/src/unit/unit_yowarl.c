@@ -17,6 +17,11 @@ static EvtWord damage_event[12];
 static EvtWord attack_event[19];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of Yowarl, an unused test-area placeholder enemy: a Goomba model with 2 HP,
+ * no attacks of its own and no special behaviour. It waits,
+ * reacts to damage the default way and at most uses a held item.
+ */
 BattleUnitKind unit_yowarl = {
     197,
     "btl_un_yowarl",
@@ -83,12 +88,16 @@ BattleUnitKind unit_yowarl = {
     data_table,
 };
 
+/** Damage reduction of Yowarl: none. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Yowarl has no elemental defence. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Yowarl is fully vulnerable to every status effect (100 for each). */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/** Poses of Yowarl: the Goomba's standing frame (KUR_S_1) and hurt frame (KUR_D_1). */
 static PoseTableEntry pose_table[] = {
     {28, "KUR_S_1"},
     {31, "KUR_S_1"},
@@ -96,12 +105,14 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
+/** Yowarl has no data table events. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Yowarl's single part: the Goomba model (c_kuribo). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_yowarl", "c_kuribo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_yowarl", "c_kuribo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /**

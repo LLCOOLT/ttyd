@@ -78,6 +78,10 @@ extern EvtWord rsh_00_init_evt[];
 static const char* window_tbl[5];
 extern EvtWord rsh_00_init_evt_nidome[];
 
+/**
+ * Figure table of the Smorg (moamoa) effect at the cab window: model c_n_moa_a with one animation offset per
+ * entry.
+ */
 MoamoaData moamoa_data[] = {
     {"c_n_moa_a", "S_1", 0.0f},
     {"c_n_moa_a", "S_1", 1.0f},
@@ -162,7 +166,7 @@ MoamoaData moamoa_data[] = {
     {0},
 };
 
-// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
+// FAKE: dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 /**
  * Builds the work area's animation table (wp->defs) from moamoa_data:
@@ -591,6 +595,7 @@ EVT_BEGIN(evt_rsh_moamoa_on_window)
     RETURN
 EVT_END()
 
+/** Doors and exits of rsh_00 variant a: w_bero to rsh_01_a. */
 static BeroEntry bero_data_a[] = {
     {
         "w_bero", // hitName
@@ -613,6 +618,7 @@ static BeroEntry bero_data_a[] = {
     {0},
 };
 
+/** Doors and exits of rsh_00 variant b: w_bero to rsh_01_b. */
 static BeroEntry bero_data_b[] = {
     {
         "w_bero", // hitName
@@ -635,6 +641,7 @@ static BeroEntry bero_data_b[] = {
     {0},
 };
 
+/** Doors and exits of rsh_00 variant c: w_bero to rsh_01_c. */
 static BeroEntry bero_data_c[] = {
     {
         "w_bero", // hitName
@@ -719,6 +726,7 @@ EVT_BEGIN(regu_unten)
     SET_VALUE(LW(6), 0)
     SET_VALUE(LW(7), 0)
     LOOP(0)
+        // The driver stays still during the stages when the train is stopped or he is busy.
         IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_27_RIVERSIDE_STATION)
             IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_43_CONDUCTOR_APPEARS)
                 RETURN
@@ -743,6 +751,7 @@ EVT_BEGIN(regu_unten)
         CALL(evt_sub_random, 300, LW(10))
         SWITCH(LW(10))
             CASE_LESS(100)
+            // Otherwise he pulls the three handles to random settings so he seems to steer.
             IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_45_DAY_3_STARTS)
             END_IF
             SET_VALUE(LW(2), LW(3))
@@ -820,17 +829,20 @@ static EVT_BEGIN(talk_unten)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_06_PENNINGTONS_ASSISTANT)
         IF_INT_EQUAL(LSWF(1), 0)
+            // His greeting alternates and early lines mention Pennington's assistant.
             CALL(evt_msg_print, 0, STRING("stg6_rsh_00"), 0, 0)
             SET_VALUE(LSWF(1), 1)
         ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_01"), 0, 0)
             SET_VALUE(LSWF(1), 0)
         END_IF
+        // He asks for the conductor and signs an autograph for Mario.
         CASE_LESS(STORY_STG6_10_THE_CONDUCTOR_ZIP_TOAD)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
         CASE_LESS(STORY_STG6_11_OBTAIN_AUTOGRAPH)
 #if VERSION <= VERSION_DEMO_US
         CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_TALK_ANIM)
+        // He signs the autograph and gives it to Mario.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_108"), 0, 0)
 #else
         CALL(evt_msg_print, 0, STRING("stg6_rsh_108"), 0, STRING("me"))
@@ -858,6 +870,7 @@ static EVT_BEGIN(talk_unten)
 #endif
         CASE_LESS(STORY_STG6_12_GIVE_AUTOGRAPH)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
+        // Hints for each later stage of the train mystery.
         CASE_LESS(STORY_STG6_19_GIVE_BLANKET)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_02"), 0, 0)
         CASE_LESS(STORY_STG6_21_DAY_2)
@@ -873,6 +886,7 @@ static EVT_BEGIN(talk_unten)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_209"), 0, 0)
         CASE_LESS(STORY_STG6_44_END_OF_DAY_2)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_217"), 0, 0)
+        // The Smorg scene (evt_moamoa) before the engineer stage.
         CASE_LESS(STORY_STG6_46_ENGINEER)
         CALL_CHILD(evt_moamoa)
         CASE_LESS(STORY_STG6_48_SMORG_MIASMA)
@@ -882,6 +896,7 @@ static EVT_BEGIN(talk_unten)
         CASE_LESS(STORY_STG6_57_A_MAIL_FROM_PEACH)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_253"), 0, 0)
         CASE_DEFAULT
+        // After the story he comments on where the train is.
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_POSHLEY), 1)
             CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08_1"), 0, 0)
             RETURN
@@ -903,6 +918,7 @@ static EVT_BEGIN(talk_unten)
     RETURN
 EVT_END()
 
+/** NPCs of the driver's cab: the driver. */
 static NpcSetupInfo npc_data[] = {
     {
         "運転手", // name
@@ -919,6 +935,10 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
+/**
+ * Signboards of the cab: the schedule board (nittei) and the controls (soujyuu), each with the message it
+ * shows.
+ */
 static const char* access_tbl[] = {
     "nittei",
     "stg6_rsh_259",
@@ -1050,6 +1070,7 @@ EVT_BEGIN(rsh_00_b_init_evt)
     RETURN
 EVT_END()
 
+/** Map objects of the scenery that passes by the cab windows. */
 static const char* window_tbl[] = {
     "mado_uturi_1",
     "mado_uturi_2",

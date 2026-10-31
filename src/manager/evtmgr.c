@@ -180,7 +180,7 @@ static void evtEntryRunCheck(EventEntry* entry) {
 /**
  * Starts a new script in a free event slot with the given priority (higher runs first) and flags,
  * type 0xEF (stopped by every system level). Its LW/LF variables start at 0.
- * Started during evtmgrMain with flag 0x20, it also runs this frame. Does not check that a slot is free.
+ * Started during evtmgrMain with EVENT_START_NOW, it also runs this frame. Does not check that a slot is free.
  */
 EventEntry* evtEntry(void* evtCode, u8 priority, u8 flags) {
     EventWork* wp = evtGetWork();
@@ -226,7 +226,7 @@ EventEntry* evtEntry(void* evtCode, u8 priority, u8 flags) {
 
     make_jump_table(entry);
 
-    if (runMainF && entry->flags & 0x20) {
+    if (runMainF && entry->flags & EVENT_START_NOW) {
         priTbl[priTblNum] = id;
         priIDTbl[priTblNum] = entry->eventId;
         priTblNum++;
@@ -289,7 +289,7 @@ EventEntry* evtEntryType(void* evtCode, u8 priority, u8 flags, u8 type) {
 
     make_jump_table(entry);
 
-    if (runMainF && entry->flags & 0x20) {
+    if (runMainF && entry->flags & EVENT_START_NOW) {
         priTbl[priTblNum] = id;
         priIDTbl[priTblNum] = entry->eventId;
         priTblNum++;

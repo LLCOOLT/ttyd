@@ -1,3 +1,4 @@
+// Platform glue (assert) for the SGI GLU tessellator (libtess) that tst.rel carries.
 #pragma once
 
 /* Platform glue for libtess. In PAL the tessellator was built with its assertions on (the game's NDEBUG build turns

@@ -77,6 +77,7 @@ static const char* pokopi_pipo_patname[] = {"a", "b", NULL};
 static const char* str_fireflower[] = {"\217\207\225\373\214\374", "\213t\225\373\214\374", NULL};
 static const char* str_fall_leaf[] = {"\227\216\202\277\227t64-1", "\227\216\202\277\227t64-2", "\227\216\202\277\227t GC-1", "\227\216\202\277\227t GC-2", "\227\216\202\277\227t GC-3", NULL};
 
+/** N64 effect table: id, script name, Japanese label and users of each effect evt_eff64 can spawn. */
 eff_set eff_set_n64[] = {
     {0, "expbom_n64", "\223G\202\252\202\265\202\361\202\266\202\341\202\244\202\306\202\253", NULL},
     {1, "kemuri1_n64", "\223y\211\214\222\205\222n", kemuri_patname},
@@ -184,6 +185,7 @@ eff_set eff_set_n64[] = {
     {-1, NULL, NULL, NULL},
 };
 #else
+/** N64 effect table: id and script name of each effect evt_eff64 can spawn (no labels after the demo). */
 eff_set eff_set_n64[] = {
     {0, "expbom_n64"},
     {1, "kemuri1_n64"},
@@ -292,6 +294,7 @@ eff_set eff_set_n64[] = {
 };
 #endif
 
+/** Fixed table of 128 random numbers that effTblRandN64 reads for repeatable effect randomness. */
 s32 _rand_table[] = {
     0x100B2AF5, 0x45B59924, 0x35094B45, 0x4ABFA67A,
     0x164F5371, 0x7B195845, 0x58562A56, 0x25733D41,

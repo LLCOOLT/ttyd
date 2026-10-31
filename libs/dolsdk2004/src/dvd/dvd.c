@@ -11,14 +11,23 @@ extern int DVDCompareDiskID(const struct DVDDiskID * id1 /* r29 */, const struct
 extern int __DVDLowTestAlarm(const OSAlarm * alarm /* r3 */);
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __DVDVersion = "<< Dolphin SDK - DVD\tdebug build: Apr  5 2004 03:56:07 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __DVDVersion = "<< Dolphin SDK - DVD\trelease build: Apr  5 2004 04:14:51 (0x2301) >>";
 #endif
 
+/**
+ * When set, read commands invalidate the data cache over their destination
+ * before the read (DVDSetAutoInvalidation).
+ */
 static BOOL autoInvalidation = TRUE;
 
 static void defaultOptionalCommandChecker(DVDCommandBlock*, DVDCommandCheckerCallback);
+/**
+ * Hook stateBusy calls for command numbers it does not know; replaced with __DVDSetOptionalCommandChecker.
+ */
 static DVDCommandChecker checkOptionalCommand = defaultOptionalCommandChecker;
 
 static DVDBB2 BB2;
@@ -154,6 +163,7 @@ static void stateReadingFST() {
     DVDLowRead(bootInfo->FSTLocation, (u32)(BB2.FSTLength + 0x1F) & 0xFFFFFFE0, BB2.FSTPosition, cbForStateReadingFST);
 }
 
+/** Extra command number (one slot, 0xFFFFFFFF: empty) that IsDmaCommand treats as a DMA transfer. */
 static u32 DmaCommand[1] = {0xFFFFFFFF};
 
 /**
@@ -858,6 +868,7 @@ static void stateBusy(DVDCommandBlock* block) {
     }
 }
 
+/** Extra command numbers (three slots, 0xFFFFFFFF: empty) treated as immediate commands with a result. */
 static u32 ImmCommand[3] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 
 /** Adds a command number to the list (three slots) of immediate commands that return a result in DI register 8. */

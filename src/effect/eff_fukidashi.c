@@ -31,12 +31,24 @@ extern u8 moja_model_dl_0_1[], moja_model_dl_0_2[], moja_model_dl_0_3[], moja_mo
     moja_model_dl_0_13[], moja_model_dl_0_14[], moja_model_dl_0_15[], moja_model_dl_0_16[],
     moja_model_dl_0_17[], moja_model_dl_0_18[], moja_model_dl_0_19[], moja_model_dl_0_20[];
 
+/**
+ * Pop-up frame sequences of the bubble marks, one entry per two frames, for bubbles spawned without a duration:
+ * the "!" mark (6-frame strip), the "?" mark (4-frame strip), the "..." dots (number of dots shown), a
+ * static hold, and the looping 4-frame scribble of type 5. The marks hold their last frame about a second and
+ * end the bubble (-1); -10 - n loops back to entry n.
+ * anim_data_table picks one per bubble type (0 "!", 1 "?", 2 spinning swirl, 3 number, 4 dots, 5 scribble,
+ * 6 bouncing icon); read by effFukidashiMain.
+ */
 s8 anim_data_bikkuri[] = {0, 0, 1, 2, 3, 5, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, -1};
 s8 anim_data_hatena[] = {0, 0, 2, 1, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, -1};
 s8 anim_data_tenten[] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, -1};
 s8 anim_data_loop[] = {0, -10};
 s8 anim_data_moja[] = {0, 0, 1, 1, 2, 2, 3, 3, -10};
 static s8* anim_data_table[] = {anim_data_bikkuri, anim_data_hatena, anim_data_bikkuri, anim_data_loop, anim_data_tenten, anim_data_moja, anim_data_loop};
+/**
+ * The same mark sequences for bubbles spawned with a duration: each holds its last frame until the
+ * duration runs out. anim_data_table_2 picks one per bubble type.
+ */
 s8 anim_data_bikkuri_2[] = {0, 0, 1, 2, 3, 5, 4, 5, -17, -1};
 s8 anim_data_hatena_2[] = {0, 0, 2, 1, 3, 2, 3, -16, -1};
 s8 anim_data_tenten_2[] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, -32, -1};
@@ -73,7 +85,12 @@ u8 moja_model_dl_0_18[] ATTRIBUTE_ALIGN(32) = {0x98, 0x00, 0x04, 0x3A, 0x13, 0x0
 u8 moja_model_dl_0_19[] ATTRIBUTE_ALIGN(32) = {0x98, 0x00, 0x04, 0x3B, 0x14, 0x00, 0x3A, 0x13, 0x00, 0x40, 0x14, 0x00, 0x3F, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 u8 moja_model_dl_0_20[] ATTRIBUTE_ALIGN(32) = {0x98, 0x00, 0x04, 0x3C, 0x16, 0x00, 0x3B, 0x14, 0x00, 0x41, 0x16, 0x00, 0x40, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 u8* moja_model_dl_0_tbl[] = {moja_model_dl_0_0, moja_model_dl_0_1, moja_model_dl_0_2, moja_model_dl_0_3, moja_model_dl_0_4, moja_model_dl_0_5, moja_model_dl_0_6, moja_model_dl_0_7, moja_model_dl_0_8, moja_model_dl_0_9, moja_model_dl_0_10, moja_model_dl_0_11, moja_model_dl_0_12, moja_model_dl_0_13, moja_model_dl_0_14, moja_model_dl_0_15, moja_model_dl_0_16, moja_model_dl_0_17, moja_model_dl_0_18, moja_model_dl_0_19, moja_model_dl_0_20};
+/** Size of each swirl display list in 32-byte units, passed to GXCallDisplayList by effFukidashiDisp. */
 u8 moja_model_dl_0_size_tbl[] = {3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+/**
+ * 15-frame bounce loop of the type 6 icon: per frame a height offset, then X and Y scale, so it hops,
+ * squashes and stretches. Read by effFukidashiDisp.
+ */
 f32 chuchu_dt[] = {0.0f, 1.0f, 1.0f, -0.169270828f, 0.847395837f, 0.785937548f, -0.368055552f, 0.676388919f, 0.545833349f, -0.5078125f, 0.542187512f, 0.357812494f, -0.5f, 0.5f, 0.300000012f, -0.280888885f, 0.579022229f, 0.41413334f, 0.0839999989f, 0.738399982f, 0.642400026f, 0.489333332f, 0.928266644f, 0.913600028f, 0.829777777f, 1.0987556f, 1.15653336f, 1.0f, 1.20000005f, 1.29999995f, 0.954666674f, 1.2236445f, 1.33137774f, 0.763999999f, 1.20293331f, 1.29813337f, 0.495999992f, 1.15040004f, 1.21920002f, 0.218666673f, 1.07857776f, 1.11351109f, 0.0f, 1.0f, 1.0f};
 
 #define QUAD(l, t, r, b, u, v)        \

@@ -30,6 +30,13 @@ typedef struct UrouroWork {
     f32 radius;   // 0x28
 } UrouroWork;
 
+// UrouroWork.flags bits; the high half is the flag word passed to urouro_init_func.
+enum UrouroFlags {
+    UROURO_FLAG_OUTSIDE = 0x1,         // left the wander radius: heading back to the centre
+    UROURO_FLAG_TURN_BACK = 0x2,       // turn toward the centre on the next paper-turn end
+    UROURO_FLAG_LOOK_AROUND = 0x10000, // turn around a few times while idle
+};
+
 /**
  * Sets up NPC args[0] to wander around centre (args[1], args[2]) within radius args[3] at speed args[4];
  * args[5] is the flag word (0x10000: look around a few times while idle). The state lives in LW(10).
@@ -96,27 +103,27 @@ USER_FUNC(urouro_main_func) {
             dist = distABf(npc->position.x, npc->position.z, work->x, work->z);
             if (animPoseGetPeraEnd(npc->poseId)) {
                 if (dist > work->radius) {
-                    if (!(work->flags & 0x1)) {
-                        work->flags |= 0x3;
+                    if (!(work->flags & UROURO_FLAG_OUTSIDE)) {
+                        work->flags |= UROURO_FLAG_OUTSIDE | UROURO_FLAG_TURN_BACK;
                     }
-                    if (work->flags & 0x2) {
+                    if (work->flags & UROURO_FLAG_TURN_BACK) {
                         npc->direction = reviseAngle(angleABf(npc->position.x, npc->position.z, work->x, work->z));
                         npc->moveDir = npc->direction;
-                        work->flags &= ~0x2;
+                        work->flags &= ~UROURO_FLAG_TURN_BACK;
                     }
-                } else if (work->flags & 0x1) {
-                    work->flags &= ~0x3;
+                } else if (work->flags & UROURO_FLAG_OUTSIDE) {
+                    work->flags &= ~(UROURO_FLAG_OUTSIDE | UROURO_FLAG_TURN_BACK);
                 }
             }
             if (animPoseGetPeraEnd(npc->poseId) && npc == marioGetTouchNpcPtr() && fabsf(compAngle(npc->moveDir, mario->directionView)) < 90.0f && fabsf(compAngle(angleABf(npc->position.x, npc->position.z, mario->position.x, mario->position.z), mario->directionView)) < 90.0f && dist < work->radius) {
                 npc->direction = reviseAngle(npc->moveDir - 180.0f);
                 npc->moveDir = npc->direction;
-                work->flags &= ~0x3;
+                work->flags &= ~(UROURO_FLAG_OUTSIDE | UROURO_FLAG_TURN_BACK);
             }
             if (animPoseGetPeraEnd(npc->poseId) && npc->wallHit != 0) {
                 npc->direction = reviseAngle(angleABf(npc->position.x, npc->position.z, work->x, work->z));
                 npc->moveDir = npc->direction;
-                work->flags &= ~0x3;
+                work->flags &= ~(UROURO_FLAG_OUTSIDE | UROURO_FLAG_TURN_BACK);
             }
             work->timer--;
             if (work->timer == 0) {
@@ -135,7 +142,7 @@ USER_FUNC(urouro_main_func) {
 #if VERSION >= VERSION_JP
                 sfxFlag = 0;
                 if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
-                    if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+                    if (!(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
                         sfxFlag = 0x10000;
                     }
                 }
@@ -163,7 +170,7 @@ USER_FUNC(urouro_main_func) {
             npc->direction = reviseAngle(npc->direction + (f32)irand(60) - 30.0f);
             npc->moveDir = npc->direction;
             work->count = 0;
-            if (work->flags & 0x10000) {
+            if (work->flags & UROURO_FLAG_LOOK_AROUND) {
                 work->count = irand(1000) % 3 + 2;
             }
             work->state = 3;

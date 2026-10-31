@@ -2,8 +2,16 @@
 #include <dolphin/mcc.h>
 
 #ifdef DEBUG
+/**
+ * Version string of the MCC (memory card channel) library in the debug build, kept in the binary as a build
+ * stamp.
+ */
 const char* __MCCVersion = "<< Dolphin SDK - MCC\tdebug build: Apr  5 2004 03:57:07 (0x2301) >>";
 #else
+/**
+ * Version string of the MCC (memory card channel) library in the release build, kept in the binary as a build
+ * stamp.
+ */
 const char* __MCCVersion = "<< Dolphin SDK - MCC\trelease build: Apr  5 2004 04:15:49 (0x2301) >>";
 #endif
 

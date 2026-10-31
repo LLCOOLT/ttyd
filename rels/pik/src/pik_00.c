@@ -83,11 +83,16 @@ static DoorParam door_1;
 const char* door_2_npc[2];
 static DoorParam door_2;
 
+/** Return point of the hazard floor mod_1 of the station area. */
 static HitDamageReturn dmgReturnPt[] = {
     {"mod_1", {0.0f, -1000.0f, 0.0f}},
     {0},
 };
 
+/**
+ * Wheels of the train standing at the station: each wheel map object (sha_N_M) with how it turns and its
+ * speed.
+ */
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},
     {"sha_1_2", 0, 0, FLOAT(1.0f)},
@@ -178,6 +183,7 @@ static EVT_BEGIN(evt_sharin)
     RETURN
 EVT_END()
 
+/** Connecting rods (bou_N) of the train, each moved in a circle together with its wheel. */
 static ClankData clankDt[] = {
     {"bou_1", 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
     {"bou_2", 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
@@ -328,9 +334,11 @@ EVT_END()
  * Train departure at a station (shared by hom_00, gor_04 and pik_00):
  * sets the train-moving flag, clears the "train at station" flags, rings the bell twice,
  * starts the engine sound for the station and accelerates the train over 20 seconds to a speed of -15 (GW(0) is
- * the train's speed, GW(1) the speed of the passing scenery, which follows with a delay).
+ * the train's speed, which also scrolls the scenery; GW(1) drives the big drive wheels sha_1_4/sha_1_5 and rods
+ * bou_2/bou_4: it follows GW(0), and after 1.5 seconds runs up to 10 faster for 2 seconds; Guess: wheel spin).
  */
 static EVT_BEGIN(hom_10_evt_resha_start)
+    // The train starts moving: the station flags are cleared.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
@@ -339,6 +347,8 @@ static EVT_BEGIN(hom_10_evt_resha_start)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    // The departure sound and the first speeds depend on the station (Rogueport, Riverside or Poshley
+    // Heights).
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("gor_04"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
@@ -391,6 +401,7 @@ static EVT_BEGIN(hom_10_evt_resha_start)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+        // The train accelerates over about 20 seconds.
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
         LOOP(0)
             SET_FLOAT_VALUE(GW(1), GW(0))
@@ -430,6 +441,7 @@ EVT_END()
 
 /** Same as hom_10_evt_resha_start but for the return trip: the train accelerates in the opposite direction to +15. */
 static EVT_BEGIN(hom_10_evt_resha_start2)
+    // The train starts moving on the return trip: the station flags are cleared.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
@@ -438,6 +450,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    // The departure sound and the first speeds depend on the station.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("gor_04"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
@@ -496,6 +509,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+        // The train accelerates over about 20 seconds.
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
         LOOP(0)
             SET_FLOAT_VALUE(GW(1), GW(0))
@@ -670,6 +684,10 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
+/**
+ * Map object groups of the train (pika_*) that hom_10_evt_resha_sub hooks to the TEV callback resha_tev,
+ * which adds environment effect 7 (an env.tpl reflection or shine texture) to them; NULL ends the list.
+ */
 static const char* pika_tbl[] = {
     "pika_1_1",
     "pika_1_2",
@@ -688,6 +706,7 @@ static const char* pika_tbl[] = {
     NULL,
 };
 
+/** The shorter list used instead on the map rsh_06_a: the same groups without the *_c ones. */
 static const char* pika_tbl_rsh_06[] = {
     "pika_1_1",
     "pika_1_2",
@@ -834,6 +853,7 @@ EVT_BEGIN(resha_noru)
     RETURN
 EVT_END()
 
+/** Doors and exits of pik_00: se_bero to pik_04; n_bero to rsh_01_a. */
 static BeroEntry bero_data[] = {
     {
         "se_bero", // hitName
@@ -872,6 +892,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/** Map objects of the arrow signs (yajirusi_N) that evt_pik_yajirushi animates. */
 static const char* name_tbl[] = {
     "yajirusi_1",
     "yajirusi_2",
@@ -914,11 +935,13 @@ EVT_BEGIN(evt_pik_yajirushi)
 EVT_END()
 
 /**
- * Guess: boarding the Excess Express back to Rogueport:
- * the door of the train slides open (500 ms, with the sliding door sound), the camera is released,
- * Mario and the partners walk to the train door and step aboard,
- * and the station attendant (駅員) walks to the door, looks both ways and says train_07.
- * Then everyone is hidden, the train pulls out (hom_10_evt_resha_start2) and, ten seconds later,
+ * Boarding the Excess Express back to Rogueport:
+ * the train door (tobira) slides open with the sliding door sound,
+ * the camera is released and Mario and the partners walk to the door and step aboard;
+ * the door slides shut, and the station attendant (駅員) walks over,
+ * looks both ways and calls "All aboard!" (train_07).
+ * Then everyone is hidden and the train pulls out (hom_10_evt_resha_start2);
+ * ten seconds later GSWF_RSH_NEW_RIDE_PENDING is set if the story has reached STORY_STG6_56_ROGUEPORT_STATION,
  * the return trip flags are set (GSWF_TRAIN_RETURN_TRIP, GSWF_TRAIN_DEPARTED, GSW_TRAIN_LEG = 2)
  * and the game changes to rsh_02_a (entrance nidome_start).
  */
@@ -1106,6 +1129,7 @@ static const Vec zoom_zero_b = {0.0f, 0.0f, 0.0f};
 EVT_BEGIN(talk_papa_taihou_kyoka)
     IF_INT_EQUAL(GSWF(GSWF_PIK00_GOLDBOB_CANNON_FIRST_TALK), 0)
         SET_VALUE(GSWF(GSWF_PIK00_GOLDBOB_CANNON_FIRST_TALK), 1)
+        // Goldbob greets Mario and hears about the Fahr Outpost cannon.
         CALL(evt_msg_print, 0, STRING("stg7_pik_01"), 0, STRING("ナリキンパパ"))
         CALL(evt_mario_set_pose, STRING("M_I_2"))
         WAIT_MS(800)
@@ -1123,8 +1147,10 @@ EVT_BEGIN(talk_papa_taihou_kyoka)
         CALL(zoom, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
         CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 500, 11)
         WAIT_MS(500)
+        // On later visits he asks how much Mario would pay.
         CALL(evt_msg_print, 0, STRING("stg7_pik_05"), 0, STRING("ナリキンパパ"))
     END_IF
+    // Mario names a price: nothing, 1 coin, 64 coins or everything.
     CALL(evt_msg_select, 0, STRING("stg7_pik_04_yn"))
     DEBUG_PUT_REG(LW(0))
     SWITCH(LW(0))
@@ -1186,6 +1212,7 @@ EVT_BEGIN(talk_papa_taihou_kyoka)
                 CALL(evt_cam3d_evt_off, 500, 11)
                 RETURN
             END_IF
+            // Mario agrees to hand over all his coins.
             CALL(evt_msg_print_add, 0, STRING("stg7_pik_16"))
             CALL(evt_pouch_get_coin, LW(10))
             MULTIPLY(LW(10), -1)
@@ -1201,6 +1228,7 @@ EVT_BEGIN(talk_papa_taihou_kyoka)
             WAIT_MS(500)
             CALL(evt_sub_status_gauge_force_close)
             CALL(evt_msg_print, 0, STRING("stg7_pik_17"), 0, STRING("ナリキンパパ"))
+            // Goldbob gives Mario the Goldbob Guide and returns the coins.
             CALL(evt_item_entry, STRING("a"), ITEM_GOLDBOB_GUIDE, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
             CALL(evt_item_get_item, STRING("a"))
             CALL(evt_item_get_item_end_wait, STRING("a"))
@@ -1222,6 +1250,7 @@ EVT_BEGIN(talk_papa_taihou_kyoka)
             CALL(pik_00_statuswin_force_off)
 #endif
             CALL(evt_msg_print, 0, STRING("stg7_pik_19"), 0, STRING("ナリキンパパ"))
+            // His approval of the cannon is recorded.
             SET_VALUE(GSWF(GSWF_PIK00_GOLDBOB_CANNON_APPROVAL), 1)
             SET_VALUE(LW(0), 0)
             IF_INT_EQUAL(GSWF(GSWF_PIK00_GOLDBOB_CANNON_APPROVAL), 1)
@@ -1231,6 +1260,7 @@ EVT_BEGIN(talk_papa_taihou_kyoka)
                 ADD(LW(0), 1)
             END_IF
             IF_INT_EQUAL(LW(0), 2)
+                // If General White has also been woken, the story advances.
                 SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_03_WHERES_WHITE)
             END_IF
         END_IF
@@ -1240,13 +1270,18 @@ EVT_BEGIN(talk_papa_taihou_kyoka)
 EVT_END()
 
 /**
- * Guess: talk script for Mr. Goldbob.
- * While Trouble Center request 25 is active he takes the package from Mario for the first time (irai_25_00 and
- * 01, he gives Mario the Package item), then reminds Mario (irai_25_02, 03) and, once the package is delivered,
- * pays 64 coins and finishes the request (irai_25_04). During request 29 he says irai_29_18_1.
- * Otherwise his line depends on the story: stg6_pik_01 before the return from the train trip,
- * stg7_pik_19_01_1 until Mayor Bob, then (chapter 7 and 8) the cannon permit talk (talk_papa_taihou_kyoka)
- * until it is approved, then stg7_pik_19_01, and stg7_pik_19_01_2 after the game.
+ * Talk script for Mr. Goldbob.
+ * During Trouble Center request 25 he gives Mario a Package for General White,
+ * who he says is back in Fahr Outpost (irai_25_00, 01), then repeats where White is (irai_25_02);
+ * once Mario has picked up White's trail elsewhere (GSWF_TROUBLE_WORK_3,
+ * set in Rogueport and Glitzville) he says White was just here
+ * and left for Fahr Outpost again (irai_25_03, setting GSWF_TROUBLE_WORK_4);
+ * and once the package is delivered he pays 64 coins and finishes the request (irai_25_04).
+ * During request 29 he mentions that Bub and his wife had a row (irai_29_18_1).
+ * Otherwise his line depends on the story: wanting a gold train set (stg6_pik_01)
+ * until the return from the train trip, stg7_pik_19_01_1 until Mayor Bob,
+ * then (chapters 7 and 8) the cannon permit talk (talk_papa_taihou_kyoka) until it is approved
+ * and stg7_pik_19_01 after, and stg7_pik_19_01_2 after the game.
  */
 static EVT_BEGIN(talk_papa)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
@@ -1302,23 +1337,31 @@ static EVT_BEGIN(init_mama)
     RETURN
 EVT_END()
 
+/** Items the player may offer for Trouble Center request 29: the Present only, ended by -1. */
 s32 iri_29_item_tbl[] = {
     ITEM_PRESENT, -1,
 };
 
 /**
- * Guess: talk script for Mrs. Goldbob.
- * While Trouble Center request 29 is active and not yet delivered she asks for a present (irai_29_14):
- * Mario picks a Present from the item window, she says irai_29_15,
- * and Mario and the partner walk next to her for the handover;
- * she then answers irai_29_16 and 17 and the progress flag GSWF_TROUBLE_WORK_1 is set.
- * If the present is already given she says irai_29_18_2; otherwise her normal story lines apply.
+ * Talk script for Mrs. Goldbob.
+ * During Trouble Center request 29, until she has had the Present:
+ * if Mario has one she greets him (irai_29_14),
+ * takes it from the item window and reads Bub's apology letter (irai_29_15);
+ * then (Mario and the partner stepping aside if they stand in her way) she walks off bawling (irai_29_16),
+ * comes back, asks Mario to tell Bub she is not angry (irai_29_17),
+ * restarts the music and sets GSWF_TROUBLE_WORK_1.
+ * Without the Present she says she has no son (irai_29_18_2); after the handover she says irai_29_18.
+ * Otherwise her story lines are stg6_pik_02 (looking for a present for Bub)
+ * until the return from the train trip, stg7_pik_21_1 until Mayor Bob,
+ * then in chapters 7 and 8 stg7_pik_21_1 or, after the first cannon permit talk,
+ * stg7_pik_20 until the cannon is approved and stg7_pik_21 after, and stg7_pik_21_2 after the game.
  */
 static EVT_BEGIN(talk_mama)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 29)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
             CALL(evt_pouch_check_item, ITEM_PRESENT, LW(0))
             IF_INT_GREATER(LW(0), 0)
+                // Trouble Center request 29: Goldbob's wife asks what Mario needs, and he shows the Present.
                 CALL(evt_msg_print, 0, STRING("irai_29_14"), 0, 0)
 #if VERSION <= VERSION_DEMO_US
                 CALL(evt_win_item_select, PTR(iri_29_item_tbl), LW(0))
@@ -1327,6 +1370,7 @@ static EVT_BEGIN(talk_mama)
 #endif
                 IF_INT_NOT_EQUAL(LW(0), -1)
                     CALL(evt_pouch_remove_item, ITEM_PRESENT, LW(0))
+                    // She learns the Present is from Little Bub and is moved.
                     CALL(evt_msg_print, 0, STRING("irai_29_15"), PTR(irai_29_15_cb), 0)
                     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
                     CALL(evt_npc_get_position, STRING("ナリキンママ"), LW(3), LW(4), LW(5))
@@ -1374,6 +1418,7 @@ static EVT_BEGIN(talk_mama)
                     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
                     CALL(evt_npc_move_position, STRING("me"), 115, 330, 0, 150, 0)
                     WAIT_MS(1000)
+                    // She is delighted with the gift.
                     CALL(evt_msg_print, 0, STRING("irai_29_16"), 0, 0)
                     WAIT_MS(1500)
                     BEGIN_INLINE_EVENT
@@ -1399,12 +1444,14 @@ static EVT_BEGIN(talk_mama)
                 RETURN
             END_IF
         ELSE
+            // She thanks Mario and the request moves on.
             CALL(evt_msg_print, 0, STRING("irai_29_18"), 0, 0)
             RETURN
         END_IF
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_54_WELCOME_BACK)
+        // With no request pending, her talk follows the story.
         CALL(evt_msg_print, 0, STRING("stg6_pik_02"), 0, 0)
         CASE_LESS(STORY_STG7_02_MAYOR_BOB)
         CALL(evt_msg_print, 0, STRING("stg7_pik_21_1"), 0, 0)
@@ -1425,8 +1472,8 @@ static EVT_BEGIN(talk_mama)
 EVT_END()
 
 /**
- * Guess: init for the Goldbobs' child (コナリ): puts him at (-150, 0, 400),
- * unless Trouble Center request 29 is active, in which case it leaves him where the request puts him.
+ * Init for Bub (コナリ), the Goldbobs' son: puts him at (-150, 0, 400), unless Trouble Center request 29 is active,
+ * when he keeps his position from npc_data.
  */
 static EVT_BEGIN(init_konari)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 29)
@@ -1437,10 +1484,10 @@ static EVT_BEGIN(init_konari)
 EVT_END()
 
 /**
- * Guess: talk script for the child: stg6_pik_03 until the return from the train trip,
- * stg7_pik_23_1 until Mayor Bob, then in chapters 7
- * and 8 stg7_pik_23_1 (before the first talk with the cannon permit) or stg7_pik_22 (after it)
- * until the cannon is approved and stg7_pik_23 afterwards, and stg7_pik_23_2 after the game.
+ * Talk script for Bub: stg6_pik_03 (he is getting a gold train set) until the return from the train trip,
+ * stg7_pik_23_1 until Mayor Bob, then in chapters 7 and 8 stg7_pik_23_1 (before the first cannon permit talk)
+ * or stg7_pik_22 (after it) until the cannon is approved and stg7_pik_23 afterwards,
+ * and stg7_pik_23_2 after the game.
  */
 static EVT_BEGIN(talk_konari)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1464,12 +1511,13 @@ static EVT_BEGIN(talk_konari)
     RETURN
 EVT_END()
 
-/** Guess: init for the madam (マダム): puts her at (352, 12, -86). */
+/** Init for Toodles (マダム): puts her at (352, 12, -86). */
 static EVT_BEGIN(init_madam)
     CALL(evt_npc_set_position, STRING("me"), 352, 12, -86)
     RETURN
 EVT_END()
 
+/** Items the player may give the madam: the Gold Ring only, ended by -1. */
 static s32 item_tbl_madam[] = {
     ITEM_GOLD_RING, -1,
 };
@@ -1501,17 +1549,24 @@ static EVT_BEGIN(talk_madam_ring_return)
     RETURN
 EVT_END()
 
+/** Items the player may offer for Trouble Center request 23: the Wrestling Mag only, ended by -1. */
 s32 iri_23_item_tbl[] = {
     ITEM_WRESTLING_MAG, -1,
 };
 
 /**
- * Guess: talk script for the madam.
- * While Trouble Center request 23 is active and Mario has the Wrestling Mag she takes it from the item window
- * (irai_23_01 and 02), gives him the Platinum Card (irai_23_03) and finishes the request (sys_request_finish);
- * otherwise she says irai_23_00 or, after the dip in the music,
- * her story lines stg6_pik_04_01 to 05 with a choice,
- * and when the Gold Ring was found she accepts it (talk_madam_ring_return).
+ * Talk script for Toodles (マダム).
+ * During Trouble Center request 23 she asks for the Wrestling Mag she lent to Jolene (irai_23_00);
+ * if Mario has it she asks for it (irai_23_01), takes it from the item window, thanks him (irai_23_02),
+ * gives him the Platinum Card, talks about the magazine (irai_23_03) and finishes the request.
+ * Until Mario agrees to help her, she dips the music and asks him (stg6_pik_04_01 the first time,
+ * stg6_pik_04_04 after), with a choice (stg6_pik_04_05):
+ * yes has her ask him to find her lost Gold Ring (stg6_pik_04_02) and sets GSWF_RSH_TOODLES_HELP_ACCEPTED,
+ * no gets stg6_pik_04_03.
+ * After that, if Mario carries the Gold Ring she takes it (talk_madam_ring_return);
+ * otherwise she says stg6_pik_04, and once the ring is returned
+ * and the story has reached STORY_STG6_70_THOUSAND_YEAR_DOOR,
+ * stg7_pik_clear_01 (stg7_pik_clear_01_1 after the game).
  */
 static EVT_BEGIN(talk_madam)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 23)
@@ -1580,8 +1635,8 @@ static EVT_BEGIN(talk_madam)
 EVT_END()
 
 /**
- * Guess: init for the salaryman (サラリーマン): until the Rogueport station story point (STORY_STG6_56) puts him at
- * (85, -5, 35).
+ * Init for the salaryman (サラリーマン), sightseeing while he waits for business partners (stg6_pik_05):
+ * before STORY_STG6_56_ROGUEPORT_STATION it puts him at (85, -5, 35).
  */
 static EVT_BEGIN(init_sarary)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
@@ -1596,6 +1651,10 @@ static EVT_BEGIN(talk_sarary)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the station and villas: the station attendant, Goldbob's wife and Goldbob, Little Narikin, the
+ * madam and the salaryman.
+ */
 static NpcSetupInfo npc_data[] = {
     {
         "駅員", // name
@@ -1673,9 +1732,10 @@ static NpcSetupInfo npc_data[] = {
 };
 
 /**
- * Guess: door callback of the left villa (evtIn):
- * rotates the map object door_1 around y by the angle in LW(0) scaled by -0.5546875,
- * so it swings open as Mario enters.
+ * evtIn callback of door_1, the left villa's front door:
+ * the door scripts run it with LW(0) going from 0 to 180 over 500 ms as the door opens
+ * and back to 0 as it shuts, so door_1 swings around y by up to about 100 degrees (0.5546875 times, negated)
+ * and back.
  */
 static EVT_BEGIN(evt_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
@@ -1684,7 +1744,7 @@ static EVT_BEGIN(evt_door)
     RETURN
 EVT_END()
 
-/** Guess: door callback of the left villa (evtOut): rotates door_1 around x by half the angle in LW(0). */
+/** evtOut callback of door_1: run with LW(0) from 0 to 180 (with the door_down_se sound) and back, it tips door_1 down around x by up to 90 degrees. */
 static EVT_BEGIN(evt_door2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), LW(0), 0, 0)
@@ -1692,9 +1752,8 @@ static EVT_BEGIN(evt_door2)
 EVT_END()
 
 /**
- * Guess: wall callback of the left villa (evtWall):
- * rotates the villa's outer walls ie_1_N and ie_1_H around y by 0.75 times the angle in LW(0),
- * in opposite directions.
+ * evtWall callback of door_1: run with LW(0) from 0 to 180 as the villa opens up and back as it closes,
+ * it swings the front walls ie_1_N and ie_1_H open around y by up to 135 degrees, in opposite directions.
  */
 static EVT_BEGIN(evt_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.75f))
@@ -1704,6 +1763,7 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
+/** Map objects inside the first villa: the badge chest. */
 const char* ie1_mobj[] = {
     "mobj_badge_gat",
     NULL,
@@ -1728,6 +1788,7 @@ static EVT_BEGIN(door_1_close)
     RETURN
 EVT_END()
 
+/** Door of the first villa: the outer door, its hit areas and the inside room (naka). */
 static DoorParam door_1 = {
     0, // flags
     2, // type
@@ -1750,8 +1811,9 @@ static DoorParam door_1 = {
 };
 
 /**
- * Guess: door callback of the right villa (evtIn):
- * rotates the map object door_2 around y by the angle in LW(0) scaled by -0.5.
+ * evtIn callback of door_2, the front door of Toodles's villa on the right:
+ * the door scripts run it with LW(0) from 0 to 180 and back,
+ * so door_2 swings around y by up to 90 degrees (negated) and back.
  */
 static EVT_BEGIN(evt_door_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
@@ -1759,7 +1821,7 @@ static EVT_BEGIN(evt_door_2)
     RETURN
 EVT_END()
 
-/** Guess: door callback of the right villa (evtOut): rotates door_2 around x by half the angle in LW(0). */
+/** evtOut callback of door_2: run with LW(0) from 0 to 180 and back, it tips door_2 down around x by up to 90 degrees. */
 static EVT_BEGIN(evt_door2_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), LW(0), 0, 0)
@@ -1767,9 +1829,9 @@ static EVT_BEGIN(evt_door2_2)
 EVT_END()
 
 /**
- * Guess: wall callback of the right villa (evtWall):
- * rotates the villa's walls ie_2_N and ie_2_H around y by 0.75 times the angle in LW(0), in opposite directions,
- * and ie_2_U around x.
+ * evtWall callback of door_2: run with LW(0) from 0 to 180 as the villa opens up and back as it closes,
+ * it swings the walls ie_2_N and ie_2_H open around y by up to 135 degrees in opposite directions
+ * and tips ie_2_U around x.
  */
 static EVT_BEGIN(evt_wall_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.75f))
@@ -1780,6 +1842,7 @@ static EVT_BEGIN(evt_wall_2)
     RETURN
 EVT_END()
 
+/** NPCs inside the second villa: the madam. */
 const char* door_2_npc[] = {
     "マダム",
     NULL,
@@ -1804,6 +1867,7 @@ static EVT_BEGIN(door_2_close)
     RETURN
 EVT_END()
 
+/** Door of the second villa: the outer door, its hit areas and the inside room (naka_). */
 static DoorParam door_2 = {
     0, // flags
     2, // type
@@ -1878,9 +1942,9 @@ static EVT_BEGIN(erase_house)
 EVT_END()
 
 /**
- * Guess: demo-only trigger (inside the demo's #if) that reveals the left villa from under its floor:
- * it returns if GF(11) is set, otherwise calls under,
- * then once (GF(10)) shows the house (ie_1) and hides its interior (naka).
+ * Demo-only counterpart of erase_house (inside the demo's #if):
+ * unless GF(11) is set (the JP and later builds set it when boarding the train), it calls under and,
+ * once (GF(10) goes from 0 to 1), shows the left villa (ie_1) and hides its interior (naka).
  */
 static EVT_BEGIN(appear_house)
     IF_INT_EQUAL(GF(11), 1)
@@ -2018,6 +2082,8 @@ EVT_BEGIN(pik_00_init_evt)
 #if VERSION >= VERSION_JP
     SET_VALUE(GF(11), 0)
 #endif
+    // The train is at Poshley Heights; arrival or return trip is chosen from the story and the door Mario
+    // came through.
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_54_WELCOME_BACK)
         SET_VALUE(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
@@ -2076,6 +2142,7 @@ EVT_BEGIN(pik_00_init_evt)
     SET_INT_READ_ADDR(PTR(&name_tbl))
     LOOP(6)
         READ_INT(LW(9))
+        // Start the arrow signs and the background music.
         SPAWN_EVENT(evt_pik_yajirushi)
     END_LOOP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))
@@ -2083,17 +2150,20 @@ EVT_BEGIN(pik_00_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_npc_setup, PTR(npc_data))
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -100, 60, 25, 0, 0)
+    // Place the spinning platform, the HP Drain P chest and the two Star Pieces.
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 8, -5, 130, STRING("jimenn"), 125, GSWF(GSWF_PIK00_STAR_PIECE_PANEL))
     CALL(evt_mobj_itembox, STRING("mobj_badge_gat"), -225, 15, -15, 0, 0, PTR(mobj_box00), GSWF(GSWF_PIK00_HP_DRAIN_P_CHEST_OPENED))
     CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 488, 0, 15, ITEM_ENTRY_FIXED, GSWF(GSWF_PIK00_STAR_PIECE_1), 0)
     CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, -460, 0, 100, ITEM_ENTRY_FIXED, GSWF(GSWF_PIK00_STAR_PIECE_2), 0)
     SET_VALUE(LW(0), PTR(&door_1))
+    // Set up the two villa doors.
     CALL_CHILD(evt_door_entry)
     SET_VALUE(LW(0), PTR(&door_2))
     CALL_CHILD(evt_door_entry)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("resha"))
         CALL(evt_npc_set_position, STRING("サラリーマン"), 0, -1000, 0)
+        // Entering from the train plays the arrival scene.
         SPAWN_EVENT(evt_pik_00_arrival)
         CALL_CHILD(hom_10_evt_resha_stop)
         RETURN
@@ -2137,6 +2207,7 @@ EVT_BEGIN(pik_00_init_evt)
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_ie_1_2_yuka"), 0, PTR(evt_seacret), 0)
     CALL(evt_hitobj_attr_onoff, 0, 1, STRING("se_bero"), 4)
     CALL(evt_hit_damage_return_set, PTR(dmgReturnPt))
+    // Finally the entrances, the biting Gazigazi and the mail check.
     CALL_CHILD(evt_gazigazi_entry)
     SPAWN_EVENT(evt_sub_mail_event)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("train_2"), MAPOBJ_FLAG_BBOX_CULL)

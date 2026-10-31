@@ -40,8 +40,8 @@ static USER_FUNC(camps30);
 static BeroEntry bero_entry_data[3];
 
 /**
- * Guess: pipe enter script for the Boggly Woods arrival:
- * only at STORY_STG1_END_TO_STAGE_2 does it set GF(0) and wait for the arrival cutscene to clear it;
+ * Enter script of the "dokan1" pipe (from tik_03): only at STORY_STG1_END_TO_STAGE_2 does it set GF(0) and wait,
+ * so Mario stays in the pipe until welcome_wonderforest clears GF(0) after its camera orbit;
  * otherwise it returns at once. Always returns LW(0) = 0.
  */
 static EVT_BEGIN(first_evt_dokan)
@@ -55,6 +55,10 @@ static EVT_BEGIN(first_evt_dokan)
     RETURN
 EVT_END()
 
+/**
+ * Exits of this map: the pipe down to Rogueport Sewers (tik_03), which holds Mario on his first arrival,
+ * and the east path to win_00.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan1", // hitName
@@ -182,9 +186,10 @@ EVT_BEGIN(welcome_wonderforest)
 EVT_END()
 
 /**
- * Guess: map init script of the Boggly Woods arrival map (win_06):
- * plays the Boggly Woods BGM and ambience (delaying the music during the first arrival), registers exits,
- * turns on bounding-box culling for the scenery, and starts the arrival scene after Chapter 1.
+ * Map init script of win_06, where Mario arrives in Boggly Woods by pipe:
+ * plays the ambience and the Boggly Woods BGM (before STORY_STG2_00 the music starts only after 9 seconds),
+ * registers exits, turns bounding-box culling off for four scenery groups,
+ * sets up and spawns welcome_wonderforest at STORY_STG1_END_TO_STAGE_2, and places the save block.
  */
 EVT_BEGIN(win_06_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_00_BOGGLY_WOODS)
@@ -304,9 +309,12 @@ static inline f32 fid(f32 x) {
 }
 
 /**
- * Guess: script helper: allocates the three orbit parameter sets and fills sets 0
- * and 1 from the two position/target vectors in its arguments,
- * then derives the working set's angle and distance.
+ * Script helper: allocates the three orbit parameter sets,
+ * fills sets 0 and 1 from the two position/target vectors in args[0..11],
+ * computes each one's angle (degrees, around the target in the xz plane) and xz distance,
+ * and copies set 0 into the working set.
+ * The source clears set 1 twice instead of the working set;
+ * harmless, since every field of the working set is then written.
  */
 static USER_FUNC(cam_kaiten_init) {
     EvtWord* args = event->args;

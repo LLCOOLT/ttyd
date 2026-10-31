@@ -29,6 +29,10 @@ static EvtWord jump_attack_event[324];
 static EvtWord dekadeka_event[125];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of Elite X-Naut: 10 max HP, level 28. The battle engine reads it when the unit spawns:
+ * size, offsets, sounds, status vulnerability, parts, init script and event table.
+ */
 BattleUnitKind unit_gundan_zako_elite = {
     120,
     "btl_un_gundan_zako_elite",
@@ -99,16 +103,37 @@ BattleUnitKind unit_gundan_zako_elite = {
     data_table,
 };
 
+/**
+ * Defence of Elite X-Naut per element (normal, fire, ice, explosion, electric), subtracted from each hit:
+ * 1 against every element.
+ */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element reactions of Elite X-Naut: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of Elite X-Naut (the demos), as the percent chance a status takes hold:
+ * always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;
+ * otherwise Sleep 60, Stop 70, Dizzy 60, Confuse 70, Freeze 60, Tiny 65, Attack Down 65, Defense Down 60,
+ * Allergic 60, Fright 80, Gale Force 70, Slow 60 and instant KO 95.
+ */
 static StatusVulnerability regist = {60, 70, 60, 100, 70, 100, 100, 60, 100, 65, 100, 65, 100, 60, 60, 80, 70, 100, 60, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of Elite X-Naut (the final versions), as the percent chance a status takes hold:
+ * always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;
+ * otherwise Sleep 70, Stop 70, Dizzy 70, Confuse 70, Freeze 60, Tiny 85, Attack Down 85, Defense Down 85,
+ * Allergic 60, Fright 80, Gale Force 60, Slow 60 and instant KO 95.
+ */
 static StatusVulnerability regist = {70, 70, 70, 100, 70, 100, 100, 60, 100, 85, 100, 85, 100, 85, 60, 80, 60, 100, 60, 100, 100, 95};
 #endif
 
+/**
+ * Pose table of Elite X-Naut: maps its battle pose types (stay, walk, hurt, dead, talk and so on) to
+ * animation names, 16 entries such as N_1, Y_1, K_1, X_1.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -128,14 +153,23 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Event table of Elite X-Naut: maps event tags to the scripts that react to them (no custom reactions);
+ * tag 0 ends it.
+ */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Body parts of Elite X-Naut: a single part (model c_zako_e) holding its hit box.
+ * Each part names its defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_gundan_zako_elite", "c_zako_e", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_gundan_zako_elite", "c_zako_e", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Attack data of Elite X-Naut's gundan zako attack: base damage 5, 100% accuracy. */
 static BattleWeapon weapon_gundan_zako_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -154,7 +188,7 @@ static BattleWeapon weapon_gundan_zako_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -172,6 +206,7 @@ static BattleWeapon weapon_gundan_zako_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data of Elite X-Naut's gundan zako jump attack: base damage 5, 100% accuracy. */
 static BattleWeapon weapon_gundan_zako_jump_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -190,7 +225,7 @@ static BattleWeapon weapon_gundan_zako_jump_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -208,6 +243,10 @@ static BattleWeapon weapon_gundan_zako_jump_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack data of Elite X-Naut's gundan zako dekadeka bottle attack: no damage, 100% accuracy;
+ * may inflict size change 100%.
+ */
 static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -225,7 +264,7 @@ static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -280,7 +319,7 @@ EVT_END()
  * when the roll lands on the bottle but it is already Huge, it rolls again.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
@@ -310,7 +349,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     ADD(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(2))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(2))
         IF_INT_EQUAL(LW(2), 0)
             CALL_CHILD(dekadeka_event)
             GOTO(99)
@@ -394,8 +433,9 @@ EVT_END()
  */
 static EVT_BEGIN(normal_attack_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_attack))
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // It picks a target; with none, it ends the turn (or flusters when confused).
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -403,15 +443,17 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The Elite X-Naut runs up to its target.
     CALL_CHILD(attack_common_event1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // It plays its attack pose with a shout and hops onto the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
@@ -433,6 +475,7 @@ static EVT_BEGIN(normal_attack_event)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The damage check decides between a miss and a hit.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -454,6 +497,7 @@ static EVT_BEGIN(normal_attack_event)
         CASE_DEFAULT
         GOTO(98)
         CASE_END
+        // On a miss it stumbles past with a flustered cry.
         LABEL(90)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_MISS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
@@ -466,6 +510,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_3"))
         WAIT_FRAMES(10)
         GOTO(98)
+        // On a hit the camera shakes and the action-command defence is resolved before the damage lands.
         LABEL(91)
         CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -475,6 +520,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 48)
         CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(2.0f), FLOAT(0.099609375f))
+        // It lands and lets out a triumphant pose.
         CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_LANDING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1B"))
@@ -482,6 +528,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
         WAIT_FRAMES(20)
         GOTO(98)
+        // It runs back to its place and returns to waiting.
         LABEL(98)
         CALL_CHILD(attack_common_event2)
         RETURN
@@ -498,7 +545,7 @@ static EVT_BEGIN(jump_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -576,8 +623,8 @@ EVT_END()
 
 /**
  * The X-Naut drinks the dekadeka bottle (weapon_gundan_zako_dekadeka_bottle, which targets only itself):
- * plays the bottle sounds with the A_4A and A_4B poses, then applies the weapon with the guard-timing result.
- * Guess: dekadeka means the Huge status is given to itself.
+ * plays the bottle sounds with the A_4A and A_4B poses, then applies the weapon with the guard-timing result,
+ * which makes it Huge (size change chance 100, strength 2) for three turns.
  */
 static EVT_BEGIN(dekadeka_event)
     SET_VALUE(LW(3), -2)

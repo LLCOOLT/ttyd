@@ -78,7 +78,7 @@ USER_FUNC(evt_img_alloc_capture) {
     } else {
         offId = -1;
     }
-    if (sh->flags & 4) {
+    if (sh->flags & IMG_SHADOW_USED) {
         return EVT_RETURN_DONE;
     }
     x -= x & 1;
@@ -86,7 +86,7 @@ USER_FUNC(evt_img_alloc_capture) {
     w += w & 1;
     h += h & 1;
     for (i = 0; i < 3; i++) {
-        if (i != shadowId && (img->shadows[i].flags & 4) && (img->width != (u16)w || img->height != (u16)h)) {
+        if (i != shadowId && (img->shadows[i].flags & IMG_SHADOW_USED) && (img->width != (u16)w || img->height != (u16)h)) {
             return EVT_RETURN_DONE;
         }
     }
@@ -102,7 +102,7 @@ USER_FUNC(evt_img_alloc_capture) {
             sh->copyFmt = 6;
             sh->texFmt = 6;
         }
-        img->flags |= 4;
+        img->flags |= IMG_FLAG_OFFSCREEN_RECT;
     } else {
         if (x < 0 || y < 0 || w <= 0 || h <= 0 ||
             x + w > DEMOGetRenderModeObj()->fbWidth || y + h > DEMOGetRenderModeObj()->efbHeight) {
@@ -121,10 +121,10 @@ USER_FUNC(evt_img_alloc_capture) {
         }
     }
     sh->offscreenId = offId;
-    sh->flags = 0x14;
+    sh->flags = IMG_SHADOW_USED | IMG_SHADOW_PENDING;
     sh->allocMode = allocMode;
     if (allocMode != 0) {
-        sh->flags |= 0x100;
+        sh->flags |= IMG_SHADOW_COPY_ONCE;
     }
     return EVT_RETURN_DONE;
 }
@@ -138,16 +138,16 @@ USER_FUNC(evt_img_free_capture) {
     return EVT_RETURN_DONE;
 }
 
-/** Shows (args[1] nonzero) or hides image args[0] by clearing or setting its hidden flag 0x2. */
+/** Shows (args[1] nonzero) or hides image args[0] by clearing or setting IMG_FLAG_HIDDEN. */
 USER_FUNC(evt_img_onoff) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
     if (on != 0) {
-        img->flags &= ~2;
+        img->flags &= ~IMG_FLAG_HIDDEN;
     } else {
-        img->flags |= 2;
+        img->flags |= IMG_FLAG_HIDDEN;
     }
     return EVT_RETURN_DONE;
 }

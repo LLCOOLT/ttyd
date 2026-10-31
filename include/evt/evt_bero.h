@@ -28,6 +28,18 @@ typedef enum BeroDirection {
 // BeroEntry.centerPosition: take the entrance position from the hit object named by hitName
 #define BERO_POS_AUTO 100000
 
+// BeroEntry.type: the entrance kind in the low 12 bits (BERO_TYPE_MASK) plus flag bits.
+enum BeroType {
+    BERO_TYPE_ROAD = 0,
+    BERO_TYPE_DOOR = 1,
+    BERO_TYPE_PIPE = 2,
+    BERO_TYPE_GATE = 3,
+    BERO_TYPE_NONE = 0xF00, // no walk-in or walk-out (bero_null)
+    BERO_TYPE_MASK = 0xFFF,
+    BERO_TYPE_FLAG_BG = 0x1000,      // background pipe: Mario goes into background mode (evt_mario_bgmode_on)
+    BERO_TYPE_FLAG_NO_FADE = 0x2000, // the pipe exit sets no pipe-direction map change fade
+};
+
 typedef struct BeroEntry {
     const char* hitName;       // 0x0
     u16 type;                  // 0x4, BeroInfoType | 0x1000 background | 0x2000 no fade; low 12 bits: 0 road, 1 door, 2 pipe, 3 gate, 0xF00 none

@@ -6,6 +6,7 @@
 
 #include "__syn.h"
 
+/** n / 128 for n = 0-127: a MIDI controller value as a fraction. */
 f32 __SYNn128[128] = {
     0.000000f,
     0.007813f,

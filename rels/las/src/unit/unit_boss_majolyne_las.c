@@ -1,4 +1,4 @@
-// Palace of Shadow battle unit: the Beldam (Shadow Sirens rematch) (`boss_majolyne_las`): parts, stats, poses and AI scripts.
+// Palace of Shadow battle unit: Beldam (Shadow Sirens rematch) (`boss_majolyne_las`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -16,6 +16,20 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_sub.h"
 #include "version.h"
+
+// Unit work slots of Beldam (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BOSS_MAJOLYNE_LAS_SHADOW_X = 0,      // floor position under her, for her shadow (majo3_shadow_tail_event)
+    UW_BOSS_MAJOLYNE_LAS_SHADOW_Y = 1,      // floor position y
+    UW_BOSS_MAJOLYNE_LAS_SHADOW_Z = 2,      // floor position z
+    UW_BOSS_MAJOLYNE_LAS_SHADOW_HELD = 3,   // non-zero stops the shadow position from following her
+    UW_BOSS_MAJOLYNE_LAS_RANK = 4,          // the HP rank (0 to 2) she stands at
+    UW_BOSS_MAJOLYNE_LAS_NEW_RANK = 5,      // her HP rank among the Sirens (majo3_sort)
+    UW_BOSS_MAJOLYNE_LAS_LOW_HP_SPOKEN = 6, // 1 once she has spoken about her own low HP
+    UW_BOSS_MAJOLYNE_LAS_ENRAGED = 7,       // 1 once a Siren's HP fell low: weighs her attack choice
+    UW_BOSS_MAJOLYNE_LAS_ATTACK_STEP = 8,   // step of her attack cycle (0 to 4)
+    UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT = 9  // 2 after a blizzard, counted down each phase; 0 lets ENRAGED weigh in
+};
 
 static USER_FUNC(majo3_sort);
 
@@ -48,6 +62,10 @@ static EvtWord powder_attack_check[16];
 static EvtWord powder_attack_event[179];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of Beldam in the Palace of Shadow: 30 HP, level 57;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_boss_majolyne_las = {
     133,
     "btl_un_majolyne4",
@@ -114,16 +132,36 @@ BattleUnitKind unit_boss_majolyne_las = {
     data_table,
 };
 
+/**
+ * Defence of Beldam against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of Beldam per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Beldam:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Beldam:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/** Pose table of Beldam: animation names for each pose type (idle, walk, hurt, attack and so on). */
 static PoseTableEntry pose_table[] = {
     {1, "MJR_N_1"},
     {2, "MJR_Z_1"},
@@ -131,29 +169,35 @@ static PoseTableEntry pose_table[] = {
     {5, "MJR_X_1"},
     {4, "MJR_X_1"},
     {3, "MJR_X_1"},
-    {28, "MJR_S_1"},
+    {BTL_POSE_NORMAL, "MJR_S_1"},
     {29, "MJR_Q_1"},
     {30, "MJR_Q_1"},
     {31, "MJR_D_1"},
-    {39, "MJR_D_1"},
+    {BTL_POSE_DAMAGE, "MJR_D_1"},
     {50, "MJR_S_1"},
-    {42, "MJR_R_1"},
-    {40, "MJR_W_1"},
-    {56, "MJR_S_1"},
-    {57, "MJR_S_1"},
+    {BTL_POSE_RUN, "MJR_R_1"},
+    {BTL_POSE_WALK, "MJR_W_1"},
+    {BTL_POSE_DANGER, "MJR_S_1"},
+    {BTL_POSE_PERIL, "MJR_S_1"},
     {BTL_POSE_TALK, "MJR_T_1"},
     {BTL_POSE_STAY_DEFAULT, "MJR_S_1"},
 };
 
+/**
+ * Data table of Beldam: event scripts and values the battle looks up by tag (damage reactions, dodge, first
+ * strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/** Part of Beldam: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_majolyne4", "c_majyorin", 0.0f, 0.0f, 0.0f, 5.0f, 20.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/** Weapon of Beldam's kagenuke attack: damage 5. */
 static BattleWeapon weapon_majolyne_kagenuke_attack1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -172,7 +216,7 @@ static BattleWeapon weapon_majolyne_kagenuke_attack1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    2, // element
+    ELEMENT_ICE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -191,6 +235,7 @@ static BattleWeapon weapon_majolyne_kagenuke_attack1 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Beldam's blizzard: damage 5; inflicts Frozen (40%). */
 static BattleWeapon weapon_majolyne_blizzard_attack1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -213,7 +258,7 @@ static BattleWeapon weapon_majolyne_blizzard_attack1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    2, // element
+    ELEMENT_ICE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -235,6 +280,7 @@ static BattleWeapon weapon_majolyne_blizzard_attack1 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Beldam's powder that changes its target's size: damage 2 to 4; inflicts a size change. */
 static BattleWeapon weapon_majolyne_powder_attack1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -252,7 +298,7 @@ static BattleWeapon weapon_majolyne_powder_attack1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -273,6 +319,7 @@ static BattleWeapon weapon_majolyne_powder_attack1 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Beldam's powder that changes its target's size: damage 2 to 4; inflicts a size change. */
 static BattleWeapon weapon_majolyne_powder_attack2 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -295,7 +342,7 @@ static BattleWeapon weapon_majolyne_powder_attack2 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -316,6 +363,7 @@ static BattleWeapon weapon_majolyne_powder_attack2 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Beldam's poison powder: damage 2 to 4; inflicts Poison. */
 BattleWeapon weapon_majolyne_powder_attack3 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -338,7 +386,7 @@ BattleWeapon weapon_majolyne_powder_attack3 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -359,6 +407,7 @@ BattleWeapon weapon_majolyne_powder_attack3 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Beldam's powder that slows its target: damage 2 to 4; inflicts Slow. */
 BattleWeapon weapon_majolyne_powder_attack4 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -381,7 +430,7 @@ BattleWeapon weapon_majolyne_powder_attack4 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -402,6 +451,7 @@ BattleWeapon weapon_majolyne_powder_attack4 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Beldam's powder that speeds its target up: damage 2 to 4; inflicts Fast. */
 BattleWeapon weapon_majolyne_powder_attack5 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -419,7 +469,7 @@ BattleWeapon weapon_majolyne_powder_attack5 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -509,9 +559,9 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ATTACK_STEP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_HELD, 0)
     SPAWN_EVENT(majo3_shadow_tail_event)
     ALLOCATE_UW(10, GW(15))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -519,11 +569,11 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Damage event of Beldam: runs the default damage handling only
- * when the damage code 1024 is set (Guess: the damage that can defeat her); other hits do nothing to her HP.
+ * Damage event of Beldam: when the hit defeats her (damage flag 0x400) sets GW(11) = 1 (she is going down; the
+ * other Sirens' scripts check it), then runs the default damage handling for every hit.
  */
 static EVT_BEGIN(damage_event)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(11), 1)
     END_IF
@@ -551,7 +601,7 @@ static EVT_BEGIN(dead_event)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -589,6 +639,7 @@ EVT_BEGIN(majo_unison_phase_event)
     SET_VALUE(LW(0), -1)
     SET_VALUE(LW(1), -1)
     SET_VALUE(LW(2), -1)
+    // Read the HP of each Siren that is still standing.
     IF_INT_EQUAL(GW(13), 0)
         CALL(btlevtcmd_GetUnitWork, GW(10), 5, LW(6))
         SWITCH(LW(6))
@@ -618,7 +669,7 @@ EVT_BEGIN(majo_unison_phase_event)
         END_SWITCH
     END_IF
     IF_INT_EQUAL(GW(11), 0)
-        CALL(btlevtcmd_GetUnitWork, GW(8), 5, LW(6))
+        CALL(btlevtcmd_GetUnitWork, GW(8), UW_BOSS_MAJOLYNE_LAS_NEW_RANK, LW(6))
         SWITCH(LW(6))
             CASE_EQUAL(0)
             CALL(btlevtcmd_GetHp, GW(8), LW(0))
@@ -631,7 +682,9 @@ EVT_BEGIN(majo_unison_phase_event)
             SET_VALUE(LW(5), 3)
         END_SWITCH
     END_IF
+    // Sort them by HP.
     CALL(majo3_sort)
+    // Hand out ranks 0 to 2 in the Sirens' unit work, highest HP first.
     SWITCH(LW(0))
         CASE_EQUAL(1)
         IF_INT_EQUAL(GW(13), 0)
@@ -643,7 +696,7 @@ EVT_BEGIN(majo_unison_phase_event)
         END_IF
         CASE_EQUAL(3)
         IF_INT_EQUAL(GW(11), 0)
-            CALL(btlevtcmd_SetUnitWork, GW(8), 5, 0)
+            CALL(btlevtcmd_SetUnitWork, GW(8), UW_BOSS_MAJOLYNE_LAS_NEW_RANK, 0)
         END_IF
     END_SWITCH
     SWITCH(LW(1))
@@ -657,7 +710,7 @@ EVT_BEGIN(majo_unison_phase_event)
         END_IF
         CASE_EQUAL(3)
         IF_INT_EQUAL(GW(11), 0)
-            CALL(btlevtcmd_SetUnitWork, GW(8), 5, 1)
+            CALL(btlevtcmd_SetUnitWork, GW(8), UW_BOSS_MAJOLYNE_LAS_NEW_RANK, 1)
         END_IF
     END_SWITCH
     SWITCH(LW(2))
@@ -671,7 +724,7 @@ EVT_BEGIN(majo_unison_phase_event)
         END_IF
         CASE_EQUAL(3)
         IF_INT_EQUAL(GW(11), 0)
-            CALL(btlevtcmd_SetUnitWork, GW(8), 5, 2)
+            CALL(btlevtcmd_SetUnitWork, GW(8), UW_BOSS_MAJOLYNE_LAS_NEW_RANK, 2)
         END_IF
     END_SWITCH
     RETURN
@@ -686,10 +739,10 @@ static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(majo_unison_phase_event)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(4))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_RANK, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_NEW_RANK, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_RANK, LW(4))
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             WAIT_MS(400)
             CALL_CHILD(majolyne_down)
@@ -723,16 +776,16 @@ EVT_END()
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             SUBTRACT(LW(0), 1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, LW(0))
         END_IF
         CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             GOTO(90)
         END_IF
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_LOW_HP_SPOKEN, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
             DEBUG_PUT_REG(LW(0))
@@ -743,14 +796,15 @@ static EVT_BEGIN(phase_event)
             CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
             DEBUG_PUT_REG(LW(1))
             IF_INT_LESS(LW(1), LW(0))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 1)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_LOW_HP_SPOKEN, 1)
+                // When her own HP is low, Beldam curses Mario.
                 CALL(btlevtcmd_StatusWindowOnOff, 0)
                 CALL_CHILD(btl_majolyne_zoom)
                 CALL(evt_msg_print, 2, STRING("btl_majo3_03"), 0, BTL_UNIT_SELF)
                 WAIT_MS(200)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ENRAGED, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
+                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ENRAGED, 1)
                 END_IF
                 IF_INT_EQUAL(GW(12), 0)
                     CALL(btlevtcmd_SetUnitWork, GW(9), 7, 1)
@@ -772,6 +826,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_GetHp, GW(9), LW(1))
                 IF_INT_LESS(LW(1), LW(0))
                     CALL(btlevtcmd_SetUnitWork, GW(9), 6, 1)
+                    // Beldam asks after Marilyn, who groans in reply.
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
                     CALL_CHILD(btl_majolyne_zoom)
                     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, GW(9), -1, 16, LW(15))
@@ -802,6 +857,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_GetHp, GW(10), LW(1))
                 IF_INT_LESS(LW(1), LW(0))
                     CALL(btlevtcmd_SetUnitWork, GW(10), 6, 1)
+                    // Beldam scolds the third Siren for letting her HP fall, who apologises.
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
                     CALL_CHILD(btl_majolyne_zoom)
                     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, GW(10), -1, 16, LW(15))
@@ -840,27 +896,30 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 8, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ATTACK_STEP, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ATTACK_STEP, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, 2)
         SET_VALUE(LW(9), PTR(&weapon_majolyne_blizzard_attack1))
+        // Beldam opens with the blizzard.
         CALL_CHILD(blizzard_attack_event)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ATTACK_STEP, 2)
         SET_VALUE(LW(9), PTR(&weapon_majolyne_powder_attack4))
+        // Then comes a powder attack, whose kind depends on where the Sirens stand.
         CALL_CHILD(powder_attack_check)
         CALL_CHILD(powder_attack_event)
         CASE_EQUAL(2)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 4)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ATTACK_STEP, 4)
         SET_VALUE(LW(9), PTR(&weapon_majolyne_powder_attack5))
         CALL_CHILD(powder_attack_check)
         CALL_CHILD(powder_attack_event)
         CASE_EQUAL(3)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 4)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ATTACK_STEP, 4)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, 2)
         SET_VALUE(LW(9), PTR(&weapon_majolyne_blizzard_attack1))
+        // Another blizzard follows.
         CALL_CHILD(blizzard_attack_event)
         CASE_EQUAL(4)
         SET_UW_BASE(GW(15))
@@ -870,7 +929,7 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             SET_VALUE(UW(0), LW(3))
             SET_VALUE(UW(1), LW(4))
-            CALL(btlevtcmd_CheckStatus, LW(3), 10, LW(0))
+            CALL(btlevtcmd_CheckStatus, LW(3), STATUS_HUGE, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 ADD(LW(14), 5)
             END_IF
@@ -880,7 +939,7 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             SET_VALUE(UW(2), LW(3))
             SET_VALUE(UW(3), LW(4))
-            CALL(btlevtcmd_CheckStatus, LW(3), 11, LW(0))
+            CALL(btlevtcmd_CheckStatus, LW(3), STATUS_TINY, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 ADD(LW(14), 5)
             END_IF
@@ -890,7 +949,7 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             SET_VALUE(UW(4), LW(3))
             SET_VALUE(UW(5), LW(4))
-            CALL(btlevtcmd_CheckStatus, LW(3), 11, LW(0))
+            CALL(btlevtcmd_CheckStatus, LW(3), STATUS_TINY, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 ADD(LW(14), 5)
             END_IF
@@ -900,7 +959,7 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             SET_VALUE(UW(6), LW(3))
             SET_VALUE(UW(7), LW(4))
-            CALL(btlevtcmd_CheckStatus, LW(3), 11, LW(0))
+            CALL(btlevtcmd_CheckStatus, LW(3), STATUS_TINY, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 ADD(LW(14), 5)
             END_IF
@@ -910,14 +969,14 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             SET_VALUE(UW(8), LW(3))
             SET_VALUE(UW(9), LW(4))
-            CALL(btlevtcmd_CheckStatus, LW(3), 11, LW(0))
+            CALL(btlevtcmd_CheckStatus, LW(3), STATUS_TINY, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 ADD(LW(14), 5)
             END_IF
         END_IF
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(2))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_ENRAGED, LW(2))
         IF_INT_NOT_EQUAL(LW(2), 0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, LW(0))
             IF_INT_EQUAL(LW(0), 0)
 #if VERSION <= VERSION_DEMO_US
                 ADD(LW(14), 20)
@@ -931,6 +990,7 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(1), 40)
         IF_INT_LESS(LW(0), LW(1))
             SET_VALUE(LW(9), PTR(&weapon_majolyne_kagenuke_attack1))
+            // Sometimes she uses her kagenuke attack instead.
             CALL_CHILD(kagenuke_attack_event)
             GOTO(90)
         END_IF
@@ -974,8 +1034,9 @@ static EVT_BEGIN(attack_event)
             CALL_CHILD(powder_attack_event)
             GOTO(90)
         ELSE
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, 2)
             SET_VALUE(LW(9), PTR(&weapon_majolyne_blizzard_attack1))
+            // The cycle ends with a blizzard and starts over.
             CALL_CHILD(blizzard_attack_event)
         END_IF
     END_SWITCH
@@ -994,7 +1055,7 @@ static EVT_BEGIN(kagenuke_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
@@ -1028,7 +1089,7 @@ static EVT_BEGIN(kagenuke_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MJR_A1_4"))
     WAIT_MS(200)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1054,7 +1115,7 @@ static EVT_BEGIN(kagenuke_attack_event)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(98)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MJR_A1_1"))
     CALL_CHILD(majolyne_down)
@@ -1075,7 +1136,7 @@ static EVT_BEGIN(blizzard_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
@@ -1107,7 +1168,7 @@ static EVT_BEGIN(blizzard_attack_event)
     WAIT_FRAMES(150)
     CALL(evt_snd_sfxoff, LW(15))
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1135,7 +1196,7 @@ static EVT_BEGIN(blizzard_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -1166,7 +1227,7 @@ EVT_END()
  */
 static EVT_BEGIN(powder_attack_event)
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1192,7 +1253,7 @@ static EVT_BEGIN(powder_attack_event)
     WAIT_MS(100)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MJR_A2_3"))
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1218,7 +1279,7 @@ static EVT_BEGIN(powder_attack_event)
     GOTO(99)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(30)
     GOTO(99)
     LABEL(99)
@@ -1241,21 +1302,21 @@ EVT_END()
 EVT_BEGIN(majo3_shadow_tail_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(1))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(2))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_X, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_Y, LW(1))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_Z, LW(2))
     LABEL(0)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(5))
     IF_INT_EQUAL(LW(5), -1)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_HELD, LW(5))
     IF_INT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(2))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_X, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_Y, LW(1))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_SHADOW_Z, LW(2))
     END_IF
     WAIT_FRAMES(1)
     GOTO(0)

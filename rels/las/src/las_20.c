@@ -52,6 +52,10 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Exits of las_20: east door e_bero to las_22 (w_bero); south road s_bero_1 to las_19 (n_bero); south road
+ * s_bero_2 to las_21 (n_bero).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -106,6 +110,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Front faces of the first group of 14 gears of the star-switch room, turned together by haguruma_evt. */
 static const char* haguruma_hontai[] = {
     "S_hgm_01a",
     "S_hgm_02a",
@@ -123,6 +128,7 @@ static const char* haguruma_hontai[] = {
     "S_hgm_20a",
 };
 
+/** Front faces of the second group of six gears, turned the other way. */
 static const char* haguruma_hontai2[] = {
     "S_hgm_05a",
     "S_hgm_09a",
@@ -132,6 +138,7 @@ static const char* haguruma_hontai2[] = {
     "S_hgm_18a",
 };
 
+/** Shadow faces of the first group of gears (12 pieces), turned with haguruma_hontai. */
 static const char* haguruma_kage[] = {
     "S_hgm_01b",
     "S_hgm_02b",
@@ -147,6 +154,7 @@ static const char* haguruma_kage[] = {
     "S_hgm_16b",
 };
 
+/** Shadow faces of the second group of gears (5 pieces), turned with haguruma_hontai2. */
 static const char* haguruma_kage2[] = {
     "S_hgm_05b",
     "S_hgm_09b",
@@ -233,6 +241,7 @@ static EVT_BEGIN(dai_evt)
     RETURN
 EVT_END()
 
+/** The seven stars of the puzzle as pairs of lit and unlit models (S_hosi_NNa and S_hosi_NNb). */
 const char* hosi_name[] = {
     "S_hosi_02a",
     "S_hosi_02b",
@@ -258,6 +267,7 @@ const char* hosi_name[] = {
  */
 EVT_BEGIN(hosi_sw_check)
     SET_VALUE(LW(0), 0)
+    // Compare the seven star switches against the solution (1, 3, 4 and 6 on, the others off).
     IF_INT_EQUAL(LSWF(1), 1)
         ADD(LW(0), 1)
     END_IF
@@ -279,6 +289,7 @@ EVT_BEGIN(hosi_sw_check)
     IF_INT_EQUAL(LSWF(7), 0)
         ADD(LW(0), 1)
     END_IF
+    // Solved: controls off and the camera looks up at the stars.
     IF_INT_EQUAL(LW(0), 7)
         CALL(evt_mario_key_onoff, 0)
         WAIT_MS(1000)
@@ -331,6 +342,7 @@ EVT_BEGIN(hosi_sw_check)
             CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(2), MAPOBJ_FLAG_HIDE)
             ADD(LW(0), 1)
         END_LOOP
+        // The stars flash in a running light, the room quakes, and the switches vanish.
         CALL(evt_snd_sfxon, STRING("SFX_STG8_STAR_LIGHTUP2"), 0)
         WAIT_MS(100)
         CALL(evt_snd_sfxon, STRING("SFX_STG8_QUAKE3"), LW(10))
@@ -343,6 +355,7 @@ EVT_BEGIN(hosi_sw_check)
         CALL(evt_mobj_delete, STRING("hosi_06_sw"))
         CALL(evt_mobj_delete, STRING("hosi_07_sw"))
         CALL(evt_mobj_delete, STRING("hosi_08_sw"))
+        // The story advances to the solved star puzzle and Mario regains control.
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_11_STAR_PUZZLE)
         CALL(evt_cam3d_evt_off, 800, 11)
         CALL(evt_mario_key_onoff, 1)

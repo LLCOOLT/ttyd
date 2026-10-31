@@ -79,6 +79,7 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/** Exit of this room: the west door to aji_17. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -101,21 +102,28 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** First safe route across the electrified floor, as the panel numbers to walk in order. */
 u8 root_0[] = {
     10, 9, 8, 7, 6, 5, 4, 3,
     2, 1,
 };
 
+/** Second safe route across the electrified floor, as panel numbers. */
 u8 root_1[] = {
     21, 8, 7, 6, 20, 19, 18, 17,
     16, 15, 14, 13, 12, 11,
 };
 
+/** Third safe route across the electrified floor, as panel numbers. */
 u8 root_2[] = {
     30, 29, 28, 27, 26, 17, 18, 19,
     20, 6, 5, 25, 24, 23, 22,
 };
 
+/**
+ * The three routes (panel list and length), one of which the game picks to show the way across the
+ * electrified floor.
+ */
 RootRoute root_data[] = {
     {root_0, 10},
     {root_1, 14},
@@ -135,9 +143,10 @@ static EVT_BEGIN(hikaru_off)
 EVT_END()
 
 /**
- * Guess: shows the route across the glowing floor to the player:
- * lights the panels of the route chosen in GW(10) (hikaru_on),
- * pans the camera over the room for about three seconds and switches the lights off again (hikaru_off).
+ * Shows the player the safe route across the electrified floor when the room is entered:
+ * lights the panels of the route chosen in GW(10) (hikaru_on, which also makes every other panel shock),
+ * pans the camera over the room for about three seconds and switches the lights off again (hikaru_off),
+ * leaving the shocking panels in place.
  */
 EVT_BEGIN(hikaru_yuka)
     CALL_CHILD(hikaru_on)
@@ -154,9 +163,9 @@ EVT_END()
 /**
  * Item-box script for the chest at "box": gives Mario the elevator key (ITEM_ELEVATOR_KEY_0x1B)
  * and sets the story progress to STORY_STG7_09_ELEVATOR_KEY_A_LIT_FLOOR.
- * It then clears the A_no01 hit flag 2048, switches off all panel lights
- * and makes the floor visibly flash between two states five times
- * while Mario turns to face away (Guess: the floor is revealed to be the electric kind).
+ * It then clears the shock flag 0x800 on A_no01 and on every panel (all_flag_off), so the floor no longer hurts,
+ * and swaps the floor models yukayu1 and yukayu2 five times, ending with yukayu2 and "ato" shown,
+ * while Mario turns to face away. Guess: the swap shows the power going off.
  */
 static EVT_BEGIN(evt_box)
     CALL(evt_mario_key_onoff, 0)
@@ -186,11 +195,16 @@ static EVT_BEGIN(evt_box)
     RETURN
 EVT_END()
 
+/** Where Mario is put back after taking damage from the electrified floor: the map position named mod_01. */
 static HitDamageReturn dmgReturnPt[] = {
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
     {0},
 };
 
+/**
+ * Setup script of the electrified floor room: resets the panels, places the treasure chest holding the
+ * elevator key and starts the panel and lightning scripts.
+ */
 static EvtWord hikaru_yuka_init[] = {
     CALL_CHILD(hikaru_off)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("A_no01"), 2048)
@@ -442,8 +456,8 @@ static USER_FUNC(loop_onoff) {
 
 /**
  * Script function: hides every panel light (hikaru_NN, nashi_NN)
- * and turns the damaging flag 0x800 off on all 30 hit areas A_hikaru_NN,
- * (Guess: this is the state with no panel active).
+ * and turns the shock flag 0x800 off on all 30 hit areas A_hikaru_NN, so no panel hurts any more
+ * (evt_box runs it once the elevator key is taken).
  */
 static USER_FUNC(all_flag_off) {
     char name[64];
@@ -463,7 +477,9 @@ static USER_FUNC(all_flag_off) {
 /**
  * Script function: shows the panels of the route chosen by GW(10) (index into root_data):
  * the route's panels are lit (hikaru_NN shown) with hit flag 0x800 cleared,
- * and every other panel is dark with 0x800 set (Guess: the flag marks the shocking floor).
+ * and every other panel is dark with 0x800 set:
+ * Mario takes spike damage (MARIO_MOTION_DAMAGE_TOGE) standing on it,
+ * which thunder_main turns into an electric shock.
  */
 static USER_FUNC(hikaru_on_func) {
     char name[64];

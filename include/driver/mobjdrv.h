@@ -7,6 +7,7 @@
 #include <dolphin/types.h>
 #include "evt/evt_word.h"
 #include <dolphin/mtx.h>
+#include "version.h"
 
 typedef struct MapObjectHitEntry {
     HitEntry* hitObject;       // 0x0
@@ -122,3 +123,7 @@ MapObjectEntry* mobjNearDistCheck(f32 x, f32 y, f32 z, f32 minMagnitude);
 s32 mobjCheckItemboxOpen(MapObjectEntry* entry);
 BOOL mobjGetHint(MapObjectEntry* entry);
 MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char** names);
+#if VERSION <= VERSION_DEMO_US
+// the demos keep it as a function; retail inlines it into mobjdrv.c
+int mobjCheckKururingFloorItem(MapObjectEntry* entry);
+#endif

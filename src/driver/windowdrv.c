@@ -27,6 +27,7 @@ typedef enum WakuTexId {
     WAKU_MAJO_ARROW_DARK = 8
 } WakuTexId;
 
+/** White fog colour passed when the window drawing turns fog off; with fog off it has no effect. */
 static const GXColor fog_color = {0xFF, 0xFF, 0xFF, 0xFF};
 
 // local prototypes
@@ -1503,7 +1504,7 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 
 /** Returns non-zero while window id is still printing its message (WINDOW_FLAG_PRINTING); scripts wait on it. */
 s32 windowCheckID(s32 id) {
-    return windowGetPointer(id)->flags & 2;
+    return windowGetPointer(id)->flags & WINDOW_FLAG_PRINTING;
 }
 
 /** Returns window slot id (no range check). */

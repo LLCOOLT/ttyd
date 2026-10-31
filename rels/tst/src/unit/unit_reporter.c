@@ -14,6 +14,10 @@ static BattleUnitKindPart parts[1];
 static EvtWord init_event[15];
 static EvtWord wait_event[7];
 
+/**
+ * Unit definition of the placeholder unit `reporter`:
+ * 10 HP and level 1, with its sizes, damage sounds, status vulnerability, parts and init script.
+ */
 BattleUnitKind unit_reporter = {
     213,
     "btl_un_reporter",
@@ -80,12 +84,19 @@ BattleUnitKind unit_reporter = {
     data_table,
 };
 
+/** Defence of the placeholder unit `reporter`: none, every hit does its full damage. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element modifiers of the placeholder unit `reporter`: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Status vulnerability of the placeholder unit `reporter`: immune to every status. */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Pose table of the placeholder unit `reporter`:
+ * maps each battle pose (waiting, hurt, running...) to one of its EM_* animations.
+ */
 static PoseTableEntry pose_table[] = {
     {28, "EM_S_1"},
     {31, "KNP_S_1"},
@@ -96,12 +107,14 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
+/** Data table of the placeholder unit `reporter`: it has no special reaction scripts. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body part of the placeholder unit `reporter`: a single part using the c_mario model. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_teresa", "c_mario", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_teresa", "c_mario", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /** Battle init script of the placeholder unit: installs only the wait handler and starts the wait event. */

@@ -102,6 +102,10 @@ typedef struct ZubaStarWork {
 
 ZubaStarWork* GetZubaStarPtr(void);
 
+/**
+ * Supernova's hit, given by marioAttackEvent_ZubaStar to every enemy: 0, 3, 6, 9, 12 or 15 damage by the
+ * minigame result (weaponGetPower_ZubaStar); it always hits, pierces defense and cannot be guarded.
+ */
 BattleWeapon weapon_zubastar = {
     "btl_wn_sac_zubastar", // name
     ICON_19B, // icon
@@ -123,7 +127,7 @@ BattleWeapon weapon_zubastar = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_sac_8", // acHelpMsg
@@ -229,7 +233,7 @@ static s32 main_star(void) {
 static void zubaStarDispStar(CameraId cam, void* param) {
 }
 
-// inlining off for GetZubaStarPtr, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it GetZubaStarPtr is inlined into its callers (6 shrink, e.g. weaponGetPower_ZubaStar 15 -> 6 instructions)
 #pragma dont_inline on
 /** Returns the Supernova work, which lives in the battle's action command work area. */
 ZubaStarWork* GetZubaStarPtr(void) {
@@ -245,7 +249,7 @@ s32 weaponGetPower_ZubaStar(BattleUnit* attacker, BattleWeapon* weapon, BattleUn
     return weapon->hpDamageWork[GetZubaStarPtr()->level];
 }
 
-// inlining off for zubastar_create_takaku, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it zubastar_create_takaku is inlined into zubastar_main (894 -> 936 instructions)
 #pragma dont_inline on
 /** Adds a polygon of n points to the list of screen pieces the cut picture is made of. */
 static void zubastar_create_takaku(s32 n, Vec* pts) {
@@ -359,7 +363,7 @@ static void zubastar_bunkatu(Vec* p0, Vec* p1) {
     }
 }
 
-// inlining off for zubastar_get_kouten, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it zubastar_get_kouten is inlined into zubastar_bunkatu (306 -> 369 instructions)
 #pragma dont_inline on
 /**
  * Intersects the line through (x1, y1)-(x2, y2) with the segment (x3, y3)-(x4, y4):
@@ -451,7 +455,7 @@ static USER_FUNC(zubastar_main) {
                 EventEntry* ev;
                 w->phase = 20;
                 w->level++;
-                ev = evtEntry(nice_event, 0, 0x20);
+                ev = evtEntry(nice_event, 0, EVENT_START_NOW);
                 {
                     s32 v = w->level + 1;
                     ev->lwData[0] = v < 6 ? v : 6;

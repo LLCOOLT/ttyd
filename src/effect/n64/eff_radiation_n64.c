@@ -13,6 +13,7 @@
 static void effRadiationMain(EffectEntry* effect);
 static void effRadiationDisp(CameraId cameraId, EffectEntry* effect);
 
+/** 150x20 quad, starting at the centre and reaching outward, drawn for each ray of types 0-1. */
 effN64Vtx size150x20_tex32x32[] = {
     {0, 10, 0, 0, 0, 255, 255, 255, 255},
     {0, -10, 0, 1024, 0, 255, 255, 255, 255},
@@ -20,11 +21,19 @@ effN64Vtx size150x20_tex32x32[] = {
     {150, 10, 0, 0, 1024, 255, 255, 255, 255},
 };
 
+/**
+ * The 300x40 triangle, its tip at the centre, drawn for each ray of the spinning types;
+ * kept as raw halfwords because its 0x2C bytes are not a whole number of 14-byte effN64Vtx records.
+ */
 s16 size300x40_tex32x32[] = {
     0, 0, 0, 16, 0, -1, -1,
     300, 20, 0, 0, 1024, -5121, -2816,
     300, -20, 0, 1024, 1024, -5121, -2816,
 };
+/**
+ * Fixed pose of each of the 16 spinning rays, five numbers per ray: X, Y and Z tilt in degrees,
+ * an unused value and the Z spin speed in tenths of a degree per frame.
+ */
 s32 r_data[] = {
     0, -20, 0, 1, 18,
     -10, -60, 45, -1, 4,
@@ -43,8 +52,6 @@ s32 r_data[] = {
     -20, 10, 292, -1, 9,
     -10, 20, 337, 1, 1,
 };
-
-/* 0x2C bytes in the original: not a whole number of 14-byte effN64Vtx records, so kept as halfwords */
 
 /**
  * Spawns the radiation rays at (x, y, z): types 0-1 use 8 rising rays, other types 16 spinning rays;

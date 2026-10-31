@@ -28,9 +28,14 @@ typedef struct EffRecoverHeartN64Work {
     s32 flag;        // 0x44
 } EffRecoverHeartN64Work;
 
+/**
+ * Width and height of each heart or flower over its 7-frame pop-in: it grows, squashes and stretches,
+ * then settles.
+ */
 f32 scale_w_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 0.9f, 1.1f, 1.0f};
 f32 scale_h_dat[] = {0.25f, 0.5f, 0.75f, 1.0f, 1.2f, 0.9f, 1.0f};
 
+/** 32x32 quad for the large first heart or flower that carries the recovered amount. */
 effN64Vtx size32x32_tex32x32_heart_vtx[] = {
     {-16, -16, 0, 0, 0, 255, 255, 255, 255},
     {16, -16, 0, 1024, 0, 255, 255, 255, 255},
@@ -38,6 +43,7 @@ effN64Vtx size32x32_tex32x32_heart_vtx[] = {
     {-16, 16, 0, 0, 1024, 255, 255, 255, 255},
 };
 
+/** 16x16 quad for the smaller hearts or flowers that float up beside the large one. */
 effN64Vtx size16x16_tex32x32_heart_vtx[] = {
     {-8, -8, 0, 0, 0, 255, 255, 255, 255},
     {8, -8, 0, 1024, 0, 255, 255, 255, 255},
@@ -45,6 +51,7 @@ effN64Vtx size16x16_tex32x32_heart_vtx[] = {
     {-8, 8, 0, 0, 1024, 255, 255, 255, 255},
 };
 
+/** Near-white quad for a single-digit amount drawn on the heart. */
 effN64Vtx size24x24_tex32x32_heart_vtx[] = {
     {-12, -15, 0, 0, 0, 250, 250, 250, 255},
     {12, -15, 0, 1024, 0, 250, 250, 250, 255},
@@ -52,6 +59,7 @@ effN64Vtx size24x24_tex32x32_heart_vtx[] = {
     {-12, 9, 0, 0, 1024, 250, 250, 250, 255},
 };
 
+/** Near-white quad for the left-hand digit of a two-digit amount on the heart. */
 effN64Vtx size16x24_tex32x32_l_heart_vtx[] = {
     {-16, -15, 0, 0, 0, 250, 250, 250, 255},
     {4, -15, 0, 1024, 0, 250, 250, 250, 255},
@@ -59,6 +67,7 @@ effN64Vtx size16x24_tex32x32_l_heart_vtx[] = {
     {-16, 9, 0, 0, 1024, 250, 250, 250, 255},
 };
 
+/** Near-white quad for the right-hand digit of a two-digit amount on the heart. */
 effN64Vtx size16x24_tex32x32_r_heart_vtx[] = {
     {-4, -15, 0, 0, 0, 250, 250, 250, 255},
     {16, -15, 0, 1024, 0, 250, 250, 250, 255},
@@ -66,6 +75,7 @@ effN64Vtx size16x24_tex32x32_r_heart_vtx[] = {
     {-4, 9, 0, 0, 1024, 250, 250, 250, 255},
 };
 
+/** Green quad for a single-digit amount drawn on the flower. */
 effN64Vtx size24x24_tex32x32_flower_vtx[] = {
     {-12, -15, 0, 0, 0, 36, 190, 20, 255},
     {12, -15, 0, 1024, 0, 36, 190, 20, 255},
@@ -73,6 +83,7 @@ effN64Vtx size24x24_tex32x32_flower_vtx[] = {
     {-12, 9, 0, 0, 1024, 36, 190, 20, 255},
 };
 
+/** Green quad for the left-hand digit of a two-digit amount on the flower. */
 effN64Vtx size16x24_tex32x32_l_flower_vtx[] = {
     {-16, -15, 0, 0, 0, 36, 190, 20, 255},
     {4, -15, 0, 1024, 0, 36, 190, 20, 255},
@@ -80,6 +91,7 @@ effN64Vtx size16x24_tex32x32_l_flower_vtx[] = {
     {-16, 9, 0, 0, 1024, 36, 190, 20, 255},
 };
 
+/** Green quad for the right-hand digit of a two-digit amount on the flower. */
 effN64Vtx size16x24_tex32x32_r_flower_vtx[] = {
     {-4, -15, 0, 0, 0, 36, 190, 20, 255},
     {16, -15, 0, 1024, 0, 36, 190, 20, 255},

@@ -22,8 +22,16 @@ static s32 comp_aiueo(const void* a, const void* b);
 static s32 comp_kind(const void* a, const void* b);
 
 #if VERSION == VERSION_DEMO_US
+/**
+ * Max HP of each partner by partner id (row) and HP level
+ * (column: levels 0 to 2, then 200 for the cap).
+ */
 s16 _party_max_hp_table[9][4] = {
 #else
+/**
+ * Max HP of each partner by partner id (row) and HP level
+ * (column: levels 0 to 2, then 200 for the cap).
+ */
 s16 _party_max_hp_table[8][4] = {
 #endif
     {0, 0, 0, 0},
@@ -268,7 +276,7 @@ BOOL pouchGetItem(ItemType type) {
         }
         return 1;
     }
-    if (type == 0x7C) {
+    if (type == ITEM_FLOWER) {
         if (mpp->currentFP < mpp->maximumFP) {
             mpp->currentFP++;
             // FAKE: dead store (function returns right after); steers register allocation
@@ -276,62 +284,62 @@ BOOL pouchGetItem(ItemType type) {
         }
         return 1;
     }
-    if (type == 0x7D) {
+    if (type == ITEM_STAR_PIECE) {
         mpp->starPieceCount++;
         return 1;
     }
-    if (type == 0x57) {
+    if (type == ITEM_SHINE_SPRITE) {
         mpp->shineSpriteCount++;
         return 1;
     }
-    if (((type == 6) || (type == 7)) || (type == 8)) {
+    if (((type == ITEM_BOOTS) || (type == ITEM_SUPER_BOOTS)) || (type == ITEM_ULTRA_BOOTS)) {
         switch (type) {
-            case 6:
+            case ITEM_BOOTS:
                 mpp->jumpLevel = 1;
                 break;
 
-            case 7:
+            case ITEM_SUPER_BOOTS:
                 mpp->jumpLevel = 2;
                 break;
 
-            case 8:
+            case ITEM_ULTRA_BOOTS:
                 mpp->jumpLevel = 3;
                 break;
         }
 
-    } else if (((type == 9) || (type == 10)) || (type == 11)) {
+    } else if (((type == ITEM_HAMMER) || (type == ITEM_SUPER_HAMMER)) || (type == ITEM_ULTRA_HAMMER)) {
         switch (type) {
-            case 9:
+            case ITEM_HAMMER:
                 mpp->hammerLevel = 1;
                 break;
 
-            case 10:
+            case ITEM_SUPER_HAMMER:
                 mpp->hammerLevel = 2;
                 break;
 
-            case 11:
+            case ITEM_ULTRA_HAMMER:
                 mpp->hammerLevel = 3;
                 break;
         }
 
-    } else if (type == 0x59) {
+    } else if (type == ITEM_BOWSER_BROS_MEAT) {
         return 1;
-    } else if ((type >= 0xF0) && (type < 0x153)) {
+    } else if ((type >= BADGE_MIN) && (type < BADGE_MAX)) {
         swSet(type - 0x70);
     }
     size = 0;
     itemLists[0] = (void*)0;
     itemLists[1] = (void*)0;
-    if ((type >= 0x79) && (type < 0xEC)) {
+    if ((type >= ITEM_MIN) && (type < ITEM_MAX)) {
         itemLists[0] = mpp->heldItems;
         size = (pouchCheckItem(ITEM_STRANGE_SACK)) ? (20) : (10);
         ok = 1;
-    } else if ((type >= 1) && (type < 0x79)) {
+    } else if ((type >= KEY_ITEM_MIN) && (type < KEY_ITEM_MAX)) {
         itemLists[1] = (void*)0;
         size = 0x79;
         ok = 1;
         itemLists[0] = mpp->keyItems;
-    } else if ((type >= 0xF0) && (type < 0x153)) {
+    } else if ((type >= BADGE_MIN) && (type < BADGE_MAX)) {
         size = 200;
         ok = 1;
         itemLists[0] = mpp->badges;
@@ -1474,9 +1482,10 @@ BOOL N_pouchUnEquipBadgeID(s32 badgeId) {
 #endif
 
 /**
- * Guess: puts a badge back on sale at the badge shop
- * when a dropped badge item carrying ITEM_FLAG_BADGE_RETURN goes away uncollected (itemdrv.c),
+ * Puts a badge on sale at the badge shop (Lovely Howz)
+ * when a dropped badge item carrying ITEM_FLAG_BADGE_RETURN goes away uncollected (itemdrv.c itemCheckBadge),
  * so it is not lost for good.
+ * In retail those are the badges field enemies drop when beaten (enemy_common_dead_event).
  * Adds it to the special table outside battle; the demo adds it to the bargain table, in or out of battle.
  */
 s32 pouchArriveBadge(s32 id) {

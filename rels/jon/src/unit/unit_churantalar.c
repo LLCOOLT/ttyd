@@ -22,6 +22,24 @@
 #include "unit/unit_piders.h"
 #include "evt/evt_sub.h"
 
+// Unit work slots of the Arantula (btlevtcmd_Get/SetUnitWork).
+enum {
+    UW_CHURANTALAR_LOWERED = 0,        // 1 after it dropped to y 10, 0 while it hangs at y 70
+    UW_CHURANTALAR_THREAD_ALPHA = 1,   // alpha of its thread; below 255 the yarn event fades it out
+    UW_CHURANTALAR_THREAD_END_Y = 2,   // y of the thread's lower end (400 at the entrance, lowered as it drops in)
+    UW_CHURANTALAR_FIRST_MOVE = 3,     // 1 until its first drop, which plays SFX_ENM_PAIDA_MOVE1
+    UW_CHURANTALAR_ARM_ANGLE = 4,      // arm angle kept between the web throw's wind-up and throw
+    UW_CHURANTALAR_CHAIN_TARGET_1 = 5, // chained attack: target unit id of throw 1 (2 and 3 follow)
+    UW_CHURANTALAR_CHAIN_TARGET_2 = 6, // chained attack: target unit id of throw 2
+    UW_CHURANTALAR_CHAIN_TARGET_3 = 7, // chained attack: target unit id of throw 3
+    UW_CHURANTALAR_CHAIN_PART_1 = 8,   // chained attack: target part id of throw 1 (2 and 3 follow)
+    UW_CHURANTALAR_CHAIN_PART_2 = 9,   // chained attack: target part id of throw 2
+    UW_CHURANTALAR_CHAIN_PART_3 = 10,  // chained attack: target part id of throw 3
+    UW_CHURANTALAR_CHAIN_HIT_1 = 11,   // chained attack: 1 once throw 1's target was hit (2 and 3 follow)
+    UW_CHURANTALAR_CHAIN_HIT_2 = 12,   // chained attack: 1 once throw 2's target was hit
+    UW_CHURANTALAR_CHAIN_HIT_3 = 13,   // chained attack: 1 once throw 3's target was hit
+};
+
 static void piders_get_next_target(s32* unitIdx, s32* partIdx);
 static void piders_get_target(s32* unitIdx, s32* partIdx);
 
@@ -71,6 +89,7 @@ static USER_FUNC(piders_yarn_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Unit data of the Arantula: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_churantalar = {
     164,
     "btl_un_churantalar",
@@ -129,7 +148,7 @@ BattleUnitKind unit_churantalar = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     5,
     parts,
@@ -137,16 +156,24 @@ BattleUnitKind unit_churantalar = {
     data_table,
 };
 
+/** Damage reduction of the Arantula: none, every attack type does full damage. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element response of the Arantula: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Arantula (percent, 0 is immune): every status effect can land. Demo values. */
 static StatusVulnerability regist = {70, 80, 30, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 80, 30, 100, 70, 100, 100, 30};
 #else
+/**
+ * Status vulnerability of the Arantula (percent, 0 is immune): every status effect can land. Released game
+ * values.
+ */
 static StatusVulnerability regist = {70, 70, 30, 100, 70, 100, 100, 70, 100, 80, 100, 80, 100, 85, 70, 80, 30, 100, 70, 100, 100, 30};
 #endif
 
+/** Pose table of the Arantula: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "PAI_N_1"},
     {2, "PAI_Y_1"},
@@ -154,20 +181,24 @@ static PoseTableEntry pose_table[] = {
     {5, "PAI_K_1"},
     {4, "PAI_X_1"},
     {3, "PAI_X_1"},
-    {28, "PAI_S_1"},
+    {BTL_POSE_NORMAL, "PAI_S_1"},
     {29, "PAI_D_1"},
     {30, "PAI_D_1"},
     {31, "PAI_S_1"},
-    {39, "PAI_D_1"},
+    {BTL_POSE_DAMAGE, "PAI_D_1"},
     {50, "PAI_A_1"},
-    {40, "PAI_W_1"},
-    {42, "PAI_W_1"},
-    {56, "PAI_X_1"},
-    {57, "PAI_X_1"},
+    {BTL_POSE_WALK, "PAI_W_1"},
+    {BTL_POSE_RUN, "PAI_W_1"},
+    {BTL_POSE_DANGER, "PAI_X_1"},
+    {BTL_POSE_PERIL, "PAI_X_1"},
     {BTL_POSE_TALK, "PAI_S_1"},
     {BTL_POSE_STAY_DEFAULT, "PAI_S_1"},
 };
 
+/**
+ * Data table of the Arantula: event handlers keyed by tag (dead_event, blow_dead_event, battle_end_event,
+ * ...).
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {58, blow_dead_event},
@@ -176,12 +207,13 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body parts of the Arantula: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
-    {2, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 5.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {3, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {4, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {5, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {2, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 5.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {3, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {4, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {5, "btl_un_churantalar", "c_paid_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
 /**
@@ -228,7 +260,7 @@ static USER_FUNC(piders_draw_yarn) {
 
     // from the pider down to its hanging height, and up to the ceiling
     BtlUnit_GetHomePos(unit, &yarn->x1, &yarn->y1, &yarn->z1);
-    yarn->y1 = unit->work[2];
+    yarn->y1 = unit->work[UW_CHURANTALAR_THREAD_END_Y];
     BtlUnit_GetHomePos(unit, &yarn->x0, &yarn->y0, &yarn->z0);
     yarn->y0 = 400.0f;
     yarn->alpha = alpha;
@@ -249,7 +281,7 @@ static USER_FUNC(piders_get_num) {
 
     for (i = 0; i < 64; i++) {
         unit = wp->units[i];
-        if (unit != NULL && (unit->currentKind == 0x1B || unit->currentKind == 0xA4) && !BtlUnit_CheckStatus(unit, 0x1B)) {
+        if (unit != NULL && (unit->currentKind == UNIT_PIDER || unit->currentKind == UNIT_ARANTULA) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
             num++;
         }
     }
@@ -274,8 +306,8 @@ static USER_FUNC(piders_get_zyun) {
     id = BattleTransID(event, id);
     for (i = 0; i < 64; i++) {
         unit = wp->units[i];
-        if (unit != NULL && (unit->currentKind == 0x1B || unit->currentKind == 0xA4)) {
-            if (!BtlUnit_CheckStatus(unit, 0x1B)) {
+        if (unit != NULL && (unit->currentKind == UNIT_PIDER || unit->currentKind == UNIT_ARANTULA)) {
+            if (!BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
                 order++;
             }
             if (unit->unitId == id) {
@@ -301,7 +333,7 @@ static USER_FUNC(piders_get_first_pos_attr) {
     // find the first living pider
     for (i = 0; i < 64; i++) {
         unit = wp->units[i];
-        if (unit != NULL && (unit->currentKind == 0x1B || unit->currentKind == 0xA4) && !BtlUnit_CheckStatus(unit, 0x1B)) {
+        if (unit != NULL && (unit->currentKind == UNIT_PIDER || unit->currentKind == UNIT_ARANTULA) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
             break;
         }
     }
@@ -375,6 +407,7 @@ static void piders_get_next_target(s32* unitIdx, s32* partIdx) {
     }
 }
 
+/** Attack data for the Arantula's web throw: 7 damage. */
 static BattleWeapon weapon_piders_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -393,7 +426,7 @@ static BattleWeapon weapon_piders_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -411,6 +444,7 @@ static BattleWeapon weapon_piders_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Arantula's chained web throws: 4 damage. */
 static BattleWeapon weapon_piders_renzoku_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -429,7 +463,7 @@ static BattleWeapon weapon_piders_renzoku_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -460,17 +494,20 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(entry_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 255)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_LOWERED, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_THREAD_END_Y, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_FIRST_MOVE, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_THREAD_ALPHA, 255)
     CALL(piders_yarn_init)
     SPAWN_EVENT(yarn_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
-/** Data event 48 of the Arantula: after a first strike it is set to y 10 and waits for the attack to end. */
+/**
+ * Data event 48 of the Arantula, run when the battle opens with Mario's or the partner's First Strike on it:
+ * it is set to y 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -490,11 +527,11 @@ static EVT_BEGIN(yarn_event)
     IF_INT_EQUAL(LW(0), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_THREAD_ALPHA, LW(0))
     IF_INT_LESS(LW(0), 255)
         IF_INT_GREATER(LW(0), 2)
             SUBTRACT(LW(0), 2)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_THREAD_ALPHA, LW(0))
         END_IF
     END_IF
     CALL(piders_draw_yarn, LW(0))
@@ -512,14 +549,14 @@ static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 180)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 400)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_THREAD_END_Y, 400)
     DIVIDE(LW(0), 10)
     ADD(LW(0), 80)
     WAIT_FRAMES(LW(0))
     CALL(evt_sub_intpl_init, 4, 400, 0, 40)
     LOOP(40)
         CALL(evt_sub_intpl_get_value)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_THREAD_END_Y, LW(0))
         WAIT_FRAMES(1)
     END_LOOP
     RETURN
@@ -575,12 +612,12 @@ static EVT_BEGIN(dead_event)
     IF_INT_GREATER(LW(0), 0)
         GOTO(20)
     END_IF
-    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 65536)
-    CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_NOT_TARGETABLE)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_IGNORE_FOR_CLEAR)
     CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
-    CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_NO_HP_GAUGE)
 #if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
 #endif
@@ -596,7 +633,7 @@ EVT_END()
 static EVT_BEGIN(blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), BTL_POSE_DAMAGE)
     BEGIN_SIBLING_EVENT
         LABEL(0)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 20, 0)
@@ -612,11 +649,11 @@ static EVT_BEGIN(blow_dead_event)
     CALL(btlevtcmd_StoreCoin, LW(0))
     CALL(btlevtcmd_GetExp, LW(10), LW(0))
     CALL(btlevtcmd_StoreExp, LW(0))
-    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 65536)
-    CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_NOT_TARGETABLE)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_IGNORE_FOR_CLEAR)
     CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
-    CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_NO_HP_GAUGE)
 #if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
 #endif
@@ -626,7 +663,7 @@ EVT_END()
 
 /** Battle-end script: sets the thread alpha (unit work 1) to 254, so yarn_event fades the thread out. */
 static EVT_BEGIN(battle_end_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 254)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_THREAD_ALPHA, 254)
     RETURN
 EVT_END()
 
@@ -671,9 +708,9 @@ EVT_END()
  * clears part 1's attributes 0x600000 and sets unit work 0 to 1.
  */
 static EVT_BEGIN(move_kuutei_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_FIRST_MOVE, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_FIRST_MOVE, 0)
         BEGIN_SIBLING_EVENT
             LOOP(4)
                 CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAIDA_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -693,8 +730,8 @@ static EVT_BEGIN(move_kuutei_event)
     SET_VALUE(LW(1), 10)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -10, 4, 0, -1)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_LOWERED, 1)
     RETURN
 EVT_END()
 
@@ -714,24 +751,27 @@ static EVT_BEGIN(move_kuuchu_event)
     END_SIBLING_EVENT
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, 10, 4, 0, -1)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_LOWERED, 0)
     RETURN
 EVT_END()
 
 /**
- * Before the player's phase, if the Arantula can act and is not in status 27,
- * it moves up (move_kuuchu_event) or down (move_kuutei_event).
- * Guess: this makes the group alternate between the floor and the air;
- * the choice depends on its order among the living Piders and Arantulas (piders_get_zyun),
- * on how many there are and on the position attribute of the first one.
+ * Before the player's phase, if the Arantula can act and is not in status 27 (KO),
+ * it moves up (move_kuuchu_event) or down (move_kuutei_event),
+ * counting the living Piders and Arantulas together.
+ * The first of them (piders_get_zyun gives 1) switches between the floor and the air every turn.
+ * With an odd number
+ * of them the others go where the first one ends up;
+ * with an even number those at odd places in the order follow the
+ * first and those at even places take the other height, so the group alternates.
  */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_INSTANT_KILL, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
@@ -741,7 +781,7 @@ static EVT_BEGIN(unison_phase_event)
     END_IF
     CALL(piders_get_zyun, BTL_UNIT_SELF, LW(14))
     IF_INT_EQUAL(LW(14), 1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_LOWERED, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL_CHILD(move_kuuchu_event)
         ELSE
@@ -790,9 +830,9 @@ EVT_END()
  * in 100) and the chained web throw (renzoku, 50 in 100).
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 11, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 13, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_HIT_1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_HIT_2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_HIT_3, 0)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -825,7 +865,7 @@ EVT_END()
  * sets this pick's flag in unit work 11 to 13, then reads the defence action command result
  * and deals the damage.
  * The damage check's last argument is 256 when LW(8) is 1 and 0
- * otherwise (Guess: 256 marks the final hit on a target).
+ * otherwise (256 is DAMAGE_FLAG_LAST_HIT, the hit that can knock out and inflict status).
  */
 static EVT_BEGIN(damage_check_event_sub)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(0))
@@ -852,15 +892,15 @@ static EVT_BEGIN(damage_check_event_sub)
     END_SWITCH
     LABEL(90)
     CALL(btlevtcmd_JumpPartsContinue, BTL_UNIT_SELF, LW(7))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_NO_SHADOW)
     GOTO(99)
     LABEL(91)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_NO_SHADOW)
     IF_INT_EQUAL(LW(10), 1)
-        SET_VALUE(LW(0), 5)
-        SET_VALUE(LW(1), 8)
+        SET_VALUE(LW(0), UW_CHURANTALAR_CHAIN_TARGET_1)
+        SET_VALUE(LW(1), UW_CHURANTALAR_CHAIN_PART_1)
         LOOP(0)
             CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(2))
             IF_INT_EQUAL(LW(3), LW(2))
@@ -877,7 +917,7 @@ static EVT_BEGIN(damage_check_event_sub)
     END_IF
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     IF_INT_EQUAL(LW(8), 1)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(0))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(0))
     ELSE
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(0))
     END_IF
@@ -899,13 +939,13 @@ static EVT_BEGIN(piders_attack_common_event1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PAI_A_1"))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("PAI_A_2a"))
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
 #if VERSION <= VERSION_DEMO_US
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, 20, 0)
     ELSE
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, 40, 0)
         ELSE
@@ -945,7 +985,7 @@ static EVT_BEGIN(piders_attack_common_event1)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_FRAMES(10)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_ARM_ANGLE, LW(0))
     RETURN
 EVT_END()
 
@@ -962,13 +1002,13 @@ static EVT_BEGIN(piders_attack_common_event1_2)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PAI_A_1"))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("PAI_A_2a"))
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(0))
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(0))
 #if VERSION <= VERSION_DEMO_US
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, 20, 0)
     ELSE
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, 40, 0)
         ELSE
@@ -981,7 +1021,7 @@ static EVT_BEGIN(piders_attack_common_event1_2)
     MULTIPLY_FLOAT(LW(0), LW(1))
     CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, LW(0), 0)
 #endif
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_ARM_ANGLE, LW(0))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAIDA_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_sub_intpl_init, 4, LW(0), 100, 5)
     LOOP(5)
@@ -991,7 +1031,7 @@ static EVT_BEGIN(piders_attack_common_event1_2)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_FRAMES(5)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_ARM_ANGLE, LW(0))
     RETURN
 EVT_END()
 
@@ -1007,7 +1047,7 @@ static EVT_BEGIN(piders_attack_common_event2)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PAI_S_1"))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
     RETURN
 EVT_END()
 
@@ -1035,8 +1075,8 @@ static EVT_BEGIN(piders_attack_common_event3)
         CASE_END
     END_SWITCH
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(7), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(7), 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(7), 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetPartsScale, BTL_UNIT_SELF, LW(7), FLOAT(2.0f), FLOAT(2.0f), FLOAT(2.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, LW(7), LW(0), LW(1), LW(2), 0, -1)
@@ -1059,7 +1099,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1091,36 +1131,40 @@ EVT_END()
  * and a throw can pick the same target again.
  */
 static EVT_BEGIN(renzoku_attack_event)
+    // Pick targets; a confused Arantula with nobody to hit gets flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Choose three targets at random; the same one can come up twice.
     CALL(piders_renzoku_attack_set_target, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(2))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(4))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, LW(1))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, LW(3))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, LW(5))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(3))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 8, LW(4))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_TARGET_1, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_TARGET_2, LW(2))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_TARGET_3, LW(4))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_PART_1, LW(1))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_PART_2, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_PART_3, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_TARGET_1, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_CHURANTALAR_CHAIN_PART_1, LW(4))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    SET_VALUE(LW(5), 5)
-    SET_VALUE(LW(6), 8)
+    SET_VALUE(LW(5), UW_CHURANTALAR_CHAIN_TARGET_1)
+    SET_VALUE(LW(6), UW_CHURANTALAR_CHAIN_PART_1)
     SET_VALUE(LW(7), 3)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(6), LW(4))
+    // First throw: the Arantula winds up its arm and the web ball flies to the first target.
     CALL_CHILD(piders_attack_common_event1)
     CALL_CHILD(piders_attack_common_event3)
     SPAWN_EVENT(renzoku_attack_event_sub)
@@ -1132,6 +1176,7 @@ static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(6), LW(4))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
+    // It swings its arm back for the second throw while the first web is resolved.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAIDA_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_sub_intpl_init, 4, 100, -200, 20)
     BEGIN_SIBLING_EVENT
@@ -1143,6 +1188,7 @@ static EVT_BEGIN(renzoku_attack_event)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_FRAMES(15)
+    // Second throw: the web ball flies to the second target.
     CALL_CHILD(piders_attack_common_event3)
     SPAWN_EVENT(renzoku_attack_event_sub)
     WAIT_FRAMES(1)
@@ -1153,6 +1199,7 @@ static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(6), LW(4))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
+    // The arm swings back again for the third throw.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAIDA_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_sub_intpl_init, 4, -200, 170, 20)
     BEGIN_SIBLING_EVENT
@@ -1164,6 +1211,7 @@ static EVT_BEGIN(renzoku_attack_event)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_FRAMES(15)
+    // Third throw: the last web ball flies out, and this time the script waits for its damage to be resolved.
     CALL_CHILD(piders_attack_common_event3)
     CALL_CHILD(renzoku_attack_event_sub)
     WAIT_FRAMES(1)
@@ -1179,8 +1227,9 @@ static EVT_BEGIN(renzoku_attack_event)
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(0))
         WAIT_FRAMES(1)
     END_LOOP
+    // The arm returns to rest and the Arantula settles down.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PAI_S_1"))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
     LABEL(99)
@@ -1199,7 +1248,7 @@ static EVT_BEGIN(renzoku_attack_event_sub)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(3))
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(4))
     LOOP(0)
-        IF_INT_GREATER_OR_EQUAL(LW(0), 7)
+        IF_INT_GREATER_OR_EQUAL(LW(0), UW_CHURANTALAR_CHAIN_TARGET_3)
             CALL_CHILD(renzoku_attack_event_sub_last)
             BREAK_LOOP
         END_IF
@@ -1236,8 +1285,8 @@ EVT_END()
  * damage_check_event_sub with LW(8) = 1 and LW(10) = 0.
  */
 static EVT_BEGIN(renzoku_attack_event_sub_last)
-    SET_VALUE(LW(0), 5)
-    SET_VALUE(LW(1), 8)
+    SET_VALUE(LW(0), UW_CHURANTALAR_CHAIN_TARGET_1)
+    SET_VALUE(LW(1), UW_CHURANTALAR_CHAIN_PART_1)
     LOOP(0)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(2))
         IF_INT_EQUAL(LW(3), LW(2))
@@ -1252,10 +1301,10 @@ static EVT_BEGIN(renzoku_attack_event_sub_last)
         ADD(LW(1), 1)
     END_LOOP
     IF_INT_EQUAL(LW(2), 1)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), 33554432)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_NO_SHADOW)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(0))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(0))
     ELSE
         SET_VALUE(LW(8), 1)
         SET_VALUE(LW(10), 0)

@@ -88,6 +88,10 @@ NpcTerritoryInfo btl_muj_setup_no_tbl[16];
 extern EvtWord bgset_muj_wave_event[];
 extern EvtWord bgset_muj_sun_event[];
 
+/**
+ * Scenery props of the four Keelhaul Key battle stages, in order: each entry names a model of the stage file
+ * and where it stands.
+ */
 BattleStageObjectData muj_btlobject_data[] = {
     {"A1", 2, 0, {0.0f, 0.0f, -50.0f}, 0, 60, {0}},
     {"hata", 2, 1, {178.0f, 0.0f, -49.0f}, 0, 60, {0}},
@@ -122,6 +126,10 @@ BattleStageObjectData muj_btlobject_data[] = {
     {"if_body", 5, 6, {0.0f, 130.0f, 0.0f}, 0, 0, {0}},
 };
 
+/**
+ * The four Keelhaul Key battle stages (stg_05_1, stg_05_2, stg_05_5 and stg_05_0), each with its slice of
+ * muj_btlobject_data and the sun background script.
+ */
 BattleStageData muj_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -168,6 +176,7 @@ BattleStageData muj_btlstage_data[] = {
     },
 };
 
+/** Enemies of the muj_cortez fight: Cortez. */
 BattleUnitSetup btlparty_muj_muj_cortez[] = {
     {
         &unit_boss_cortez, // unitKindParams
@@ -181,6 +190,10 @@ BattleUnitSetup btlparty_muj_muj_cortez[] = {
     },
 };
 
+/**
+ * Battle group of the muj_cortez fight (btlparty_muj_muj_cortez): never drops an item;
+ * default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_cortez = {
     1, // numEnemies
     btlparty_muj_muj_cortez, // enemyData
@@ -191,6 +204,7 @@ BattleGroupSetup btlgrp_muj_muj_cortez = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_kanbu fight: X-Nauts, Lord Crump. */
 BattleUnitSetup btlparty_muj_muj_kanbu[] = {
     {
         &unit_boss_gundan_zako_group1, // unitKindParams
@@ -214,6 +228,10 @@ BattleUnitSetup btlparty_muj_muj_kanbu[] = {
     },
 };
 
+/**
+ * Battle group of the muj_kanbu fight (btlparty_muj_muj_kanbu): never drops an item;
+ * default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_kanbu = {
     2, // numEnemies
     btlparty_muj_muj_kanbu, // enemyData
@@ -224,6 +242,7 @@ BattleGroupSetup btlgrp_muj_muj_kanbu = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_01_01 fight: Ember x3. */
 BattleUnitSetup btlparty_muj_muj_01_01[] = {
     {
         &unit_hermos, // unitKindParams
@@ -257,6 +276,10 @@ BattleUnitSetup btlparty_muj_muj_01_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_01_01 fight (btlparty_muj_muj_01_01): never drops an item;
+ * heart drop table default, flower drop table default2.
+ */
 BattleGroupSetup btlgrp_muj_muj_01_01 = {
     3, // numEnemies
     btlparty_muj_muj_01_01, // enemyData
@@ -267,6 +290,7 @@ BattleGroupSetup btlgrp_muj_muj_01_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_05_01 fight: Ember x3. */
 BattleUnitSetup btlparty_muj_muj_05_01[] = {
     {
         &unit_hermos, // unitKindParams
@@ -300,6 +324,10 @@ BattleUnitSetup btlparty_muj_muj_05_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_05_01 fight (btlparty_muj_muj_05_01): never drops an item;
+ * heart drop table default, flower drop table default2.
+ */
 BattleGroupSetup btlgrp_muj_muj_05_01 = {
     3, // numEnemies
     btlparty_muj_muj_05_01, // enemyData
@@ -310,6 +338,7 @@ BattleGroupSetup btlgrp_muj_muj_05_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_05_02 fight: Ember x3. */
 BattleUnitSetup btlparty_muj_muj_05_02[] = {
     {
         &unit_hermos, // unitKindParams
@@ -343,6 +372,10 @@ BattleUnitSetup btlparty_muj_muj_05_02[] = {
     },
 };
 
+/**
+ * Battle group of the muj_05_02 fight (btlparty_muj_muj_05_02): never drops an item;
+ * heart drop table default, flower drop table default2.
+ */
 BattleGroupSetup btlgrp_muj_muj_05_02 = {
     3, // numEnemies
     btlparty_muj_muj_05_02, // enemyData
@@ -353,6 +386,7 @@ BattleGroupSetup btlgrp_muj_muj_05_02 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_00_01 fight: Goomba x3. */
 BattleUnitSetup btlparty_muj_muj_00_01[] = {
     {
         &unit_kuriboo, // unitKindParams
@@ -386,6 +420,11 @@ BattleUnitSetup btlparty_muj_muj_00_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_00_01 fight (btlparty_muj_muj_00_01):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ * No encounter references it.
+ */
 BattleGroupSetup btlgrp_muj_muj_00_01 = {
     3, // numEnemies
     btlparty_muj_muj_00_01, // enemyData
@@ -397,6 +436,7 @@ BattleGroupSetup btlgrp_muj_muj_00_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_01_off_01 fight: Green Fuzzy. */
 BattleUnitSetup btlparty_muj_muj_02_01_off_01[] = {
     {
         &unit_green_chorobon, // unitKindParams
@@ -410,6 +450,10 @@ BattleUnitSetup btlparty_muj_muj_02_01_off_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_01_off_01 fight (btlparty_muj_muj_02_01_off_01):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_01_off_01 = {
     1, // numEnemies
     btlparty_muj_muj_02_01_off_01, // enemyData
@@ -421,6 +465,7 @@ BattleGroupSetup btlgrp_muj_muj_02_01_off_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_01_off_02 fight: Green Fuzzy x2. */
 BattleUnitSetup btlparty_muj_muj_02_01_off_02[] = {
     {
         &unit_green_chorobon, // unitKindParams
@@ -444,6 +489,10 @@ BattleUnitSetup btlparty_muj_muj_02_01_off_02[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_01_off_02 fight (btlparty_muj_muj_02_01_off_02):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_01_off_02 = {
     2, // numEnemies
     btlparty_muj_muj_02_01_off_02, // enemyData
@@ -455,6 +504,7 @@ BattleGroupSetup btlgrp_muj_muj_02_01_off_02 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_01_off_03 fight: Green Fuzzy x3. */
 BattleUnitSetup btlparty_muj_muj_02_01_off_03[] = {
     {
         &unit_green_chorobon, // unitKindParams
@@ -488,6 +538,10 @@ BattleUnitSetup btlparty_muj_muj_02_01_off_03[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_01_off_03 fight (btlparty_muj_muj_02_01_off_03):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_01_off_03 = {
     3, // numEnemies
     btlparty_muj_muj_02_01_off_03, // enemyData
@@ -499,6 +553,7 @@ BattleGroupSetup btlgrp_muj_muj_02_01_off_03 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_01_off_04 fight: Green Fuzzy x4. */
 BattleUnitSetup btlparty_muj_muj_02_01_off_04[] = {
     {
         &unit_green_chorobon, // unitKindParams
@@ -542,6 +597,11 @@ BattleUnitSetup btlparty_muj_muj_02_01_off_04[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_01_off_04 fight (btlparty_muj_muj_02_01_off_04):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ * No encounter references it.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_01_off_04 = {
     4, // numEnemies
     btlparty_muj_muj_02_01_off_04, // enemyData
@@ -553,6 +613,7 @@ BattleGroupSetup btlgrp_muj_muj_02_01_off_04 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_04_off_01 fight: Flower Fuzzy. */
 BattleUnitSetup btlparty_muj_muj_02_04_off_01[] = {
     {
         &unit_flower_chorobon, // unitKindParams
@@ -566,6 +627,10 @@ BattleUnitSetup btlparty_muj_muj_02_04_off_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_04_off_01 fight (btlparty_muj_muj_02_04_off_01):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_04_off_01 = {
     1, // numEnemies
     btlparty_muj_muj_02_04_off_01, // enemyData
@@ -577,6 +642,7 @@ BattleGroupSetup btlgrp_muj_muj_02_04_off_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_04_off_02 fight: Flower Fuzzy x2. */
 BattleUnitSetup btlparty_muj_muj_02_04_off_02[] = {
     {
         &unit_flower_chorobon, // unitKindParams
@@ -600,6 +666,10 @@ BattleUnitSetup btlparty_muj_muj_02_04_off_02[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_04_off_02 fight (btlparty_muj_muj_02_04_off_02):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_04_off_02 = {
     2, // numEnemies
     btlparty_muj_muj_02_04_off_02, // enemyData
@@ -611,6 +681,7 @@ BattleGroupSetup btlgrp_muj_muj_02_04_off_02 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_04_off_03 fight: Flower Fuzzy x3. */
 BattleUnitSetup btlparty_muj_muj_02_04_off_03[] = {
     {
         &unit_flower_chorobon, // unitKindParams
@@ -644,6 +715,10 @@ BattleUnitSetup btlparty_muj_muj_02_04_off_03[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_04_off_03 fight (btlparty_muj_muj_02_04_off_03):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_04_off_03 = {
     3, // numEnemies
     btlparty_muj_muj_02_04_off_03, // enemyData
@@ -655,6 +730,7 @@ BattleGroupSetup btlgrp_muj_muj_02_04_off_03 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_07_off_01 fight: Green Fuzzy, Flower Fuzzy. */
 BattleUnitSetup btlparty_muj_muj_02_07_off_01[] = {
     {
         &unit_green_chorobon, // unitKindParams
@@ -678,6 +754,10 @@ BattleUnitSetup btlparty_muj_muj_02_07_off_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_07_off_01 fight (btlparty_muj_muj_02_07_off_01):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_07_off_01 = {
     2, // numEnemies
     btlparty_muj_muj_02_07_off_01, // enemyData
@@ -689,6 +769,7 @@ BattleGroupSetup btlgrp_muj_muj_02_07_off_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_07_off_02 fight: Green Fuzzy x2, Flower Fuzzy. */
 BattleUnitSetup btlparty_muj_muj_02_07_off_02[] = {
     {
         &unit_green_chorobon, // unitKindParams
@@ -722,6 +803,10 @@ BattleUnitSetup btlparty_muj_muj_02_07_off_02[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_07_off_02 fight (btlparty_muj_muj_02_07_off_02):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_07_off_02 = {
     3, // numEnemies
     btlparty_muj_muj_02_07_off_02, // enemyData
@@ -733,6 +818,7 @@ BattleGroupSetup btlgrp_muj_muj_02_07_off_02 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_02_07_off_03 fight: Green Fuzzy x2, Flower Fuzzy x2. */
 BattleUnitSetup btlparty_muj_muj_02_07_off_03[] = {
     {
         &unit_green_chorobon, // unitKindParams
@@ -776,6 +862,10 @@ BattleUnitSetup btlparty_muj_muj_02_07_off_03[] = {
     },
 };
 
+/**
+ * Battle group of the muj_02_07_off_03 fight (btlparty_muj_muj_02_07_off_03):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_02_07_off_03 = {
     4, // numEnemies
     btlparty_muj_muj_02_07_off_03, // enemyData
@@ -787,6 +877,7 @@ BattleGroupSetup btlgrp_muj_muj_02_07_off_03 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_01_off_01 fight: Putrid Piranha x2. */
 BattleUnitSetup btlparty_muj_muj_03_01_off_01[] = {
     {
         &unit_poison_pakkun, // unitKindParams
@@ -810,6 +901,11 @@ BattleUnitSetup btlparty_muj_muj_03_01_off_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_01_off_01 fight (btlparty_muj_muj_03_01_off_01):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing;
+ * heart drop table default, flower drop table default3.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_01_off_01 = {
     2, // numEnemies
     btlparty_muj_muj_03_01_off_01, // enemyData
@@ -821,6 +917,7 @@ BattleGroupSetup btlgrp_muj_muj_03_01_off_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_01_off_02 fight: Putrid Piranha x2, Green Fuzzy. */
 BattleUnitSetup btlparty_muj_muj_03_01_off_02[] = {
     {
         &unit_poison_pakkun, // unitKindParams
@@ -854,6 +951,11 @@ BattleUnitSetup btlparty_muj_muj_03_01_off_02[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_01_off_02 fight (btlparty_muj_muj_03_01_off_02):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing;
+ * heart drop table default, flower drop table default3.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_01_off_02 = {
     3, // numEnemies
     btlparty_muj_muj_03_01_off_02, // enemyData
@@ -865,6 +967,7 @@ BattleGroupSetup btlgrp_muj_muj_03_01_off_02 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_01_off_03 fight: Putrid Piranha x3. */
 BattleUnitSetup btlparty_muj_muj_03_01_off_03[] = {
     {
         &unit_poison_pakkun, // unitKindParams
@@ -898,6 +1001,11 @@ BattleUnitSetup btlparty_muj_muj_03_01_off_03[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_01_off_03 fight (btlparty_muj_muj_03_01_off_03):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing;
+ * heart drop table default, flower drop table default3.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_01_off_03 = {
     3, // numEnemies
     btlparty_muj_muj_03_01_off_03, // enemyData
@@ -909,6 +1017,7 @@ BattleGroupSetup btlgrp_muj_muj_03_01_off_03 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_02_off_01 fight: Putrid Piranha x2. */
 BattleUnitSetup btlparty_muj_muj_03_02_off_01[] = {
     {
         &unit_poison_pakkun, // unitKindParams
@@ -932,6 +1041,11 @@ BattleUnitSetup btlparty_muj_muj_03_02_off_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_02_off_01 fight (btlparty_muj_muj_03_02_off_01):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing;
+ * heart drop table default, flower drop table default3.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_02_off_01 = {
     2, // numEnemies
     btlparty_muj_muj_03_02_off_01, // enemyData
@@ -943,6 +1057,7 @@ BattleGroupSetup btlgrp_muj_muj_03_02_off_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_02_off_02 fight: Putrid Piranha x2, Flower Fuzzy. */
 BattleUnitSetup btlparty_muj_muj_03_02_off_02[] = {
     {
         &unit_poison_pakkun, // unitKindParams
@@ -976,6 +1091,11 @@ BattleUnitSetup btlparty_muj_muj_03_02_off_02[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_02_off_02 fight (btlparty_muj_muj_03_02_off_02):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing;
+ * heart drop table default, flower drop table default3.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_02_off_02 = {
     3, // numEnemies
     btlparty_muj_muj_03_02_off_02, // enemyData
@@ -987,6 +1107,7 @@ BattleGroupSetup btlgrp_muj_muj_03_02_off_02 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_02_off_03 fight: Putrid Piranha x3. */
 BattleUnitSetup btlparty_muj_muj_03_02_off_03[] = {
     {
         &unit_poison_pakkun, // unitKindParams
@@ -1020,6 +1141,11 @@ BattleUnitSetup btlparty_muj_muj_03_02_off_03[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_02_off_03 fight (btlparty_muj_muj_03_02_off_03):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing;
+ * heart drop table default, flower drop table default3.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_02_off_03 = {
     3, // numEnemies
     btlparty_muj_muj_03_02_off_03, // enemyData
@@ -1031,6 +1157,7 @@ BattleGroupSetup btlgrp_muj_muj_03_02_off_03 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_04_off_01 fight: Flower Fuzzy, Putrid Piranha. */
 BattleUnitSetup btlparty_muj_muj_03_04_off_01[] = {
     {
         &unit_flower_chorobon, // unitKindParams
@@ -1054,6 +1181,10 @@ BattleUnitSetup btlparty_muj_muj_03_04_off_01[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_04_off_01 fight (btlparty_muj_muj_03_04_off_01):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_04_off_01 = {
     2, // numEnemies
     btlparty_muj_muj_03_04_off_01, // enemyData
@@ -1065,6 +1196,7 @@ BattleGroupSetup btlgrp_muj_muj_03_04_off_01 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_04_off_02 fight: Flower Fuzzy, Putrid Piranha, Green Fuzzy. */
 BattleUnitSetup btlparty_muj_muj_03_04_off_02[] = {
     {
         &unit_flower_chorobon, // unitKindParams
@@ -1098,6 +1230,10 @@ BattleUnitSetup btlparty_muj_muj_03_04_off_02[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_04_off_02 fight (btlparty_muj_muj_03_04_off_02):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_04_off_02 = {
     3, // numEnemies
     btlparty_muj_muj_03_04_off_02, // enemyData
@@ -1109,6 +1245,7 @@ BattleGroupSetup btlgrp_muj_muj_03_04_off_02 = {
     5, // reserved_1C
 };
 
+/** Enemies of the muj_03_04_off_03 fight: Flower Fuzzy x2, Putrid Piranha. */
 BattleUnitSetup btlparty_muj_muj_03_04_off_03[] = {
     {
         &unit_flower_chorobon, // unitKindParams
@@ -1142,6 +1279,10 @@ BattleUnitSetup btlparty_muj_muj_03_04_off_03[] = {
     },
 };
 
+/**
+ * Battle group of the muj_03_04_off_03 fight (btlparty_muj_muj_03_04_off_03):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing; default heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_muj_muj_03_04_off_03 = {
     3, // numEnemies
     btlparty_muj_muj_03_04_off_03, // enemyData
@@ -1153,51 +1294,64 @@ BattleGroupSetup btlgrp_muj_muj_03_04_off_03 = {
     5, // reserved_1C
 };
 
+/** Enemy group of the muj_test1_off encounter: btlgrp_muj_muj_01_01. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_test1_off[] = {
     {50, &btlgrp_muj_muj_01_01, &muj_btlstage_data[3]},
     {0},
 };
 
+/** Enemy group of the muj_test2_off encounter: btlgrp_muj_muj_01_01. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_test2_off[] = {
     {50, &btlgrp_muj_muj_01_01, muj_btlstage_data},
     {0},
 };
 
+/** Enemy group of the muj_test3_off encounter: btlgrp_muj_muj_01_01. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_test3_off[] = {
     {50, &btlgrp_muj_muj_01_01, &muj_btlstage_data[1]},
     {0},
 };
 
+/** Enemy group of the muj_test4_off encounter: btlgrp_muj_muj_01_01. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_test4_off[] = {
     {50, &btlgrp_muj_muj_01_01, &muj_btlstage_data[2]},
     {0},
 };
 
+/** Enemy group of the muj_cortez_off encounter: btlgrp_muj_muj_cortez. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_cortez_off[] = {
     {50, &btlgrp_muj_muj_cortez, &muj_btlstage_data[2]},
     {0},
 };
 
+/** Enemy group of the muj_kanbu_off encounter: btlgrp_muj_muj_kanbu. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_kanbu_off[] = {
     {50, &btlgrp_muj_muj_kanbu, &muj_btlstage_data[3]},
     {0},
 };
 
+/** Enemy group of the muj_01_01_off encounter: btlgrp_muj_muj_01_01. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_01_01_off[] = {
     {50, &btlgrp_muj_muj_01_01, muj_btlstage_data},
     {0},
 };
 
+/** Enemy group of the muj_05_01_off encounter: btlgrp_muj_muj_05_01. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_05_01_off[] = {
     {50, &btlgrp_muj_muj_05_01, &muj_btlstage_data[1]},
     {0},
 };
 
+/** Enemy group of the muj_05_02_off encounter: btlgrp_muj_muj_05_02. */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_05_02_off[] = {
     {50, &btlgrp_muj_muj_05_02, &muj_btlstage_data[1]},
     {0},
 };
 
+/**
+ * Enemy groups that may start the muj_02_01_off encounter, picked by weight: btlgrp_muj_muj_02_01_off_01
+ * (weight 10), btlgrp_muj_muj_02_01_off_02 (weight 20), btlgrp_muj_muj_02_01_off_03 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_02_01_off[] = {
     {10, &btlgrp_muj_muj_02_01_off_01, &muj_btlstage_data[1]},
     {20, &btlgrp_muj_muj_02_01_off_02, &muj_btlstage_data[1]},
@@ -1205,6 +1359,10 @@ NpcBattleSelect btlgrpsel_muj_btlno_muj_02_01_off[] = {
     {0},
 };
 
+/**
+ * Enemy groups that may start the muj_02_02_off encounter, picked by weight: btlgrp_muj_muj_02_04_off_01
+ * (weight 10), btlgrp_muj_muj_02_04_off_02 (weight 20), btlgrp_muj_muj_02_04_off_03 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_02_02_off[] = {
     {10, &btlgrp_muj_muj_02_04_off_01, &muj_btlstage_data[1]},
     {20, &btlgrp_muj_muj_02_04_off_02, &muj_btlstage_data[1]},
@@ -1212,6 +1370,10 @@ NpcBattleSelect btlgrpsel_muj_btlno_muj_02_02_off[] = {
     {0},
 };
 
+/**
+ * Enemy groups that may start the muj_02_07_off encounter, picked by weight: btlgrp_muj_muj_02_07_off_01
+ * (weight 10), btlgrp_muj_muj_02_07_off_02 (weight 20), btlgrp_muj_muj_02_07_off_03 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_02_07_off[] = {
     {10, &btlgrp_muj_muj_02_07_off_01, &muj_btlstage_data[1]},
     {20, &btlgrp_muj_muj_02_07_off_02, &muj_btlstage_data[1]},
@@ -1219,6 +1381,10 @@ NpcBattleSelect btlgrpsel_muj_btlno_muj_02_07_off[] = {
     {0},
 };
 
+/**
+ * Enemy groups that may start the muj_03_01_off encounter, picked by weight: btlgrp_muj_muj_03_01_off_01
+ * (weight 10), btlgrp_muj_muj_03_01_off_02 (weight 20), btlgrp_muj_muj_03_01_off_03 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_03_01_off[] = {
     {10, &btlgrp_muj_muj_03_01_off_01, &muj_btlstage_data[1]},
     {20, &btlgrp_muj_muj_03_01_off_02, &muj_btlstage_data[1]},
@@ -1226,6 +1392,10 @@ NpcBattleSelect btlgrpsel_muj_btlno_muj_03_01_off[] = {
     {0},
 };
 
+/**
+ * Enemy groups that may start the muj_03_02_off encounter, picked by weight: btlgrp_muj_muj_03_02_off_01
+ * (weight 10), btlgrp_muj_muj_03_02_off_02 (weight 20), btlgrp_muj_muj_03_02_off_03 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_03_02_off[] = {
     {10, &btlgrp_muj_muj_03_02_off_01, &muj_btlstage_data[1]},
     {20, &btlgrp_muj_muj_03_02_off_02, &muj_btlstage_data[1]},
@@ -1233,6 +1403,10 @@ NpcBattleSelect btlgrpsel_muj_btlno_muj_03_02_off[] = {
     {0},
 };
 
+/**
+ * Enemy groups that may start the muj_03_04_off encounter, picked by weight: btlgrp_muj_muj_03_04_off_01
+ * (weight 10), btlgrp_muj_muj_03_04_off_02 (weight 10), btlgrp_muj_muj_03_04_off_03 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_muj_btlno_muj_03_04_off[] = {
     {10, &btlgrp_muj_muj_03_04_off_01, &muj_btlstage_data[1]},
     {10, &btlgrp_muj_muj_03_04_off_02, &muj_btlstage_data[1]},
@@ -1240,6 +1414,10 @@ NpcBattleSelect btlgrpsel_muj_btlno_muj_03_04_off[] = {
     {0},
 };
 
+/**
+ * Encounter table of Keelhaul Key: one entry per battle number with its stage, enemy group pool, battle music
+ * and random-roll ranges.
+ */
 NpcSetupBattleInfo btlsetup_muj_tbl[] = {
     {
         "マップstg_05_0", // name
@@ -1400,6 +1578,7 @@ NpcSetupBattleInfo btlsetup_muj_tbl[] = {
     {0},
 };
 
+/** Maps the BTLNO_MUJ battle names to their positions in btlsetup_muj_tbl. */
 NpcTerritoryInfo btl_muj_setup_no_tbl[] = {
     {"BTLNO_MUJ_TEST1", 0},
     {"BTLNO_MUJ_TEST2", 1},

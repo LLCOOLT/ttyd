@@ -53,6 +53,7 @@ static TreeAccess ki_data[2];
 static KusaAccess kusa_data[11];
 static BeroEntry bero_entry_data[2];
 
+/** The two actors of the house: Parakarry, who delivers the letter in the prologue, and Luigi. */
 static NpcSetupInfo npcEnt[] = {
     {
         "パレッタ", // name
@@ -106,6 +107,7 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
+/** Actors that stay in view during the house door scenes: Luigi. */
 static const char* ie_npc[] = {
     "ルイージ",
     NULL,
@@ -130,6 +132,10 @@ static EVT_BEGIN(door_1_close)
     RETURN
 EVT_END()
 
+/**
+ * The front door of Mario's house, with the outside and inside map objects it swaps and the open and close
+ * sound handlers.
+ */
 static DoorParam door_1 = {
     0, // flags
     3, // type
@@ -158,6 +164,7 @@ static DoorParam door_1 = {
  * and changes map to muj_20 with the "prologue" entrance.
  */
 static EVT_BEGIN(evt_prologue)
+    // The house music fades in and the screen is letterboxed; Luigi and Parakarry are hidden for now.
     BEGIN_INLINE_EVENT
         WAIT_MS(1500)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MARIO_HOUSE1"))
@@ -177,6 +184,7 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_mario_set_pos, -150, 30, -330)
     CALL(evt_party_set_pos, 0, -150, 30, -330)
     BEGIN_INLINE_EVENT
+        // The camera pulls back slowly while the two trees outside slide apart like curtains.
         CALL(evt_sub_intpl_msec_init, 11, 0, 1500, 4000)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
@@ -217,7 +225,9 @@ static EVT_BEGIN(evt_prologue)
         END_LOOP
     END_INLINE_EVENT
 #endif
+    // Parakarry glides in to the mailbox, with a wing-beat sound at intervals until he lands.
     CALL(evt_npc_glide_position, STRING("パレッタ"), 210, 25, -30, 0, FLOAT(80.0f), FLOAT(-30.0f), 11, 0)
+    // The mailbox shakes as she drops the mail in.
     CALL(evt_npc_reverse_ry, STRING("パレッタ"))
     WAIT_MS(500)
     CALL(evt_mapobj_get_position, STRING("S_posuto"), LW(0), LW(1), LW(2))
@@ -230,11 +240,13 @@ static EVT_BEGIN(evt_prologue)
     END_LOOP
     CALL(evt_npc_reverse_ry, STRING("パレッタ"))
     WAIT_MS(500)
+    // Parakarry calls out "Mail call!" and flies off.
     CALL(evt_msg_print, 0, STRING("pro_00"), 0, STRING("パレッタ"))
 #if VERSION >= VERSION_JP
     SET_VALUE(GF(1), 1)
 #endif
     CALL(evt_npc_glide_position, STRING("パレッタ"), 0, 300, -100, 0, FLOAT(80.0f), FLOAT(-30.0f), 11, 0)
+    // Luigi opens the front door and walks out to the mailbox.
     CALL(evt_npc_set_position, STRING("ルイージ"), 20, 30, -150)
     CALL(evt_npc_set_ry, STRING("ルイージ"), 90)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_naka"), MAPOBJ_FLAG_HIDE)
@@ -252,6 +264,7 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_mapobj_get_position, STRING("S_ie_door"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT1"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
+        // The door shuts behind him as he hops along and reaches the mailbox.
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
@@ -274,6 +287,7 @@ static EVT_BEGIN(evt_prologue)
         WAIT_FRAMES(2)
     END_LOOP
     WAIT_MS(340)
+    // Luigi takes the letter from the mailbox and goes back inside.
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_5"))
     WAIT_MS(500)
     CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), NPC_FLAG_MOVE_ANIM)
@@ -298,6 +312,7 @@ static EVT_BEGIN(evt_prologue)
         CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_5"))
     END_INLINE_EVENT
     WAIT_MS(500)
+    // The camera cuts to the inside of the house; the outside is hidden.
     CALL(evt_cam3d_evt_set, -345, 154, 96, -32, 75, -217, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_aaa_00"), MAPOBJ_FLAG_HIDE)
@@ -323,12 +338,14 @@ static EVT_BEGIN(evt_prologue)
     WAIT_MS(500)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_5"))
     CALL(evt_npc_set_autotalkpose, STRING("ルイージ"), STRING("L_5"), STRING("L_7"))
+    // Luigi shouts that a letter from Princess Peach has arrived.
     CALL(evt_msg_print, 0, STRING("pro_01"), 0, STRING("ルイージ"))
     CALL(evt_cam3d_evt_set, -376, 154, 65, -63, 75, -247, 2000, 11)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_6"))
     CALL(evt_npc_move_position, STRING("ルイージ"), 23, -156, 0, FLOAT(80.0f), 1)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_5"))
     BEGIN_INLINE_EVENT
+        // Mario is placed in the house and Luigi walks over to him.
         CALL(evt_mario_set_pos, -155, 30, -320)
         CALL(evt_mario_mov_pos2, -125, -290, FLOAT(80.0f))
         CALL(evt_mario_mov_pos2, -85, -310, FLOAT(80.0f))
@@ -338,10 +355,12 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_npc_move_position, STRING("ルイージ"), -52, -275, 0, FLOAT(80.0f), 1)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_5"))
     WAIT_MS(500)
+    // Luigi offers to read the letter aloud.
     CALL(evt_msg_print, 0, STRING("pro_02"), 0, STRING("ルイージ"))
     WAIT_MS(300)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("L_8"))
     CALL(evt_npc_set_autotalkpose, STRING("ルイージ"), STRING("L_8"), STRING("L_9"))
+    // Luigi starts to read, and the scene ends with a white fade to the map gor_10.
     CALL(evt_msg_print, 0, STRING("pro_03"), 0, STRING("ルイージ"))
     WAIT_MS(300)
     CALL(evt_cam_letter_box_camid, 10)
@@ -380,6 +399,7 @@ static void draw(CameraId camera, void* param) {
  * the scene, and the game moves on to muj_20 with the story at STORY_STG0_02_MARIOS_HOUSE.
  */
 EVT_BEGIN(evt_prologue2)
+    // Back in the house after the letter has been read: Mario and Luigi are placed on a black background.
     CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_aaa_00"), MAPOBJ_FLAG_HIDE)
@@ -406,6 +426,7 @@ EVT_BEGIN(evt_prologue2)
 #endif
     CALL(evt_fade_end_wait)
     CALL(evt_cam_letter_box_camid, 8)
+    // Luigi notices an old map was in the envelope with the letter.
     CALL(evt_msg_print, 0, STRING("pro_05"), 0, STRING("ルイージ"))
     WAIT_MS(300)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("I_1"))
@@ -413,6 +434,7 @@ EVT_BEGIN(evt_prologue2)
     ADD(LW(0), -25)
     ADD(LW(1), 15)
     ADD(LW(2), -3)
+    // Luigi holds up the map for a moment.
     CALL(evt_item_entry, STRING("map"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_item_set_scale, STRING("map"), FLOAT(0.5498047f))
     WAIT_MS(1000)
@@ -420,6 +442,7 @@ EVT_BEGIN(evt_prologue2)
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("S_1"))
     CALL(evt_mario_set_pose, STRING("M_L_3"))
     WAIT_MS(1500)
+    // The title picture fades in; the script waits until it is fully shown.
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
         CALL(mapdraw)
@@ -431,6 +454,7 @@ EVT_BEGIN(evt_prologue2)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(1000)
+    // The music fades out, the story progress is set, and the game moves on to muj_20.
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_fade_set_mapchange_type, 1, FADE_PAGE_FLIP_Z1, 0, FADE_PAGE_FLIP_A1, 0)
@@ -445,6 +469,7 @@ EVT_END()
  * Mario jumps and Luigi follows, then the map changes to gor_02.
  */
 static EVT_BEGIN(epilogue_evt)
+    // The ending ambience starts; Mario and Luigi are placed in the house.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_END_AAA1"))
     CALL(evt_mario_key_onoff, 0)
@@ -458,6 +483,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_mario_set_pose, STRING("M_S_5"))
     CALL(evt_npc_set_anim, STRING("ルイージ"), STRING("S_2"))
     WAIT_MS(3000)
+    // Luigi hears about Mario's trip, then the screen fades and the front door opens.
     CALL(evt_msg_print, 0, STRING("ep_31"), 0, 0)
     WAIT_MS(500)
     CALL(evt_fade_entry, FADE_OUT_BLACK, 1, 0, 0, 0)
@@ -470,6 +496,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_env_lpf, 0, 800)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("ルイージ"), STRING("S_2"), STRING("T_2"))
+    // Luigi says Peach is safe and asks if Mario is ready for a new adventure.
     CALL(evt_msg_print, 0, STRING("ep_32"), 0, STRING("ルイージ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAND_UP1_2"), LW(0), LW(1), LW(2), 0)
@@ -479,6 +506,7 @@ static EVT_BEGIN(epilogue_evt)
     WAIT_MS(1000)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_2"), LW(0), LW(1), LW(2), 0)
+    // A mail arrives: the mail jingle plays and the controller rumbles until A is pressed.
     CALL(evt_mario_balloon_bikkuri)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_MAIL_RECEPTION3"))
@@ -499,6 +527,7 @@ static EVT_BEGIN(epilogue_evt)
     DELETE_EVENT(LW(10))
     WAIT_FRAMES(1)
     CALL(evt_sub_rumble_onoff, 1, 0)
+    // Luigi asks about the "newfangled mail gadget" and Mario jumps for joy.
     CALL(evt_msg_print, 0, STRING("ep_34"), 0, STRING("ルイージ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
 #if VERSION >= VERSION_US
@@ -520,6 +549,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_sfxon_3d, STRING("SFX_MAIL_RECEPTION2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_10"))
     WAIT_MS(500)
+    // Goombella's mail is read, the sound fades and the map changes to gor_02.
     CALL(evt_msg_print, 0, STRING("ep_35"), 0, 0)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
     CALL(evt_snd_envoff_f, PSND_FADE_OUT, 3000)
@@ -558,6 +588,7 @@ EVT_END()
  * the story progress is set to STORY_STG9_00_EPILOGUE and the map changes to end_00.
  */
 static EVT_BEGIN(epilogue_evt2)
+    // Later in the epilogue: Mario and Luigi are placed in the house and the front door is opened.
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_END_AAA1"))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
@@ -577,6 +608,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_fade_end_wait)
     WAIT_MS(500)
     CALL(evt_npc_flag_onoff, 0, STRING("ルイージ"), NPC_FLAG_INSTANT_TURN)
+    // The end of Goombella's mail is read and the house music starts.
     CALL(evt_msg_print, 0, STRING("ep_47"), 0, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MARIO_HOUSE2"))
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -587,6 +619,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_mario_set_dir, 90, 0, 0)
 #endif
     WAIT_MS(1000)
+    // Luigi says everyone sounds like they are doing great.
     CALL(evt_msg_print, 0, STRING("ep_48"), 0, STRING("ルイージ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_4"), LW(0), LW(1), LW(2), 0)
@@ -595,6 +628,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_mapobj_get_position, STRING("S_ie_door"), LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
+    // Someone knocks at the door twice and Luigi goes to look.
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_EPILOGUE_KINOJII_KNOCK1"), LW(0), LW(1), LW(2), 0)
     WAIT_FRAMES(20)
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_EPILOGUE_KINOJII_KNOCK1"), LW(0), LW(1), LW(2), 0)
@@ -604,6 +638,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_npc_set_ry, STRING("ルイージ"), 90)
     WAIT_FRAMES(1)
     CALL(evt_npc_wait_pera, STRING("ルイージ"))
+    // Luigi wonders who is there and Toadsworth and Peach appear.
     CALL(evt_msg_print, 0, STRING("ep_49"), 0, STRING("ルイージ"))
     CALL(evt_npc_set_position, STRING("キノじい"), 60, 30, -110)
     CALL(evt_npc_set_position, STRING("ピーチ姫"), 78, 30, -89)
@@ -622,12 +657,14 @@ static EVT_BEGIN(epilogue_evt2)
     END_LOOP
     CALL(evt_npc_move_position, STRING("キノじい"), 10, -205, 0, 60, 0)
     CALL(evt_npc_move_position, STRING("ピーチ姫"), 10, -160, 0, 60, 0)
+    // They greet Mario and Luigi and Toadsworth explains the visit.
     CALL(evt_msg_print, 0, STRING("ep_51"), 0, STRING("ピーチ姫"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("ep_52"), 0, STRING("キノじい"))
     CALL(evt_cam3d_evt_set, -259, 137, 44, -15, 76, -200, 800, 11)
     WAIT_MS(800)
     CALL(evt_npc_set_autotalkpose, STRING("ピーチ姫"), STRING("P_S_5"), STRING("P_T_5"))
+    // Peach shows the treasure map Toadsworth found and invites Mario to go hunting for treasure.
     CALL(evt_msg_print, 0, STRING("ep_53"), 0, STRING("ピーチ姫"))
     CALL(evt_npc_set_anim, STRING("ピーチ姫"), STRING("P_S_7"))
     CALL(evt_cam3d_evt_set, -406, 179, 126, -47, 90, -232, 800, 11)
@@ -635,6 +672,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_npc_set_autotalkpose, STRING("ピーチ姫"), STRING("P_S_7"), STRING("P_T_13"))
     CALL(evt_msg_print, 0, STRING("ep_54"), 0, STRING("ピーチ姫"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    // Mario is startled and Luigi keeps turning back and forth in surprise.
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_5B"))
     WAIT_MS(550)
@@ -666,6 +704,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_npc_move_position, STRING("ピーチ姫"), 78, -89, 0, 60, 0)
     CALL(evt_npc_set_position, STRING("ピーチ姫"), 0, -1000, 0)
     WAIT_WHILE(GF(0))
+    // Peach and Toadsworth walk away and leave the house.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_ENDING4"))
     CALL(evt_cam3d_evt_set, -260, 90, -62, -68, 42, -253, 800, 11)
     WAIT_MS(800)
@@ -673,6 +712,8 @@ static EVT_BEGIN(epilogue_evt2)
     WAIT_MS(1000)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 30)
+    // A spotlight closes in on Mario; the story progress is set to the epilogue and the ending starts at
+    // end_00.
     CALL(evt_fade_set_spot_pos, LW(0), LW(1), LW(2))
     CALL(evt_fade_entry, FADE_OUT_SPOT, 3000, 0, 0, 0)
     CALL(evt_fade_end_wait)
@@ -683,11 +724,13 @@ static EVT_BEGIN(epilogue_evt2)
     RETURN
 EVT_END()
 
+/** The tree outside the house that can be shaken, ending with a terminator entry. */
 static TreeAccess ki_data[] = {
     {6, "A_ki_1", "S_ki_1", "S_ha_1", 0, NULL},
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/** The ten grass patches around the house that can be cut, ending with a terminator entry. */
 static KusaAccess kusa_data[] = {
     {0, "A_kusa_01", "S_kusa_01", NULL},
     {0, "A_kusa_02", "S_kusa_02", NULL},
@@ -702,6 +745,7 @@ static KusaAccess kusa_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/** Exit of this room: the pipe named dokan_1. */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan_1", // hitName

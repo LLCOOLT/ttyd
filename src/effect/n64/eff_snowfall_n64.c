@@ -43,6 +43,10 @@ static void effSnowfallMain(EffectEntry* effect);
 static void effSnowfallDisp(CameraId cameraId, EffectEntry* effect);
 static void cam_clip_chk(EffSnowfallParticle* p, s32 w, s32 h, s32 life);
 
+/**
+ * A loose cluster of eight small flake quads drawn for every snowfall particle,
+ * so each one reads as several flakes.
+ */
 static effN64Vtx eff_snowfall_v[] = {
     {-78, 3, -38, 0, 2048, 0xFF, 0xFF, 0xFF, 0xFF},
     {-68, 3, -38, 2048, 2048, 0xFF, 0xFF, 0xFF, 0xFF},

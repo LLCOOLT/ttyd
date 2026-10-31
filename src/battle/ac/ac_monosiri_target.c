@@ -36,9 +36,10 @@ typedef struct MonosiriTargetWork {
 
 static void actionCommandDisp(f32 x, f32 y);
 
+/** Frames the Tattle cursor takes to cross the target, by difficulty (240 at the easiest down to 20). */
 s32 _frame_table[] = {240, 180, 120, 90, 70, 40, 20};
 
-// inlining off for _getmaxcount, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _getmaxcount is inlined into battleAcMain_MonosiriTarget (188 -> 192 instructions)
 #pragma dont_inline on
 /** Frames the Tattle cursor takes to cross the target, by action command difficulty: 240 at the easiest down to 20. */
 static s32 _getmaxcount(void) {
@@ -167,7 +168,7 @@ void battleAcDelete_MonosiriTarget(BattleWork* work) {
     work->actionCommands.acState = 1002;
 }
 
-// inlining off for actionCommandDisp, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it actionCommandDisp is inlined into battleAcDisp_MonosiriTarget (15 -> 258 instructions)
 #pragma dont_inline on
 /**
  * Draws the moving cursor and the spinning target reticle (each with a grey shadow),

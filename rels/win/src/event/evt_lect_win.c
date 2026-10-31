@@ -433,8 +433,11 @@ EVT_BEGIN(cloud_party_lecture_init)
 EVT_END()
 
 /**
- * Guess: flurrie's tutorial after she joins ("lecture_friends_07_0_1" to 08):
- * messages explain her blow-wind and body slam style abilities while the camera zooms in and back out.
+ * Flurrie's ability primer, run by all_party_lecture when she joins (lecture_friends_07_0_1 to 08):
+ * the text explains that X makes her blow gusts of wind (holding it keeps her blowing) and the camera moves in
+ * while she blows three times;
+ * then she steps back beside Mario as the camera pulls out and the text adds her Body Slam
+ * and Gale Force battle moves.
  */
 EVT_BEGIN(cloud_party_lecture)
     CALL(evt_msg_print, 0, STRING("lecture_friends_07_0_1"), 0, 0)
@@ -484,10 +487,11 @@ EVT_END()
 /**
  * Shared "partner joins" cutscene run by each partner's pickup scene (LW(8) the partner NPC, LW(9) the partner
  * id): the partner joins the party with a fanfare,
- * an "itemget" background appears and the lecture message for that partner plays, then the game is restored.
- * For Koops the extra kick tutorial runs inside it.
+ * an "itemget" background appears with that partner's joining message, the partner's lesson runs
+ * (this map area's copy has only Flurrie's) and the game is restored.
  */
 EVT_BEGIN(all_party_lecture)
+    // Unless it is Goombella (already out), the current partner leaves and the new one takes the NPC's place.
     CALL(evt_mario_normalize)
     IF_INT_NOT_EQUAL(LW(9), 1)
         IF_INT_NOT_EQUAL(LW(9), 5)
@@ -505,6 +509,8 @@ EVT_BEGIN(all_party_lecture)
     ELSE
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     END_IF
+    // The joining fanfare plays over an "itemget" backdrop with this partner's "joined your party!" message
+    // (Yoshi's includes the name Mario chose).
     CALL(evt_party_set_camid, 0, 7)
     SPAWN_EVENT_GET_ID(PTR(all_party_lecture_otosub), LW(11))
     CALL(lect_itemget_kesan, 0, FLOAT(600.0f), LW(0), LW(1), LW(2))
@@ -529,12 +535,14 @@ EVT_BEGIN(all_party_lecture)
         CASE_EQUAL(7)
         CALL(evt_msg_print, 0, STRING("lecture_friends_17"), 0, 0)
     END_SWITCH
+    // When the message closes the fanfare is cut short if it is still playing.
     IS_EVENT_RUNNING(LW(11), LW(12))
     IF_INT_EQUAL(LW(12), 1)
         DELETE_EVENT(LW(11))
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_IF
+    // The lecture starts: its music plays and the scene is captured onto a paper sheet as a transition.
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_mario_set_camid, 7)
     CALL(effitemget_open, STRING("sub_bg"))
@@ -569,6 +577,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_cont_onoff, 0, 1)
     CALL(lect_test_systemlevel)
+    // Mario blinks out of view and the partner's lesson runs (here only Flurrie has one: cloud_party_lecture).
     SWITCH(LW(9))
         CASE_EQUAL(5)
         CALL_CHILD(cloud_party_lecture_init)
@@ -588,6 +597,7 @@ EVT_BEGIN(all_party_lecture)
         CASE_EQUAL(5)
         CALL_CHILD(cloud_party_lecture)
     END_SWITCH
+    // Mario and the partner blink back in.
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)
         CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
@@ -600,6 +610,7 @@ EVT_BEGIN(all_party_lecture)
     END_LOOP
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
+    // The cameras, music and ambience are restored and the paper sheet folds away, returning to the game.
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(lect_cam_load, 0)

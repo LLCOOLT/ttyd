@@ -11,6 +11,13 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
 
+// Unit work slots of the Spike Top.
+enum {
+    UW_TOGEMET_ON_CEILING = 0, // set by the battle setup: non-zero while it hangs from the ceiling; cleared when it drops
+    UW_TOGEMET_SPIN_STOP = 1,  // 1 stops the shell spin loop of attack_event
+    UW_TOGEMET_SPIN_SPEED = 2, // degrees the shell turns per frame while it charges
+};
+
 BattleUnitKind unit_togemet;
 static PoseTableEntry pose_table[17];
 static PoseTableEntry pose_table_ceil[17];
@@ -58,8 +65,12 @@ static EvtWord attack_event_ceil[426];
 #endif
 static EvtWord wait_event_ceil[6];
 
+/**
+ * Unit definition of the Spike Top: 5 HP and level 17, with its sizes, damage sounds, status vulnerability,
+ * parts and init script.
+ */
 BattleUnitKind unit_togemet = {
-    73,
+    UNIT_SPIKE_TOP,
     "btl_un_togemet",
     5,
     0,
@@ -124,67 +135,82 @@ BattleUnitKind unit_togemet = {
     data_table,
 };
 
+/**
+ * Pose table of the Spike Top: maps each battle pose (waiting, hurt, running...) to one of its TMT_* animations.
+ */
 static PoseTableEntry pose_table[] = {
-    {1, "TMT_N_1"},
-    {2, "TMT_Y_1"},
-    {9, "TMT_Y_1"},
-    {5, "TMT_K_1"},
-    {4, "TMT_X_1"},
-    {3, "TMT_X_1"},
-    {28, "TMT_S_1"},
+    {STATUS_SLEEP, "TMT_N_1"},
+    {STATUS_STOP, "TMT_Y_1"},
+    {STATUS_FREEZE, "TMT_Y_1"},
+    {STATUS_CONFUSE, "TMT_K_1"},
+    {STATUS_POISON, "TMT_X_1"},
+    {STATUS_DIZZY, "TMT_X_1"},
+    {BTL_POSE_NORMAL, "TMT_S_1"},
     {29, "TMT_Q_1"},
     {30, "TMT_Q_1"},
     {31, "TMT_A_1"},
-    {39, "TMT_D_1"},
+    {BTL_POSE_DAMAGE, "TMT_D_1"},
     {50, "TMT_A_1"},
-    {40, "TMT_W_1"},
-    {42, "TMT_R_1"},
-    {56, "TMT_X_1"},
-    {57, "TMT_X_1"},
+    {BTL_POSE_WALK, "TMT_W_1"},
+    {BTL_POSE_RUN, "TMT_R_1"},
+    {BTL_POSE_DANGER, "TMT_X_1"},
+    {BTL_POSE_PERIL, "TMT_X_1"},
     {BTL_POSE_STAY_DEFAULT, "TMT_S_1"},
 };
 
+/**
+ * Pose table of the Spike Top while it clings to the ceiling:
+ * maps each battle pose (waiting, hurt, running...) to one of its STM_* animations.
+ */
 static PoseTableEntry pose_table_ceil[] = {
-    {1, "STM_N_1"},
-    {2, "STM_Y_1"},
-    {9, "STM_Y_1"},
-    {5, "STM_K_1"},
-    {4, "STM_X_1"},
-    {3, "STM_X_1"},
-    {28, "STM_S_1"},
+    {STATUS_SLEEP, "STM_N_1"},
+    {STATUS_STOP, "STM_Y_1"},
+    {STATUS_FREEZE, "STM_Y_1"},
+    {STATUS_CONFUSE, "STM_K_1"},
+    {STATUS_POISON, "STM_X_1"},
+    {STATUS_DIZZY, "STM_X_1"},
+    {BTL_POSE_NORMAL, "STM_S_1"},
     {29, "STM_Q_1"},
     {30, "STM_Q_1"},
     {31, "STM_A_1"},
-    {39, "STM_D_1"},
+    {BTL_POSE_DAMAGE, "STM_D_1"},
     {50, "STM_A_1"},
-    {40, "STM_W_1"},
-    {42, "STM_R_1"},
-    {56, "STM_X_1"},
-    {57, "STM_X_1"},
+    {BTL_POSE_WALK, "STM_W_1"},
+    {BTL_POSE_RUN, "STM_R_1"},
+    {BTL_POSE_DANGER, "STM_X_1"},
+    {BTL_POSE_PERIL, "STM_X_1"},
     {BTL_POSE_STAY_DEFAULT, "STM_S_1"},
 };
 
+/**
+ * Pose table of the Spike Top while it is flipped on its back:
+ * maps each battle pose (waiting, hurt, running...) to one of its TMT_* animations.
+ */
 static PoseTableEntry pose_table_turn[] = {
-    {1, "TMT_Y_2"},
-    {2, "TMT_Y_2"},
-    {9, "TMT_Y_2"},
-    {5, "TMT_S_3"},
-    {4, "TMT_S_3"},
-    {3, "TMT_S_3"},
-    {28, "TMT_S_3"},
+    {STATUS_SLEEP, "TMT_Y_2"},
+    {STATUS_STOP, "TMT_Y_2"},
+    {STATUS_FREEZE, "TMT_Y_2"},
+    {STATUS_CONFUSE, "TMT_S_3"},
+    {STATUS_POISON, "TMT_S_3"},
+    {STATUS_DIZZY, "TMT_S_3"},
+    {BTL_POSE_NORMAL, "TMT_S_3"},
     {29, "TMT_Q_2"},
     {30, "TMT_Q_2"},
     {31, "TMT_A_1"},
-    {39, "TMT_S_3"},
+    {BTL_POSE_DAMAGE, "TMT_S_3"},
 #if VERSION >= VERSION_JP
-    {40, "TMT_W_1"},
-    {42, "TMT_R_1"},
+    {BTL_POSE_WALK, "TMT_W_1"},
+    {BTL_POSE_RUN, "TMT_R_1"},
 #endif
-    {56, "TMT_S_3"},
-    {57, "TMT_S_3"},
+    {BTL_POSE_DANGER, "TMT_S_3"},
+    {BTL_POSE_PERIL, "TMT_S_3"},
     {BTL_POSE_STAY_DEFAULT, "TMT_S_3"},
 };
 
+/**
+ * Data table of the Spike Top: reaction scripts for being flipped over and an attacker hurt by its spikes;
+ * a First Strike on it triggers nothing special.
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
@@ -192,6 +218,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Data table of the Spike Top while it clings to the ceiling:
+ * reaction scripts for taking a hit with a particular damage pattern;
+ * a First Strike on it triggers nothing special.
+ */
 static BattleDataEntry data_table_ceil[] = {
     {26, counter_damage_event_ceil},
     {25, counter_damage_event_ceil},
@@ -209,6 +240,7 @@ static BattleDataEntry data_table_ceil[] = {
     {0},
 };
 
+/** Attack data of the Spike Top's shell charge: 3 damage. */
 static BattleWeapon weapon_met_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -227,7 +259,7 @@ static BattleWeapon weapon_met_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -249,6 +281,7 @@ static BattleWeapon weapon_met_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data of the Spike Top's ceiling drop: 5 damage. */
 static BattleWeapon weapon_met_ceil_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -267,7 +300,7 @@ static BattleWeapon weapon_met_ceil_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -289,27 +322,43 @@ static BattleWeapon weapon_met_ceil_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Defence of the Spike Top: 4 against normal, ice and electric hits;
+ * immune to fire and explosions (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{4, 99, 4, 99, 4}};
 
+/** Element modifiers of the Spike Top: fire and explosion hits do no damage. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 2, 0}};
 
+/** Defence of the Spike Top while it is flipped on its back: none, every hit does its full damage. */
 static BattleUnitDefense defence_turn = {0};
 
+/**
+ * Element modifiers of the Spike Top while it is flipped on its back: none, no element is special to it.
+ */
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Spike Top in the demo builds: immune to burn; resists most other statuses.
+ */
 static StatusVulnerability regist = {60, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 65, 100, 75, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Spike Top in the retail builds: immune to burn; resists most other statuses.
+ */
 static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 30, 100, 75, 100, 100, 95};
 #endif
 
+/** Body part of the Spike Top: a single part using the c_met model. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_togemet", "c_met", 0.0f, 0.0f, 0.0f, 0.0f, 23.0f, 0.0f, 0.0f, 28.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
+    {1, "btl_un_togemet", "c_met", 0.0f, 0.0f, 0.0f, 0.0f, 23.0f, 0.0f, 0.0f, 28.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_TOP_SPIKY, pose_table},
 };
 
 /** Init script of the Spike Top: sets up the floor or ceiling form through init_event2 and starts the wait script. */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_ON_CEILING, LW(15))
     CALL_CHILD(init_event2)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -322,19 +371,19 @@ EVT_END()
  * Both set the run and walk sounds and clear the overturn count. Rerun whenever it drops to the floor.
  */
 static EVT_BEGIN(init_event2)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_ON_CEILING, LW(15))
     IF_INT_EQUAL(LW(15), 0)
         CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
         CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
         CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
         CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
         CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 4096)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELLED)
         CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     ELSE
-        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 2)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_ceil))
         CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_ceil))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -365,12 +414,12 @@ EVT_END()
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 38)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 18)
         GOTO(90)
@@ -401,9 +450,9 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 1)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(4)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
@@ -411,7 +460,7 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 5, LW(2), 18, -1)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 5, LW(2), 12, -1)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 5, LW(2))
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     RETURN
 EVT_END()
 
@@ -431,7 +480,7 @@ static EVT_BEGIN(wakeup_event)
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -439,7 +488,7 @@ static EVT_BEGIN(wakeup_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 18, -1)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -454,14 +503,17 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        // If the Spike Top is on its back it spends the turn getting up instead of attacking.
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // First-strike battle: the target is already fixed; otherwise one is picked from the opposing party.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
         WAIT_FRAMES(30)
     ELSE
+        // If the Spike Top holds an item, it uses that instead of attacking.
         CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(LW(0))
@@ -472,19 +524,22 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_met_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_met_attack), LW(3), LW(4))
     END_IF
+    // No target to attack: a confused Spike Top just flusters about, otherwise it skips its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera frames the Spike Top and its target.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_met_attack))
+    // The Spike Top declares its shell charge.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_met_attack))
@@ -498,25 +553,27 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_ATTACK2"), EVT_NULLPTR, 0, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_STOP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_SPEED, 0)
+    // It curls into its shell and starts to spin, faster in two steps.
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_STOP, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_SPEED, 10)
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_SPEED, 20)
     WAIT_MS(100)
+    // A trail of smoke kicks up behind it while it rolls at the target.
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -531,7 +588,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 0)
     DELETE_EVENT(LW(13))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), 256, LW(5))
+    // Check whether the attack will connect; a miss sends the target into its dodge.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -553,14 +611,15 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A miss: it rolls past the target, then jumps and turns back.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 100)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0, 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_SPEED, 10)
     WAIT_MS(250)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_STOP, 1)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
@@ -569,11 +628,12 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     GOTO(98)
+    // A hit: the target takes the damage and the Spike Top bounces off it twice.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_met_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_SPEED, 10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
@@ -584,13 +644,15 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_SPIN_STOP, 1)
     GOTO(98)
+    // The charge is over: it walks back to its place.
     LABEL(98)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    // Turn finished: the Spike Top goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -612,9 +674,9 @@ static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -623,7 +685,7 @@ static EVT_BEGIN(damage_event_ceil)
     IF_INT_EQUAL(LW(12), 0)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(ceil_fall_ready_event)
     END_IF
@@ -636,12 +698,12 @@ EVT_END()
  * then plays the common counter-damage reaction.
  */
 static EVT_BEGIN(counter_damage_event_ceil)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_ON_CEILING, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
 #if VERSION >= VERSION_JP
@@ -658,7 +720,8 @@ static EVT_BEGIN(counter_damage_event_ceil)
 EVT_END()
 
 /**
- * Knocks the Spike Top off the ceiling (also its ceiling-fall script, Guess: for quakes and similar):
+ * Knocks the Spike Top off the ceiling; also its ceiling-fall script,
+ * which _fall_frame_event runs when the stage's overhead iron frame falls:
  * it falls with SFX_ENM_FALL1, lands on its back with SFX_ENM_TOGEMET_LANDING1
  * and is set up flipped like dmg_turn_event.
  */
@@ -670,12 +733,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 20, LW(2), 15, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEMET_LANDING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_turn))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_ON_CEILING, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
 #if VERSION >= VERSION_JP
@@ -688,14 +751,14 @@ static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 1)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 5, LW(2), 18, -1)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 5, LW(2), 12, -1)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 5, LW(2))
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     RETURN
 EVT_END()
 
@@ -707,10 +770,12 @@ EVT_END()
  * hops off the target twice and walks to the spot below where it hung.
  */
 static EVT_BEGIN(attack_event_ceil)
+    // First-strike battle: the target is already fixed; otherwise one is picked from the opposing party.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
+        // If the Spike Top holds an item, it uses that instead of attacking.
         CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(LW(0))
@@ -721,8 +786,9 @@ static EVT_BEGIN(attack_event_ceil)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_met_ceil_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_met_ceil_attack), LW(3), LW(4))
     END_IF
+    // No target to attack: a confused Spike Top just flusters about, otherwise it skips its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -730,6 +796,7 @@ static EVT_BEGIN(attack_event_ceil)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
+    // The camera frames the Spike Top and its target.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -742,7 +809,8 @@ static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(100)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // The Spike Top crawls along the ceiling until it is above the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
@@ -751,13 +819,15 @@ static EVT_BEGIN(attack_event_ceil)
     WAIT_MS(250)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, 0)
+    // It lets go of the ceiling and drops onto the target spike first.
     CALL(btlevtcmd_SetJumpSpeed, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 20, LW(2), 15, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEMET_LANDING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), 256, LW(5))
+    // Check whether the attack will connect; a miss sends the target into its dodge.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -781,24 +851,29 @@ static EVT_BEGIN(attack_event_ceil)
     END_SWITCH
     LABEL(90)
     GOTO(98)
+    // The drop connects: the target takes the damage.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_met_ceil_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
+    // Hit or miss, it comes down off the ceiling.
     LABEL(98)
     WAIT_FRAMES(60)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+    // It is on the floor now: its flags, poses and data table switch from the ceiling versions to the floor
+    // ones.
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGEMET_ON_CEILING, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
 #if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 14, 17, 0)
 #endif
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
+    // It hops twice off the target.
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 25)
@@ -809,11 +884,13 @@ static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 25)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
+    // Its home becomes the spot below where it hung.
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(7), 0, LW(9))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(7), 0, LW(9), 0, -1, 0)
     CALL_CHILD(init_event2)
+    // Turn finished: the Spike Top goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

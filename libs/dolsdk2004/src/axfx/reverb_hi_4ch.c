@@ -196,8 +196,8 @@ const static double i2fMagic = 4503601774854144.0;
 
 /**
  * Assembly inner loop of the 4-channel reverb for output k (0 L, 1 R, 2 Ls, 3 Rs) over a 160-sample buffer:
- * pre-delay, comb and all-pass delay lines and damping, mixed with the dry signal.
- * Guess: the exact filter topology, as in the stereo version. Original assembly.
+ * the same chain as the stereo HandleReverb (pre-delay, three combs, two all-passes, low-pass, third all-pass,
+ * level mix with the dry input). Original assembly.
  */
 asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DPL2* rv, register s32 k) {
     nofralloc

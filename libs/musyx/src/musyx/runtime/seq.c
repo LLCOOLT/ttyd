@@ -10,6 +10,10 @@ static NOTE seqNote[256];
 SEQ_INSTANCE seqInstance[8];
 u16 seqMIDIPriority[8][16];
 
+/**
+ * State of the sequence player: the next sequence id to hand out, the fade-out in progress and the sequence
+ * now playing.
+ */
 static u32 seq_next_id = 0;
 static bool8 curFadeOutState = 0;
 static u32 curSeqId = 0;
@@ -1034,7 +1038,7 @@ static SEQ_EVENT* GenerateNextTrackEvent(u8 trackId) {
 
         ev->type = 3;
         ev->time = track->addr->time;
-        // TODO what is this?
+        // loop marker: its transpose/velocityAdd bytes hold the u16 index of the entry to loop to
         track->addr = &track->base[*((u16*)&track->addr->transpose)];
         return ev;
       }
@@ -1196,7 +1200,7 @@ static SEQ_EVENT* HandleEvent(SEQ_EVENT* event, u8 secIndex, bool* loopFlag) {
         DoPrgChange(cseq, key & 0x7f, midi);
         break;
       case 1:
-        inpSetMidiCtrl(0x82 /* TODO SND_MIDICTRL_? */, midi, curSeqId, key & 0x7f);
+        inpSetMidiCtrl(0x82 /* aftertouch (macro ctrl 0x81, see inpTranslateExCtrl) */, midi, curSeqId, key & 0x7f);
         break;
       default:
         if ((velocity & 0x80) != 0x80) {

@@ -1,6 +1,5 @@
-#pragma once
-
 // Declarations shared by the pik.rel units (ピカリーヒルズ, Poshley Heights).
+#pragma once
 
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"

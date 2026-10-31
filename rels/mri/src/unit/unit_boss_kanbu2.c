@@ -28,6 +28,10 @@ static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_guard[18];
 static EvtWord normal_attack_event[365];
 
+/**
+ * Unit data of Lord Crump: 15 HP, 56x59 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_boss_kanbu2 = {
     188,
     "btl_un_kanbu2",
@@ -94,22 +98,31 @@ BattleUnitKind unit_boss_kanbu2 = {
     data_table,
 };
 
+/** Defence of Lord Crump: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Lord Crump: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of Lord Crump (percent chance each status takes hold): immune to fright, Gale Force,
+ * instant KO; the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 0, 0, 100, 100, 100, 100, 0};
 
+/** Event table of Lord Crump: dead_event (tag 49). */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/** Parts of Lord Crump: 1 part (model c_kanbu). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_kanbu2", "c_kanbu", 0.0f, 0.0f, 0.0f, 0.0f, 45.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_kanbu2", "c_kanbu", 0.0f, 0.0f, 0.0f, 0.0f, 45.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Weapon of Lord Crump (attack): targets one unit for 2 damage; used by attack_event. */
 BattleWeapon weapon_kanbu2_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -128,7 +141,7 @@ BattleWeapon weapon_kanbu2_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -205,6 +218,7 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/** Pose table of Lord Crump: maps its battle poses to its animations. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -212,20 +226,21 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {BTL_POSE_TALK, "T_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_1"},
-    {39, "D_1"},
-    {42, "R_2"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_RUN, "R_2"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Poses of Lord Crump while he is guarding (set by guard_event). */
 static PoseTableEntry pose_table_guard[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -233,16 +248,16 @@ static PoseTableEntry pose_table_guard[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "G_2"},
+    {BTL_POSE_NORMAL, "G_2"},
     {BTL_POSE_TALK, "T_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "G_2"},
-    {39, "D_1"},
-    {42, "R_2"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_RUN, "R_2"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "G_2"},
 };
@@ -266,7 +281,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -277,11 +292,13 @@ static EVT_BEGIN(normal_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Lord Crump runs at his target (R_2), stopping 60 units short of it.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_2"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
+    // He jumps (A_1A, A_1B) and comes down over the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KANBU_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
@@ -312,12 +329,15 @@ static EVT_BEGIN(normal_attack_event)
         CASE_DEFAULT
         GOTO(98)
         CASE_END
+        // He misses or is blocked: the target gets out of the way and he comes down on the spot.
         LABEL(90)
         GOTO(98)
+        // He hits: the Action Command defence result is applied and damage is dealt.
         LABEL(91)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         GOTO(98)
+        // The belly flop: he lands flat (A_1C) with a heavy thud and the screen shakes, then bounces twice.
         LABEL(98)
         CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1C"))
@@ -338,6 +358,7 @@ static EVT_BEGIN(normal_attack_event)
             WAIT_FRAMES(7)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KANBU_HIP_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
         END_SIBLING_EVENT
+        // He lies dazed for a moment (D_1), then hops up and gets back on his feet.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_1"))
         WAIT_FRAMES(15)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -346,6 +367,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
         WAIT_FRAMES(10)
         CALL(evt_btl_camera_set_mode, 0, 0)
+        // He runs back to his starting spot.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
         CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))

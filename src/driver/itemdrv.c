@@ -93,7 +93,10 @@ WinMgrDesc itemdrv_window_desc[4] = {
 #define itemGetWork() (gp->inBattle ? &work[1] : &work[0])
 
 #if VERSION <= VERSION_DEMO_US
-/** the demo returns a badge to the pouch when its 0x100 flag is clear, in or out of battle */
+/**
+ * The demo puts a removed badge item on sale at the badge shop (pouchArriveBadge, the bargain table)
+ * when its ITEM_FLAG_BADGE_RETURN bit (0x100) is clear, in or out of battle.
+ */
 inline void itemCheckBadge(ItemEntry* entry) {
     if (BADGE_MIN <= entry->itemId && entry->itemId < BADGE_MAX && !(entry->flags & ITEM_FLAG_BADGE_RETURN)) {
         pouchArriveBadge(entry->itemId);
@@ -101,8 +104,8 @@ inline void itemCheckBadge(ItemEntry* entry) {
 }
 #else
 /**
- * On the field, gives a badge back to the pouch when its item entry is removed
- * while it carries ITEM_FLAG_BADGE_RETURN (a badge that was taken off and dropped).
+ * On the field, when a badge item carrying ITEM_FLAG_BADGE_RETURN (a dropped badge) is removed uncollected,
+ * puts the badge on sale at the badge shop (pouchArriveBadge, the special table) so it is not lost.
  */
 inline void itemCheckBadge(ItemEntry* entry) {
     if (!gp->inBattle) {
@@ -179,8 +182,8 @@ void itemInit(void) { // 1:1
 }
 
 /**
- * Clears the current item table on map change; on the field first returns dropped badges
- * (ITEM_FLAG_BADGE_RETURN) to the pouch.
+ * Clears the current item table on map change; on the field it first puts dropped badges
+ * (ITEM_FLAG_BADGE_RETURN) on sale at the badge shop (itemCheckBadge).
  */
 void itemReInit(void) {
     ItemWork* wp = itemGetWork();
@@ -243,7 +246,7 @@ static BOOL itemGetCheck(ItemEntry* entry) {
         return FALSE;
 #else
     if (mario->characterId == 2) {
-        if (!(mario->stageFlags & 1)) {
+        if (!(mario->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW)) {
             if (marioStGetSystemLevel() != 0U)
                 return FALSE;
             if (mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF))
@@ -515,13 +518,13 @@ void itemMain(void) {
 
         if (entry->flags & ITEM_FLAG_USED) {
             switch (entry->itemId) {
-                case 0x72:
-                case 0x73:
-                case 0x74:
-                case 0x75:
-                case 0x76:
-                case 0x77:
-                case 0x78:
+                case ITEM_DIAMOND_STAR:
+                case ITEM_EMERALD_STAR:
+                case ITEM_GOLD_STAR:
+                case ITEM_RUBY_STAR:
+                case ITEM_SAPPHIRE_STAR:
+                case ITEM_GARNET_STAR:
+                case ITEM_CRYSTAL_STAR:
                     if (!(entry->status & ITEM_STATUS_BLINK_HIDDEN)) {
                         ((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
                         ((ItemEffPos*)entry->effect->userdata)->position.y = 16.0f + entry->position.y;
@@ -543,7 +546,7 @@ void itemMain(void) {
                     break;
             }
             entry->baseTime = gp->renderTime;
-            if (entry->itemId == 0x79 || entry->itemId == 0x7A) {
+            if (entry->itemId == ITEM_COIN || entry->itemId == ITEM_PIANTA_TOKEN) {
                 if (irand(1000) < 30) {
                     dx = 10 - irand(20);
                     dy = irand(20) + 10;
@@ -655,7 +658,7 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
     if (i >= wp->count) {
         entry = NULL;
         for (e = base, i = 0; i < wp->count; i++, e++) {
-            if (e->flags & ITEM_FLAG_USED && e->itemId == 0x79 && e->flags & ITEM_FLAG_REPLACEABLE) {
+            if (e->flags & ITEM_FLAG_USED && e->itemId == ITEM_COIN && e->flags & ITEM_FLAG_REPLACEABLE) {
                 entry = e;
                 break;
             }
@@ -665,7 +668,7 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
         } else {
             entry = NULL;
             for (e = base, i = 0; i < wp->count; i++, e++) {
-                if (e->flags & ITEM_FLAG_USED && e->itemId == 0x7C && e->flags & ITEM_FLAG_REPLACEABLE) {
+                if (e->flags & ITEM_FLAG_USED && e->itemId == ITEM_FLOWER && e->flags & ITEM_FLAG_REPLACEABLE) {
                     entry = e;
                     break;
                 }
@@ -680,15 +683,15 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
 #else
     if (i >= wp->count) {
         entry = wp->entries;
-        if (entry->flags & ITEM_FLAG_USED && entry->itemId == 0x79 && entry->flags & ITEM_FLAG_REPLACEABLE) {
+        if (entry->flags & ITEM_FLAG_USED && entry->itemId == ITEM_COIN && entry->flags & ITEM_FLAG_REPLACEABLE) {
             itemDelete(entry->name);
         } else {
             entry = wp->entries;
-            if (entry->flags & ITEM_FLAG_USED && entry->itemId == 0x7C && entry->flags & ITEM_FLAG_REPLACEABLE) {
+            if (entry->flags & ITEM_FLAG_USED && entry->itemId == ITEM_FLOWER && entry->flags & ITEM_FLAG_REPLACEABLE) {
                 itemDelete(entry->name);
             } else {
                 entry = wp->entries;
-                if (entry->flags & ITEM_FLAG_USED && entry->itemId == 0x7B && entry->flags & ITEM_FLAG_REPLACEABLE) {
+                if (entry->flags & ITEM_FLAG_USED && entry->itemId == ITEM_HEART && entry->flags & ITEM_FLAG_REPLACEABLE) {
                     itemDelete(entry->name);
                 } else {
                     entry = NULL;
@@ -725,14 +728,14 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
     }
 
     switch (entry->itemId) {
-        case 0x72:
-        case 0x73:
-        case 0x74:
-        case 0x75:
-        case 0x76:
-        case 0x77:
-        case 0x78:
-            entry->effect = effStarStoneEntry(entry->itemId - 0x72, x, 16.0f + y, z, 1.0f);
+        case ITEM_DIAMOND_STAR:
+        case ITEM_EMERALD_STAR:
+        case ITEM_GOLD_STAR:
+        case ITEM_RUBY_STAR:
+        case ITEM_SAPPHIRE_STAR:
+        case ITEM_GARNET_STAR:
+        case ITEM_CRYSTAL_STAR:
+            entry->effect = effStarStoneEntry(entry->itemId - ITEM_DIAMOND_STAR, x, 16.0f + y, z, 1.0f);
             break;
         default:
 #if VERSION >= VERSION_JP
@@ -750,10 +753,10 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
     entry->bounceFactor = entry->gravityScale = 1.0f;
     entry->baseTime = gp->renderTime;
     switch (entry->itemId) {
-        case 0x79:
-        case 0x7A:
-        case 0x7B:
-        case 0x7C:
+        case ITEM_COIN:
+        case ITEM_PIANTA_TOKEN:
+        case ITEM_HEART:
+        case ITEM_FLOWER:
             entry->flags |= ITEM_FLAG_INSTANT_GET;
             break;
     }
@@ -831,7 +834,10 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
     return entry;
 }
 
-/** Removes the named field item (and its name windows); later versions first return a dropped badge to the pouch. */
+/**
+ * Removes the named field item (and its name windows);
+ * JP, US and PAL first put a dropped badge on sale at the badge shop (itemCheckBadge).
+ */
 void itemDelete(const char* name) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -843,13 +849,13 @@ void itemDelete(const char* name) {
             itemCheckBadge(entry);
 #endif
             switch (entry->itemId) {
-                case 0x72:
-                case 0x73:
-                case 0x74:
-                case 0x75:
-                case 0x76:
-                case 0x77:
-                case 0x78:
+                case ITEM_DIAMOND_STAR:
+                case ITEM_EMERALD_STAR:
+                case ITEM_GOLD_STAR:
+                case ITEM_RUBY_STAR:
+                case ITEM_SAPPHIRE_STAR:
+                case ITEM_GARNET_STAR:
+                case ITEM_CRYSTAL_STAR:
                     effSoftDelete(entry->effect);
                     break;
                 default:
@@ -999,13 +1005,13 @@ static void winNameDisp(WinMgrEntry* win) {
 
     name = msgSearch(itemDataTable[entry->itemId].name);
     if ((u32)gp->language == 0) {
-        if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+        if (entry->itemId >= BADGE_MIN && entry->itemId < BADGE_MAX) {
             sprintf(buffer, msgSearch("msg_window_badge_get"), name);
         } else {
             sprintf(buffer, msgSearch("msg_window_item_get"), name);
         }
     } else {
-        if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+        if (entry->itemId >= BADGE_MIN && entry->itemId < BADGE_MAX) {
             strcpy(buffer, msgSearch("msg_window_badge_get"));
         } else {
             strcpy(buffer, msgSearch("msg_window_item_get"));
@@ -1034,7 +1040,7 @@ static void winNameDisp(WinMgrEntry* win) {
     char buffer[1024];
 
     name = msgSearch(itemDataTable[entry->itemId].name);
-    if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+    if (entry->itemId >= BADGE_MIN && entry->itemId < BADGE_MAX) {
         sprintf(buffer, msgSearch("msg_window_badge_get"), name);
     } else {
         sprintf(buffer, msgSearch("msg_window_item_get"), name);
@@ -1152,7 +1158,7 @@ static void winFullDisp(WinMgrEntry* win) {
     u16 width;
     const char* msg;
 
-    if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+    if (entry->itemId >= BADGE_MIN && entry->itemId < BADGE_MAX) {
         isBadge = TRUE;
     }
     msg = isBadge ? msgSearch("msg_window_badge_full") : msgSearch("msg_window_item_full");
@@ -1203,7 +1209,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
             marioKeyOff();
             marioStSystemLevel(2);
             psndSetFlag(PSND_FLAG_MUTE_SFX);
-            if (entry->itemId == 7 || entry->itemId == 8 || entry->itemId == 10 || entry->itemId == 11) {
+            if (entry->itemId == ITEM_SUPER_BOOTS || entry->itemId == ITEM_ULTRA_BOOTS || entry->itemId == ITEM_SUPER_HAMMER || entry->itemId == ITEM_ULTRA_HAMMER) {
                 entry->status |= ITEM_STATUS_IMPORTANT;
             }
         case 1:
@@ -1222,25 +1228,25 @@ static void itemseq_GetItem(ItemEntry* entry) {
             }
             type = 7;
             bgm = -1;
-            if (entry->itemId == 0x57) {
+            if (entry->itemId == ITEM_SHINE_SPRITE) {
                 type = 4;
                 bgm = -1;
-            } else if (entry->itemId == 0x7D) {
+            } else if (entry->itemId == ITEM_STAR_PIECE) {
                 type = 8;
                 bgm = 0;
             } else if (entry->itemId < 0xC) {
                 type = 3;
                 bgm = 3;
-            } else if (entry->itemId < 0x72) {
+            } else if (entry->itemId < ITEM_DIAMOND_STAR) {
                 type = 6;
                 bgm = 1;
-            } else if (entry->itemId < 0x79) {
+            } else if (entry->itemId < KEY_ITEM_MAX) {
                 type = 0;
                 bgm = -1;
-            } else if (entry->itemId < 0xEC) {
+            } else if (entry->itemId < ITEM_MAX) {
                 type = 7;
                 bgm = -1;
-            } else if (entry->itemId < 0x153) {
+            } else if (entry->itemId < BADGE_MAX) {
                 type = 5;
                 bgm = 2;
             }
@@ -1311,7 +1317,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
                 winMgrOpen(entry->winId[2]);
                 winMgrSetParam(entry->winId[2], entry);
             }
-            if (entry->itemId == 0x49) {
+            if (entry->itemId == ITEM_WEDDING_RING) {
                 iconChange(entry->name, 0x114);
             }
             break;
@@ -1345,7 +1351,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
                 entry->subState = 5;
                 break;
             }
-            if (entry->itemId >= 0x79 && entry->itemId < 0xEC && entry->itemId != 0x7D && !swGet(GSWF_ITEM_TUTORIAL_SEEN) && !(gp->flags & GLOBAL_FLAG_KIOSK)) {
+            if (entry->itemId >= ITEM_MIN && entry->itemId < ITEM_MAX && entry->itemId != ITEM_STAR_PIECE && !swGet(GSWF_ITEM_TUTORIAL_SEEN) && !(gp->flags & GLOBAL_FLAG_KIOSK)) {
                 swSet(GSWF_ITEM_TUTORIAL_SEEN);
                 entry->subState = 3;
                 wp->msgWindowId = msgWindow_Entry(msgSearch("item_first_hit"), 0, 0);
@@ -1354,7 +1360,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
             effSoftDelete(wp->effect);
             marioSetCamId(4);
             iconFlagOff(entry->name, 0x40);
-            if (entry->itemId == 0x49) {
+            if (entry->itemId == ITEM_WEDDING_RING) {
                 iconChange(entry->name, 0x115);
             }
             if (entry->status & ITEM_STATUS_IN_POUCH) {
@@ -1436,9 +1442,9 @@ static void itemseq_GetItem(ItemEntry* entry) {
             entry->status |= ITEM_STATUS_THROWN;
             itemModeChange(entry, 6);
             entry->flags &= ~ITEM_FLAG_CUSTOM_BOUNCE;
-            if (entry->itemId >= 1 && entry->itemId < 0x79) {
+            if (entry->itemId >= KEY_ITEM_MIN && entry->itemId < KEY_ITEM_MAX) {
                 entry->timer = 0;
-            } else if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+            } else if (entry->itemId >= BADGE_MIN && entry->itemId < BADGE_MAX) {
                 entry->timer = 0;
             } else {
                 entry->timer = 20000;
@@ -1493,7 +1499,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
             mario->floorMove.z = 0.0f;
             mario->baseSpeed = 0.0f;
             mario->moveDist = 0.0f;
-            if (entry->itemId == 7 || entry->itemId == 8 || entry->itemId == 10 || entry->itemId == 11) {
+            if (entry->itemId == ITEM_SUPER_BOOTS || entry->itemId == ITEM_ULTRA_BOOTS || entry->itemId == ITEM_SUPER_HAMMER || entry->itemId == ITEM_ULTRA_HAMMER) {
                 entry->status |= ITEM_STATUS_IMPORTANT;
             }
         case 1:
@@ -1516,25 +1522,25 @@ static void itemseq_GetItem(ItemEntry* entry) {
             }
             type = 7;
             bgm = -1;
-            if (entry->itemId == 0x57) {
+            if (entry->itemId == ITEM_SHINE_SPRITE) {
                 type = 4;
                 bgm = -1;
-            } else if (entry->itemId == 0x7D) {
+            } else if (entry->itemId == ITEM_STAR_PIECE) {
                 type = 8;
                 bgm = 0;
             } else if (entry->itemId < 0xC) {
                 type = 3;
                 bgm = 3;
-            } else if (entry->itemId < 0x72) {
+            } else if (entry->itemId < ITEM_DIAMOND_STAR) {
                 type = 6;
                 bgm = 1;
-            } else if (entry->itemId < 0x79) {
+            } else if (entry->itemId < KEY_ITEM_MAX) {
                 type = 0;
                 bgm = -1;
-            } else if (entry->itemId < 0xEC) {
+            } else if (entry->itemId < ITEM_MAX) {
                 type = 7;
                 bgm = -1;
-            } else if (entry->itemId < 0x153) {
+            } else if (entry->itemId < BADGE_MAX) {
                 type = 5;
                 bgm = 2;
             }
@@ -1605,7 +1611,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
                 winMgrOpen(entry->winId[2]);
                 winMgrSetParam(entry->winId[2], entry);
             }
-            if (entry->itemId == 0x49) {
+            if (entry->itemId == ITEM_WEDDING_RING) {
 #if VERSION >= VERSION_US
                 iconChange(entry->name, 0x11B);
 #else
@@ -1613,7 +1619,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
 #endif
             }
             if (!entry->effect) {
-                iconNameToPtr(entry->name)->uflags |= 0x80;
+                iconNameToPtr(entry->name)->uflags |= ICON_FLAG_ITEM_NO_BLEND;
             }
             break;
         case 2:
@@ -1652,7 +1658,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
                 entry->subState = 6;
                 break;
             }
-            if (entry->itemId >= 0x79 && entry->itemId < 0xEC && entry->itemId != 0x7D && !swGet(GSWF_ITEM_TUTORIAL_SEEN) && !(gp->flags & GLOBAL_FLAG_KIOSK)) {
+            if (entry->itemId >= ITEM_MIN && entry->itemId < ITEM_MAX && entry->itemId != ITEM_STAR_PIECE && !swGet(GSWF_ITEM_TUTORIAL_SEEN) && !(gp->flags & GLOBAL_FLAG_KIOSK)) {
                 swSet(GSWF_ITEM_TUTORIAL_SEEN);
                 entry->subState = 4;
                 wp->msgWindowId = msgWindow_Entry(msgSearch("item_first_hit"), 0, 0);
@@ -1661,7 +1667,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
             effSoftDelete(wp->effect);
             marioSetCamId(4);
             iconFlagOff(entry->name, 0x100);
-            if (entry->itemId == 0x49) {
+            if (entry->itemId == ITEM_WEDDING_RING) {
 #if VERSION >= VERSION_US
                 iconChange(entry->name, 0x11C);
 #else
@@ -1669,7 +1675,7 @@ static void itemseq_GetItem(ItemEntry* entry) {
 #endif
             }
             if (!entry->effect) {
-                iconNameToPtr(entry->name)->uflags &= ~0x80;
+                iconNameToPtr(entry->name)->uflags &= ~ICON_FLAG_ITEM_NO_BLEND;
             }
             if (entry->status & ITEM_STATUS_IN_POUCH) {
                 itemGetEnd(entry);
@@ -1760,9 +1766,9 @@ static void itemseq_GetItem(ItemEntry* entry) {
             entry->status |= ITEM_STATUS_THROWN;
             itemModeChange(entry, 6);
             entry->flags &= ~ITEM_FLAG_CUSTOM_BOUNCE;
-            if (entry->itemId >= 1 && entry->itemId < 0x79) {
+            if (entry->itemId >= KEY_ITEM_MIN && entry->itemId < KEY_ITEM_MAX) {
                 entry->timer = 0;
-            } else if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+            } else if (entry->itemId >= BADGE_MIN && entry->itemId < BADGE_MAX) {
                 entry->timer = 0;
             } else {
                 entry->timer = 20000;
@@ -1853,9 +1859,9 @@ static void itemseq_Bound(ItemEntry* entry) {
                     }
                     if (!(entry->status & ITEM_STATUS_SCATTER)) {
                         switch (entry->itemId) {
-                            case 0x79:
-                            case 0x7B:
-                            case 0x7C:
+                            case ITEM_COIN:
+                            case ITEM_HEART:
+                            case ITEM_FLOWER:
                                 entry->speed = irand(30) + 45;
                                 if (irand(100) < 50) {
                                     entry->direction = 90.0f + camera->viewYaw + irand(60) - 30.0f;
@@ -1991,9 +1997,9 @@ static void itemseq_Bound(ItemEntry* entry) {
                 entry->status &= ~ITEM_STATUS_LAUNCH;
                 entry->status &= ~ITEM_STATUS_THROWN;
                 entry->status &= ~ITEM_STATUS_TIMER_HOLD;
-                if (entry->itemId >= 1 && entry->itemId < 0x79) {
+                if (entry->itemId >= KEY_ITEM_MIN && entry->itemId < KEY_ITEM_MAX) {
                     entry->timer = 0;
-                } else if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+                } else if (entry->itemId >= BADGE_MIN && entry->itemId < BADGE_MAX) {
                     entry->timer = 0;
                 } else {
                     entry->timer = 20000;
@@ -2030,7 +2036,7 @@ static void itemseq_Bound(ItemEntry* entry) {
                 }
             }
             if (hit) {
-                if (hitGetAttr(hit) & 0x600) {
+                if (hitGetAttr(hit) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_DAMAGE_LIQUID)) {
                     entry->status |= ITEM_STATUS_IN_WATER;
                     {
                         Vec sndPos = (Vec){0.0f, 0.0f, 0.0f};
@@ -2043,7 +2049,7 @@ static void itemseq_Bound(ItemEntry* entry) {
                     entry->flags |= ITEM_FLAG_NO_TOUCH;
                 } else {
                     entry->bounceCount++;
-                    if (!(hitGetAttr(hit) & 0x80000000) && entry->maxBounces != 0 && entry->bounceCount >= entry->maxBounces) {
+                    if (!(hitGetAttr(hit) & HIT_ATTR_MOBJ) && entry->maxBounces != 0 && entry->bounceCount >= entry->maxBounces) {
                         itemModeChange(entry, 1);
                         entry->status &= ~ITEM_STATUS_LAUNCH;
                         entry->status &= ~ITEM_STATUS_THROWN;
@@ -2053,32 +2059,32 @@ static void itemseq_Bound(ItemEntry* entry) {
                     {
                         pos = (Vec){entry->position.x, entry->position.y, entry->position.z};
                         switch (itemId = entry->itemId) {
-                            case 0x79:
+                            case ITEM_COIN:
                                 psndSFXOn_3D("SFX_COIN_LEAPED1", &pos);
                                 break;
-                            case 0x7A:
+                            case ITEM_PIANTA_TOKEN:
                                 psndSFXOn_3D("SFX_EVT_GAME_MONTE_LEAPED1", &pos);
                                 break;
-                            case 0x7B:
+                            case ITEM_HEART:
                                 psndSFXOn_3D("SFX_HEART_LEAPED1", &pos);
                                 break;
-                            case 0x7C:
+                            case ITEM_FLOWER:
                                 psndSFXOn_3D("SFX_FLOWER_LEAPED1", &pos);
                                 break;
-                            case 0x7D:
+                            case ITEM_STAR_PIECE:
                                 psndSFXOn_3D("SFX_STAR_PIECE_LEAPED1", &pos);
                                 break;
-                            case 0x72:
-                            case 0x73:
-                            case 0x74:
-                            case 0x75:
-                            case 0x76:
-                            case 0x77:
-                            case 0x78:
+                            case ITEM_DIAMOND_STAR:
+                            case ITEM_EMERALD_STAR:
+                            case ITEM_GOLD_STAR:
+                            case ITEM_RUBY_STAR:
+                            case ITEM_SAPPHIRE_STAR:
+                            case ITEM_GARNET_STAR:
+                            case ITEM_CRYSTAL_STAR:
                                 psndSFXOn_3D("SFX_EVT_STARSTONE_JUMP1", &pos);
                                 break;
                             default:
-                                if (itemId >= 0xF0 && itemId < 0x153) {
+                                if (itemId >= BADGE_MIN && itemId < BADGE_MAX) {
                                     psndSFXOn_3D("SFX_BADGE_LEAPED1", &pos);
                                 } else {
                                     psndSFXOn_3D("SFX_ITEM_LEAPED1", &pos);
@@ -2089,7 +2095,7 @@ static void itemseq_Bound(ItemEntry* entry) {
                     isFloor = FALSE;
                     if (entry->flags & ITEM_FLAG_ELASTIC && entry->velocityY != 0.0f) {
                         bounce = TRUE;
-                    } else if (hitGetAttr(hit) & 0x80000000 && entry->velocityY != 0.0f) {
+                    } else if (hitGetAttr(hit) & HIT_ATTR_MOBJ && entry->velocityY != 0.0f) {
                         mobj = mobjHitObjPtrToPtr(hit);
                         if (mario->characterId == 2) {
                             bounce = FALSE;
@@ -2148,21 +2154,21 @@ void itemGetSound(ItemEntry* entry) {
 
     pos = (Vec){entry->position.x, entry->position.y, entry->position.z};
     switch (entry->itemId) {
-        case 0x79:
+        case ITEM_COIN:
             effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
             psndSFXOn_3D("SFX_COIN_GET1", &pos);
             break;
-        case 0x7A:
+        case ITEM_PIANTA_TOKEN:
             effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
             psndSFXOn_3D("SFX_EVT_GAME_MONTE_COUNT1", &pos);
             break;
-        case 0x7B:
+        case ITEM_HEART:
             psndSFXOn_3D("SFX_HEART_GET1", &pos);
             break;
-        case 0x7C:
+        case ITEM_FLOWER:
             psndSFXOn_3D("SFX_FLOWER_GET1", &pos);
             break;
-        case 0x7D:
+        case ITEM_STAR_PIECE:
             break;
     }
 }

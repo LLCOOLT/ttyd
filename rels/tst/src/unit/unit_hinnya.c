@@ -24,6 +24,7 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[455];
 static EvtWord wait_event[6];
 
+/** Unit definition of the Spinia: 3 HP, level 7, 1 part, with its sounds, init script and data table. */
 BattleUnitKind unit_hinnya = {
     4,
     "btl_un_hinnya",
@@ -90,25 +91,38 @@ BattleUnitKind unit_hinnya = {
     data_table,
 };
 
+/** Defence of the Spinia: none, so it takes full damage from every kind of attack. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type modifiers of the Spinia: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Spinia (100% is the normal chance): immune to Dodgy and Invisible; weak to Stop
+ * 120%, Poison 150%, Electrified 150%, Burn 150%, Huge 150%, Attack Up 150%, Defense Up 150%, Fright 120%,
+ * Gale Force 120%, Fast 150% and instant KO 150%.
+ */
 static StatusVulnerability regist = {100, 120, 100, 150, 100, 150, 150, 100, 150, 100, 150, 100, 150, 100, 100, 120, 120, 150, 100, 0, 0, 150};
 #else
 static StatusVulnerability regist = {100, 120, 100, 150, 100, 150, 150, 100, 150, 100, 150, 100, 150, 100, 100, 110, 110, 150, 100, 0, 0, 150};
 #endif
 
+/** Data table of the Spinia: event 48 does nothing (btldefaultevt_Dummy). */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/**
+ * Body of the Spinia: one targetable part, the model `c_hannya_n`, with its hit box, defence tables and pose
+ * table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_hinnya", "c_hannya_n", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 37.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_hinnya", "c_hannya_n", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 37.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Attack data of the Spinia's rolling attack: hits one opposing unit for 1 damage. */
 static BattleWeapon weapon_hannya_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -127,7 +141,7 @@ static BattleWeapon weapon_hannya_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -145,6 +159,10 @@ static BattleWeapon weapon_hannya_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Pose table of the Spinia: its 18 battle poses (status, hurt and action) and the animation each one plays;
+ * the idle animation is `S_1`.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -152,26 +170,26 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_3"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 /**
- * Init script: sets unit flag 0x1000000 (guess: a flag for this form's pose or targeting), installs the wait,
+ * Init script: sets unit flag 0x1000000 (UNIT_FLAG_NO_BACKFACE_FLIP: no mirror flip when facing away), installs the wait,
  * attack, damage and confusion handlers (confusion reuses the attack) and starts the wait event.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
@@ -189,12 +207,12 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 53)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 33)
         GOTO(90)
@@ -227,7 +245,9 @@ EVT_END()
  * position.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // Uses a held item if it has one to use; otherwise picks the target: the preset first-attack target when battle
+    // flag 2 is set, else a random opposing unit. With no target it does nothing (or is flustered when confused).
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_FRAMES(30)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -243,13 +263,14 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_hannya_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera follows the target; the Spinia declares the attack and pays its cost.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -259,6 +280,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_hannya_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(14))
+    // Wind-up: it rocks back and forth on the spot ten times, winding itself up.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HANNYA_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1"))
     SET_VALUE(LW(15), 0)
@@ -272,13 +294,16 @@ static EVT_BEGIN(attack_event)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // It rolls into a spin and speeds toward the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HANNYA_MOVE1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_hannya_attack), 256, LW(5))
+    // Checks the outcome of the hit: a miss, dodge or guard goes to the no-damage branch; a connecting hit applies
+    // the Action Command defence result and deals the damage.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_hannya_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -300,6 +325,7 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss branch: it rolls past the target and carries on.
     LABEL(90)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     MULTIPLY(LW(14), 500)
@@ -307,18 +333,20 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     GOTO(98)
+    // Hit branch: the camera shakes and pulls in as it slams into the target, which takes the damage.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_hannya_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_hannya_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_hannya_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     MULTIPLY(LW(14), 500)
     ADD(LW(0), LW(14))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     GOTO(98)
+    // Retreat: it re-enters from the right edge of the screen and slows to a halt back at its home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_snd_sfxoff, LW(15))

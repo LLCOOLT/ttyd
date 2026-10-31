@@ -12,6 +12,12 @@
 #include "tst.h"
 #include "version.h"
 
+// Unit work slots of a Mini-Yux (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BARRIERN_Z_SATELLITE_PARENT = 0, // unit id of the Yux it orbits (set by the Yux when it spawns it)
+    UW_BARRIERN_Z_SATELLITE_IDLE = 1    // non-zero once the Yux lets it play its idle pose
+};
+
 static USER_FUNC(battleGetBarriernSatelliteInitPos);
 
 BattleUnitKind unit_barriern_z_satellite;
@@ -27,6 +33,10 @@ static EvtWord unison_phase_event[5];
 static EvtWord attack_event[5];
 static EvtWord wait_event[56];
 
+/**
+ * Unit kind of Mini-Z-Yux: 2 max HP, level 0. The battle engine reads it when the unit spawns:
+ * size, offsets, sounds, status vulnerability, parts, init script and event table.
+ */
 BattleUnitKind unit_barriern_z_satellite = {
     116,
     "btl_un_barriern_satellite_z",
@@ -98,10 +108,19 @@ BattleUnitKind unit_barriern_z_satellite = {
     data_table,
 };
 
+/**
+ * Defence of Mini-Z-Yux per element (normal, fire, ice, explosion, electric), subtracted from each hit:
+ * none.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of Mini-Z-Yux: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Body parts of Mini-Z-Yux: 6 parts (model c_baria_z); the first is the body.
+ * Each part names its defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_barriern_satellite_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
     {2, "btl_un_barriern_satellite_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
@@ -112,11 +131,27 @@ static BattleUnitKindPart parts[] = {
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of Mini-Z-Yux (the demos), as the percent chance a status takes hold:
+ * immune to Poison, Freeze and Fright; always hit by Electric, Burn, Huge, Attack Up, Defense Up, Fast,
+ * Dodgy, Invisible and instant KO; otherwise Sleep 70, Stop 90, Dizzy 90, Confuse 80, Tiny 80,
+ * Attack Down 80, Defense Down 80, Allergic 80, Gale Force 90 and Slow 80.
+ */
 static StatusVulnerability regist = {70, 90, 90, 0, 80, 100, 100, 0, 100, 80, 100, 80, 100, 80, 80, 0, 90, 100, 80, 100, 100, 100};
 #else
+/**
+ * Status vulnerability of Mini-Z-Yux (the final versions), as the percent chance a status takes hold:
+ * immune to Poison, Freeze and Fright; always hit by Electric, Burn, Huge, Attack Up, Defense Up, Fast,
+ * Dodgy, Invisible and instant KO; otherwise Sleep 70, Stop 90, Dizzy 95, Confuse 80, Tiny 85,
+ * Attack Down 85, Defense Down 90, Allergic 80, Gale Force 95 and Slow 80.
+ */
 static StatusVulnerability regist = {70, 90, 95, 0, 80, 100, 100, 0, 100, 85, 100, 85, 100, 90, 80, 0, 95, 100, 80, 100, 100, 100};
 #endif
 
+/**
+ * Pose table of Mini-Z-Yux: maps its battle pose types (stay, walk, hurt, dead, talk and so on) to
+ * animation names, 17 entries such as N_2, Y_2, K_2, X_2.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_2"},
     {2, "Y_2"},
@@ -137,6 +172,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
+/**
+ * Event table of Mini-Z-Yux: maps event tags to the scripts that react to them (no custom reactions);
+ * tag 0 ends it.
+ */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
@@ -152,7 +191,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 3145728)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT | UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -199,11 +238,11 @@ static EVT_BEGIN(wait_event)
     CALL(evt_sub_random, 120, LW(0))
     ADD(LW(0), 30)
     WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_SATELLITE_IDLE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
+            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_4"))
                 WAIT_FRAMES(180)

@@ -1,6 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/mtx.h>
 
+/** Constants 0, 1, 0.5 and 3 for the paired-single 4x4 matrix routines. */
 static f32 mtxUnit[] = {0.0f, 1.0f, 0.5f, 3.0f};
 
 /**

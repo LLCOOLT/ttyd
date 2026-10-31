@@ -28,6 +28,7 @@
 #include <string.h>
 
 #ifdef _DEBUG
+/** Highest number of voices playing at once, kept for debug builds. */
 static u32 dbgActiveVoicesMax = 0;
 #endif
 
@@ -36,36 +37,55 @@ extern u8 salAuxFrame;
 
 DSPstudioinfo dspStudio[8];
 
+/** Address in auxiliary memory of a zero-filled block that silent voices read from. */
 static u32 dspARAMZeroBuffer = 0;
 
+/**
+ * The most recent continue (MORE) command written; its size field is filled in once the next block is
+ * finished.
+ */
 u16* dspCmdLastLoad = NULL;
 
+/** Start of the previous block of the command list, flushed to memory once it is complete. */
 u16* dspCmdLastBase = NULL;
 
+/** Size of the DSP command list most recently built. */
 u16 dspCmdLastSize = 0;
 
+/** Start of the block of the DSP command list being built. */
 u16* dspCmdCurBase = NULL;
 
+/** End of the current block of the command list; a new block is started before it is passed. */
 u16* dspCmdMaxPtr = NULL;
 
+/** Where the next DSP command is written. */
 u16* dspCmdPtr = NULL;
 
+/** Size of the first DSP command list of the current frame, announced to the DSP in the start-up mail. */
 u16 dspCmdFirstSize = 0;
 
+/** The buffer the DSP command lists are built in (1024 words). */
 u16* dspCmdList = NULL;
 
+/** Whether the output compressor is switched on. */
 bool dspCompressorOn = FALSE;
 
+/** Whether head-related (3D headphone) filtering is switched on. */
 u32 dspHRTFOn = FALSE;
 
+/** History samples for the head-related (HRTF) filter. */
 s16* dspHrtfHistoryBuffer = NULL;
 
+/** Buffer of 160 words shared with the DSP for the surround mix. */
 s32* dspSurround = NULL;
 
+/** Buffers for the interaural time difference delay of each voice (64 bytes per voice). */
 s16* dspITDBuffer = NULL;
 
+/** The state of every voice as the DSP sees it. */
 DSPvoice* dspVoice = NULL;
 
+/** Callback the application registered to receive DSP messages. */
 SND_MESSAGE_CALLBACK salMessageCallback = NULL;
 
 /** Allocates the DSP-side state: the 1024-word command list, the 160-word surround buffer, the DSP voice array (each
@@ -513,6 +533,7 @@ struct {
     0,
 };
 
+/** DSP cycles each mixer setup costs, indexed by which mixer features a voice uses. */
 const u16 dspMixerCyclesMain[16] = {
     0, 760, 760, 1470, 760, 1520, 1520, 2230, 0, 1265, 1265, 2470, 1265, 2530, 2530, 3735,
 };
@@ -726,8 +747,8 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
   u32 endAddr;       // r1+0xB0
   u32 loopAddr;      // r1+0xAC
   u32 zeroAddr;      // r1+0x98
-  DSPvoice* sp78;
-  DSPvoice* sp74;
+  DSPvoice* firstVoice; // written, never read: the first voice of the studio's list
+  DSPvoice* nextVoice; // written, never read: the voice after the one just visited
 
 #ifdef _DEBUG
   dbgActiveVoices = 0;
@@ -821,8 +842,8 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
         cyclesUsed += 0x294D;
       }
       last_pb = NULL;
-      for (v = 0, dsp_vptr = stp->voiceRoot, sp78 = dsp_vptr; dsp_vptr;
-           v++, dsp_vptr = dsp_vptr->next, sp74 = dsp_vptr) {
+      for (v = 0, dsp_vptr = stp->voiceRoot, firstVoice = dsp_vptr; dsp_vptr;
+           v++, dsp_vptr = dsp_vptr->next, nextVoice = dsp_vptr) {
         voices[v] = dsp_vptr;
       }
       voiceNum = (int)v;

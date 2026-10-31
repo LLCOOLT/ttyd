@@ -1,3 +1,4 @@
+// icondrv.c: the icon driver (IconEntry flags, icon.bin layout, iconEntry/iconDispGx): the button and item icons drawn on screen.
 #pragma once
 
 /*
@@ -57,6 +58,9 @@ typedef struct IconBinary {
 #define ICON_FLAG_CULL_BACK 0x400
 #define ICON_FLAG_CULL_FRONT 0x800
 #endif
+// Set on field item icons (itemdrv): the map's blend colour is not applied. The demo has it as ICON_FLAG_NO_MAP_BLEND;
+// the later versions test it beside their own ICON_FLAG_NO_MAP_BLEND.
+#define ICON_FLAG_ITEM_NO_BLEND 0x80
 
 typedef struct IconEntry {
     union {

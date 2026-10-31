@@ -1,7 +1,6 @@
-#pragma once
-
 // Gundan zako (the X-Naut horde in the chapter 5 boss fight): the shared work of
 // unit_boss_gundan_zako_group1.c (owner of `zakogun` and `work`), group2 and group3.
+#pragma once
 
 #include "battle/battle_unit.h"
 #include "driver/extdrv.h"
@@ -59,6 +58,7 @@ extern ZakoGunWork* work;
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
 BattleUnit* zakogun_get_ptr(void);
 void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i);
+void zakogun_ext_main3(void);
 USER_FUNC(zakogun_get_kanbu_id_evtcmd);
 USER_FUNC(zakogun_ext_init2);
 USER_FUNC(zakogun_escape3);

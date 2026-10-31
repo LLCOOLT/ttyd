@@ -462,7 +462,7 @@ EVT_END()
 
 /**
  * Exit event of the roll-through doorways: returns 0 in LW(0), which blocks the exit,
- * while Mario is in motion 22 (Guess: the paper-roll form), and 1 otherwise.
+ * while Mario is in motion 22 (MARIO_MOTION_ROLL, the paper-roll form), and 1 otherwise.
  */
 static EVT_BEGIN(check_roll)
     CALL(evt_mario_get_motion, LW(0))
@@ -626,6 +626,7 @@ EVT_BEGIN(door_teresa_s)
     RETURN
 EVT_END()
 
+/** Doors of this room: the west exit (w_bero) to usu_00 (Twilight Town). */
 BeroEntry bero_stg4majo3nin[] = {
     {
         "w_bero", // hitName
@@ -647,6 +648,12 @@ BeroEntry bero_stg4majo3nin[] = {
     },
 };
 
+/**
+ * Doors of this room: the north exit (n_bero_1) to jin_05, the hole (ana) to jin_06, the west exit (w_bero)
+ * to gra_06 (Twilight Trail), the north exit (n_bero_3) to jin_01, the south exit (s_bero) to jin_02, the
+ * north exit (n_bero_2) to jin_04, the east exit (e_bero_3) to jin_03, the east exit (e_bero_1) to jin_03
+ * and the east exit (e_bero_2) to jin_03.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "n_bero_1", // hitName
@@ -945,6 +952,7 @@ static EVT_BEGIN(evt_key)
     RETURN
 EVT_END()
 
+/** Item list of the lock's key picker: only the Steeple Key (-1 ends the list). */
 static s32 lock_tbl[] = {
     ITEM_STEEPLE_KEY_0x16, -1,
 };
@@ -1030,6 +1038,7 @@ EVT_END()
  * vanishes and starts the 1000-Boos swarm (senteresa_evt); when it ends the story becomes "1000 Boos".
  */
 EVT_BEGIN(tyuou_teresa_talk)
+    // The central Boo asks Mario whether he means to be mean to it; a no sends him away.
     CALL(evt_msg_print, 0, STRING("stg4_jin_54"), 0, STRING("中央テレサ"))
     CALL(evt_msg_select, 0, STRING("stg4_jin_54_yn"))
     IF_INT_EQUAL(LW(0), 0)
@@ -1038,6 +1047,7 @@ EVT_BEGIN(tyuou_teresa_talk)
     ELSE
         CALL(evt_msg_continue)
     END_IF
+    // The Boo is startled; Mario and his partner jump back as the camera swings.
     CALL(evt_cam3d_evt_set, 70, 165, 472, 70, 72, -45, 1000, 11)
     CALL(evt_npc_set_anim, STRING("中央テレサ"), STRING("A_1"))
     WAIT_MS(1000)
@@ -1087,6 +1097,7 @@ EVT_BEGIN(tyuou_teresa_talk)
             WAIT_MS(60)
         END_LOOP
     END_INLINE_EVENT
+    // The Boo swells to four times its size and shouts for the others to come out.
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, 100, 400, 100)
         LABEL(1)
@@ -1118,6 +1129,7 @@ EVT_BEGIN(tyuou_teresa_talk)
     END_IF
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg4_jin_57"), 0, STRING("中央テレサ"))
+    // The Boo fades out and the swarm of Boos starts; the story advances once it ends.
     CALL(evt_cam3d_evt_set, 70, 400, 1125, 70, 200, -13, 1000, 11)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT
@@ -1177,6 +1189,10 @@ EVT_BEGIN(atomic_teresa_init)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the main hall: the Boos (the central one, those at the far and near doors, the Atomic Boo boss and
+ * the numbered 1001 to 1006 Boos).
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "テレサ", // name
@@ -1286,6 +1302,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Boo models of the swarm effect (c_teresa): one per Boo, each with an animation (S_1, W_1, D_1 or A_2) and
+ * its start frame.
+ */
 static ExtTexInfo senteresa_ext_entry_data[] = {
     {"c_teresa", "S_1", 0.0f},
     {"c_teresa", "S_1", 5.0f},
@@ -1337,11 +1357,13 @@ static ExtTexInfo senteresa_ext_entry_data[] = {
 };
 
 /**
- * Per-frame update of the 200-Boo swarm (the "1000 Boos" scene):
- * follows Mario's walking with a lagging swarm centre,
- * and moves each Boo through its sequence (waiting, fading in around Mario, circling,
- * chasing and clinging to Mario, being knocked away by the spin hammer, gathering into the Atomic Boo,
- * being blown away at the end).
+ * Per-frame update of the 200-Boo swarm (the "1000 Boos" scene): a lagging swarm centre follows Mario's
+ * walking, and each Boo runs its sequence: 0 start delay, 1 fade in around Mario, 2 wait until all 200 are in,
+ * 3 staggered start, 4 circle Mario ever faster (now and then a short A_2 turn in 9), 5 fly at Mario (not while
+ * a partner ability is in use), 6 cling to him until the spin hammer knocks it off (10, falling away; once 20
+ * are knocked off the circling Boos stop attacking), 20-22 gather at the central Boo and shake there
+ * (senteresa_syugo, the Atomic Boo forming), 30 blown away (senteresa_huttobu), 80 lifting Mario
+ * (senteresa_turiageru).
  */
 static void senteresa_ext_main(void) {
     ExtdrvPose* pose = extGetPosePtr();
@@ -1939,6 +1961,7 @@ static USER_FUNC(senteresa_huttobu) {
  * After the fight a Lucky Start badge drops, the Boos are blown away and GSWF_JIN00_ATOMIC_BOO_DEFEATED is set.
  */
 EVT_BEGIN(senteresa_evt)
+    // The swarm of 200 Boos is created and Mario waits until the Boos have appeared.
     CALL(evt_ext_entry, 200, PTR(senteresa_ext_entry_data), PTR(senteresa_ext_init), PTR(senteresa_ext_main), PTR(senteresa_ext_dispent))
     LOOP(0)
         CALL(senteresa_get_seq, 199, LW(0))
@@ -1947,6 +1970,7 @@ EVT_BEGIN(senteresa_evt)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Boo chatter pops up around Mario while the swarm closes in.
     SET_VALUE(GW(0), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(600)
@@ -2083,6 +2107,8 @@ EVT_BEGIN(senteresa_evt)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+    // Main loop: the swarm follows Mario; once 20 Boos have been blown away it gives up, and if 20 cling to
+    // him they carry him out of the Steeple.
     LOOP(0)
         PEEK_INT(LW(0), PTR(g_nNumHuttobasu))
         IF_INT_GREATER_OR_EQUAL(LW(0), 20)
@@ -2122,6 +2148,7 @@ EVT_BEGIN(senteresa_evt)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The swarm stops closing in and the central Boo reappears, fading back in.
     CALL(senteresa_tikaduku_stop)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(2500)
@@ -2167,6 +2194,7 @@ EVT_BEGIN(senteresa_evt)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
+    // The Boos gather together into the Atomic Boo.
     CALL(evt_npc_get_position, STRING("中央テレサ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_get_dir, STRING("中央テレサ"), LW(3))
     CALL(evt_npc_set_position, STRING("アトミックテレサ"), LW(0), LW(1), LW(2))
@@ -2188,6 +2216,7 @@ EVT_BEGIN(senteresa_evt)
     CALL(evt_npc_set_position, STRING("アトミックテレサ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_flag_onoff, 1, STRING("中央テレサ"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_flag_onoff, 0, STRING("アトミックテレサ"), NPC_FLAG_HIDDEN)
+    // The Atomic Boo speaks, startling Mario, then floats toward him shaking the camera.
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg4_jin_62"), 0, STRING("アトミックテレサ"))
     CALL(evt_cam3d_evt_off, 400, 11)
@@ -2225,6 +2254,7 @@ EVT_BEGIN(senteresa_evt)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(300)
+    // The Boos jeer at Mario from all sides.
     SET_VALUE(GW(0), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(100)
@@ -2286,11 +2316,14 @@ EVT_BEGIN(senteresa_evt)
         CALL(evt_msg_print, 0, STRING("stg4_jin_63"), 0, 0)
         WAIT_MS(750)
     END_INLINE_EVENT
+    // The Atomic Boo fight starts.
     CALL(evt_npc_get_position, STRING("アトミックテレサ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_set_battle_info, STRING("アトミックテレサ"), 7)
     CALL(evt_npc_battle_start, STRING("アトミックテレサ"))
     CALL(evt_npc_wait_battle_end)
     ADD(LW(1), 50)
+    // After the fight the Lucky Start pops out, the remaining Boos are blown away and the Atomic Boo is
+    // marked as defeated.
     CALL(evt_item_entry, STRING("item_99"), ITEM_LUCKY_START, LW(0), LW(1), LW(2), ITEM_ENTRY_LAUNCH, GSWF(GSWF_JIN00_ATOMIC_BOO_LUCKY_START_TAKEN), 0)
 #if VERSION >= VERSION_JP
     CALL(evt_item_flag_on, STRING("item_99"), ITEM_FLAG_BADGE_RETURN)
@@ -2395,8 +2428,8 @@ EVT_BEGIN(jin_00_init_evt)
 EVT_END()
 
 /**
- * Script helper: ends the carrying of Mario: Boos that were clinging (sequence 6) switch to the lifting sequence
- * (80) and all others wait indefinitely.
+ * Script helper: Boos that are clinging to Mario (sequence 6) switch to the lifting sequence (80), which keeps
+ * them at their height offset from Mario as he is lifted; all others (but sequence 9) wait indefinitely.
  */
 static USER_FUNC(senteresa_turiageru) {
     s32 n = extGetPoseNum();

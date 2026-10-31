@@ -70,7 +70,7 @@ USER_FUNC(evt_cam_shake) {
     camId = id;
     y = evtGetFloat(event, args[2]);
     msec = evtGetValue(event, args[3]);
-    now = *(u64*)&event->lifetime;
+    now = event->lifetime;
     if (isFirstCall) {
         event->userdata[0] = 0;
         ((u32*)&event->userdata[1])[0] = (now >> 32) & 0xFFFFFFFF;
@@ -342,6 +342,7 @@ USER_FUNC(evt_cam3d_evt_set_rel_dir) {
 }
 
 /** unused (dead-stripped): only its string and 100.0f survive */
+// FAKE: uncalled stand-in for a stripped function; keeps its format string and orders 100.0f
 static void evt_cam_debug_print(f32 a) {
     OSReport("%f%f%f%f%f%f%d%s", a / 100.0f);
 }

@@ -22,9 +22,19 @@
 #include "version.h"
 #include <dolphin/pad.h>
 
+// Bits of MotPlaneWork.flags.
+enum MotPlaneFlag {
+    PLANE_FLAG_YAW_90 = 0x1,  // flies at yaw 90 (DIRF +1), else 270; from the launch panel's attribute bit 0x10
+    PLANE_FLAG_DIVING = 0x10, // set while the pitch is 0 or more, cleared when it goes below; nothing else reads it
+};
+
 static BOOL chkCollision(f32* outY);
 static void flyMain(void);
 
+/**
+ * Tuning values of Mario's paper airplane flight: top speed, gravity and drag, the nose-up and nose-down pitch
+ * limits, turn and glide rates, and the pose offsets for each phase of the flight.
+ */
 f32 planeData[41] = {
     5.0f, -0.02f, -0.03f, 25.0f, -45.0f, 0.4f, 1.0f, 0.1f, -0.1f, 1.5f,
     0.2f, 0.05f, 3.4f, 1.0f, 0.025f, 0.045f, 0.8f, 1.5f, -0.3f, -5.0f,
@@ -57,6 +67,7 @@ static inline void planeSetSpd(f32 a, f32 b, f32 c) {
     mario->camZoomOfs = (Vec){0.0f, 40.0f, 0.0f};
 }
 
+/** Paper airplane animation for each of Mario's colours (marioGetColor). */
 const char* paper_plane[4] = {"p_hikohki", "p_hikohki_g", "p_hikohki_y", "p_hikohki_v"};
 
 /** Stops the plane's looping flight sound if it is playing. */
@@ -115,7 +126,7 @@ s32 marioPlaneGetFlyingDir(void) {
         return 0;
     }
     ret = -1;
-    if (mario->motPlane->flags & 1) {
+    if (mario->motPlane->flags & PLANE_FLAG_YAW_90) {
         ret = 1;
     }
     return ret;
@@ -181,7 +192,7 @@ void marioForcePlaneAnime(void) {
     mario->dispFlags |= MARIO_DISP_FLAG_NO_MIRROR;
 }
 
-#define DIRF(mp) ((mp->motPlane->flags & 1) ? 1.0f : -1.0f)
+#define DIRF(mp) ((mp->motPlane->flags & PLANE_FLAG_YAW_90) ? 1.0f : -1.0f)
 
 /** 1.0 or -1.0 for the direction the plane is flying (motPlane flag 1). */
 static inline f32 planeDir(MarioWork* mario) {
@@ -264,7 +275,7 @@ void mot_plane(void) {
             planeRoll1(mp, 0.125f, 30.0f);
             done = FALSE;
             mp->displayDirection += mp->mot.plane.turnSpeed;
-            if (mp->motPlane->flags & 1) {
+            if (mp->motPlane->flags & PLANE_FLAG_YAW_90) {
                 if (mp->displayDirection >= 630.0f) {
                     done = TRUE;
                 }
@@ -297,7 +308,7 @@ void mot_plane(void) {
             planeRoll1(mp, 0.125f, 30.0f);
             done = FALSE;
             mp->displayDirection += mp->mot.plane.turnSpeed;
-            if (mp->motPlane->flags & 1) {
+            if (mp->motPlane->flags & PLANE_FLAG_YAW_90) {
                 if (mp->displayDirection >= 1260.0f) {
                     mp->displayDirection = 1260.0f;
                     done = TRUE;
@@ -321,13 +332,13 @@ void mot_plane(void) {
                 break;
             }
             marioChgPaper("PM_P_1B");
-            mp->motPlane->yaw = (mp->motPlane->flags & 1) ? 90.0f : 270.0f;
+            mp->motPlane->yaw = (mp->motPlane->flags & PLANE_FLAG_YAW_90) ? 90.0f : 270.0f;
             mp->mot.plane.turnSpeed = 0.0f;
             mp->motPlane->pitch = 0.0f;
             mp->motPlane->roll = 0.0f;
             mp->motPlane->pitchSpeed = 0.0f;
             mp->motPlane->diveSpeed = 0.0f;
-            if (mp->motPlane->flags & 1) {
+            if (mp->motPlane->flags & PLANE_FLAG_YAW_90) {
                 mp->rotOfs.x = planeData[33];
                 mp->dispOfs.x = planeData[34];
             } else {
@@ -345,7 +356,7 @@ void mot_plane(void) {
                 m->camShiftTargetZ = 0.0f;
                 m->camShiftRate.z = 0.004f;
             }
-            mp->camShiftTargetX = 70.0f * ((mp->motPlane->flags & 1) ? -1.0f : 1.0f);
+            mp->camShiftTargetX = 70.0f * ((mp->motPlane->flags & PLANE_FLAG_YAW_90) ? -1.0f : 1.0f);
             mp->camShiftTargetY = -70.0f;
             break;
     }
@@ -620,7 +631,7 @@ static void flyMain(void) {
         return;
     }
     mp->motPlane->yaw = revise360(mp->motPlane->roll * planeData[14] + mp->motPlane->yaw);
-    if (mp->motPlane->flags & 1) {
+    if (mp->motPlane->flags & PLANE_FLAG_YAW_90) {
         if (mp->motPlane->yaw <= 60.0f) {
             mp->motPlane->yaw += 0.1f * (60.0f - mp->motPlane->yaw);
         }
@@ -644,7 +655,7 @@ static void flyMain(void) {
     if (STICK != 0) {
         if (SPD) {
             a = __fabsf((f32)STICK);
-            if (mp->motPlane->flags & 1) {
+            if (mp->motPlane->flags & PLANE_FLAG_YAW_90) {
                 if (STICK < 0) {
                     if (mp->motPlane->pitch >= planeData[3]) {
                         mp->motPlane->pitch += 0.1f * (planeData[3] - mp->motPlane->pitch);
@@ -710,7 +721,7 @@ static void flyMain(void) {
     }
     SPD += SPD * planeData[1];
     if (mp->motPlane->pitch >= 0.0f) {
-        mp->motPlane->flags |= 0x10;
+        mp->motPlane->flags |= PLANE_FLAG_DIVING;
         a = (f32)sin(PI * (mp->motPlane->pitch * planeData[7]) / 180.0f);
         a = SPD * (planeData[8] * a);
         SPD = SPD + a;
@@ -759,8 +770,8 @@ static void flyMain(void) {
         }
         mp->motPlane->pitch += v;
     } else if (mp->motPlane->pitch >= -80.0f) {
-        if (mp->motPlane->flags & 0x10) {
-            mp->motPlane->flags &= ~0x10;
+        if (mp->motPlane->flags & PLANE_FLAG_DIVING) {
+            mp->motPlane->flags &= ~PLANE_FLAG_DIVING;
         }
         mp->motPlane->diveSpeed = planeData[10] * (f32)sin(PI * (planeData[9] * __fabsf(mp->motPlane->pitch)) / 180.0f);
         SPD += mp->motPlane->diveSpeed;
@@ -772,7 +783,7 @@ static void flyMain(void) {
         }
         mp->motPlane->pitchSpeed = mp->motPlane->pitchSpeed + a;
         if (STICK != 0) {
-            if (mp->motPlane->flags & 1) {
+            if (mp->motPlane->flags & PLANE_FLAG_YAW_90) {
                 if (STICK > 0 && mp->motPlane->pitchSpeed >= 1.0f) {
                     mp->motPlane->pitchSpeed = 1.0f;
                 }
@@ -813,7 +824,7 @@ static void flyMain(void) {
     mp->position.x += s2 * (SPD * s);
     if (SPD <= planeData[16]) {
         n = sysMsec2Frame(1000.0f * planeData[17]);
-        if (mp->motPlane->flags & 1) {
+        if (mp->motPlane->flags & PLANE_FLAG_YAW_90) {
             if ((f32)STICK < 0.0f) {
                 if (++mp->motPlane->stallTimer >= n) {
                     mp->mot.plane.groundY = mp->position.y;
@@ -846,7 +857,7 @@ static void flyMain(void) {
             if (mp->hitobjStandOn != NULL) {
                 h = mp->hitobjStandOn;
             }
-            if (h != NULL && (hitGetAttr(h) & 0x200)) {
+            if (h != NULL && (hitGetAttr(h) & HIT_ATTR_DEEP_WATER)) {
                 mp->currSubMotionId = 70;
             }
         }
@@ -871,7 +882,8 @@ void mot_plane_post(void) {
     allPartyRideOff2();
 }
 
-/** Unknown: unused helper that returns the constant 270. */
+/** Stand-in for a stripped function (in no version's symbols, never called): only puts 270.0f in the pool. */
+// FAKE: uncalled stand-in for a stripped function; puts 270.0f in its .sdata2 slot
 static f32 planeDead270(void) {
     return 270.0f;
 }
@@ -1005,7 +1017,8 @@ static BOOL chkCollision(f32* outY) {
     return ret;
 }
 
-/** Unknown: unused helper that returns the constant 4. */
+/** Stand-in for a stripped function (in no version's symbols, never called): only places 4.0f in the pool. */
+// FAKE: uncalled stand-in for a stripped function; puts 4.0f ahead of 90.0f in .sdata2
 static f32 planeDead4(void) {
     return 4.0f;
 }

@@ -281,10 +281,9 @@ static USER_FUNC(kpa_make_item_name) {
 
 /**
  * Script helper for kpa_coin_evt: args[0..2] = coin x, y, z.
- * Adds one coin to Bowser's stage coin tally at that position (kpaAddCoinPos),
- * then takes one coin back out of the pouch.
- * Guess: the second step undoes the coin the item pickup itself added to the pouch,
- * so only the stage tally counts.
+ * Adds one coin to Bowser's stage coin tally and its score popup at that position (kpaAddCoinPos),
+ * then takes back the coin that the pickup itself put in Mario's pouch (pouchGetItem runs before the pickup
+ * script), so only the stage tally counts.
  */
 static USER_FUNC(kpa_add_coin) {
     EvtWord* args = event->args;
@@ -376,8 +375,7 @@ EVT_END()
 
 /**
  * Handler for Bowser falling into a pit: locks the letterbox, controls and camera,
- * waits until the ride-object lookup under Bowser returns a name, then runs kpa_dead.
- * Guess: the wait is for the end of the fall; the loop condition is the only evidence.
+ * waits until Bowser stands on a hit object again (he has landed at the bottom of the pit), then runs kpa_dead.
  */
 EVT_BEGIN(kpa_fall_sub)
     CALL(evt_cam_letter_box_disable, 1)
@@ -572,6 +570,10 @@ EVT_BEGIN(kpa_stage_start)
     RETURN
 EVT_END()
 
+/**
+ * Icon ids of the digits 0 to 9 (ten u16 values packed into five words), used to draw the score,
+ * stage and time numbers of the Bowser interlude HUD.
+ */
 s32 numeric_id[] = {
 #if VERSION >= VERSION_US
     31523299, 31785447, 32047595, 32309743, 32571891,
@@ -581,6 +583,10 @@ s32 numeric_id[] = {
 };
 
 #if VERSION >= VERSION_US
+/**
+ * Icon ids of the three HUD labels of the Bowser interlude,
+ * one row per language (US and PAL only; the other versions pick their icons in the code).
+ */
 u16 kpa_status_icon_tbl[6][3] = {
     { 0x21A, 0x221, 0x21C }, { 0x21B, 0x221, 0x21C }, { 0x21B, 0x222, 0x21D },
     { 0x21B, 0x223, 0x21E }, { 0x21B, 0x224, 0x21F }, { 0x21B, 0x225, 0x220 },

@@ -11,6 +11,12 @@
 #include "battle/battle_event_cmd.h"
 #include "evt/evt_sub.h"
 
+// Unit work slots of a Mini-Yux (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BARRIERN_Z_SATELLITE_PARENT = 0, // unit id of the Yux it orbits (set by the Yux when it spawns it)
+    UW_BARRIERN_Z_SATELLITE_IDLE = 1    // non-zero once the Yux lets it play its idle pose
+};
+
 BattleUnitKind unit_barriern_z_satellite;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -24,6 +30,10 @@ static EvtWord unison_phase_event[5];
 static EvtWord attack_event[5];
 static EvtWord wait_event[56];
 
+/**
+ * Unit data of the Mini-Z-Yux: 2 HP, 16x16 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_barriern_z_satellite = {
     116,
     "btl_un_barriern_satellite_z",
@@ -95,10 +105,13 @@ BattleUnitKind unit_barriern_z_satellite = {
     data_table,
 };
 
+/** Defence of the Mini-Z-Yux: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of the Mini-Z-Yux: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Parts of the Mini-Z-Yux: 6 parts (model c_baria_z). */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_barriern_satellite_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
     {2, "btl_un_barriern_satellite_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
@@ -109,11 +122,20 @@ static BattleUnitKindPart parts[] = {
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Mini-Z-Yux (percent chance each status takes hold):
+ * immune to poison, freeze, fright; resists sleep (70%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {70, 90, 90, 0, 80, 100, 100, 0, 100, 80, 100, 80, 100, 80, 80, 0, 90, 100, 80, 100, 100, 100};
 #else
+/**
+ * Retail builds: Status vulnerability of the Mini-Z-Yux (percent chance each status takes hold):
+ * immune to poison, freeze, fright; resists sleep (70%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {70, 90, 95, 0, 80, 100, 100, 0, 100, 85, 100, 85, 100, 90, 80, 0, 95, 100, 80, 100, 100, 100};
 #endif
 
+/** Pose table of the Mini-Z-Yux: maps its battle poses to its animations. */
 static PoseTableEntry pose_table[] = {
     {1, "N_2"},
     {2, "Y_2"},
@@ -134,14 +156,15 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
+/** Event table of the Mini-Z-Yux: it has no special event scripts. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
 /**
  * Init event of the Mini Z-Yux: installs its wait, unison phase, attack,
- * damage and confusion events and sets unit flags 0x100000
- * and 0x200000 (Guess: the flags that keep it out of normal targeting).
+ * damage and confusion events and sets unit flags 0x100000 and 0x200000 (UNIT_FLAG_FLOAT and FLOAT_ACTIVE:
+ * it hovers with the bobbing motion).
  */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -149,7 +172,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 3145728)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT | UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -193,11 +216,11 @@ static EVT_BEGIN(wait_event)
     CALL(evt_sub_random, 120, LW(0))
     ADD(LW(0), 30)
     WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_SATELLITE_IDLE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
+            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_4"))
                 WAIT_FRAMES(180)

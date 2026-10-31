@@ -265,7 +265,7 @@ EVT_BEGIN(monban_talk)
 EVT_END()
 
 /**
- * Guess: init of Nokotarou (Koops) in the village:
+ * Init of Nokotarou (Koops) in the village:
  * runs the standard NPC init, then, before the Gold Fuzzy (STORY_STG1_06_01),
  * stands him at (-35, 65, -425) facing 90; after that it sends him off the map to (0, -1000, 0).
  */
@@ -432,6 +432,7 @@ EVT_BEGIN(boss_noko_open_gate)
     RETURN
 EVT_END()
 
+/** Items the player may hand to Mayor Kroop for request 17: the Routing Slip only, ended by -1. */
 static s32 iri_17_item_tbl[] = {
     ITEM_ROUTING_SLIP, -1,
 };
@@ -466,8 +467,10 @@ EVT_BEGIN(boss_noko_talk)
             WAIT_WHILE(GF(0))
             CALL(evt_mario_sleep_on)
         END_INLINE_EVENT
+        // The mayor asks Mario for help with Trouble Center request 8.
         CALL(evt_msg_print, 0, STRING("irai_08_001"), PTR(iri_08_msg), STRING("me"))
         CALL(evt_mario_sleep_off)
+        // He forgot to set out the tea and gives Mario a Turtley Leaf.
         CALL(evt_msg_print, 0, STRING("irai_08_002"), 0, STRING("me"))
         CALL(evt_pouch_get_haveitemcnt, LW(0))
         CALL(evt_pouch_check_item, ITEM_STRANGE_SACK, LW(1))
@@ -496,6 +499,7 @@ EVT_BEGIN(boss_noko_talk)
             CALL(evt_npc_wait_pera, STRING("me"))
             CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
         END_IF
+        // Request 8 is marked solved.
         CALL(evt_msg_print, 0, STRING("irai_08_004"), 0, STRING("me"))
         SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
         SET_VALUE(GSWF(GSWF_TROUBLE_08_SOLVED), 1)
@@ -508,6 +512,7 @@ EVT_BEGIN(boss_noko_talk)
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
             ELSE
                 IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 0)
+                    // Request 17: the mayor takes the Routing Slip from Mario.
                     CALL(evt_msg_print, 0, STRING("irai_17_00"), 0, 0)
 #if VERSION <= VERSION_DEMO_US
                     CALL(evt_win_item_select, PTR(iri_17_item_tbl), LW(0))
@@ -530,12 +535,14 @@ EVT_BEGIN(boss_noko_talk)
             END_IF
         END_IF
     END_IF
+    // With no request pending, his talk follows the story.
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_02_TALKING_WITH_KROOP)
         CALL_CHILD(boss_noko_open_gate)
         CASE_LESS(STORY_STG1_08_OPENING_THE_PATH)
         IF_INT_EQUAL(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 1)
             IF_INT_EQUAL(GSWF(GSWF_HEI_MOON_STONE_TAKEN), 1)
+                // After the Sun Stone and Moon Stone errand he congratulates Mario.
                 CALL(evt_msg_print, 0, STRING("stg1_nok_56"), 0, 0)
                 RETURN
             END_IF
@@ -587,6 +594,7 @@ EVT_BEGIN(nokorin_talk)
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
         IF_INT_EQUAL(GSWF(GSWF_NOK01_KOOPIE_KOO_MET), 0)
             SET_VALUE(GSWF(GSWF_NOK01_KOOPIE_KOO_MET), 1)
+            // Koopie Koo introduces herself to Mario.
             CALL(evt_msg_print, 0, STRING("stg1_nok_64"), 0, 0)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_5"), LW(0), LW(1), LW(2), 0)
@@ -595,6 +603,7 @@ EVT_BEGIN(nokorin_talk)
             CALL(evt_mario_set_pose, STRING("M_S_1"))
             CALL(evt_msg_print, 0, STRING("stg1_nok_64_01"), 0, 0)
             ELSE
+            // She confides her worries about her boyfriend Koops.
             CALL(evt_msg_print, 0, STRING("stg1_nok_65"), 0, 0)
             IF_INT_EQUAL(GSWF(GSWF_NOK01_KOOPIE_KOO_CONFIDED), 0)
                 SET_VALUE(GSWF(GSWF_NOK01_KOOPIE_KOO_CONFIDED), 1)
@@ -611,6 +620,7 @@ EVT_BEGIN(nokorin_talk)
             CALL(evt_mario_get_party, LW(0))
             IF_INT_EQUAL(LW(0), 2)
                 SET_VALUE(GSWF(GSWF_NOK01_KOOPIE_KOO_TALKED_TO_KOOPS), 1)
+                // Koops is in the party: she apologizes to him and hops away.
                 CALL(evt_msg_print, 0, STRING("stg1_nok_67"), 0, 0)
                 CALL(evt_msg_print, 0, STRING("stg1_nok_68"), 0, 0)
                 CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -632,6 +642,7 @@ EVT_BEGIN(nokorin_talk)
     CASE_LESS(STORY_STG2_00_BOGGLY_WOODS)
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 2)
+        // Chapter 2 on: she cheers Koops on and asks Mario to look after him.
         CALL(evt_msg_print, 0, STRING("stg1_nok_71"), 0, 0)
         ELSE
         CALL(evt_msg_print, 0, STRING("stg1_nok_72"), 0, 0)
@@ -653,6 +664,7 @@ EVT_BEGIN(nokorin_talk)
     CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 2)
+        // The late game: she wonders whether Koops has changed.
         CALL(evt_msg_print, 0, STRING("stg1_nok_77"), 0, 0)
         ELSE
         CALL(evt_msg_print, 0, STRING("stg1_nok_78"), 0, 0)
@@ -766,6 +778,7 @@ static EVT_BEGIN(odoriko_3_init)
     RETURN
 EVT_END()
 
+/** NPCs of the east village: the mayor, the gate guard, Koops, Koops's father and Koopie Koo. */
 static NpcSetupInfo npcEnt[] = {
     {
         "ノコノコG", // name
@@ -874,6 +887,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Doors and exits of nok_01: w_bero to nok_00; e_bero to hei_02 (Petal Meadows); dokan_1 to tik_16 (Rogueport
+ * Sewers).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -927,21 +944,25 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** NPCs inside the mayor's house: the mayor. */
 const char* son_npc[] = {
     "村長",
     NULL,
 };
 
+/** Map objects inside the mayor's house: the spinning floor kururin3. */
 const char* son_mobj[] = {
     "kururin3",
     NULL,
 };
 
+/** Items inside the mayor's house: the Turtley Leaf iri_08 of request 8. */
 const char* son_item[] = {
     "iri_08",
     NULL,
 };
 
+/** Door of the mayor's house: outside hit area A_son_doa, the inside room and its NPCs and objects. */
 HouseParam son_data = {
     1, // type
     9, // hitInKind
@@ -959,26 +980,31 @@ HouseParam son_data = {
     son_item, // items
 };
 
+/** NPCs inside Koops's house: Koops. */
 const char* taro_npc[] = {
     "ノコタロウ",
     NULL,
 };
 
+/** Map group whose bounding-box culling is off while Mario is inside Koops's house: the room S_taro_in. */
 const char* taro_map[] = {
     "S_taro_in",
     NULL,
 };
 
+/** Map objects inside Koops's house: the box. */
 const char* taro_mobj[] = {
     "box",
     NULL,
 };
 
+/** Items inside Koops's house: item_01. */
 const char* taro_item[] = {
     "item_01",
     NULL,
 };
 
+/** Door of Koops's house: outside hit area A_taro_doa, the inside room and its NPCs and objects. */
 HouseParam taro_data = {
     1, // type
     9, // hitInKind
@@ -996,16 +1022,19 @@ HouseParam taro_data = {
     taro_item, // items
 };
 
+/** NPCs inside the house: Koopa K. */
 static const char* ie_npc[] = {
     "ノコノコK",
     NULL,
 };
 
+/** Map group whose bounding-box culling is off while Mario is inside this house: S_ie_sit. */
 static const char* ie_map[] = {
     "S_ie_sit",
     NULL,
 };
 
+/** Door of a village house in the east half: outside hit area A_ie_doa, the inside room and its NPCs. */
 static HouseParam ie_data = {
     1, // type
     9, // hitInKind
@@ -1022,6 +1051,7 @@ static HouseParam ie_data = {
     NULL, NULL, // mobjs..items
 };
 
+/** Return points of the hazard-water floors of the east village (the mod_NN hit areas). */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_00", {0.0f, -1000.0f, 0.0f}},
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
@@ -1150,8 +1180,10 @@ EVT_BEGIN(nokotarou_tabidachi_init)
 EVT_END()
 
 /**
- * Guess: sets the view matrix of the "yami" (darkness) overlay (envSetYamiView) to look along x from a point
- * offset by args[0] (a float z), used by the chapter 8 darkness scenes.
+ * Script helper: sets the view matrix of the yami (darkness) overlay (envSetYamiView) to look from (-100 + d,
+ * 100, 0) at (d, 0, 0), with d the float args[0].
+ * sekai_yami_evt sweeps d from -600 to 600 to pass the darkness across the village;
+ * minnnanokoe_evt sets it to 600.
  */
 static USER_FUNC(yami_view) {
     f32 z = evtGetFloat(event, event->args[0]);
@@ -1163,9 +1195,9 @@ static USER_FUNC(yami_view) {
 }
 
 /**
- * Guess: reaction of one villager (name in LW(0)) in the darkening-world cutscene:
- * waits until Mario's position GW(0) passes him, stops his regular script,
- * shows an exclamation bubble and then turns around at random intervals (100 to 499 ms) forever.
+ * Reaction of one villager (name in LW(0)) in the darkening-world cutscene:
+ * waits until the darkness sweep (GW(0), set by sekai_yami_evt) passes his x position, stops his regular script,
+ * shows a surprise bubble and then turns around at random intervals (100 to 499 ms) forever.
  */
 static EVT_BEGIN(sekai_yami_npc)
     LOOP(0)
@@ -1191,11 +1223,13 @@ static EVT_BEGIN(sekai_yami_npc)
 EVT_END()
 
 /**
- * Guess: cutscene of the world going dark (chapter 8, the Shadow Queen's darkness):
- * locks the controls, hides Mario and the partner,
- * fades the map and the villagers (mayor, Koopas G, H, I and Nokorin) to dark with the envSetYami callback
- * while the camera pans (yami_view), plays the world-dark sound,
- * has the mayor say stg8_dark_01 and then goes to mri_00 (entrance sekai_yami1).
+ * Cutscene of the world going dark in Petalburg (STORY_STG8_15_GRODUS, entered as "sekai_yami1"):
+ * locks the controls and hides Mario and the partner, dims the background,
+ * and puts the map and the villagers (the mayor, Koopas G, H and I and Nokorin) under the envSetYami darkness
+ * callback.
+ * The darkness sweeps across the village (yami_view) with the world-dark sound while each villager starts
+ * and looks around (sekai_yami_npc); the mayor stammers, asking what is going on (stg8_dark_01),
+ * and the scene moves to mri_00 (entrance sekai_yami1).
  */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
@@ -1271,12 +1305,17 @@ static EVT_BEGIN(sekai_yami_evt)
 EVT_END()
 
 /**
- * Guess: cutscene of "everyone's voices" in the chapter 8 finale:
- * Mario and the partner are hidden, the mayor, Koops's father and Nokorin are placed in the dark village,
- * a Crystal Star-like "starstone" rises and turns in the sky while the camera moves,
- * and the mayor and Koops's father speak the stg8_las_148 lines before the scene moves on.
+ * Cutscene of "everyone's voices" in the chapter 8 finale (STORY_STG8_15_GRODUS, entered as "minnnanokoe"):
+ * Mario and the partner are hidden and the mayor,
+ * Koops's father and Nokorin (Koopie Koo) stand in the darkened village as a Crystal Star (the starstone effect)
+ * descends, spinning.
+ * The mayor wonders what the shiny thing is (stg8_las_148_03, _04),
+ * the father recognises the Crystal Star (_05), the mayor ties it to the dark sky (_06),
+ * the father worries for Koops and Mario (_07) and Koopie Koo hopes Koops is safe (_08, _09);
+ * then the scene moves to mri_00 (entrance minnnanokoe).
  */
 static EVT_BEGIN(minnnanokoe_evt)
+    // Everyone's voices: Mario and his partner are hidden in the darkened village.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -1359,12 +1398,14 @@ static EVT_BEGIN(minnnanokoe_evt)
     WAIT_MS(500)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("村長"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1200)
+    // The mayor wonders about a shiny thing falling from the sky.
     CALL(evt_msg_print, 0, STRING("stg8_las_148_03"), 0, STRING("村長"))
     CALL(evt_cam3d_evt_set, 211, 133, 145, 0, 50, -50, 2000, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("村長"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_move_position, STRING("村長"), -50, -50, 2000, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_04"), 0, STRING("村長"))
     CALL(evt_npc_move_position, STRING("ノコタロウ父"), 25, -75, 2000, 0, 0)
+    // Koops's father recognizes the Crystal Star.
     CALL(evt_msg_print, 0, STRING("stg8_las_148_05"), 0, STRING("ノコタロウ父"))
     CALL(evt_npc_move_position, STRING("ノコリン"), 0, -150, 1000, 0, 0)
     WAIT_MS(500)
@@ -1372,6 +1413,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_07"), 0, STRING("ノコタロウ父"))
     WAIT_MS(500)
+    // Koopie Koo worries for Koops.
     CALL(evt_msg_print, 0, STRING("stg8_las_148_08"), 0, STRING("ノコリン"))
     CALL(evt_npc_set_ry, STRING("ノコタロウ父"), 90)
     WAIT_MS(500)
@@ -1382,14 +1424,14 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_cam3d_evt_set, 562, 320, 474, 0, 100, -50, 6000, 11)
     WAIT_MS(3000)
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
+    // The scene moves on to mri_00.
     CALL(evt_bero_mapchange, STRING("mri_00"), STRING("minnnanokoe"))
     RETURN
 EVT_END()
 
 /**
- * Guess: hides the pipe object S_dakan and disables its collision A_dokan
- * unless GSWF_TIK16_PIPE_NOK_OPEN is set, i.e. until the pipe to the Rogueport Sewers has been opened from the
- * other side.
+ * Hides the pipe object S_dakan and disables its collision A_dokan unless GSWF_TIK16_PIPE_NOK_OPEN is set,
+ * i.e. until the tornado switch in the Rogueport Sewers (tik_16) has opened the pipe from the other side.
  */
 static EVT_BEGIN(evt_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_TIK16_PIPE_NOK_OPEN), 0)
@@ -1412,7 +1454,8 @@ EVT_END()
 /**
  * Script helper: turns on a TEV callback material flag of an NPC's model.
  * args[0] is the NPC name, args[1] the callback number (low four bits).
- * Guess: used to light up the villagers during the chapter 8 darkness scenes.
+ * The chapter 8 darkness scenes use it with callback 1
+ * so the villagers get the same envSetYami darkening as the map.
  * Does nothing if the NPC does not exist.
  */
 static USER_FUNC(anim_tevcallback) {
@@ -1469,8 +1512,8 @@ static USER_FUNC(starstone_set_ry) {
 }
 
 /**
- * Guess: creates the epilogue's extra NPC クリスチーヌ (Christine, model c_pkr) at (-200, 0, -65) facing 90,
- * intangible, and moves Koopa H off the map.
+ * Creates Goombella (クリスチーヌ, model c_pkr) for the epilogue at (-200, 0, -65) facing 90, intangible,
+ * and moves Koopa H off the map.
  */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
@@ -1483,9 +1526,10 @@ static EVT_BEGIN(epilogue_npc_entry)
 EVT_END()
 
 /**
- * Guess: choreography run beside the epilogue: Nokotarou, Nokorin, Christine and the others turn,
- * talk and walk across the village (the animations PNK_*, T_1, PKR_*), the father and the mayor walk in,
- * and Christine takes part in the conversation.
+ * Background acting for the epilogue: Koops (Nokotarou) and Koopie Koo (Nokorin) chat, Goombella walks up,
+ * Koopie Koo starts in surprise, Koops and Koopie Koo walk over to her
+ * and the three take turns talking (talk animations PNK_*, T_1, PKR_*) while Koops's father
+ * and the mayor walk in; the talking loops forever.
  */
 static EVT_BEGIN(epilogue_evt_sub)
     CALL(evt_npc_set_anim, STRING("ノコタロウ"), STRING("PNK_T_1"))
@@ -1547,9 +1591,12 @@ static EVT_BEGIN(epilogue_evt_sub)
 EVT_END()
 
 /**
- * Guess: epilogue cutscene in Petalburg: fades out the music, positions Nokotarou, Nokorin,
- * Koops's father and the mayor, runs epilogue_evt_sub, prints ep_38, then starts a battle with Koopa H,
- * and after it fades out and changes to tou_08.
+ * Koops's epilogue scene in Petalburg (STORY_STG8_END_AFTER_THE_BATTLE):
+ * plays the village music, hides Mario, places Koops, Koopie Koo,
+ * Koops's father and the mayor and runs epilogue_evt_sub.
+ * The narration (ep_38) tells Mario that Koops lives peacefully with his dad and Koopie Koo
+ * and wants to become mayor; then Flurrie's stage-play epilogue (btlgrp_nok_hei_ep, the only battle of nok.rel;
+ * unit_act_mario) starts as a battle through Koopa H's NPC, and after it the scene fades out to tou_08.
  */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_NOK1"))
@@ -1589,9 +1636,10 @@ static EVT_BEGIN(epilogue_evt)
 EVT_END()
 
 /**
- * Guess: re-creates the Turtley Leaf of bush 4 at (-407, 70, -160) when the leaf slot LSW(1) is 0
- * and the leaf object was collected (evt_item_delete_check);
- * the item launches out of the bush and sets LSWF(4) when picked up.
+ * Script of bush 4 (S_kamehapa_04, from kusa_data):
+ * when it is the bush the map init chose at random for this visit (LSW(1) = 0)
+ * and its leaf is not already out (evt_item_delete_check),
+ * a Turtley Leaf launches out of it at (-407, 70, -160) and sets LSWF(4) when picked up.
  * In the US demo and earlier it appears at z = -148 instead.
  */
 static EVT_BEGIN(evt_kusa_4)
@@ -1610,8 +1658,8 @@ static EVT_BEGIN(evt_kusa_4)
 EVT_END()
 
 /**
- * Guess: re-creates the Turtley Leaf of bush 5 at (-452, 70, -160) when the leaf slot LSW(1) is 1;
- * same behaviour as evt_kusa_4.
+ * Script of bush 5 (S_kamehapa_05): launches the Turtley Leaf at (-452, 70, -160) when LSW(1) is 1;
+ * otherwise as evt_kusa_4.
  */
 static EVT_BEGIN(evt_kusa_5)
     IF_INT_NOT_EQUAL(LSW(1), 1)
@@ -1629,8 +1677,8 @@ static EVT_BEGIN(evt_kusa_5)
 EVT_END()
 
 /**
- * Guess: re-creates the Turtley Leaf of bush 6 at (-362, 70, -160) when the leaf slot LSW(1) is 2;
- * same behaviour as evt_kusa_4.
+ * Script of bush 6 (S_kamehapa_06): launches the Turtley Leaf at (-362, 70, -160) when LSW(1) is 2;
+ * otherwise as evt_kusa_4.
  */
 static EVT_BEGIN(evt_kusa_6)
     IF_INT_NOT_EQUAL(LSW(1), 2)
@@ -1647,6 +1695,10 @@ static EVT_BEGIN(evt_kusa_6)
     RETURN
 EVT_END()
 
+/**
+ * Bushes of nok_01 that Mario can check for hidden things (3 in all); A_kamehapa_04 runs evt_kusa_4,
+ * A_kamehapa_05 runs evt_kusa_5, A_kamehapa_06 runs evt_kusa_6.
+ */
 static KusaAccess kusa_data[] = {
     {0, "A_kamehapa_04", "S_kamehapa_04", evt_kusa_4},
     {0, "A_kamehapa_05", "S_kamehapa_05", evt_kusa_5},
@@ -1664,6 +1716,7 @@ static KusaAccess kusa_data[] = {
  */
 EVT_BEGIN(nok_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
+    // Register the exits, then pick the music: the village theme or the dark finale tracks.
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
     SPAWN_EVENT(evt_switch_init)
@@ -1694,6 +1747,7 @@ EVT_BEGIN(nok_01_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_PETAL_MEADOWS)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
+            // Place the dancers, the house doors and the gate guard.
             CALL_CHILD(odoriko_1_init)
             CALL_CHILD(odoriko_2_init)
             CALL_CHILD(odoriko_3_init)
@@ -1711,6 +1765,7 @@ EVT_BEGIN(nok_01_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_mon"), 1, 0)
     END_IF
     SET_VALUE(LW(0), PTR(kusa_data))
+    // Set up the bushes, the spinning floor, the Mega Rush P badge and the Turtley Leaf.
     CALL_CHILD(evt_sub_kusa_access_entry)
     SET_VALUE(LSWF(4), 0)
     CALL(evt_sub_random, 2, LSW(1))
@@ -1747,11 +1802,13 @@ EVT_BEGIN(nok_01_init_evt)
     IF_STR_EQUAL(LW(0), STRING("nokotarou"))
         CALL(evt_pouch_mario_recovery)
         CALL(evt_pouch_all_party_recovery)
+        // Entering through nokotarou heals Mario and starts Koops's goodbye scene.
         CALL_CHILD(nokotarou_tabidachi_init)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
+            // The chapter 8 finale scenes start from here.
             SPAWN_EVENT(sekai_yami_evt)
         END_IF
         IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
@@ -1761,6 +1818,7 @@ EVT_BEGIN(nok_01_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
         CALL_CHILD(epilogue_npc_entry)
+        // The epilogue scene starts here after the final battle.
         SPAWN_EVENT(epilogue_evt)
     END_IF
     SPAWN_EVENT(evt_sub_mail_event)

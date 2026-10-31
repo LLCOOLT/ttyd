@@ -58,6 +58,7 @@ EVT_BEGIN(bero_out_event)
     RETURN
 EVT_END()
 
+/** Doors of this room: the west exit (w_bero) to hei_13 and the east exit (e_bero) to nok_00 (Petalburg). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -162,6 +163,7 @@ static EVT_BEGIN(evt_kusa_7)
     RETURN
 EVT_END()
 
+/** Grass patches Mario can hit on this field (a_kusa_2 to a_kusa_8); three of them run events when cut. */
 static KusaAccess kusa_data[] = {
     {0, "a_kusa_2", "kusa_2", evt_kusa_2},
     {0, "a_kusa_3", "kusa_7", NULL},
@@ -196,6 +198,10 @@ EVT_BEGIN(kusa_dokan)
     RETURN
 EVT_END()
 
+/**
+ * The 25 parts of the bridge (hasi_1 to hasi_25) that are captured into the paper image of the
+ * bridge-flipping scene.
+ */
 static const char* name_tbl[] = {
     "hasi_1",
     "hasi_2",
@@ -509,20 +515,23 @@ EVT_BEGIN(nokorin_pose)
 EVT_END()
 
 /**
- * Guess: Koops' father (Koopie Koo) scene after Koops joins:
- * a rolling shell (Nokorin) crashes into Mario and his partner, knocks them down,
- * and the story turns on a farewell conversation (stg1_hei_12_01..);
- * skipped once GSWF_HEI01_KOOPIE_KOO_FAREWELL is set.
+ * Koopie Koo (ノコリン) scene once Koops has joined (STORY_STG1_07_KOOPS_JOINS): she comes over and tries to talk
+ * Koops out of fighting Hooktail (stg1_hei_12_01 to 06); when he insists she rams Mario and Koops twice in her
+ * shell, knocking them down ("FINE! IGNORE ME!", stg1_hei_12_07 and 08), and Koops promises to come back
+ * stronger (stg1_hei_12_09). Skipped once GSWF_HEI01_KOOPIE_KOO_FAREWELL is set.
  */
 EVT_BEGIN(evt_nokorin)
+    // Skipped once Koopie Koo has said her farewell.
     IF_INT_EQUAL(GSWF(GSWF_HEI01_KOOPIE_KOO_FAREWELL), 1)
         RETURN
     END_IF
+    // Waits until Koops has joined the party.
     LABEL(0)
     WAIT_FRAMES(1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_07_KOOPS_JOINS)
         GOTO(0)
     END_IF
+    // Mario freezes and walks forward; Koopie Koo calls out from the east and Mario spots her.
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(800)
     BEGIN_INLINE_EVENT
@@ -551,6 +560,7 @@ EVT_BEGIN(evt_nokorin)
         WAIT_MS(2000)
         CALL(evt_mario_set_pose, STRING("M_S_1"))
     END_INLINE_EVENT
+    // The camera pans to her as she rolls in, and Mario and his partner take their places.
     CALL(evt_cam3d_evt_set, 550, 89, 279, 550, 38, -8, 1000, 11)
     CALL(evt_npc_move_position, STRING("ノコリン"), 550, 0, 0, FLOAT(80.0f), 1)
     WAIT_MS(2000)
@@ -565,6 +575,7 @@ EVT_BEGIN(evt_nokorin)
     END_IF
     CALL(evt_cam3d_evt_set, 400, 89, 279, 400, 38, -8, 0, 11)
     WAIT_MS(200)
+    // She and the party talk about Koops fighting Hooktail, with the camera cutting between them.
     CALL(evt_msg_print, 0, STRING("stg1_hei_12_02"), 0, STRING("party"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 460, 126, 485, 460, 40, -8, 0, 11)
@@ -580,6 +591,7 @@ EVT_BEGIN(evt_nokorin)
     CALL(evt_msg_print, 0, STRING("stg1_hei_12_06"), 0, STRING("party"))
     CALL(evt_cam3d_evt_set, 460, 126, 485, 460, 40, -8, 500, 11)
     WAIT_MS(500)
+    // She rolls through them toward the west, knocking Mario and his partner down; Koops cries out.
     SET_VALUE(GF(10), 0)
     SET_VALUE(GF(11), 0)
     SET_VALUE(GF(12), 0)
@@ -633,6 +645,7 @@ EVT_BEGIN(evt_nokorin)
         CALL(evt_msg_print, 0, STRING("stg1_hei_12_07"), 0, 0)
         SET_VALUE(GF(12), 1)
     END_INLINE_EVENT
+    // She spins her shell while the camera follows her.
     CALL_CHILD(nokorin_pose)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_get_position, STRING("ノコリン"), LW(0), LW(1), LW(2))
@@ -660,6 +673,7 @@ EVT_BEGIN(evt_nokorin)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(1000)
+    // She rolls back through them toward the east, knocking them down again, and rolls off screen.
     SET_VALUE(GF(10), 0)
     SET_VALUE(GF(11), 0)
     SET_VALUE(GF(12), 0)
@@ -739,6 +753,7 @@ EVT_BEGIN(evt_nokorin)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(1000)
+    // The partners comment; Koops promises to come back stronger and Mario nods.
     CALL(evt_msg_print, 0, STRING("stg1_hei_12_09"), 0, STRING("party"))
     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
@@ -757,12 +772,17 @@ EVT_BEGIN(evt_nokorin)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
+    // The farewell is marked as done and control returns.
     SET_VALUE(GSWF(GSWF_HEI01_KOOPIE_KOO_FAREWELL), 1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the field: Koops (Nokotaro), who is met here and joins as a partner, and Koopie Koo (Nokorin), who
+ * tries to talk him out of fighting Hooktail.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "ノコタロウ", // name
@@ -791,6 +811,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Guess: damage-return spots for the map objects mod_00 and mod_01, registered with
+ * evt_hit_damage_return_set; both sit far below the field.
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_00", {0.0f, -1000.0f, 0.0f}},
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
@@ -805,6 +829,7 @@ static HitDamageReturn hitDmgRetPoints[] = {
  */
 static EVT_BEGIN(peach_mail)
     LABEL(0)
+    // Waits until Mario walks west of x=200.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     IF_INT_GREATER(LW(0), 200)
         WAIT_FRAMES(1)
@@ -823,6 +848,7 @@ static EVT_BEGIN(peach_mail)
         CALL(evt_party_set_dir, 0, 270, 0)
     END_IF
 #endif
+    // The mail jingle plays and the screen vibrates as a letter arrives; Mario's partner comes over.
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_MAIL_RECEPTION1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -847,6 +873,7 @@ static EVT_BEGIN(peach_mail)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(300)
+    // The partner comments; Mario waits for A to open the mail.
     CALL(evt_msg_print_party, STRING("stg1_gon_44"))
     CALL(evt_mario_balloon_bikkuri)
     LOOP(0)
@@ -863,6 +890,7 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAND_UP1_4"), LW(0), LW(1), LW(2), 0)
     DELETE_EVENT(LW(10))
     WAIT_FRAMES(1)
+    // The camera zooms in as Mario holds the letter and reads it, with the partner joining in.
     CALL(evt_sub_rumble_onoff, 1, 0)
     CALL(evt_cam3d_evt_set_rel, 0, 48, 267, 20, 38, 5, 1000, 11)
     WAIT_MS(1000)
@@ -888,6 +916,7 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_party_run, 0)
     CALL(evt_cam_shift_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
+    // The story advances to "A Mail from Peach" and the letter is added to Mario's mailbox.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_21_A_MAIL_FROM_PEACH)
     CALL(evt_pouch_receive_mail, 0)
     CALL(evt_pouch_open_mail, 0)

@@ -120,6 +120,10 @@ EVT_BEGIN(nice_event_pow)
 EVT_END()
 #endif
 
+/**
+ * Power Lift's weapon template (3 SP, targets Mario and the partner): set_weapon copies it and adds a sure
+ * 3-turn Attack or Defense boost of the points earned in the minigame.
+ */
 static BattleWeapon weapon = {
     "btl_wn_sac_mukimuki_body", // name
     ICON_19A, // icon
@@ -141,7 +145,7 @@ static BattleWeapon weapon = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_ENEMY | TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_sac_4", // acHelpMsg
@@ -287,7 +291,7 @@ static void main_base(void) {
                     } else if (n >= 5) {
                         n = 6;
                     }
-                    evtEntry(nice_event_pow, 0, 0x20)->lwData[0] = n;
+                    evtEntry(nice_event_pow, 0, EVENT_START_NOW)->lwData[0] = n;
                 }
             }
             break;
@@ -984,7 +988,7 @@ static void disp_3D_alpha(CameraId cam, void* param) {
     }
 }
 
-// inlining off for get_ptr, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it get_ptr is inlined into its callers (9 shrink, e.g. star_stone_appear 11 -> 5 instructions)
 #pragma dont_inline on
 /** The minigame's work area, kept in the battle's shared action-command work buffer. */
 static MukiWork* get_ptr(void) {
@@ -1053,7 +1057,7 @@ static USER_FUNC(star_stone_appear) {
 EVT_BEGIN(marioAttackEvent_Muki)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(14))
     CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
-    CALL(btlevtcmd_CheckStatus, LW(14), 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(14), STATUS_INSTANT_KILL, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(14), -1)
     END_IF
@@ -1130,9 +1134,9 @@ EVT_BEGIN(marioAttackEvent_Muki)
             IF_INT_NOT_EQUAL(LW(1), 0)
                 CALL(set_weapon, 1, LW(1), LW(9))
                 IF_INT_NOT_EQUAL(LW(14), -1)
-                    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(14), LW(15), LW(9), 256, LW(5))
+                    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(14), LW(15), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
                 END_IF
-                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
             END_IF
         END_INLINE_EVENT
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1141,9 +1145,9 @@ EVT_BEGIN(marioAttackEvent_Muki)
 #endif
             CALL(set_weapon, 0, LW(0), LW(9))
             IF_INT_NOT_EQUAL(LW(14), -1)
-                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(14), LW(15), LW(9), 256, LW(5))
+                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(14), LW(15), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
             END_IF
-            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
             RETURN
         END_IF
     END_IF

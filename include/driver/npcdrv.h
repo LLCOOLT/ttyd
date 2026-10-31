@@ -171,6 +171,44 @@ enum NpcFlags {
     NPC_FLAG_NO_WALL_HIT = 0x40000000,      // moves without side (wall) collision
 };
 
+// NpcEntry.jumpFlags bits, the NPC status set by evt_npc_status_onoff and read by
+// evt_npc_status_check; named from their uses in npcdrv.c and evt_npc.c.
+enum NpcStatusFlags {
+    NPC_STATUS_AIRBORNE = 0x1,            // npcMoveG: off the floor this frame (NPC_FLAG_LAND_ON_FLOOR); evt_npc moves stop re-aiming, evt_npc_jump waits
+    NPC_STATUS_FACE_MOVE_DIR = 0x2,       // the evt_npc moves turn the body toward the travel direction (npcTuningRy)
+    NPC_STATUS_DEAD = 0x4,                // _npcDead; the Bowser stage hit checks skip it
+    NPC_STATUS_CLOCK_RUNNING = 0x10,      // the movement clock advances this frame (set each frame without NPC_FLAG_NO_AUTO_UPDATE, and by the evt_npc moves)
+    NPC_STATUS_NO_FIND_EVENT = 0x1000,    // npcCheckInterrupt raises no find/lost/return event, then clears it (evt_npc moves set it)
+    NPC_STATUS_FROZEN = 0x10000,          // npcStopForOneEvent: the movement clock and move offset stop
+    NPC_STATUS_IN_LAVA = 0x100000,        // in kpa_03's lava this frame: slowed, fall speed capped
+    NPC_STATUS_WAS_IN_LAVA = 0x200000,    // in the lava last frame: no splash sound
+    NPC_STATUS_DIM_COLOR = 0x400000,      // the colour is halved before it is applied (npcDimColor)
+    NPC_STATUS_LAVA_NO_SLOW = 0x10000000, // the lava does not slow the movement
+    NPC_STATUS_MARIO_NEAR = 0x20000000,   // Mario is in talk range: the regular event is stopped and the NPC faces him
+};
+
+// NpcEntry.interruptFlags bits: why the regular event is replaced, read by npcCheckInterrupt to pick the event to run.
+enum NpcInterruptFlags {
+    NPC_INTERRUPT_FIND = 0x1,        // Mario found: findEvent
+    NPC_INTERRUPT_LOST = 0x2,        // Mario lost: lostEvent
+    NPC_INTERRUPT_RETURN = 0x4,      // back in its territory: returnEvent
+    NPC_INTERRUPT_BLOW = 0x8,        // blown away (npcCheckBlow): blowEvent
+    NPC_INTERRUPT_DEAD = 0x10,       // defeated (_npcDead): deadEvent
+    NPC_INTERRUPT_NO_FIND = 0x100,   // JP and later: set as a field battle ends (battle_seq_end), find interrupts are ignored
+    NPC_INTERRUPT_KEEP_MASK = 0xF00, // JP and later: bits that npcCheckInterrupt keeps
+    NPC_INTERRUPT_MOVE = 0x10000000, // restart the move event (evt_npc_return_interrupt, after a battle or the hit cooldown)
+};
+
+// NpcEntry.hazardFlags bits: the Bowser stage hazards (npcKoopaModeEncountCheck, npcKoopaModeMobjBoundDeadCheck)
+// that do not kill the NPC; npcGroupDead gets the matching bit as its reason.
+enum NpcHazardFlags {
+    NPC_HAZARD_NO_STOMP = 0x1, // stomped by Bowser (kpaEnemyHitChk 1); also set every frame the NPC is in kpa_03's lava
+    NPC_HAZARD_NO_FIRE = 0x2,  // Bowser's fire (kpaEnemyHitChk 2)
+    NPC_HAZARD_NO_STAR = 0x4,  // touching Bowser while he is invincible (kpaEnemyHitChk 3)
+    NPC_HAZARD_NO_BUMP = 0x8,  // a block bumped from below (npcKoopaModeMobjBoundDeadCheck)
+    NPC_HAZARD_NO_LAVA = 0x10, // standing on the "a_magu" lava
+};
+
 typedef struct NpcEntry {
     s32 flags;                      // 0x0
     u32 reactionFlags;              // 0x4
@@ -200,7 +238,7 @@ typedef struct NpcEntry {
     EvtWord* lostEvent;             // 0x134, verified
     EvtWord* returnEvent;           // 0x138, verified
     EvtWord* blowEvent;             // 0x13C, verified
-    u32 interruptFlags;             // 0x140, why the regular event was interrupted (blow/find/...)
+    u32 interruptFlags;             // 0x140, NPC_INTERRUPT_*: why the regular event was interrupted
     f32 direction;                  // 0x144, angle we're facing at, verified
     f32 savedDirection;             // 0x148, saved during field battle
     f32 width;                      // 0x14C
@@ -254,7 +292,7 @@ typedef struct NpcEntry {
     s8 balloonType;                 // 0x317
     u32 fbatHitKind;                // 0x318, kind from fbatHitCheck when this NPC triggered the battle
     u16 koopaEncounterType;         // 0x31C
-    u16 hazardFlags;                // 0x31E, 1 lava (kpa_03), 2/4/8/0x10 hazard deaths already handled
+    u16 hazardFlags;                // 0x31E, NPC_KOOPA_DEATH_*: Bowser-stage deaths it is immune to
     u16 fbatHitCooldown;            // 0x320
     u8 pad_322[2];                  // 0x322
     struct NpcEntry* prev;          // 0x324
@@ -273,6 +311,11 @@ typedef struct NpcFieldEntry {
     f32 savedPeraTargetRotY; // 0x90
 } NpcFieldEntry;
 
+// NpcWork.flags bits.
+enum NpcWorkFlags {
+    NPC_WORK_RELEASE_FIELD = 0x2, // evt_npc_release_filednpc: the next battle start frees the field NPCs' poses (npcReleaseFiledNpc)
+};
+
 typedef struct NpcWork {
     s32 count;            // 0x0, currently allocated
     s32 total;            // 0x4, maximum allowed
@@ -280,6 +323,28 @@ typedef struct NpcWork {
     NpcEntry* entries;    // 0xC
     NpcEntry* talkTarget; // 0x10, NPC that A would talk to this frame
 } NpcWork;
+
+// NpcWork.flags
+#define NPC_WORK_FLAG_CTRL_OFF_OK 0x1   // talk targets and field hits are checked even with Mario's keys or control off (gor_01)
+#define NPC_WORK_FLAG_RELEASE_POSES 0x2 // evt_npc_release_filednpc: the field NPC poses are freed for the battle and rebuilt after
+
+// fbatHitCheck flags: which hits to look for
+#define FBAT_CHECK_LIVE_ATTACK 0x1  // the attacks are live: the hammer's current frame, Koops's shell, Bobbery's blast
+#define FBAT_CHECK_CONTACT 0x10     // enemy contact too (and no checks while Mario is invincible)
+#define FBAT_CHECK_JUMP 0x20        // touch and jump
+#define FBAT_CHECK_HAMMER 0x40      // hammer
+#define FBAT_CHECK_SPIN_HAMMER 0x80 // spin hammer
+#define FBAT_CHECK_SHELL 0x100      // Koops's shell
+#define FBAT_CHECK_BOMB 0x200       // Bobbery's bomb
+#define FBAT_CHECK_ENEMIES 0x1000   // test enemies (NPC_FLAG_ENEMY) instead of the other NPCs
+#define FBAT_CHECK_QUERY 0x2000     // only NPCs whose reactionFlags allow it, without the attack banner
+
+// NpcEntry.hazardFlags: Bowser-stage deaths the NPC is immune to; also the reason passed to npcGroupDead
+#define NPC_KOOPA_DEATH_STOMP 0x1 // stomped by Bowser (kpaEnemyHitChk 1); also set while the NPC is in lava
+#define NPC_KOOPA_DEATH_FIRE 0x2  // burnt by Bowser's fire (kpaEnemyHitChk 2)
+#define NPC_KOOPA_DEATH_STAR 0x4  // touched while Bowser is invincible (kpaEnemyHitChk 3)
+#define NPC_KOOPA_DEATH_BLOCK 0x8 // standing on a block bumped from below (npcKoopaModeMobjBoundDeadCheck)
+#define NPC_KOOPA_DEATH_LAVA 0x10 // standing on the lava floor "a_magu"
 
 // What fbatHitCheck found (FieldBattleData.hitKind, FirstStrikeInfo.hitKind). Every kind but
 // FBAT_HIT_CONTACT and FBAT_HIT_ENEMY_FIRST is a first strike by Mario or the partner.

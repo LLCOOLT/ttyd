@@ -15,6 +15,7 @@
 #include "driver/icondrv.h"
 #include "yuu.h"
 #include "icon_ids.h"
+#include "evt/evt_yuugijou.h"
 
 typedef struct YuuCounterWork {
     EventEntry* event;
@@ -32,10 +33,12 @@ typedef struct YuuCounterWork {
 } YuuCounterWork;
 static void* yuunpc_wp;
 static YuuCounterWork* _wp;
-#if VERSION >= VERSION_JP
-void evtYuuSetWindowEvt(EvtWord* evt);
-#endif
+
 static void evt_yuucounter_disp_func(CameraId camera, void* param);
+/**
+ * Colours of the minigame counter: plain white for the digits and unit icon,
+ * and translucent white for the backdrop drawn behind them.
+ */
 static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor bgColor = {0xFF, 0xFF, 0xFF, 0x99};
 

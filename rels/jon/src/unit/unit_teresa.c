@@ -15,6 +15,11 @@
 #include "evt/evt_sub.h"
 #include "version.h"
 
+// Unit work slots of the Boo (btlevtcmd_Get/SetUnitWork).
+enum {
+    UW_TERESA_MOVED = 0, // 1 once move_event_sub has lifted it; Boos still at 0 join the next group move
+};
+
 BattleUnitKind unit_teresa;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -63,7 +68,7 @@ static USER_FUNC(teresa_check_teresa) {
 
 /**
  * Script helper: returns in args[0] 1 if any Boo or Dark Boo on the field has work[0] equal to 0, otherwise 0.
- * Guess: work[0] flags a Boo that has already moved or turned invisible.
+ * work[0] is set by move_event_sub once that Boo has taken part in the group move.
  */
 static USER_FUNC(teresa_check_move) {
     EvtWord* args = event->args;
@@ -91,7 +96,7 @@ static USER_FUNC(teresa_check_move) {
 
 /**
  * Script helper: args[0] = unit; returns in args[1] 1 if some other Boo
- * or Dark Boo is not in status 0x12 (probably the transparent state), otherwise 0.
+ * or Dark Boo is not Invisible (status 0x12), otherwise 0.
  */
 static USER_FUNC(teresa_check_trans) {
     EvtWord* args = event->args;
@@ -121,6 +126,10 @@ static USER_FUNC(teresa_check_trans) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit data of the Boo in the Pit of 100 Trials: 7 HP, level 17;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_teresa = {
     75,
     "btl_un_teresa",
@@ -179,7 +188,7 @@ BattleUnitKind unit_teresa = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     1,
     parts,
@@ -187,20 +196,40 @@ BattleUnitKind unit_teresa = {
     data_table,
 };
 
+/**
+ * Defence of the Boo against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of the Boo per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of the Boo:
+ * percent chance that each status takes hold (100 is normal); immune to Poison;
+ * strongly resistant to Slow, Instant KO.
+ */
 static StatusVulnerability regist = {50, 50, 90, 0, 50, 100, 100, 50, 100, 60, 100, 60, 100, 60, 60, 50, 95, 100, 10, 100, 100, 10};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of the Boo:
+ * percent chance that each status takes hold (100 is normal); immune to Poison; extra susceptible to Dizzy;
+ * strongly resistant to Slow, Instant KO.
+ */
 static StatusVulnerability regist = {50, 50, 105, 0, 50, 100, 100, 50, 100, 90, 100, 90, 100, 95, 60, 50, 90, 100, 10, 100, 100, 10};
 #endif
 
+/** Part of the Boo: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_teresa", "c_teresa", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_teresa", "c_teresa", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Weapon of the Boo's slap: damage 3. */
 static BattleWeapon weapon_teresa_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -219,7 +248,7 @@ static BattleWeapon weapon_teresa_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -237,6 +266,7 @@ static BattleWeapon weapon_teresa_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Boo making itself invisible: inflicts Invisible. */
 static BattleWeapon weapon_teresa_trans_myself = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -254,7 +284,7 @@ static BattleWeapon weapon_teresa_trans_myself = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -274,6 +304,7 @@ static BattleWeapon weapon_teresa_trans_myself = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Boo making another Boo invisible: inflicts Invisible. */
 static BattleWeapon weapon_teresa_trans = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -291,7 +322,7 @@ static BattleWeapon weapon_teresa_trans = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -311,6 +342,7 @@ static BattleWeapon weapon_teresa_trans = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Boo's move to a new spot. */
 static BattleWeapon weapon_teresa_move = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -328,7 +360,7 @@ static BattleWeapon weapon_teresa_move = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -345,6 +377,7 @@ static BattleWeapon weapon_teresa_move = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Boo: animation names for each pose type (idle, walk, hurt, attack and so on). */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -352,19 +385,23 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_2"},
-    {39, "D_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Data table of the Boo: event scripts and values the battle looks up by tag (damage reactions, dodge, first
+ * strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
@@ -378,7 +415,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TERESA_MOVED, 0)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 15)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -398,12 +435,13 @@ EVT_END()
 /**
  * Attack event of the Boo.
  * Uses an enemy item if it has one, otherwise rolls among four options:
- * the transparency move on itself (25, only if it is not already in status 18, Guess: transparent),
- * the same move on another Boo (25, if teresa_check_trans finds one; not allowed while status 5 is on it),
+ * the Invisible move on itself (25, only if it is not already Invisible, status 18),
+ * the same move on another Boo (25, if teresa_check_trans finds one; not allowed while it is Confused,
+ * status 5),
  * the Boo move (15, if teresa_check_move allows it) and the plain attack (the rest, 50).
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
@@ -414,19 +452,19 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 18, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_INVISIBLE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(13), 0)
     ELSE
         SET_VALUE(LW(13), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(14), 0)
     ELSE
         CALL(teresa_check_trans, BTL_UNIT_SELF, LW(14))
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(15), 0)
     ELSE
@@ -473,8 +511,9 @@ EVT_END()
  * and applies the damage with the action command defence check. It then turns around and floats back home.
  */
 static EVT_BEGIN(normal_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // Pick a target for the attack; a confused unit that has none flusters.
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -482,7 +521,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_teresa_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -490,6 +529,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_teresa_attack))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_teresa_attack))
@@ -497,7 +537,8 @@ static EVT_BEGIN(normal_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // The Boo fades out of sight.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TELESA_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
@@ -522,6 +563,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 15)
     ADD(LW(2), 5)
     SUBTRACT(LW(1), 10)
+    // It reappears right next to the target.
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -5, 4, 0, -1)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
@@ -529,10 +571,12 @@ static EVT_BEGIN(normal_attack_event)
     WAIT_FRAMES(15)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(9)
+        // It slaps the target.
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TELESA_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SIBLING_EVENT
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_FRAMES(15)
+    // Find out whether the attack will connect or miss.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_teresa_attack), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -556,20 +600,25 @@ static EVT_BEGIN(normal_attack_event)
         CASE_END
         LABEL(90)
         WAIT_FRAMES(30)
+        // The Boo shows its X_1 pose after the miss.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("X_1"))
         WAIT_FRAMES(60)
         GOTO(98)
+        // The attack connects.
         LABEL(91)
         CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
         CALL(evt_btl_camera_add_zoom, 0, -50)
+        // Deal the damage, reduced by the action command defence.
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_teresa_attack))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_teresa_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_teresa_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
         WAIT_FRAMES(30)
         GOTO(98)
+        // Return to its place.
         LABEL(98)
         CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
+        // Turn around and float back home.
         CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, 1, 0, 180, 0)
         CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
@@ -579,15 +628,15 @@ static EVT_BEGIN(normal_attack_event)
 EVT_END()
 
 /**
- * Guess: the Boo's self-transparency move.
- * It dips and shows pose A_1, fades its alpha down (unless it was already in status 18),
+ * The Boo's move that turns itself Invisible.
+ * It dips and shows pose A_1, fades its alpha down (unless it was already Invisible, status 18),
  * turns around in two 90 degree steps (15 degrees x 6 frames each) with pose S_1,
- * and applies weapon_teresa_trans_myself to itself with the defence check, which presumably sets status 18.
+ * and applies weapon_teresa_trans_myself to itself with the defence check (Invisible for 2 turns).
  */
 static EVT_BEGIN(trans_myself_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 18, LW(8))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_INVISIBLE, LW(8))
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_teresa_trans_myself))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_teresa_trans_myself))
@@ -595,7 +644,7 @@ static EVT_BEGIN(trans_myself_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 300)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
     SUBTRACT(LW(1), 10)
@@ -632,14 +681,15 @@ static EVT_BEGIN(trans_myself_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, 255)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_teresa_trans_myself))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_teresa_trans_myself), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_teresa_trans_myself), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 
 /**
- * Guess: the Boo's move on an ally.
- * It picks another Boo (teresa_check_teresa) that is not yet in status 18, fades out and reappears beside it,
- * applies weapon_teresa_trans_myself with the defence check (presumably setting status 18 on that Boo)
+ * The Boo's move that turns another Boo Invisible.
+ * It picks another Boo (teresa_check_teresa) that is not yet Invisible (status 18),
+ * fades out and reappears beside it,
+ * applies weapon_teresa_trans_myself with the defence check (Invisible for 2 turns on that Boo)
  * and returns home.
  */
 static EVT_BEGIN(trans_event)
@@ -652,7 +702,7 @@ static EVT_BEGIN(trans_event)
     END_IF
     CALL(teresa_check_teresa, LW(3), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_CheckStatus, LW(3), 18, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INVISIBLE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             GOTO(1)
         END_IF
@@ -683,7 +733,7 @@ static EVT_BEGIN(trans_event)
             CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 1, LW(7))
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 40)
     SUBTRACT(LW(1), 10)
@@ -703,7 +753,7 @@ static EVT_BEGIN(trans_event)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, 0, 0, 0, -1)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_teresa_trans_myself))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_teresa_trans_myself), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_teresa_trans_myself), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -5, 4, 0, -1)
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 0, 0)
@@ -726,7 +776,7 @@ static EVT_BEGIN(move_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_teresa_move))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_teresa_move), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -743,7 +793,7 @@ static EVT_BEGIN(move_event)
 #endif
     CALL(teresa_check_teresa, LW(3), LW(5))
     IF_INT_EQUAL(LW(5), 1)
-        CALL(btlevtcmd_GetUnitWork, LW(3), 0, LW(6))
+        CALL(btlevtcmd_GetUnitWork, LW(3), UW_TERESA_MOVED, LW(6))
         IF_INT_EQUAL(LW(6), 0)
             SPAWN_EVENT(move_event_sub)
             ADD(LW(12), 20)
@@ -785,8 +835,8 @@ static EVT_BEGIN(move_event_sub)
         SET_VALUE(LW(1), 12)
     END_IF
     WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_SetUnitWork, LW(3), 0, 1)
-    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 6291456)
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_TERESA_MOVED, 1)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
     BEGIN_SIBLING_EVENT
         LOOP(60)
             CALL(btlevtcmd_AddRotate, LW(3), 0, LW(1), 0)

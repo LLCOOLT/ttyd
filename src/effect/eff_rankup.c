@@ -14,6 +14,10 @@
 static void effRankupDisp(CameraId cameraId, EffectEntry* effect);
 static void effRankupMain(EffectEntry* effect);
 #if VERSION >= VERSION_US
+/**
+ * Animation group of the rank-up effect by language
+ * (Japanese, English, German, French, Spanish, Italian).
+ */
 const char* eff_rankup_str_tbl[6] = {"EFF_Rankup", "EFF_Rankup_us", "EFF_Rankup_ge", "EFF_Rankup_fr", "EFF_Rankup_sp", "EFF_Rankup_it"};
 #endif
 

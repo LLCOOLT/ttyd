@@ -1,4 +1,4 @@
-// Pit of 100 Trials battle unit: the Bob-ulk (`heavy_bom`): parts, stats, poses and AI scripts.
+// Pit of 100 Trials battle unit: the Bulky Bob-omb (`heavy_bom`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -17,6 +17,14 @@
 #include "evt/evt_snd.h"
 #include "data_tables.h"
 #include "version.h"
+
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_HEAVY_BOM_FUSE_LIT = 0,    // nonzero once the fuse is lit (its first attack)
+    UW_HEAVY_BOM_FUSE_LEFT = 1,   // fuse stages left, 3 down to 0; picks the pose tables and the spark locator
+    UW_HEAVY_BOM_FUSE_SFX = 2,    // id of the looping fuse sound, -1 when none
+    UW_HEAVY_BOM_GUARD_CYCLE = 3, // which guard weapon it uses next (0, 1, 2, then back to 0)
+};
 
 static USER_FUNC(_set_draw_callback);
 
@@ -54,6 +62,7 @@ static EvtWord explosion_event[254];
 static EvtWord explosion_event[247];
 #endif
 
+/** Unit data of the Bulky Bob-omb: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_heavy_bom = {
     92,
     "btl_un_heavy_bom",
@@ -120,6 +129,10 @@ BattleUnitKind unit_heavy_bom = {
     data_table,
 };
 
+/**
+ * Attack data for the Bulky Bob-omb's super explosion that hits every enemy when the fuse runs out: 2
+ * damage.
+ */
 static BattleWeapon weapon_heavy_bomb_super_explosion = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -142,7 +155,7 @@ static BattleWeapon weapon_heavy_bomb_super_explosion = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -161,6 +174,10 @@ static BattleWeapon weapon_heavy_bomb_super_explosion = {
     {0, 50, 50, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack data for the Bulky Bob-omb's first guard stance, which raises its own defence: no damage, 100%
+ * defence change.
+ */
 static BattleWeapon weapon_heavy_bomb_guard = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -178,7 +195,7 @@ static BattleWeapon weapon_heavy_bomb_guard = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -199,6 +216,7 @@ static BattleWeapon weapon_heavy_bomb_guard = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Bulky Bob-omb's second guard stance, which raises its own defence: no damage. */
 static BattleWeapon weapon_heavy_bomb_guard_2 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -216,7 +234,7 @@ static BattleWeapon weapon_heavy_bomb_guard_2 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -240,6 +258,7 @@ static BattleWeapon weapon_heavy_bomb_guard_2 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Bulky Bob-omb's third guard stance, which raises its own defence: no damage. */
 static BattleWeapon weapon_heavy_bomb_guard_3 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -257,7 +276,7 @@ static BattleWeapon weapon_heavy_bomb_guard_3 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -279,16 +298,27 @@ static BattleWeapon weapon_heavy_bomb_guard_3 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Damage reduction of the Bulky Bob-omb: defence 1 against every attack type. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element response of the Bulky Bob-omb: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Bulky Bob-omb (percent, 0 is immune): immune to poison. Demo values. */
 static StatusVulnerability regist = {70, 50, 70, 0, 70, 150, 100, 70, 100, 70, 100, 70, 100, 70, 70, 80, 20, 100, 70, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Bulky Bob-omb (percent, 0 is immune): immune to poison. Released game
+ * values.
+ */
 static StatusVulnerability regist = {90, 75, 70, 0, 70, 150, 100, 100, 100, 80, 100, 80, 100, 95, 70, 80, 20, 100, 70, 100, 100, 95};
 #endif
 
+/**
+ * Pose table of the Bulky Bob-omb with 3 fuse stages left, fuse out: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_3[] = {
     {1, "N_1"},
     {9, "Y_1"},
@@ -297,17 +327,21 @@ static PoseTableEntry pose_table_3[] = {
     {4, "X_1"},
     {5, "K_1"},
     {9, "Z_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "D_1"},
     {35, "S_1"},
     {31, "S_1"},
-    {39, "D_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "S_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb with 3 fuse stages left, fuse lit: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_3_fire[] = {
     {1, "N_1"},
     {9, "Y_1"},
@@ -316,17 +350,21 @@ static PoseTableEntry pose_table_3_fire[] = {
     {4, "X_1"},
     {5, "K_1"},
     {9, "Z_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "D_1"},
     {35, "S_1"},
     {31, "S_1"},
-    {39, "D_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "S_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb with 2 fuse stages left, fuse out: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_2[] = {
     {1, "N_2"},
     {9, "Y_2"},
@@ -335,17 +373,21 @@ static PoseTableEntry pose_table_2[] = {
     {4, "X_2"},
     {5, "K_2"},
     {9, "Z_2B"},
-    {28, "S_2B"},
+    {BTL_POSE_NORMAL, "S_2B"},
     {29, "D_2"},
     {35, "S_2B"},
     {31, "S_2B"},
-    {39, "D_2"},
-    {56, "X_2"},
-    {57, "X_2"},
+    {BTL_POSE_DAMAGE, "D_2"},
+    {BTL_POSE_DANGER, "X_2"},
+    {BTL_POSE_PERIL, "X_2"},
     {BTL_POSE_TALK, "S_2B"},
     {BTL_POSE_STAY_DEFAULT, "S_2B"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb with 2 fuse stages left, fuse lit: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_2_fire[] = {
     {1, "N_2"},
     {9, "Y_2"},
@@ -354,17 +396,21 @@ static PoseTableEntry pose_table_2_fire[] = {
     {4, "X_2"},
     {5, "K_2"},
     {9, "Z_2A"},
-    {28, "S_2A"},
+    {BTL_POSE_NORMAL, "S_2A"},
     {29, "D_2"},
     {35, "S_2A"},
     {31, "S_2A"},
-    {39, "D_2"},
-    {56, "X_2"},
-    {57, "X_2"},
+    {BTL_POSE_DAMAGE, "D_2"},
+    {BTL_POSE_DANGER, "X_2"},
+    {BTL_POSE_PERIL, "X_2"},
     {BTL_POSE_TALK, "S_2A"},
     {BTL_POSE_STAY_DEFAULT, "S_2A"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb with 1 fuse stage left, fuse out: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_1[] = {
     {1, "N_3"},
     {9, "Y_3"},
@@ -373,17 +419,21 @@ static PoseTableEntry pose_table_1[] = {
     {4, "X_3"},
     {5, "K_3"},
     {9, "Z_3B"},
-    {28, "S_3B"},
+    {BTL_POSE_NORMAL, "S_3B"},
     {29, "D_3"},
     {35, "S_3B"},
     {31, "S_3B"},
-    {39, "D_3"},
-    {56, "X_3"},
-    {57, "X_3"},
+    {BTL_POSE_DAMAGE, "D_3"},
+    {BTL_POSE_DANGER, "X_3"},
+    {BTL_POSE_PERIL, "X_3"},
     {BTL_POSE_TALK, "S_3B"},
     {BTL_POSE_STAY_DEFAULT, "S_3B"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb with 1 fuse stage left, fuse lit: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_1_fire[] = {
     {1, "N_3"},
     {9, "Y_3"},
@@ -392,17 +442,21 @@ static PoseTableEntry pose_table_1_fire[] = {
     {4, "X_3"},
     {5, "K_3"},
     {9, "Z_3A"},
-    {28, "S_3A"},
+    {BTL_POSE_NORMAL, "S_3A"},
     {29, "D_3"},
     {35, "S_3A"},
     {31, "S_3A"},
-    {39, "D_3"},
-    {56, "X_3"},
-    {57, "X_3"},
+    {BTL_POSE_DAMAGE, "D_3"},
+    {BTL_POSE_DANGER, "X_3"},
+    {BTL_POSE_PERIL, "X_3"},
     {BTL_POSE_TALK, "S_3A"},
     {BTL_POSE_STAY_DEFAULT, "S_3A"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb with 0 fuse stages left, fuse lit: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_0_fire[] = {
     {1, "N_4"},
     {9, "Y_4"},
@@ -411,17 +465,21 @@ static PoseTableEntry pose_table_0_fire[] = {
     {4, "X_4"},
     {5, "K_4"},
     {9, "Z_4A"},
-    {28, "S_4A"},
+    {BTL_POSE_NORMAL, "S_4A"},
     {29, "D_4"},
     {35, "S_4A"},
     {31, "S_4A"},
-    {39, "D_4"},
-    {56, "X_4"},
-    {57, "X_4"},
+    {BTL_POSE_DAMAGE, "D_4"},
+    {BTL_POSE_DANGER, "X_4"},
+    {BTL_POSE_PERIL, "X_4"},
     {BTL_POSE_TALK, "S_4A"},
     {BTL_POSE_STAY_DEFAULT, "S_4A"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb with 0 fuse stages left, fuse out: battle pose types mapped to animation
+ * names.
+ */
 static PoseTableEntry pose_table_0[] = {
     {1, "N_4"},
     {9, "Y_4"},
@@ -430,17 +488,21 @@ static PoseTableEntry pose_table_0[] = {
     {4, "X_4"},
     {5, "K_4"},
     {9, "Z_4B"},
-    {28, "S_4B"},
+    {BTL_POSE_NORMAL, "S_4B"},
     {29, "D_4"},
     {35, "S_4B"},
     {31, "S_4B"},
-    {39, "D_4"},
-    {56, "X_4"},
-    {57, "X_4"},
+    {BTL_POSE_DAMAGE, "D_4"},
+    {BTL_POSE_DANGER, "X_4"},
+    {BTL_POSE_PERIL, "X_4"},
     {BTL_POSE_TALK, "S_4B"},
     {BTL_POSE_STAY_DEFAULT, "S_4B"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb as its fuse burns down from stage 3 to stage 2: battle pose types mapped
+ * to animation names.
+ */
 static PoseTableEntry pose_table_3_to_2[] = {
     {1, "B_4"},
     {9, "B_1"},
@@ -448,15 +510,19 @@ static PoseTableEntry pose_table_3_to_2[] = {
     {3, "B_7"},
     {4, "B_10"},
     {5, "B_7"},
-    {28, "B_1"},
+    {BTL_POSE_NORMAL, "B_1"},
     {31, "B_1"},
-    {39, "B_1"},
-    {56, "B_10"},
-    {57, "B_10"},
+    {BTL_POSE_DAMAGE, "B_1"},
+    {BTL_POSE_DANGER, "B_10"},
+    {BTL_POSE_PERIL, "B_10"},
     {BTL_POSE_TALK, "B_1"},
     {BTL_POSE_STAY_DEFAULT, "B_1"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb as its fuse burns down from stage 2 to stage 1: battle pose types mapped
+ * to animation names.
+ */
 static PoseTableEntry pose_table_2_to_1[] = {
     {1, "B_5"},
     {9, "B_2"},
@@ -464,15 +530,19 @@ static PoseTableEntry pose_table_2_to_1[] = {
     {3, "B_8"},
     {4, "B_11"},
     {5, "B_8"},
-    {28, "B_2"},
+    {BTL_POSE_NORMAL, "B_2"},
     {31, "B_2"},
-    {39, "B_2"},
-    {56, "B_11"},
-    {57, "B_11"},
+    {BTL_POSE_DAMAGE, "B_2"},
+    {BTL_POSE_DANGER, "B_11"},
+    {BTL_POSE_PERIL, "B_11"},
     {BTL_POSE_TALK, "B_2"},
     {BTL_POSE_STAY_DEFAULT, "B_2"},
 };
 
+/**
+ * Pose table of the Bulky Bob-omb as its fuse burns down from stage 1 to stage 0: battle pose types mapped
+ * to animation names.
+ */
 static PoseTableEntry pose_table_1_to_0[] = {
     {1, "B_6"},
     {9, "B_3"},
@@ -480,21 +550,23 @@ static PoseTableEntry pose_table_1_to_0[] = {
     {3, "B_9"},
     {4, "B_12"},
     {5, "B_9"},
-    {28, "B_3"},
+    {BTL_POSE_NORMAL, "B_3"},
     {31, "B_3"},
-    {39, "B_3"},
-    {56, "B_12"},
-    {57, "B_12"},
+    {BTL_POSE_DAMAGE, "B_3"},
+    {BTL_POSE_DANGER, "B_12"},
+    {BTL_POSE_PERIL, "B_12"},
     {BTL_POSE_TALK, "B_3"},
     {BTL_POSE_STAY_DEFAULT, "B_3"},
 };
 
+/** Data table of the Bulky Bob-omb: event handlers keyed by tag (dead_event, explosion_event). */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {52, explosion_event},
     {0, NULL},
 };
 
+/** Sound table of the Bulky Bob-omb: the sound each animation plays while it runs. */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"S_3A", 0.01f, NULL, "SFX_ENM_HEAVYB_WAIT3", 0, 1},
     {"S_3A", 0.26666668f, NULL, "SFX_ENM_HEAVYB_WAIT3", 0, 1},
@@ -507,13 +579,14 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/** Body parts of the Bulky Bob-omb: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_heavy_bom", "c_heavy", 0.0f, 0.0f, 0.0f, 15.0f, 50.0f, 0.0f, 0.0f, 65.0f, 0.0f, 65, 70, 255, &defence, &defence_attr, 0x9, 0, pose_table_3},
-    {2, "ヘビーボム", "c_heavy", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table_3},
+    {1, "btl_un_heavy_bom", "c_heavy", 0.0f, 0.0f, 0.0f, 15.0f, 50.0f, 0.0f, 0.0f, 65.0f, 0.0f, 65, 70, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table_3},
+    {2, "ヘビーボム", "c_heavy", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table_3},
 };
 
 /**
- * Init script of the Bob-ulk: registers its wait, phase,
+ * Init script of the Bulky Bob-omb: registers its wait, phase,
  * attack and damage handlers and the default confusion handler.
  * Unit work 0 (fuse lit) is cleared, unit work 1 (fuse stages left) is 3,
  * unit work 2 (fuse sound handle) is -1 and unit work 3 (guard cycle) is 0.
@@ -525,10 +598,10 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 3)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, -1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LIT, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, 3)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_SFX, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_GUARD_CYCLE, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("F_1"))
     CALL(btlevtcmd_AnimeSetPoseSoundTable, BTL_UNIT_SELF, 1, PTR(pose_sound_timing_table))
     CALL(_set_draw_callback)
@@ -537,25 +610,25 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Damage script of the Bob-ulk.
- * If it has status 9 while its fuse is lit, the fuse sound stops,
+ * Damage script of the Bulky Bob-omb.
+ * If it has status 9 (Freeze) while its fuse is lit, the fuse sound stops,
  * the fuse is put out and the pose table for the current fuse stage is restored.
- * A damaging hit with damage code 24, 25, 27, 46, 50,
- * 52 or 54 (Guess: the fire and explosion kinds) sets it off at once (pose 29, dead_event);
+ * A damaging hit with damage code 24, 25 or 27 (a fire, explosion or electric hit) or 46, 50, 52 or 54 (the
+ * fiery, volatile-explosive, electrified and Hold Fast counters) sets it off at once (pose 29, dead_event);
  * anything else takes the default damage handling.
  */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 9, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_FREEZE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LIT, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_SFX, LW(0))
             CALL(evt_snd_sfxoff, LW(0))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, -1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_SFX, -1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LIT, 0)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(2)
                 CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_2))
@@ -566,7 +639,7 @@ static EVT_BEGIN(damage_event)
             END_SWITCH
         END_IF
     END_IF
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
         SWITCH(LW(0))
@@ -590,7 +663,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * After the player's phase, if the fuse is lit, the Bob-ulk burns one fuse stage:
+ * After the player's phase, if the fuse is lit, the Bulky Bob-omb burns one fuse stage:
  * the stage 3 to 2, 2 to 1 and 1 to 0 pose tables are played with SFX_ENM_HEAVYB_WAIT2
  * and the stage in unit work 1 goes down.
  * When the fuse is already at 0 it instead plays pose K_4 and queues the explosion (after-reaction 52).
@@ -598,17 +671,17 @@ EVT_END()
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LIT, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("K_4"))
                 CALL(btlevtcmd_AfterReactionEntry, BTL_UNIT_SELF, 52)
                 RETURN
             END_IF
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HEAVYB_WAIT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(3)
                 CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_3_to_2))
@@ -619,9 +692,9 @@ static EVT_BEGIN(phase_event)
             END_SWITCH
             CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
             WAIT_FRAMES(40)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, LW(0))
             SUBTRACT(LW(0), 1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(2)
                 CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_2_fire))
@@ -639,7 +712,7 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 /**
- * Attack script of the Bob-ulk, with SFX_ENM_HEAVYB_ATTACK1
+ * Attack script of the Bulky Bob-omb, with SFX_ENM_HEAVYB_ATTACK1
  * and the pose for the current fuse stage (G_1 to G_4).
  * If the fuse is not lit it lights it: the looping fuse sound starts (handle kept in unit work 2)
  * and unit work 0 and unit flag 16 are set.
@@ -647,9 +720,9 @@ EVT_END()
  */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HEAVYB_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LIT, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(3)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("G_1"))
@@ -662,12 +735,12 @@ static EVT_BEGIN(attack_event)
         END_SWITCH
         WAIT_FRAMES(40)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HEAVYB_WAIT1"), EVT_NULLPTR, 0, LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_SFX, LW(0))
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HEAVYB_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-        CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LIT, 1)
+        CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FUSE_LIT)
     ELSE
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_LEFT, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(3)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("G_1"))
@@ -679,38 +752,38 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("G_4"))
         END_SWITCH
         WAIT_FRAMES(40)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_GUARD_CYCLE, LW(0))
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(12), PTR(&weapon_heavy_bomb_guard))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_GUARD_CYCLE, 1)
             CASE_EQUAL(1)
             SET_VALUE(LW(12), PTR(&weapon_heavy_bomb_guard_2))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_GUARD_CYCLE, 2)
             CASE_EQUAL(2)
             SET_VALUE(LW(12), PTR(&weapon_heavy_bomb_guard_3))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_GUARD_CYCLE, 0)
         END_SWITCH
         CALL(btlevtcmd_WeaponAftereffect, LW(12))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
-/** Wait script: plays the Bob-ulk's idle pose from its current pose table. */
+/** Wait script: plays the Bulky Bob-omb's idle pose from its current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
 /**
- * Defeat script of the Bob-ulk: stops the fuse sound, then,
+ * Defeat script of the Bulky Bob-omb: stops the fuse sound, then,
  * if the killing blow has a fire or explosion damage code (24, 25, 27, 46, 50, 52 or 54),
  * queues the explosion (after-reaction 52); otherwise it dies the normal way.
  */
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_SFX, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
         CALL(evt_snd_sfxoff, LW(0))
     END_IF
@@ -736,15 +809,15 @@ static EVT_BEGIN(dead_event)
 EVT_END()
 
 /**
- * The Bob-ulk blows up (after-reaction 52): stops the fuse sound,
+ * The Bulky Bob-omb blows up (after-reaction 52): stops the fuse sound,
  * plays SFX_ENM_HEAVYB_ATTACK3 and a sequence of "bomb" explosion effects scaled to its size
  * while the stage fog is cleared, then deals the super explosion weapon's damage to every enemy it can hit.
  * It then dies and is removed from the battle.
  */
 static EVT_BEGIN(explosion_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_SFX, LW(0))
     CALL(evt_snd_sfxoff, LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HEAVY_BOM_FUSE_SFX, -1)
 #if VERSION >= VERSION_US
     CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
 #endif
@@ -779,9 +852,9 @@ static EVT_BEGIN(explosion_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_heavy_bomb_super_explosion))
     SET_VALUE(LW(10), 0)
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_heavy_bomb_super_explosion), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_heavy_bomb_super_explosion), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 1)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_heavy_bomb_super_explosion), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_heavy_bomb_super_explosion), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -807,11 +880,11 @@ static void _fire_point_callback(BattleUnitPart* part, s32 group) {
     const char* name;
     s32 poseId;
 
-    if (unit->work[0] == 0) {
+    if (unit->work[UW_HEAVY_BOM_FUSE_LIT] == 0) {
         return;
     }
     poseId = part->poseId;
-    switch (unit->work[1]) {
+    switch (unit->work[UW_HEAVY_BOM_FUSE_LEFT]) {
         case 0:
             name = "locator11";
             break;

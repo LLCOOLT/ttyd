@@ -1,6 +1,5 @@
-#pragma once
-
 // Declarations shared by the hom.rel units (リバーサイド駅, Riverside Station and the Excess Express scenes).
+#pragma once
 
 #include "dolphin/types.h"
 #include "evt/evt_word.h"

@@ -87,6 +87,7 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/** Exit of this room: the west door to aji_17. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -378,6 +379,10 @@ static EVT_BEGIN(offscreen_to_normal)
     RETURN
 EVT_END()
 
+/**
+ * The seven quiz questions of the stone statue: for each, the map animation, the question and choice text,
+ * and the number of the correct choice.
+ */
 QuizEntry kuizu_data[] = {
     {"anm_1mon", "stg7_aji_06", "stg7_aji_07", 2},
     {"anm_2mon", "stg7_aji_08", "stg7_aji_09", 3},
@@ -390,9 +395,9 @@ QuizEntry kuizu_data[] = {
 
 #if VERSION >= VERSION_JP
 /**
- * Right-answer celebration: confetti above Mario, shows lamp dennshoku and hides dennshoku_2,
- * plays the map animation anm_seikai and waits 1.8 seconds.
- * Guess: the lamps are the quiz set's lights; exists only in the JP and later releases.
+ * Right-answer celebration that the quiz runs in place of quiz_ok in the JP and later releases:
+ * confetti above Mario, the quiz set's illumination (dennshoku shown, dennshoku_2 hidden),
+ * the map animation anm_seikai, then a 1.8-second wait.
  */
 EVT_BEGIN(quiz_ok_confetti)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -490,6 +495,7 @@ EVT_BEGIN(kuizu_sekizou)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
+    // The statue wakes up with a rumble and a camera shake.
     CALL(evt_snd_sfxon, STRING("SFX_STG7_QUAKE1"), GW(10))
     BEGIN_INLINE_EVENT
         CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 2500)
@@ -508,6 +514,7 @@ EVT_BEGIN(kuizu_sekizou)
 #endif
     CALL(evt_msg_toge, 2, 95, 65, 0)
     SPAWN_EVENT(sekizou_talk)
+    // The statue asks who Mario is and offers its quiz: challenge it or bail out.
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_print, 0, STRING("stg7_aji_01"), 0, 0)
 #else
@@ -520,6 +527,7 @@ EVT_BEGIN(kuizu_sekizou)
         SET_VALUE(LW(2), STRING("DOSN"))
         CALL_CHILD(sekizou_kaiten)
         SPAWN_EVENT(sekizou_talk)
+        // If Mario bails out, the statue scolds him and lets him go.
         CALL(evt_msg_print_add, 0, STRING("stg7_aji_04"))
         WAIT_MS(500)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("me_mae"), MAPOBJ_FLAG_HIDE)
@@ -533,6 +541,7 @@ EVT_BEGIN(kuizu_sekizou)
     SET_VALUE(LW(2), STRING("DOSN"))
     CALL_CHILD(sekizou_kaiten)
     SPAWN_EVENT(sekizou_talk)
+    // If he takes the challenge, the quiz set appears and the quiz music starts.
     CALL(evt_msg_print_add, 0, STRING("stg7_aji_05"))
     WAIT_MS(500)
 #if VERSION >= VERSION_JP
@@ -547,6 +556,7 @@ EVT_BEGIN(kuizu_sekizou)
     SET_VALUE(LW(13), 0)
     SET_VALUE(LW(14), 0)
     SET_VALUE(LW(15), 0)
+    // The questions are read one at a time from the quiz table; each is multiple choice.
     SET_INT_READ_ADDR(PTR(&kuizu_data))
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     LOOP(0)
@@ -588,6 +598,7 @@ EVT_BEGIN(kuizu_sekizou)
             END_IF
             IF_INT_EQUAL(LW(0), 0)
                 SPAWN_EVENT(sekizou_talk)
+                // The statue asks "You sure about that?" and Mario confirms or chooses again.
                 CALL(evt_msg_print_add, 0, STRING("stg7_aji_20"))
                 CALL(evt_msg_select, 0, STRING("stg7_aji_03"))
                 IF_INT_EQUAL(LW(0), 0)
@@ -611,6 +622,7 @@ EVT_BEGIN(kuizu_sekizou)
         CALL(evt_cam3d_evt_set, -189, 72, 207, 219, 69, -80, 0, 11)
         WAIT_MS(500)
 #endif
+        // A right answer earns a fanfare; the statue reacts to the first, fourth and fifth correct answers.
         IF_INT_EQUAL(LF(0), 1)
 #if VERSION <= VERSION_DEMO_US
             SPAWN_EVENT(quiz_ok)
@@ -674,6 +686,7 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(sekizou_talk)
 #if VERSION <= VERSION_DEMO_US
+                // After the fifth correct answer the statue admits defeat in a rage.
                 CALL(evt_msg_print, 0, STRING("stg7_aji_25"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_25"), PTR(kuti_callback), 0)
@@ -690,6 +703,7 @@ EVT_BEGIN(kuizu_sekizou)
             IF_INT_EQUAL(LW(15), 2)
                 CALL(evt_snd_sfxon, STRING("SFX_STG7_BAD_SOUND2"), 0)
             ELSE
+                // A wrong answer sounds a buzzer and the statue gloats; the third wrong answer ends the quiz.
                 CALL(evt_snd_sfxon, STRING("SFX_STG7_BAD_SOUND1"), 0)
             END_IF
             CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("me_ato2"), MAPOBJ_FLAG_HIDE)
@@ -741,6 +755,7 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(sekizou_talk)
 #if VERSION <= VERSION_DEMO_US
+                // Punishment round: two Yuxes jump in and Mario must fight them.
                 CALL(evt_msg_print, 0, STRING("stg7_aji_29"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_29"), PTR(kuti_callback), 0)
@@ -838,6 +853,7 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(sekizou_talk)
 #if VERSION <= VERSION_DEMO_US
+                // After the fight the statue is furious that its underlings lost.
                 CALL(evt_msg_print, 0, STRING("stg7_aji_31"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_31"), PTR(kuti_callback), 0)
@@ -859,6 +875,7 @@ EVT_BEGIN(kuizu_sekizou)
     CALL(evt_snd_sfxon, STRING("SFX_STG7_QUAKE1"), LW(10))
     CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1500)
     CALL(evt_snd_sfxoff, LW(10))
+    // The statue shakes and drops the Elevator Key, then Mario gets control back.
     CALL(evt_item_entry, STRING("dummy"), ITEM_ELEVATOR_KEY_0x1C, 50, 100, 0, ITEM_ENTRY_FALL, -1, PTR(evt_item))
     CALL(evt_msg_toge, 2, 95, 65, 0)
     SPAWN_EVENT(sekizou_talk)

@@ -5,6 +5,10 @@
 #include <dolphin/gx.h>
 #include "memory.h"
 
+// OffscreenEntry.flags
+#define OFFSCREEN_FLAG_USED 0x1     // entry allocated (offscreenEntry)
+#define OFFSCREEN_FLAG_HAS_AREA 0x2 // something drew into it this frame: the current bounding box is valid
+#define OFFSCREEN_FLAG_CAPTURED 0x4 // offscreenDisp copied the area to texObj this frame
 typedef struct OffscreenEntry {
     s32 flags;          // 0x0
     char name[16];      // 0x4

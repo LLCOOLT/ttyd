@@ -20,8 +20,10 @@
 #include "icon_ids.h"
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
+/** Red "No messages" text shown in place of a message key that is not found, Japanese version (ErrMessage). */
 const char R_no_messages_JP[] = "<col ff0000ff>\203\201\203b\203Z\201[\203W\202\252\202\240\202\350\202\334\202\271\202\361</col>\n<key>";
 #if VERSION >= VERSION_US
+/** The same red "No messages" text for each other language, tagged with its name; ErrMessage picks one. */
 const char R_no_messages_US[] = "<col ff0000ff>No messages.[English]<col>\012<key>";
 const char R_no_messages_DE[] = "<col ff0000ff>No messages.[German]<col>\012<key>";
 const char R_no_messages_FR[] = "<col ff0000ff>No messages.[French]<col>\012<key>";
@@ -29,6 +31,7 @@ const char R_no_messages_ES[] = "<col ff0000ff>No messages.[Spanish]<col>\012<ke
 const char R_no_messages_IT[] = "<col ff0000ff>No messages.[Italian]<col>\012<key>";
 const char R_no_messages_DU[] = "<col ff0000ff>No messages.[Dutch]<col>\012<key>";
 #else
+/** Red "No messages" text shown in English in place of a message key that is not found (ErrMessage). */
 const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>";
 #endif
 
@@ -88,6 +91,7 @@ MsgIcon msgIcon[] = {
 };
 
 #if VERSION >= VERSION_JP
+/** Sound effects of the message windows by window type: the sound when it opens, then the one when it closes. */
 s32 msgWindowOpen_SE_Data[] = {
     0x16, 0x17, 0x1A, 0x1B, 0x20, 0x21, 0x1C, 0x1D,
     0x20, 0x21, 0x1C, 0x1D, 0x18, 0x19, 0x22, 0x23,
@@ -107,6 +111,7 @@ u16 g5_active_s772;
 //.sdata
 MessageWork* msgw = &msgWork;
 #if VERSION <= VERSION_DEMO_US
+/** Empty text that a message file which failed to load is replaced with. */
 static char NoMessage[] = ""; // the text of dummySmartList
 #endif
 #if VERSION >= VERSION_US
@@ -519,9 +524,9 @@ static s32 msgMain(smartEntry* smart) {
                 if (MSG_CB(data)) {
                     MSG_CB(data)(5, smart);
                 }
-                if (entry->value & 0x10) {
+                if (entry->value & MSG_CHAR_DOT) {
                     msgVoiceSE(smart);
-                } else if (entry->value & 8) {
+                } else if (entry->value & MSG_CHAR_TALK) {
                     if (((MsgWinData*)smart->address)->window->type != 3) {
                         ((MsgWinData*)smart->address)->talkTimer = 15;
                     }
@@ -1002,9 +1007,9 @@ void msgAnalize(smartEntry* smart, const char* msg) {
 #endif
             entry->value = flags;
             if ((*((const u16*)msg)) == 0x8145) {
-                entry->value |= 0x10;
+                entry->value |= MSG_CHAR_DOT;
             } else if (((*((const u16*)msg)) != 0x8140) && ((*((const u16*)msg)) != 0x8151)) {
-                entry->value |= 8;
+                entry->value |= MSG_CHAR_TALK;
             }
             if ((flags & MSG_CHAR_DYNAMIC) != 0) {
                 entry->rot = dynScale;
@@ -1456,6 +1461,8 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                     *(int*)z3 = 1;
                     *(int*)z4 = 2;
                     for (kR = zz[0] + z3[0] + z4[0] - 3; kR < half; kR++) {
+                        // FAKE: dead guard (never runs) redefining fp and ys at the ruby loop top; without it the whole
+                        // function colours differently and gains an instruction (FAKES.md)
                         {
                             s32 gz = 0;
                             if (gz != 0) {
@@ -1960,12 +1967,12 @@ static void msgWindow_Main(WindowEntry* window) {
             }
             break;
         case 3:
-            target = 0x100;
+            target = PAD_BUTTON_A;
             if (WIN_DATA(window)->flags & MSG_WIN_FLAG_KEY_X) {
-                target = 0x500;
+                target = PAD_BUTTON_A | PAD_BUTTON_X;
             }
             trg = keyGetButtonTrg(0);
-            if (trg & (target | 0x200)) {
+            if (trg & (target | PAD_BUTTON_B)) {
                 WIN_STATE(window) = 1;
                 data->pageState = 2;
                 if (keyGetButtonTrg(0) & PAD_BUTTON_B) {
@@ -2015,9 +2022,9 @@ static void msgWindow_Main(WindowEntry* window) {
             }
             break;
         case 11:
-            target = 0x100;
+            target = PAD_BUTTON_A;
             if (WIN_DATA(window)->flags & MSG_WIN_FLAG_KEY_X) {
-                target = 0x500;
+                target = PAD_BUTTON_A | PAD_BUTTON_X;
             }
             trg = keyGetButtonTrg(0);
             if (trg & target) {

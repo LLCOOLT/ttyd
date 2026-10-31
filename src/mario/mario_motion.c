@@ -62,6 +62,10 @@ static void mot_dummy(void);
 
 #define PCHK(x) pouchCheckItem(x)
 
+/**
+ * Mario's motions by motion id (standing, walking, dashing, jumping, ... and Bowser's): the function that runs
+ * each frame, an unused slot and the cleanup run when Mario leaves the motion; marioMotion calls through it.
+ */
 MarioMotTblEntry marioMotTbl[] = {
     {mot_stay, NULL, mot_stay_post},
     {mot_walk, NULL, NULL},
@@ -114,6 +118,10 @@ MarioMotTblEntry marioMotTbl[] = {
     {mot_dummy, NULL, NULL},
 };
 
+/**
+ * Mario's normal jump physics: rising speed, acceleration, jerk and snap; the same for falling; an unread height
+ * and the fastest fall speed. Bowser's jump also starts from the rising values.
+ */
 MarioJumpData marioJumpData = {
     {8.0f, -0.84f, 0.08f, -0.02f},
     {-0.1f, -0.2f, 0.024f, -0.004f},
@@ -314,10 +322,10 @@ BOOL marioChkTalkable(void) {
 void marioBoots(void) {
     MarioWork* mario = marioGetPtr();
     u32 flags = mario->flags;
-    if (flags & 0x80000000) {
+    if (flags & MARIO_FLAG_IS_8_BIT) {
         return;
     }
-    if (flags & 0x100000) {
+    if (flags & MARIO_FLAG_PAPER_MODE) {
         return;
     }
     if (mario->characterId == 2) {
@@ -333,7 +341,7 @@ void marioBoots(void) {
         marioChgMot(MARIO_MOTION_HIP);
         return;
     }
-    if (!(flags & 0x80000)) {
+    if (!(flags & MARIO_FLAG_HAS_INPUT_JUMP)) {
         return;
     }
 #if VERSION == VERSION_EU
@@ -704,7 +712,7 @@ void marioFall(void) {
     if (hit) {
         mario->hitobjStandOn = hit;
         mario->hitobjJumpFrom = NULL;
-        if (hitGetAttr(hit) & 0x200) {
+        if (hitGetAttr(hit) & HIT_ATTR_DEEP_WATER) {
             mario->position.y += spd;
         } else {
             mario->position.y = y;
@@ -747,7 +755,7 @@ void marioLandOn(void) {
     s32 sfx;
     void* stand;
 
-    if (!(hitGetAttr(mario->hitobjStandOn) & 0x200)) {
+    if (!(hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_DEEP_WATER)) {
         marioClearJumpPara();
     }
     mario->flags &= ~MARIO_FLAG_STOP_AIR_MOVEMENT;
@@ -765,13 +773,13 @@ void marioLandOn(void) {
     pos = mario->position;
     if (stand) {
         attr = hitGetAttr(stand);
-        if (attr & 0x100) {
+        if (attr & HIT_ATTR_SHALLOW_WATER) {
             sfx = 0x150;
         } else if (attr & 0x200000) {
             sfx = 0x151;
         } else if (attr & 0x100000) {
             sfx = 0x152;
-        } else if (attr & 0x1000) {
+        } else if (attr & HIT_ATTR_GRASS) {
             sfx = 0x153;
         } else if (attr & 0x400000) {
             sfx = 0x154;
@@ -787,17 +795,17 @@ void marioLandOn(void) {
     }
     mario->mot.jump.dist = __fabsf(distABf(mario->position.x, mario->position.z, mario->lastGroundPos.x, mario->lastGroundPos.z));
     attr = hitGetAttr(mario->hitobjStandOn);
-    if (mario->currMotionId != MARIO_MOTION_DAMAGE && (attr & 0x200)) {
+    if (mario->currMotionId != MARIO_MOTION_DAMAGE && (attr & HIT_ATTR_DEEP_WATER)) {
         set_damage_root_ypos(mario->position.y);
         marioChgMot(MARIO_MOTION_DAMAGE);
         return;
     }
-    if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & 0x800)) {
+    if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & HIT_ATTR_SPIKES)) {
         set_damage_root_ypos(mario->position.y);
         marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
         return;
     }
-    if (hitGetAttr(mario->hitobjStandOn) & 0x80000000) {
+    if (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_MOBJ) {
         mobj = mobjHitObjPtrToPtr(mario->hitobjStandOn);
         if (!strcmp(mobj->animName, "MOBJ_RedSwitch")) {
             marioChgMot(MARIO_MOTION_JUMP_SW);
@@ -867,7 +875,7 @@ void marioLandOn(void) {
 #endif
     }
     flags = mario->flags;
-    if (flags & 0x1000000) {
+    if (flags & MARIO_FLAG_TUBE_MODE) {
         marioChgRollMotion();
         return;
     }
@@ -877,14 +885,14 @@ void marioLandOn(void) {
         return;
     }
     if (mario->currMotionId != MARIO_MOTION_SLIT) {
-        if (!(flags & 0x20)) {
+        if (!(flags & MARIO_FLAG_FORCED_MOVEMENT)) {
             marioChgMot(MARIO_MOTION_STAY);
             return;
         }
         marioChgMot(mario->baseSpeed > mario->baseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
         return;
     }
-    if (flags & 0x100000) {
+    if (flags & MARIO_FLAG_PAPER_MODE) {
 #if VERSION <= VERSION_DEMO_US
         marioChgMotSub(MARIO_MOTION_STAY, FALSE);
 #else
@@ -1016,7 +1024,7 @@ BOOL marioChkJump(void) {
         return FALSE;
     }
     if (mario->hitobjFrontA) {
-        if ((hitGetAttr(mario->hitobjFrontA) & 0x80000000) && mobjGetHint(mobjHitObjPtrToPtr(mario->hitobjFrontA)) == 1) {
+        if ((hitGetAttr(mario->hitobjFrontA) & HIT_ATTR_MOBJ) && mobjGetHint(mobjHitObjPtrToPtr(mario->hitobjFrontA)) == 1) {
             return FALSE;
         }
         ce = caseCheckHitObj(mario->hitobjFrontA);
@@ -1025,7 +1033,7 @@ BOOL marioChkJump(void) {
         }
     }
     if (mario->hitobjFront) {
-        if ((hitGetAttr(mario->hitobjFront) & 0x80000000) && mobjGetHint(mobjHitObjPtrToPtr(mario->hitobjFront)) == 1) {
+        if ((hitGetAttr(mario->hitobjFront) & HIT_ATTR_MOBJ) && mobjGetHint(mobjHitObjPtrToPtr(mario->hitobjFront)) == 1) {
             return FALSE;
         }
         ce = caseCheckHitObj(mario->hitobjFront);
@@ -1034,7 +1042,7 @@ BOOL marioChkJump(void) {
         }
     }
     if (mario->hitobjStandOn) {
-        if ((hitGetAttr(mario->hitobjStandOn) & 0x80000000) && mobjGetHint(mobjHitObjPtrToPtr(mario->hitobjStandOn)) == 1) {
+        if ((hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_MOBJ) && mobjGetHint(mobjHitObjPtrToPtr(mario->hitobjStandOn)) == 1) {
             return FALSE;
         }
         ce = caseCheckHitObj(mario->hitobjStandOn);
@@ -1046,7 +1054,7 @@ BOOL marioChkJump(void) {
         return FALSE;
     }
 #if VERSION == VERSION_EU
-    if (mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & 0x200)) {
+    if (mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_DEEP_WATER)) {
         return FALSE;
     }
 #endif
@@ -1210,9 +1218,10 @@ static inline BOOL marioChkBackAngle(f32 a) {
 }
 
 /**
- * Guess: an unused whirl ("kaze", wind): spins Mario in pose M_P_2 up to 60 degrees a frame while Z is held,
+ * Unused spin: turns Mario in pose M_P_2 up to 60 degrees a frame while Z is held,
  * then slows him to a stop and stands.
  * No code in the tree enters MARIO_MOTION_KAZE; marioChkSts 0x20 only tests for it.
+ * Guess: a whirlwind, from the name ("kaze", wind).
  */
 static void mot_kaze(void) {
     MarioWork* mario = marioGetPtr();
@@ -1254,8 +1263,8 @@ static void mot_kaze(void) {
 }
 
 /**
- * Unknown: lays Mario flat (rot.x 90, pose M_S_1) out of the slit until B stands him back up.
- * No code in the tree enters MARIO_MOTION_SHADOW.
+ * Unused: lays Mario flat (rot.x 90, pose M_S_1, slit display flag cleared) until B stands him back up.
+ * No code in the tree enters MARIO_MOTION_SHADOW. Guess: lying flat as a shadow, from the name.
  */
 static void mot_shadow(void) {
     MarioWork* mario = marioGetPtr();

@@ -96,3 +96,13 @@ void yuuminigame_disp_3roll(CameraId camera, void* param);
 void yuuminigame_disp_4slit(CameraId camera, void* param);
 void yuucounter_flag_on(u32 mask);
 void yuunpc_wp_flag_off(u16 flag);
+
+// the minigame init/main callbacks of yuu_00 .. yuu_03 (evt_yuuminigame.c starts them)
+void yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall);
+void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall);

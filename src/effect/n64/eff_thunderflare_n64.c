@@ -9,6 +9,10 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 
+/**
+ * 16x16 quad drawn for each spark, white at the top shading to red at the bottom,
+ * followed by an unused larger copy turned 45 degrees.
+ */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 250, 250, 250, 255},
     {8, -8, 0, 1024, 0, 250, 250, 250, 255},

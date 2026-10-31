@@ -16,7 +16,7 @@ extern EvtWord item_box_00[];
 
 /**
  * Exit event of the roll-through doorway: returns 0 in LW(0), which blocks the exit,
- * while Mario is in motion 22 (Guess: the paper-roll form), and 1 otherwise.
+ * while Mario is in motion 22 (MARIO_MOTION_ROLL, the paper-roll form), and 1 otherwise.
  */
 static EVT_BEGIN(check_roll)
     CALL(evt_mario_get_motion, LW(0))
@@ -28,6 +28,7 @@ static EVT_BEGIN(check_roll)
     RETURN
 EVT_END()
 
+/** Doors of this room: the south exit (s_bero) to jin_00. */
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName

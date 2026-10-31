@@ -9,6 +9,7 @@ static OSFontHeader* FontDataAnsi;
 static OSFontHeader* FontDataSjis;
 static int FixedPitch;
 static ParseStringCallback ParseString;
+/** Cached result of OSGetFontEncode (0xFFFF: not read yet). */
 static u16 FontEncode = 0xFFFF;
 
 // prototypes

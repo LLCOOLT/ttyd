@@ -22,8 +22,16 @@
 #include "mario/mario_kemuri.h"
 #include <dolphin/pad.h>
 
+// Bits of MotJabaraWork.flags.
+enum MotJabaraFlag {
+    JABARA_FLAG_SWING_INPUT = 0x1,    // A or B was pressed for the ceiling swing (swingMain)
+    JABARA_FLAG_CHARGE_LV1 = 0x10000, // charge level 1 reached (set once)
+    JABARA_FLAG_CHARGE_LV2 = 0x20000, // charge level 2 reached; its sound played once
+    JABARA_FLAG_CHARGE_LV3 = 0x40000, // charge level 3 reached; its sound played once
+};
+
 typedef struct MotJabaraWork {
-    u32 flags;          // 0x00: 1 = swing input taken (swingMain); 0x10000 / 0x20000 / 0x40000 = one-shot charge-level sounds played
+    u32 flags;          // 0x00: MotJabaraFlag bits
     f32 swingAccel;     // 0x04: added to the swing angle while the push timer runs (2.4 start, 0.1 walk)
     f32 swingDecel;     // 0x08: added once the push timer hits 0 (-0.4 start, -0.1 walk)
     f32 swingDrift;     // 0x0C: cleared at sub-motion 0x32, never read
@@ -192,7 +200,7 @@ BOOL marioChkJabara(void) {
         }
     }
 #endif
-    if (marioGetRub(0x100, &b, &a, &c) == FALSE) {
+    if (marioGetRub(PAD_BUTTON_A, &b, &a, &c) == FALSE) {
         return FALSE;
     } else {
         return a >= 1;
@@ -313,8 +321,8 @@ void mot_jabara(void) {
 #endif
             if (--mario->multiTimer <= 0) {
                 mario->currSubMotionId = 12;
-                if (!(marioGetPtr()->motJabara->flags & 0x10000)) {
-                    marioGetPtr()->motJabara->flags |= 0x10000;
+                if (!(marioGetPtr()->motJabara->flags & JABARA_FLAG_CHARGE_LV1)) {
+                    marioGetPtr()->motJabara->flags |= JABARA_FLAG_CHARGE_LV1;
                 }
             }
         case 12:
@@ -324,23 +332,23 @@ void mot_jabara(void) {
                 mario->position.y = hitY;
             }
 #endif
-            if (marioGetRub(0x100, &rubDir, &rubCount, &rubMag) == 1) {
+            if (marioGetRub(PAD_BUTTON_A, &rubDir, &rubCount, &rubMag) == 1) {
                 mario->hammerChargeTimer++;
                 if (mario->hammerChargeTimer >= 0x14) {
                     mario->hammerChargeTimer = 0x14;
                 }
             }
             if (mario->hammerChargeTimer == 3) {
-                if (!(marioGetPtr()->motJabara->flags & 0x40000)) {
-                    marioGetPtr()->motJabara->flags |= 0x40000;
+                if (!(marioGetPtr()->motJabara->flags & JABARA_FLAG_CHARGE_LV3)) {
+                    marioGetPtr()->motJabara->flags |= JABARA_FLAG_CHARGE_LV3;
                     psndSFXOn_3D(SFX_NAME_WORD(0x184), &mario->position);
                 }
                 marioChgPaper("PM_J_3B");
                 mario->hammerChargeLv = 3;
                 jabaraSetSpd(0.4f, 0.005f, 1.7f);
             } else if (mario->hammerChargeTimer == 2) {
-                if (!(marioGetPtr()->motJabara->flags & 0x20000)) {
-                    marioGetPtr()->motJabara->flags |= 0x20000;
+                if (!(marioGetPtr()->motJabara->flags & JABARA_FLAG_CHARGE_LV2)) {
+                    marioGetPtr()->motJabara->flags |= JABARA_FLAG_CHARGE_LV2;
                     psndSFXOn_3D(SFX_NAME_WORD(0x183), &mario->position);
                 }
                 marioChgPaper("PM_J_2B");
@@ -452,7 +460,7 @@ void mot_jabara(void) {
                 mario->currSubMotionId = 0x1e;
                 break;
             }
-            if (hitGetAttr(mario->hitobjHead) & 0x40000) {
+            if (hitGetAttr(mario->hitobjHead) & HIT_ATTR_SPRING_GRAB) {
                 mario->mot.jabara.dir = mario->displayDirectionTarget;
                 mario->displayDirection = mario->displayDirectionTarget;
                 mario->currSubMotionId = 0x46;
@@ -734,7 +742,7 @@ void mot_jabara(void) {
                         {
                             BOOL hit = FALSE;
                             f32 f31 = 1.0f;
-                            if (mario->hitobjHead != NULL && (hitGetAttr(mario->hitobjHead) & 0x40000)) {
+                            if (mario->hitobjHead != NULL && (hitGetAttr(mario->hitobjHead) & HIT_ATTR_SPRING_GRAB)) {
                                 hit = TRUE;
                             }
                             if (hit) {
@@ -905,9 +913,9 @@ void jabaraSwingWalk(void) {
 static void swingMain(void) {
     MarioWork* mario = marioGetPtr();
     if (marioGetPtr()->motStruct) {
-        if ((s32)mario->currSubMotionId < 0x5a && (mario->buttonTrg & (PAD_BUTTON_A | PAD_BUTTON_B)) && !(marioGetPtr()->motJabara->flags & 1)) {
+        if ((s32)mario->currSubMotionId < 0x5a && (mario->buttonTrg & (PAD_BUTTON_A | PAD_BUTTON_B)) && !(marioGetPtr()->motJabara->flags & JABARA_FLAG_SWING_INPUT)) {
             mario->mot.jabara.rotTimer = 0;
-            marioGetPtr()->motJabara->flags |= 1;
+            marioGetPtr()->motJabara->flags |= JABARA_FLAG_SWING_INPUT;
         }
         switch (mario->mot.jabara.state) {
             case 0:
@@ -931,7 +939,7 @@ static void swingMain(void) {
                         }
                     }
                 }
-                if (marioGetPtr()->motJabara->flags & 1) {
+                if (marioGetPtr()->motJabara->flags & JABARA_FLAG_SWING_INPUT) {
                     f32 old = mario->rot.x;
                     mario->rot.x = revise360(old + mario->mot.jabara.rotSpeed);
                     if (mario->rot.x < old) {
@@ -1014,7 +1022,7 @@ static void swingMain(void) {
                         }
                     }
                 }
-                if (marioGetPtr()->motJabara->flags & 1) {
+                if (marioGetPtr()->motJabara->flags & JABARA_FLAG_SWING_INPUT) {
                     f32 old = mario->rot.x;
                     mario->rot.x = revise360(old - mario->mot.jabara.rotSpeed);
                     if (mario->rot.x > old) {
@@ -1077,8 +1085,8 @@ static void swingMain(void) {
 }
 
 /**
- * Unknown: motion 0x1E (MARIO_MOTION_GRASP) only clears the jump and fall flags on entry and does nothing else;
- * nothing in the tree switches to it.
+ * Unused stub: motion 0x1E (MARIO_MOTION_GRASP) only clears the jump and fall flags on entry and does nothing
+ * else; nothing in the tree switches to it. Guess: a grabbing motion that was never written, from the name.
  */
 void mot_grasp(void) {
     MarioWork* mario = marioGetPtr();

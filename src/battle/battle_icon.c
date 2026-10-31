@@ -13,7 +13,7 @@
 
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-// inlining off for BtlIconGetPtr, BattleIconInit, BattleIconMain and 4 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 7 functions change length, e.g. btlevtcmd_BtlIconEntryItemId 72 -> 122 instructions
 #pragma dont_inline on
 /**
  * Finds the in-use battle icon (of the 16 slots in BattleWork) whose slot index matches; NULL if none.
@@ -281,6 +281,7 @@ USER_FUNC(btlevtcmd_BtlIconJumpPosition) {
  * Never called: a stand-in for a function the linker stripped, so that 0.0f,
  * 1.0f and 0.5f come first in the unit's float constant pool as in the original.
  */
+// FAKE: uncalled stand-in for a stripped function; orders 0.0f, 1.0f, 0.5f in .sdata2
 void btlIconStrippedPool(f32* f) {
     f[0] = 0.0f;
     f[1] = 1.0f;

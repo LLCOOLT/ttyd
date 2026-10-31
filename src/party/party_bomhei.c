@@ -28,6 +28,7 @@
 #include <dolphin/pad.h>
 
 #if VERSION >= VERSION_JP
+/** Height bob of Bobbery over Mario's head per frame of Mario's carry walk (M_W_7), in quarter units. */
 s32 m_w_7_sync[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 8, 7, 5, 3, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0, 0};
 #endif
 
@@ -57,7 +58,7 @@ static inline BOOL isBombRock(HitEntry* hit) {
     if (hit == NULL) {
         return FALSE;
     }
-    if (hitGetAttr(hit) & 0x80000000) {
+    if (hitGetAttr(hit) & HIT_ATTR_MOBJ) {
         if (strcmp(mobjHitObjPtrToPtr(hit)->animName, "MOBJ_BombRock") == 0) {
             return TRUE;
         }
@@ -95,9 +96,9 @@ static inline void bomheiStopUseSfx(PartyEntry* party) {
 
 #define BOMHEI_CLEAN_FLAGS(p)                 \
     (p)->flags2 &= ~PARTY_DISP_FLAG_DIR_LOCK; \
-    (p)->flags &= ~(1 << 25);                 \
-    (p)->flags &= ~(1U << 31);                \
-    (p)->flags &= ~(1 << 8);
+    (p)->flags &= ~PARTY_FLAG_FORCE_FALL;     \
+    (p)->flags &= ~PARTY_FLAG_IS_EVT_USE;     \
+    (p)->flags &= ~PARTY_FLAG_IS_BEING_USED;
 
 #define BOMHEI_FREE(p)                \
     if ((p)->useStruct != NULL) {     \
@@ -127,7 +128,7 @@ void bomhei_bye(PartyEntry* party) {
  * starts in idle state 100 with no bomb sounds playing.
  */
 void bomhei_init(PartyEntry* party) {
-    party->memberKind = 3;
+    party->memberKind = PARTY_MEMBER_BOBBERY;
     party->moveKind = 0;
     party->height = 28.0f;
     party->width = 28.0f;
@@ -385,7 +386,7 @@ void bomhei_use(PartyEntry* party) {
             }
             mario_controll(party);
         }
-        if (party->useMotionId <= 10 && mario->hitobjStandOn != NULL && (hitGetAttr(mario->hitobjStandOn) & 0x80000000)) {
+        if (party->useMotionId <= 10 && mario->hitobjStandOn != NULL && (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_MOBJ)) {
             mobj = mobjHitObjPtrToPtr(mario->hitobjStandOn);
             if (strcmp(mobj->animName, "MOBJ_RedJumpStand") == 0 ||
                 strcmp(mobj->animName, "MOBJ_RedJumpStand2") == 0 ||
@@ -406,8 +407,15 @@ void bomhei_use(PartyEntry* party) {
 }
 #endif
 
+// Bits of BomheiWork.flags (cleared when Bobbery is picked up).
+enum BomheiWorkFlag {
+    BOMHEI_FLAG_FUSE_SHORT = 0x2,   // 2.5 s left on the fuse (or splashed): the L_2 / W_2 poses
+    BOMHEI_FLAG_LAND_EXPLODE = 0x4, // Unknown: never set; on landing Bobbery would explode (use motion 50, not 30)
+    BOMHEI_FLAG_SPLASHED = 0x8,     // fell into deep water (marioSetSplash); cleared when he explodes
+};
+
 typedef struct BomheiWork {
-    u32 flags; // 0x0
+    u32 flags; // 0x0, BomheiWorkFlag bits
     s32 timer; // 0x4
 } BomheiWork;
 
@@ -430,24 +438,26 @@ static inline s16 bomheiToS16(f32 x) {
  * The demo checks only the first hit object present.
  * Ends the fuse early when the first of Bobbery's front,
  * head or floor hits present has attribute 0xC00 (use motion 60, explode)
- * or his floor has 0x200 (use motion 40, the splash). Guess: 0x200 is water and 0xC00 a hazard such as lava.
+ * or his floor has 0x200 (use motion 40, the splash).
+ * 0x200 is the hazard water that sinks Mario (mario_hit.c, MARIO_MOTION_DAMAGE) and 0x800 the spikes
+ * (MARIO_MOTION_DAMAGE_TOGE). Guess: 0x400, the other bit of 0xC00, is a further hazard.
  */
 static inline void bomheiChkHitAttr(PartyEntry* party) {
     u32 attr;
 
     if (party->hitobjFront != NULL) {
-        if (hitGetAttr(party->hitobjFront) & 0xC00) {
+        if (hitGetAttr(party->hitobjFront) & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES)) {
             party->useMotionId = 60;
         }
     } else if (party->hitobjHead != NULL) {
-        if (hitGetAttr(party->hitobjHead) & 0xC00) {
+        if (hitGetAttr(party->hitobjHead) & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES)) {
             party->useMotionId = 60;
         }
     } else if (party->hitobjStandOn != NULL) {
         attr = hitGetAttr(party->hitobjStandOn);
-        if (attr & 0xC00) {
+        if (attr & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES)) {
             party->useMotionId = 60;
-        } else if (attr & 0x200) {
+        } else if (attr & HIT_ATTR_DEEP_WATER) {
             party->useMotionId = 40;
         }
     }
@@ -456,30 +466,31 @@ static inline void bomheiChkHitAttr(PartyEntry* party) {
 /**
  * Ends the fuse early when Bobbery's front, head or floor hit has attribute 0xC00 (use motion 60, explode)
  * or his floor has 0x200 (use motion 40, the splash); returns TRUE if it did.
- * Guess: 0x200 is water and 0xC00 a hazard such as lava.
+ * 0x200 is the hazard water that sinks Mario (mario_hit.c, MARIO_MOTION_DAMAGE) and 0x800 the spikes
+ * (MARIO_MOTION_DAMAGE_TOGE). Guess: 0x400, the other bit of 0xC00, is a further hazard.
  */
 static inline BOOL bomheiChkHitAttr(PartyEntry* party) {
     HitEntry* hit;
     u32 attr;
 
     hit = party->hitobjFront;
-    if (hit != NULL && (hitGetAttr(hit) & 0xC00)) {
+    if (hit != NULL && (hitGetAttr(hit) & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES))) {
         party->useMotionId = 60;
         return TRUE;
     }
     hit = party->hitobjHead;
-    if (hit != NULL && (hitGetAttr(hit) & 0xC00)) {
+    if (hit != NULL && (hitGetAttr(hit) & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES))) {
         party->useMotionId = 60;
         return TRUE;
     }
     hit = party->hitobjStandOn;
     if (hit != NULL) {
         attr = hitGetAttr(hit);
-        if (attr & 0xC00) {
+        if (attr & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES)) {
             party->useMotionId = 60;
             return TRUE;
         }
-        if (attr & 0x200) {
+        if (attr & HIT_ATTR_DEEP_WATER) {
             party->useMotionId = 40;
             return TRUE;
         }
@@ -578,7 +589,7 @@ static void bomhei_use_main(PartyEntry* party) {
             party->work.bomhei.state = 20;
             break;
         case 10:
-            if (BWORK(party)->flags & 2) {
+            if (BWORK(party)->flags & BOMHEI_FLAG_FUSE_SHORT) {
                 partyChgPose(party, "L_2");
             }
             bomheiSetHoldPos(party);
@@ -640,12 +651,12 @@ static void bomhei_use_main(PartyEntry* party) {
             partyMoveNoHosei(party);
 #if VERSION <= VERSION_DEMO_US
             if (party->hitobjStandOn != NULL) {
-                party->useMotionId = !(BWORK(party)->flags & 4) ? 30 : 50;
+                party->useMotionId = !(BWORK(party)->flags & BOMHEI_FLAG_LAND_EXPLODE) ? 30 : 50;
             }
             bomheiChkHitAttr(party);
 #else
             if (party->hitobjStandOn != NULL && !bomheiChkHitAttr(party)) {
-                party->useMotionId = !(BWORK(party)->flags & 4) ? 30 : 50;
+                party->useMotionId = !(BWORK(party)->flags & BOMHEI_FLAG_LAND_EXPLODE) ? 30 : 50;
             }
 #endif
             break;
@@ -667,7 +678,7 @@ static void bomhei_use_main(PartyEntry* party) {
             if (!(party->flags & PARTY_FLAG_IS_EVT_USE) && (gp->buttonNew[0] & PAD_BUTTON_X)) {
                 BWORK(party)->timer = (s16)(sysMsec2Frame(500) + 1);
             }
-            partyChgPose(party, !(BWORK(party)->flags & 2) ? "W_1" : "W_2");
+            partyChgPose(party, !(BWORK(party)->flags & BOMHEI_FLAG_FUSE_SHORT) ? "W_1" : "W_2");
             party->moveSpeed = 0.6f;
             partyMove(party);
             if (BWORK(party)->timer <= 0) {
@@ -681,13 +692,13 @@ static void bomhei_use_main(PartyEntry* party) {
     if (BWORK(party)->timer > 0) {
         BWORK(party)->timer--;
         if (BWORK(party)->timer == (s16)sysMsec2Frame(2500)) {
-            BWORK(party)->flags |= 2;
+            BWORK(party)->flags |= BOMHEI_FLAG_FUSE_SHORT;
             party->work.bomhei.sfxId = psndSFXOn_3D((const char*)0x93C, &party->playerPtr->position);
 #else
     if (party->useMotionId < 50 && BWORK(party)->timer > 0) {
         BWORK(party)->timer--;
         if (BWORK(party)->timer == (s16)sysMsec2Frame(2500)) {
-            BWORK(party)->flags |= 2;
+            BWORK(party)->flags |= BOMHEI_FLAG_FUSE_SHORT;
             if ((u32)party->work.bomhei.sfxId2 == 0xFFFFFFFFU) {
                 party->work.bomhei.sfxId = psndSFXOn_3D((const char*)0x93C, &party->playerPtr->position);
             }
@@ -711,9 +722,9 @@ static void bomhei_use_main(PartyEntry* party) {
             // FAKE: the Vec goes by value (a pointer to a stack copy, which is what the real `Vec*` receives);
             // passing &party->position changes the frame of this function and its inlined callers
             ((MarioSetSplashByValueFn)marioSetSplash)(0, party->position);
-            BWORK(party)->flags |= 8;
+            BWORK(party)->flags |= BOMHEI_FLAG_SPLASHED;
             BWORK(party)->timer = (s16)(sysMsec2Frame(500) + 30);
-            BWORK(party)->flags |= 2;
+            BWORK(party)->flags |= BOMHEI_FLAG_FUSE_SHORT;
             party->flags |= PARTY_FLAG_FORCE_FALL;
             party->useMotionId = 41;
             party->moveFrames = 6;
@@ -768,13 +779,13 @@ static void bomhei_use_main(PartyEntry* party) {
                 psndSFXOff(party->work.bomhei.sfxId2);
                 party->work.bomhei.sfxId2 = -1;
             }
-            BWORK(party)->flags &= ~2;
+            BWORK(party)->flags &= ~BOMHEI_FLAG_FUSE_SHORT;
             party->hitobjAction = check_front(party);
             if (mario->flags & MARIO_FLAG_IS_CARRYING_BOBBERY) {
                 mario->flags &= ~MARIO_FLAG_IS_CARRYING_BOBBERY;
             }
             party->flags &= ~PARTY_FLAG_IS_FALLING;
-            BWORK(party)->flags &= ~8;
+            BWORK(party)->flags &= ~BOMHEI_FLAG_SPLASHED;
             party->useMotionId = 60;
             break;
     }
@@ -1032,7 +1043,7 @@ static inline BOOL bomheiChkReturnGround(Vec* pos, f32 dist, f32 angle) {
     movePos(&x, &z, dist, angle);
     d = 4.0f;
     hit = hitCheckFilter(NULL, &hx, &hy, &hz, &d, &nx, &ny, &nz, x, 2.0f + y, z, 0.0f, -1.0f, 0.0f);
-    if (hit != NULL && !(hitGetAttr(hit) & 0xE00)) {
+    if (hit != NULL && !(hitGetAttr(hit) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES))) {
         pos->x = x;
         pos->y = y;
         pos->z = z;
@@ -1066,7 +1077,7 @@ static inline BOOL bomheiChkReturnGround(Vec* pos, f32 dist, f32 angle) {
         query.targetDir = dir;
     }
     hit = hitCheckVecFilter(&query, NULL);
-    if (hit != NULL && !(hitGetAttr(hit) & 0xE00)) {
+    if (hit != NULL && !(hitGetAttr(hit) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES))) {
         if (query.hitPos.x >= 0.0f) {
             rf = 0.5f;
         } else {

@@ -143,13 +143,13 @@ void BattleStageMain(void) {
     batSpotMain();
     for (i = 0; i < 12; i++) {
         l = &s->lights[i];
-        if (l->flags & 1) {
+        if (l->flags & STAGE_LIGHT_ACTIVE) {
             if (l->colorTime > 0) {
                 l->colorTime--;
                 l->color.r = intplGetValue(l->colorMode, l->colorStart.r, l->colorTarget.r, l->colorMax - l->colorTime, l->colorMax);
                 l->color.g = intplGetValue(l->colorMode, l->colorStart.g, l->colorTarget.g, l->colorMax - l->colorTime, l->colorMax);
                 l->color.b = intplGetValue(l->colorMode, l->colorStart.b, l->colorTarget.b, l->colorMax - l->colorTime, l->colorMax);
-                if ((l->flags & 2) && l->color.r == 0 && l->color.g == 0 && l->color.b == 0) {
+                if ((l->flags & STAGE_LIGHT_RELEASING) && l->color.r == 0 && l->color.g == 0 && l->color.b == 0) {
                     l->flags = 0;
                     continue;
                 }
@@ -164,14 +164,14 @@ void BattleStageMain(void) {
                 l->pos.y = intplGetValue(l->posMode, l->posStart.y, l->posTarget.y, l->posMax - l->posTime, l->posMax);
                 l->pos.z = intplGetValue(l->posMode, l->posStart.z, l->posTarget.z, l->posMax - l->posTime, l->posMax);
             }
-            if (l->flags & 4) {
+            if (l->flags & STAGE_LIGHT_SPLINE) {
                 sp = l->data;
                 l->target.x = getSpline(sp->x[0], sp->x[1], sp->x[2], sp->x[3], sp->t, sp->n, l->targetTime);
                 l->target.y = getSpline(sp->y[0], sp->y[1], sp->y[2], sp->y[3], sp->t, sp->n, l->targetTime);
                 l->target.z = getSpline(sp->z[0], sp->z[1], sp->z[2], sp->z[3], sp->t, sp->n, l->targetTime);
                 l->targetTime++;
                 if (l->targetTime >= sp->t[sp->n - 1]) {
-                    if (l->flags & 8) {
+                    if (l->flags & STAGE_LIGHT_SPLINE_LOOP) {
                         l->targetTime -= sp->t[sp->n - 1];
                     } else {
                         l->targetTime = sp->t[sp->n - 1];
@@ -251,7 +251,7 @@ void BattleStageDisp(void) {
     dispEntry(CAMERA_3D, 6000.0f, 2, BattleStageDispLight, NULL);
 }
 
-// inlining off for DarkByPoint, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it DarkByPoint is inlined into DarkBySquare (43 -> 53 instructions)
 #pragma dont_inline on
 /** Emits one vertex of a darkening quad: the position, coloured black at the given alpha. */
 static void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z) {
@@ -260,7 +260,7 @@ static void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z) {
 }
 #pragma dont_inline reset
 
-// inlining off for DarkBySquare, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it DarkBySquare is inlined into BattleStageDispDark (130 -> 184 instructions)
 #pragma dont_inline on
 /** Draws one black quad of the given alpha at depth z with corners (x0, y0) and (x1, y1). */
 static void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha) {
@@ -349,7 +349,7 @@ static void BattleStageDispLight(CameraId camId, void* param) {
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXLoadPosMtxImm(cam->view, GX_PNMTX0);
     for (i = 0; i < 12; i++) {
-        if (s->lights[i].flags & 1) {
+        if (s->lights[i].flags & STAGE_LIGHT_ACTIVE) {
             Mtx m;
             Vec v;
             Vec axis;
@@ -430,7 +430,7 @@ s32 BattleStageGetLightNumberByName(const char* name) {
 
     for (i = 0; i < 12; i++) {
         StageLight* l = &s->lights[i];
-        if ((l->flags & 1) && !strcmp(l->name, name)) {
+        if ((l->flags & STAGE_LIGHT_ACTIVE) && !strcmp(l->name, name)) {
             return i;
         }
     }
@@ -448,13 +448,13 @@ s32 BattleStageSysLightEntry(const char* name) {
 
     for (i = 0; i <= 6; i++) {
         StageLight* l = &s->lights[i];
-        if ((l->flags & 1) && !strcmp(l->name, name)) {
+        if ((l->flags & STAGE_LIGHT_ACTIVE) && !strcmp(l->name, name)) {
         }
     }
     for (i = 0; i < 7; i++) {
         StageLight* l = &s->lights[i];
-        if (!(l->flags & 1)) {
-            l->flags = 1;
+        if (!(l->flags & STAGE_LIGHT_ACTIVE)) {
+            l->flags = STAGE_LIGHT_ACTIVE;
             strcpy(l->name, name);
             break;
         }
@@ -473,11 +473,11 @@ void BattleStageLightRelease(s32 idx, s32 time, u8 mode) {
 
     l = ((BattleStage*)l)->lights + idx;
 
-    if (l->flags & 1) {
+    if (l->flags & STAGE_LIGHT_ACTIVE) {
         if (time == 0) {
             l->flags = 0;
         } else {
-            l->flags |= 2;
+            l->flags |= STAGE_LIGHT_RELEASING;
             l->colorStart = (GXColor){l->color.r, l->color.g, l->color.b};
             {
                 GXColor z = {0, 0, 0};
@@ -554,7 +554,7 @@ void BattleStageLightSetPosition(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode
 }
 #pragma opt_propagation reset
 
-// inlining off for BattleStageLightSetTarget, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleStageLightSetTarget is inlined into BattleStageLightSetTargetByUnit (46 -> 80 instructions)
 #pragma dont_inline on
 // propagation optimisation off for BattleStageLightSetTarget: the original register allocation and scheduling need it
 #pragma opt_propagation off
@@ -574,7 +574,7 @@ void BattleStageLightSetTarget(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode) 
     l->targetTime = time;
     l->targetMax = time;
     l->targetMode = mode;
-    l->flags &= ~4;
+    l->flags &= ~STAGE_LIGHT_SPLINE;
     if (time == 0) {
         l->target = (Vec){x, y, z};
     }
@@ -621,7 +621,7 @@ void BattleStageLightSetUpVec(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode) {
 }
 #pragma opt_propagation reset
 
-// inlining off for BattleStageSetDark, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleStageSetDark is inlined into its callers (4 shrink, e.g. BattleStageSetAudDark 15 -> 12 instructions)
 #pragma dont_inline on
 /**
  * Starts a fade of a darkness layer's current alpha to v over time frames with interpolation curve mode;
@@ -639,7 +639,7 @@ static void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleStageSetDarkBase, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleStageSetDarkBase is inlined into its callers (2 shrink, e.g. BattleStageSetAudDarkBase 15 -> 12 instructions)
 #pragma dont_inline on
 /**
  * Starts a fade of a darkness layer's base alpha (the level the Return functions go back to) to v over time
@@ -695,7 +695,7 @@ void BattleStageReturnAudDarkBase(s32 time, u8 mode) {
     BattleStageSetDark(d, d->base, time, mode);
 }
 
-// inlining off for getSpline, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it getSpline is inlined into BattleStageMain (398 -> 500 instructions)
 #pragma dont_inline on
 /**
  * Evaluates a piecewise cubic at frame x: picks the last segment i whose start frame t[i] is at or before x
@@ -719,7 +719,7 @@ BattleSpotWork* BatSpotGetPtr(void) {
     return wp;
 }
 
-// inlining off for batSpotInit, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it batSpotInit is inlined into BattleStageInit (57 -> 126 instructions)
 #pragma dont_inline on
 /**
  * Allocates the five spotlight cones from the battle heap at battle start
@@ -744,7 +744,7 @@ static void batSpotInit(void) {
 }
 #pragma dont_inline reset
 
-// inlining off for batSpotMain, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it batSpotMain is inlined into BattleStageMain (398 -> 413 instructions)
 #pragma dont_inline on
 /**
  * Per-frame from BattleStageMain: queues batSpotDisp on the 3D image camera
@@ -762,6 +762,7 @@ static void batSpotMain() {
 
 #if VERSION >= VERSION_US
 // US: frees the spot entries at battle end
+// FAKE: inlining off (US, PAL; FAKES.md); without it batSpotEnd is inlined into BattleStageEnd (27 -> 29 instructions)
 #pragma dont_inline on
 /** Frees the spotlight cone array at battle end (BattleStageEnd). */
 void batSpotEnd(void) {
@@ -823,7 +824,7 @@ static void batSpotDisp(CameraId camId, void* param) {
     }
 }
 
-// inlining off for drawCone, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it drawCone is inlined into batSpotDisp (177 -> 509 instructions)
 #pragma dont_inline on
 /**
  * Draws one spotlight cone: apex at the origin with alpha color.a,
@@ -866,11 +867,12 @@ static void drawCone(CameraId camId, BattleSpotEntry* e) {
 }
 #pragma dont_inline reset
 
-// inlining off for batSpotEntry, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it batSpotEntry is inlined into batSpotInit (79 -> 100 instructions)
 #pragma dont_inline on
 /**
  * Claims the first unused cone (flag 1), resets it to the origin, unit scale and clear colour, and returns it.
- * With all cones taken it writes one entry past the end of the array.
+ * With all cones taken it would write one entry past the end of the array, but its only caller, batSpotInit,
+ * claims exactly the five cones it allocates.
  */
 static BattleSpotEntry* batSpotEntry(void) {
     int i;
@@ -892,7 +894,7 @@ static BattleSpotEntry* batSpotEntry(void) {
 }
 #pragma dont_inline reset
 
-// inlining off for randf, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it randf is inlined into tou_gamen_screen_tev (383 -> 422 instructions)
 #pragma dont_inline on
 /** Returns a random float between min and max, from rand() / 32767. */
 static f32 randf(f32 min, f32 max) {

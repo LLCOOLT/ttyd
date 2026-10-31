@@ -94,7 +94,7 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
             ac->result = 1;
             break;
         case 100:
-            if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+            if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
                 if (irand(100) >= 0) {
                     ac->setupParam = 0;
                     if (ac->params[2] > 0) {

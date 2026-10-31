@@ -132,6 +132,7 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/** Exits of las_04: west door w_bero to las_03 (e_bero_1); east door e_bero to las_05 (w_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -205,6 +206,10 @@ EVT_BEGIN(firebar_coin)
     RETURN
 EVT_END()
 
+/**
+ * Fire bars of the hall: each entry gives the number of fireballs, their start position, spacing and size,
+ * the turning speed and the callback for hits.
+ */
 FirebarSetup firebardesc[] = {
     {
         0, // type
@@ -809,6 +814,10 @@ static void firebar_cb(FirebarWork* wp, s32 type) {
     }
 }
 
+/**
+ * Where Mario is put back after falling into the pits A_oti_01 to A_oti_03 of the fire-bar hall
+ * (a point far below the floor).
+ */
 static HitDamageReturn dmgRetPoint[] = {
     {"A_oti_01", {0.0f, -1000.0f, 0.0f}},
     {"A_oti_02", {0.0f, -1000.0f, 0.0f}},

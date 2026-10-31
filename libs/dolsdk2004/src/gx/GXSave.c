@@ -116,7 +116,9 @@ static void __ReconstVtxStatus(u8 vatIdx) {
     }
 }
 
+/** Bytes per vertex component for each component type: 8-bit and 16-bit, unsigned and signed, and float. */
 static u32 vtxCompSize[5] = { 1, 1, 2, 2, 4 };
+/** Bytes per colour format, in the order RGB565, RGB8, RGBX8, RGBA4, RGBA6, RGBA8. */
 static int clrCompSize[6] = { 2, 3, 4, 2, 3, 4 };
 
 /**

@@ -1,4 +1,4 @@
-// Battle unit Hyper Sinnosuke (`hyper_sinnosuke`): tst.rel's copy of rels/tou2/src/unit/unit_hyper_sinnosuke.c.
+// Battle unit Hyper Bald Cleft (`hyper_sinnosuke`): tst.rel's copy of rels/tou2/src/unit/unit_hyper_sinnosuke.c.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -26,6 +26,10 @@ static EvtWord dmg_turn_event[91];
 static EvtWord attack_event[595];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the Hyper Bald Cleft: 3 HP, level 12, 1 part, with its sounds, init script and data
+ * table.
+ */
 BattleUnitKind unit_hyper_sinnosuke = {
     42,
     "btl_un_hyper_sinnosuke",
@@ -92,22 +96,41 @@ BattleUnitKind unit_hyper_sinnosuke = {
     data_table,
 };
 
+/**
+ * Defence of the Hyper Bald Cleft: 2 against normal, ice, explosion and electric hits;
+ * immune to fire (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{2, 99, 2, 2, 2}};
 
+/**
+ * Defence of the Hyper Bald Cleft while it is flipped onto its back: none, so it takes full damage from every
+ * kind of attack.
+ */
 static BattleUnitDefense defence_turn = {0};
 
+/** Damage-type modifiers of the Hyper Bald Cleft: it is immune to fire attacks. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Hyper Bald Cleft (100% is the normal chance): immune to Burn; resists Sleep
+ * 30%, Stop 80%, Dizzy 40%, Confusion 40%, Freeze 60%, Tiny 60%, Attack Down 60%, Defense Down 70%, Allergic
+ * 70%, Fright 40%, Gale Force 20%, Slow 70% and instant KO 95%.
+ */
 static StatusVulnerability regist = {30, 80, 40, 100, 40, 100, 0, 60, 100, 60, 100, 60, 100, 70, 70, 40, 20, 100, 70, 100, 100, 95};
 #else
 static StatusVulnerability regist = {40, 90, 40, 100, 40, 100, 0, 60, 100, 65, 100, 65, 100, 100, 60, 40, 30, 100, 60, 100, 100, 95};
 #endif
 
+/**
+ * Body of the Hyper Bald Cleft: one targetable part, the model `c_sinnosuke_h`, with its hit box, defence
+ * tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_hyper_sinnosuke", "c_sinnosuke_h", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0, pose_table},
 };
 
+/** Attack data of the Hyper Bald Cleft's dash attack: hits one opposing unit for 2 damage. */
 static BattleWeapon weapon_sinnosuke_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -126,7 +149,7 @@ static BattleWeapon weapon_sinnosuke_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -144,6 +167,7 @@ static BattleWeapon weapon_sinnosuke_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data of the Hyper Bald Cleft's charge-up: powers up its next attack by 6. */
 BattleWeapon weapon_sinnosuke_charge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -161,7 +185,7 @@ BattleWeapon weapon_sinnosuke_charge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -179,6 +203,10 @@ BattleWeapon weapon_sinnosuke_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Pose table of the Hyper Bald Cleft: its 18 battle poses (status, hurt and action) and the animation each
+ * one plays; the idle animation is `SIS_S_1`.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "SIS_N_1"},
     {2, "SIS_Y_1"},
@@ -200,6 +228,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "SIS_S_1"},
 };
 
+/**
+ * Pose table of the Hyper Bald Cleft while it is flipped onto its back: its 15 battle poses (status, hurt and
+ * action) and the animation each one plays; the idle animation is `SIS_D_2`.
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "SIS_N_2"},
     {2, "SIS_Y_2"},
@@ -218,6 +250,10 @@ static PoseTableEntry pose_table_turn[] = {
     {BTL_POSE_STAY_DEFAULT, "SIS_D_2"},
 };
 
+/**
+ * Data table of the Hyper Bald Cleft: event 13 runs dmg_turn_event; event 48 does nothing
+ * (btldefaultevt_Dummy).
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
@@ -225,7 +261,7 @@ static BattleDataEntry data_table[] = {
 };
 
 /**
- * Init script of the Hyper Sinnosuke: installs the wait, attack,
+ * Init script of the Hyper Bald Cleft: installs the wait, attack,
  * damage and confusion handlers (confusion reuses the attack), sets its walk,
  * run and jump sounds and starts the wait event.
  */
@@ -241,7 +277,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-/** Damage handler of the Hyper Sinnosuke: runs damage_event_sub, then the default damage script. */
+/** Damage handler of the Hyper Bald Cleft: runs damage_event_sub, then the default damage script. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -261,7 +297,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Hurt reaction of the Hyper Sinnosuke: plays SIS_D_1 if it took damage;
+ * Hurt reaction of the Hyper Bald Cleft: plays SIS_D_1 if it took damage;
  * if it is flipped (flipped-over count 1 or more) it plays SIS_D_2 and bounces twice.
  */
 static EVT_BEGIN(damage_event_sub)
@@ -281,7 +317,7 @@ static EVT_BEGIN(damage_event_sub)
 EVT_END()
 
 /**
- * Flips the Hyper Sinnosuke onto its back: swaps in the flipped defence and pose tables,
+ * Flips the Hyper Bald Cleft onto its back: swaps in the flipped defence and pose tables,
  * marks status flag 1 (flipped) with a flipped-over count of 2,
  * plays the flip sound and SIS_D_2 and drops it to height 5 in two bounces.
  */
@@ -290,7 +326,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -307,7 +343,7 @@ static EVT_BEGIN(dmg_turn_event)
 EVT_END()
 
 /**
- * Turn-over recovery of the Hyper Sinnosuke: counts down the flipped-over count;
+ * Turn-over recovery of the Hyper Bald Cleft: counts down the flipped-over count;
  * at 0 it restores the normal defence and pose tables, clears status flag 1,
  * plays SIS_S_1 and the wake-up sound and hops to the ground.
  */
@@ -322,7 +358,7 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("SIS_S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -338,26 +374,30 @@ static EVT_BEGIN(wakeup_event)
 EVT_END()
 
 /**
- * Attack script of the Hyper Sinnosuke: after the item-use check it may charge up first (charge sound,
+ * Attack script of the Hyper Bald Cleft: after the item-use check it may charge up first (charge sound,
  * crystal effect and a self-applied buff), then walks up to the target with the move sounds,
  * curls (pose type 50) for 750 ms and dashes at it at speed 6 (weapon_sinnosuke_attack).
  * A miss lets it run past; a hit shakes the camera and applies the damage with the guard-timing check.
  * It then hops twice and walks home.
  */
 static EVT_BEGIN(attack_event)
+    // If it is lying flipped on its back it spends the turn getting back up (wakeup_event) instead of attacking.
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // On the opening hit (battle flag 2) it uses the preset first-attack target; otherwise it decides what to do this
+    // turn.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
         CALL(evt_btl_camera_set_mode, 0, 8)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 3)
         WAIT_MS(800)
+        // Normal turn: if already charged it just attacks; otherwise it uses a held item if it has one.
     ELSE
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CHARGE, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             GOTO(10)
         END_IF
@@ -367,12 +407,15 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             RETURN
         END_IF
+        // Draws lots on charging up instead of attacking (more likely on the first turn).
         CALL(btlevtcmd_get_turn, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 1)
             CALL(btlevtcmd_DrawLots, LW(0), 2, 50, 50)
         ELSE
             CALL(btlevtcmd_DrawLots, LW(0), 2, 50, 16)
         END_IF
+        // Charge-up: the camera pulls back and a crystal-like glow gathers around it with the charge sound; it hops
+        // once and its next attack is stronger.
         IF_INT_EQUAL(LW(0), 1)
             SET_VALUE(LW(9), PTR(&weapon_sinnosuke_charge))
             CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -399,18 +442,21 @@ static EVT_BEGIN(attack_event)
             RETURN
         END_IF
         LABEL(10)
+        // Picks a random opposing unit as the target.
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sinnosuke_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sinnosuke_attack), LW(3), LW(4))
     END_IF
+    // With no target it does nothing (or is flustered when confused).
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Declares the attack and pays its cost while the camera zooms in.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -419,7 +465,9 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_sinnosuke_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // Wind-up: it runs past the target and out the far side, turns around, and rolls on the spot with a drumming
+    // sound while the camera moves in.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -441,6 +489,7 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(750)
+    // It shoots forward in a dash straight at the target.
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_DASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
@@ -448,6 +497,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, -1, 0)
     DELETE_EVENT(LW(15))
+    // Checks the outcome of the hit: a miss, dodge or guard goes to the no-damage branch; a connecting hit applies
+    // the Action Command defence result and deals the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinnosuke_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -470,11 +521,14 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss branch: it runs on past the target and then waits.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 50)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_MS(500)
     GOTO(98)
+    // Hit branch: the camera shakes and pulls in, the defence result is read and the damage is applied, and it hops
+    // back off the target in two bounces.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -492,9 +546,10 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // Trots back to its home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)

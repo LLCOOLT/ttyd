@@ -31,6 +31,7 @@ static inline ExtdrvWork* extGetWork(void) {
 static void extMakeTexture(CameraId camId, void* param);
 static s32 compare(const void* a, const void* b);
 
+/** Sine of each whole degree, 450 entries so cosine is 90 further on: extMain turns each copy to its heading. */
 static f32 sintbl[450] = {
     0.0f, 0.0174519997f, 0.0348990001f, 0.0523359999f, 0.0697560012f, 0.0871559978f, 0.104528002f, 0.121868998f,
     0.139173001f, 0.156434f, 0.173648f, 0.190808997f, 0.207911998f, 0.224950999f, 0.241922006f, 0.258819014f,
@@ -270,10 +271,10 @@ void extMain(void) {
     for (i = wp->poseNum - 1; i >= 0; i--, pose++, sort++) {
         flags = pose->flags;
         sort->index = i;
-        if (flags & 1) {
+        if (flags & EXT_POSE_FLAG_ACTIVE) {
             sort->z = pose->texId;
         }
-        if (flags & 2) {
+        if (flags & EXT_POSE_FLAG_FACE_CAMERA) {
             angle = 90.0f + (ry - pose->dir);
             while (angle < -360.0f) {
                 angle += 360.0f;
@@ -354,7 +355,7 @@ void extPoseDraw(s32 index) {
     Mtx mtx;
     Mtx nrm;
 
-    if (pose->flags & 1) {
+    if (pose->flags & EXT_POSE_FLAG_ACTIVE) {
         texId = pose->texId;
         if (wp->curTex != texId) {
             tex = &wp->texs[texId];
@@ -385,7 +386,7 @@ void extDraw(void) {
 
     for (i = wp->poseNum - 1, sort = wp->sort; i >= 0; i--, sort++) {
         pose = &wp->poses[sort->index];
-        if (pose->flags & 1) {
+        if (pose->flags & EXT_POSE_FLAG_ACTIVE) {
             texId = pose->texId;
             if (texId != wp->curTex) {
                 tex = &wp->texs[texId];
@@ -478,8 +479,10 @@ static u8 shadow_dl[32] ATTRIBUTE_ALIGN(32) = {
 
 // The retail builds place shadow_vtx in small data; the demo keeps it in .data
 #if VERSION <= VERSION_DEMO_US
+/** Corners of the shared shadow quad, 2.4 units square and flat on the ground, drawn under every copy. */
 static f32 shadow_vtx[16] = {
 #else
+/** Corners of the shared shadow quad, 2.4 units square and flat on the ground, drawn under every copy. */
 __declspec(section ".sdata") static f32 shadow_vtx[16] = {
 #endif
     -1.2f, 0.0f, -1.2f,
@@ -488,6 +491,7 @@ __declspec(section ".sdata") static f32 shadow_vtx[16] = {
     1.2f, 0.0f, -1.2f,
 };
 
+/** Texture coordinates of the shadow quad's four corners. */
 static f32 shadow_coord[8] = {
     0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 };
@@ -553,10 +557,10 @@ void extDrawShadow(void) {
     sort = &wp->sort[wp->poseNum - 1];
     for (i = wp->poseNum - 1; i >= 0; i--, sort--) {
         pose = &wp->poses[sort->index];
-        if (!(pose->flags & 4)) {
+        if (!(pose->flags & EXT_POSE_FLAG_NO_SHADOW)) {
             PSMTXConcat(camGetCurPtr()->view, *pose->mtx, mtx);
             PSMTXConcat(mtx, wp->shadowMtx, mtx);
-            if (pose->flags & 0x10) {
+            if (pose->flags & EXT_POSE_FLAG_SHADOW_Y) {
                 PSMTXTransApply(mtx, mtx, 0.0f, -(*pose->mtx)[1][3] + pose->shadowY, 0.0f);
             }
             GXLoadPosMtxImm(mtx, 0);

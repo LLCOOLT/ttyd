@@ -126,6 +126,10 @@ static EVT_BEGIN(e3_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Exits (beros) of this room: w_bero_1 to gon_03, w_bero_2 to gon_08, e_bero_1 to gon_05, e_bero_2 to gon_05
+ * and e_bero_3 to gon_05.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
@@ -220,8 +224,8 @@ static BeroEntry bero_entry_data[] = {
 
 /**
  * Map-init helper for the first floating block (mobj_fltbl01) and its switch:
- * if the saved up/down state LSWF(6) is the raised one,
- * moves the block 225 units up so it starts where it was left.
+ * while LSWF(6) is clear (the raised state) it moves the block 225 units up so it starts where it was left.
+ * The IF_INT_EQUAL(1, 0) arm, which reads the flag the other way round, never runs.
  */
 EVT_BEGIN(evt_gon_04flowblock_updown1_init)
     IF_INT_EQUAL(1, 0)
@@ -242,15 +246,20 @@ EVT_END()
 
 /**
  * Runs when Mario hits the floating-block switch for mobj_fltbl01:
- * flips the block between its low and high position (225 units apart) with the floating-block sound
- * and a camera shake, carries along anything standing on it, and flips the state flag LSWF(6).
+ * flips the block between its high position (LSWF(6) clear) and its low one 225 units below, with the
+ * floating-block sound and a camera shake, and flips LSWF(6). A sinking block that comes down on Mario's head
+ * turns back up instead. The outer IF_INT_NOT_EQUAL(1, 0) is always true, so its ELSE branch (the switch only
+ * resetting) is dead code, as is the inner IF_INT_EQUAL(1, 0) arm.
  */
 EVT_BEGIN(evt_gon_04flowblock_updown1)
 #if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
+    // The switch is disabled while the block moves.
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(1, 0)
+        // Decide the direction from the saved state (only the ELSE arm below can run): with LSWF(6) clear the
+        // block is high and sinks 225 units, with it set the block is low and rises.
         SET_VALUE(LW(10), 0)
         IF_INT_EQUAL(1, 0)
             IF_INT_EQUAL(LSWF(6), 0)
@@ -303,6 +312,8 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
 #else
         END_SIBLING_EVENT
 #endif
+        // The camera shakes and the block starts to move, with a heavy or light floating-block sound depending
+        // on its size.
         WAIT_MS(500)
         CALL(evt_mobj_get_position, STRING("mobj_fltbl01"), LW(12), LW(13), LW(14))
         CALL(evt_mobj_get_kindname, STRING("mobj_fltbl01"), LW(11))
@@ -331,9 +342,15 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
                 CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_BLOCK_S_FLOAT_DOWN1"), LW(12), LW(13), LW(14), LW(15))
             END_IF
         END_IF
+        // The block moves a little each frame; if a sinking block comes down on Mario's head it turns back
+        // up, its state flag is flipped and the switch is reset.
         SET_FLOAT_VALUE(LW(4), LW(2))
         SET_VALUE(LF(0), 0)
         LOOP(0)
+            // BUG: with no partner out the head test uses the bare mobj name, but mobj hit objects are
+            // named "MOBJ_" + name, so it never matches; with a partner it tests LW(7), which nothing sets,
+            // instead of the partner's head object. Fix: test "MOBJ_" + name, and fill LW(7) with
+            // evt_party_get_name_hitobj_head.
             CALL(evt_mario_get_party, LW(5))
             IF_INT_EQUAL(LW(5), 0)
                 CALL(evt_mario_get_name_hitobj_head, LW(6))
@@ -390,6 +407,8 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
+        // The block reaches its destination and the moving sound stops; a block that has sunk stops with a
+        // thump and a screen shake.
         IF_INT_EQUAL(LF(1), 0)
             CALL(evt_snd_sfxoff, LW(15))
         END_IF
@@ -436,11 +455,14 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
 #endif
             WAIT_MS(1000)
         END_IF
+        // The block's saved up/down state is flipped.
         IF_INT_EQUAL(LSWF(6), 0)
             SET_VALUE(LSWF(6), 1)
         ELSE
             SET_VALUE(LSWF(6), 0)
         END_IF
+        // Dead code: IF_INT_NOT_EQUAL(1, 0) is always true, so this branch (the switch just resetting after a
+        // short wait) never runs.
     ELSE
         CALL(evt_mobj_exec_cancel, STRING("mobj_fltsw01"))
         SET_VALUE(LW(0), 0)
@@ -488,8 +510,12 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
 #if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
+    // The switch is disabled while the block moves.
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     IF_INT_NOT_EQUAL(GSWF(GSWF_GON04_BIG_BLOCK_A_BROKEN), 0)
+        // The block only moves once big block A in this room has been broken.
+        // Decide the direction from the saved state: a low block will rise 200 units, a raised one will sink
+        // back.
         SET_VALUE(LW(10), 0)
         IF_INT_EQUAL(0, 0)
             IF_INT_EQUAL(LSWF(7), 0)
@@ -542,6 +568,8 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
 #else
         END_SIBLING_EVENT
 #endif
+        // The camera shakes and the block starts to move, with a heavy or light floating-block sound depending
+        // on its size.
         WAIT_MS(500)
         CALL(evt_mobj_get_position, STRING("mobj_fltbl02"), LW(12), LW(13), LW(14))
         CALL(evt_mobj_get_kindname, STRING("mobj_fltbl02"), LW(11))
@@ -570,9 +598,15 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
                 CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_BLOCK_S_FLOAT_DOWN1"), LW(12), LW(13), LW(14), LW(15))
             END_IF
         END_IF
+        // The block moves a little each frame; if a sinking block comes down on Mario's head it turns back
+        // up, its state flag is flipped and the switch is reset.
         SET_FLOAT_VALUE(LW(4), LW(2))
         SET_VALUE(LF(0), 0)
         LOOP(0)
+            // BUG: with no partner out the head test uses the bare mobj name, but mobj hit objects are
+            // named "MOBJ_" + name, so it never matches; with a partner it tests LW(7), which nothing sets,
+            // instead of the partner's head object. Fix: test "MOBJ_" + name, and fill LW(7) with
+            // evt_party_get_name_hitobj_head.
             CALL(evt_mario_get_party, LW(5))
             IF_INT_EQUAL(LW(5), 0)
                 CALL(evt_mario_get_name_hitobj_head, LW(6))
@@ -629,6 +663,8 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
+        // The block reaches its destination and the moving sound stops; a block that has sunk stops with a
+        // thump and a screen shake.
         IF_INT_EQUAL(LF(1), 0)
             CALL(evt_snd_sfxoff, LW(15))
         END_IF
@@ -675,11 +711,13 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
 #endif
             WAIT_MS(1000)
         END_IF
+        // The block's saved up/down state is flipped.
         IF_INT_EQUAL(LSWF(7), 0)
             SET_VALUE(LSWF(7), 1)
         ELSE
             SET_VALUE(LSWF(7), 0)
         END_IF
+        // Big block A is not broken yet: the block stays put and the switch resets after a short wait.
     ELSE
         CALL(evt_mobj_exec_cancel, STRING("mobj_fltsw02"))
         SET_VALUE(LW(0), 0)
@@ -697,6 +735,7 @@ EVT_BEGIN(evt_gon_04flowblock_updown2)
     RETURN
 EVT_END()
 
+/** Positions (x, z) where dust puffs rise when the first folding stairs land. */
 KemuriPos kemuri_pos1[] = {
     {150, 20},
     {130, 55},
@@ -705,6 +744,7 @@ KemuriPos kemuri_pos1[] = {
     {185, 75},
 };
 
+/** Positions (x, z) where dust puffs rise when the second folding stairs land. */
 KemuriPos kemuri_pos2[] = {
     {315, 75},
     {270, 30},
@@ -986,6 +1026,7 @@ EVT_BEGIN(evt_hashi)
     RETURN
 EVT_END()
 
+/** Items offered in the item menu at the castle lock: only the Castle Key (0x0D). */
 static s32 key_tbl[] = {
     ITEM_CASTLE_KEY_0x0D, -1,
 };

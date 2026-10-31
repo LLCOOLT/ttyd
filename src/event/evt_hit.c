@@ -24,15 +24,15 @@ USER_FUNC(evt_hitobj_onoff) {
 
     if (isGroup == 0) {
         if (off != 0) {
-            hitObjFlagOff(name, 1);
+            hitObjFlagOff(name, HIT_FLAG_OFF);
         } else {
-            hitObjFlagOn(name, 1);
+            hitObjFlagOn(name, HIT_FLAG_OFF);
         }
     } else {
         if (off != 0) {
-            hitGrpFlagOff(name, 1);
+            hitGrpFlagOff(name, HIT_FLAG_OFF);
         } else {
-            hitGrpFlagOn(name, 1);
+            hitGrpFlagOn(name, HIT_FLAG_OFF);
         }
     }
     return EVT_RETURN_DONE;

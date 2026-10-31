@@ -20,6 +20,10 @@
 static BeroEntry bero_entry_data[7];
 static HitDamageReturn hitDmgRetPoints[9];
 
+/**
+ * Doors of this room: two west exits to tik_18, two east exits to tik_16, and the pipes to Poshley Heights
+ * (pik_01) and Keelhaul Key (muj_02).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_2", // hitName
@@ -122,6 +126,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Spots Mario is put back on after falling into one of this room's hazards (each object's own position). */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_1", {0.0f, -1000.0f, 0.0f}},
     {"mod_2", {-250.0f, 0.0f, 0.0f}},

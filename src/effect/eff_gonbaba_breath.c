@@ -19,6 +19,12 @@
 #define PI 3.1415927f
 #define HALF_PI 1.5707964f
 
+/**
+ * Colour sets of the dragon breath, one per breath kind: normal fire (orange), poison (olive green), mega
+ * (pale yellow), cold (ice blue), confusion (green), sleep (pale grey-pink) and mini (purple). In each set the
+ * first three colours tint the three nested layers of a breath puff, outermost first; the companion sparks fade
+ * from the fourth colour to the first. col_tbl picks a set by type % 10 (type 7, Bowser's flame, reuses normal).
+ */
 static GXColor col_normal[] = {
     {0xF2, 0x65, 0x22, 0xFF}, {0xF6, 0x86, 0x1E, 0xFF}, {0xF6, 0xAC, 0x1E, 0xFF}, {0xFF, 0xF5, 0x68, 0xFF}, {0x96, 0x5E, 0x1A, 0xFF},
 };
@@ -119,9 +125,9 @@ static inline f32 _cosf(f32 x) {
 static void effGonbabaBreathMain(EffectEntry* effect);
 static void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect);
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-// lifetimes optimisation off for init_breath: the original register allocation and scheduling need it
+// FAKE: lifetimes optimisation off for init_breath: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 /** Initialises one breath particle for the given type: delay by index, start offset, velocity and lifetime. */
 static void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {

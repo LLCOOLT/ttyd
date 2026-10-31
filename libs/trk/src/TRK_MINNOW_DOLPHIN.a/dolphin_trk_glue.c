@@ -57,6 +57,7 @@ int ddh_cc_post_stop(void);
 int ddh_cc_peek(void);
 int ddh_cc_initinterrupts(void);
 
+/** Callbacks of the debugger communication channel in use; filled in when the channel is chosen. */
 DBCommTable gDBCommTable = {0};
 BOOL _MetroTRK_Has_Framing;
 u8 TRK_Use_BBA;

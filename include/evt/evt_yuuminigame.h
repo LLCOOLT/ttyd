@@ -1,7 +1,6 @@
-#pragma once
-
 // Minigame driver of the Pianta Parlor (yuu evt_yuuminigame.c) and its gor copy (evt_goryuugijo.c):
 // a script-allocated work that runs one minigame's init/main/disp callbacks every frame.
+#pragma once
 
 #include "driver/camdrv.h"
 #include "manager/evtmgr.h"

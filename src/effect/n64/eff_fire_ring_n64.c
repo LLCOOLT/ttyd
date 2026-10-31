@@ -28,6 +28,7 @@ typedef struct EffFireRingN64Work {
 static void effFireRingMain(EffectEntry* effect);
 static void effFireRingDisp(CameraId cameraId, EffectEntry* effect);
 
+/** The fire ring mesh: 90 vertices of a flat ring, with coordinates for the two scrolling flame textures. */
 static effN64Vtx stg__s_v[] = {
     {99, 0, 205, 9173, 4096, 255, 255, 255, 255},
     {54, 0, 113, 9641, 2048, 255, 255, 255, 255},

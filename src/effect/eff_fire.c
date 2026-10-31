@@ -31,6 +31,10 @@ typedef struct FireScaleKey {
     f32 value;
 } FireScaleKey;
 
+/**
+ * Looping 200-frame flicker of the flame's size (frame, scale between 0.95 and 1.1) for flame types 3 and 8;
+ * read by effFireMain.
+ */
 FireScaleKey scale1[] = {
     { 0, 1.0f },     { 20, 1.1f },    { 30, 1.0f },    { 45, 1.05f },   { 60, 0.95f },
     { 70, 1.05f },   { 80, 1.025f },  { 100, 1.1f },   { 120, 1.0f },   { 130, 1.025f },
@@ -38,6 +42,7 @@ FireScaleKey scale1[] = {
 };
 #if VERSION <= VERSION_DEMO_US
 // the demo defines scale2 here, right after scale1 (.data order)
+/** Slower looping 200-frame swell of the flame's size (up to 1.2) for flame type 4; read by effFireMain. */
 FireScaleKey scale2[] = {
     { 0, 1.0f },
     { 100, 1.2f },
@@ -45,6 +50,10 @@ FireScaleKey scale2[] = {
     { 200, 1.0f },
 };
 #endif
+/**
+ * Eight vertex colours of the layered flame for the spark-throwing types: orange fire (type 5), blue (6)
+ * and green (7). Read by effFireDisp3.
+ */
 static GXColor col_tbl[3][8] = {
     { { 0xAC, 0x2E, 0x00, 0xFF }, { 0xE0, 0x22, 0x00, 0xFF }, { 0xFD, 0x5F, 0x00, 0xFF }, { 0xFD, 0x5F, 0x04, 0xFF },
       { 0xFF, 0x69, 0x00, 0xFF }, { 0xFF, 0x8A, 0x00, 0xFF }, { 0xFF, 0xB7, 0x00, 0xFF }, { 0xFF, 0xD7, 0x00, 0xFF } },
@@ -54,6 +63,10 @@ static GXColor col_tbl[3][8] = {
       { 0xDE, 0xF6, 0x18, 0xFF }, { 0xA0, 0xF6, 0x06, 0xFF }, { 0xA0, 0xF6, 0x06, 0xFF }, { 0x92, 0xE4, 0x00, 0xFF } },
 };
 
+/**
+ * Per-frame X and Y stretch (out of 128) of a smoke puff over its first 30 frames: it widens and
+ * flattens as it ages. Read by effFireSmokeDisp.
+ */
 static u8 scale_dt[] = {
     128, 128, 129, 127, 130, 127, 131, 126, 132, 126, 132, 126, 133, 125, 134, 125, 135, 124, 136, 124, 137, 124, 138, 123, 138, 123, 139, 123, 140, 123, 141, 122, 141, 122, 142, 122, 143, 121, 143, 121, 144, 121, 145, 121, 146, 120, 146, 120, 147, 120, 148, 119, 149, 119, 149, 119, 150, 118, 151, 118, 152, 118, 152, 118, 153, 117, 154, 117, 155, 116, 156, 116, 157, 116, 158, 115, 159, 115, 160, 115, 161, 114, 162, 114, 163, 113, 165, 113, 166, 112, 167, 112, 169, 111, 170, 111, 171, 110, 173, 109, 174, 109, 176, 108, 178, 107, 180, 107, 181, 106, 183, 105, 185, 104, 187, 104, 189, 103, 192, 102,
 };
@@ -83,6 +96,7 @@ static void effFireDisp2(CameraId cameraId, EffectEntry* effect);
 static void effFireDisp3(CameraId cameraId, EffectEntry* effect);
 
 #if VERSION >= VERSION_JP
+/** Slower looping 200-frame swell of the flame's size (up to 1.2) for flame type 4; read by effFireMain. */
 FireScaleKey scale2[] = {
     { 0, 1.0f },
     { 100, 1.2f },

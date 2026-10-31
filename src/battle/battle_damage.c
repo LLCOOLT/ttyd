@@ -5,7 +5,7 @@
 #include "battle/battle_audience.h"
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-// inlining off for BattleDamageDirect, BattleCheckPikkyoro, BattleCalculateDamage and 14 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 3 functions change length, e.g. BattleCheckDamage 640 -> 866 instructions
 #pragma dont_inline on
 #include "battle/battle_damage.h"
 #include "battle/battle.h"
@@ -27,6 +27,8 @@
 #include "pmario_sound.h"
 #include "eff/eff_fukidashi.h"
 #include "battle/battle_status_effect.h"
+#include "eff/eff_updown.h"
+#include "battle/battle_actrecord.h"
 // FAKE: battle_damage.c calls BtlUnit_GetStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
 typedef void (*BtlUnit_GetStatusS8Fn)(BattleUnit*, s8, s8*, s8*);
 // FAKE: battle_damage.c calls BtlUnit_SetStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
@@ -41,8 +43,6 @@ static s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags);
 static void __declare(s32 unitIdx, s32 partIdx, s32* outUnit, s32* outPart);
 
 void BtlActRec_AddCount(u8* count);
-// FAKE: local prototype: BtlActRec_AddPoint takes the points as u8 (battle_actrecord.h: s32); this file was compiled with it and the header prototype changes the code.
-void BtlActRec_AddPoint(u8* rec, u8 points);
 
 /**
  * Applies a finished hit to target: clamps damage to +-99, credits the attacker's totals,
@@ -267,10 +267,10 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
     if (damage > 0) {
         if (target->currentKind == UNIT_MARIO) {
             BtlActRec_AddCount(&wp->actRecord.marioHitsTaken);
-            BtlActRec_AddPoint(&wp->actRecord.marioDamageTaken, damage);
+            BtlActRec_AddPoint(&wp->actRecord.marioDamageTaken, (u8)damage);
         } else if (target->currentKind >= TYPE_PARTNER_MIN && target->currentKind < TYPE_PARTNER_MAX) {
             BtlActRec_AddCount(&wp->actRecord.partnerHitsTaken);
-            BtlActRec_AddPoint(&wp->actRecord.partnerDamageTaken, damage);
+            BtlActRec_AddPoint(&wp->actRecord.partnerDamageTaken, (u8)damage);
         }
     }
     if (flag && (damage > 0 || fpDamage > 0) && BtlUnit_CheckStatus(target, STATUS_SLEEP) && irand(100) < 50) {
@@ -436,7 +436,7 @@ static s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, Battl
     }
     element = weapon->element;
     if (attacker && (weapon->special & SPECIAL_FIERY_IF_BURNED) && BtlUnit_CheckStatus(attacker, STATUS_BURN)) {
-        element = 1;
+        element = ELEMENT_FIRE;
     }
     defaultResult = flags | DAMAGE_HIT_NONE;
     *result = defaultResult;
@@ -532,19 +532,19 @@ skip:
     defense = part->defense->defenses[element];
     defenseAttr = part->defenseAttr->defenseAttrs[element];
     switch (element) {
-        case 1:
+        case ELEMENT_FIRE:
             *result = flags | DAMAGE_HIT_FIRE;
             break;
-        case 2:
+        case ELEMENT_ICE:
             *result = flags | DAMAGE_HIT_ICE;
             break;
-        case 4:
+        case ELEMENT_ELECTRIC:
             *result = flags | DAMAGE_HIT_ELECTRIC;
             break;
-        case 3:
+        case ELEMENT_EXPLOSION:
             *result = flags | DAMAGE_HIT_EXPLOSION;
             break;
-        case 0:
+        case ELEMENT_NORMAL:
         default:
             *result = flags | DAMAGE_HIT_NORMAL;
             break;
@@ -557,7 +557,7 @@ skip:
             defense += target->badgesEquipped.DamageDodge;
         }
 #if VERSION <= VERSION_DEMO_US
-        if (element == 1 && target->badgesEquipped.IcePower) {
+        if (element == ELEMENT_FIRE && target->badgesEquipped.IcePower) {
             defense += target->badgesEquipped.IcePower;
         }
 #endif
@@ -603,7 +603,7 @@ skip:
         damage--;
     }
 #if VERSION >= VERSION_JP
-    if (element == 1 && target->badgesEquipped.IcePower) {
+    if (element == ELEMENT_FIRE && target->badgesEquipped.IcePower) {
         damage -= target->badgesEquipped.IcePower;
     }
 #endif
@@ -1042,8 +1042,6 @@ static u8 _getRegistStatus(BattleUnit* unit, s32 type) {
 }
 
 #include "eff/n64/eff_stamp_n64.h"
-// FAKE: local prototype: effUpdownEntry declares the parameters as (s32, s32, s32, f32, f32, f32) (eff_updown.h: (s32, f32, f32, f32, s32, s32), same registers); this file was compiled with it and the header prototype changes the code.
-EffectEntry* effUpdownEntry(s32 type, s32 strength, s32 time, f32 x, f32 y, f32 z);
 
 #define STAMP_COL(e, r0, g0, b0, r1, g1, b1)      \
     ((EffStampN64Work*)(e)->userdata)->r = (r0);  \
@@ -1381,14 +1379,14 @@ static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* 
         switch (type) {
             case 0xe:
             case 0xf:
-                effUpdownEntry(1, strength, 0x3c, x, y, 20.0f + z);
+                effUpdownEntry(1, x, y, 20.0f + z, strength, 0x3c);
                 break;
             case 0xa:
             case 0xb:
             case 0xc:
             case 0xd:
             case 0x10:
-                effUpdownEntry(0, strength, 0x3c, x, y, 15.0f + z);
+                effUpdownEntry(0, x, y, 15.0f + z, strength, 0x3c);
                 break;
         }
     } else {
@@ -1677,21 +1675,21 @@ s32 BattlePreCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPar
  */
 static s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
     s32 kind = unit->currentKind;
-    if (kind == 0xDE) {
+    if (kind == UNIT_MARIO) {
         if ((s32)pouchCheckItem(ITEM_LIFE_SHROOM) > 0) {
             *flags |= DAMAGE_FLAG_LIFE_SHROOM;
             return 1;
         }
         return 0;
     }
-    if (kind >= 0xE0 && kind < 0xE7) {
+    if (kind >= UNIT_GOOMBELLA && kind < UNIT_MAX) {
         if ((s32)pouchCheckItem(ITEM_LIFE_SHROOM) > 0) {
             *flags |= DAMAGE_FLAG_LIFE_SHROOM;
             return 1;
         }
         return 0;
     }
-    if (unit->heldItem == 0x97) {
+    if (unit->heldItem == ITEM_LIFE_SHROOM) {
         *flags |= DAMAGE_FLAG_LIFE_SHROOM;
         return 1;
     }
@@ -1785,7 +1783,7 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
                 break;
             }
             if ((part->counterAttributes & COUNTER_ATTR_EXPLOSIVE) &&
-                (weapon->element == 3 || weapon->element == 4 || weapon->element == 1 ||
+                (weapon->element == ELEMENT_EXPLOSION || weapon->element == ELEMENT_ELECTRIC || weapon->element == ELEMENT_FIRE ||
                  ((weapon->special & SPECIAL_FIERY_IF_BURNED) && BtlUnit_CheckStatus(attacker, STATUS_BURN)))) {
                 BattleRunHitEvent(target, (DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_KO | DAMAGE_FLAG_DEFEATED | DAMAGE_HIT_EXPLOSION));
                 ret = 18;
@@ -1948,8 +1946,12 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
     return ret;
 }
 
-// Redirects an attack on *unitIdx to its bodyguard: the first unit whose protectId names the target, is able to guard
-// and has a guard-cover part steps in; both run their guard hit events and *unitIdx/*partIdx become the guard's.
+/**
+ * Redirects an attack on *unitIdx to its bodyguard: the first unit whose protectId names the target, that was not
+ * hit or declared a guard this action, whose status lets it guard (BtlUnit_CanGuardStatus) and that has a
+ * PART_ATTR_GUARD_COVER part steps in; both run their guard hit events (0x1029 on the target, 0x1038 on the guard)
+ * and *unitIdx/*partIdx become the guard's.
+ */
 void BattleAttackDeclare(s32* unitIdx, s32* partIdx) {
     s32 i;
     BattleUnit* unit;
@@ -2172,7 +2174,7 @@ s32 BattleCheckCounter(CounterWork* work, BattleUnit* attacker, BattleUnit* targ
         }
     } else {
         if ((part->counterAttributes & COUNTER_ATTR_EXPLOSIVE) && !(weapon->counterResistFlags & COUNTER_RESIST_EXPLOSIVE)) {
-            if (weapon->element == 3 || weapon->element == 4 || weapon->element == 1 ||
+            if (weapon->element == ELEMENT_EXPLOSION || weapon->element == ELEMENT_ELECTRIC || weapon->element == ELEMENT_FIRE ||
                 ((weapon->special & SPECIAL_FIERY_IF_BURNED) && BtlUnit_CheckStatus(attacker, STATUS_BURN))) {
                 work->type = DAMAGE_HIT_COUNTER_EXPLOSIVE;
                 work->msg = (DAMAGE_FLAG_LAST_HIT | DAMAGE_HIT_COUNTER_EXPLOSIVE);

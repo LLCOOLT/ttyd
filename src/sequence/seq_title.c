@@ -20,6 +20,10 @@
 #include <dolphin/pad.h>
 
 TitleWork work2;
+/**
+ * Title screen state (logo animation, the press-start prompt, the debug flag);
+ * wp2 is the pointer the code uses.
+ */
 TitleWork* wp2 = &work2;
 
 // Resting height of the title logo (TitleWork.topPosY). The timings below use one second,

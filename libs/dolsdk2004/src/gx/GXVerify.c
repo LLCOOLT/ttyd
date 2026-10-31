@@ -7,6 +7,7 @@
 static __GXVerifyData __gxVerifData;
 struct __GXVerifyData* __gxVerif = &__gxVerifData;
 
+/** Text of each graphics-verifier warning, indexed by warning number; the text is a format string. */
 char* __gxvWarnings[125] = {
     "Invalid Vertex Format. Normal count must be set to %s.",
     "Texture size %ld not initialized.",
@@ -135,6 +136,7 @@ char* __gxvWarnings[125] = {
     "Output XF colors or color textures enabled, COLOR%dCNTRL_REG.ambient_src == REGISTER, but Ambient %d register (0x%04x) is not initialized."
 };
 
+/** Severity of each graphics-verifier warning, indexed by warning number. */
 GXWarningLevel __gxvWarnLev[125] = {
     GX_WARN_SEVERE,
     GX_WARN_SEVERE,

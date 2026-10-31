@@ -1,4 +1,4 @@
-// Palace of Shadow battle unit: the Swampire (`basabasa_chururu`): parts, stats, poses and AI scripts.
+// Palace of Shadow battle unit: the Swoopula (`basabasa_chururu`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -11,6 +11,11 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "battle/battle_sub.h"
+
+// Unit work slots of the Swoopula.
+enum {
+    UW_BASABASA_CHURURU_START_IN_AIR = 0, // 1 (from the battle setup): starts off the ceiling, already flying
+};
 
 BattleUnitKind unit_basabasa_chururu;
 static BattleUnitDefense defence;
@@ -32,6 +37,10 @@ static EvtWord ceil_fall_ready_event[23];
 static EvtWord attack_event[683];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Swoopula in the Palace of Shadow: 9 HP, level 30;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_basabasa_chururu = {
     123,
     "btl_un_basabasa_chururu",
@@ -90,7 +99,7 @@ BattleUnitKind unit_basabasa_chururu = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4040002,
+    UNIT_ATTR_CEILING | UNIT_ATTR_REQUIRED_FOR_CLEAR | UNIT_ATTR_BILLBOARD,
     &regist,
     1,
     parts,
@@ -98,10 +107,19 @@ BattleUnitKind unit_basabasa_chururu = {
     data_table,
 };
 
+/**
+ * Defence of the Swoopula against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of the Swoopula per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Weapon of the Swoopula's bite when the target is electrified or held fast, which drains nothing. */
 static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -119,7 +137,7 @@ static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, 0, // acHelpMsg..counterResistFlags
@@ -135,6 +153,7 @@ static BattleWeapon weapon_basabasa_drain_attack_biribiri_counterd = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Swoopula: animation names for each pose type (idle, walk, hurt, attack and so on). */
 static PoseTableEntry pose_table[] = {
     {1, "CYU_N_1"},
     {2, "CYU_Y_1"},
@@ -142,20 +161,24 @@ static PoseTableEntry pose_table[] = {
     {5, "CYU_K_1"},
     {4, "CYU_X_1"},
     {3, "CYU_X_1"},
-    {28, "CYU_S_1"},
+    {BTL_POSE_NORMAL, "CYU_S_1"},
     {29, "CYU_Q_1"},
     {30, "CYU_Q_1"},
     {31, "CYU_S_1"},
-    {39, "CYU_D_1"},
+    {BTL_POSE_DAMAGE, "CYU_D_1"},
     {50, "CYU_A_1"},
-    {42, "CYU_R_1"},
-    {40, "CYU_W_1"},
-    {56, "CYU_X_1"},
-    {57, "CYU_X_1"},
+    {BTL_POSE_RUN, "CYU_R_1"},
+    {BTL_POSE_WALK, "CYU_W_1"},
+    {BTL_POSE_DANGER, "CYU_X_1"},
+    {BTL_POSE_PERIL, "CYU_X_1"},
     {BTL_POSE_TALK, "CYU_T_1"},
     {BTL_POSE_STAY_DEFAULT, "CYU_S_1"},
 };
 
+/**
+ * Pose table of the Swoopula while hanging from the ceiling:
+ * animation names for each pose type (idle, walk, hurt, attack and so on).
+ */
 static PoseTableEntry pose_table_ceil[] = {
     {1, "CYU_N_2"},
     {2, "CYU_Y_2"},
@@ -163,20 +186,24 @@ static PoseTableEntry pose_table_ceil[] = {
     {5, "CYU_K_2"},
     {4, "CYU_X_2"},
     {3, "CYU_X_2"},
-    {28, "CYU_S_2"},
+    {BTL_POSE_NORMAL, "CYU_S_2"},
     {29, "CYU_Q_2"},
     {30, "CYU_Q_2"},
     {31, "CYU_S_2"},
-    {39, "CYU_D_2"},
+    {BTL_POSE_DAMAGE, "CYU_D_2"},
     {50, "CYU_A_1"},
-    {42, "CYU_S_1"},
-    {40, "CYU_S_1"},
-    {56, "CYU_X_2"},
-    {57, "CYU_X_2"},
+    {BTL_POSE_RUN, "CYU_S_1"},
+    {BTL_POSE_WALK, "CYU_S_1"},
+    {BTL_POSE_DANGER, "CYU_X_2"},
+    {BTL_POSE_PERIL, "CYU_X_2"},
     {BTL_POSE_TALK, "CYU_T_2"},
     {BTL_POSE_STAY_DEFAULT, "CYU_S_2"},
 };
 
+/**
+ * Data table of the Swoopula: event scripts and values the battle looks up by tag (damage reactions, dodge,
+ * first strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {26, counter_damage_event},
     {25, counter_damage_event},
@@ -194,16 +221,26 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Part of the Swoopula: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_basabasa_chururu", "c_cyuru", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table_ceil},
+    {1, "btl_un_basabasa_chururu", "c_cyuru", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table_ceil},
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of the Swoopula:
+ * percent chance that each status takes hold (100 is normal).
+ */
 static StatusVulnerability regist = {70, 75, 90, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 70, 100, 100, 70, 100, 100, 95};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of the Swoopula:
+ * percent chance that each status takes hold (100 is normal).
+ */
 static StatusVulnerability regist = {70, 75, 100, 100, 70, 100, 100, 70, 100, 80, 100, 80, 100, 90, 70, 70, 85, 100, 70, 100, 100, 95};
 #endif
 
+/** Weapon of the Swoopula's draining bite: damage 4. */
 static BattleWeapon weapon_basabasa_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -222,7 +259,7 @@ static BattleWeapon weapon_basabasa_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -240,6 +277,7 @@ static BattleWeapon weapon_basabasa_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Sound table of the Swoopula: for each pose name, the sound that plays with its animation. */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"CYU_S_1", 0.01f, NULL, "SFX_ENM_BASA_WAIT1", 0, 1},
     {"CYU_W_1", 0.01f, NULL, "SFX_ENM_BASA_MOVE1", 0, 1},
@@ -253,22 +291,22 @@ static PoseSoundTiming pose_sound_timing_table[] = {
 };
 
 /**
- * Brings a Swampire down from the ceiling when it is first hit or attacks:
+ * Brings a Swoopula down from the ceiling when it is first hit or attacks:
  * if its ceiling attribute is still set (attribute 2) it clears it, sets the flying attribute (4),
  * switches to the flying pose table and moves it 30 units down with new hit, cursor,
  * kiss and status icon offsets. Leaves its home position in LW(0) to LW(2).
  */
 static EVT_BEGIN(ceil_sky_event)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_FLOATING)
     CALL(btlevtcmd_SetPossessionItemOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_AddPos, BTL_UNIT_SELF, 0, -30, 0)
     CALL(btlevtcmd_AddHomePos, BTL_UNIT_SELF, 0, -30, 0)
@@ -284,8 +322,9 @@ static EVT_BEGIN(ceil_sky_event)
 EVT_END()
 
 /**
- * Init event of the Swampire: installs wait, attack, ceiling damage (damage_event_ceil),
- * confusion and ceiling-fall (ceil_fall_ready_event) events and the hang-from-ceiling hit offsets;
+ * Init event of the Swoopula: installs wait, attack, ceiling damage (damage_event_ceil),
+ * confusion and ceiling-fall (ceil_fall_ready_event, run when the stage's overhead iron frame falls) events
+ * and the hang-from-ceiling hit offsets;
  * if unit work 0 is 1 it starts already in flight (ceil_sky_event).
  */
 static EVT_BEGIN(init_event)
@@ -300,7 +339,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, -30, 0)
     CALL(btlevtcmd_SetStatusIconOffset, BTL_UNIT_SELF, 6, 10)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 16, -18, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BASABASA_CHURURU_START_IN_AIR, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(ceil_sky_event)
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -310,7 +349,7 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Position the Swampire takes for a first-strike reaction:
+ * Data table entry 48, run when the battle opens with a First Strike on the Swoopula (damage code 0x39):
  * drops from the ceiling (ceil_sky_event), sets its height to 10 and waits for the attack to end.
  */
 static EVT_BEGIN(dmg_first_attack_pos)
@@ -320,7 +359,7 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
-/** Damage event of the Swampire: runs the default damage handling. */
+/** Damage event of the Swoopula: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -329,7 +368,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Damage event of the Swampire while it hangs from the ceiling:
+ * Damage event of the Swoopula while it hangs from the ceiling:
  * runs the default damage handling and then, unless the hit was a counter-type hit (512 without 2048)
  * or did no damage, makes it drop to its flying position (ceil_sky_event) and dive down.
  */
@@ -337,9 +376,9 @@ static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -354,7 +393,7 @@ static EVT_BEGIN(damage_event_ceil)
 EVT_END()
 
 /**
- * Damage event used for the Swampire's counter-damage case:
+ * Damage event used for the Swoopula's counter-damage case:
  * drops it from the ceiling (ceil_sky_event) and runs the shared counter damage handling
  * (subsetevt_counter_damage).
  */
@@ -368,7 +407,7 @@ static EVT_BEGIN(counter_damage_event)
 EVT_END()
 
 /**
- * Event run when the ceiling-fall hit lands on a hanging Swampire:
+ * Ceiling-fall event of the Swoopula, run when the stage's overhead iron frame falls:
  * runs the default damage handling, then drops it to its flying position (ceil_sky_event) and dives down.
  */
 static EVT_BEGIN(ceil_fall_ready_event)
@@ -381,12 +420,11 @@ static EVT_BEGIN(ceil_fall_ready_event)
 EVT_END()
 
 /**
- * The Swampire's draining bite: like the Swampire's swoop,
+ * The Swoopula's draining bite: like the Swoopula's swoop,
  * but when the hit lands it tilts into the target (SFX_ENM_BASA_SUCK1, pose CYU_A_2)
  * and heals itself with the recovery effect for the damage it dealt.
- * When the pre- check counter result is 17 or 14 (Guess: the target shocks attackers,
- * from the weapon name biribiri_counterd) it uses weapon_basabasa_drain_attack_biribiri_counterd for the damage
- * instead.
+ * When the counter check (btlevtcmd_PreCheckCounter) finds the target electrified (14) or under Hold Fast (17),
+ * it skips the drain and applies weapon_basabasa_drain_attack_biribiri_counterd instead.
  */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -396,10 +434,11 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_basabasa_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_basabasa_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -407,6 +446,7 @@ static EVT_BEGIN(attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_basabasa_attack))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_basabasa_attack))
@@ -416,9 +456,10 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        // Take off and fly toward the target in a dive.
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_AddPos, BTL_UNIT_SELF, 0, -30, 0)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(2.5f))
@@ -426,13 +467,14 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
         SUBTRACT(LW(1), 40)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -16, 0, 0, -1)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     END_IF
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), -6)
     LOOP(2)
         ADD(LW(1), 13)
+        // Swoop in on the target.
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, 10, 0, 0, -1)
         ADD(LW(1), -13)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -10, 0, 0, -1)
@@ -443,6 +485,7 @@ static EVT_BEGIN(attack_event)
     SUBTRACT(LW(1), 10)
     SUBTRACT(LW(2), 10)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -16, 0, 0, -1)
+    // Find out whether the attack will connect or miss.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -465,16 +508,19 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.5f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 50)
     ADD(LW(1), 10)
+    // The Swoopula swoops on past the target.
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 0, 0, -1)
     WAIT_MS(200)
     GOTO(98)
     LABEL(91)
     SET_VALUE(LF(0), 0)
+    // A target that is electrified or under Hold Fast gets a no-damage variant of the bite, with no drain.
     CALL(btlevtcmd_PreCheckCounter, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
     IF_INT_EQUAL(LW(5), 17)
         SET_VALUE(LF(0), 1)
@@ -484,11 +530,13 @@ static EVT_BEGIN(attack_event)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
         CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+        // Deal the damage, reduced by the action command defence.
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_basabasa_attack))
         SET_VALUE(LW(9), PTR(&weapon_basabasa_drain_attack_biribiri_counterd))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
         RETURN
     END_IF
+    // On contact it tilts into the target and sinks its fangs in.
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, -45)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BASA_SUCK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("CYU_A_2"))
@@ -508,7 +556,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_basabasa_attack))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_basabasa_attack), 256, LW(5))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 15)
@@ -518,6 +566,7 @@ static EVT_BEGIN(attack_event)
     IF_INT_GREATER_OR_EQUAL(LW(10), 1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("CYU_N_1"))
         WAIT_MS(300)
+        // It heals itself for the damage it dealt, with the recovery effect.
         CALL(btlevtcmd_RecoverHp, BTL_UNIT_SELF, 1, LW(10))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
         ADD(LW(6), 20)
@@ -555,18 +604,20 @@ static EVT_BEGIN(attack_event)
     END_IF
     WAIT_MS(500)
     GOTO(98)
+    // Return to its place.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(7))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(7))
     IF_INT_EQUAL(LW(7), 1)
         SUBTRACT(LW(1), 30)
     END_IF
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -10, 0, 0, -1)
+    // The attack is over; back to waiting.
     LABEL(99)
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("CYU_S_2"))
         WAIT_FRAMES(1)
@@ -580,7 +631,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-/** Wait (idle) event of the Swampire: shows the idle pose from the pose table. */
+/** Wait (idle) event of the Swoopula: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

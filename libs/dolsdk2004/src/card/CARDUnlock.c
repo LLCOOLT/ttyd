@@ -26,6 +26,7 @@ static u8 CardData[352] ATTRIBUTE_ALIGN(DOLPHIN_ALIGNMENT) = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
+/** State of the CARDRand generator, reseeded by CARDSrand. */
 static u32 next = 1;
 
 // prototypes

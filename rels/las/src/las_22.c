@@ -84,6 +84,10 @@ EVT_BEGIN(door_dummy)
     RETURN
 EVT_END()
 
+/**
+ * Exits of las_22: west door w_bero to las_20 (e_bero); east door e_bero to las_24 (w_bero); south road
+ * s_bero to las_23 (n_bero_1).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -140,6 +144,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Front faces of the first group of gears of the turntable room, turned together by haguruma_evt. */
 static const char* haguruma_hontai[] = {
     "S_hgm_01a",
     "S_hgm_02a",
@@ -156,6 +161,7 @@ static const char* haguruma_hontai[] = {
     "S_hgm_20a",
 };
 
+/** Front faces of the second group of gears, turned the other way. */
 static const char* haguruma_hontai2[] = {
     "S_hgm_05a",
     "S_hgm_09a",
@@ -166,6 +172,7 @@ static const char* haguruma_hontai2[] = {
     "S_hgm_18a",
 };
 
+/** Shadow faces of the first group of gears, turned with haguruma_hontai. */
 static const char* haguruma_kage[] = {
     "S_hgm_01b",
     "S_hgm_02b",
@@ -180,6 +187,7 @@ static const char* haguruma_kage[] = {
     "S_hgm_16b",
 };
 
+/** Shadow faces of the second group of gears, turned with haguruma_hontai2. */
 static const char* haguruma_kage2[] = {
     "S_hgm_05b",
     "S_hgm_09b",
@@ -274,11 +282,13 @@ EVT_BEGIN(kaitendai_evt)
     CALL(evt_hit_bind_mapobj, STRING("A_hgm_dai_04"), STRING("S_hgm_dai_04"))
     CALL(evt_hit_bind_mapobj, STRING("A_hgm_dai_05"), STRING("S_hgm_dai_05"))
     CALL(evt_mapobj_get_position, STRING("A_hgm_dai_01"), LW(13), LW(14), LW(15))
+    // The turntable starts to spin with its starting sound.
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_FLOOR_ROUND_START1"), LW(13), LW(14), LW(15), 0)
     LOOP(0)
         SET_VALUE(LF(0), 0)
         SET_VALUE(LF(1), 0)
         CALL(evt_mario_get_name_hitobj_ride, LW(2))
+        // Each frame, work out which of the four small platforms Mario stands on.
         IF_STR_EQUAL(LW(2), STRING("A_hgm_dai_02"))
             CALL(evt_hit_get_position, STRING("A_hgm_dai_02"), LW(3), LW(4), LW(5))
             SET_VALUE(LF(0), 1)
@@ -295,6 +305,7 @@ EVT_BEGIN(kaitendai_evt)
             CALL(evt_hit_get_position, STRING("A_hgm_dai_05"), LW(3), LW(4), LW(5))
             SET_VALUE(LF(0), 1)
         END_IF
+        // And which one the partner stands on.
         CALL(evt_party_get_name_hitobj_ride, 0, LW(6))
         IF_STR_EQUAL(LW(6), STRING("A_hgm_dai_02"))
             CALL(evt_hit_get_position, STRING("A_hgm_dai_02"), LW(7), LW(8), LW(9))
@@ -322,6 +333,8 @@ EVT_BEGIN(kaitendai_evt)
         CALL(evt_hit_bind_update, STRING("A_hgm_dai_03"))
         CALL(evt_hit_bind_update, STRING("A_hgm_dai_04"))
         CALL(evt_hit_bind_update, STRING("A_hgm_dai_05"))
+        // Turn the centre platform and the small ones in opposite directions and move whoever is standing on
+        // them along.
         IF_INT_EQUAL(LF(0), 1)
             CALL(evt_hit_get_position, LW(2), LW(10), LW(11), LW(12))
             SUBTRACT_FLOAT(LW(10), LW(3))
@@ -369,6 +382,7 @@ static EVT_BEGIN(dai_evt)
     RETURN
 EVT_END()
 
+/** Item list for the key window: only Palace Key 0x2F (-1 ends the list). */
 static s32 key_tbl[] = {
     ITEM_PALACE_KEY_0x2F, -1,
 };

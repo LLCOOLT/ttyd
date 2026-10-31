@@ -18,6 +18,11 @@
 #include "eff/eff_sleep.h"
 #include "battle/battle_damage.h"
 
+// StChgMsg.flags: who the pending status message is about.
+#define ST_CHG_MSG_FLAG_MARIO 0x1   // Mario
+#define ST_CHG_MSG_FLAG_PARTNER 0x2 // a partner on the player's side
+#define ST_CHG_MSG_FLAG_OTHER 0x4   // any other unit
+
 #define ST_CHG_MSG(i) ((StChgMsg*)_battleWorkPointer->announce.stChg.msg + (i)) /* cast keeps the 0x18D88 displacement folded into each access */
 
 BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit);
@@ -34,6 +39,10 @@ typedef struct StChgMsgData {
 
 // Status Type Priority Data. The demo defines it first; its .data follows that order (retail keeps it in .sdata).
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo copy of the status announcement order: Charge first, then Poison, Sleep and so on, ending with -1.
+ * BattleStatusChangeMsgMain shows pending messages in this order and _get_pri ranks queued changes by it.
+ */
 s8 _st_pri_data[] = {
     STATUS_CHARGE, //charge is elevated
     STATUS_POISON, //poison is elevated
@@ -63,6 +72,11 @@ s8 _st_pri_data[] = {
 };
 #endif
 
+/**
+ * Message for each status change announcement (the Japanese status name is only a label):
+ * msg1 when the status took hold, msg0 when not; only Charge differs ("...But it had no effect!").
+ * Ends with type -1.
+ */
 StChgMsgData _st_chg_msg_data[] = {
     { 4, "どく", "msg_st_chg_poison", "msg_st_chg_poison" },
     { 16, "チャージ", "msg_st_chg_charge", "msg_st_chg_charge3" },
@@ -167,6 +181,8 @@ void BattleStatusEffectDelete(BattleUnit* unit) {
 }
 
 #include "driver/effdrv.h"
+// FAKE: local prototype with two extra arguments (eff_spark.h: (s32 type, f32 x, f32 y, f32 z)): BSE_Biribiri passes
+// 10 and half the unit width, which effSparkEntry never reads; the target computes and passes them.
 EffectEntry* effSparkEntry(s32, s32, f32, f32, f32, f32);
 #define EFF_SLEEP(u) ((u)->sleepEff)
 #define EFF_SPARK(u) ((u)->sparkEff)
@@ -337,8 +353,8 @@ static void BSE_Freeze(BattleUnit* unit) {
 }
 
 /**
- * Removes the unit's ice-block effect with effSoftDelete,
- * so the effect can finish (Guess: the ice shattering) instead of vanishing.
+ * Removes the unit's ice-block effect with effSoftDelete, so instead of vanishing it plays out the rest of its
+ * animation and then sags, fades and drips smoke puffs (effIceMain).
  */
 static void BSE_FreezeDelete(BattleUnit* unit) {
     if (EFF_ICE(unit) != NULL) {
@@ -351,7 +367,7 @@ static void BSE_FreezeDelete(BattleUnit* unit) {
 
 /**
  * Kagegakure = hiding in the shadows (Vivian's Veil).
- * While the command menu is up (dispFlags bit 0) and the unit is UNIT_ATTR_VEILED,
+ * While the command menu is up (BATTLE_DISP_FLAG_COMMAND_MENU) and the unit is UNIT_ATTR_VEILED,
  * shows icon 0xA1 (0x99 in the demos) named "_biK_<unitId>" at the unit's body part; removes it otherwise.
  */
 static void BSE_Kagegakure(BattleUnit* unit) {
@@ -359,7 +375,7 @@ static void BSE_Kagegakure(BattleUnit* unit) {
     f32 x, y, z;
     BOOL on = FALSE;
 
-    if ((_battleWorkPointer->dispFlags & 1) && (unit->attributeFlags & UNIT_ATTR_VEILED)) {
+    if ((_battleWorkPointer->dispFlags & BATTLE_DISP_FLAG_COMMAND_MENU) && (unit->attributeFlags & UNIT_ATTR_VEILED)) {
         on = TRUE;
     }
     if (on) {
@@ -481,7 +497,7 @@ void BattleStatusChangeInfoWorkInit(BattleUnit* unit) {
 }
 #pragma optimize_for_size reset
 
-// inlining off for _get_pri, BattleStatusChangeInfoSetAnnouce, BattleStatusChangeAnnouceMain and 6 more, as in the original (the object differs without it)
+// FAKE: inlining off from here to the end of the file (FAKES.md); without it 11 functions change length, e.g. BattleStatusEffectMain 19 -> 373 instructions
 #pragma dont_inline on
 /**
  * Priority of a status for the change messages:
@@ -509,7 +525,8 @@ static s32 _get_pri(s8 type) {
  * Queues a status change on the unit (battle_damage.c calls it when a status is inflicted or changed):
  * inserts it into the six-entry statusChangeInfo list by _get_pri priority,
  * replacing an entry of the same status, then gives each entry a 10-step stagger and a stacking offset.
- * Guess: layout for per-unit popups; BattleStatusChangeAnnouceMain_Unit no longer draws any.
+ * BattleStatusChangeMsgAdjust still reads the queued types; nothing reads the stagger or offsets.
+ * Guess: they laid out per-unit popups that BattleStatusChangeAnnouceMain_Unit no longer draws.
  */
 void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 strength, s32 changed) {
     StChgInfo* e = &unit->statusChangeInfo[0];
@@ -610,7 +627,7 @@ void BattleStatusChangeMsgWorkInit(void) {
 
 /**
  * Marks the status-change message for status index as pending and records who it is about:
- * flags bit 0 for Mario, bit 1 for a partner on the player's side, bit 2 for any other unit.
+ * ST_CHG_MSG_FLAG_MARIO, _PARTNER (a partner on the player's side) or _OTHER (any other unit).
  * changed selects msg1 over msg0 (only Charge differs).
  */
 void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 changed) {
@@ -622,12 +639,12 @@ void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 changed) {
     msg->timer = 0;
     msg->changed = changed;
     id = unit->currentKind;
-    if (id == 0xDE) {
-        msg->flags |= 1;
-    } else if (id >= 0xE0 && id < 0xE7 && unit->alliance == 0) {
-        msg->flags |= 2;
+    if (id == UNIT_MARIO) {
+        msg->flags |= ST_CHG_MSG_FLAG_MARIO;
+    } else if (id >= UNIT_GOOMBELLA && id < UNIT_MAX && unit->alliance == 0) {
+        msg->flags |= ST_CHG_MSG_FLAG_PARTNER;
     } else {
-        msg->flags |= 4;
+        msg->flags |= ST_CHG_MSG_FLAG_OTHER;
     }
 }
 // the rest of this unit is size-optimised, as in the original (the object differs without it)

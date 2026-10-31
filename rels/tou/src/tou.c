@@ -750,6 +750,12 @@ static void printRanking(void) {
     }
 }
 
+/**
+ * The Glitz Pit fighters during chapter 3, by FighterId:
+ * from the champion Rawk Hawk down to the Goomba Bros., then Mario (The Great Gonzales)
+ * and the late arrivals Wings of Night and The Destructors.
+ * Each has its name, title, battle setup, pre-match and victory lines and starting ranking points.
+ */
 static FighterData fighterDt[] = {
     {4, "stg3_tou_sensyu_00", "stg3_tou_sensyu2_00", 22, "stg3_tou_400_02", "stg3_tou_400_03", 250},
     {4097, "stg3_tou_sensyu_01", "stg3_tou_sensyu2_01", 19, "stg3_tou_118_00", "stg3_tou_118_01", 200},
@@ -776,6 +782,10 @@ static FighterData fighterDt[] = {
     {2, "stg3_tou_sensyu_22", "stg3_tou_sensyu2_22", 21, "stg3_tou_118_36_04", "stg3_tou_118_36_05", 0},
 };
 
+/**
+ * The same roster after chapter 3 (from STORY_STG3_34_RETURN_TO_ROGUEPORT on), with Jolene's era lines;
+ * the two late arrivals are gone, so it has 21 entries.
+ */
 static FighterData fighterDt_re[] = {
     {4, "stg3_tou_re_315", "stg3_tou_re_338", 22, "stg3_tou_re_289", "stg3_tou_re_290", 250},
     {4097, "stg3_tou_re_316", "stg3_tou_re_339", 19, "stg3_tou_re_179", "stg3_tou_re_180", 200},
@@ -800,6 +810,10 @@ static FighterData fighterDt_re[] = {
     {8, "stg3_tou_re_335", "stg3_tou_re_358", 1, 0, 0, 0},
 };
 
+/**
+ * Grubba's special match conditions in the minor league (Mario ranked below 10th): the condition speech, the
+ * short condition shown in battle, the rule id and its two parameters.
+ */
 static RuleData ruleDt_2bu[] = {
     {"stg3_tou_107_01", "stg3_tou_cp_000", 18, 3, 3},
     {"stg3_tou_107_02", "stg3_tou_cp_001", 1, 1, 1},
@@ -813,6 +827,7 @@ static RuleData ruleDt_2bu[] = {
     {"stg3_tou_107_16", "stg3_tou_cp_009", 43, 1, 1},
 };
 
+/** Grubba's special match conditions in the major league, with stricter numbers and four extra rules. */
 static RuleData ruleDt_1bu[] = {
     {"stg3_tou_107_01", "stg3_tou_cp_010", 18, 5, 5},
     {"stg3_tou_107_02", "stg3_tou_cp_011", 1, 1, 1},
@@ -830,6 +845,7 @@ static RuleData ruleDt_1bu[] = {
     {"stg3_tou_107_20", "stg3_tou_cp_024", 63, 255, 255},
 };
 
+/** The match conditions after chapter 3, read out by Jolene instead of Grubba (the major-league rules). */
 static RuleData ruleDt_re[] = {
     {"stg3_tou_re_362", "stg3_tou_cp_040", 18, 5, 5},
     {"stg3_tou_re_363", "stg3_tou_cp_041", 1, 1, 1},
@@ -847,10 +863,13 @@ static RuleData ruleDt_re[] = {
     {"stg3_tou_re_376", "stg3_tou_cp_054", 63, 255, 255},
 };
 
+/** Pointer to the live ranking (rank_work) that the ranking helpers in this file work on. */
 static RankData* rank_wp = &rank_work;
 
+/** Pointer to the ranking board's display state (disp_work). */
 static RankDispWork* dwp = &disp_work;
 
+/** Full-width digits 0 to 9, used to write ranking numbers into the ranking board text. */
 static const char* suuji[] = {
     "０", "１", "２", "３", "４", "５", "６", "７",
     "８", "９",
@@ -1022,6 +1041,11 @@ static void disp_proc(CameraId cameraId, void* param) {
     }
 }
 
+/**
+ * The Glitz Pit lockers (numbers 1-3 and 5-10, there is no 4), five object names each:
+ * the collision (R_), the door, its front and back faces and its feet (asi);
+ * evt_tou_locker_init reads them five at a time.
+ */
 const char* lockerDt[] = {
     "R_door_1",
     "a_door_1",
@@ -1414,8 +1438,8 @@ EVT_BEGIN(evt_tou_monitor_init)
 EVT_END()
 
 /**
- * Guess: the guard's remark during the poison cake event;
- * only plays when the guard is more than 100 units away in z.
+ * The guard's remark added after the poisoned partner's stand-in speaks (dummy_party_msg_*): when the guard
+ * (ガードマン) stands at z above 100 he says they are waiting on Mr. Gonzales (stg3_tou_304).
  */
 EVT_BEGIN(talk_gardman_doku)
     CALL(evt_npc_get_position, STRING("ガードマン"), LW(0), LW(1), LW(2))
@@ -1716,16 +1740,19 @@ EVT_BEGIN(talk_gardman)
 EVT_END()
 
 /**
- * Guess: the guard escort scene.
+ * The guard's match call, spawned after a match is booked.
  * The guard (ガードマン) is the NPC of the map; LF(0),
  * LF(1) and LF(2) tell which map it is (tou_10, tou_08 or tou_07)
  * and select the door message (stg3_tou_74, 327 or 453).
  * It waits for Mario to be free; if Mario stands near the door (x within 35, z at or below -60) he is bounced
- * back to (40, 0, -120), and the guard opens the door_1 map object (with the door sounds), steps out,
- * closes it and speaks. It then gives the guard his talk event (talk_gardman) back and returns control to Mario.
+ * back to (40, 0, -120), and the guard opens the door_1 map object (with the door sounds), steps in,
+ * closes it and tells Gonzales (or the champion, in tou_07) it is time for his match.
+ * It then gives the guard his
+ * talk event (talk_gardman) back, turns off entrance 0 and returns control to Mario.
  * The versions before the US release wait 240 frames of free movement first.
  */
 static EVT_BEGIN(evt_gardman)
+    // Work out which locker room this is: minor league (tou_10), major league (tou_08) or champion (tou_07).
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
     SET_VALUE(LF(2), 0)
@@ -1739,6 +1766,7 @@ static EVT_BEGIN(evt_gardman)
     IF_STR_EQUAL(LW(0), STRING("tou_07"))
         SET_VALUE(LF(2), 1)
     END_IF
+    // Wait until Mario is free to move.
 #if VERSION <= VERSION_DEMO_US
     SET_VALUE(LW(0), 0)
     LOOP(0)
@@ -1774,6 +1802,7 @@ static EVT_BEGIN(evt_gardman)
 #else
     WAIT_FRAMES(1)
 #endif
+    // If Mario is standing in the doorway he is startled and hops out of the way.
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1802,6 +1831,7 @@ static EVT_BEGIN(evt_gardman)
         CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_POSE_LOCK)
         CALL(evt_mario_set_dir_npc, STRING("ガードマン"))
     END_INLINE_EVENT
+    // The door swings open, the guard steps in and shuts it behind him.
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
@@ -1847,6 +1877,7 @@ static EVT_BEGIN(evt_gardman)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // The guard tells Mario it is time for his match ("Follow me, bub").
     CALL(evt_set_dir_to_target, STRING("ガードマン"), STRING("mario"))
     IF_INT_EQUAL(LF(0), 1)
         CALL(evt_msg_print, 0, STRING("stg3_tou_74"), 0, STRING("ガードマン"))
@@ -1858,6 +1889,7 @@ static EVT_BEGIN(evt_gardman)
         CALL(evt_msg_print, 0, STRING("stg3_tou_453"), 0, STRING("ガードマン"))
     END_IF
     WAIT_MS(300)
+    // The guard keeps watch again and Mario can move.
     CALL(evt_npc_change_interrupt, STRING("ガードマン"), 6, PTR(talk_gardman))
     CALL(evt_npc_status_onoff, 1, STRING("ガードマン"), 2)
     CALL(evt_npc_flag_onoff, 0, STRING("ガードマン"), NPC_FLAG_INSTANT_TURN)
@@ -1880,6 +1912,7 @@ EVT_END()
  * sets which map (tou_10, tou_08 or tou_07) is running and prepares the registration prompts.
  */
 EVT_BEGIN(evt_tou_match_make_default_sub)
+    // Work out which locker room this is (and, in French, the order of the inserted rank and name).
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
     SET_VALUE(LF(2), 0)
@@ -1900,6 +1933,7 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
         SET_VALUE(LF(3), 1) // French: the two inserted values are swapped
     END_IF
 #endif
+    // Mario and the partner step up to the terminal and the screen lights up.
     CALL(evt_party_stop, 0)
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LF(2), 1)
@@ -1922,6 +1956,8 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
     CALL_CHILD(evt_tou_monitor_on)
     WAIT_MS(800)
     CALL(evt_party_run, 0)
+    // Minor league: Grubba (or Jolene after chapter 3) names the next opponent and its rank,
+    // with a special greeting for the promotion match.
     IF_INT_EQUAL(LF(0), 1)
         CALL(evt_mapobj_get_position, STRING("gamen"), LW(0), LW(1), LW(2))
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
@@ -1975,6 +2011,7 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
 #endif
         END_IF
     END_IF
+    // Major league: the same announcement; booking Rawk Hawk for the first time reserves the title match.
     IF_INT_EQUAL(LF(1), 1)
         CALL(evt_mapobj_get_position, STRING("gamenn"), LW(0), LW(1), LW(2))
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
@@ -2017,6 +2054,7 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
             END_IF
         END_IF
     END_IF
+    // Champion's room: the same announcement.
     IF_INT_EQUAL(LF(2), 1)
         CALL(evt_mapobj_get_position, STRING("gamenn"), LW(0), LW(1), LW(2))
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
@@ -2046,11 +2084,13 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
 #endif
         END_IF
     END_IF
+    // The special condition for this match is read out and stored for the battle.
     CALL(evt_tou_get_rule_info, GSW(GSW_TOU_OPPONENT_ID), LW(10), LW(13), LW(14), LW(15))
     SET_VALUE(GSW(GSW_TOU_MATCH_RULE), LW(13))
     SET_VALUE(GSW(GSW_TOU_MATCH_RULE_PARAM1), LW(14))
     SET_VALUE(GSW(GSW_TOU_MATCH_RULE_PARAM2), LW(15))
     CALL(evt_msg_print_add, 0, LW(10))
+    // The screen goes dark and the guard is sent for.
     CALL_CHILD(evt_tou_monitor_off)
     WAIT_MS(500)
     SET_VALUE(LW(0), 0)
@@ -2062,6 +2102,7 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
     END_IF
 #endif
     CALL(evt_cam3d_evt_off, 500, 11)
+    // At 3rd place the poisoned cake is delivered once.
     CALL(evt_tou_get_ranking, LW(0))
     IF_INT_EQUAL(LW(0), 3)
         IF_INT_EQUAL(GSWF(GSWF_TOU_POISON_CAKE_EVENT), 0)
@@ -2069,6 +2110,7 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
             CALL_CHILD(evt_doku_cake)
         END_IF
     END_IF
+    // The guard comes to fetch Mario; booking King K's match plays his good-luck scene the first time.
     SPAWN_EVENT(evt_gardman)
     SET_VALUE(GSWF(GSWF_TOU_MATCH_RESERVED), 1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
@@ -2094,6 +2136,7 @@ EVT_BEGIN(evt_tou_match_make_default)
         RETURN
     END_IF
 #endif
+    // The terminal beeps and the reservation texts for this locker room are picked.
     CALL(evt_hit_get_position, STRING("M_make"), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_TOUROKU_COM1"), LW(10), LW(11), LW(12), 0)
     SET_VALUE(LF(0), 0)
@@ -2125,10 +2168,13 @@ EVT_BEGIN(evt_tou_match_make_default)
         SET_VALUE(LW(11), STRING("stg3_tou_476_yn"))
         SET_VALUE(LW(12), STRING("stg3_tou_477_01"))
     END_IF
+    // Mario chooses Reserve a Match or View Rankings.
     CALL(evt_msg_print, 0, LW(10), 0, 0)
     CALL(evt_msg_select, 0, LW(11))
     SWITCH(LW(0))
         CASE_EQUAL(0)
+        // Reservations are suspended at some story points,
+        // and a major-leaguer must use the major-league terminal.
         SET_VALUE(LF(10), 0)
         SET_VALUE(LF(11), 0)
         SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -2166,6 +2212,7 @@ EVT_BEGIN(evt_tou_match_make_default)
                 END_IF
             END_IF
         END_SWITCH
+        // Reservations suspended: the system says so and the partner comments.
         IF_INT_EQUAL(LF(10), 1)
             CALL(evt_party_stop, 0)
             CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
@@ -2182,12 +2229,14 @@ EVT_BEGIN(evt_tou_match_make_default)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
+        // Wrong locker room for Mario's league.
         IF_INT_EQUAL(LF(11), 1)
             CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
             CALL(evt_msg_print_add, 0, STRING("stg3_tou_104_01_1"))
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
+        // A match already booked is repeated with its opponent and condition; otherwise a new one is booked.
         IF_INT_EQUAL(GSWF(GSWF_TOU_MATCH_RESERVED), 1)
             CALL(evt_tou_get_fighter_info, GSW(GSW_TOU_OPPONENT_ID), LW(0), LW(1))
             CALL(evt_tou_get_rule_msg2, GSW(GSW_TOU_MATCH_RULE), LW(2))
@@ -2197,6 +2246,7 @@ EVT_BEGIN(evt_tou_match_make_default)
             CALL(evt_msg_continue)
             CALL_CHILD(evt_tou_match_make_default_sub)
         END_IF
+        // View Rankings shows the ranking board.
         CASE_EQUAL(1)
         CALL(evt_msg_continue)
         CALL(evt_tou_print_ranking)
@@ -2217,6 +2267,7 @@ EVT_END()
 
 /** Mario's decision to eat the poison cake: partner remark, a yes/no prompt and, on yes, the eating sequence. */
 EVT_BEGIN(evt_eat_doku_cake)
+    // The partner comes over and comments; the game asks whether to eat the cake and No ends the scene.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
 #if VERSION >= VERSION_JP
@@ -2239,6 +2290,7 @@ EVT_BEGIN(evt_eat_doku_cake)
         CALL(evt_party_run, 0)
         RETURN
     END_IF
+    // Mario and the partner step up to the table and the partner gobbles the cake.
 #if VERSION >= VERSION_JP
     CALL(evt_party_flg_onoff, 0, 16777216, 1)
 #endif
@@ -2269,6 +2321,7 @@ EVT_BEGIN(evt_eat_doku_cake)
     END_INLINE_EVENT
     WAIT_MS(1000)
     DELETE_EVENT(LW(0))
+    // The partner starts to feel funny, the music stops and a surprise jingle plays.
     CALL(evt_msg_print_party, STRING("stg3_tou_300"))
     WAIT_MS(300)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -2282,6 +2335,7 @@ EVT_BEGIN(evt_eat_doku_cake)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
+    // The partner, now standing apart as an NPC, says their body is going numb.
     CALL_CHILD(party_npc_replace)
     WAIT_MS(300)
     CALL(evt_mario_get_party, LW(3))
@@ -2296,6 +2350,7 @@ EVT_BEGIN(evt_eat_doku_cake)
         CALL(evt_msg_print, 0, STRING("stg3_tou_301_yos"), 0, STRING("dummy_party"))
     END_SWITCH
     WAIT_MS(300)
+    // The cake is gone and the partner is poisoned: all partners leave the party until after the next match.
     SET_VALUE(GSWF(GSWF_TOU_POISON_CAKE_ON_TABLE), 0)
     SET_VALUE(GSWF(GSWF_TOU_PARTNER_POISONED), 1)
 #if VERSION >= VERSION_JP
@@ -2307,6 +2362,7 @@ EVT_BEGIN(evt_eat_doku_cake)
     CALL(evt_pouch_party_left, 2)
     CALL(evt_pouch_party_left, 5)
     CALL(evt_pouch_party_left, 4)
+    // The locker room music returns and Mario can move again.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
@@ -2315,7 +2371,12 @@ EVT_BEGIN(evt_eat_doku_cake)
     RETURN
 EVT_END()
 
-/** Guess: poison cake delivery scene; a character comes in through the door of the room and sets the cake down. */
+/**
+ * Poisoned cake delivery, run once at rank 3 (GSWF_TOU_POISON_CAKE_EVENT) when a match is booked: Jolene
+ * (キノシコワ) comes in through the door, says another gift arrived from an admirer (stg3_tou_295_doku), sets the
+ * Poisoned Cake down (doku_cake, with the eat case event evt_eat_doku_cake on a_cake), leaves, and
+ * GSWF_TOU_POISON_CAKE_ON_TABLE is set.
+ */
 EVT_BEGIN(evt_doku_cake)
     WAIT_MS(2000)
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -180)
@@ -2394,7 +2455,10 @@ EVT_BEGIN(evt_doku_cake)
     RETURN
 EVT_END()
 
-/** Guess: Michel's first scene; Mario and the partner turn to him, the camera pans and he talks (stg3_npc_10_01_01). */
+/**
+ * King K (マイケル) before Mario's match against him (opponent 18, once: GSWF_TOU_KING_K_MATCH_SCENE): Mario and
+ * the partner turn to him and he wishes both of them luck (stg3_npc_10_01_01).
+ */
 EVT_BEGIN(evt_michel_1)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir_npc, STRING("マイケル"))
@@ -2407,7 +2471,10 @@ EVT_BEGIN(evt_michel_1)
     RETURN
 EVT_END()
 
-/** Guess: Michel's second line (stg3_npc_10_01_02) with a camera zoom, then he walks away. */
+/**
+ * King K at rank 18 (once): he walks up, admits Mario beat him fair and square (stg3_npc_10_01_02) and walks
+ * back.
+ */
 EVT_BEGIN(evt_michel_2)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2454,7 +2521,11 @@ EVT_BEGIN(evt_michel_3_sub)
     RETURN
 EVT_END()
 
-/** Guess: Michel scene; he turns to Mario and talks with a camera move (stg3_tou_93_17 and following). */
+/**
+ * King K at rank 17 (once): he greets Mario (stg3_tou_93_17, 18); Jolene (キノシコワ) pushes the fighter ブロッツ in
+ * through the door and scolds him for entering the off-limits room (stg3_tou_93_19, 20) and leaves; King K and
+ * ブロッツ banter about her (stg3_tou_93_21 to 23_01) and ブロッツ leaves too (evt_michel_3_sub).
+ */
 EVT_BEGIN(evt_michel_3)
     CALL(evt_set_dir_to_target, STRING("マイケル"), STRING("mario"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_17"), 0, STRING("マイケル"))
@@ -2522,8 +2593,9 @@ EVT_BEGIN(evt_michel_3)
 EVT_END()
 
 /**
- * Guess: Michel scene with a startled-Mario reaction (surprised voice and "!" bubble),
- * then dialogue (stg3_tou_93_24).
+ * King K at rank 16 (once): he praises Mario (stg3_tou_93_24), a scream comes through the wall
+ * (stg3_tou_93_24_01, with Mario's and his "!" bubbles), the camera pans along the wall while voices behind it
+ * treat someone's injury (24_02 to 24_10), and King K remarks that this is a brutal sport (24_11, 24_12).
  */
 EVT_BEGIN(evt_michel_4)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
@@ -2589,7 +2661,7 @@ EVT_BEGIN(evt_michel_4)
     RETURN
 EVT_END()
 
-/** Guess: Michel's next line (stg3_tou_93_25) with the same camera framing as the previous scenes. */
+/** King K at rank 15 (once): he tells Mario about the Hot Dog Stand's new item (stg3_tou_93_25). */
 EVT_BEGIN(evt_michel_5)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2600,7 +2672,7 @@ EVT_BEGIN(evt_michel_5)
     RETURN
 EVT_END()
 
-/** Guess: Michel's next line (stg3_tou_93_26) with the same camera framing. */
+/** King K at rank 14 (once): he passes on a rumour about a girl seen at the Fresh Juice Shop (stg3_tou_93_26). */
 EVT_BEGIN(evt_michel_6)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2611,7 +2683,7 @@ EVT_BEGIN(evt_michel_6)
     RETURN
 EVT_END()
 
-/** Guess: Michel's next line (stg3_tou_93_27) with the same camera framing. */
+/** King K at rank 13 (once): he confides that he is thinking of retiring after his next match (stg3_tou_93_27). */
 EVT_BEGIN(evt_michel_7)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2861,10 +2933,13 @@ static USER_FUNC(tou_champion_belt_onoff) {
 }
 
 /**
- * Guess: scene where Octor and Gangan are at the door and the next visitors enter (Pogo, Jolene);
- * camera cuts and dialogue stg3_tou_93_28 to 30.
+ * Rank 11 scene (once: GSWF_TOU_RANK11_SWOOPS_JOINS), after King K has gone: オクトール and ガンガン (Cleftor)
+ * talk about missing him (stg3_tou_93_28 to 30); Jolene brings in the new fighter Sir Swoop (ポグ), shows him
+ * the minor-league room and the match terminal, Grubba (ガンス) books his first match over the monitor
+ * (stg3_tou_93_31 to 37) and Swoop introduces himself (stg3_tou_93_38), then the guard comes in.
  */
 EVT_BEGIN(evt_michel_8)
+    // The Bob-omb fighter and Cleftor talk about missing King K.
     CALL(evt_npc_set_position, STRING("オクトール"), 145, 0, 50)
     CALL(evt_npc_set_position, STRING("ガンガン"), 95, 0, 50)
     CALL(evt_cam3d_evt_set, 95, 109, 419, 95, 45, -6, 1000, 11)
@@ -2872,6 +2947,7 @@ EVT_BEGIN(evt_michel_8)
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_28"), 0, STRING("オクトール"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_29"), 0, STRING("ガンガン"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_30"), 0, STRING("オクトール"))
+    // Jolene opens the door and leads in the new fighter, Sir Swoop.
     CALL(evt_cam3d_evt_set, 0, 112, 287, 0, 60, -8, 1000, 11)
     WAIT_MS(1000)
 #if VERSION <= VERSION_DEMO_US
@@ -2923,6 +2999,7 @@ EVT_BEGIN(evt_michel_8)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Jolene shows Swoop his dressing room and the match terminal, and Mario steps aside.
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_31"), 0, STRING("キノシコワ"))
     WAIT_MS(300)
     CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("M_1"))
@@ -2940,6 +3017,7 @@ EVT_BEGIN(evt_michel_8)
     CALL(evt_npc_move_position, STRING("ポグ"), -70, -120, 0, FLOAT(80.0f), 1)
     WAIT_MS(1000)
 #endif
+    // Swoop uses the terminal and Grubba books his first match over the monitor.
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_34"), 0, STRING("キノシコワ"))
     CALL(evt_npc_get_position, STRING("ポグ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_jump_position_nohit, STRING("ポグ"), LW(0), LW(1), LW(2), 500, 30)
@@ -2950,6 +3028,7 @@ EVT_BEGIN(evt_michel_8)
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_35"), 0, STRING("ガンス"))
     CALL_CHILD(evt_tou_monitor_off)
     WAIT_MS(500)
+    // Jolene explains how fights work, then Swoop introduces himself.
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_36"), 0, STRING("キノシコワ"))
     CALL(evt_npc_get_position, STRING("ポグ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_jump_position_nohit, STRING("ポグ"), LW(0), LW(1), LW(2), 500, 30)
@@ -2968,6 +3047,7 @@ EVT_BEGIN(evt_michel_8)
 #endif
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_38"), 0, STRING("ポグ"))
     WAIT_MS(2000)
+    // The guard comes in to fetch Swoop for his battle and Jolene sees him off.
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
@@ -3021,6 +3101,7 @@ EVT_BEGIN(evt_michel_8)
         CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("ポグ"))
     END_INLINE_EVENT
 #endif
+    // The guard, Swoop and Jolene leave through the door in turn.
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
@@ -3070,6 +3151,7 @@ EVT_BEGIN(evt_michel_8)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // Cleftor goes back to his spot and the camera returns to Mario.
     CALL(evt_npc_set_position, STRING("ガンガン"), -75, 0, 90)
     CALL(evt_npc_set_ry, STRING("ガンガン"), 90)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -3275,8 +3357,9 @@ EVT_BEGIN(evt_cake_init)
 EVT_END()
 
 /**
- * Guess: cake scene; a camera move to the cake and the トゲノコエース NPC's announcement (stg3_tou_295),
- * then it waits for Mario.
+ * Cake scene at rank 6 (once: GSWF_TOU_CAKE_EVENT_DONE): registers the eat case event (evt_eat_cake) on a_cake,
+ * moves the camera to the cake and the fighter トゲノコエース says Jolene brought Gonzales a piece of cake from a
+ * fan (stg3_tou_295); then sets GSWF_TOU_CAKE_WAITING.
  */
 EVT_BEGIN(evt_cake)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_cake"), 0, PTR(evt_eat_cake), 0)
@@ -3527,6 +3610,8 @@ EVT_END()
  * ranking announcements and cleanup.
  */
 EVT_BEGIN(evt_tou_match_after_default)
+    // Back in the locker room: the partner is hidden for the Yoshi egg scenes,
+    // and the Shady Koopa and Cleftor are placed where needed.
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSW(GSW_TOU_OPPONENT_ID), 10)
         CALL(chk, LW(0))
@@ -3566,6 +3651,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             END_IF
         END_IF
     END_IF
+    // Work out which locker room this is; Jolene stands beside Mario and his partner.
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
     SET_VALUE(LF(2), 0)
@@ -3602,6 +3688,7 @@ EVT_BEGIN(evt_tou_match_after_default)
     CALL(evt_seq_wait, 2)
     CALL(octo_stop)
     WAIT_MS(1000)
+    // Fight money for the match, more for a win.
     CALL(evt_tou_get_ranking, LW(0))
     IF_INT_EQUAL(GSWF(GSWF_TOU_LAST_MATCH_WON), 1)
         CALL(fight_money, LW(0), 1, LW(10))
@@ -3612,6 +3699,7 @@ EVT_BEGIN(evt_tou_match_after_default)
     SET_VALUE(LF(11), 0)
     SET_VALUE(LF(12), 0)
     SET_VALUE(LF(13), 0)
+    // Minor-league room: Jolene pays out, first telling Mario if he has dropped back to the minors.
     IF_INT_EQUAL(LF(0), 1)
         IF_INT_LESS(GSW(GSW_TOU_RANK_BEFORE_MATCH), 11)
             CALL(evt_msg_print, 0, STRING("stg3_tou_114_00"), 0, STRING("キノシコワ"))
@@ -3682,6 +3770,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("S_1"))
         END_IF
     END_IF
+    // Major-league room: Jolene pays out, announcing a lost title or a return from the minors.
     IF_INT_EQUAL(LF(1), 1)
         SWITCH(GSW(GSW_TOU_RANK_BEFORE_MATCH))
             CASE_LESS(1)
@@ -3788,6 +3877,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("S_1"))
         END_SWITCH
     END_IF
+    // Champion's room: Jolene pays out, welcoming Mario back if he won the title back.
     IF_INT_EQUAL(LF(2), 1)
         IF_INT_GREATER(GSW(GSW_TOU_RANK_BEFORE_MATCH), 0)
             CALL(evt_msg_print, 0, STRING("stg3_tou_365_04_00"), 0, STRING("キノシコワ"))
@@ -3858,6 +3948,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("S_1"))
         END_IF
     END_IF
+    // Jolene leaves through the door.
     CALL(evt_npc_status_onoff, 1, STRING("キノシコワ"), 2)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
@@ -3905,6 +3996,8 @@ EVT_BEGIN(evt_tou_match_after_default)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // After the poisoned cake: a poisoned partner recovers and everyone rejoins;
+    // otherwise the Shady Koopa who ate it lies numb.
     IF_INT_EQUAL(GSWF(GSWF_TOU_POISON_CAKE_EVENT), 1)
         IF_INT_EQUAL(GSWF(GSWF_TOU_PARTNER_POISON_CURED), 0)
             IF_INT_EQUAL(GSWF(GSWF_TOU_PARTNER_POISONED), 1)
@@ -3949,6 +4042,8 @@ EVT_BEGIN(evt_tou_match_after_default)
             SET_VALUE(GSWF(GSWF_TOU_PARTNER_POISON_CURED), 1)
         END_IF
     END_IF
+    // The partner reacts to a demotion, a lost title, a promotion or a regained title
+    // (the Champ's Belt goes or comes back).
     IF_INT_EQUAL(LF(10), 1)
         CALL(evt_mario_set_dir, 270, 300, 0)
         CALL(evt_msg_print_party, STRING("stg3_tou_114"))
@@ -3970,6 +4065,8 @@ EVT_BEGIN(evt_tou_match_after_default)
         CALL(evt_msg_print_party, STRING("stg3_tou_365_04_03"))
         CALL(evt_pouch_add_item, ITEM_CHAMPS_BELT, LW(0))
     END_IF
+    // After the Iron Clefts match the egg hatches into Yoshi (or Pogo has a word);
+    // otherwise the egg says hello.
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSW(GSW_TOU_OPPONENT_ID), 10)
         CALL(chk, LW(0))
@@ -3990,6 +4087,8 @@ EVT_BEGIN(evt_tou_match_after_default)
             END_IF
         END_IF
     END_IF
+    // Ranking milestones: the King K scenes at 18th to 13th,
+    // his departure at 12th and Sir Swoop's arrival at 11th.
     CALL_CHILD(evt_cake_init)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
@@ -4037,6 +4136,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL_CHILD(evt_michel_8)
             CALL(evt_rankingReInit)
         END_IF
+        // Major-league milestones: the mystery e-mails, the cake at 6th and Bowser's raid at 5th.
         CASE_EQUAL(10)
         CASE_EQUAL(9)
         CASE_EQUAL(8)

@@ -17,6 +17,10 @@ static void effKemuriDisp(CameraId camId, void* param);
 static void effKemuri2Main(EffectEntry* entry);
 static void effKemuri2Disp(CameraId camId, void* param);
 
+/**
+ * Per-frame X and Y stretch (out of 128) of a type 0 landing puff over its first 30 frames: it spreads
+ * to 1.5 wide while flattening to 0.8 tall. Read by effKemuriMain.
+ */
 u8 touchdown_scale[30][2] = {
     {0x80, 0x80}, {0x82, 0x7F}, {0x84, 0x7E}, {0x87, 0x7D}, {0x89, 0x7C}, {0x8C, 0x7A},
     {0x8F, 0x79}, {0x92, 0x78}, {0x95, 0x77}, {0x98, 0x76}, {0x9B, 0x75}, {0x9D, 0x74},
@@ -25,6 +29,10 @@ u8 touchdown_scale[30][2] = {
     {0xBC, 0x67}, {0xBD, 0x67}, {0xBE, 0x66}, {0xBF, 0x66}, {0xBF, 0x66}, {0xC0, 0x66},
 };
 
+/**
+ * Per-frame X and Y stretch (out of 128) of the bigger type 2 puff over its first 30 frames: it billows
+ * to 2.0 wide and 1.2 tall. Read by effKemuriMain.
+ */
 u8 heavy_scale[30][2] = {
     {0x80, 0x80}, {0x84, 0x80}, {0x89, 0x81}, {0x8E, 0x82}, {0x93, 0x83}, {0x99, 0x85},
     {0x9E, 0x86}, {0xA4, 0x87}, {0xAA, 0x88}, {0xB0, 0x89}, {0xB6, 0x8A}, {0xBB, 0x8B},
@@ -105,7 +113,7 @@ EffectEntry* effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 dir) {
     return entry;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 /**
  * Spawns one smoke puff at (x, y, z) that drifts along (dx, dz) while rising and spinning.
@@ -208,7 +216,7 @@ static void effKemuriMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&pos2), 2, effKemuriDisp, effect);
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 /** Moves the puff along its direction with friction, spins it, and deletes it after 30 frames. */
 static void effKemuri2Main(EffectEntry* entry) {

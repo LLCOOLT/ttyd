@@ -35,20 +35,76 @@ typedef struct GaugeKey {
 #if VERSION <= VERSION_DEMO_US
 // the demo curve rises faster and falls off sooner; table 3 already has the retail one
 #define GAUGE_TABLE_DEMO {{0, 0.0f, 1}, {10, 1.2f, 1}, {30, 0.7f, 1}, {50, 0.0f, 0}, {-1, -1.0f, 0}}
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the demo curve:
+ * copy 0 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_0[5] = GAUGE_TABLE_DEMO;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the demo curve:
+ * copy 1 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_1[5] = GAUGE_TABLE_DEMO;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the demo curve:
+ * copy 2 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_2[5] = GAUGE_TABLE_DEMO;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 3 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_3[5] = GAUGE_TABLE;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the demo curve:
+ * copy 4 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_4[5] = GAUGE_TABLE_DEMO;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the demo curve:
+ * copy 5 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_5[5] = GAUGE_TABLE_DEMO;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the demo curve:
+ * copy 6 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_6[5] = GAUGE_TABLE_DEMO;
 #else
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 0 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_0[5] = GAUGE_TABLE;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 1 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_1[5] = GAUGE_TABLE;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 2 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_2[5] = GAUGE_TABLE;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 3 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_3[5] = GAUGE_TABLE;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 4 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_4[5] = GAUGE_TABLE;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 5 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_5[5] = GAUGE_TABLE;
+/**
+ * Gauge curve keys {frame, value, flag; -1 ends it} of the final curve:
+ * copy 6 of the 7 static tables the inlined header code emits, never read here.
+ */
 GaugeKey _table_6[5] = GAUGE_TABLE;
 #endif
 
@@ -97,7 +153,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+            if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
                 if (irand(100) >= 0) {
                     ac->setupParam = ac->params[3] / 2;
                     ac->outputParams[0] = 0;
@@ -354,7 +410,7 @@ void battleAcDelete_AirGauge(BattleWork* work) {
     work->actionCommands.acState = 1002;
 }
 
-// inlining off for actionCommandDisp, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it actionCommandDisp is inlined into battleAcDisp_AirGauge (63 -> 235 instructions)
 #pragma dont_inline on
 /**
  * Draws the level gauge (its fill eased toward the real value by 0.01 a frame) and the A button icon,

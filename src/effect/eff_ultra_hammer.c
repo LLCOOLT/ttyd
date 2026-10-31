@@ -442,6 +442,7 @@ u8 wakka_dl_0_19[] ATTRIBUTE_ALIGN(32) = {
     GX_NOP, GX_NOP, GX_NOP, GX_NOP, GX_NOP,
 };
 
+/** The ring model's 20 display lists, drawn with wakka_dl_0_size_tbl. */
 void* wakka_dl_0_tbl[] = {
     wakka_dl_0_0, // 0
     wakka_dl_0_1, // 1
@@ -465,6 +466,7 @@ void* wakka_dl_0_tbl[] = {
     wakka_dl_0_19, // 19
 };
 
+/** Display-list sizes (32-byte units) of the ring model's lists. */
 u8 wakka_dl_0_size_tbl[] = {
     1, // 0
     1, // 1

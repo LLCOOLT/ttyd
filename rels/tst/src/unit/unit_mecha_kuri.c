@@ -17,6 +17,10 @@ static EvtWord damage_event[12];
 static EvtWord attack_event[19];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the `mecha_kuri` placeholder unit: 2 HP, level 1, 1 part, with its sounds, init script
+ * and data table.
+ */
 BattleUnitKind unit_mecha_kuri = {
     194,
     "btl_un_mecha_kuri",
@@ -83,25 +87,40 @@ BattleUnitKind unit_mecha_kuri = {
     data_table,
 };
 
+/** Defence of the `mecha_kuri` placeholder unit: none, so it takes full damage from every kind of attack. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type modifiers of the `mecha_kuri` placeholder unit: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the `mecha_kuri` placeholder unit (100% is the normal chance): takes every status
+ * at the normal rate.
+ */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Pose table of the `mecha_kuri` placeholder unit: its 4 battle poses (status, hurt and action) and the
+ * animation each one plays; the idle animation is `KUR_S_1`.
+ */
 static PoseTableEntry pose_table[] = {
-    {28, "KUR_S_1"},
+    {BTL_POSE_NORMAL, "KUR_S_1"},
     {31, "KUR_S_1"},
-    {39, "KUR_D_1"},
+    {BTL_POSE_DAMAGE, "KUR_D_1"},
     {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
+/** Data table of the `mecha_kuri` placeholder unit: no events. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Body of the `mecha_kuri` placeholder unit: one targetable part, the model `c_kuribo`, with its hit box,
+ * defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_mecha_kuri", "c_kuribo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_mecha_kuri", "c_kuribo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /**

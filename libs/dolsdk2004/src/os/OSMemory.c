@@ -9,6 +9,7 @@
 
 static BOOL OnReset(BOOL final);
 
+/** Registers OnReset (priority 0x7F) with the OS so memory protection is opened up again before a reset. */
 static OSResetFunctionInfo ResetFunctionInfo = {
     OnReset,
     0x7F,

@@ -24,6 +24,7 @@
 #include "evt/evt_story.h"
 #include <dolphin/pad.h>
 
+/** White colour, kept from the original but never used. */
 const GXColor yuuranking_unused_color = {0xFF, 0xFF, 0xFF, 0xFF};
 
 #if VERSION >= VERSION_US

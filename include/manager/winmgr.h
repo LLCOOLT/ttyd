@@ -25,6 +25,14 @@ struct WinMgrDesc {
     void (*disp)(WinMgrEntry* entry); // 0x24
 };
 
+// WinMgrEntry.flags
+enum WinMgrEntryFlags {
+    WINMGR_ENTRY_IN_USE = 0x1,      // the window slot is taken (winMgrEntry)
+    WINMGR_ENTRY_VISIBLE = 0x2,     // open or animating: winMgrMain queues its drawing
+    WINMGR_ENTRY_ANIMATING = 0x4,   // the open or close animation is running (winMgrAction)
+    WINMGR_ENTRY_AUTO_DELETE = 0x8, // winMgrCloseAutoDelete: free the slot once closed
+};
+
 struct WinMgrEntry {
     s32 flags;               // 0x0
     s32 state;               // 0x4
@@ -50,8 +58,16 @@ typedef struct WinMgrWork {
     WinMgrEntry* entries; // 0x4
 } WinMgrWork;
 
+// WinMgrSelectItem.flags
+enum WinMgrSelectItemFlags {
+    WINMGR_ITEM_GRAY = 0x1,     // drawn grayed out (already used, already upgraded, ...)
+    WINMGR_ITEM_DISABLED = 0x2, // A only plays the error sound; no price or cost is drawn
+    WINMGR_ITEM_OVER_CAP = 0x4, // retail level-up menu: the stat would go over its cap
+    WINMGR_ITEM_EQUIPPED = 0x8, // US/PAL badge lists: the badge is equipped (drawn with a mark)
+};
+
 typedef struct WinMgrSelectItem {
-    u16 flags; // 0x0
+    u16 flags; // 0x0, WinMgrSelectItemFlags
     u16 id;    // 0x2
 } WinMgrSelectItem;
 

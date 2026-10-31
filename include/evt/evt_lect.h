@@ -1,7 +1,6 @@
-#pragma once
-
 // Types shared by the per-area lecture (tutorial) scripts, rels/<area>/src/event/evt_lect_<area>.c.
 // Each copy keeps its own two on-screen button icons, `static LectButton lbtn[2]`.
+#pragma once
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>

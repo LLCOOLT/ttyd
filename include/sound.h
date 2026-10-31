@@ -1,3 +1,4 @@
+// sound.h: the game's sound layer over MusyX: music (SoundSong*), sound effects (SoundEfx*), streamed audio and sample banks.
 #pragma once
 
 /* SLIB File Structure:
@@ -38,8 +39,14 @@ typedef struct StreamHeader {
     SND_ADPCMSTREAM_INFO coef1; // 0xBC, type 2: channel 1 DSP header (at 0xA0) coefficients
 } StreamHeader;
 
+// SoundGroup.flags.
+enum SoundGroupFlags {
+    SOUND_GROUP_FLAG_IN_DATA = 0x1,    // arrfile points into the loaded sound data: SoundDropData frees only the group
+    SOUND_GROUP_FLAG_SONG_ENDED = 0x2, // SoundMain: the group's song stopped on its own (nothing reads it)
+};
+
 typedef struct SoundGroup {
-    u16 flags;               // 0x0
+    u16 flags;               // 0x0, SoundGroupFlags
     u16 index;               // 0x2, position in the group list (SoundSongGetGroup lookup key)
     SND_GROUPID groupId;     // 0x4
     SND_SONGID songId;       // 0x6
@@ -54,8 +61,14 @@ typedef struct SoundSong {
     u32 mask;          // 0xC
 } SoundSong;
 
+// SoundEffect.flags (an effect channel).
+enum SoundEfxChannelFlags {
+    SOUND_EFX_FLAG_USED = 0x1,     // SoundEfxPlayEx started an effect on the channel
+    SOUND_EFX_FLAG_EMITTER = 0x10, // a 3D effect played through its emitter (nothing in C sets it)
+};
+
 typedef struct SoundEffect {
-    u16 flags;              // 0x0
+    u16 flags;              // 0x0, SoundEfxChannelFlags
     u16 priority;           // 0x2, SoundEfxPlayEx priority; a full table steals the first slot with priority <= the new one
     u16 vol;                // 0x4
     u16 pan;                // 0x6
@@ -70,8 +83,17 @@ typedef struct SoundEffect {
     SND_FVECTOR dir;        // 0x7C
 } SoundEffect;
 
+// SoundDVD.flags. Nothing in C starts DVD audio, so only the pause bit is ever set (by a fade to pause).
+enum SoundDVDFlags {
+    SOUND_DVD_FLAG_PLAYING = 0x1,        // the disc audio stream is playing
+    SOUND_DVD_FLAG_PAUSED = 0x2,         // stopped by a fade to pause, samples keeps the position
+    SOUND_DVD_FLAG_FADE_IN = 0x10,       // SoundDVDMain raises vol to volTarget
+    SOUND_DVD_FLAG_FADE_OUT = 0x20,      // SoundDVDMain lowers vol and stops at silence
+    SOUND_DVD_FLAG_FADE_TO_PAUSE = 0x40, // SoundDVDMain lowers vol and pauses at silence
+};
+
 typedef struct SoundDVD {
-    u16 flags;               // 0x0
+    u16 flags;               // 0x0, SoundDVDFlags
     u16 pan;                 // 0x2, SoundDVDSetPanCh
     f32 volTarget;           // 0x4, fade-in stops here
     f32 vol;                 // 0x8, current volume, split into left/right by pan
@@ -107,8 +129,27 @@ typedef struct SoundStreamEntry {
     SND_ADPCMSTREAM_INFO info; // 0x68
 } SoundStreamEntry;
 
+// SoundStream.flags, the state of a streamed (.stm) channel; SoundSSCheck returns them.
+enum SoundStreamFlags {
+    SOUND_SS_FLAG_USED = 0x1,           // SoundSSPlayChEx took the channel
+    SOUND_SS_FLAG_PAUSED = 0x2,         // SoundSSMuteOn: silent output, no fades or disc reads
+    SOUND_SS_FLAG_STOP_REQ = 0x4,       // stop at the next SoundSSMain (end of a non-looping stream; the demo's deferred stop)
+    SOUND_SS_FLAG_ACTIVE = 0x8,         // the MusyX streams are allocated and running
+    SOUND_SS_FLAG_FADE_IN = 0x10,       // SoundSSMain raises curVol to vol
+    SOUND_SS_FLAG_FADE_OUT = 0x20,      // SoundSSFadeoutCh: SoundSSMain lowers curVol and stops at silence
+    SOUND_SS_FLAG_FADE_TO_PAUSE = 0x40, // SoundSSMain lowers curVol and pauses at silence (nothing in C sets it)
+    SOUND_SS_FLAG_DPCM = 0x80,          // header type 1: decoded by ssDecodeDPCM
+    SOUND_SS_FLAG_ADPCM = 0x100,        // header type 2: DSP ADPCM handed to MusyX with its coefficients
+    SOUND_SS_FLAG_LOOP = 0x200,         // the header has a loop start: the reads wrap instead of ending
+    SOUND_SS_FLAG_ARAM = 0x400,         // the data is cached in an ARAM slot (slot) rather than read from disc as it plays
+    SOUND_SS_FLAG_READING_0 = 0x1000,   // a disc read for channel 0 is in flight
+    SOUND_SS_FLAG_READING_1 = 0x2000,   // a disc read for channel 1 is in flight
+    SOUND_SS_FLAG_END_LOADED = 0x4000,  // the last block of a non-looping stream is loaded: no more reads to wait for
+    SOUND_SS_FLAG_SILENT = 0x8000,      // Unknown: _sscallback outputs silence while set; nothing in C sets it
+};
+
 typedef struct SoundStream {
-    u16 flags;                   // 0x0
+    u16 flags;                   // 0x0, SoundStreamFlags
     u16 slot;                    // 0x2, aram slot
     u16 dataOffset;              // 0x4
     u16 pan;                     // 0x6

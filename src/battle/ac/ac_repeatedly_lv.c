@@ -170,7 +170,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if (!((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
+            if (!((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
                 if (p->maxMask != 0 && !BattlePadCheckNow(p->maxMask) && !autoCmd) {
                     p->s22++;
                     if (p->s22 < 150) {
@@ -187,8 +187,8 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
             ac->outputParams[0] = 1;
             ac->acState = 1000;
         case 1000:
-            if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
-                if (ac->setupFlags & 2) {
+            if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+                if (ac->setupFlags & AC_SETUP_FLAG_RETRIES) {
                     ac->setupParam--;
                     if (ac->setupParam >= 0) {
                         break;
@@ -374,7 +374,7 @@ void battleAcDelete_RepeatedlyLv(BattleWork* work) {
     BattleAcGaugeSeDelete();
 }
 
-// inlining off for actionCommandDisp, as in the original (the object differs without it)
+// FAKE: inlining off from here to the end of the file (FAKES.md); without it 1 function changes length, e.g. battleAcMain_RepeatedlyLv 366 -> 368 instructions
 #pragma dont_inline on
 /**
  * Draws the flashing input icons (two for the alternating inputs),

@@ -6,6 +6,9 @@
 
 #include "__syn.h"
 
+/**
+ * Attenuation for each MIDI volume or velocity value 0-127, in tenths of a dB as 16.16 fixed point (0: -96 dB).
+ */
 s32 __SYNVolumeAttenuation[128] = {
     0xFC400000,
     0xFCB67A80,
@@ -137,6 +140,7 @@ s32 __SYNVolumeAttenuation[128] = {
     0x00000000
 };
 
+/** Attenuation curve of the volume envelope's attack, in 100 steps, in the same units. */
 s32 __SYNAttackAttnTable[100] = {
     0xFC400000,
     0xFE70DF7B,

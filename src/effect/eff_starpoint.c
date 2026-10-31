@@ -73,12 +73,13 @@ static inline f32 _cosf(f32 x) {
     f32 x2;
 
     if (x <= PI) {
+        // FAKE: dead guard, no code (COLOURING W); its float temps keep the hoisted 2.0 deferred (f31)
         {
             s32 gz = 0;
             if (gz != 0) {
                 a = (a / x) / (x / a);
             }
-        } // FAKE: dead guard, no code (COLOURING W); its float temps keep the hoisted 2.0 deferred (f31)
+        }
         if (x <= HALF_PI) {
             x2 = x * x;
             a = a * x2 - b;
@@ -105,9 +106,9 @@ static inline f32 _cosf(f32 x) {
     return a;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-// lifetimes optimisation off for effStarPointEntry: the original register allocation and scheduling need it
+// FAKE: lifetimes optimisation off for effStarPointEntry: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 /**
  * Spawns `count` star icons at (x, y, z), each launched at a random horizontal angle

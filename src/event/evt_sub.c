@@ -81,10 +81,13 @@ typedef struct SplineWork {
 #if VERSION >= VERSION_JP
 // coin_fmt is only used by a function the linker stripped; force_active keeps the string in .rodata
 #pragma force_active on
+/** Format of three floats for a coin-position helper the linker stripped; nothing reads it. */
+// FAKE: force_active keeps a stripped function's string in .rodata; nothing reads it
 static const char coin_fmt[] = "%f%f%f";
 #pragma force_active reset
 #endif
 
+/** Black text colour of the "You got N coins!" line in the coin reward window (coingetDisp). */
 static const GXColor coin_black = {0x00, 0x00, 0x00, 0xFF};
 
 static USER_FUNC(bgm_start_wait);
@@ -126,6 +129,10 @@ EVT_BEGIN(evt_sub_stopwatch)
 EVT_END()
 #endif
 
+/**
+ * Sway of a hammered tree, one row per frame for 25 frames: the trunk's tilt in degrees and the leaves' two
+ * offsets, swinging out and settling back to rest. tree_evt reads it.
+ */
 s32 tree_data[] = {
     FLOAT(0.0f), FLOAT(0.0f), FLOAT(0.0f), FLOAT(-0.535f), FLOAT(1.447f), FLOAT(1.624f), FLOAT(-1.171f), FLOAT(3.175f),
     FLOAT(3.567f), FLOAT(-1.605f), FLOAT(4.339f), FLOAT(4.872f), FLOAT(-1.534f), FLOAT(4.091f), FLOAT(4.581f), FLOAT(-0.686f),
@@ -141,8 +148,8 @@ s32 tree_data[] = {
 
 #if VERSION >= VERSION_JP
 /**
- * Placeholder script that just waits a frame forever; scripts run it to have an event to time against.
- * Guess: the stopwatch for evt_sub_get_stopwatch.
+ * Stopwatch script that just waits a frame forever: scripts spawn it with SPAWN_EVENT_GET_ID
+ * and read how long it has run with evt_sub_get_stopwatch (Peach's timed tasks in aji_06, aji_16 and aji_17).
  */
 EVT_BEGIN(evt_sub_stopwatch)
     LOOP(0)
@@ -151,11 +158,19 @@ EVT_BEGIN(evt_sub_stopwatch)
     RETURN
 EVT_END()
 
+/**
+ * Sideways sway of a checked bush, one offset per frame for 12 frames, out and back to rest;
+ * kusa_evt reads it.
+ */
 static s32 kusa_data[] = {
     FLOAT(0.0f), FLOAT(-1.874f), FLOAT(-2.999f), FLOAT(-2.22f), FLOAT(-0.776f), FLOAT(0.0f), FLOAT(-0.776f), FLOAT(-2.22f),
     FLOAT(-2.999f), FLOAT(-2.443f), FLOAT(-1.22f), FLOAT(0.0f),
 };
 
+/**
+ * The pale yellow "You got N coins!" window that evt_sub_get_coin opens for coin rewards;
+ * coingetDisp draws it.
+ */
 WinMgrDesc coinget_window_desc[] = {
     {0, 0, 8, -175, 120, 350, 42, {0xE1, 0xD7, 0x9B, 0xFF}, NULL, coingetDisp},
 };
@@ -357,6 +372,7 @@ EVT_BEGIN(evt_sub_tree_access_entry)
 EVT_END()
 
 #if VERSION <= VERSION_DEMO_US
+/** Demo position of kusa_data: the bush sway offsets read by kusa_evt. */
 static s32 kusa_data[] = {
     FLOAT(0.0f), FLOAT(-1.874f), FLOAT(-2.999f), FLOAT(-2.22f), FLOAT(-0.776f), FLOAT(0.0f), FLOAT(-0.776f), FLOAT(-2.22f),
     FLOAT(-2.999f), FLOAT(-2.443f), FLOAT(-1.22f), FLOAT(0.0f),
@@ -444,6 +460,7 @@ EVT_BEGIN(evt_sub_kusa_access_entry)
 EVT_END()
 
 #if VERSION <= VERSION_DEMO_US
+/** Demo position of coinget_window_desc: the "You got N coins!" window of evt_sub_get_coin. */
 WinMgrDesc coinget_window_desc[] = {
     {0, 0, 8, -175, 120, 350, 42, {0xE1, 0xD7, 0x9B, 0xFF}, NULL, coingetDisp},
 };
@@ -460,6 +477,7 @@ WinMgrDesc coinget_window_desc[] = {
  * US and PAL time the spin in milliseconds and scale its steps by the frame rate.
  */
 EVT_BEGIN(evt_sub_starstone)
+    // Mario stops and the star goes into his pouch; the Doopliss scene (-1) adds nothing.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     SWITCH(LW(0))
@@ -486,6 +504,7 @@ EVT_BEGIN(evt_sub_starstone)
         CALL(evt_pouch_add_item, ITEM_CRYSTAL_STAR, LW(2))
         CASE_EQUAL(-1)
     END_SWITCH
+    // Remember which star this is for the rest of the scene.
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LF(1), 1)
     END_IF
@@ -510,6 +529,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LW(0), -1)
         SET_VALUE(LF(8), 1)
     END_IF
+    // The fanfare lasts at least 9.7 seconds; the screen flashes white with a chime.
     CALL(set_stop, 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(9700)
@@ -518,6 +538,8 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_STARSTONE_WHITEOUT1"), 0)
     CALL(evt_fade_entry, FADE_OUT_BLACK, 300, 255, 255, 255)
     CALL(evt_fade_end_wait)
+    // In the flash the star appears beside Mario (or Doopliss posing as him), he strikes a pose and the
+    // Crystal Star fanfare starts.
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_npc_get_position, STRING("にせマリオ"), LW(2), LW(3), LW(4))
     ELSE
@@ -537,6 +559,8 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_GET_STARSTONE1"))
     CALL(bgm_start_wait)
+    // Fade back in; the camera closes in while the star spirals up around him, spinning,
+    // until it hovers overhead.
     CALL(evt_fade_entry, FADE_IN_BLACK, 300, 255, 255, 255)
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_cam3d_evt_set_npc_rel, STRING("にせマリオ"), 0, 50, 397, 0, 70, 25, 2000, 11)
@@ -579,6 +603,8 @@ EVT_BEGIN(evt_sub_starstone)
     END_IF
     ADD(LW(3), 48)
     CALL(evt_item_set_position, LW(7), LW(2), LW(3), LW(4))
+    // Mario cheers and holds the star high in a burst of light, and the chapter's "You got a Crystal Star!"
+    // message shows.
     IF_INT_NOT_EQUAL(LF(8), 1)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAPPY1"), LW(0), LW(1), LW(2), 0)
@@ -618,6 +644,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_msg_print, 0, STRING("stg4_jin_10_02"), 0, 0)
     END_IF
+    // Wait out the fanfare, then the stage-clear jingle plays and the light fades.
     LOOP(0)
         CALL(get_stop, LW(0))
         IF_INT_EQUAL(LW(0), 1)
@@ -631,6 +658,8 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_eff_softdelete, STRING("sub_hikari"))
     CALL(stone_bg_open, LW(7))
+    // The curtain comes down (the map's own star object is hidden behind it),
+    // STAGE CLEAR appears and Mario cheers.
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LF(1), 1)
             SET_VALUE(LW(0), STRING("gon_11_S"))
@@ -669,6 +698,7 @@ EVT_BEGIN(evt_sub_starstone)
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAPPY2"), LW(0), LW(1), LW(2), 0)
     END_IF
     WAIT_MS(2000)
+    // The curtain closes and the chapter's diary page sums up what happened.
     CALL(evt_fade_entry, FADE_CURTAIN_CENTER_A2_3D, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_item_delete, LW(7))
@@ -697,6 +727,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_msg_print, 0, STRING("stg4_jin_10_03"), 0, 0)
     END_IF
+    // Offer to save; the save kind tells which chapter was just finished.
     WAIT_MS(1000)
     IF_INT_EQUAL(LF(1), 1)
         SET_VALUE(LW(0), 1)
@@ -724,6 +755,8 @@ EVT_BEGIN(evt_sub_starstone)
     END_IF
     SET_VALUE(LF(10), 0)
     CALL_CHILD(evt_memcard_save_wrapper)
+    // Move on: Peach's interlude (aji_10) after chapters 1-3, then usu_00, muj_12, pik_03 and pik_01 after
+    // chapters 4-7. The Doopliss scene instead fades back in where it is.
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(evt_party_init_camid, 1)
@@ -805,6 +838,7 @@ EVT_END()
  * it also leaves the ambient sound and, in the Doopliss case, the music running.
  */
 EVT_BEGIN(evt_sub_starstone)
+    // Mario stops and the star goes into his pouch; the Doopliss scene (-1) adds nothing.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     SWITCH(LW(0))
@@ -831,6 +865,7 @@ EVT_BEGIN(evt_sub_starstone)
         CALL(evt_pouch_add_item, ITEM_CRYSTAL_STAR, LW(2))
         CASE_EQUAL(-1)
     END_SWITCH
+    // Remember which star this is for the rest of the scene.
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LF(1), 1)
     END_IF
@@ -855,6 +890,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LW(0), -1)
         SET_VALUE(LF(8), 1)
     END_IF
+    // The fanfare lasts at least 9.7 seconds; the screen flashes white with a chime.
     CALL(set_stop, 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(9700)
@@ -863,6 +899,8 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_STARSTONE_WHITEOUT1"), 0)
     CALL(evt_fade_entry, FADE_OUT_BLACK, 300, 255, 255, 255)
     CALL(evt_fade_end_wait)
+    // In the flash the star appears beside Mario (or Doopliss posing as him), he strikes a pose and the
+    // Crystal Star fanfare starts.
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_npc_get_position, STRING("にせマリオ"), LW(2), LW(3), LW(4))
     ELSE
@@ -879,6 +917,8 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 0)
         CALL(evt_mario_set_pose, STRING("M_N_3"))
     END_IF
+    // Fade back in; the camera closes in while the star spirals up around him, spinning,
+    // until it hovers overhead.
     CALL(evt_fade_entry, FADE_IN_BLACK, 300, 255, 255, 255)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_GET_STARSTONE1"))
@@ -911,6 +951,8 @@ EVT_BEGIN(evt_sub_starstone)
         ADD_FLOAT(LW(9), FLOAT(0.2822265625f))
         WAIT_FRAMES(1)
     END_LOOP
+    // Mario cheers and holds the star high in a burst of light, and the chapter's "You got a Crystal Star!"
+    // message shows.
     IF_INT_NOT_EQUAL(LF(8), 1)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAPPY1"), LW(0), LW(1), LW(2), 0)
@@ -950,6 +992,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_msg_print, 0, STRING("stg4_jin_10_02"), 0, 0)
     END_IF
+    // Wait out the fanfare, then the stage-clear jingle plays and the light fades.
     LOOP(0)
         CALL(get_stop, LW(0))
         IF_INT_EQUAL(LW(0), 1)
@@ -962,6 +1005,8 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STAGE_CLEAR1"))
     CALL(evt_eff_softdelete, STRING("sub_hikari"))
     CALL(stone_bg_open, LW(7))
+    // The curtain comes down (the map's own star object is hidden behind it),
+    // STAGE CLEAR appears and Mario cheers.
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LF(1), 1)
             SET_VALUE(LW(0), STRING("gon_11_S"))
@@ -1000,6 +1045,7 @@ EVT_BEGIN(evt_sub_starstone)
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAPPY2"), LW(0), LW(1), LW(2), 0)
     END_IF
     WAIT_MS(2000)
+    // The curtain closes and the chapter's diary page sums up what happened.
     CALL(evt_fade_entry, FADE_CURTAIN_CENTER_A2_3D, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_item_delete, LW(7))
@@ -1028,6 +1074,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_msg_print, 0, STRING("stg4_jin_10_03"), 0, 0)
     END_IF
+    // Offer to save; the save kind tells which chapter was just finished.
     WAIT_MS(1000)
     IF_INT_EQUAL(LF(1), 1)
         SET_VALUE(LW(0), 1)
@@ -1055,6 +1102,8 @@ EVT_BEGIN(evt_sub_starstone)
     END_IF
     SET_VALUE(LF(10), 0)
     CALL_CHILD(evt_memcard_save)
+    // Move on: Peach's interlude (aji_10) after chapters 1-3, then usu_00, muj_12, pik_03 and pik_01 after
+    // chapters 4-7. The Doopliss scene instead fades back in where it is.
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(evt_party_init_camid, 1)
@@ -1132,6 +1181,7 @@ EVT_END()
  * and the plain evt_memcard_save prompt.
  */
 EVT_BEGIN(evt_sub_starstone)
+    // Mario stops and the star goes into his pouch; the Doopliss scene (-1) adds nothing.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     SWITCH(LW(0))
@@ -1158,6 +1208,7 @@ EVT_BEGIN(evt_sub_starstone)
         CALL(evt_pouch_add_item, ITEM_CRYSTAL_STAR, LW(2))
         CASE_EQUAL(-1)
     END_SWITCH
+    // Remember which star this is for the rest of the scene.
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LF(1), 1)
     END_IF
@@ -1182,6 +1233,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LW(0), -1)
         SET_VALUE(LF(8), 1)
     END_IF
+    // The fanfare lasts at least 9.7 seconds; the screen flashes white with a chime.
     CALL(set_stop, 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(9700)
@@ -1190,6 +1242,8 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_STARSTONE_WHITEOUT1"), 0)
     CALL(evt_fade_entry, FADE_OUT_BLACK, 300, 255, 255, 255)
     CALL(evt_fade_end_wait)
+    // In the flash the star appears beside Mario (or Doopliss posing as him), he strikes a pose and the
+    // Crystal Star fanfare starts.
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_npc_get_position, STRING("にせマリオ"), LW(2), LW(3), LW(4))
     ELSE
@@ -1206,6 +1260,8 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 0)
         CALL(evt_mario_set_pose, STRING("M_N_3"))
     END_IF
+    // Fade back in; the camera closes in while the star spirals up around him, spinning,
+    // until it hovers overhead.
     CALL(evt_fade_entry, FADE_IN_BLACK, 300, 255, 255, 255)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_GET_STARSTONE1"))
@@ -1238,6 +1294,8 @@ EVT_BEGIN(evt_sub_starstone)
         ADD_FLOAT(LW(9), FLOAT(0.28222656f))
         WAIT_FRAMES(1)
     END_LOOP
+    // Mario cheers and holds the star high in a burst of light, and the chapter's "You got a Crystal Star!"
+    // message shows.
     IF_INT_NOT_EQUAL(LF(8), 1)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAPPY1"), LW(0), LW(1), LW(2), 0)
@@ -1277,6 +1335,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_msg_print, 0, STRING("stg4_jin_10_02"), 0, 0)
     END_IF
+    // Wait out the fanfare, then the stage-clear jingle plays and the light fades.
     LOOP(0)
         CALL(get_stop, LW(0))
         IF_INT_EQUAL(LW(0), 1)
@@ -1290,6 +1349,8 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_eff_softdelete, STRING("sub_hikari"))
     CALL(stone_bg_open, LW(7))
+    // The curtain comes down (the map's own star object is hidden behind it),
+    // STAGE CLEAR appears and Mario cheers.
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LF(1), 1)
             SET_VALUE(LW(0), STRING("gon_11_S"))
@@ -1328,6 +1389,7 @@ EVT_BEGIN(evt_sub_starstone)
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAPPY2"), LW(0), LW(1), LW(2), 0)
     END_IF
     WAIT_MS(2000)
+    // The curtain closes and the chapter's diary page sums up what happened.
     CALL(evt_fade_entry, FADE_CURTAIN_CENTER_A2_3D, 0, 0, 0, 0)
     CALL(evt_fade_end_wait)
     CALL(evt_item_delete, LW(7))
@@ -1356,6 +1418,7 @@ EVT_BEGIN(evt_sub_starstone)
     IF_INT_EQUAL(LF(8), 1)
         CALL(evt_msg_print, 0, STRING("stg4_jin_10_03"), 0, 0)
     END_IF
+    // Offer to save; the save kind tells which chapter was just finished.
     WAIT_MS(1000)
     IF_INT_EQUAL(LF(1), 1)
         SET_VALUE(LW(0), 1)
@@ -1383,6 +1446,8 @@ EVT_BEGIN(evt_sub_starstone)
     END_IF
     SET_VALUE(LF(10), 0)
     CALL_CHILD(evt_memcard_save)
+    // Move on: Peach's interlude (aji_10) after chapters 1-3, then usu_00, muj_12, pik_03 and pik_01 after
+    // chapters 4-7. The Doopliss scene instead fades back in where it is.
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(evt_party_init_camid, 1)
@@ -2387,8 +2452,8 @@ USER_FUNC(evt_sub_random) {
 }
 
 /**
- * Returns in args[1] the milliseconds held in the timer that args[0]'s pointer id points to,
- * capped at ten minutes. Guess: the timer kept by evt_sub_stopwatch.
+ * Returns in args[1] how many milliseconds event args[0] has run (its EventEntry.lifetime),
+ * capped at ten minutes; used with an evt_sub_stopwatch event.
  */
 USER_FUNC(evt_sub_get_stopwatch) {
     EvtWord* args = event->args;
@@ -2801,12 +2866,12 @@ USER_FUNC(evt_sub_get_coin) {
             iconEntry2D("iraiCoin", ICON_18B);
             getScreenPoint(&b, &scr);
             iconSetPos("iraiCoin", scr.x, scr.y, scr.z);
-            iconFlagOn("iraiCoin", 2);
+            iconFlagOn("iraiCoin", ICON_FLAG_HIDDEN);
 #else
             iconEntry("iraiCoin", ICON_18B);
             iconSetPos("iraiCoin", b.x, b.y, b.z);
-            iconFlagOn("iraiCoin", 0x102);
-            ((ItemGetWork*)eff->userdata)->camera = 5;
+            iconFlagOn("iraiCoin", ICON_FLAG_EFFECT_A | ICON_FLAG_HIDDEN);
+            ((ItemGetWork*)eff->userdata)->camera = CAMERA_3D_EFFECTA;
 #endif
             marioChgGetItemMotion();
             event->userdata3 = winMgrEntry(coinget_window_desc);
@@ -2822,7 +2887,7 @@ USER_FUNC(evt_sub_get_coin) {
             return EVT_RETURN_BLOCK;
         case 1:
             if ((s32)(((u32)gp->renderTime - (u32)event->savedTime) / (OS_TIMER_CLOCK / 1000)) > event->userdata[2]) {
-                iconFlagOff("iraiCoin", 2);
+                iconFlagOff("iraiCoin", ICON_FLAG_HIDDEN);
                 work[1] = 1;
                 event->userdata[2] = 500;
                 event->savedTime = gp->renderTime;
@@ -2868,7 +2933,7 @@ static USER_FUNC(stone_ry) {
     char* name = (char*)evtGetValue(event, args[0]);
     s32 ang = evtGetValue(event, args[1]);
     EffectEntry* item = itemNameToPtr(name)->effect;
-    ((EffStarStoneWork*)item->userdata)->flags &= ~4;
+    ((EffStarStoneWork*)item->userdata)->flags &= ~STARSTONE_FLAG_SHINE_SFX;
     ((EffStarStoneWork*)item->userdata)->rotY = ang % 360;
     return EVT_RETURN_DONE;
 }
@@ -2886,7 +2951,7 @@ static USER_FUNC(stone_bg) {
     cam = camGetPtr(CAMERA_2D);
     cam->letterBoxCamId = 5;
     eff = effNameToPtr("sub_bg");
-    ((ItemGetWork*)eff->userdata)->camera = 5;
+    ((ItemGetWork*)eff->userdata)->camera = CAMERA_3D_EFFECTA;
     item = (u8*)itemNameToPtr(name);
     ((EffStarStoneWork*)((ItemEntry*)item)->effect->userdata)->cam = 5;
     if (npcNameToPtr_NoAssert("\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49") != NULL && evtGetValue(event, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_15_DOOPLISS_BATTLE_2) {
@@ -3014,8 +3079,10 @@ USER_FUNC(evt_sub_check_intersect) {
         }                                                          \
     }
 /**
- * Guess: Trouble Center follow-up mail ("irai" is request).
- * For six requests that are taken but whose mail has not been sent,
+ * Trouble Center follow-up mail ("irai" is request): the thank-you letters irai_af_mail_00 to 05
+ * (Koopook, Pine T. Jr., Jolene, Bub-ulber, Eve, Gob; mails 37-42).
+ * For the six troubles that send one (#7, #12, #13, #15, #20, #26: GSWF_TROUBLE_*_SOLVED) and are solved but
+ * whose mail has not gone out (GSWF 23-28),
  * checks whether two hours have passed since the time stamp saved for them; args[1] returns 1 if one is due.
  * With args[0] nonzero it also marks it sent and puts the mail in the pouch.
  */

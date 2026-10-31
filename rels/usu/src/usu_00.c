@@ -143,8 +143,8 @@ static void kpa_stg5_009_7_cb(s32 type, smartEntry* smart) {
 }
 
 /**
- * Script helper: gives each of the five Boo NPCs in booboo_name[] the "paper, no ambient light" material flag,
- * so the ghosts are drawn without scene ambient light.
+ * Script helper: gives each of the five pig NPCs in booboo_name[] (pig villagers A, D, E, K and the pig
+ * Mayor) the "paper, no ambient light" material flag, so their models are drawn without scene ambient light.
  */
 static USER_FUNC(booboo_main) {
     u32 i;
@@ -450,6 +450,7 @@ EVT_BEGIN(village_chief_pig_init)
     RETURN
 EVT_END()
 
+/** Item menu choices in the Mayor's trouble 17: only the Routing Slip, which Mario hands over to finish it. */
 s32 iri_15_item_tbl[] = {
     ITEM_ROUTING_SLIP, -1,
 };
@@ -602,9 +603,11 @@ EVT_BEGIN(chief_mario_talk)
 EVT_END()
 
 /**
- * Guess: init script of Vivian in Twilight Town:
- * enables move/talk animation and, while Doopliss waits for the swap (STORY_STG4_11_02 to STORY_STG4_12_01),
- * switches her to the crying tribe "ビビアンべそ"; from STORY_STG4_12_VIVIAN on she is repositioned for the party.
+ * Init script of Vivian in Twilight Town: enables her move and talk animations;
+ * from STORY_STG4_11_02_WAITING_DOOPLISS to STORY_STG4_12_01_SUPERBOMBBOMB_FOUND she uses the tearful tribe
+ * "ビビアンべそ" with its stand and talk poses (PTR_S_3, PTR_T_3), stands at (-71, 0, 329) facing right,
+ * and from STORY_STG4_12_VIVIAN on also wanders (urouro_move)
+ * while she searches for the lost Super Bombomb (her line stg4_usu_109).
  */
 static EVT_BEGIN(vivian_init)
     CALL(evt_npc_flag_onoff, 1, STRING("ビビアン"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
@@ -622,6 +625,7 @@ static EVT_BEGIN(vivian_init)
     RETURN
 EVT_END()
 
+/** Item menu choices when Mario talks to Vivian while she searches: only the Super Bombomb. */
 static s32 key_tbl[] = {
     ITEM_SUPERBOMBOMB, -1,
 };
@@ -708,8 +712,8 @@ EVT_BEGIN(crow_e_init)
 EVT_END()
 
 /**
- * Guess: regular behavior of the villagers: wanders around their start position (50 units across, 30 deep) using
- * the shared urouro movement helpers.
+ * Wandering script of Villagers C and E, the pig villagers A, D and E, and Vivian while she searches:
+ * from where it stands, the NPC wanders within 50 units of that spot at speed 30 with the shared urouro helpers.
  */
 static EVT_BEGIN(urouro_move)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_NO_WALL_HIT)
@@ -719,6 +723,10 @@ static EVT_BEGIN(urouro_move)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of this map: the human villagers A to E and K, the Mayor, Vivian and the innkeeper,
+ * their pig forms (pig villagers A, D, E, K and the pig Mayor) and the five crows A to E on the rooftops.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "村人Ａ", // name
@@ -944,6 +952,7 @@ static NpcSetupInfo npcEnt[] = {
  * the Mayor explains and Mario's party reacts; the town gate rotates open at the end.
  */
 EVT_BEGIN(usu00_stage4_coming_event)
+    // The camera drops from the sky as Mario and the party arrive by pipe; the partner looks around.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_cam_letter_box_onoff, 1, 0)
@@ -978,6 +987,7 @@ EVT_BEGIN(usu00_stage4_coming_event)
     WAIT_MS(300)
     CALL(evt_party_stop, 0)
     WAIT_MS(300)
+    // A villager greets the "adventurers" from outside and starts to tell of the town's trouble.
     CALL(evt_msg_print_party, STRING("stg4_usu_00_0"))
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg4_usu_00"), 0, STRING("村人Ａ"))
@@ -1004,6 +1014,7 @@ EVT_BEGIN(usu00_stage4_coming_event)
     CALL(evt_msg_print_party, STRING("stg4_usu_03"))
     WAIT_MS(200)
     CALL(evt_msg_print, 0, STRING("stg4_usu_04"), 0, STRING("村人Ａ"))
+    // The steeple bell rings and the villager turns into a pig before Mario's eyes.
     WAIT_MS(500)
     CALL(evt_snd_sfxon, STRING("SFX_STG4_TEMPLE_BELL1"), 0)
     WAIT_MS(500)
@@ -1048,6 +1059,7 @@ EVT_BEGIN(usu00_stage4_coming_event)
     CALL(evt_npc_flag_onoff, 1, STRING("ブタ村人Ｄ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("ブタ村人Ｋ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_msg_print_party, STRING("stg4_usu_07"))
+    // The Mayor (Dour) appears, introduces himself and leads them to his house.
     WAIT_MS(1000)
     CALL(evt_npc_get_position, STRING("村長"), LW(0), LW(1), LW(2))
     CALL(evt_npc_set_position, STRING("村長"), -40, 0, 184)
@@ -1090,6 +1102,7 @@ EVT_BEGIN(usu00_stage4_coming_event)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+    // Mario follows the Mayor to his front door while the chapter title card plays.
     WAIT_MS(600)
     CALL(evt_party_set_dir, 0, 270, 300)
     WAIT_MS(500)
@@ -1110,6 +1123,7 @@ EVT_BEGIN(usu00_stage4_coming_event)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, -79, -180, FLOAT(60.0f))
     CALL(evt_party_run, 0)
+    // Inside, the Mayor tells of the curse: the Creepy Steeple bell turns a villager into a pig with each ring.
     SET_VALUE(LW(0), PTR(&door_2))
     SET_VALUE(LW(15), 0)
     CALL_CHILD(evt_door_open)
@@ -1136,6 +1150,8 @@ EVT_BEGIN(usu00_stage4_coming_event)
     CALL(evt_mario_set_pose, STRING("M_N_5B"))
     WAIT_MS(600)
     CALL(evt_msg_print, 0, STRING("stg4_usu_15"), 0, STRING("村長"))
+    // The partner asks about the Crystal Star; the Mayor tells of a red star stone in the steeple and is horrified
+    // that they mean to go there.
     WAIT_MS(300)
     CALL(evt_party_move_pos2, 0, -60, -305, FLOAT(60.0f))
     WAIT_MS(300)
@@ -1148,6 +1164,7 @@ EVT_BEGIN(usu00_stage4_coming_event)
     CALL(evt_msg_print_party, STRING("stg4_usu_18"))
     WAIT_MS(250)
     CALL(evt_msg_print, 0, STRING("stg4_usu_19"), 0, STRING("村長"))
+    // The scene ends and the story becomes STORY_STG4_00_WELCOME_TO_STAGE_4.
     CALL(evt_cam3d_evt_off, 1000, 11)
     WAIT_MS(1000)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_00_WELCOME_TO_STAGE_4)
@@ -1178,8 +1195,12 @@ EVT_BEGIN(usu00_3witch_init)
 EVT_END()
 
 /**
- * Guess: cutscene: Beldam, Marilyn and Vivian argue in Twilight Town (messages stg4_usu_97 to 105+)
- * while the camera cuts between them; Vivian looks troubled.
+ * Cutscene in Twilight Town (Mario and the partner moved off screen):
+ * Beldam gloats that the Super Bombomb will win them Mario's map and asks Vivian for it (stg4_usu_97 to 99);
+ * Vivian never had it (100, 102; she switches to the troubled tribe "ビビアン困る"),
+ * Beldam calls her a liar and sends her to find it or be punished (101, 103 to 106),
+ * with Marilyn grunting along (98, 107).
+ * Beldam and Marilyn vanish, the story becomes STORY_STG4_11_SUPERBOMBBOMB_LOST and the map changes to gra_06.
  */
 EVT_BEGIN(usu00_3witch_event)
     CALL(evt_mario_key_onoff, 0)
@@ -1317,6 +1338,7 @@ EVT_END()
  * and she joins the party.
  */
 EVT_BEGIN(usu00_vivian_joinup_event)
+    // Vivian hears Mario found the Super Bombomb; he holds it out and she takes it, then notices it is broken.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("ビビアン"), NPC_FLAG_INTANGIBLE)
     CALL(evt_msg_print, 0, STRING("stg4_usu_110"), 0, STRING("ビビアン"))
@@ -1351,6 +1373,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
     CALL(evt_npc_jump_position_nohit, STRING("ビビアン"), LW(0), LW(1), LW(2), 200, FLOAT(15.0f))
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("stg4_usu_112"), 0, STRING("ビビアン"))
+    // Mario jumps in surprise; Vivian wails that her sister will punish her forever and Mario picks his answer.
     CALL(evt_mario_dispflag_onoff, 1, 2)
     CALL(evt_mario_set_pose, STRING("M_N_H"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1374,6 +1397,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
         CALL(evt_mario_set_pose, STRING("M_N_2"))
         WAIT_MS(500)
     END_IF
+    // The broken Super Bombomb vanishes; Vivian cheers up and asks Mario's name.
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_item_get_position, STRING("shine"), LW(0), LW(1), LW(2))
     LOOP(10)
@@ -1390,6 +1414,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
     WAIT_MS(750)
     CALL(evt_mario_set_pose, STRING("M_I_2"))
     WAIT_MS(500)
+    // Mario mimes that his name was stolen; Vivian, moved, vows to help him get back his name and friends.
     CALL(evt_msg_print, 0, STRING("stg4_usu_117"), 0, STRING("ビビアン"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAND_UP1_4"), LW(0), LW(1), LW(2), 0)
@@ -1413,6 +1438,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
     CALL(evt_msg_print, 0, STRING("stg4_usu_119"), 0, STRING("ビビアン"))
     CALL(evt_mario_set_pose, STRING("M_N_5B"))
     WAIT_MS(500)
+    // She insists on coming along and kisses Mario on the cheek.
     CALL(evt_msg_print, 0, STRING("stg4_usu_120"), 0, STRING("ビビアン"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NO1"), LW(0), LW(1), LW(2), 0)
@@ -1444,6 +1470,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
     SUBTRACT(LW(0), -15)
     CALL(evt_npc_move_position, STRING("ビビアン"), LW(0), LW(2), 0, 20, 0)
     WAIT_MS(300)
+    // Vivian joins the party and shows her field ability (all_party_lecture).
     CALL(evt_msg_print, 0, STRING("stg4_usu_121_01"), 0, STRING("ビビアン"))
     CALL(evt_cam3d_evt_set_npc_rel, STRING("ビビアン"), 0, 50, 290, 0, 45, 14, 800, 11)
     WAIT_MS(800)
@@ -1454,6 +1481,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_USU1"))
 #endif
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_USU1"))
+    // The partner comments, then the story becomes STORY_STG4_13_VIVIAN_JOINS and Mario is no longer a shadow.
     CALL(evt_msg_print_party, STRING("stg4_usu_123"))
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
@@ -1471,8 +1499,8 @@ EVT_BEGIN(usu00_vivian_joinup_event)
 EVT_END()
 
 /**
- * Guess: raises the 3D camera and its target by 85 units over 500 ms (curve 11), then waits 600 ms;
- * used when a crow talks from its high perch.
+ * Raises the 3D camera and its target by 85 units over 500 ms (curve 11), then waits 600 ms;
+ * used by usu00_crowAB_talk_event and usu00_crowCDE_talk_event before a crow speaks from its high perch.
  */
 static EVT_BEGIN(cam_up)
     BEGIN_INLINE_EVENT
@@ -1486,7 +1514,10 @@ static EVT_BEGIN(cam_up)
     RETURN
 EVT_END()
 
-/** Guess: returns the 3D camera to its normal event-free position over 500 ms after cam_up. */
+/**
+ * Returns the 3D camera to normal (evt_cam3d_evt_off over 500 ms) and waits 500 ms;
+ * ends cam_up in the crow talk events.
+ */
 static EVT_BEGIN(cam_down)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
@@ -1520,12 +1551,14 @@ EVT_END()
  * "stg4_jin_152" otherwise); GW(0) gates repeats.
  */
 EVT_BEGIN(usu00_crowAB_talk_event)
+    // Wait until this crow pair is allowed to talk again.
     SET_VALUE(LW(15), 0)
     LABEL(0)
     IF_INT_NOT_EQUAL(GW(0), 0)
         WAIT_FRAMES(1)
         GOTO(0)
     END_IF
+    // Show the "..." balloon while Mario stands below crow B (a wider area in Bowser's interlude).
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_npc_get_position, STRING("カラスＢ"), LW(3), LW(4), LW(5))
     CALL(evt_mario_get_mode, LW(7))
@@ -1565,6 +1598,7 @@ EVT_BEGIN(usu00_crowAB_talk_event)
             SET_VALUE(LW(15), 0)
         END_IF
     END_IF
+    // Pressing A there gets only a caw ("Cawf cawf cawf!", or Bowser's version in the interlude).
     IF_INT_EQUAL(LW(15), 1)
         CALL(evt_key_get_buttontrg, 0, LW(0))
         CALL(evt_mario_party_use_check, LW(1))
@@ -1594,6 +1628,8 @@ EVT_BEGIN(usu00_crowAB_talk_event)
             END_IF
         END_IF
     END_IF
+    // When Vivian is the partner in party status 2 (Guess: hiding Mario in her shadow), the crows talk for real:
+    // A and B chat about the internet and business ideas, by story progress; once per visit (GW(0)).
     CALL(evt_mario_get_party, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 6)
         WAIT_FRAMES(1)
@@ -1649,12 +1685,14 @@ EVT_END()
 
 /** Background watcher for crows C, D and E; same as the A/B watcher but using GW(1) as its gate. */
 EVT_BEGIN(usu00_crowCDE_talk_event)
+    // Wait until this crow trio is allowed to talk again.
     SET_VALUE(LW(15), 0)
     LABEL(0)
     IF_INT_NOT_EQUAL(GW(1), 0)
         WAIT_FRAMES(1)
         GOTO(0)
     END_IF
+    // Show the "..." balloon while Mario stands below crow D, but not past the north edge.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_npc_get_position, STRING("カラスＤ"), LW(3), LW(4), LW(5))
     CALL(evt_sub_area_check, 1, LW(3), LW(5), 60, LW(0), LW(2), LW(6))
@@ -1691,6 +1729,7 @@ EVT_BEGIN(usu00_crowCDE_talk_event)
             SET_VALUE(LW(15), 0)
         END_IF
     END_IF
+    // Pressing A there gets only a caw ("Cawf cawf cawf!", or Bowser's version in the interlude).
     IF_INT_EQUAL(LW(15), 1)
         CALL(evt_key_get_buttontrg, 0, LW(0))
         CALL(evt_mario_party_use_check, LW(1))
@@ -1721,6 +1760,8 @@ EVT_BEGIN(usu00_crowCDE_talk_event)
             END_IF
         END_IF
     END_IF
+    // When Vivian is the partner in party status 2 (Guess: hiding Mario in her shadow), the crows talk for real:
+    // C, D and E chat about energy and solar power, by story progress; once per visit (GW(1)).
     CALL(evt_mario_get_party, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 6)
         WAIT_FRAMES(1)
@@ -1805,6 +1846,10 @@ EVT_BEGIN(chief_pig_event)
     RETURN
 EVT_END()
 
+/**
+ * Twilight Town inn (house 3), run by the innkeeper: breakfast item 176 and price 10 coins, the bed and camera
+ * spots for sleeping, and the innkeeper's lines usugurayado_00 to 13.
+ */
 static KinopioData kino_dt = {
     176, // breakfastItem
     {250.0f, 16.0f, -300.0f}, // breakfastPos
@@ -1823,16 +1868,22 @@ static KinopioData kino_dt = {
     NULL, NULL, // toBedEvt..fromBedEvt
 };
 
+/** NPCs hidden and shown with the inn's interior (house 3): the innkeeper. */
 static const char* yado_npc[] = {
     "宿店員",
     NULL,
 };
 
+/** Map objects hidden and shown with the inn's interior: its save block. */
 const char* yado_mobj[] = {
     "pblk00",
     NULL,
 };
 
+/**
+ * NPCs that belong to the Mayor's house (house 2) interior: the Mayor in human and pig form, the fake Mario
+ * and the partners who can stand inside during his scenes.
+ */
 const char* village_chief_npc[] = {
     "村長",
     "ブタ村長",
@@ -1857,8 +1908,10 @@ static EVT_BEGIN(evt_door_1_2)
 EVT_END()
 
 /**
- * Guess: wall script for house 1: swings the inside shutters "ie1_kai1" and "ie1_kai2" open with a 10-frame gap,
- * by LW(0) scaled by -0.5 and 0.5.
+ * Wall script of house 1 (DoorParam evtWall), which evt_door_open spawns every frame with the opening angle in
+ * LW(0) (0 to 180 as the house front opens, back to 0 as it closes):
+ * turns the front-wall pieces ie1_kai1 and ie1_kai2 about x by -LW(0) / 2 and LW(0) / 2,
+ * the second 10 frames later.
  */
 static EVT_BEGIN(evt_wall_1)
     SET_FLOAT_VALUE(LW(1), LW(0))
@@ -1871,6 +1924,7 @@ static EVT_BEGIN(evt_wall_1)
     RETURN
 EVT_END()
 
+/** NPCs that belong to house 1's interior: villager B. */
 const char* door_1_npc[] = {
     "村人Ｂ",
     NULL,
@@ -1892,6 +1946,7 @@ static EVT_BEGIN(door_1_close)
     RETURN
 EVT_END()
 
+/** House 1, a villager's house with a fold-down front wall (door S_ie1_door). */
 static DoorParam door_1 = {
     0, // flags
     3, // type
@@ -1934,8 +1989,10 @@ EVT_BEGIN(evt_door_2_2)
 EVT_END()
 
 /**
- * Guess: wall script for house 2: swings the inside shutters "ie2_kai1"
- * and "ie2_kai2" (and more pieces) open in 5-frame steps by LW(0) scaled by -0.5 and 0.5.
+ * Wall script of house 2 (DoorParam evtWall), spawned every frame with the opening angle in LW(0) (0 to 180 and
+ * back): turns the front-wall pieces ie2_kai1, ie2_kai2 and ie2_kai4 about x and ie2_kai3 about z,
+ * by half the angle with alternating signs, one after the other (5, 5 and 10 frames apart).
+ * When LW(1) equals LW(0) it goes from kai1 to kai4, otherwise in the reverse order.
  */
 static EVT_BEGIN(evt_wall_2)
     IF_INT_EQUAL(LW(1), LW(0))
@@ -1999,6 +2056,7 @@ EVT_BEGIN(evt_door2_close)
     RETURN
 EVT_END()
 
+/** House 2, the Mayor's house (door S__ie2_door), opened for him in the chapter 4 arrival scene. */
 static DoorParam door_2 = {
     0, // flags
     3, // type
@@ -2026,14 +2084,21 @@ static EVT_BEGIN(evt_door_3_1)
     RETURN
 EVT_END()
 
-/** Guess: door script for house 3's door (evtOut of door_3): turns "S_ie3_door" about x by LW(0) scaled by 0.5. */
+/**
+ * Door script for house 3's door (evtOut of door_3), spawned with the door angle in LW(0) (0 to 180):
+ * turns S_ie3_door about x by LW(0) / 2.
+ */
 static EVT_BEGIN(evt_door_3_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie3_door"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
-/** Guess: wall script for house 3: swings the inside shutters "ie3_kai1" and "ie3_kai2" open with a 10-frame gap. */
+/**
+ * Wall script of house 3 (DoorParam evtWall), spawned every frame with the opening angle in LW(0) (0 to 180 and
+ * back): turns the front-wall pieces ie3_kai1 and ie3_kai2 about x by -LW(0) / 2 and LW(0) / 2,
+ * the second 10 frames later.
+ */
 static EVT_BEGIN(evt_wall_3)
     SET_FLOAT_VALUE(LW(1), LW(0))
     MULTIPLY_FLOAT(LW(1), FLOAT(-0.5f))
@@ -2061,6 +2126,7 @@ static EVT_BEGIN(door_3_close)
     RETURN
 EVT_END()
 
+/** House 3, the inn (door S_ie3_door), with the innkeeper and the save block inside. */
 static DoorParam door_3 = {
     0, // flags
     3, // type
@@ -2100,6 +2166,7 @@ EVT_BEGIN(dokan_1_evt)
     RETURN
 EVT_END()
 
+/** Exits of this map: the pipe down to tik_08 in the Rogueport Sewers and the east road to usu_01. */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan_1", // hitName
@@ -2138,8 +2205,10 @@ static BeroEntry bero_entry_data[] = {
 };
 
 /**
- * Guess: enter script of the pipe to tik_08: after the bero move it shows the "stg4_jin_151" message (the pipe
- * is blocked) and gives control back; returns LW(0) = 0.
+ * Exit script of bero_oshimodo, which replaces the dokan_1 pipe to tik_08 from STORY_STG4_10_DOOPLISS_BATTLE
+ * until STORY_STG4_15_02_BACK_TO_NORMAL (while Doopliss has Mario's name):
+ * the pipe sends Mario back out of itself ("oshimodo", pushed back),
+ * then the system message stg4_jin_151 says he cannot enter the pipe and control returns. Returns LW(0) = 0.
  */
 static EVT_BEGIN(oshimodo_event)
     BEGIN_INLINE_EVENT
@@ -2153,6 +2222,10 @@ static EVT_BEGIN(oshimodo_event)
     RETURN
 EVT_END()
 
+/**
+ * Replacement for the pipe while Doopliss has Mario's name: it does not lead anywhere and pushes Mario back out
+ * (oshimodo_event).
+ */
 static BeroEntry bero_oshimodo[] = {
     {
         "dokan_1", // hitName
@@ -2204,6 +2277,7 @@ EVT_BEGIN(koopa_dokan_evt)
     RETURN
 EVT_END()
 
+/** Replacement for the pipe in Bowser's interlude: Bowser tries it and is told off (koopa_dokan_evt). */
 BeroEntry bero_koopa_dokan[] = {
     {
         "dokan_1", // hitName
@@ -2262,7 +2336,10 @@ EVT_BEGIN(door_ie3_koopa_evt)
     RETURN
 EVT_END()
 
-/** Guess: crows A and B flap (animation A_1) for 1.5 seconds and return to standing (S_1). */
+/**
+ * Tree-shake script of tree 1 (tree_tbl, A_ki_1):
+ * crows A and B on it flap (animation A_1) for 1.5 seconds, then stand again (S_1).
+ */
 static EVT_BEGIN(evt_ki_1)
     CALL(evt_npc_set_anim, STRING("カラスＡ"), STRING("A_1"))
     CALL(evt_npc_set_anim, STRING("カラスＢ"), STRING("A_1"))
@@ -2272,7 +2349,10 @@ static EVT_BEGIN(evt_ki_1)
     RETURN
 EVT_END()
 
-/** Guess: crows C, D and E flap (animation A_1) for 1.5 seconds and return to standing (S_1). */
+/**
+ * Tree-shake script of tree 2 (tree_tbl, A_ki_2):
+ * crows C, D and E on it flap (animation A_1) for 1.5 seconds, then stand again (S_1).
+ */
 static EVT_BEGIN(evt_ki_2)
     CALL(evt_npc_set_anim, STRING("カラスＣ"), STRING("A_1"))
     CALL(evt_npc_set_anim, STRING("カラスＤ"), STRING("A_1"))
@@ -2284,6 +2364,7 @@ static EVT_BEGIN(evt_ki_2)
     RETURN
 EVT_END()
 
+/** Trees of the town square: tree 1 and tree 2 (where crows C, D and E perch) react to being shaken. */
 static TreeAccess tree_tbl[] = {
     {2, "A_ki_1", "S_usu00_ki01", NULL, 0, evt_ki_1},
     {2, "A_ki_2", "S_usu00_ki02", NULL, 0, evt_ki_2},
@@ -2337,6 +2418,10 @@ EVT_BEGIN(evt_kusa_06)
     RETURN
 EVT_END()
 
+/**
+ * Bushes of the town square: bush 1 has Bowser's line in his interlude, bush 4 hides a Star Piece and bush 6
+ * coins; the rest only rustle.
+ */
 static KusaAccess kusa_tbl[] = {
     {2, "A_kusa_01", "S_kusa_01", kusa_01_evt},
     {2, "A_kusa_02", "S_kusa_02", NULL},
@@ -2402,6 +2487,7 @@ EVT_BEGIN(usu_00_touch_ichikorori_ball)
     RETURN
 EVT_END()
 
+/** The five pig NPCs (pig villagers A, D, E, K and the pig Mayor), whose models get the paper lighting. */
 static BoobooName booboo_name[] = {
     {"ブタ村人Ａ", 2, 1},
     {"ブタ村人Ｄ", 0, 1},
@@ -2410,6 +2496,10 @@ static BoobooName booboo_name[] = {
     {"ブタ村長", 9, 0},
 };
 
+/**
+ * Sprite list of the 200-strong crowd in Bowser's second Twilight Town scene: X-Nauts (c_zako_n) for Crump's
+ * side, Koopatrols, Hammer Bros and Magikoopas for Kammy's, each pose with a staggered start time.
+ */
 ExtTexInfo kpaSen_ext_entry_data[] = {
     {"c_zako_n", "S_1", 0.0f},
     {"c_zako_n", "S_1", 8.0f},
@@ -2705,8 +2795,12 @@ EVT_BEGIN(kanbu_talk)
 EVT_END()
 
 /**
- * Guess: spawns the Bowser interlude cast: Kammy (Baba), Kanbu with the "third-force executive" tribe,
- * a Spike Koopa, a Hammer Bro, a Magikoopa and generic Koopa troops, and stops the town NPCs' regular events.
+ * Sets up the Bowser interlude cast (run by the map init when GF(1) is 1):
+ * stops the regular events of Vivian, the pig mayor, pig villagers K, E, D and A, the inn clerk,
+ * villager B and the mayor and deletes those NPCs.
+ * It then adds Kammy (ババ, tribe カメックババ, off stage, talk script baba_talk),
+ * Lord Crump (カンブー, tribe 第三勢力幹部, at (100, 0, 200), talk script kanbu_talk) and, off stage for the later scenes,
+ * a Koopatrol (トゲノコ), a Hammer Bro (c_burosu_h), a Magikoopa (カメック) and a minion (ザコ, c_zako_n).
  */
 static EVT_BEGIN(koopa_npc_entry)
     CALL(evt_npc_get_reglid, STRING("ビビアン"), LW(0))
@@ -2849,8 +2943,10 @@ EVT_BEGIN(bakuhatu_evt)
 EVT_END()
 
 /**
- * Guess: Bowser interlude: the villagers run out of town;
- * delete their regular events and walks them off to the left.
+ * Spawned by usu_00_koopa_second_evt once Lord Crump calls his troops (kpa_stg5_014): the villagers flee.
+ * It stops the regular events of villagers C and E;
+ * villagers D, C, A and K turn and run off to the left,
+ * villager E to the right (A and K half a second after the others), and each is then moved off stage.
  */
 EVT_BEGIN(murabito_out)
     CALL(delete_npc_regl_evt, STRING("村人Ｃ"))
@@ -2903,6 +2999,7 @@ EVT_END()
  * the Koopa troops gather, a Super Bombomb goes off and the scene fades to white.
  */
 EVT_BEGIN(usu_00_koopa_second_evt)
+    // Lord Crump grumbles about Beldam's lost Super Bombomb while Bowser walks up and Kammy flies in.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_motion, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -2956,6 +3053,8 @@ EVT_BEGIN(usu_00_koopa_second_evt)
         CALL(evt_npc_flag_onoff, 0, STRING("ババ"), NPC_FLAG_INTANGIBLE)
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
+    // Crump digs in the bushes, finds the Super Bombomb and gloats; Kammy demands what he knows about the Crystal
+    // Stars and Bowser threatens him.
     CALL(evt_cam3d_evt_set, 75, 116, 612, 75, 50, 268, 1500, 11)
     CALL(evt_npc_flag_onoff, 1, STRING("カンブー"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_move_position, STRING("カンブー"), 75, 275, 1500, 0, 4)
@@ -3001,6 +3100,7 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     ADD(LW(0), 10)
     CALL(evt_npc_move_position, STRING("カンブー"), LW(0), LW(2), 0, FLOAT(60.0f), 0)
     CALL(evt_msg_print, 0, STRING("kpa_stg5_014"), 0, STRING("カンブー"))
+    // Crump calls in his X-Naut troops, who march into rows across the square.
     CALL(evt_npc_get_position, STRING("カンブー"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_3RD_SHUGOU1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(500)
@@ -3018,6 +3118,7 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     CALL(evt_cam3d_evt_set, 42, 29, 375, 85, 45, 113, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("kpa_stg5_015"), 0, STRING("カンブー"))
+    // Kammy flies to Bowser's side and forms up the Koopa troop against them.
     CALL(evt_cam3d_evt_set, -80, 172, 456, -80, 50, 78, 800, 11)
     WAIT_MS(800)
     CALL(evt_mario_flag_onoff, 1, 1024)
@@ -3062,6 +3163,7 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     WAIT_MS(1500)
     CALL(evt_npc_set_autotalkpose, STRING("ババ"), STRING("S_2"), STRING("T_9"))
     CALL(evt_npc_set_stay_anim, STRING("ババ"))
+    // Crump is outnumbered, then laughs and pulls out the Super Bombomb.
     CALL(evt_cam3d_evt_set, -14, 225, 715, -4, 57, 120, 1000, 11)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("kpa_stg5_017"), 0, STRING("カンブー"))
@@ -3076,6 +3178,7 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_npc_set_anim, STRING("カンブー"), STRING("C_2"))
     WAIT_MS(250)
+    // The Super Bombomb hops across the ground and lands at Bowser's feet ("INCOMING!!!").
     CALL(evt_npc_get_position, STRING("カンブー"), LW(2), LW(3), LW(4))
     CALL(evt_mario_get_pos, 0, LW(5), LW(6), LW(7))
     ADD_FLOAT(LW(5), FLOAT(60.0f))
@@ -3173,6 +3276,7 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     WAIT_MS(160)
     CALL(evt_cam3d_evt_set, -80, 172, 456, -80, 50, 78, 0, 11)
     WAIT_FRAMES(1)
+    // Bowser mocks the dud and breathes fire at it; it sputters while Crump mutters "Oh, crud...".
     SET_VALUE(GF(0), 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_KOOPA_SURPRISED2_2"), LW(0), LW(1), LW(2), 0)
@@ -3216,6 +3320,7 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     WAIT_MS(800)
     CALL(evt_msg_print, 0, STRING("kpa_stg5_022"), 0, STRING("カンブー"))
     WAIT_MS(100)
+    // The bomb charges up and explodes, and the screen fades to white.
     CALL(evt_item_get_position, STRING("itikoro"), LW(0), LW(1), LW(2))
     ADD(LW(1), 10)
     CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_ITIKORO_BIRIBIRI1"), LW(0), LW(1), LW(2), 0)
@@ -3244,6 +3349,7 @@ EVT_BEGIN(usu_00_koopa_second_evt)
     CALL(evt_fade_entry, FADE_OUT_BLACK, 600, 255, 255, 255)
     CALL(evt_fade_end_wait)
     WAIT_MS(3000)
+    // The story becomes STORY_STG5_49_BOWSER_TWILIGHT_TOWN_2; the game saves and moves on to muj_00.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_49_BOWSER_TWILIGHT_TOWN_2)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     CALL(white_on)
@@ -3351,7 +3457,9 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
-/** Guess: stops the regular events of villagers A to E so the dark-world scene can place them. */
+/**
+ * Stops the regular events of villagers A to E for sekai_yami_evt, which then runs sekai_yami_npc on each.
+ */
 static EVT_BEGIN(sekai_yami_npc_init)
     CALL(delete_npc_regl_evt, STRING("村人Ａ"))
     CALL(delete_npc_regl_evt, STRING("村人Ｂ"))
@@ -3362,8 +3470,8 @@ static EVT_BEGIN(sekai_yami_npc_init)
 EVT_END()
 
 /**
- * Guess: regular behavior of a villager in the dark-world scene:
- * every 100 to 500 ms turns around, then waits for the paper-flip idle.
+ * Panic loop of one villager (name in LW(0)) in sekai_yami_evt:
+ * every 100 to 500 ms it turns around and waits for the paper turn to finish.
  */
 static EVT_BEGIN(sekai_yami_npc)
     LOOP(0)
@@ -3377,7 +3485,10 @@ static EVT_BEGIN(sekai_yami_npc)
     RETURN
 EVT_END()
 
-/** Guess: endless loop that shakes the 3D camera slightly (0.0098 in y) every 500 ms. */
+/**
+ * Endless loop that shakes the 3D camera slightly (0.0098 in y, 500 ms per shake);
+ * spawned by sekai_yami_evt with the quake sound.
+ */
 static EVT_BEGIN(sekai_yami_shake)
     LOOP(0)
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.009765625f), 500)
@@ -3386,11 +3497,16 @@ static EVT_BEGIN(sekai_yami_shake)
 EVT_END()
 
 /**
- * Guess: chapter 8 dark-world scene ("sekai yami"):
- * the town goes dark, the villagers turn about and shake,
- * the message "stg8_dark_05" plays and the game changes to map muj_01.
+ * Final-chapter scene ("sekai yami", the world goes dark)
+ * when the map is entered through sekai_yami2 at STORY_STG8_15_GRODUS:
+ * with Mario and the partner off stage the town is drawn in darkness (envSetYami),
+ * the light flickers with SFX_STG8_LIGHT1 (once from US on, twice before),
+ * villagers A to E turn about in panic (sekai_yami_npc), crows C, D and E fly off,
+ * a quake rumbles with the camera shaking, a villager screams (stg8_dark_05)
+ * and the game moves on to muj_01 (entrance sekai_yami2).
  */
 static EVT_BEGIN(sekai_yami_evt)
+    // The town is drawn in darkness and the light flickers.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -3428,6 +3544,7 @@ static EVT_BEGIN(sekai_yami_evt)
         WAIT_MS(100)
 #endif
     END_LOOP
+    // The villagers turn about in panic and the crows fly off.
     SET_VALUE(LW(0), STRING("村人Ａ"))
     SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("村人Ｂ"))
@@ -3459,6 +3576,7 @@ static EVT_BEGIN(sekai_yami_evt)
         CALL(evt_npc_get_position, STRING("カラスＥ"), LW(0), LW(1), LW(2))
         CALL(evt_npc_jump_position_nohit, STRING("カラスＥ"), 150, 250, LW(2), 1500, 30)
     END_INLINE_EVENT
+    // The ground quakes and a villager cries out, then the game moves on to muj_01.
     CALL(evt_snd_sfxon, STRING("SFX_STG8_QUAKE1"), LW(0))
     SPAWN_EVENT(sekai_yami_shake)
     WAIT_MS(2000)
@@ -3474,7 +3592,10 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
-/** Guess: spawns the aunt and her three children for the Chapter 8 "everyone's voices" scene. */
+/**
+ * Spawns a woman (おばさん, tribe ウスグラおばさん) and three children (子供１ to ３, tribes ウスグラ子供A to C) of Twilight Town for
+ * minnnanokoe_evt ("minna no koe", everyone's voices).
+ */
 static EVT_BEGIN(minnnanokoe_npc_entry)
     CALL(evt_npc_entry, STRING("おばさん"), STRING("c_f_mama"))
     CALL(evt_npc_set_tribe, STRING("おばさん"), STRING("ウスグラおばさん"))
@@ -3500,10 +3621,16 @@ static EVT_BEGIN(minnnanokoe_npc_entry)
 EVT_END()
 
 /**
- * Guess: chapter 8 scene where the townspeople call out to Mario in the dark town (children's lines
- * "stg8_las_148_26" and on), with the camera drifting back and forth.
+ * Final-battle scene ("minna no koe", everyone's voices)
+ * when the map is entered through minnnanokoe at STORY_STG8_15_GRODUS:
+ * with Mario off stage and the town in darkness,
+ * a Crystal Star effect hovers and spins over the square
+ * while the three children cheer Mario on (stg8_las_148_26 to 31), villager A,
+ * the woman (worried about Vivian) and the mayor speak (32 to 34), the children cheer again (35 to 37),
+ * and the game moves on to muj_01 (entrance minnnanokoe).
  */
 static EVT_BEGIN(minnnanokoe_evt)
+    // Set up the dark town with the townsfolk and a spinning Crystal Star effect over the square.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -3573,6 +3700,7 @@ static EVT_BEGIN(minnnanokoe_evt)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+    // The children cheer Mario on.
     CALL(evt_seq_wait, 2)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_26"), 0, STRING("子供１"))
@@ -3581,6 +3709,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_29"), 0, STRING("子供１"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_30"), 0, STRING("子供２"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_31"), 0, STRING("子供３"))
+    // Villager A, the woman and the Mayor speak, then the children cheer again and the game moves on to muj_01.
     CALL(evt_npc_flag_onoff, 1, STRING("子供１"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_flag_onoff, 1, STRING("子供２"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_flag_onoff, 1, STRING("子供３"), NPC_FLAG_INSTANT_TURN)
@@ -3603,6 +3732,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
+/** Normal (1, 1, 1) scale the partner is reset to by party_scale before the after-Peach scene. */
 __declspec(section ".rodata") Vec party_scale_vec = {1.0f, 1.0f, 1.0f};
 
 /** Script helper: sets Mario's partner scale to party_scale_vec. */
@@ -3612,8 +3742,11 @@ static USER_FUNC(party_scale) {
 }
 
 /**
- * Guess: cutscene in Twilight Town after Peach's report:
- * the Mayor offers to help ("stg4_usu_153" with a yes/no choice), the party answers,
+ * Cutscene in Twilight Town after the Peach and Bowser interludes (spawned at
+ * STORY_STG4_15_08_BOWSER_ROGUEPORT_DOCK): the mayor apologizes for being fooled by the fake Mario
+ * and asks whether they hurt his feelings (stg4_usu_153 with a choice);
+ * "Nah, not really" draws praise (154), "Maybe a little" an awkward reply (155).
+ * The partner suggests heading back to Rogueport (stg4_usu_156), the mayor invites him back anytime (157),
  * and the story becomes STORY_STG4_16_LEAVING_TWILIGHT_TOWN.
  */
 static EVT_BEGIN(evt_after_peach)
@@ -3682,7 +3815,10 @@ static USER_FUNC(npc_process) {
     return EVT_RETURN_BLOCK;
 }
 
-/** Guess: spawns Goombella, Beldam and Marilyn for the ending epilogue scene in Twilight Town. */
+/**
+ * Spawns Goombella (クリスチーヌ) beside Vivian, and Beldam and Marilyn off stage,
+ * for the ending epilogue in Twilight Town.
+ */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
     CALL(evt_npc_set_tribe, STRING("クリスチーヌ"), STRING("クリスチーヌ"))
@@ -3698,8 +3834,10 @@ static EVT_BEGIN(epilogue_npc_entry)
 EVT_END()
 
 /**
- * Guess: epilogue animation script: Vivian, Goombella,
- * Beldam and Marilyn take turns talking and acting in sequence, synchronised with epilogue_evt through GF(0).
+ * Animation script of the ending epilogue, spawned by epilogue_evt: Vivian and Goombella chat;
+ * Beldam and Marilyn appear beside them (evt_npc_majo_disp_on), Vivian turns to them and the three talk;
+ * the sisters vanish again, Vivian turns back and she and Goombella keep chatting until the scene ends.
+ * GF(0) is set while Marilyn's appear or vanish effect runs.
  */
 static EVT_BEGIN(epilogue_evt_sub)
     CALL(evt_npc_set_anim, STRING("ビビアン"), STRING("PTR_T_1"))
@@ -3762,8 +3900,11 @@ static EVT_BEGIN(epilogue_evt_sub)
 EVT_END()
 
 /**
- * Guess: ending epilogue in Twilight Town: Vivian and the sisters gather with the party,
- * "ep_41" is shown and the map changes to muj_20.
+ * Ending epilogue in Twilight Town (STORY_STG8_END_AFTER_THE_BATTLE):
+ * with the town theme playing and Mario hidden,
+ * Vivian and Goombella stand together while epilogue_evt_sub plays,
+ * the epilogue text ep_41 says Vivian has gone back to her sisters
+ * and Beldam promised never to be mean to her again, and the game fades to muj_20.
  */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_USU1"))
@@ -3792,6 +3933,7 @@ EVT_END()
  * and starts Chapter 4 and Bowser interlude cutscenes.
  */
 EVT_BEGIN(usu_00_init_evt)
+    // In Bowser's interlude (from Peach's talk with TEC to Bowser's town visit) Mario is Bowser; GF(1) marks it.
     SET_VALUE(GF(1), 0)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_47_PEACH_TEC_TALK)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_48_BOWSER_TWILIGHT_TOWN)
@@ -3799,6 +3941,8 @@ EVT_BEGIN(usu_00_init_evt)
             SET_VALUE(GF(1), 1)
         END_IF
     END_IF
+    // Music: the Shadow Sirens' theme while Mario has lost his name, chapter 8 voices or silence in the darkness
+    // scenes, otherwise the town theme.
     IF_INT_EQUAL(GF(1), 0)
         SWITCH(GSW(GSW_STORY_PROGRESS))
             CASE_BETWEEN(STORY_STG4_10_02_TRADING_PLACES, STORY_STG4_11_SUPERBOMBBOMB_LOST)
@@ -3840,6 +3984,7 @@ EVT_BEGIN(usu_00_init_evt)
     IF_INT_EQUAL(GF(1), 0)
         CALL(evt_kagemario_init)
     END_IF
+    // Register the exits; in Bowser's visit the pipe becomes his scene and the doors, bushes and exits are shut.
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
@@ -3874,6 +4019,7 @@ EVT_BEGIN(usu_00_init_evt)
         CALL(L_evt_hitobj_flag_onoff, 1, 1, STRING("A_kusa_20"), 1)
 #endif
     END_IF
+    // Save block, Star Piece, NPCs, house doors (Bowser gets locked-out scripts) and the inn.
     IF_INT_EQUAL(GF(1), 0)
         CALL(evt_mobj_save_blk, STRING("mobj_save"), 365, 60, -50, 0, 0)
     END_IF
@@ -3900,6 +4046,7 @@ EVT_BEGIN(usu_00_init_evt)
     IF_INT_EQUAL(GF(1), 0)
         CALL(evt_kinopio_setup, PTR(&kino_dt))
     END_IF
+    // Trees and bushes.
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ki1"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ki2"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ki3"), MAPOBJ_FLAG_BBOX_CULL)
@@ -3907,6 +4054,8 @@ EVT_BEGIN(usu_00_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ki5"), MAPOBJ_FLAG_BBOX_CULL)
     CALL_CHILD(usu_00_kusa_init)
     CALL_CHILD(usu_00_tree_init)
+    // Story scenes: the chapter 4 arrival, the pig Mayor, Mario's talk with the Mayor while a shadow, the Shadow
+    // Sirens, Vivian crying, the lost Super Bombomb in bush 7 and Doopliss found again.
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG4_00_WELCOME_TO_STAGE_4)
         SPAWN_EVENT(usu00_stage4_coming_event)
@@ -3933,6 +4082,8 @@ EVT_BEGIN(usu_00_init_evt)
         CALL_CHILD(usu00_3witch_init)
         SPAWN_EVENT(gra00_2witch_find_ranpel_event)
     END_IF
+    // Background watchers for Vivian and the crows; the pipe is blocked while Doopliss has Mario's name, and the
+    // pig villagers' material loop runs outside Bowser's visit.
     SPAWN_EVENT(usu00_check_vivian)
     SET_VALUE(GW(0), 0)
     SET_VALUE(GW(1), 0)
@@ -3952,6 +4103,7 @@ EVT_BEGIN(usu_00_init_evt)
             CALL(booboo_main)
         END_INLINE_EVENT
     END_IF
+    // Bowser's interlude: Crump's arrival and Bowser's two scenes with Kammy.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_47_PEACH_TEC_TALK)
         CALL(evt_npc_change_interrupt, STRING("カンブー"), 1, PTR(kanbu_regl))
         CALL(evt_npc_restart_regular_event, STRING("カンブー"))
@@ -3979,6 +4131,7 @@ EVT_BEGIN(usu_00_init_evt)
         END_IF
         CALL(evt_cam_road_reset)
     END_IF
+    // After the Peach and Bowser interludes the party is healed and the Mayor's farewell scene plays.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_08_BOWSER_ROGUEPORT_DOCK)
         CALL(evt_mario_get_party, LW(15))
         IF_INT_EQUAL(LW(15), 0)
@@ -3998,6 +4151,7 @@ EVT_BEGIN(usu_00_init_evt)
         CALL(evt_party_set_pos, 0, -130, 0, -60)
         SPAWN_EVENT(evt_after_peach)
     END_IF
+    // Chapter 8: the world going dark and the townsfolk's voices cheering Mario.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("sekai_yami2"))
@@ -4009,6 +4163,7 @@ EVT_BEGIN(usu_00_init_evt)
             SPAWN_EVENT(minnnanokoe_evt)
         END_IF
     END_IF
+    // Epilogue scene, then the NPC hide/show loop.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
         CALL_CHILD(epilogue_npc_entry)

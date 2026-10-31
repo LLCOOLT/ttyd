@@ -103,8 +103,8 @@ void seq_battleInit(SequenceWork* work) {
     psndSetFlag(PSND_FLAG_MUTE_SFX);
 #if VERSION >= VERSION_JP
     switch (fbatGetPointer()->hitKind) {
-        case 0x1000000:
-        case 0x800000:
+        case FBAT_HIT_BOMB:
+        case FBAT_HIT_SHELL:
             if (debug_battle_flag == 0) {
                 marioCtrlOff();
                 partyCtrlOff();
@@ -163,17 +163,17 @@ void seq_battleMain(SequenceWork* work) {
         case 2:
             pouchGetPtr();
             switch (fbatGetPointer()->hitKind) {
-                case 0x1000000:
-                case 0x800000:
+                case FBAT_HIT_BOMB:
+                case FBAT_HIT_SHELL:
                     if (debug_battle_flag == 0) {
-                        marioGetPtr()->flags &= ~1;
+                        marioGetPtr()->flags &= ~MARIO_FLAG_ACTIVE;
                     }
                     break;
                 default:
                     if (debug_battle_flag == 0) {
                         marioCtrlOff();
                         partyCtrlOff();
-                        marioGetPtr()->flags &= ~1;
+                        marioGetPtr()->flags &= ~MARIO_FLAG_ACTIVE;
                         padRumbleOff(0);
                     }
                     break;
@@ -246,7 +246,7 @@ void seq_battleMain(SequenceWork* work) {
             pos.x = 0.0f;
             pos.y = 0.0f;
             pos.z = 400.0f;
-            if (_battleWorkPointer->flags & 0x100) {
+            if (_battleWorkPointer->flags & BATTLE_FLAG_WIDE_STAGE) {
                 pos.z += 200.0f;
             }
             psndSetPosDirListener(&pos, camGetPtr(CAMERA_3D)->viewYaw);
@@ -316,7 +316,7 @@ static BOOL battle_init(void) {
     if (debug_battle_flag == 0) {
         marioCtrlOff();
         partyCtrlOff();
-        marioGetPtr()->flags &= ~1;
+        marioGetPtr()->flags &= ~MARIO_FLAG_ACTIVE;
         padRumbleOff(0);
     }
     switch (pouch->rank) {
@@ -376,7 +376,7 @@ static BOOL battle_init(void) {
     if (party) {
         s32 id = party->currentMemberId;
         BattleUnitType kind = BattleTransPartyIdToUnitKind(id);
-        if (!(pouch->partyData[id].flags & 2)) {
+        if (!(pouch->partyData[id].flags & POUCH_PARTY_FLAG_AWAY)) {
             BattleInformationSetParty(info, kind);
         }
     }
@@ -402,10 +402,10 @@ static BOOL battle_init(void) {
             case 0x400000:
                 BattleInformationSetFirstAttack(info, 6);
                 break;
-            case 0x800000:
+            case FBAT_HIT_SHELL:
                 BattleInformationSetFirstAttack(info, 7);
                 break;
-            case 0x1000000:
+            case FBAT_HIT_BOMB:
                 BattleInformationSetFirstAttack(info, 8);
                 break;
             case 0x10000000:
@@ -467,7 +467,7 @@ static void battle_exit(void) {
     if (debug_battle_flag == 0) {
         marioCtrlOn();
         partyCtrlOn();
-        marioGetPtr()->flags |= 1;
+        marioGetPtr()->flags |= MARIO_FLAG_ACTIVE;
     }
 #if VERSION <= VERSION_DEMO_US
     psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
@@ -496,12 +496,20 @@ static void battle_exit(void) {
 
 // the demo defines the names in another order (their order in .rodata)
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Names of the battle stage maps for Mario's rank (bti_01 to bti_04, the stage gets bigger as he rises),
+ * and gon_11, whose message file a debug battle loads when its menu has none.
+ */
 static const char bti01[] = "bti_01";
 static const char bti02[] = "bti_02";
 static const char bti03[] = "bti_03";
 static const char bti04[] = "bti_04";
 static const char gon11[] = "gon_11";
 #else
+/**
+ * gon_11, whose message file a debug battle loads when its menu has none, and the battle stage maps for
+ * Mario's rank (bti_01 to bti_04, the stage gets bigger as he rises).
+ */
 static const char gon11[] = "gon_11";
 static const char bti01[] = "bti_01";
 static const char bti02[] = "bti_02";

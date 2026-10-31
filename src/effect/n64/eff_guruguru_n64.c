@@ -9,6 +9,7 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 
+/** Camera-facing 16x16 quad each circling sprite is drawn with. */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, 64, 0, 0, 0, 0, 255},

@@ -257,8 +257,8 @@ typedef enum ItemType {
     ITEM_FRESH_JUICE,      // 0xEB
 #define ITEM_MAX ITEM_FRESH_JUICE + 1
 #define ITEM_COUNT (ITEM_MAX - ITEM_MIN)
-    // ??? ------------------------------------------------
-    // Audience-thrown items
+    // Audience items -------------------------------------
+    // Thrown into the battle by the audience; past ITEM_MAX, so not counted as normal items
     ITEM_AUDIENCE_CAN,    // 0xEC
     ITEM_AUDIENCE_ROCK,   // 0xED
     ITEM_AUDIENCE_BONE,   // 0xEE
@@ -380,8 +380,14 @@ typedef enum MarioPartner {
     PARTNER_MSMOWZ
 } PartyId;
 
+// PouchPartyData.flags bits; bits 13-15 hold the partner's colour (pouchGetPartyColor).
+enum PouchPartyFlags {
+    POUCH_PARTY_FLAG_JOINED = 0x1, // partyJoin/partyLeft: the partner is in Mario's party
+    POUCH_PARTY_FLAG_AWAY = 0x2,   // gone for now (Vivian, set in jin_04, cleared after the Doopliss fights): not in the party menu, not taken into battle
+};
+
 typedef struct PouchPartyData {
-    u16 flags;       // 0x0
+    u16 flags;       // 0x0, PouchPartyFlags
     s16 maximumHP;   // 0x2, includes HP Plus P boost
     s16 baseMaxHP;   // 0x4
     s16 currentHP;   // 0x6

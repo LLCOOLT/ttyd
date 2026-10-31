@@ -1,4 +1,4 @@
-// Pit of 100 Trials battle unit: the Bonetail (boss of floor 100) (`boss_zonbaba`): parts, stats, poses and AI scripts.
+// Pit of 100 Trials battle unit: Bonetail (boss of floor 100) (`boss_zonbaba`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -15,6 +15,13 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_snd.h"
 #include "version.h"
+
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_BOSS_ZONBABA_HP_STAGE = 0,   // HP stage: 0 healthy, 1 hurt, 2 low (after tik_boss_15)
+    UW_BOSS_ZONBABA_HEALS_LEFT = 1, // uses of the recovery move left (2 at the start)
+    UW_BOSS_ZONBABA_HEAL_LINE = 2,  // 0 plays the first-recovery line (tik_boss_14); the script reads it but never sets it
+};
 
 static USER_FUNC(_leg_smoke_effect);
 
@@ -49,6 +56,7 @@ static EvtWord phase_event[94];
 static EvtWord attack_event[282];
 static EvtWord wait_event[6];
 
+/** Unit data of Bonetail: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_boss_zonbaba = {
     171,
     "btl_un_zonbaba",
@@ -119,7 +127,7 @@ BattleUnitKind unit_boss_zonbaba = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x200000,
+    UNIT_ATTR_NO_KNOCKBACK_POSE,
     &regist,
     2,
     parts,
@@ -127,12 +135,22 @@ BattleUnitKind unit_boss_zonbaba = {
     data_table,
 };
 
+/**
+ * Damage reduction of Bonetail: defence per attack type (normal 2, fire 2, ice 2, explosive 2, electric
+ * 0).
+ */
 static BattleUnitDefense defence = {{2, 2, 2, 2, 0}};
 
+/** Element response of Bonetail: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of Bonetail (percent, 0 is immune): immune to sleep, stop, dizzy, confuse, freeze,
+ * huge, tiny, attack down, defence down, allergic, fright, gale force, slow, dodgy, invisible, instant KO.
+ */
 static StatusVulnerability regist = {0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 0, 0, 0};
 
+/** Pose table of Bonetail: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
@@ -140,13 +158,14 @@ static PoseTableEntry pose_table[] = {
     {3, "GNB_X_1"},
     {2, "GNB_Z_1"},
 #endif
-    {28, "GNB_S_3"},
+    {BTL_POSE_NORMAL, "GNB_S_3"},
     {BTL_POSE_TALK, "GNB_T_3"},
     {31, "GNB_S_3"},
-    {39, "GNB_D_1"},
+    {BTL_POSE_DAMAGE, "GNB_D_1"},
     {BTL_POSE_STAY_DEFAULT, "GNB_S_3"},
 };
 
+/** Pose table of Bonetail, weakened: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_weak[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
@@ -154,24 +173,27 @@ static PoseTableEntry pose_table_weak[] = {
     {3, "GNB_X_1"},
     {2, "GNB_N_1"},
 #endif
-    {28, "GNB_S_4"},
+    {BTL_POSE_NORMAL, "GNB_S_4"},
     {BTL_POSE_TALK, "GNB_T_4"},
     {31, "GNB_S_4"},
-    {39, "GNB_V_1"},
+    {BTL_POSE_DAMAGE, "GNB_V_1"},
     {BTL_POSE_STAY_DEFAULT, "GNB_S_4"},
 };
 
+/** Data table of Bonetail: event handlers keyed by tag (zonbaba_damage_sub_event, dead_event). */
 static BattleDataEntry data_table[] = {
     {9, zonbaba_damage_sub_event},
     {49, dead_event},
     {0, NULL},
 };
 
+/** Body parts of Bonetail: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_zonbaba", "c_gonbaba_z", 0.0f, 0.0f, 0.0f, 230.0f, 36.0f, 60.0f, 230.0f, 36.0f, 60.0f, 20, 30, 255, &defence, &defence_attr, 0x2, 0, pose_table},
-    {2, "btl_un_zonbaba", "c_gonbaba_z", 100.0f, 0.0f, 0.0f, 250.0f, 110.0f, 25.0f, 250.0f, 110.0f, 25.0f, 20, 30, 255, &defence, &defence_attr, 0x1600009, 0, pose_table},
+    {1, "btl_un_zonbaba", "c_gonbaba_z", 0.0f, 0.0f, 0.0f, 230.0f, 36.0f, 60.0f, 230.0f, 36.0f, 60.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_IMPORTANT, 0, pose_table},
+    {2, "btl_un_zonbaba", "c_gonbaba_z", 100.0f, 0.0f, 0.0f, 250.0f, 110.0f, 25.0f, 250.0f, 110.0f, 25.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET | PART_ATTR_HIDDEN, 0, pose_table},
 };
 
+/** Attack data for Bonetail's stomp: 8 damage. */
 BattleWeapon weapon_zonbaba_fumituke_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -194,7 +216,7 @@ BattleWeapon weapon_zonbaba_fumituke_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     11, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -213,6 +235,7 @@ BattleWeapon weapon_zonbaba_fumituke_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 10, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for Bonetail's bite: 8 damage. */
 BattleWeapon weapon_zonbaba_kamituki_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -235,7 +258,7 @@ BattleWeapon weapon_zonbaba_kamituki_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -252,6 +275,7 @@ BattleWeapon weapon_zonbaba_kamituki_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for Bonetail's freezing breath: 8 damage, 30% Freeze. */
 BattleWeapon weapon_zonbaba_cold_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -274,7 +298,7 @@ BattleWeapon weapon_zonbaba_cold_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -294,6 +318,7 @@ BattleWeapon weapon_zonbaba_cold_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for Bonetail's confusing breath: 8 damage, 30% Confusion. */
 BattleWeapon weapon_zonbaba_confuze_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -316,7 +341,7 @@ BattleWeapon weapon_zonbaba_confuze_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -336,6 +361,7 @@ BattleWeapon weapon_zonbaba_confuze_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for Bonetail's sleep breath: 8 damage, 30% Sleep. */
 BattleWeapon weapon_zonbaba_sleep_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -358,7 +384,7 @@ BattleWeapon weapon_zonbaba_sleep_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -378,6 +404,7 @@ BattleWeapon weapon_zonbaba_sleep_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for Bonetail's shrinking breath: 8 damage, 30% size change. */
 BattleWeapon weapon_zonbaba_minimini_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -400,7 +427,7 @@ BattleWeapon weapon_zonbaba_minimini_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -420,6 +447,7 @@ BattleWeapon weapon_zonbaba_minimini_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for Bonetail's self-heal: no damage. */
 BattleWeapon weapon_zonbaba_recover = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -437,7 +465,7 @@ BattleWeapon weapon_zonbaba_recover = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -463,6 +491,8 @@ BattleWeapon weapon_zonbaba_recover = {
  * Bonetail speaks tik_boss_12 and the partner answers with tik_boss_13 before the camera returns to normal.
  */
 static EVT_BEGIN(battle_entry_event)
+    // Bonetail's entrance: Mario and his partner are moved off the left edge of the stage and Bonetail is
+    // lifted out of view.
     CALL(evt_btl_camera_set_prilimit, 1)
     CALL(evt_map_replayanim, 0, STRING("dontyo"))
     CALL(evt_btl_camera_set_mode, 1, 3)
@@ -478,9 +508,9 @@ static EVT_BEGIN(battle_entry_event)
     ADD(LW(1), LW(3))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     WAIT_FRAMES(60)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_MARIO, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_MARIO, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_PARTNER, LW(3), LW(4), LW(5))
     SET_VALUE(LW(8), LW(0))
@@ -495,21 +525,24 @@ static EVT_BEGIN(battle_entry_event)
     MULTIPLY(LW(7), -1)
     CALL(btlevtcmd_SetPos, BTL_UNIT_MARIO, LW(6), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_PARTNER, LW(7), LW(4), LW(5))
+    // Mario and his partner walk in from the left and stop, looking up.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_PARTNER, FLOAT(6.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_PARTNER, LW(3), LW(4), LW(5), 0, -1, 0)
         CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), BTL_POSE_STAY)
     END_SIBLING_EVENT
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_MARIO, FLOAT(6.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_MARIO, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_I_Y"))
     WAIT_FRAMES(2)
+    // Bonetail drops into the arena.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_F_3"))
     WAIT_FRAMES(1)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     WAIT_FRAMES(10)
+    // It lands with a crash and a camera shake; Mario and his partner jump back, startled.
     BEGIN_INLINE_EVENT
         WAIT_FRAMES(5)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_I_O"))
@@ -531,10 +564,11 @@ static EVT_BEGIN(battle_entry_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_I_Y"))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), BTL_POSE_STAY)
     CALL(evt_btl_camera_set_mode, 1, 3)
     CALL(evt_btl_camera_set_moveto, 1, -233, 45, 452, 56, 125, 37, 60, 0)
     WAIT_FRAMES(60)
+    // Bonetail roars its challenge and the partner answers before the fight starts.
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_msg_print, 2, STRING("tik_boss_12"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
@@ -557,7 +591,7 @@ EVT_END()
  * and installs battle_entry_event.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -565,9 +599,9 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_SetTalkBodyId, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, FLOAT(1.2998047f), FLOAT(1.2998047f), FLOAT(0.5f))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HP_STAGE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEALS_LEFT, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEAL_LINE, 0)
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(battle_entry_event))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -692,7 +726,7 @@ static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HP_STAGE, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
@@ -700,7 +734,7 @@ static EVT_BEGIN(phase_event)
         DIVIDE(LW(0), 100)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HP_STAGE, 1)
         END_IF
         CASE_EQUAL(1)
         CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
@@ -709,7 +743,7 @@ static EVT_BEGIN(phase_event)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HP_STAGE, 2)
             CALL(evt_msg_print, 2, STRING("tik_boss_15"), 0, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
         END_IF
@@ -725,15 +759,18 @@ EVT_END()
  * The target is checked for avoidance and takes the damage if the arm lands on it.
  */
 static EVT_BEGIN(fumituke_attack_event)
+    // Pick a target.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // Bonetail stomps forward, kicking up a dust cloud at every footstep.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_W_2"))
     WAIT_FRAMES(57)
     BEGIN_SIBLING_EVENT
@@ -754,6 +791,7 @@ static EVT_BEGIN(fumituke_attack_event)
     END_SIBLING_EVENT
     CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
     WAIT_FRAMES(1)
+    // It raises an arm high and brings it down on the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_3"))
     BEGIN_INLINE_EVENT
         CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_ARM_UP1"), EVT_NULLPTR, 0, -320, 30, 30, EVT_NULLPTR)
@@ -761,7 +799,8 @@ static EVT_BEGIN(fumituke_attack_event)
         CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_ARM_DOWN1"), EVT_NULLPTR, 0, -360, 50, 30, EVT_NULLPTR)
     END_INLINE_EVENT
     WAIT_FRAMES(45)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Find out whether the arm lands on the target.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -785,10 +824,12 @@ static EVT_BEGIN(fumituke_attack_event)
     END_SWITCH
     LABEL(90)
     GOTO(97)
+    // Hit: the damage is dealt.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
+    // Bonetail steps back to its place, kicking up dust again.
     LABEL(97)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MOVE1"), EVT_NULLPTR, 0, -400, 0, -5, EVT_NULLPTR)
@@ -848,7 +889,7 @@ static EVT_BEGIN(kamituki_attack_event)
     END_INLINE_EVENT
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_2"))
     WAIT_FRAMES(20)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -874,7 +915,7 @@ static EVT_BEGIN(kamituki_attack_event)
     GOTO(97)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(97)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     LABEL(99)
@@ -896,9 +937,11 @@ EVT_BEGIN(breath1_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The breath hits the whole party: Bonetail declares the attack on every enemy.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // It rears up and raises its neck.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A_1"))
     SET_VALUE(LW(10), 120)
     SET_VALUE(LW(11), 30)
@@ -917,6 +960,7 @@ EVT_BEGIN(breath1_attack_event)
         CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, LW(13), EVT_NULLPTR, 0, -300, 0, 0, EVT_NULLPTR)
         ADD(LW(11), 45)
         SUBTRACT(LW(8), 10)
+        // It spits the breath effect that matches the weapon: cold, confusion, sleep or shrinking.
         SWITCH(LW(9))
             CASE_EQUAL(PTR(&weapon_zonbaba_cold_attack))
             CALL(evt_eff, 0, STRING("gonbaba_breath"), 3, LW(6), LW(7), LW(8), FLOAT(3.0f), LW(11), 0, 0, 0, 0, 0, 0)
@@ -939,8 +983,9 @@ EVT_BEGIN(breath1_attack_event)
     ADD(LW(12), 105)
     WAIT_FRAMES(LW(12))
     SET_VALUE(LW(10), 0)
+    // Check each party member in turn for avoidance, Action Command defence and damage.
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -968,7 +1013,7 @@ EVT_BEGIN(breath1_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -995,13 +1040,16 @@ EVT_BEGIN(breath2_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The breath hits the whole party: Bonetail declares the attack on every enemy.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // It slowly lifts its neck.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A2_1"))
     WAIT_MS(833)
     CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_NECK_UP1"), EVT_NULLPTR, 0, -250, 0, 0, EVT_NULLPTR)
     WAIT_MS(1000)
+    // It tilts its head back and breathes out.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_A2_3"))
     CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, LW(13), EVT_NULLPTR, 0, -300, 0, 0, EVT_NULLPTR)
     SET_VALUE(LW(10), 120)
@@ -1016,6 +1064,7 @@ EVT_BEGIN(breath2_attack_event)
         WAIT_FRAMES(20)
         ADD(LW(11), 45)
         SUBTRACT(LW(8), 10)
+        // It spits the breath effect that matches the weapon: cold, confusion, sleep or shrinking.
         SWITCH(LW(9))
             CASE_EQUAL(PTR(&weapon_zonbaba_cold_attack))
             CALL(evt_eff, 0, STRING("gonbaba_breath"), 3, LW(6), LW(7), LW(8), FLOAT(3.0f), LW(11), 0, 0, 0, 0, 0, 0)
@@ -1038,8 +1087,9 @@ EVT_BEGIN(breath2_attack_event)
     ADD(LW(12), 20)
     WAIT_FRAMES(LW(12))
     SET_VALUE(LW(10), 0)
+    // Check each party member in turn for avoidance, Action Command defence and damage.
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1067,7 +1117,7 @@ EVT_BEGIN(breath2_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -1082,21 +1132,22 @@ EVT_BEGIN(breath2_attack_event)
 EVT_END()
 
 /**
- * Bonetail heals itself: speaks its recovery line (tik_boss_14) the first time,
+ * Bonetail heals itself: speaks its recovery line (tik_boss_14) (meant for the first heal only, but see the BUG note),
  * counts down the remaining uses in work 1, recovers 20 HP on part 1 and shows the recovery effect at its mouth.
  */
 EVT_BEGIN(recover_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEAL_LINE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_StatusWindowOnOff, 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, 1)
+        // BUG: Get, not Set: the slot is never set to 1, so the line plays on every heal. Fix: btlevtcmd_SetUnitWork.
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEAL_LINE, 1)
         CALL(evt_msg_print, 2, STRING("tik_boss_14"), 0, BTL_UNIT_SELF)
         CALL(btlevtcmd_StatusWindowOnOff, 1)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEALS_LEFT, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SUBTRACT(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEALS_LEFT, LW(0))
     END_IF
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_RecoverHp, BTL_UNIT_SELF, 1, 20)
@@ -1117,13 +1168,16 @@ EVT_END()
  * while it has recoveries left in unit work 1. The demo builds use weights 30 and 15 for the stomp and bite.
  */
 static EVT_BEGIN(attack_event)
+    // Use an item if it has one; otherwise choose a move by stage.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HP_STAGE, LW(0))
+    // Stage 0 (healthy): draw lots between the stomp, the bite and the four breaths (cold, confusion, sleep,
+    // shrinking).
     SWITCH(LW(0))
         CASE_EQUAL(0)
 #if VERSION <= VERSION_DEMO_US
@@ -1135,9 +1189,11 @@ static EVT_BEGIN(attack_event)
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_fumituke_attack))
             CALL_CHILD(fumituke_attack_event)
+            // Stage 1 (HP at or below half): the same moves, and now it can also heal itself.
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_kamituki_attack))
             CALL_CHILD(kamituki_attack_event)
+            // Stage 2 (HP at or below a quarter): the same moves, and healing is much more likely.
             CASE_EQUAL(2)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_COLD1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_cold_attack))
@@ -1157,7 +1213,7 @@ static EVT_BEGIN(attack_event)
         END_SWITCH
         CASE_EQUAL(1)
         SET_VALUE(LW(1), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEALS_LEFT, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(1), 20)
         END_IF
@@ -1195,7 +1251,7 @@ static EVT_BEGIN(attack_event)
         END_SWITCH
         CASE_EQUAL(2)
         SET_VALUE(LW(1), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_ZONBABA_HEALS_LEFT, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(1), 50)
         END_IF

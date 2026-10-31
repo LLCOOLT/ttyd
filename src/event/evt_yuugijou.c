@@ -11,16 +11,9 @@
 #include "pmario_sound.h"
 #include "version.h"
 #include "evt/evt_story.h"
-
-extern USER_FUNC(evt_mario_set_prev_party_pos);
-extern USER_FUNC(evt_mario_set_enable_key);
-extern USER_FUNC(evt_bero_mapchange);
-extern USER_FUNC(evt_mario_cont_onoff);
-extern USER_FUNC(evt_mario_get_pos);
-extern USER_FUNC(evt_mario_set_pos);
-extern USER_FUNC(evt_msg_print);
-extern USER_FUNC(evt_msg_select);
-extern USER_FUNC(evt_msg_continue);
+#include "evt/evt_bero.h"
+#include "evt/evt_mario.h"
+#include "evt/evt_msg.h"
 
 // Retail only: the per-minigame window script lookup, defined at the end of the file.
 #if VERSION >= VERSION_JP
@@ -35,7 +28,7 @@ PiantaParlorWork yuugijouwork;
 //.sbss
 PiantaParlorWork* yuwp;
 #if VERSION >= VERSION_JP
-s32 yuu_window_evt; // the demo has no per-game window script
+EvtWord* yuu_window_evt; // the demo has no per-game window script
 #endif
 
 /**
@@ -441,7 +434,8 @@ void yuugijou_init(void) {
  * higher on screen with flag 4.
  * Every 4th frame the shown count steps a tenth of the way (at least 1) toward the real count,
  * with a tick sound; retail versions space the sound out to every 8 steps.
- * Unknown: no caller in the C tree; presumably a display callback registered elsewhere.
+ * Called from the draw callbacks of gor_03 (the Pianta Changer)
+ * and of the Pianta Parlor games (yuu_00 to yuu_03).
  */
 void monteCountDisp(void) {
     static s32 monte_snd_flag;
@@ -449,9 +443,9 @@ void monteCountDisp(void) {
     u32 flags = yuwp->flags;
     Mtx mtx;
     GXColor c1, c2, c3, c4;
-    if (flags & 4)
+    if (flags & PARLOR_FLAG_COUNTER_HIGH)
         y = -0x78;
-    if (!(flags & 1) || !(flags & 2))
+    if (!(flags & PARLOR_FLAG_COUNTER_SHOWN) || !(flags & PARLOR_FLAG_TOKENS_OUT))
         return;
     {
         {
@@ -533,7 +527,7 @@ USER_FUNC(yuugijou_get_montemedal) {
 /** Writes to args[0] the tokens left in deposit (yuugijou_montemedal_keep), or 0 while the tokens are taken out. */
 USER_FUNC(yuugijou_get_montemedal_keep) {
     EvtWord* args = event->args;
-    if (yuwp->flags & 2) {
+    if (yuwp->flags & PARLOR_FLAG_TOKENS_OUT) {
         evtSetValue(event, args[0], 0);
     } else {
         evtSetValue(event, args[0], yuwp->keptTokens);
@@ -542,13 +536,15 @@ USER_FUNC(yuugijou_get_montemedal_keep) {
 }
 
 /**
- * Guess: adds args[1] to the deposit total while tokens are taken out, keeping the base (moto) amount in step.
- * args[0] is read but ignored.
+ * Adds args[1] to keptTokens while the tokens are taken out (flag 2); args[0] is read but ignored.
+ * keptTokens is overwritten by the next yuugijou_montemedal_keep, so nothing comes of it.
+ * Its one caller, gor_03's Pianta Changer (exchange_set), passes only the tokens bought,
+ * so args[1] reads the next script word. Guess: meant to add the purchase to the deposit too.
  */
 USER_FUNC(yuugijou_add_montemedal_moto) {
     EvtWord* args = event->args;
     evtGetValue(event, args[0]);
-    if (yuwp->flags & 2) {
+    if (yuwp->flags & PARLOR_FLAG_TOKENS_OUT) {
         yuwp->keptTokens += evtGetValue(event, args[1]);
     }
     return EVT_RETURN_DONE;
@@ -557,10 +553,10 @@ USER_FUNC(yuugijou_add_montemedal_moto) {
 /** Shows (args[0] nonzero, display snapped to the real count) or hides the Pianta token counter. */
 USER_FUNC(yuugijou_montemedal_disp_onoff) {
     if (evtGetValue(event, event->args[0]) != 0) {
-        yuwp->flags |= 1;
+        yuwp->flags |= PARLOR_FLAG_COUNTER_SHOWN;
         yuwp->dispTokens = yuwp->tokens;
     } else {
-        yuwp->flags &= ~1;
+        yuwp->flags &= ~PARLOR_FLAG_COUNTER_SHOWN;
     }
     return EVT_RETURN_DONE;
 }
@@ -577,22 +573,22 @@ USER_FUNC(yuugijou_montemedal_wait) {
  * Does nothing unless the tokens are currently taken out.
  */
 USER_FUNC(yuugijou_montemedal_keep) {
-    if (yuwp->flags & 2) {
+    if (yuwp->flags & PARLOR_FLAG_TOKENS_OUT) {
         yuwp->keptTokens = yuwp->tokens;
         yuwp->tokens = 0;
         yuwp->dispTokens = 0;
-        yuwp->flags &= ~2;
-        yuwp->flags &= ~1;
+        yuwp->flags &= ~PARLOR_FLAG_TOKENS_OUT;
+        yuwp->flags &= ~PARLOR_FLAG_COUNTER_SHOWN;
     }
     return EVT_RETURN_DONE;
 }
 
 /** Takes the deposited tokens back out and shows the counter again; does nothing if they are already out. */
 USER_FUNC(yuugijou_montemedal_return) {
-    if (!(yuwp->flags & 2)) {
+    if (!(yuwp->flags & PARLOR_FLAG_TOKENS_OUT)) {
         yuwp->dispTokens = yuwp->tokens = yuwp->keptTokens;
-        yuwp->flags |= 2;
-        yuwp->flags |= 1;
+        yuwp->flags |= PARLOR_FLAG_TOKENS_OUT;
+        yuwp->flags |= PARLOR_FLAG_COUNTER_SHOWN;
     }
     return EVT_RETURN_DONE;
 }
@@ -600,7 +596,7 @@ USER_FUNC(yuugijou_montemedal_return) {
 /** Writes 1 to args[0] while Mario has his tokens taken out (flag 2), else 0. */
 USER_FUNC(yuugijou_get_takeoutflag) {
     EvtWord* args = event->args;
-    if (yuwp->flags & 2) {
+    if (yuwp->flags & PARLOR_FLAG_TOKENS_OUT) {
         evtSetValue(event, args[0], 1);
     } else {
         evtSetValue(event, args[0], 0);
@@ -611,16 +607,16 @@ USER_FUNC(yuugijou_get_takeoutflag) {
 /** Sets (args[0] nonzero) or clears flag 4, which draws the token counter higher on screen. */
 USER_FUNC(yuugijou_set_yupflag) {
     if (evtGetValue(event, event->args[0]) != 0) {
-        yuwp->flags |= 4;
+        yuwp->flags |= PARLOR_FLAG_COUNTER_HIGH;
     } else {
-        yuwp->flags &= ~4;
+        yuwp->flags &= ~PARLOR_FLAG_COUNTER_HIGH;
     }
     return EVT_RETURN_DONE;
 }
 
 /** Flags the pause window as finished (flag 8), which evtYuuWindowEndChk reports to the window code. */
 static USER_FUNC(yuuminigame_window_end) {
-    yuwp->flags |= 8;
+    yuwp->flags |= PARLOR_FLAG_WINDOW_DONE;
     return EVT_RETURN_DONE;
 }
 
@@ -633,19 +629,19 @@ static USER_FUNC(yuuminigame_end) {
 /** Retail: writes to args[0] the current minigame's window script, set by evtYuuSetWindowEvt. */
 #if VERSION >= VERSION_JP
 USER_FUNC(yuuminigame_get_window_evt) {
-    evtSetValue(event, event->args[0], yuu_window_evt);
+    evtSetValue(event, event->args[0], (EvtWord)yuu_window_evt);
     return EVT_RETURN_DONE;
 }
 
 /** Retail: sets the script window_open runs as a child before the quit prompt; each minigame sets its own. */
-void evtYuuSetWindowEvt(s32 value) {
-    yuu_window_evt = value;
+void evtYuuSetWindowEvt(EvtWord* evt) {
+    yuu_window_evt = evt;
 }
 #endif
 
 /** Opens the minigame pause window (window_open); called by the menu code (win_main.c, state 400). */
 void evtYuuWindow(void) {
-    yuwp->flags &= ~8;
+    yuwp->flags &= ~PARLOR_FLAG_WINDOW_DONE;
     evtEntryType(window_open, 0, 0, 0);
 }
 

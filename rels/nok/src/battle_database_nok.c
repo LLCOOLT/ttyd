@@ -18,6 +18,7 @@ NpcBattleSelect btlgrpsel_nok_btlno_hei_test1_off[2];
 NpcSetupBattleInfo btlsetup_nok_tbl[2];
 NpcTerritoryInfo btl_nok_setup_no_tbl[2];
 
+/** Scenery props of the Petalburg battle stage (stg_04_0): rocks and grass tufts with their positions. */
 BattleStageObjectData nok_btlobject_data[] = {
     {"ki_1", 2, 0, {-100.0f, 0.0f, -30.0f}, 0, 60, {0}},
     {"isi_A", 2, 0, {150.0f, 0.0f, -30.0f}, 10, 50, {0}},
@@ -31,6 +32,7 @@ BattleStageObjectData nok_btlobject_data[] = {
     {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
+/** The Petalburg battle stage (bti_01 backdrop, stg_04_0 scenery) used by the epilogue stage-play fight. */
 BattleStageData nok_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -44,6 +46,7 @@ BattleStageData nok_btlstage_data[] = {
     },
 };
 
+/** Enemy of the epilogue stage play: the play's Mario (unit_act_mario). */
 BattleUnitSetup btlparty_nok_hei_ep[] = {
     {
         &unit_act_mario, // unitKindParams
@@ -57,6 +60,11 @@ BattleUnitSetup btlparty_nok_hei_ep[] = {
     },
 };
 
+/**
+ * Battle group of the hei_ep fight (btlparty_nok_hei_ep):
+ * item drop odds 25 from the drop table, 25 the held item, 50 nothing;
+ * heart drop table default, flower drop table battle_heart_drop_param_default (the heart table).
+ */
 BattleGroupSetup btlgrp_nok_hei_ep = {
     1, // numEnemies
     btlparty_nok_hei_ep, // enemyData
@@ -68,11 +76,15 @@ BattleGroupSetup btlgrp_nok_hei_ep = {
     5, // reserved_1C
 };
 
+/** Enemy group of the hei_test1_off encounter: btlgrp_nok_hei_ep. */
 NpcBattleSelect btlgrpsel_nok_btlno_hei_test1_off[] = {
     {50, &btlgrp_nok_hei_ep, nok_btlstage_data},
     {0},
 };
 
+/**
+ * Encounter table of Petalburg: the single epilogue stage-play battle with its enemy pool and battle music.
+ */
 NpcSetupBattleInfo btlsetup_nok_tbl[] = {
     {
         "マップstg_01_0", // name
@@ -89,6 +101,7 @@ NpcSetupBattleInfo btlsetup_nok_tbl[] = {
     {0},
 };
 
+/** Maps the BTLNO_NOK battle name to its position in btlsetup_nok_tbl. */
 NpcTerritoryInfo btl_nok_setup_no_tbl[] = {
     {"BTLNO_HEI_TEST1", 0},
     {0},

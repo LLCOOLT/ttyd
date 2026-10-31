@@ -59,9 +59,9 @@ void mario_kemuri(void) {
                     attr = hitGetAttr(mario->hitobjJumpFrom);
                 }
                 {
-                    if (attr & 0x1000) {
+                    if (attr & HIT_ATTR_GRASS) {
                         kemuri_mugi();
-                    } else if (attr & 0x100) {
+                    } else if (attr & HIT_ATTR_SHALLOW_WATER) {
                         mario_kemuri_landon();
                     } else if (attr & 0x100000) {
                         mario = marioGetPtr();
@@ -117,9 +117,9 @@ void mario_land_kemuri(void) {
             mario->trigFlags &= ~MARIO_TRIG_FLAG_DISABLE_JUMP_KEMURI;
         } else {
             attr = hitGetAttr(hit);
-            if (attr & 0x1000) {
+            if (attr & HIT_ATTR_GRASS) {
                 kemuri_mugi();
-            } else if (attr & 0x100) {
+            } else if (attr & HIT_ATTR_SHALLOW_WATER) {
                 mario_kemuri_landon();
             } else {
                 eff = effKemuriEntry(0, mario->position.x, mario->position.y, mario->position.z, 0.0f);
@@ -304,7 +304,7 @@ void party_kemuri(PartyEntry* party) {
             if (party->moveKind != 1) {
                 if (party->runMode == 3 && party->currentMemberId == PARTY_MEMBER_YOSHI) {
                     if (party->hitobjStandOn != NULL) {
-                        if (!(hitGetAttr(party->hitobjStandOn) & 0x100)) {
+                        if (!(hitGetAttr(party->hitobjStandOn) & HIT_ATTR_SHALLOW_WATER)) {
                             if (party->moveSpeed < 2.0f) {
                             } else if (party->kemuriTimer++ > 6) {
                                 {
@@ -321,7 +321,7 @@ void party_kemuri(PartyEntry* party) {
                     }
                 } else if (party->motionId == 1) {
                     if (party->hitobjStandOn != NULL) {
-                        if (!(hitGetAttr(party->hitobjStandOn) & 0x100)) {
+                        if (!(hitGetAttr(party->hitobjStandOn) & HIT_ATTR_SHALLOW_WATER)) {
                             if (party->moveSpeed < 2.0f) {
                             } else if (party->kemuriTimer++ > 6) {
                                 {

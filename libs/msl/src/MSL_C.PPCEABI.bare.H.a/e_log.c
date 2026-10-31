@@ -12,6 +12,7 @@ Lg5 = 1.818357216161805012e-01,
 Lg6 = 1.531383769920937332e-01,
 Lg7 = 1.479819860511658591e-01;
 
+/** Zero constant for log. */
 static double zero = 0.0;
 
 /** Natural logarithm of x (fdlibm). */

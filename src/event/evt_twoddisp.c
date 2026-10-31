@@ -51,11 +51,7 @@ static void twoddisp_disp(CameraId camera, void* param) {
                 pos.y = p->baseY + p->y;
                 pos.z = 0.0f;
                 GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fogi);
-#if VERSION <= VERSION_DEMO_US
-                iconDispGx(&pos, 4, (u16)p->id, p->scale);
-#else
-                iconDispGx(&pos, 0x10, (u16)p->id, p->scale);
-#endif
+                iconDispGx(&pos, ICON_DISP_2D, (u16)p->id, p->scale);
             } else {
                 FontDrawStart();
                 FontDrawScale(p->scale);
@@ -78,7 +74,7 @@ static USER_FUNC(twoddisp_main) {
     u32 i;
     for (i = 0; (s32)i < 100; i++) {
     }
-    dispEntry((CameraId)8, 1000.0f, 0, twoddisp_disp, NULL);
+    dispEntry(CAMERA_2D, 1000.0f, 0, twoddisp_disp, NULL);
     return 2;
 }
 

@@ -25,6 +25,10 @@ typedef struct SklWork {
 #define SKL_W(w) ((SklWork*)(w)->actionCommands.work)
 #define SKL_D(w) (&(w)->actionCommands.disp)
 
+/**
+ * Frames allowed to let go of the stick after the last light, by difficulty (80 at the easiest down to 5).
+ * Used by Mario's hammer attacks and Frankly's battle lesson.
+ */
 s32 ac_stickkeepleft_ok_frame[7] = {80, 70, 60, 40, 20, 10, 5};
 
 static void actionCommandDisp(f32 x, f32 y, s32 unused);
@@ -93,8 +97,8 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                 work->actionCommands.acState = 1000;
                 // fallthrough
             case 1000:
-                if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
-                    if (work->actionCommands.setupFlags & 2) {
+                if ((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+                    if (work->actionCommands.setupFlags & AC_SETUP_FLAG_RETRIES) {
                         work->actionCommands.setupParam--;
                         if (work->actionCommands.setupParam >= 0) {
                             break;

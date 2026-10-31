@@ -14,7 +14,12 @@ static volatile u64 salLastTick = 0;
 static volatile u32 salLogicActive = 0;
 static volatile u32 salLogicIsWaiting = 0;
 static volatile u32 salDspIsDone = 0;
+/** Base address of the audio output buffers in memory. */
 void* salAIBufferBase = NULL;
+/**
+ * Index of the audio output buffer being filled, and the callback the application registered for each
+ * finished buffer.
+ */
 static u8 salAIBufferIndex = 0;
 static SND_SOME_CALLBACK userCallback = NULL;
 

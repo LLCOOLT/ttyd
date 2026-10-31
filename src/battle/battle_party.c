@@ -11,6 +11,11 @@
 
 #define PARTY_SETUP(kind) {&kind, 0, {0}, BATTLE_PHASE_PLAYER, {1000.0f, 0.0f, 1000.0f}, 0, {0, 0, 0, 0}, NULL}
 
+/**
+ * Battle entries for the seven partners in unit-kind order 0xE0-0xE6 (Goombella, Koops, Yoshi, Flurrie, Vivian,
+ * Bobbery, Ms. Mowz). Btl_UnitSetup enters the partner the field party has; BattleChangeParty and
+ * BattlePartyAnimeLoad use it when the player switches partners.
+ */
 BattleUnitSetup entryunit_party[7] = {
     PARTY_SETUP(unitdata_Party_Christine),
     PARTY_SETUP(unitdata_Party_Nokotarou),

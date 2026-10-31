@@ -34,6 +34,7 @@
 #include "driver/hitdrv.h"
 #include "version.h"
 #include <dolphin/pad.h>
+#include "mot/mot_roll.h"
 
 static OSTime wwstart;
 static s32 x_flag_data[2];
@@ -55,11 +56,6 @@ static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
     camera->curveA = 11;
 }
 static Vec daiv;
-void marioRollTryCancel(void);
-#if VERSION <= VERSION_DEMO_US
-void marioRollCancel(void);
-#endif
-BOOL marioRollKeyDisable(void);
 
 static USER_FUNC(evtflash);
 static USER_FUNC(lect_slit_check);
@@ -446,8 +442,9 @@ static USER_FUNC(effitemget_open_ptr) {
 
 /**
  * Script helper: args[0] nonzero moves the 3D camera 2016 units up,
- * zero moves it back down (effitemget_cam_move).
- * Guess: the lecture uses it to move the view away from the map while the item-get effect is arranged.
+ * zero moves it back down (effitemget_cam_move). Nothing in this file calls it; the lecture copies in eki, gor,
+ * hei and mri lift the camera and Mario 2016 units, capture the screen into an image for the paper-seal
+ * transition one frame later, and move both back.
  */
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
@@ -465,8 +462,8 @@ static USER_FUNC(effitemget_busaiku) {
 
 /**
  * Script helper: turns on hit-group flag 1 for the hit objects of the map object named by args[0] ("me" means
- * the object running the script).
- * Guess: "nasi" means "none", so this switches the object's collision off for the lecture.
+ * the object running the script), which the hit checks skip, so the object loses its collision (nasi = none).
+ * Nothing in this file calls it.
  */
 static USER_FUNC(lect_mobj_hit_nasi) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
@@ -643,6 +640,8 @@ EVT_END()
  * otherwise the genie asks (stg1_gon_12_15_yn) whether to repeat it, and finally says goodbye (stg1_gon_12_17).
  */
 EVT_BEGIN(slit_majin_lecture)
+    // Set up the lesson: the button prompt icon appears beside Mario and the genie floats in front of the
+    // camera.
     BEGIN_SIBLING_EVENT
         CALL(lecture_button_rtn)
     END_SIBLING_EVENT
@@ -660,10 +659,12 @@ EVT_BEGIN(slit_majin_lecture)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // The genie laughs at Mario for falling for the trap and explains the castle's curse.
     CALL(evt_npc_set_anim, STRING("ペラ魔人"), STRING("P_1"))
     WAIT_MS(200)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg1_gon_12_12"), 0, STRING("ペラ魔人"))
+    // Mario is dazzled by flashes of light.
     CALL(evt_mario_set_pose, STRING("M_N_H"))
     LOOP(4)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -672,6 +673,7 @@ EVT_BEGIN(slit_majin_lecture)
     END_LOOP
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_toge, 1, 0, 0, 0)
+    // The genie announces the paper curse and tells Mario to hold the R button.
     CALL(evt_msg_print, 0, STRING("stg1_gon_12_13"), 0, STRING("ペラ魔人"))
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_toge, 1, 0, 0, 0)
@@ -679,6 +681,7 @@ EVT_BEGIN(slit_majin_lecture)
 #else
     CALL(evt_msg_print_add, 0, STRING("stg1_gon_12_14"))
 #endif
+    // Practice loop: the prompt icon blinks while Mario tries to turn sideways.
     LOOP(0)
         LOOP(0)
             CALL(lecture_button_flag_on_off, 0, 2, 1)
@@ -711,6 +714,7 @@ EVT_BEGIN(slit_majin_lecture)
             CALL(evt_mario_set_enable_key, 32)
             CALL(evt_mario_key_onoff, 1)
             CALL(evt_mario_key_onoff, 1)
+            // Mario is moved only by the check; the lesson is passed once he stays paper-thin for 180 frames.
             LOOP(0)
                 CALL(lect_status_off)
                 CALL(evt_mario_get_pos, 0, LW(5), LW(1), LW(6))
@@ -739,6 +743,7 @@ EVT_BEGIN(slit_majin_lecture)
 #if VERSION >= VERSION_JP
             CALL(evt_msg_continue)
 #endif
+            // Control is returned to normal and the prompt is dismissed.
             CALL(evt_mario_key_onoff, 0)
             CALL(evt_mario_key_onoff, 0)
             CALL(lect_status_on)
@@ -763,6 +768,7 @@ EVT_BEGIN(slit_majin_lecture)
             CALL(evt_mario_set_pose, STRING("M_S_1"))
             CALL(lecture_button_seq_wait, 0, 1)
             WAIT_MS(300)
+            // If Mario failed to hold paper mode, the genie scolds him and he tries again.
             IF_INT_EQUAL(LW(11), 1)
                 BREAK_LOOP
             ELSE
@@ -779,10 +785,12 @@ EVT_BEGIN(slit_majin_lecture)
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg1_gon_12_15"), 0, STRING("ペラ魔人"))
 #endif
+        // The genie asks whether Mario understands the curse.
         CALL(evt_msg_select, 0, STRING("stg1_gon_12_15_yn"))
 #if VERSION <= VERSION_DEMO_US
         CALL(evt_msg_continue)
 #endif
+        // No: the genie scolds him and the lesson repeats.
         IF_INT_EQUAL(LW(0), 0)
 #if VERSION <= VERSION_DEMO_US
             CALL(evt_msg_toge, 1, 0, 0, 0)
@@ -800,6 +808,7 @@ EVT_BEGIN(slit_majin_lecture)
 #else
     CALL(evt_msg_print_add, 0, STRING("stg1_gon_12_17"))
 #endif
+    // The genie says farewell and disappears.
     CALL(evt_npc_set_anim, STRING("ペラ魔人"), STRING("P_2"))
     WAIT_MS(200)
     CALL(evt_npc_set_camid, STRING("ペラ魔人"), 4)

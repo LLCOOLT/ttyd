@@ -21,6 +21,12 @@
 #include "evt/evt_sub.h"
 #include "version.h"
 
+// Unit work slots of the Poison Puff (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_DOKUGASSUN_LOW = 0,     // 1 while it floats low (hammers and shell tosses reach it), 0 while high
+    UW_DOKUGASSUN_UNUSED_1 = 1 // cleared at init, never read
+};
+
 static USER_FUNC(eff_poison_barrier);
 static USER_FUNC(eff_poison_breath);
 
@@ -52,6 +58,10 @@ static EvtWord wait_event[12];
 static EvtWord wait_event[13];
 #endif
 
+/**
+ * Unit data of the Poison Puff; ties together its sounds, parts, status vulnerability, init event
+ * and event table.
+ */
 static BattleUnitKind unit_dokugassun = {
     166, // unitType
     "btl_un_dokugassun", // name
@@ -97,16 +107,30 @@ static BattleUnitKind unit_dokugassun = {
     (BattleDataEntry*)data_table, // dataTable
 };
 
+/** Defence of the Poison Puff: 0 against every kind of hit. */
 static BattleUnitDefense defence = {0};
 
+/** Defence attributes of the Poison Puff: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Poison Puff (percent chance each status takes hold):
+ * immune to poison; resists sleep (70%), stop (70%), confusion (60%), freeze (60%), Tiny (60%),
+ * Attack Down (60%), Defense Down (60%), allergic (60%), fright (60%), Slow (60%), instant KO (20%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {70, 70, 80, 0, 60, 100, 100, 60, 100, 60, 100, 60, 100, 60, 60, 60, 80, 100, 60, 100, 100, 20};
 #else
+/**
+ * Retail builds: Status vulnerability of the Poison Puff (percent chance each status takes hold):
+ * immune to poison; resists sleep (65%), stop (65%), confusion (60%), allergic (50%), fright (60%),
+ * Slow (60%), instant KO (20%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {65, 65, 90, 0, 60, 100, 100, 100, 100, 80, 100, 80, 100, 80, 50, 60, 85, 100, 60, 100, 100, 20};
 #endif
 
+/** Parts of the Poison Puff: 1 part (model c_kmoon_g). */
 static BattleUnitKindPart parts[] = {
     {
         1, // partNum
@@ -159,6 +183,7 @@ static USER_FUNC(eff_poison_breath) {
     return EVT_RETURN_DONE;
 }
 
+/** Weapon of the Poison Puff (attack): targets one unit for 8 damage; used by attack_event. */
 static BattleWeapon weapon_dokugassun_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -177,7 +202,7 @@ static BattleWeapon weapon_dokugassun_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -195,6 +220,10 @@ static BattleWeapon weapon_dokugassun_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of the Poison Puff (poisongas attack): targets every unit for 10 damage, ignores Defense,
+ * may inflict Poison (50%, 10 turns); used by attack_event.
+ */
 static BattleWeapon weapon_dokugassun_poisongas_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -217,7 +246,7 @@ static BattleWeapon weapon_dokugassun_poisongas_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -244,7 +273,7 @@ static BattleWeapon weapon_dokugassun_poisongas_attack = {
 
 /**
  * Attack event of the Poison Puff. Uses an enemy item if it has one.
- * If it is charged up (the counter attribute 512 is set) it breathes the poison gas (poisongas_event);
+ * If it is charged up (COUNTER_ATTR_POISON_STATUS is set) it breathes the poison gas (poisongas_event);
  * otherwise it rolls: a 65 percent chance (70 in the demo) of the body slam (normal_attack_event),
  * else it charges up (charge_event).
  */
@@ -255,7 +284,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 512, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_POISON_STATUS, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_dokugassun_poisongas_attack))
         CALL_CHILD(poisongas_event)
@@ -295,11 +324,12 @@ EVT_END()
  * and poison checks run for each target.
  */
 static EVT_BEGIN(poisongas_event)
+    // The Poison Puff picks the whole opposing side as its target (it is already charged up).
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -312,6 +342,7 @@ static EVT_BEGIN(poisongas_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
 #if VERSION >= VERSION_JP
+    // In the later versions it first slides back 40 units to make room.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE3"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -319,15 +350,18 @@ static EVT_BEGIN(poisongas_event)
 #endif
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It faces the opposing side and rears up (A_2B) for a second, with the charge sound.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_DOKU_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     WAIT_FRAMES(60)
+    // It inflates (A_3A, A_3B) and its charge is used up.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_DOKU_KUMO_CHARGE_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 512)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_POISON_STATUS)
+    // It puffs out 20 clouds of poison gas, one every 3 frames, over the opposing side.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
         IF_INT_EQUAL(LW(10), 0)
@@ -344,6 +378,8 @@ static EVT_BEGIN(poisongas_event)
     END_SIBLING_EVENT
     WAIT_FRAMES(10)
     SET_VALUE(LW(6), 0)
+    // Each target is checked in turn: a miss, or a hit that applies damage and possible Poison (the defence
+    // result counts for the first target only).
     LABEL(0)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
@@ -382,6 +418,7 @@ static EVT_BEGIN(poisongas_event)
         GOTO(98)
     END_IF
     GOTO(0)
+    // After a pause (60 frames) it slides back to its place and settles down.
     LABEL(98)
     WAIT_FRAMES(60)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
@@ -395,6 +432,7 @@ static EVT_BEGIN(poisongas_event)
     RETURN
 EVT_END()
 
+/** Pose table of the Poison Puff: maps its battle poses to its animations. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -449,6 +487,7 @@ static USER_FUNC(eff_poison_barrier) {
     return EVT_RETURN_DONE;
 }
 
+/** Event table of the Poison Puff: counter_event (tag 43), dmg_first_attack_pos (tag 48). */
 static BattleDataEntry data_table[] = {
     {43, counter_event},
     {48, dmg_first_attack_pos},
@@ -466,8 +505,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_DOKUGASSUN_LOW, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_DOKUGASSUN_UNUSED_1, 0)
     SPAWN_EVENT(barrier_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -475,7 +514,7 @@ EVT_END()
 
 /**
  * Loop that runs for as long as the Poison Puff exists:
- * every 31 frames, if it is charged (counter attribute 512), it creates the poison barrier puffs around itself.
+ * every 31 frames, if it is charged (COUNTER_ATTR_POISON_STATUS), it creates the poison barrier puffs around itself.
  */
 static EVT_BEGIN(barrier_event)
     LABEL(0)
@@ -484,7 +523,7 @@ static EVT_BEGIN(barrier_event)
     IF_INT_EQUAL(LW(0), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 512, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_POISON_STATUS, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(eff_poison_barrier, BTL_UNIT_SELF)
     END_IF
@@ -493,7 +532,10 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
-/** Data-table hook for a first attack on the Poison Puff: sets its y position to 10 and waits for the attack to end. */
+/**
+ * Data-table event 48, run when the battle opens with Mario's or his partner's First Strike on the Poison Puff:
+ * sets its y position to 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -518,7 +560,7 @@ EVT_END()
 /**
  * Unison-phase event: before the player phase, if it can act and is not charged,
  * there is a 25 percent chance (rolled from 0 to 98) it moves between two heights,
- * y 40 (with the hit-avoiding part attributes 6291456 set) and y 10 (attributes cleared), with a sound,
+ * y 40 (with the hit-avoiding PART_ATTR_HAMMERLIKE_CANNOT_TARGET and SHELL_TOSSLIKE_CANNOT_TARGET set) and y 10 (attributes cleared), with a sound,
  * toggling work 0 each time.
  */
 static EVT_BEGIN(unison_phase_event)
@@ -530,29 +572,29 @@ static EVT_BEGIN(unison_phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 512, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_POISON_STATUS, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
     CALL(evt_sub_random, 99, LW(0))
     IF_INT_LESS(LW(0), 25)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_DOKUGASSUN_LOW, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE4"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 40)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_DOKUGASSUN_LOW, 0)
         ELSE
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE5"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 10)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_DOKUGASSUN_LOW, 1)
         END_IF
     END_IF
     LABEL(99)
@@ -574,7 +616,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -587,6 +629,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // The Poison Puff shakes and shrinks for 40 frames, getting ready to ram.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -607,6 +650,7 @@ static EVT_BEGIN(normal_attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // It rears back (A_2A) and dives to a spot behind itself.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -615,6 +659,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, 0, 4, 0, -1)
     WAIT_FRAMES(10)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    // Then it flies at the target in a long arc (A_1A).
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE2"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
@@ -643,8 +688,10 @@ static EVT_BEGIN(normal_attack_event)
         SET_VALUE(LW(15), 1)
         CASE_END
     END_SWITCH
+    // The slam misses or is blocked: it goes by the target.
     LABEL(90)
     GOTO(98)
+    // The slam hits: the screen shakes, the Action Command defence result is applied and damage is dealt.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -652,6 +699,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     GOTO(98)
+    // It floats back to its home position, small again, and settles down.
     LABEL(98)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
@@ -673,7 +721,7 @@ EVT_END()
 
 /**
  * Charge-up: the camera moves in, the Poison Puff plays the charge sound and poses for 80 frames
- * while the counter attribute (512) is set, which makes it poison whoever hits it,
+ * while COUNTER_ATTR_POISON_STATUS is set, which makes it poison whoever hits it,
  * then goes back to its normal pose.
  */
 static EVT_BEGIN(charge_event)
@@ -682,7 +730,7 @@ static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 300)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_DOKU_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 512)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_POISON_STATUS)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))

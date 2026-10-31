@@ -30,6 +30,11 @@ static EvtWord jump_attack_event[324];
 static EvtWord dekadeka_event[125];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the X-Naut (btl_un_gundan_zako): 4 HP, level 13, with a body slam,
+ * a jump attack and a growth potion that makes it Huge. win.rel carries this copy,
+ * but no battle group of Boggly Woods places it.
+ */
 static BattleUnitKind unit_gundan_zako = {
     28, // unitType
     "btl_un_gundan_zako", // name
@@ -75,16 +80,29 @@ static BattleUnitKind unit_gundan_zako = {
     (BattleDataEntry*)data_table, // dataTable
 };
 
+/** Flat damage reduction of the X-Naut against normal, fire, ice, explosion and electric hits: none. */
 static BattleUnitDefense defence = {0};
 
+/** Element attributes of the X-Naut: none, so every element does its normal damage. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the X-Naut in the demo builds, as a percent of the normal chance of each status:
+ * 80% for sleep, dizzy, freeze, Defense Down, allergy, Slow; 85% for Tiny, Attack Down; 90% for stop,
+ * confusion, Gale Force; 95% for instant KO.
+ */
 static StatusVulnerability regist = {80, 90, 80, 100, 90, 100, 100, 80, 100, 85, 100, 85, 100, 80, 80, 100, 90, 100, 80, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the X-Naut in the retail builds, as a percent of the normal chance of each status:
+ * 80% for freeze, allergy, Gale Force, Slow; 90% for sleep, stop, dizzy, confusion; 95% for Tiny,
+ * Attack Down, Defense Down, instant KO.
+ */
 static StatusVulnerability regist = {90, 90, 90, 100, 90, 100, 100, 80, 100, 95, 100, 95, 100, 95, 80, 100, 80, 100, 80, 100, 100, 95};
 #endif
 
+/** Poses of the X-Naut: idle, status, hurt, run, attack and talking animations (the names have no prefix). */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -93,21 +111,25 @@ static PoseTableEntry pose_table[] = {
     {4, "X_1"},
     {3, "X_1"},
     {27, "Z_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "D_1"},
     {30, "D_1"},
     {31, "S_1"},
-    {39, "D_1"},
-    {42, "R_1"},
-    {40, "W_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** The X-Naut has no data table events. */
 static BattleDataEntry data_table[] = {
     {0},
 };
 
+/**
+ * The X-Naut's single part: the X-Naut model (c_zako_n), the main target and the part that covers for allies.
+ */
 static BattleUnitKindPart parts[] = {
     {
         1, // partNum
@@ -127,6 +149,10 @@ static BattleUnitKindPart parts[] = {
     },
 };
 
+/**
+ * The X-Naut's body slam: 3 damage to the front-most opposing target,
+ * a hammer-like attack that can be guarded.
+ */
 static BattleWeapon weapon_gundan_zako_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -145,7 +171,7 @@ static BattleWeapon weapon_gundan_zako_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -163,6 +189,7 @@ static BattleWeapon weapon_gundan_zako_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** The X-Naut's jump attack: 3 damage to one opposing target, a jump-like attack that can be guarded. */
 static BattleWeapon weapon_gundan_zako_jump_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -181,7 +208,7 @@ static BattleWeapon weapon_gundan_zako_jump_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -199,6 +226,7 @@ static BattleWeapon weapon_gundan_zako_jump_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** The X-Naut's growth potion (dekadeka bottle): it drinks it itself and always grows Huge for 3 turns. */
 static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -216,7 +244,7 @@ static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -267,7 +295,7 @@ EVT_END()
  * the jump attack (30%) or drinking its growth potion (20%, rerolled while already huge).
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
@@ -297,7 +325,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     ADD(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(2))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(2))
         IF_INT_EQUAL(LW(2), 0)
             CALL_CHILD(dekadeka_event)
             GOTO(99)
@@ -378,7 +406,9 @@ EVT_END()
  */
 static EVT_BEGIN(normal_attack_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_attack))
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // A First Strike aims at the first-strike target;
+    // otherwise the X-Naut picks a target from the opposing side.
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -387,14 +417,17 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Shared run-up: declare the attack, point the camera at the target and dash over, kicking up dust.
     CALL_CHILD(attack_common_event1)
+    // Lunge: the X-Naut springs at the target,
+    // sliding along the ground until it reaches the target's x position.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -417,6 +450,7 @@ static EVT_BEGIN(normal_attack_event)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Damage pre-check: the target either evades the slam or takes it.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -439,6 +473,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
         LABEL(90)
+        // Miss: the X-Naut skids past, tumbles over and picks itself up.
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_MISS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_2"))
@@ -451,11 +486,13 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(10)
         GOTO(98)
         LABEL(91)
+        // Hit: the camera shakes, the guard result is resolved and the damage is dealt;
+        // the X-Naut recoils backwards and lands.
         CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
         CALL(evt_btl_camera_add_zoom, 0, -50)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 48)
         CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(2.0f), FLOAT(0.099609375f))
@@ -467,6 +504,7 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(20)
         GOTO(98)
         LABEL(98)
+        // Shared wind-down: reset the camera and run back to the home position.
         CALL_CHILD(attack_common_event2)
         RETURN
 EVT_END()
@@ -482,7 +520,7 @@ static EVT_BEGIN(jump_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -534,7 +572,7 @@ static EVT_BEGIN(jump_attack_event)
         GOTO(98)
         LABEL(91)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_ATTACK3"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -598,7 +636,7 @@ static EVT_BEGIN(dekadeka_event)
         CALL(evt_btl_camera_set_mode, 0, 0)
     END_INLINE_EVENT
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_gundan_zako_dekadeka_bottle))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_gundan_zako_dekadeka_bottle), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_gundan_zako_dekadeka_bottle), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 

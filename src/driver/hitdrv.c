@@ -93,7 +93,6 @@ static BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector);
 static BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry);
 static void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion);
 static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion);
-s32 hitGetEntNum(HitEntry* hitObject);
 
 /** Boot setup for the collision driver; empty, all state lives with the loaded maps. */
 void hitInit(void) {
@@ -281,12 +280,12 @@ inline void hitPreCheck(void) {
         hit = entry->hitEntries;
         for (j = 0; j < entry->hitNumJoints; j++, hit++) {
 #if VERSION <= VERSION_DEMO_US
-            hit->flags |= 0x8000;
+            hit->flags |= HIT_FLAG_NO_GEOMETRY;
             if (hit->joint->partCount != 0) {
-                hit->flags &= ~0x8000;
+                hit->flags &= ~HIT_FLAG_NO_GEOMETRY;
             }
 #else
-            if (hit->joint->partCount != 0 && !(hit->flags & 0x81)) {
+            if (hit->joint->partCount != 0 && !(hit->flags & (HIT_FLAG_OFF | HIT_FLAG_DELETED))) {
                 if (prev == NULL) {
                     hitActiveListTop = hit;
                     prev = hit;
@@ -315,7 +314,7 @@ inline HitEntry* hitNameToPtrNoChk(const char* name) {
     for (i = 0; i < wp->entries->count; map++, i++) {
         hit = map->hitEntries;
         for (j = 0; j < map->hitNumJoints; j++, hit++) {
-            if (!(hit->flags & 0x80) && !strcmp(hit->joint->name, name)) {
+            if (!(hit->flags & HIT_FLAG_DELETED) && !strcmp(hit->joint->name, name)) {
                 return hit;
             }
         }
@@ -336,11 +335,11 @@ void hitDelete(const char* name) {
         HitEntry* hit;
 
         for (j = 0, hit = wp->entries[i].hitEntries; j < wp->entries[i].hitNumJoints; j++, hit++) {
-            if (hit->flags & 0x80) {
+            if (hit->flags & HIT_FLAG_DELETED) {
                 continue;
             }
             if (strcmp(name, hit->joint->name) == 0) {
-                hit->flags |= 0x80;
+                hit->flags |= HIT_FLAG_DELETED;
 #if VERSION >= VERSION_JP
                 hitPreCheck();
 #endif
@@ -374,10 +373,10 @@ void hitMain(void) {
         anim = entry->animData;
         for (recalc = FALSE, j = 0; j < entry->numAnims; j++, anim++) {
             list = (HitAnimJointList*)anim->anim->jointAnims;
-            if (!(anim->flags & 1)) {
+            if (!(anim->flags & MAP_ANIM_FLAG_PLAYING)) {
                 continue;
             }
-            if ((anim->flags & 2) && (anim->flags & 0x1000)) {
+            if ((anim->flags & MAP_ANIM_FLAG_ENDED) && (anim->flags & MAP_ANIM_FLAG_HIT_APPLIED)) {
                 continue;
             }
             if (list == NULL) {
@@ -389,9 +388,9 @@ void hitMain(void) {
                 if (hit != NULL) {
                     mapCalcAnimMatrix(hit->animMtx, hit->localMtx, anim, joints[1]);
                     recalc = TRUE;
-                    hit->flags |= 0x10;
-                    hit->flags |= 0x40;
-                    anim->flags |= 0x1000;
+                    hit->flags |= HIT_FLAG_ANIM_MTX;
+                    hit->flags |= HIT_FLAG_MTX_DIRTY;
+                    anim->flags |= MAP_ANIM_FLAG_HIT_APPLIED;
                 }
             }
         }
@@ -541,7 +540,7 @@ void hitGrpAttrOff(const char* name, u32 mask) {
 void hitReCalcMatrix(HitEntry* hit, Mtx mtx) {
     Vec world;
 
-    hit->flags |= 0x40;
+    hit->flags |= HIT_FLAG_MTX_DIRTY;
     hitReCalcMatrix2(hit, mtx, FALSE);
     MTXMultVec(hit->worldMtx, &hit->joint->bboxMax, &world);
     hit->radius = PSVECDistance(&world, &hit->centerWorld);
@@ -555,24 +554,24 @@ static void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
     int doCalc;
 
     doCalc = 0;
-    if (hit->flags & 0x40) {
+    if (hit->flags & HIT_FLAG_MTX_DIRTY) {
         doCalc = 1;
     }
     if (recursion != 0) {
         doCalc = 1;
     }
     if (doCalc != 0) {
-        if (hit->flags & 0x10) {
+        if (hit->flags & HIT_FLAG_ANIM_MTX) {
             PSMTXConcat(mtx, hit->animMtx, hit->worldMtx);
         } else {
             PSMTXConcat(mtx, hit->localMtx, hit->worldMtx);
         }
-        if (hit->flags & 0x20) {
+        if (hit->flags & HIT_FLAG_BOUND) {
             PSMTXConcat(hit->worldMtx, hit->mapObj->transformMtx, hit->worldMtx);
         }
         PSMTXMultVec(hit->worldMtx, &hit->centerLocal, &hit->centerWorld);
         hitCalcVtxPosition(hit);
-        hit->flags &= ~0x40;
+        hit->flags &= ~HIT_FLAG_MTX_DIRTY;
         if (hit->child != NULL) {
             hitReCalcMatrix2(hit->child, hit->worldMtx, TRUE);
         }
@@ -951,7 +950,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     if (query->targetDir.x == 0.0f && query->targetDir.y == -1.0f && query->targetDir.z == 0.0f) {
         for (mapEntry = map, i = 0; i < map->count; mapEntry++, i++) {
             for (j = 0, hit = mapEntry->hitEntries; j < mapEntry->hitNumJoints; j++, hit++) {
-                if (hit->flags & 0x8081) {
+                if (hit->flags & (HIT_FLAG_NO_GEOMETRY | HIT_FLAG_DELETED | HIT_FLAG_OFF)) {
                     continue;
                 }
                 if (callback != NULL && !callback(query, hit)) {
@@ -983,7 +982,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     } else if (query->targetDir.y == 0.0f) {
         for (mapEntry = map, i = 0; i < map->count; mapEntry++, i++) {
             for (j = 0, hit2 = mapEntry->hitEntries; j < mapEntry->hitNumJoints; j++, hit2++) {
-                if (hit2->flags & 0x8081) {
+                if (hit2->flags & (HIT_FLAG_NO_GEOMETRY | HIT_FLAG_DELETED | HIT_FLAG_OFF)) {
                     continue;
                 }
                 if (callback != NULL && !callback(query, hit2)) {
@@ -1015,7 +1014,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     } else {
         for (mapEntry = map, i = 0; i < map->count; mapEntry++, i++) {
             for (j = 0, hit3 = mapEntry->hitEntries; j < mapEntry->hitNumJoints; j++, hit3++) {
-                if (hit3->flags & 0x8081) {
+                if (hit3->flags & (HIT_FLAG_NO_GEOMETRY | HIT_FLAG_DELETED | HIT_FLAG_OFF)) {
                     continue;
                 }
                 if (callback != NULL && !callback(query, hit3)) {
@@ -1386,9 +1385,9 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     for (i = 0; i < map->count; mapEntry++, i++) {
         hitObj = mapEntry->hitEntries;
         for (j = 0; j < mapEntry->hitNumJoints; j++, hitObj++) {
-            if ((hitObj->attributes & 0x80000000) && (hitObj->joint->partCount != 0)) {
+            if ((hitObj->attributes & HIT_ATTR_MOBJ) && (hitObj->joint->partCount != 0)) {
                 entryFlags = hitObj->flags;
-                if (!(entryFlags & 1) && !(entryFlags & 0x80)) {
+                if (!(entryFlags & HIT_FLAG_OFF) && !(entryFlags & HIT_FLAG_DELETED)) {
                     dist = PSVECDistance(&center, &hitObj->centerWorld);
                     if (!(dist > (distance + hitObj->radius))) {
                         if (callback == NULL || callback(query, hitObj)) {
@@ -1458,7 +1457,7 @@ HitEntry* hitNameToPtr(const char* name) { // 1:1
         map = &wp->entries[i];
         hit = map->hitEntries;
         for (j = 0; j < map->hitNumJoints; j++, hit++) {
-            if (!(hit->flags & 0x80) && !strcmp(hit->joint->name, name)) {
+            if (!(hit->flags & HIT_FLAG_DELETED) && !strcmp(hit->joint->name, name)) {
                 return hit;
             }
         }
@@ -1568,10 +1567,14 @@ s32 hitGetAttr(HitEntry* hit) { // 1:1
 
 /**
  * Marks hit and its descendants (and following siblings when recursing) as a damaging surface (attribute
- * 0x40000000) with damage as its return point. Guess: hazards such as spikes, lava or pits.
+ * 0x40000000) with damage as its return point.
+ * Map scripts set these through evt_hit_damage_return_set (Pirate's Grotto, Rogueport Sewers, Keelhaul Key,
+ * the Palace of Shadow and others); mario.c records such a floor in damageHit and the damage motions put Mario
+ * back at its point.
+ * They are the hazard water: mot_damage sinks Mario in it and has the Gazigazi bite him (evt_gazigazi).
  */
 static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion) { // 1:1
-    hit->attributes |= 0x40000000;
+    hit->attributes |= HIT_ATTR_DAMAGE_RETURN;
     hit->damage = damage;
     if (hit->child != NULL) {
         hitDamageReturnSet(hit->child, damage, TRUE);
@@ -1621,7 +1624,7 @@ void hitBindMapObj(const char* hitName, const char* mapobjName) {
         return;
     }
     hit->mapObj = mapObj;
-    hit->flags |= 0x20;
+    hit->flags |= HIT_FLAG_BOUND;
 }
 
 /** Recomputes the collision object name after its bound map object moved (only if it was bound by hitBindMapObj). */
@@ -1635,7 +1638,7 @@ void hitBindUpdate(const char* name) {
         mapErrorEntry(1, name);
         return;
     }
-    if (hit->flags & 0x20) {
+    if (hit->flags & HIT_FLAG_BOUND) {
         parent = hit->parent;
         if (parent != NULL) {
             hitReCalcMatrix(hit, parent->worldMtx);

@@ -197,7 +197,7 @@ EVT_END()
 /**
  * Entry event of the background-camera section:
  * after the entrance finishes it releases the keep-camera mode and switches on Y-following for Mario's camera,
- * and returns LW(0) = 1 (Guess: the door code reads it as "handled").
+ * and returns LW(0) = 1, which makes evt_bero_mario_enter skip the normal walk-in.
  */
 static EVT_BEGIN(evt_haikei_in)
     BEGIN_INLINE_EVENT
@@ -210,6 +210,7 @@ static EVT_BEGIN(evt_haikei_in)
     RETURN
 EVT_END()
 
+/** Exits of this room: the west door to aji_18 and the east door to aji_14. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -442,6 +443,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Hit areas of the 13 moving platform groups whose movement is measured to carry Mario along. */
 static const char* name_tbl[] = {
     "A_ugoku_1",
     "A_ugoku_2",
@@ -458,6 +460,7 @@ static const char* name_tbl[] = {
     "A_ugoku_h_9",
 };
 
+/** Hit areas of the clockwork (zenmai) platform groups. */
 const char* name_tbl2[] = {
     "A_zenmai1",
     "A_zenmai2",
@@ -573,7 +576,8 @@ static USER_FUNC(mario_chk) {
 /**
  * Script for one sliding platform of left_right_tbl (row values in LW(0) to LW(4): hit area, map object,
  * two positions, time in ms): binds the hit area to the map object and slides it back
- * and forth between the two positions. Guess: the global flag GF(0) pauses the movement between passes.
+ * and forth between the two positions, pausing 300 ms at each end and then waiting while GF(0) is set
+ * (evt_sw raises it during the staircase-reveal cutscene).
  */
 EVT_BEGIN(move_left_right)
     SET_VALUE(LW(5), LW(0))
@@ -636,6 +640,7 @@ EVT_END()
  * after something is standing on it (GF(1) is set once its movement value passes a small threshold).
  */
 EVT_BEGIN(move_up_down)
+    // The hit area is tied to the platform and the row's heights are scaled for smooth movement.
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(6), LW(1))
     SET_VALUE(LW(7), LW(2))
@@ -651,6 +656,7 @@ EVT_BEGIN(move_up_down)
     IF_STR_EQUAL(LW(5), STRING("A_ugoku_2"))
         SET_VALUE(LW(3), 1)
         SET_VALUE(GF(1), 0)
+        // The first platform (A_ugoku_2) starts only after someone is standing on it.
         BEGIN_SIBLING_EVENT
             LOOP(0)
                 CALL(evt_mario_get_name_hitobj_head, LW(10))
@@ -668,6 +674,7 @@ EVT_BEGIN(move_up_down)
         SET_VALUE(LW(3), 0)
     END_IF
 #endif
+    // Each cycle the platform glides from its first height to its second over the row's time, then pauses.
     LOOP(0)
         CALL(evt_sub_intpl_msec_init, 11, LW(7), LW(8), LW(9))
         LABEL(0)
@@ -723,6 +730,7 @@ EVT_BEGIN(move_up_down)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_sub_intpl_msec_init, 11, LW(8), LW(7), LW(9))
+        // Then it glides back, and the cycle repeats forever.
         LABEL(1)
         CALL(evt_sub_intpl_msec_get_value)
         DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
@@ -750,7 +758,8 @@ EVT_END()
 
 /**
  * Script for one platform of r_tbl: binds the hit area to the map object
- * and turns it between two angles over the row's time. Guess: GF(0) pauses the turning between swings.
+ * and turns it between two angles over the row's time, again and again; while GF(0) is set
+ * (evt_sw raises it during the staircase-reveal cutscene) it stops mid-swing and waits.
  */
 EVT_BEGIN(move_r)
     SET_VALUE(LW(5), LW(0))
@@ -790,6 +799,10 @@ EVT_BEGIN(move_r)
     RETURN
 EVT_END()
 
+/**
+ * The platforms that slide sideways: for each, the hit area, the map object, the two end positions and the
+ * travel time.
+ */
 ShikakeMoveTbl7 left_right_tbl = {
     {
         {"A_ugoku_1", "S_ugoku_1", 0, -150, 3000},
@@ -803,6 +816,10 @@ ShikakeMoveTbl7 left_right_tbl = {
     {NULL, NULL},
 };
 
+/**
+ * The platforms that move up and down: hit area, map object, the two end positions and the travel time of
+ * each.
+ */
 ShikakeMoveTbl6 up_down_tbl = {
     {
         {"A_ugoku_2", "S_ugoku_2", 0, -150, 2800},
@@ -819,6 +836,10 @@ ShikakeMoveTbl6 up_down_tbl = {
     {NULL, NULL},
 };
 
+/**
+ * The clockwork (zenmai) platforms that rotate: hit area, map object, the two angles and the swing time of
+ * each.
+ */
 ShikakeMoveTbl15 r_tbl = {
     {
         {"A_zenmai1", "S_zenmai1", 0, 360, 6000},
@@ -922,8 +943,10 @@ static EVT_BEGIN(evt_sw)
 EVT_END()
 
 /**
- * Swings the needle map object whose name is in LW(0) around its Z axis with random target angles and durations,
- * the same effect as evt_hari in aji_03 (Guess: it animates a gauge needle on the conveyor machinery).
+ * Swings the needle map object whose name is in LW(0) (S_hari01 to S_hari04, started by evt_ramp
+ * when the conveyor belt is switched on) around its Z axis forever, to random angles up to 90 degrees
+ * on alternating sides over 1.5 to 3 seconds each, like evt_hari in aji_03 but without a stop.
+ * Guess: the needles are dial pointers on the machinery.
  */
 static EVT_BEGIN(evt_hari)
     SET_VALUE(LW(8), LW(0))
@@ -1018,6 +1041,7 @@ EVT_BEGIN(evt_key_get)
     RETURN
 EVT_END()
 
+/** Key item list for the item menu in the conveyor room: the Card Key. */
 static s32 key_tbl[] = {
     ITEM_CARD_KEY_0x20, -1,
 };

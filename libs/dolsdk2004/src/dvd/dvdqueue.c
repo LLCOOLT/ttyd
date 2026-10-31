@@ -140,6 +140,7 @@ int __DVDIsBlockInWaitingQueue(DVDCommandBlock* block) {
     return 0;
 }
 
+/** Names of the DVD command codes (index = the block's command), printed by DVDDumpWaitingQueue. */
 static char* CommandNames[16] = {
     "",
     "READ",

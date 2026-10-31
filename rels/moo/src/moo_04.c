@@ -29,6 +29,7 @@ static USER_FUNC(mario_kirimomi);
 static f32 spline_dt[9];
 static NpcSetupInfo npcEnt[2];
 
+/** Three control points (x, y, z) of the path the partner flies along during the five seconds of the flight scene. */
 static f32 spline_dt[] = {
     -12.916925f, 123.84991f, 512.97614f, 17.94919f, 46.050007f, 5.011878f, 65.15421f, 48.400024f,
     -75.32023f,
@@ -121,11 +122,11 @@ static EVT_BEGIN(mario_fly)
 EVT_END()
 
 /**
- * Event script: the X-Naut officer flung through space
- * after the story reaches STORY_STG7_20_LORD_CRUMP_DEFEATED:
- * he spins as he flies away from the camera at small scale,
- * a flash (wangflush) lights up and the map changes to aji_14 at tuzuki.
- * Guess: the officer is Lord Crump, from the story flag.
+ * Event script: Lord Crump (the NPC 幹部) blasted into space after the Magnus von Grapple 2.0 fight,
+ * while the story is still before STORY_STG7_20_LORD_CRUMP_DEFEATED:
+ * he spins as he flies off at shrinking scale with the SFX_STG7_3RD_FLY1 sound,
+ * a flash (wangflush) lights up and the map changes back to aji_14 at "tuzuki",
+ * where the aftermath sets that flag.
  */
 EVT_BEGIN(kanbu_fly)
     WAIT_MS(2000)
@@ -188,6 +189,7 @@ EVT_BEGIN(kanbu_fly)
     RETURN
 EVT_END()
 
+/** The single NPC of the scene, an X-Naut officer (幹部) who can move and talk. */
 static NpcSetupInfo npcEnt[] = {
     {
         "幹部", // name

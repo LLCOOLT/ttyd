@@ -1,5 +1,6 @@
 #include "fdlibm.h"
 
+/** Constants for fmod: 1.0 and the signed zeros it returns. */
 static const double one = 1.0, Zero[] = {0.0, -0.0};
 
 /** Floating-point remainder of x/y with the sign of x (fdlibm), computed by integer long division on the mantissas. */

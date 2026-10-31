@@ -86,6 +86,7 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/** Doors of the storage room: the north door back to the main corridor tou_04 and the west door to tou_12. */
 static BeroEntry bero_data[] = {
     {
         "n_bero", // hitName
@@ -181,6 +182,7 @@ EVT_BEGIN(evt_kaidan)
     RETURN
 EVT_END()
 
+/** Map objects of the second, labelled container, which Flurrie's gust blows away together (evt_kontena2). */
 const char* cloud_kontena2_list[] = {
     "kontena_2",
     "fuda_1",
@@ -204,6 +206,7 @@ static EVT_BEGIN(evt_block_broken)
     RETURN
 EVT_END()
 
+/** Items offered when Mario uses the storage room lock: just the Storage Key (the list ends with -1). */
 static s32 key_tbl[] = {
     ITEM_STORAGE_KEY_0x13, -1,
 };
@@ -240,11 +243,19 @@ static EVT_BEGIN(evt_lock)
 EVT_END()
 
 /**
- * Guess: scene where Mario meets Ms. Mowz (チュチュリーナ) in the storage room:
- * Mowz's theme starts, Mario and Goombella react (stg3_tou_308, 309 and following),
- * and she joins as the Badge-hunting thief introduction.
+ * Scene on entering the storage room before STORY_STG3_20_08_MS_MOWZ:
+ * Ms. Mowz (チュチュリーナ) is there with her theme playing and greets Mario again (stg3_tou_308).
+ * The partner asks if security heard her (309);
+ * she denies it and says someone else was in here (310) and that she has taken what she came for (312),
+ * then hops down, blows Mario a kiss (313), warns him not to end up like the "poor souls upstairs" (315)
+ * and leaves through the door.
+ * The partner wonders what she meant (316), Mario's mail arrives with the mail jingle and a "!" balloon
+ * until A is pressed, and he reads it: find the staircase switch to reach the attic,
+ * from X (stg3_tou_316_01, 316_02).
+ * Mail 12 is received and opened and the story advances to STORY_STG3_20_08_MS_MOWZ.
  */
 EVT_BEGIN(evt_chuchu)
+    // Ms. Mowz waits on the crates with her theme playing; Mario and the partner spot her.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_CYUCYURINA1"))
     CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -274,6 +285,7 @@ EVT_BEGIN(evt_chuchu)
     END_INLINE_EVENT
     CALL(evt_set_dir_to_target, STRING("チュチュリーナ"), STRING("mario"))
     WAIT_MS(500)
+    // She greets Mario and trades words with the partner about the noise Security heard.
     CALL(evt_cam3d_evt_set, -75, 117, 224, -75, 88, -8, 800, 11)
     WAIT_MS(800)
     CALL(evt_msg_print, 0, STRING("stg3_tou_308"), 0, STRING("チュチュリーナ"))
@@ -297,6 +309,7 @@ EVT_BEGIN(evt_chuchu)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("stg3_tou_312"), 0, STRING("チュチュリーナ"))
     WAIT_MS(300)
+    // She hops down to Mario, says goodbye and blows him a kiss.
     CALL(evt_cam3d_evt_set, 4, 67, 224, 4, 38, -8, 1000, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_move_position, STRING("チュチュリーナ"), -65, -60, 0, FLOAT(80.0f), 1)
@@ -318,6 +331,7 @@ EVT_BEGIN(evt_chuchu)
     CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_S_1"))
     CALL(evt_npc_move_position, STRING("チュチュリーナ"), -20, -60, 0, FLOAT(80.0f), 1)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // The partner reacts to the kiss and Ms. Mowz warns about the poor souls upstairs.
     CALL(evt_cam3d_evt_set, 25, 67, 224, 25, 38, -8, 300, 11)
     WAIT_MS(300)
     CALL(evt_msg_print_party, STRING("stg3_tou_314"))
@@ -326,6 +340,7 @@ EVT_BEGIN(evt_chuchu)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg3_tou_315"), 0, STRING("チュチュリーナ"))
     WAIT_MS(300)
+    // She walks out through the north door, which swings open and shut behind her.
     CALL(evt_npc_move_position, STRING("チュチュリーナ"), 0, -140, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
@@ -356,10 +371,12 @@ EVT_BEGIN(evt_chuchu)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // The Glitz Pit music returns and the partner wonders what she meant.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
     CALL(evt_msg_print_party, STRING("stg3_tou_316"))
+    // Mail arrives: the mail jingle plays and Mario waits with a "!" until A is pressed.
     BEGIN_INLINE_EVENT_GET_ID(LW(11))
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
@@ -386,6 +403,7 @@ EVT_BEGIN(evt_chuchu)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_mario_balloon_off)
+    // Mario reads X's mail about the staircase switch and the partner wonders where the stairs could be.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -406,6 +424,7 @@ EVT_BEGIN(evt_chuchu)
     CALL(evt_mario_set_pose, STRING("M_I_Z"))
     WAIT_MS(1500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // The camera returns, mail 12 is filed and opened, and the story advances.
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     CALL(evt_pouch_receive_mail, 12)
@@ -416,6 +435,10 @@ EVT_BEGIN(evt_chuchu)
     RETURN
 EVT_END()
 
+/**
+ * The 25 spots (x, y, z each) where Trouble Center job 13's Battle Trunks can lie;
+ * make_tbl shuffles their order and get_pos reads them.
+ */
 static s32 list[] = {
     -305, 250, 130, -221, 200, 5, -235, 200,
     85, -159, 250, -14, -129, 200, 45, 80,
@@ -436,9 +459,12 @@ EVT_BEGIN(iri_13_pants_00_evt)
 EVT_END()
 
 /**
- * Guess: trouble Center job 13 (find the lost Battle Trunks):
- * puts the Battle Trunks item at a random location of the storage room, with a fly appearing as a hint,
- * unless Mario already has them.
+ * Sets up Trouble Center job 13 (Jolene's storeroom garbage) when the room loads,
+ * unless GSWF_TROUBLE_WORK_1 shows Mario already reported all 20:
+ * places Battle Trunks for the ones Mario is still missing out of 20 at spots taken from the shuffled position
+ * list (make_tbl, get_pos), shows the flies (gor_hae) and plays a fly buzz every 3 to 4 seconds
+ * while any trunks lie in the room.
+ * While GSWF_TROUBLE_WORK_3 is unset, spot 0 comes first and its trunks run iri_13_pants_00_evt when picked up.
  */
 EVT_BEGIN(iri_13_init)
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
@@ -485,6 +511,7 @@ EVT_BEGIN(iri_13_init)
     RETURN
 EVT_END()
 
+/** NPCs of the storage room: Ms. Mowz, for her scene on the first visit. */
 static NpcSetupInfo npcEnt[] = {
     {
         "チュチュリーナ", // name
@@ -518,11 +545,13 @@ EVT_END()
  * the Lv1 big blocks, the job 13 trunks, and the scene to run from story progress.
  */
 EVT_BEGIN(tou_06_init_evt)
+    // Doors, Ms. Mowz and the hole in the floor that drops Mario into Grubba's office.
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("ana"), 0, PTR(evt_ana), 0)
+    // The first container until Flurrie blows it away, then the second, labelled container.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_09_BLOWING_CONTAINERS)
         CALL(evt_cloud_init)
         CALL(evt_cloud_ent, 0, STRING("kontena"), STRING("a_kon_H"), PTR(evt_kontena))
@@ -542,6 +571,7 @@ EVT_BEGIN(tou_06_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuda_3"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_kon_N"), 1, 0)
     END_IF
+    // The big blocks on the floor, each kept broken by its own flag.
     CALL(evt_mobj_lv_blk, STRING("i"), 126, -1, -126, 0, GSWF(GSWF_TOU06_BLOCK_I_BROKEN), STRING("MOBJ_Lv1BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("j"), 176, -1, -76, 0, GSWF(GSWF_TOU06_BLOCK_J_BROKEN), STRING("MOBJ_Lv1BigBlock"))
     IF_INT_EQUAL(GSWF(GSWF_TOU06_BLOCK_I_BROKEN), 0)
@@ -582,6 +612,7 @@ EVT_BEGIN(tou_06_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_TOU06_BLOCK_H_BROKEN), 0)
         CALL(evt_mobj_flag_onoff, 0, STRING("h"), MOBJ_FLAG_FALL)
     END_IF
+    // Until the stairway appears: the blue switch, the hidden stairs and their paper-unfold image.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_10_HIDDEN_STAIRWAY)
         CALL(evt_mobj_switch_blue, 0, STRING("sw"), -165, 0, -115, PTR(evt_kaidan), GSWF(GSWF_TOU06_STAIR_SWITCH_HIT))
         CALL(evt_mobj_flag_onoff, 0, STRING("sw"), MOBJ_FLAG_FALL)
@@ -592,6 +623,7 @@ EVT_BEGIN(tou_06_init_evt)
         CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_ori"))
         CALL(evt_img_onoff, STRING("img"), 0)
     END_IF
+    // The huge block on the upper floor until it is broken, and the door lock until the key is used.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_11_HOLE_IN_THE_FLOOR)
         CALL(evt_mobj_lv_blk, STRING("aa"), -450, 200, 55, PTR(evt_block_broken), GSWF(GSWF_TOU06_BIG_BLOCK_BROKEN), STRING("MOBJ_Lv1BigBigBlock"))
         CALL(evt_mobj_flag_onoff, 0, STRING("aa"), MOBJ_FLAG_FALL)
@@ -601,11 +633,13 @@ EVT_BEGIN(tou_06_init_evt)
         SET_VALUE(LW(0), 1)
         CALL_CHILD(bero_case_switch_off)
     END_IF
+    // Shine Sprite block, the spinning floor panel to the Star Piece, and the HP Plus P and Charge P badges.
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -30, 260, -30, 0, GSWF(GSWF_TOU06_SHINE_SPRITE), 0)
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 50, 0, 0, STRING("tou_6_sita"), 125, GSWF(GSWF_TOU06_STAR_PIECE_PANEL))
     CALL(evt_hitobj_attr_onoff, 0, 1, STRING("MOBJ_kururin1"), 4194304)
     CALL(evt_item_entry, STRING("item_01"), ITEM_HP_PLUS_P, -450, 250, -25, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU06_HP_PLUS_P), 0)
     CALL(evt_item_entry, STRING("item_02"), ITEM_CHARGE_P, 175, 0, -125, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU06_CHARGE_P), 0)
+    // Arriving through the "fall" entrance: Mario and the partner drop in and control returns on landing.
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("fall"))
         CALL(evt_mario_key_onoff, 0)
@@ -650,6 +684,7 @@ EVT_BEGIN(tou_06_init_evt)
         END_INLINE_EVENT
 #endif
     END_IF
+    // The flies over the garbage and, from JP on, Trouble Center job 13.
     CALL(evt_map_playanim, STRING("anm_hae"), 1, 0)
 #if VERSION >= VERSION_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gor_hae"), MAPOBJ_FLAG_HIDE)
@@ -658,6 +693,7 @@ EVT_BEGIN(tou_06_init_evt)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kaidan"), MAPOBJ_FLAG_BBOX_CULL)
 #endif
+    // Unless map events are skipped: Ms. Mowz's scene on the first visit, else music for the story stage.
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_SKIP_MAP_EVENTS)
         RETURN
@@ -693,6 +729,7 @@ EVT_BEGIN(tou_06_init_evt)
         END_IF
     END_IF
 #if VERSION <= VERSION_DEMO_US
+    // The older versions set up job 13 here instead.
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gor_hae"), MAPOBJ_FLAG_HIDE)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 13)
         CALL_CHILD(iri_13_init)

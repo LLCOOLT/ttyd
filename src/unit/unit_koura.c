@@ -1,5 +1,6 @@
 // Battle unit data for the Koopa shell (unit_koura), used by Koops, with its cracked poses.
 #include "battle/battle_unit.h"
+#include "unit/unit_koura.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
 #include "battle/battle_event_cmd.h"
@@ -32,6 +33,11 @@ static EvtWord damage_event[10];
 static EvtWord wait_event[6];
 static EvtWord attack_event[2];
 
+/**
+ * Unit data of the giant shell that Koops' Shell Shield drops over Mario (unit work 0 holds the shielded
+ * unit): 2 parts, a solid shell and a hidden spare part, with data events for opening, closing,
+ * cracking and breaking.
+ */
 BattleUnitKind unit_koura = {
     223,
     "btl_un_koura",
@@ -98,36 +104,49 @@ BattleUnitKind unit_koura = {
     data_table,
 };
 
+/** Damage reduction of the shell: none (its limited HP is what makes it wear down). */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** The shell has no elemental defence. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** The shell has no status vulnerabilities (all zero). */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Poses of the intact shell: standing (PKO_S_1), hurt (PKO_D_1) and the shield pose over Mario (PKO_Z_1).
+ */
 static PoseTableEntry pose_table[] = {
-    {28, "PKO_S_1"},
+    {BTL_POSE_NORMAL, "PKO_S_1"},
     {31, "PKO_S_1"},
-    {39, "PKO_D_1"},
+    {BTL_POSE_DAMAGE, "PKO_D_1"},
     {BTL_POSE_SHELL_SHIELD, "PKO_Z_1"},
     {BTL_POSE_STAY_DEFAULT, "PKO_S_1"},
 };
 
+/** Poses of the cracked shell (HP 4-6), used once damage_core or pose_tbl_reset notice the damage. */
 PoseTableEntry pose_table_crack_lv1[] = {
-    {28, "PKO_S_2"},
+    {BTL_POSE_NORMAL, "PKO_S_2"},
     {31, "PKO_S_2"},
-    {39, "PKO_D_2"},
+    {BTL_POSE_DAMAGE, "PKO_D_2"},
     {BTL_POSE_SHELL_SHIELD, "PKO_Z_2"},
     {BTL_POSE_STAY_DEFAULT, "PKO_S_2"},
 };
 
+/** Poses of the badly cracked shell (HP 3 or less). */
 PoseTableEntry pose_table_crack_lv2[] = {
-    {28, "PKO_S_3"},
+    {BTL_POSE_NORMAL, "PKO_S_3"},
     {31, "PKO_S_3"},
-    {39, "PKO_D_3"},
+    {BTL_POSE_DAMAGE, "PKO_D_3"},
     {BTL_POSE_SHELL_SHIELD, "PKO_Z_3"},
     {BTL_POSE_STAY_DEFAULT, "PKO_S_3"},
 };
 
+/**
+ * Data table events: 59 opens the shell off Mario, 60 closes it over him,
+ * 9 reacts to damage by picking the crack stage, 61 refreshes the crack poses,
+ * 62 removes the shell at once and 49 plays the break animation.
+ */
 static BattleDataEntry data_table[] = {
     {59, koura_open},
     {60, koura_close},
@@ -138,6 +157,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Parts of the shell: part 1 is the shell itself (main target, cannot be tattled); part 2 is a hidden,
+ * untargetable copy that plays the second half in the break animation.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_koura", "c_koura", 0.0f, 0.0f, 0.0f, 20.0f, 40.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_UNTATTLEABLE, 0, pose_table},
     {2, "btl_un_koura", "c_koura", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, 0, pose_table},
@@ -155,9 +178,9 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_OPEN, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_FOLLOWS_UNIT, KOURA_FOLLOW_NONE)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -206,23 +229,23 @@ EVT_END()
  * Does nothing if already open.
  */
 EVT_BEGIN(koura_open)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KOURA_OPEN, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
     CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, -23, 0, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KOURA_SHIELDED_UNIT, LW(3))
     CALL(btlevtcmd_OffPartsAttribute, LW(3), 1, PART_ATTR_HIDDEN)
     LOOP(30)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, 2)
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_OPEN, 1)
     CALL(btlevtcmd_OffAttribute, LW(3), UNIT_ATTR_NOT_SAMPLED_AS_TARGET)
     CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NOT_TARGETABLE)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_FOLLOWS_UNIT, KOURA_FOLLOW_ON)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_SHELL_SHIELD)
     RETURN
 EVT_END()
@@ -233,7 +256,7 @@ EVT_END()
  * Does nothing if already closed.
  */
 EVT_BEGIN(koura_close)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KOURA_OPEN, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         RETURN
     END_IF
@@ -245,13 +268,13 @@ EVT_BEGIN(koura_close)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_OPEN, 0)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KOURA_SHIELDED_UNIT, LW(3))
     CALL(btlevtcmd_OnAttribute, LW(3), UNIT_ATTR_NOT_SAMPLED_AS_TARGET)
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NOT_TARGETABLE)
     CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, PART_ATTR_HIDDEN)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_FOLLOWS_UNIT, KOURA_FOLLOW_NONE)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -268,7 +291,7 @@ EVT_END()
  * plays the crack sound when the stage changes, and records the stage in unit work 3.
  */
 EVT_BEGIN(damage_core)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, LW(1))
     CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
     SWITCH(LW(0))
         CASE_LESS_OR_EQUAL(3)
@@ -276,21 +299,21 @@ EVT_BEGIN(damage_core)
         IF_INT_NOT_EQUAL(LW(1), 2)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_GUARD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
         END_IF
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 2)
         CASE_LESS_OR_EQUAL(6)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_crack_lv1))
         IF_INT_NOT_EQUAL(LW(1), 1)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_GUARD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
         END_IF
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 1)
         CASE_DEFAULT
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
         IF_INT_NOT_EQUAL(LW(1), 0)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_GUARD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
         END_IF
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 0)
     END_SWITCH
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
 #if VERSION <= VERSION_DEMO_US
     WAIT_FRAMES(30)
 #else
@@ -310,14 +333,14 @@ EVT_BEGIN(pose_tbl_reset)
         CASE_LESS_OR_EQUAL(3)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_crack_lv2))
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_GUARD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 2)
         CASE_LESS_OR_EQUAL(6)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_crack_lv1))
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_GUARD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 1)
         CASE_DEFAULT
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 0)
     END_SWITCH
     RETURN
 EVT_END()
@@ -328,7 +351,7 @@ EVT_END()
  * then the two halves (parts 1 and 2) spring apart, tip over and blink out before the unit is removed.
  */
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KOURA_SHIELDED_UNIT, LW(3))
     CALL(btlevtcmd_OffAttribute, LW(3), UNIT_ATTR_SHELL_SHIELDED | UNIT_ATTR_NOT_SAMPLED_AS_TARGET)
     CALL(btlevtcmd_OffPartsAttribute, LW(3), 1, PART_ATTR_HIDDEN)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_GUARD4"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -402,7 +425,7 @@ EVT_END()
  * giving Mario back his normal targeting and visibility, without the split-in-two break animation of dead_event.
  */
 EVT_BEGIN(destroy_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KOURA_SHIELDED_UNIT, LW(3))
     CALL(btlevtcmd_OffAttribute, LW(3), UNIT_ATTR_SHELL_SHIELDED | UNIT_ATTR_NOT_SAMPLED_AS_TARGET)
     CALL(btlevtcmd_OffPartsAttribute, LW(3), 1, PART_ATTR_HIDDEN)
     CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)

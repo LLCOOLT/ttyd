@@ -5,6 +5,14 @@
 #include "evt/evt_cmd.h"
 #include "version.h"
 
+// PiantaParlorWork.flags bits.
+enum PiantaParlorFlags {
+    PARLOR_FLAG_COUNTER_SHOWN = 0x1, // the token counter is drawn (yuugijou_montemedal_disp_onoff)
+    PARLOR_FLAG_TOKENS_OUT = 0x2,    // the tokens are taken out of deposit (playing)
+    PARLOR_FLAG_COUNTER_HIGH = 0x4,  // the token counter is drawn higher on screen (yuugijou_set_yupflag)
+    PARLOR_FLAG_WINDOW_DONE = 0x8,   // the minigame pause window has finished (evtYuuWindowEndChk)
+};
+
 typedef struct PiantaParlorWork {
     u32 flags;      // 0x00, 1: token counter shown, 2: tokens taken out (playing), 4: counter raised, 8: window closed
     u32 keptTokens; // 0x04, tokens deposited by yuugijou_montemedal_keep
@@ -118,4 +126,4 @@ USER_FUNC(yuugijou_montemedal_return);
 USER_FUNC(yuugijou_get_takeoutflag);
 USER_FUNC(yuugijou_set_yupflag);
 void monteCountDisp(void);
-void evtYuuSetWindowEvt(s32 value);
+void evtYuuSetWindowEvt(EvtWord* evt);

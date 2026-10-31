@@ -51,7 +51,7 @@ static inline void bgLoad(BackgroundWork* bgwork, const char* filename) {
 
     size = 0;
     if (!filename) {
-        bgwork->flags &= ~1;
+        bgwork->flags &= ~BG_RENDERING;
     } else {
         bgwork->data = NULL;
         arcOpen(filename, &bgwork->data, &size);
@@ -68,14 +68,14 @@ static inline void bgLoad(BackgroundWork* bgwork, const char* filename) {
         tpl = (TEXPalette*)bgwork->data;
         if (tpl) {
             UnpackTexPalette(tpl);
-            bgwork->flags |= 1;
-            bgwork->flags &= ~2;
-            bgwork->flags &= ~4;
+            bgwork->flags |= BG_RENDERING;
+            bgwork->flags &= ~BG_FLAT_COLOR;
+            bgwork->flags &= ~BG_NO_AUTOSCROLL;
             bgwork->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
         } else {
-            bgwork->flags |= 2u;
+            bgwork->flags |= BG_FLAT_COLOR;
             bgwork->multiply = (GXColor){0x00, 0xFF, 0x00, 0xFF};
-            bgwork->flags |= 1u;
+            bgwork->flags |= BG_RENDERING;
             bgwork->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
         }
     }
@@ -105,12 +105,12 @@ void bgSetColor(GXColor color) {
 
 /** Turns background drawing back on for the current mode. */
 void bgDispOn(void) {
-    bgGetWork()->flags |= 1;
+    bgGetWork()->flags |= BG_RENDERING;
 }
 
 /** Hides the background for the current mode. */
 void bgDispOff(void) {
-    bgGetWork()->flags &= ~1;
+    bgGetWork()->flags &= ~BG_RENDERING;
 }
 
 /** Sets the extra texture scroll offset of the backdrop, in texture coordinates (1.0 is one texture width). */
@@ -122,12 +122,12 @@ void bgSetScrlOffset(f32 x, f32 y) {
 
 /** Stops the backdrop following the camera: only the scroll offset set by bgSetScrlOffset moves it. */
 void bgAutoScrollOff(void) {
-    bgGetWork()->flags |= 4;
+    bgGetWork()->flags |= BG_NO_AUTOSCROLL;
 }
 
 /** Makes the backdrop follow the camera's yaw and position again (the default). */
 void bgAutoScrollOn(void) {
-    bgGetWork()->flags &= ~4;
+    bgGetWork()->flags &= ~BG_NO_AUTOSCROLL;
 }
 
 /**
@@ -135,12 +135,12 @@ void bgAutoScrollOn(void) {
  * No caller in this tree.
  */
 void bgTransOffsetOff(void) {
-    bgGetWork()->flags |= 8;
+    bgGetWork()->flags |= BG_NO_TRANSLATION;
 }
 
 /** Lets the camera's position shift the backdrop again (the default). */
 void bgTransOffsetOn(void) {
-    bgGetWork()->flags &= ~8;
+    bgGetWork()->flags &= ~BG_NO_TRANSLATION;
 }
 
 /**
@@ -155,19 +155,19 @@ void bgMain(void) {
     int width;
 
     bgwork = bgGetWork();
-    if (bgwork->flags & 1) {
+    if (bgwork->flags & BG_RENDERING) {
         camera = camGetPtr(CAMERA_3D);
         angle = (TWO_PI * reviseAngle(-camera->viewYaw)) / 360.0f;
         sinangle = sin(angle);
         cosangle = cos(angle);
         v8 = 0.0f;
-        if (!(bgwork->flags & 2)) {
+        if (!(bgwork->flags & BG_FLAT_COLOR)) {
             TEXGetGXTexObjFromPalette(bgwork->data, &texobj, 0);
             width = gp->fbWidth / GXGetTexObjWidth(&texobj);
         } else {
             width = 0;
         }
-        if (!(bgwork->flags & 8)) {
+        if (!(bgwork->flags & BG_NO_TRANSLATION)) {
             v8 = (0.001f * ((cosangle * camera->cameraAt.x) - (sinangle * camera->cameraAt.z))) + v8;
         }
         v11 = 4.0f * (camGetPtr(CAMERA_3D)->viewYaw / 360.0f);
@@ -189,7 +189,7 @@ static void bgDisp(CameraId camId, void* param) {
     GXTexObj texobj;
     Mtx trans, scale;
     f32 sy;
-    if (bgwork->flags & 1) {
+    if (bgwork->flags & BG_RENDERING) {
         GXSetAlphaUpdate(GX_FALSE);
         GXSetCullMode(GX_CULL_BACK);
         GXSetZCompLoc(GX_TRUE);
@@ -202,7 +202,7 @@ static void bgDisp(CameraId camId, void* param) {
         blend.a = blend.a * bgwork->color.a / 255;
         blend.r = blend.r * bgwork->color.r / 255;
         GXSetTevColor(GX_TEVREG0, blend);
-        if (!(bgwork->flags & 2)) {
+        if (!(bgwork->flags & BG_FLAT_COLOR)) {
             GXSetNumChans(0);
             GXSetNumTevStages(1);
             GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
@@ -213,7 +213,7 @@ static void bgDisp(CameraId camId, void* param) {
             TEXGetGXTexObjFromPalette(bgwork->data, &texobj, 0);
             GXLoadTexObj(&texobj, GX_TEXMAP0);
             MTXScale(scale, 608.0f / (f32)GXGetTexObjWidth(&texobj), 480.0f / (f32)GXGetTexObjHeight(&texobj), 1.0f);
-            if (bgwork->flags & 4) {
+            if (bgwork->flags & BG_NO_AUTOSCROLL) {
                 MTXTrans(trans, bgwork->scrl_x, bgwork->scrl_y, 0.0f);
             } else {
                 MTXTrans(trans, bgwork->trans_x + bgwork->scrl_x, bgwork->trans_y + bgwork->scrl_y, 0.0f);

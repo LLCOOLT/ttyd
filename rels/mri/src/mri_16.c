@@ -72,6 +72,10 @@ static USER_FUNC(puni_get_id) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Exits of mri_16: dokan1 (scripted pipe); pipe dokan2 to mri_18 (dokan2); dokan3 (scripted pipe); dokan4
+ * (scripted pipe); dokan6 (scripted pipe); pipe dokan7 to mri_13 (dokan).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan1", // hitName
@@ -211,6 +215,8 @@ EVT_END()
  * the stairs and ledges of the drained room become solid, and a jingle plays.
  */
 EVT_BEGIN(water_shikake)
+    // The blue switch has been pressed: controls off and the music dips; Punies already on the lower level are
+    // put at fixed spots there.
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
@@ -251,6 +257,8 @@ EVT_BEGIN(water_shikake)
     CALL(evt_hitobj_onoff, STRING("A_f1_rak_l03"), 1, 1)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mizu_before"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mizu_now"), MAPOBJ_FLAG_HIDE)
+    // The room quakes and the water starts draining with a flowing sound while the camera follows the water
+    // level down.
     CALL(evt_snd_sfxon, STRING("SFX_STG2_QUAKE1"), GW(0))
     CALL(evt_snd_sfxon, STRING("SFX_STG2_WATER_FLOW1"), GW(1))
     SPAWN_EVENT_GET_ID(PTR(cam_shake), LW(10))
@@ -268,6 +276,7 @@ EVT_BEGIN(water_shikake)
     END_INLINE_EVENT
     CALL(evt_map_checkanim, STRING("mizu_guru"), LW(0), LW(1))
     WAIT_MS(LW(1))
+    // The water is gone; the stairs and ledges become solid and a jingle plays.
     DELETE_EVENT(LW(10))
     CALL_CHILD(cam_shake2)
     BEGIN_INLINE_EVENT
@@ -367,6 +376,10 @@ EVT_BEGIN(switch_up_down)
     RETURN
 EVT_END()
 
+/**
+ * Where Mario is put back after damage from falling through the floor panels: the lower floor on either
+ * side, or a point far below the room.
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"S_f2_yuka01_l", {-248.0f, 80.0f, 27.0f}},
     {"S_f2_yuka01_r", {248.0f, 80.0f, 27.0f}},

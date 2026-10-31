@@ -64,7 +64,8 @@ void _load(const char*, const char*, const char*);
 
 void evt_cam_road_reset(s32, s32);
 double cos(double);
-// sound.h is not included: it pulls in musyx.h and <math.h>, whose MSL inlines change this file's code
+// FAKE: local prototype with an s32 mode (sound.h: SND_OUTPUTMODE, the same int): including sound.h (musyx.h,
+// <math.h>) changes the code of every function in this file.
 void SoundSetOutputMode(s32 mode);
 
 static const char mc_tou[4];
@@ -113,11 +114,11 @@ void seq_mapChangeInit(SequenceWork* work) {
         int c1 = strcmp(gp->currentMapName, "gor_01");
         int c2 = strcmp(_next_map, "gor_01");
         if (c0 && c1 && c2) {
-            bdsw->restockFlags |= 1;
-        } else if (!c2 && bdsw->restockFlags & 1) {
+            bdsw->restockFlags |= BADGESHOP_RESTOCK_PENDING;
+        } else if (!c2 && bdsw->restockFlags & BADGESHOP_RESTOCK_PENDING) {
             badgeShop_bargainGeneration();
             badgeShop_bottakuruGeneration();
-            bdsw->restockFlags &= 0xFFFE;
+            bdsw->restockFlags &= (u16)~BADGESHOP_RESTOCK_PENDING;
         }
     }
 }
@@ -132,11 +133,13 @@ void seq_mapChangeExit(SequenceWork* work) {
 typedef struct {
     const char* s[7];
 } LangTbl;
+/** Folder name of each language, used to load that language's window textures (win.tpl) on a map change. */
 static const LangTbl lang_tbl = {{"jp", "us", "ge", "fr", "sp", "it", "du"}};
 #else
 typedef struct {
     const char* s[2];
 } LangTbl;
+/** Folder name of each language (Japanese, English), for loading its window textures (win.tpl) on a map change. */
 static const LangTbl lang_tbl = {{"jp", "us"}};
 #endif
 /**
@@ -576,6 +579,10 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
     }
 }
 
+/**
+ * Names the map change compares and builds with: Glitzville and the tou2 REL it switches to for tou_03,
+ * the area REL path, and the test (tst) and Pit of 100 Trials (jon) areas, whose REL gets its own buffer.
+ */
 static const char mc_tou[] = "tou";
 static const char mc_tou2[] = "tou2";
 static const char mc_tou_03[] = "tou_03";

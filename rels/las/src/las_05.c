@@ -179,11 +179,17 @@ static s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz) {
     return result;
 }
 
+/** Which of the six waypoints of kurokaron_move_list Dark Bones is currently heading for. */
 u8 kurokaron_move_index = 0;
+/** State bits of Dark Bones: 1 patrol direction, 2 fleeing from Mario, 4 and 8 flee steering state. */
 u8 kurokaron_move_flag = 0;
+/** How many times in a row Dark Bones picked the same waypoint. */
 u8 kurokaron_same_goal = 0;
+/** Vivian's status on the previous frame, used to notice when she stops hiding Mario. */
 s32 kurokaron_vivian_prev_sts = 0;
+/** Frames Dark Bones stands still (set to 60 when Vivian stops hiding Mario next to him). */
 u8 kurokaron_stop_cnt = 0;
+/** Frames Dark Bones has been running away. */
 u16 kurokaron_run_cnt = 0;
 
 /**
@@ -285,7 +291,7 @@ static USER_FUNC(kurokaron_move_position) {
     f32 marioDist;
     f32 dist;
 
-    npc->jumpFlags |= 0x10;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
     if (isFirstCall) {
         npc->moveTicks = 0;
         npc->moveAnimState = 0;
@@ -315,7 +321,7 @@ static USER_FUNC(kurokaron_move_position) {
     }
     kurokaron_vivian_prev_sts = vivianGetStatus();
     if (kurokaron_stop_cnt != 0) {
-        npc->jumpFlags &= ~0x10;
+        npc->jumpFlags &= ~NPC_STATUS_CLOCK_RUNNING;
         kurokaron_stop_cnt--;
         return EVT_RETURN_BLOCK;
     }
@@ -361,7 +367,7 @@ static USER_FUNC(kurokaron_move_position) {
         _kurokaron_next_move_index();
         return EVT_RETURN_DONE;
     }
-    if ((npc->jumpFlags & 2) && npc->moveSpeed > 0.1f) {
+    if ((npc->jumpFlags & NPC_STATUS_FACE_MOVE_DIR) && npc->moveSpeed > 0.1f) {
         npcTuningRy(npc, npc->moveDir);
     }
     if ((kurokaron_move_flag & 2) && kurokaron_run_cnt != 0) {
@@ -594,6 +600,7 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/** Exits of las_05: west door w_bero to las_04 (e_bero); east door e_bero_1 to las_06 (w_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -634,8 +641,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** The waypoint Dark Bones last reached. */
 u8 kurokaron_prev_goal = 5;
 
+/** The six waypoints (x, z) around the room that Dark Bones patrols along. */
 f32 kurokaron_move_list[6][2] = {
     {500.0f, -130.0f}, {0.0f, -200.0f}, {-500.0f, -130.0f}, {-500.0f, 130.0f}, {0.0f, 200.0f}, {500.0f, 130.0f},
 };
@@ -690,6 +699,10 @@ EVT_BEGIN(kurokaron_move)
     RETURN
 EVT_END()
 
+/**
+ * Texture overrides for the swarm of Dull Bones: the head part c_karon_h gets a different frame of the
+ * KRN_R_1 animation for each of the 26 skeletons.
+ */
 static ExtTexInfo senkaron_ext_entry_data[] = {
     {"c_karon_h", "KRN_R_1", 0.0f},
     {"c_karon_h", "KRN_R_1", 1.0f},
@@ -719,6 +732,7 @@ static ExtTexInfo senkaron_ext_entry_data[] = {
     {0},
 };
 
+/** Distance thresholds used to decide how hard the Dull Bones swarm pushes Mario at a given range. */
 s32 move_check_list[] = {
     25, 52, 79, 107, 136, 166, 197, 229,
     263, 298, 335, 374, 416, 461, 510, 565,
@@ -1128,6 +1142,7 @@ static void senkaron_ext_shadow_disp(CameraId camera, void* param) {
  * after which the west door is opened for the escape.
  */
 static EVT_BEGIN(senkaron_event)
+    // First visit: controls are off and Dark Bones appears with a rattling sound.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_00_START)
         CALL(evt_mario_key_onoff, 0)
         BEGIN_INLINE_EVENT
@@ -1142,6 +1157,7 @@ static EVT_BEGIN(senkaron_event)
         CALL(evt_cam3d_evt_set, 550, 80, 310, 550, 30, -90, 300, 0)
         WAIT_MS(300)
         CALL(evt_msg_toge, 1, 0, 0, 0)
+        // Dark Bones speaks to Mario from across the room; Mario is startled and the danger music starts.
         CALL(evt_msg_print, 0, STRING("stg8_las_02"), 0, STRING("黒カロン"))
         CALL(evt_ext_entry, 1000, PTR(senkaron_ext_entry_data), PTR(senkaron_ext_init), PTR(senkaron_ext_main), PTR(senkaron_ext_dispent))
         CALL(senkaronFlagOffMesPushing)
@@ -1158,6 +1174,8 @@ static EVT_BEGIN(senkaron_event)
             WAIT_MS(500)
             CALL(evt_mario_set_pose, STRING("M_I_Y"))
         END_INLINE_EVENT
+        // Dark Bones calls the swarm: a thousand Dry Bones pour in, rolling and clattering across the floor
+        // while the room shakes.
         CALL(evt_npc_set_anim, STRING("黒カロン"), STRING("KRN_D_4"))
         SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
         SET_FLOAT_VALUE(LW(11), FLOAT(10.0f))
@@ -1202,6 +1220,7 @@ static EVT_BEGIN(senkaron_event)
             CALL(evt_mario_set_dir, 270, 300, 0)
         END_INLINE_EVENT
         WAIT_MS(1000)
+        // Mario's partner reacts, then Dark Bones taunts them again (stg8_las_04).
         CALL(evt_msg_print_party, STRING("stg8_las_03"))
         LOOP(0)
             IF_INT_NOT_EQUAL(GF(0), 0)
@@ -1213,6 +1232,8 @@ static EVT_BEGIN(senkaron_event)
         SET_FLOAT_VALUE(LW(3), FLOAT(-1.5f))
         SET_FLOAT_VALUE(LW(4), FLOAT(0.0009765625f))
         SET_VALUE(LW(5), 270)
+        // The swarm pushes Mario back along the floor until Dark Bones turns to chase him; then control is
+        // returned.
         CALL(evt_mario_set_pose, STRING("M_I_O"))
         LOOP(0)
             WAIT_FRAMES(1)
@@ -1239,6 +1260,8 @@ static EVT_BEGIN(senkaron_event)
         CALL(evt_mario_dispflag_onoff, 0, 2)
         CALL(evt_mario_key_onoff, 1)
         SET_VALUE(LW(0), STRING("w_bero"))
+        // Mario is pushed around by the swarm with his partner in tow; if he is held too long the partner
+        // calls out (stg8_las_05, stg8_las_06) and the game is over.
         CALL_CHILD(bero_case_switch_off)
         SET_VALUE(GF(0), 0)
         BEGIN_INLINE_EVENT
@@ -1386,6 +1409,7 @@ static EVT_BEGIN(senkaron_event)
         END_INLINE_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
+            // The partner is knocked about by the swarm and keeps getting back on its feet.
             CALL(party_hit, LW(0))
             IF_INT_EQUAL(LW(0), 1)
                 BREAK_LOOP
@@ -1429,11 +1453,14 @@ static EVT_BEGIN(senkaron_event)
         CALL(senkaronFlagOnMesPushing)
         CALL(evt_snd_sfxoff, GW(13))
         WAIT_FRAMES(1)
+        // The swarm stops and the battle with Dark Bones starts.
         CALL(evt_npc_set_battle_info, STRING("黒カロン"), 7)
         CALL(evt_npc_battle_start, STRING("黒カロン"))
         CALL(evt_npc_wait_battle_end)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
         CALL(senkaronToEscape)
+        // After the battle the story advances, the west door works again and Dark Bones leaves behind Palace
+        // Key 0x2E, which pops out and bounces.
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_1000_DRY_BONES)
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(bero_case_switch_on)
@@ -1602,6 +1629,7 @@ EVT_BEGIN(kurokaron_talk)
     RETURN
 EVT_END()
 
+/** The single NPC of the room, Dark Bones (黒カロン); it does not turn to face Mario. */
 static NpcSetupInfo npcEnt[] = {
     {
         "黒カロン", // name
@@ -1635,6 +1663,7 @@ static EVT_BEGIN(key_evt)
     RETURN
 EVT_END()
 
+/** Item list for the key window: only Palace Key 0x2E (-1 ends the list). */
 static s32 key_tbl[] = {
     ITEM_PALACE_KEY_0x2E, -1,
 };

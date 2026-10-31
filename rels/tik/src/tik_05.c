@@ -58,6 +58,7 @@
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "evt/evt_pouch.h"
+#include <dolphin/exi.h>
 
 /**
  * Identity function on a float (returns x).
@@ -164,7 +165,6 @@ static inline f32 tb_cos(f32 x) {
     return a;
 }
 static void tiz_broken_draw(CameraId cameraId, void* param);
-s32 EXIGetType(s32 chan, u32 dev, u32* type);
 
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
@@ -241,6 +241,11 @@ static EVT_BEGIN(n_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Doors of this room: the west exit to tik_06, the east exit to tik_04 (which can start the scene of looking
+ * at the Door, look_large_door) and the Thousand-Year Door itself,
+ * which leads to the Palace of Shadow (las_00).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -326,6 +331,7 @@ static EVT_BEGIN(kurihakase_talk)
     RETURN
 EVT_END()
 
+/** NPCs of this room: Professor Frankly, who waits by the pedestal in chapter 7. */
 static NpcSetupInfo npcEnt[] = {
     {
         "クリハカセ", // name
@@ -711,8 +717,9 @@ EVT_BEGIN(evt_fogreset)
 EVT_END()
 
 /**
- * Sound-effect timing script for the magic circle scenes. Waits 3.5 s and then 1.6 s between its sound effects.
- * Guess: the sounds were removed, leaving only the waits.
+ * Sound-effect timing script spawned when each magic circle appears (mahojin_event1 to 7).
+ * In every version it only
+ * waits 3.5 s and then 1.6 s and returns, playing nothing. Guess: its sound calls were cut, leaving the waits.
  */
 EVT_BEGIN(mahojin_se_event)
     WAIT_MS(3500)
@@ -768,6 +775,8 @@ static USER_FUNC(alpha_set_func) {
  * Script helper that prepares the rotating camera of the map scene.
  * args[0..5] and [6..11] are the position and target of two key camera views;
  * the helper allocates three work areas and computes each key view's yaw and distance around the target.
+ * It clears the second area twice instead of the working one; harmless, since every field of the working area
+ * is then written (a copy of the first view).
  */
 static USER_FUNC(cam_kaiten_init) {
     EvtWord* args = event->args;
@@ -1156,13 +1165,15 @@ static void tiz_broken_draw(CameraId cameraId, void* param) {
     }
 }
 
-// Built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
+// FAKE: built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 /**
- * Guess: runs the screen-shatter effect (tiz_broken_draw) shown when the map appears;
- * the script helper keeps its pieces' timers going and ends when they have all fallen.
+ * Blocking script helper for evt_mapwrite: shatters the screen into the item-get view. On the first call it sets
+ * up a 38 by 30 grid of tiles, each flying outward from the centre after a delay proportional to its distance
+ * (param_tbl); every frame it moves the tiles and queues tiz_broken_draw on camera 8, and it returns once every
+ * tile has left the screen (|x| over 340 or |y| over 260), freeing its buffers.
  * Parts of it are written with hand-expanded math to keep the original code.
  */
 static USER_FUNC(tiz_broken) {
@@ -1309,16 +1320,23 @@ static USER_FUNC(tiz_broken) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** The work area tiz_broken uses for the shattering screen. */
 BrokenWork* broken_wp = &broken_work;
 
+/**
+ * Tuning values of the shattering screen (tiz_broken), named in name_tbl: the delay per unit of distance
+ * from the centre, the starting speed, the speed factor, the outward pull and the spin added each frame.
+ */
 f32 param_tbl[] = {
     90.0f, 23.0f, 0.98f, 19.4f, 2.0f,
 };
 
+/** Guess: step sizes for adjusting each param_tbl value in a debug menu; nothing in the game reads them. */
 f32 add_tbl[] = {
     1.0f, 0.1f, 0.01f, 0.1f, 1.0f,
 };
 
+/** Names of the param_tbl values, apparently for the same debug menu; unused. */
 static const char* name_tbl[] = {
     "delay",
     "v0",
@@ -1587,7 +1605,9 @@ static USER_FUNC(stardust_setting) {
 /**
  * Script helper (JP and earlier).
  * Checks whether an EXI device of ID 0x05070000 is attached to channel 0;
- * if so, releases the big map-scene animations. Guess: a development kit or viewer memory saving.
+ * if so, releases the big map-scene animations that the map init has just loaded. The same check in end_00
+ * (JP and earlier) swaps the credits NPCs for Mario's model, so both cut memory use when that device is present.
+ * Guess: the device is the "DOL viewer" development tool the name refers to.
  */
 static USER_FUNC(is_dol_viewer) {
     u32 type;
@@ -1613,14 +1633,17 @@ static USER_FUNC(is_dol_viewer) {
 #endif
 
 /**
- * The treasure-map scene after a Crystal Star appears.
- * Magic circle and wave effects rise, the camera turns around the pedestal,
- * a map of the next chapter's area (TIZ_stg_N) is revealed with star dust,
- * the screen shatters into the item-get view (tiz_broken)
- * and the matching message (mac_0_099 or mac_N_00x) is shown.
- * Guess: the details of the camera turns are only roughly traced.
+ * The treasure-map scene of the pedestal events (GW(15) = 0 for the prologue, else the Crystal Star number).
+ * The Magical Map item rises over Mario with wave, orb and map effects; in the prologue the partner speaks
+ * (mac_0_098) and the camera circles the pedestal (cam_kaiten helpers), otherwise the camera moves straight in.
+ * A laser and white flashes follow, the next star's spot is drawn on the map with star dust (tiz_stone,
+ * tiz_obj),
+ * the screen fades in from white and shatters into the item-get view (tiz_broken),
+ * and the message says the Crystal Star's location was recorded on the Magical Map (mac_0_099, which also
+ * teaches a move, or mac_N_00x_01).
  */
 EVT_BEGIN(evt_mapwrite)
+    // The camera moves in: in the prologue Goombella calls out to Frankly; later Mario just raises his hands.
     WAIT_MS(800)
     IF_INT_EQUAL(GW(15), 0)
         CALL(evt_cam3d_evt_set, 0, 65, 40, 0, 65, -250, 1000, 11)
@@ -1635,6 +1658,7 @@ EVT_BEGIN(evt_mapwrite)
         CALL(evt_mario_set_pose, STRING("M_I_N"))
         CALL(evt_cam3d_evt_set, 0, 102, 300, 0, 110, -250, 2000, 11)
     END_IF
+    // The Magical Map appears over Mario's head with the wave, orb and map effects.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 15)
     CALL(evt_item_entry, STRING("item00"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
@@ -1654,6 +1678,7 @@ EVT_BEGIN(evt_mapwrite)
     WAIT_MS(200)
     CALL(evt_eff, STRING("map_map"), STRING("treasure_map"), 0, 0, -1000, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
+    // In the prologue the camera slowly circles the pedestal while the Thousand-Year Door flickers in and out.
     IF_INT_EQUAL(GW(15), 0)
         CALL(cam_kaiten_init, 0, 65, 40, 0, 65, -250, -24, 102, -800, 0, 110, -250)
         BEGIN_INLINE_EVENT_GET_ID(LW(7))
@@ -1736,6 +1761,7 @@ EVT_BEGIN(evt_mapwrite)
             CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
         END_INLINE_EVENT
     END_IF
+    // The effects brighten and the map rises; a laser shoots from it and the screen flashes white.
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 4000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1771,6 +1797,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(map_disp_onoff, 0)
     WAIT_FRAMES(1)
 #endif
+    // The Magical Map fills the screen and its paper animation for this Crystal Star plays.
     CALL(evt_paper_entry, STRING("OFF_d_tizu_tex"))
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_tizu_tex"))
@@ -1822,6 +1849,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_img_wait_animend, STRING("img"))
     WAIT_MS(1000)
     WAIT_MS(1000)
+    // The next Crystal Star's place appears on the map: star dust, the place picture (TIZ_stg_N) and its sound.
     SWITCH(GW(15))
         CASE_EQUAL(0)
         SET_VALUE(LW(5), 55)
@@ -1932,6 +1960,7 @@ EVT_BEGIN(evt_mapwrite)
         END_IF
     END_LOOP
     WAIT_MS(2000)
+    // The map closes, the screen fades back in from white and a light falls on Mario.
     CALL(evt_img_release, STRING("img"))
     CALL(evt_eff_softdelete, STRING("tiz_stone"))
     CALL(evt_npc_delete, STRING("tiz_obj"))
@@ -1956,6 +1985,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 120, 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(1000)
+    // The screen shatters into the item-get view and the message says the location was recorded on the map.
     CALL(tiz_broken)
     CALL(evt_eff_softdelete, STRING("map_wave"))
     CALL(evt_eff_softdelete, STRING("map_ball"))
@@ -1987,6 +2017,7 @@ EVT_BEGIN(evt_mapwrite)
     END_SWITCH
     CALL(map_bgmode_end, STRING("map_itemget"), STRING("map_map"))
     CALL(evt_eff_softdelete, STRING("map_itemget"))
+    // The magic circle ends, the fog clears and the map drops back into Mario's hands.
     SET_VALUE(GF(11), 1)
     CALL(evt_eff_softdelete, STRING("mahojin"))
     SPAWN_EVENT(mahojin_se_event_end)
@@ -2023,8 +2054,9 @@ EVT_BEGIN(evt_mapwrite)
 EVT_END()
 
 /**
- * Short camera move (0, 225, 469 looking at 0, 100, -270 in two seconds) used to end the Crystal Star scenes.
- * Guess: it replaces a fade that was cut.
+ * Ending of the pedestal scenes before their map change: starts a two-second camera move (0, 225, 469 looking at
+ * 0, 100, -270), irises out after 1.2 s, then sets the next map change to an instant black fade-out and a 500 ms
+ * iris-in, so the change continues the iris it has already done.
  */
 EVT_BEGIN(fake_fade)
     CALL(evt_cam3d_evt_set, 0, 225, 469, 0, 100, -270, 2000, 11)
@@ -2113,6 +2145,7 @@ EVT_END()
  * Sets story progress STORY_STG0_15_THE_PEDESTAL.
  */
 EVT_BEGIN(mahojin_event)
+    // Mario walks onto the pedestal, the music stops and he is startled as the magic circle flashes into being.
     SET_VALUE(GW(15), 0)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -2132,6 +2165,7 @@ EVT_BEGIN(mahojin_event)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_MAP_KAKAGERU2"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(2000)
+    // Seen from above, Mario, Goombella and Frankly look around in confusion while fog fills the room.
     CALL(evt_cam3d_evt_set, 0, 634, 421, 0, 58, -270, 0, 11)
     CALL(evt_mario_set_pose, STRING("M_I_N"))
     CALL(evt_party_set_pos, 1, -30, 19, -190)
@@ -2174,6 +2208,7 @@ EVT_BEGIN(mahojin_event)
     END_INLINE_EVENT
     SPAWN_EVENT(evt_fogset)
     WAIT_MS(6000)
+    // Goombella and Frankly face the pedestal and the Magical Map scene plays.
     DELETE_EVENT(LW(11))
     DELETE_EVENT(LW(12))
     BEGIN_INLINE_EVENT
@@ -2183,6 +2218,7 @@ EVT_BEGIN(mahojin_event)
         CALL(evt_party_set_dir, 1, 90, -1)
     END_INLINE_EVENT
     CALL_CHILD(evt_mapwrite)
+    // They jump onto the pedestal; Goombella asks about the map and the lights, and Frankly thinks it over.
     BEGIN_INLINE_EVENT
         CALL(evt_party_jump_pos, 0, 30, 28, -250, 300, 0, -1000)
     END_INLINE_EVENT
@@ -2193,6 +2229,7 @@ EVT_BEGIN(mahojin_event)
     CALL(evt_msg_print, 0, STRING("mac_0_101"), 0, STRING("extparty"))
     CALL(evt_cam3d_evt_set, 0, 60, 447, 0, 120, -250, 500, 11)
     WAIT_MS(1000)
+    // Frankly suggests going back to his place to study the map, and Mario nods.
     CALL(evt_msg_print, 0, STRING("mac_0_101_04"), 0, STRING("extparty"))
     CALL(evt_mario_set_pose, STRING("M_Z_1"))
     WAIT_MS(500)
@@ -2204,6 +2241,7 @@ EVT_BEGIN(mahojin_event)
     END_INLINE_EVENT
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(1000)
+    // Mario receives the star power of the map (Sweet Treat), the room irises out and he returns to Rogueport.
     CALL(evt_pouch_get_starstone, 0)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
@@ -2485,8 +2523,8 @@ EVT_BEGIN(lastdungeon_init)
 EVT_END()
 
 /**
- * Guess: the entry into the final dungeon through the Thousand-Year Door (STORY_STG7_52_THE_PEDESTAL, push of
- * n_bero).
+ * Entry into the final dungeon through the Thousand-Year Door: the push case event of n_bero that the map init
+ * registers at STORY_STG7_52_THE_PEDESTAL.
  * Mario walks in and is hidden, the camera shakes,
  * the door leaves swing from 120 degrees to 0 over five seconds,
  * and the game moves on to the chapter 8 title (sys_01, stg_8).
@@ -2525,11 +2563,16 @@ EVT_BEGIN(lastdungeon)
 EVT_END()
 
 /**
- * Guess: the last pedestal scene, at STORY_STG7_50_A_WAITING_PROF_FRANKLY.
- * Professor Frankly talks to Mario (mac_7_009) while the eighth magic circle forms with a crystal wave;
- * the seven Crystal Stars appear on the pedestal and the circle charges.
+ * The last pedestal scene, registered on a_dai from STORY_STG7_50_A_WAITING_PROF_FRANKLY to STORY_STG7_51.
+ * Professor Frankly urges Mario to hold up the last Crystal Star (mac_7_009) and the eighth magic circle forms
+ * (effect type 8, 7 in the demos) with a crystal wave;
+ * the seven Crystal Stars fade in around Mario and the camera
+ * circles while the charge rises; the partner cries out at the door (mac_7_010), the seven star marks
+ * (anm_hosi_1 to 7) and the door (anm_tobira) animate, Frankly and the partner speak (mac_7_011, mac_7_013)
+ * and the story becomes STORY_STG7_52_THE_PEDESTAL.
  */
 EVT_BEGIN(mahojin_event7)
+    // Mario walks onto the pedestal and Frankly tells him to hold up the last Crystal Star.
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -2546,6 +2589,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // The music stops and the magic circle forms; seen from above, a crystal wave rises around Mario.
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_MAP_KAKAGERU3_1"), 0)
 #if VERSION <= VERSION_DEMO_US
@@ -2563,6 +2607,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_eff64, STRING("map_wave"), STRING("crystal_n64"), 6, LW(0), LW(1), LW(2), FLOAT(1.0f), 60, 0, 0, 0, 0, 0, 0)
     CALL(crystal_bgmode, STRING("map_wave"))
     WAIT_MS(2000)
+    // The seven Crystal Stars are placed on a ring around Mario, invisible at first.
     CALL(evt_cam3d_evt_set, 0, 65, 40, 0, 65, -250, 1000, 11)
     WAIT_MS(2000)
     CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_FRONT_POSE)
@@ -2593,6 +2638,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(starstone_set_alpha, STRING("stone05"), 0)
     CALL(starstone_set_alpha, STRING("stone06"), 0)
     CALL(starstone_set_alpha, STRING("stone07"), 0)
+    // The stars spin and fade in as Mario raises his hands, and the camera circles the pedestal.
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
         LOOP(0)
@@ -2743,6 +2789,7 @@ EVT_BEGIN(mahojin_event7)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_yuka1"), MAPOBJ_FLAG_HIDE)
     END_INLINE_EVENT
+    // The stars vanish one by one in bursts of star dust.
     WAIT_MS(14000)
     CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_FRONT_POSE)
     DELETE_EVENT(LW(7))
@@ -2790,6 +2837,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_eff64, STRING(""), STRING("stardust_n64"), 0, LW(0), LW(1), LW(2), FLOAT(20.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff64, STRING(""), STRING("stardust_n64"), 2, LW(0), LW(1), LW(2), FLOAT(30.0f), 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(1300)
+    // Seen from above, the stars reappear one by one on a ring around Mario.
     CALL(starstone_setting, STRING("stone01"), 0)
     CALL(starstone_setting, STRING("stone02"), 1)
     CALL(starstone_setting, STRING("stone03"), 2)
@@ -2846,6 +2894,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_eff64, STRING("sd_7_2"), STRING("stardust_n64"), 2, LW(0), LW(1), LW(2), FLOAT(30.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(stardust_setting, STRING("sd_7_1"), STRING("sd_7_2"))
     WAIT_MS(1000)
+    // The room shakes, the partner cries out, and the seven star marks on the Door light up one after another.
     CALL(evt_cam3d_evt_set, 0, 65, 40, 0, 65, -250, 0, 11)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     WAIT_MS(1000)
@@ -2889,6 +2938,7 @@ EVT_BEGIN(mahojin_event7)
     CALL(evt_map_playanim, STRING("anm_hosi_7"), 0, 0)
     CALL(evt_map_checkanim, STRING("anm_hosi_7"), LW(0), LW(1))
     WAIT_MS(LW(1))
+    // The Door glows and pulses, then cracks spread over it as Mario turns to watch.
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 0, 125, 0, 0, 130, -400, 500, 11)
     WAIT_MS(500)
@@ -2918,6 +2968,7 @@ EVT_BEGIN(mahojin_event7)
     END_INLINE_EVENT
     CALL(evt_map_playanim, STRING("anm_hibi"), 0, 0)
     WAIT_MS(1500)
+    // Purple smoke pours out and the Thousand-Year Door swings open; the magic circle and the stars fade away.
     BEGIN_INLINE_EVENT
         CALL(evt_eff, STRING("kemuri00"), STRING("mist2"), 0, 50, 40, -580, 20, 10, 0, 0, 0, 0, 0, 0)
         CALL(evt_eff, STRING("kemuri01"), STRING("mist2"), 0, -50, 40, -580, 20, 10, 0, 0, 0, 0, 0, 0)
@@ -3029,6 +3080,7 @@ EVT_BEGIN(mahojin_event7)
         CALL(starstone_set_position, STRING("stone06"), 0, -1000, 0)
         CALL(starstone_set_position, STRING("stone07"), 0, -1000, 0)
     END_INLINE_EVENT
+    // Views of the open Door, then Frankly tells Mario to rescue the princess and the partner urges him on.
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, -625, 550, 370, 0, 90, -545, 0, 11)
     CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_FRONT_POSE)
@@ -3051,6 +3103,7 @@ EVT_BEGIN(mahojin_event7)
         WAIT_MS(150)
         CALL(evt_cam3d_evt_off, 500, 11)
     END_INLINE_EVENT
+    // Mario jumps down, the open Door becomes the way to the Palace of Shadow, and the music returns.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 300, 0, -1000)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_52_THE_PEDESTAL)

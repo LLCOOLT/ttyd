@@ -30,6 +30,11 @@ static BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkS
 static BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
 
 #if VERSION >= VERSION_US
+/**
+ * Status icons shown over a unit, one row per status: the status, the routine that decides whether to show it,
+ * the icon and its flags; ends with -1.
+ * Used in the US release and, in the PAL release, for Japanese and English (game languages 0 and 1).
+ */
 IconDispTableEntry _disp_table[0x17] = {
         {1, _bsi_default_turn, 22, 1},
         {4, _bsi_default_turn, 20, 1},
@@ -55,6 +60,7 @@ IconDispTableEntry _disp_table[0x17] = {
         {24, _bsi_regeneration, 31, 0},
         {-1, NULL, 0, 0},
 };
+/** The same icons for German (PAL game language 2), with the German HP and FP Regen icons. */
 IconDispTableEntry _disp_table_1[0x17] = {
         {1, _bsi_default_turn, 22, 1},
         {4, _bsi_default_turn, 20, 1},
@@ -80,6 +86,7 @@ IconDispTableEntry _disp_table_1[0x17] = {
         {24, _bsi_regeneration, 33, 0},
         {-1, NULL, 0, 0},
 };
+/** The same icons for French and Spanish (PAL game languages 3 and 4), which share HP and FP Regen icons. */
 IconDispTableEntry _disp_table_2[0x17] = {
         {1, _bsi_default_turn, 22, 1},
         {4, _bsi_default_turn, 20, 1},
@@ -105,6 +112,7 @@ IconDispTableEntry _disp_table_2[0x17] = {
         {24, _bsi_regeneration, 35, 0},
         {-1, NULL, 0, 0},
 };
+/** The same icons for Italian (PAL game language 5), with the Italian HP and FP Regen icons. */
 IconDispTableEntry _disp_table_3[0x17] = {
         {1, _bsi_default_turn, 22, 1},
         {4, _bsi_default_turn, 20, 1},
@@ -131,6 +139,10 @@ IconDispTableEntry _disp_table_3[0x17] = {
         {-1, NULL, 0, 0},
 };
 #else
+/**
+ * Status icons shown over a unit in the demos and the Japanese release, one row per status:
+ * the status, the routine that decides whether to show it, the icon and its flags; ends with -1.
+ */
 IconDispTableEntry _disp_table[0x17] = {
     {1, _bsi_default_turn, 15, 1},
     {4, _bsi_default_turn, 13, 1},
@@ -171,7 +183,8 @@ void BattleStatusIconInit(BattleUnit* unit) {
  * while the command menu is up (dispFlags bit 0), fills the unit's icon list from _disp_table,
  * one entry per active status, placed at the unit's statusIconOffset and stacked 25.6 units apart,
  * and registers BattleStatusIconDisp.
- * The US release picks the table by language; the PAL tables differ only in the HP and FP Regen icons.
+ * From the US release on it picks the table by game language;
+ * the tables differ only in the HP and FP Regen icons.
  */
 void BattleStatusIconMain(BattleUnit* unit) {
     BattleWorkStatusIcon* icon = &unit->statusIconWork;
@@ -448,11 +461,11 @@ static BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, Battle
     GXColor c0, c1, col;
     s32 t;
     s8 turns, strength;
-    if (type == 0x17) {
+    if (type == STATUS_HP_REGEN) {
         ctr = &unit->statusIconWork.hpRegenTimer;
         c0 = (GXColor){0xED, 0x14, 0x5B, 0xFF};
         c1 = (GXColor){0xFF, 0xEA, 0x05, 0xFF};
-    } else if (type == 0x18) {
+    } else if (type == STATUS_FP_REGEN) {
         ctr = &unit->statusIconWork.fpRegenTimer;
         c0 = (GXColor){0x3D, 0xD1, 0x09, 0xFF};
         c1 = (GXColor){0x61, 0xE9, 0xE7, 0xFF};

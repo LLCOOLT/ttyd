@@ -364,9 +364,12 @@ BOOL marioCamZoomUp(void) {
 }
 
 /**
- * Guess: the camera zoom-in when Mario levels up;
- * runs each frame and acts only once MARIO_TRIG_FLAG_CAM_ZOOM_UP_LEVEL is set,
- * picking the distance from mario->zoomLevel (1..3: 520/475/440, else 450). Nothing in C sets the flag.
+ * Runs each frame and acts only once MARIO_TRIG_FLAG_CAM_ZOOM_UP_LEVEL is set:
+ * zooms the 3D camera in over 1.5 s towards a point offset from Mario's screen position,
+ * at a distance picked by mario->zoomLevel
+ * (1..3: 520/475/440, else 450), like marioCamZoomUp.
+ * Nothing in the tree sets the flag or a nonzero zoomLevel, so it never acts.
+ * The "level" in the name is this zoom step (zoomLevel); nothing ties it to Mario's level-up.
  */
 BOOL marioCamZoomUpLevelMain(void) {
     MarioWork* mario;

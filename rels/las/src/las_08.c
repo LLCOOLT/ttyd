@@ -167,6 +167,10 @@ EVT_BEGIN(door_seikai_evt)
     RETURN
 EVT_END()
 
+/**
+ * Exits of las_08: west door w_bero_1 to las_07 (e_bero_1); east door e_bero_1 to las_09 (w_bero); west door
+ * w_bero_2 to las_07 (e_bero_2); east door e_bero_2 to las_07 (w_bero_2).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
@@ -243,6 +247,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Exit of las_08: east door e_bero_1 to las_07 (w_bero_1). */
 BeroEntry e_bero_1_matigai[] = {
     {
         "e_bero_1", // hitName
@@ -264,6 +269,7 @@ BeroEntry e_bero_1_matigai[] = {
     },
 };
 
+/** Exit of las_08: east door e_bero_1 to las_08 (w_bero_1). */
 BeroEntry e_bero_1_seikai[] = {
     {
         "e_bero_1", // hitName
@@ -285,6 +291,7 @@ BeroEntry e_bero_1_seikai[] = {
     },
 };
 
+/** Exit of las_08: east door e_bero_2 to las_08 (w_bero_2). */
 BeroEntry e_bero_2_seikai[] = {
     {
         "e_bero_2", // hitName
@@ -306,6 +313,10 @@ BeroEntry e_bero_2_seikai[] = {
     },
 };
 
+/**
+ * Torch objects of the corridor as pairs: the glow model S_hikari_NN and the hit object A_hi_NN that gives
+ * the position of the flame.
+ */
 const char* taimatu_data[] = {
     "S_hikari_01",
     "A_hi_01",
@@ -365,6 +376,10 @@ EVT_BEGIN(taimatu_evt)
     RETURN
 EVT_END()
 
+/**
+ * Which door is right in each of the seven rounds of the endless corridor: 7 means door e_bero_1 and 3 means
+ * e_bero_2.
+ */
 s32 mugen_kairou_list[] = {
     7, 7, 3, 3, 7, 3, 7,
 };

@@ -13,6 +13,10 @@ typedef struct ImageRect {
     u16 height; // 0x6
 } ImageRect;
 
+// ImageShadow.flags (evt_img_capture sets USED | PENDING)
+#define IMG_SHADOW_USED 0x4        // capture slot in use
+#define IMG_SHADOW_PENDING 0x10    // not captured yet: the image is not drawn from this slot until imgCapture_Prim takes it
+#define IMG_SHADOW_COPY_ONCE 0x100 // allocMode set: the next capture is copied once into the slot's own buffer
 typedef struct ImageShadow {
     s32 flags;        // 0x0
     u16 x;            // 0x4
@@ -26,6 +30,12 @@ typedef struct ImageShadow {
     s32 allocMode;    // 0x40, 1/2: smartAlloc heap for the captured copy
 } ImageShadow;
 
+// ImageEntry.flags
+#define IMG_FLAG_USED 0x1                    // entry allocated (imgEntry)
+#define IMG_FLAG_HIDDEN 0x2                  // evt_img_onoff off: not drawn
+#define IMG_FLAG_OFFSCREEN_RECT 0x4          // captured from an offscreen buffer: drawn at each slot's capture rectangle
+#define IMG_FLAG_NO_VIRTUAL_POINT 0x8        // drawn at a fixed depth, not scaled by the distance to point (imgClearVirtualPoint)
+#define IMG_FLAG_NOTHING_CAPTURED 0x10000000 // JP and later: no slot had a capture at the last draw, so nothing was drawn
 typedef struct ImageEntry {
     ImageShadow shadows[3];    // 0x0
     u32 flags;                 // 0xCC

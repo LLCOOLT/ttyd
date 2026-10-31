@@ -3,6 +3,14 @@
 
 #include <dolphin/types.h>
 
+// The type argument of parseGet1Next and parseTagGet1: what is read and what data points to.
+enum ParseValueType {
+    PARSE_STRING = 0, // a quoted string, copied without the quotes (char*)
+    PARSE_INT = 1,    // a decimal integer (s32*)
+    PARSE_FLOAT = 2,  // a float (f32*)
+    PARSE_VEC = 3,    // three floats (Vec*)
+};
+
 typedef struct ParseWork {
     char* ptr;   // 0x0
     s32 pos[10]; // 0x4

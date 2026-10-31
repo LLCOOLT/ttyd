@@ -117,6 +117,7 @@ static EVT_BEGIN(evt_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01f), 200)
     RETURN
 EVT_END()
+/** Animation names of the coloured switch blocks, in the order mobj_switch_float_blk steps through them. */
 const char* _switch_anim[] = {"A_1", "A_2", "A_3", "A_4", "A_5", "S_1"};
 
 // FAKE: the hit pointer is tested as a signed word (cmpwi); a pointer or BOOL test compiles to cmplwi
@@ -401,13 +402,13 @@ USER_FUNC(evt_mobj_hit_onoff) {
     if (on) {
         for (i = 0; i < 2; i++) {
             if (mobj->hitObj[i].name) {
-                hitGrpFlagOff(mobj->hitObj[i].name, 1);
+                hitGrpFlagOff(mobj->hitObj[i].name, HIT_FLAG_OFF);
             }
         }
     } else {
         for (i = 0; i < 2; i++) {
             if (mobj->hitObj[i].name) {
-                hitGrpFlagOn(mobj->hitObj[i].name, 1);
+                hitGrpFlagOn(mobj->hitObj[i].name, HIT_FLAG_OFF);
             }
         }
     }
@@ -1135,7 +1136,8 @@ static s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
 }
 
 #if !MOBJ_EXTRA_OBJS
-/** Never called: JP and US keep this stub so the stripped ride-switch and red tornado-switch names stay in .data. */
+/** JP and US keep this uncalled stub so the stripped ride-switch and red tornado-switch names stay in .rodata. */
+// FAKE: uncalled stand-in for the stripped switch objects; keeps their names in .rodata
 void evt_mobj_rideswitch(void) {
     mobjNameToPtr("MOBJ_RideSwitchB");
     mobjNameToPtr("MOBJ_RideSwitchA");
@@ -1186,7 +1188,7 @@ USER_FUNC(evt_mobj_rideswitch_lightblue) {
  * Main function of the red jump stands (springs):
  * landing on one runs the event with LW(0) = 1 when Mario fell onto it from above,
  * plays the spring sound plus a random voice clip (a plain sound when playing as Bowser, characterId 2)
- * and the bounce animation; Mario's controls stay locked (systemLevelFlags 0x10) while it runs.
+ * and the bounce animation; Mario's controls stay locked (SYSTEM_LEVEL_FLAG_NO_BATTLE) while it runs.
  */
 static s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
     MarioWork* mario = marioGetPtr();
@@ -1195,7 +1197,7 @@ static s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
             if (mobj->flags & MOBJ_FLAG_HIT) {
-                gp->systemLevelFlags |= 0x10;
+                gp->systemLevelFlags |= SYSTEM_LEVEL_FLAG_NO_BATTLE;
                 ev = mobjRunEvent(mobj, (s32*)mobj->event);
                 if (ev) {
                     ev->lwData[0] = mario->fallStartPos.y < mario->position.y ? 0 : (mario->fallStartPos.y < mobj->position.y + mario->wPlayerCollisionBox.y ? 0 : 1);
@@ -1244,7 +1246,7 @@ static s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
             if (evtCheckID(mobj->eventId) == 1) {
                 break;
             }
-            gp->systemLevelFlags &= ~0x10;
+            gp->systemLevelFlags &= ~SYSTEM_LEVEL_FLAG_NO_BATTLE;
             if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
                 break;
             }
@@ -1296,7 +1298,7 @@ static s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
             if (mobj->flags & MOBJ_FLAG_HIT) {
-                gp->systemLevelFlags |= 0x10;
+                gp->systemLevelFlags |= SYSTEM_LEVEL_FLAG_NO_BATTLE;
                 mobjRunEvent(mobj, (s32*)mobj->event);
                 if (mobj->hitFlag == MOBJ_HIT_STAND_ON) {
                     marioChgJumpStandMotion(mobj->typeDataF[3]);
@@ -1343,7 +1345,7 @@ static s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
             if (evtCheckID(mobj->eventId) == 1) {
                 break;
             }
-            gp->systemLevelFlags &= ~0x10;
+            gp->systemLevelFlags &= ~SYSTEM_LEVEL_FLAG_NO_BATTLE;
             if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
                 break;
             }
@@ -1482,7 +1484,7 @@ static s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
                 mobj->state = 12;
             }
 #if VERSION >= VERSION_JP
-            if (img->flags & 0x10000000) {
+            if (img->flags & IMG_FLAG_NOTHING_CAPTURED) {
                 mobj->state = 12;
             }
 #endif
@@ -2172,10 +2174,10 @@ EVT_BEGIN(evt_box_sound3)
     RETURN
 EVT_END()
 
-/**
- * Guess: shifts and enlarges the open chest's second matrix (translation, scale2) to fit the raised lid,
- * from the bounding-box arithmetic; applied once the chest has opened or was already open on load.
- */
+/** Resizes the open chest's collision box (translation, scale2, applied by mobjCalcMtx2):
+ * centres it on the model's bounding box with the back pushed out by a fifth of the height,
+ * 1.4 times taller and 1.2 times deeper; applied once the chest has opened or was already open on load.
+ * Guess: so the box covers the raised lid. */
 static inline void mobj_itemb(MapObjectEntry* mobj) {
     AnimationPoseData* data = animPoseGetAnimBaseDataPtr(mobj->poseId);
     Vec a, b;
@@ -2451,7 +2453,8 @@ USER_FUNC(evt_mobj_arrow) {
     return EVT_RETURN_DONE;
 }
 #else
-/** Never called: JP and US keep this stub so the stripped "MOBJ_Arrow" name stays in .data. */
+/** Never called: JP and US keep this stub so the stripped "MOBJ_Arrow" name stays in .rodata. */
+// FAKE: uncalled stand-in for the stripped arrow object; keeps its name in .rodata
 void mobj_sign(void) {
     mobjNameToPtr("MOBJ_Arrow");
 }
@@ -2469,7 +2472,7 @@ static inline void recoveryHeal(void) {
     ((PouchData*)party)->currentHP = ((PouchData*)party)->maximumHP;
     ((PouchData*)party)->currentFP = ((PouchData*)party)->maximumFP;
     for (i = 0; i < 8; party++, i++) {
-        if ((party->flags & 1) && !(party->flags & 2)) {
+        if ((party->flags & POUCH_PARTY_FLAG_JOINED) && !(party->flags & POUCH_PARTY_FLAG_AWAY)) {
             party->currentHP = party->maximumHP;
         }
     }
@@ -2502,7 +2505,7 @@ static s32 mobj_recovery_blk(MapObjectEntry* mobj) {
                 break;
             }
             marioKeyOff();
-            camGetPtr((CameraId)8)->flags |= 0x200;
+            camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_DISABLE;
             psndSFXOn_3D((const char*)0x1d9, &mobj->position);
             mobj->state++;
         case 1:
@@ -2560,7 +2563,7 @@ static s32 mobj_recovery_blk(MapObjectEntry* mobj) {
                 ((PouchData*)party)->currentHP = ((PouchData*)party)->maximumHP;
                 ((PouchData*)party)->currentFP = ((PouchData*)party)->maximumFP;
                 for (i = 0; i < 8; party++, i++) {
-                    if ((party->flags & 1) && !(party->flags & 2)) {
+                    if ((party->flags & POUCH_PARTY_FLAG_JOINED) && !(party->flags & POUCH_PARTY_FLAG_AWAY)) {
                         party->currentHP = party->maximumHP;
                     }
                 }
@@ -2579,7 +2582,7 @@ static s32 mobj_recovery_blk(MapObjectEntry* mobj) {
             marioChgPose("M_S_1");
             marioKeyOn();
             statusWinForceOff();
-            camGetPtr((CameraId)8)->flags &= ~0x200;
+            camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
             mobj->state++;
             break;
         case 6:
@@ -2600,7 +2603,7 @@ static s32 mobj_recovery_blk(MapObjectEntry* mobj) {
         case 11:
             if (windowCheckID(mobj->typeData[2]) == 0) {
                 marioKeyOn();
-                camGetPtr((CameraId)8)->flags &= ~0x200;
+                camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
                 mobj->flags &= ~MOBJ_FLAG_HIT;
                 mobj->state = 0;
             }
@@ -2612,7 +2615,7 @@ static s32 mobj_recovery_blk(MapObjectEntry* mobj) {
         case 21:
             if (windowCheckID(mobj->typeData[2]) == 0) {
                 marioKeyOn();
-                camGetPtr((CameraId)8)->flags &= ~0x200;
+                camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
                 mobj->flags &= ~MOBJ_FLAG_HIT;
                 mobj->state = 0;
             }
@@ -2707,7 +2710,7 @@ static s32 mobj_save_blk(MapObjectEntry* mobj) {
                 marioStSystemLevel(1);
                 psndSFXOn_3D((const char*)0x1af, &mobj->position);
                 animPoseSetAnim(mobj->poseId, "A_1", 1);
-                camGetPtr((CameraId)8)->flags |= 0x200;
+                camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_DISABLE;
                 mobj->state++;
             }
             break;
@@ -2736,7 +2739,7 @@ static s32 mobj_save_blk(MapObjectEntry* mobj) {
         case 4:
             if (evtCheckID(mobj->eventId) != 1) {
                 marioStSystemLevel(0);
-                camGetPtr((CameraId)8)->flags &= ~0x200;
+                camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
                 mobj->flags &= ~MOBJ_FLAG_HIT;
                 marioKeyOn();
                 mobj->state = 0;
@@ -2915,7 +2918,7 @@ static s32 mobj_badgeblk(MapObjectEntry* mobj) {
                     psndSFXOn_3D((const char*)0x1bc, &mobj->position);
                 } else {
                     pouchAddCoin(1);
-                    itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, 0x79, ITEM_ENTRY_POP_VANISH, -1, NULL);
+                    itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, ITEM_COIN, ITEM_ENTRY_POP_VANISH, -1, NULL);
                     evtSetValue(NULL, mobj->flagVar, 1);
                     psndSFXOn_3D((const char*)0x5b, &mobj->position);
                 }
@@ -3035,10 +3038,10 @@ static s32 mobj_powerupblk(MapObjectEntry* mobj) {
                 marioCtrlOff();
             }
 #endif
-            gp->systemLevelFlags |= 3;
+            gp->systemLevelFlags |= SYSTEM_LEVEL_FLAG_STOP_LV0 | SYSTEM_LEVEL_FLAG_STOP_LV1;
             psndSFXOn_3D((const char*)0x201c0, &mobj->position);
             animPoseSetAnim(mobj->poseId, "A_1", 1);
-            itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, "pwrblk1", 0x57, ITEM_ENTRY_POP_VANISH, -1, NULL);
+            itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, "pwrblk1", ITEM_SHINE_SPRITE, ITEM_ENTRY_POP_VANISH, -1, NULL);
             mobj->state++;
             break;
         case 1:
@@ -3055,7 +3058,7 @@ static s32 mobj_powerupblk(MapObjectEntry* mobj) {
                 mobj->typeData[1]--;
                 break;
             }
-            itemForceGet(itemEntry(mobj->position.x, 40.0f + mobj->position.y, mobj->position.z, "pwrblk2", 0x57, ITEM_ENTRY_FIXED_NO_TOUCH, -1, NULL));
+            itemForceGet(itemEntry(mobj->position.x, 40.0f + mobj->position.y, mobj->position.z, "pwrblk2", ITEM_SHINE_SPRITE, ITEM_ENTRY_FIXED_NO_TOUCH, -1, NULL));
             evtSetValue(NULL, mobj->flagVar, 1);
             marioKeyOn();
 #if VERSION >= VERSION_JP
@@ -3184,7 +3187,7 @@ static s32 mobj_brickblk(MapObjectEntry* mobj) {
                 mobj->state = 12;
             }
 #if VERSION >= VERSION_JP
-            if (img->flags & 0x10000000) {
+            if (img->flags & IMG_FLAG_NOTHING_CAPTURED) {
                 mobj->state = 12;
             }
 #endif
@@ -3231,7 +3234,7 @@ static s32 mobj_10countblk(MapObjectEntry* mobj) {
                     mobjRunEvent(mobj, (s32*)mobj->event);
                 } else {
                     pouchAddCoin(1);
-                    itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, 0x79, ITEM_ENTRY_POP_VANISH, -1, NULL);
+                    itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, ITEM_COIN, ITEM_ENTRY_POP_VANISH, -1, NULL);
                     mobj->timer = 200;
                 }
                 mobj->state++;
@@ -3251,7 +3254,7 @@ static s32 mobj_10countblk(MapObjectEntry* mobj) {
             if (mobj->flags & MOBJ_FLAG_HIT) {
                 psndSFXOn_3D((const char*)0x1bf, &mobj->position);
                 pouchAddCoin(1);
-                itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, 0x79, ITEM_ENTRY_POP_VANISH, -1, NULL);
+                itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, ITEM_COIN, ITEM_ENTRY_POP_VANISH, -1, NULL);
                 mobj->flags &= ~MOBJ_FLAG_HIT;
                 animPoseSetAnim(mobj->poseId, "A_1", 1);
             }
@@ -3434,7 +3437,7 @@ static s32 mobj_breaking_floor(MapObjectEntry* mobj) {
                     mobjRunEvent(mobj, (s32*)mobj->event);
                 }
                 if (mobj->hitObj[0].hitObject) {
-                    mobj->hitObj[0].hitObject->flags |= 1;
+                    mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
                 }
                 mobj->flags |= MOBJ_FLAG_NO_SHADOW;
                 evtSetValue(NULL, mobj->flagVar, 1);
@@ -3660,8 +3663,8 @@ static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
                 psndSFXOn_3D((const char*)0x1ef, &mobj->position);
                 mobj->state = 1;
                 item = itemNameToPtr(mobj->name);
-                if (item == NULL || !(((ItemEntry*)item)->flags & 1)) {
-                    if (itemEntry(mobj->position.x, 30.0f + mobj->position.y, mobj->position.z, mobj->name, 0x7d, ITEM_ENTRY_LAUNCH, mobj->flagVar, NULL)) {
+                if (item == NULL || !(((ItemEntry*)item)->flags & ITEM_FLAG_USED)) {
+                    if (itemEntry(mobj->position.x, 30.0f + mobj->position.y, mobj->position.z, mobj->name, ITEM_STAR_PIECE, ITEM_ENTRY_LAUNCH, mobj->flagVar, NULL)) {
                         item = itemNameToPtr(mobj->name);
                         itemFlagOn(item, ITEM_FLAG_CUSTOM_BOUNCE);
                         ((ItemEntry*)item)->bounceFactor = 0.6f;
@@ -3671,16 +3674,16 @@ static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
                     }
                 }
             }
-            KURU_POSE_FLAGS(mobj) |= 0x10;
+            KURU_POSE_FLAGS(mobj) |= ANIM_POSE_FLAG_TEX_OVERLAY;
             mobj->flags |= MOBJ_FLAG_PAPER_TEX;
             dispEntry(CAMERA_SHADOW, 0.0f, 0, (DispCallback)kururing_capture, mobj);
             break;
         case 1:
-            KURU_POSE_FLAGS(mobj) |= 0x10;
+            KURU_POSE_FLAGS(mobj) |= ANIM_POSE_FLAG_TEX_OVERLAY;
             mobj->flags |= MOBJ_FLAG_PAPER_TEX;
             dispEntry(CAMERA_SHADOW, 0.0f, 0, (DispCallback)kururing_capture, mobj);
             if (!(animPoseGetLoopTimes(mobj->poseId) < 1.0f)) {
-                KURU_POSE_FLAGS(mobj) &= ~0x10;
+                KURU_POSE_FLAGS(mobj) &= ~ANIM_POSE_FLAG_TEX_OVERLAY;
                 mobj->flags &= ~MOBJ_FLAG_PAPER_TEX;
                 mobj->flags &= ~MOBJ_FLAG_HIT;
                 animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -3690,7 +3693,7 @@ static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             break;
         case 10: {
             Vec* joint;
-            KURU_POSE_FLAGS(mobj) |= 0x10;
+            KURU_POSE_FLAGS(mobj) |= ANIM_POSE_FLAG_TEX_OVERLAY;
             mobj->flags |= MOBJ_FLAG_PAPER_TEX;
             dispEntry(CAMERA_SHADOW, 0.0f, 0, (DispCallback)kururing_capture, mobj);
             joint = &animPoseGetAnimPosePtr(mobj->poseId)->worldPositions[0][1];
@@ -3700,7 +3703,7 @@ static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             }
             p = partyGetPtr(marioGetPartyId());
 #if VERSION >= VERSION_US
-            if (p && !(((PartyEntry*)p)->flags & 0x100)) {
+            if (p && !(((PartyEntry*)p)->flags & PARTY_FLAG_IS_BEING_USED)) {
 #else
             if (p) {
 #endif
@@ -3710,7 +3713,7 @@ static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             }
             p = partyGetPtr(marioGetExtraPartyId());
 #if VERSION >= VERSION_US
-            if (p && !(((PartyEntry*)p)->flags & 0x100)) {
+            if (p && !(((PartyEntry*)p)->flags & PARTY_FLAG_IS_BEING_USED)) {
 #else
             if (p) {
 #endif
@@ -3737,7 +3740,7 @@ static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             if (animPoseGetLoopTimes(mobj->poseId) < 2.0f) {
                 break;
             }
-            KURU_POSE_FLAGS(mobj) &= ~0x10;
+            KURU_POSE_FLAGS(mobj) &= ~ANIM_POSE_FLAG_TEX_OVERLAY;
             mobj->flags &= ~MOBJ_FLAG_PAPER_TEX;
             animPoseSetAnim(mobj->poseId, "S_1", 1);
             psndSFXOn_3D((const char*)0x1f0, &mobj->position);
@@ -3801,7 +3804,7 @@ USER_FUNC(evt_mobj_kururing_floor) {
         char iname[16] = "i_";
     }
 #endif
-    mapGrpFlagOn(grp, 0x400000);
+    mapGrpFlagOn(grp, MAPOBJ_FLAG_KURURING_PASS);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     animPoseWorldPositionEvalOn(mobj->poseId);
     return EVT_RETURN_DONE;
@@ -3824,11 +3827,11 @@ static s32 mobj_trap_floor(MapObjectEntry* mobj) {
             }
             break;
         case 1:
-            KURU_POSE_FLAGS(mobj) |= 0x10;
+            KURU_POSE_FLAGS(mobj) |= ANIM_POSE_FLAG_TEX_OVERLAY;
             mobj->flags |= MOBJ_FLAG_PAPER_TEX;
             dispEntry(CAMERA_SHADOW, 0.0f, 0, (DispCallback)kururing_capture, mobj);
             if (!(animPoseGetLoopTimes(mobj->poseId) < 1.0f)) {
-                KURU_POSE_FLAGS(mobj) &= ~0x10;
+                KURU_POSE_FLAGS(mobj) &= ~ANIM_POSE_FLAG_TEX_OVERLAY;
                 mobj->flags &= ~MOBJ_FLAG_PAPER_TEX;
                 mobj->state++;
             }
@@ -3878,7 +3881,7 @@ USER_FUNC(evt_mobj_trap_floor) {
     mobj->flags |= MOBJ_FLAG_NO_SHADOW;
     mobj->flags |= MOBJ_FLAG_CALC_MTX;
     mobjCalcMtx(mobj);
-    mapGrpFlagOn(grp, 0x400000);
+    mapGrpFlagOn(grp, MAPOBJ_FLAG_KURURING_PASS);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     return EVT_RETURN_DONE;
 }
@@ -4070,7 +4073,7 @@ static s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
                     npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
                 }
                 if (mobj->hitObj[0].hitObject) {
-                    mobj->hitObj[0].hitObject->flags |= 1;
+                    mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
                 }
                 mobj->flags |= MOBJ_FLAG_NO_SHADOW;
                 kpaAddScore(kpaMutekiCheck() ? 500 : 400);
@@ -4080,7 +4083,7 @@ static s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
         case 10:
             psndSFXOn_3D((const char*)0x1c4, &mobj->position);
             effMObjBrokenEntry(5, mobj->position.x, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
-            item = itemEntry(mobj->position.x, 25.0f + mobj->position.y, mobj->position.z, mobj->name, 0x59, ITEM_ENTRY_LAUNCH, -1, kpa_powerup_evt);
+            item = itemEntry(mobj->position.x, 25.0f + mobj->position.y, mobj->position.z, mobj->name, ITEM_BOWSER_BROS_MEAT, ITEM_ENTRY_LAUNCH, -1, kpa_powerup_evt);
             if (item) {
                 itemStatusOn(item, ITEM_STATUS_CUSTOM_LAUNCH);
                 itemFlagOn(item, ITEM_FLAG_CUSTOM_BOUNCE | ITEM_FLAG_INSTANT_GET);
@@ -4141,7 +4144,8 @@ USER_FUNC(evt_mobj_koopa_ojama_blk) {
 }
 
 #if !MOBJ_EXTRA_OBJS
-/** Never called: JP and US keep this stub so the stripped bomb-rock and trap names stay in .data. */
+/** Never called: JP and US keep this stub so the stripped bomb-rock and trap names stay in .rodata. */
+// FAKE: uncalled stand-in for the stripped rock and trap objects; keeps their names in .rodata
 void mobj_koopa_stone_blk(void) {
     mobjNameToPtr("MOBJ_BombRock");
     mobjNameToPtr("OFF_d_bom");
@@ -4240,7 +4244,7 @@ static s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
                     npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
                 }
                 if (mobj->hitObj[0].hitObject) {
-                    mobj->hitObj[0].hitObject->flags |= 1;
+                    mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
                 }
                 mobj->flags |= MOBJ_FLAG_NO_SHADOW;
                 kpaAddScore(kpaMutekiCheck() ? 500 : 400);
@@ -4387,7 +4391,7 @@ static s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
                 psndSFXOn_3D((const char*)0x836, &mobj->position);
             } else {
                 kpaAddCoin(1);
-                itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, 0x79, ITEM_ENTRY_POP_VANISH, -1, NULL);
+                itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, ITEM_COIN, ITEM_ENTRY_POP_VANISH, -1, NULL);
                 evtSetValue(NULL, mobj->flagVar, 1);
                 psndSFXOn_3D((const char*)0x5b, &mobj->position);
             }
@@ -4422,7 +4426,7 @@ static s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
                     npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
                 }
                 if (mobj->hitObj[0].hitObject) {
-                    mobj->hitObj[0].hitObject->flags |= 1;
+                    mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
                 }
                 mobj->flags |= MOBJ_FLAG_NO_SHADOW;
                 mobj->state++;
@@ -4559,7 +4563,7 @@ static s32 mobj_koopa_blk(MapObjectEntry* mobj) {
                     npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
                 }
                 if (mobj->hitObj[0].hitObject) {
-                    mobj->hitObj[0].hitObject->flags |= 1;
+                    mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
                 }
                 mobj->flags |= MOBJ_FLAG_NO_SHADOW;
                 mobj->state = 10;
@@ -4639,7 +4643,7 @@ static s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
                     npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
                 }
                 if (mobj->hitObj[0].hitObject) {
-                    mobj->hitObj[0].hitObject->flags |= 1;
+                    mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
                 }
                 mobj->flags |= MOBJ_FLAG_NO_SHADOW;
                 kpaAddScore(kpaMutekiCheck() ? 500 : 400);
@@ -4785,7 +4789,7 @@ static s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
                     npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
                 }
                 if (mobj->hitObj[0].hitObject) {
-                    mobj->hitObj[0].hitObject->flags |= 1;
+                    mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
                 }
                 mobj->flags |= MOBJ_FLAG_NO_SHADOW;
                 kpaAddScore(kpaMutekiCheck() ? 500 : 400);
@@ -4934,7 +4938,7 @@ static s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
             mobjRunEvent(mobj, (s32*)mobj->event);
             evtSetValue(NULL, mobj->flagVar, 1);
             if (mobj->hitObj[0].hitObject) {
-                mobj->hitObj[0].hitObject->flags |= 1;
+                mobj->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
             }
             mobj->flags |= MOBJ_FLAG_NO_SHADOW;
             kpaAddScore(kpaMutekiCheck() ? 500 : 400);
@@ -4956,7 +4960,7 @@ static s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
                 npc->jumpTargetPos.y = 6.0f - irand(101) / 75.0f;
                 npc->jumpTargetPos.z = 4.8f;
                 npc->moveTime = 2.0f;
-                npc->jumpFlags |= 4;
+                npc->jumpFlags |= NPC_STATUS_DEAD;
             }
             if (psndSFXChk(mobj->typeWork) == 0) {
                 psndSFXOff(mobj->typeWork);
@@ -5050,7 +5054,7 @@ USER_FUNC(evt_mobj_koopa_fireber_dodai) {
         npcEntry(buf, "c_fireber");
         npc = npcNameToPtr(buf);
         npc->flags |= NPC_FLAG_KOOPA_MODE;
-        npc->hazardFlags |= 0xf;
+        npc->hazardFlags |= NPC_HAZARD_NO_STOMP | NPC_HAZARD_NO_FIRE | NPC_HAZARD_NO_STAR | NPC_HAZARD_NO_BUMP;
         npc->position.x = x;
         npc->position.y = 25.0f + y + 25.0f * i;
 #if VERSION >= VERSION_US
@@ -5304,6 +5308,7 @@ EVT_END()
  * Run by mobj_koopa_pole_evt with the score in LW(0).
  */
 EVT_BEGIN(kpa_pole)
+    // Bowser grabs the goal pole with the jump sound, facing right, just left of the flag.
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -5320,6 +5325,7 @@ EVT_BEGIN(kpa_pole)
     MULTIPLY_FLOAT(LW(5), FLOAT(0.5996094f))
     SUBTRACT_FLOAT(LW(4), LW(5))
     CALL(evt_mario_set_pos, LW(4), LW(2), LW(3))
+    // The score pops up beside the flag.
     CALL(kpa_score_to_str, LW(0))
     SET_FLOAT_VALUE(LW(14), FLOAT(2.0f))
     SET_FLOAT_VALUE(LW(13), FLOAT(2.0f))
@@ -5330,6 +5336,7 @@ EVT_BEGIN(kpa_pole)
         CALL(kpa_disp_pole_score_main, LW(3), LW(7), LW(5), LW(13))
     END_INLINE_EVENT
     CALL(evt_mario_get_pos, 0, LW(1), LW(2), LW(3))
+    // Bowser and the flag slide down the pole together to the ground.
     CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_POST_SLIDE1"), LW(1), LW(2), LW(3), LW(10))
     BEGIN_INLINE_EVENT_GET_ID(LW(6))
         LOOP(0)
@@ -5360,6 +5367,7 @@ EVT_BEGIN(kpa_pole)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The slide sound stops and the camera moves on ahead of Bowser.
     CALL(evt_snd_sfxoff, LW(10))
     WAIT_MS(200)
     CALL(evt_cam_get_pos, 4, LW(4), LW(5), LW(6))
@@ -5375,6 +5383,7 @@ EVT_BEGIN(kpa_pole)
     CALL(evt_cam3d_evt_set, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9), 300, 0)
     WAIT_MS(200)
     CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+    // Bowser turns around, hops off the pole and gets control back as the camera returns to normal.
     CALL(evt_mario_set_dir, 270, 0, 0)
     CALL(evt_mario_set_mov_spd, 0)
     WAIT_MS(200)
@@ -5440,10 +5449,10 @@ EVT_BEGIN(kpa_pole_move)
     RETURN
 EVT_END()
 
-/**
- * After the goal pole: walks Bowser to the fortress ("toride" in kpa_06, "toride_" elsewhere) and sets LSWF(5).
- * Guess: at level 2 and above he is too big for the door, hence the 2-second struggle with his model hidden.
- */
+/** After the goal pole: sets LSWF(5) and walks Bowser to the fortress (toride in kpa_06, else toride_).
+ * Up to level 1 he walks 100 units past it; at level 2 and above he stops 1.2 of his widths short,
+ * plays SFX_KUPPA_STRUGGLE1 for 2 seconds with his pose locked (display flag 2), then stands (KPA2_S_1).
+ * Guess: he is too big to fit through the door. */
 EVT_BEGIN(kpa_move_to_toride)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_wait_landon)
@@ -5525,7 +5534,7 @@ static s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
             for (i = 0, off = 0; i < npcGetWorkPtr()->total; off += 0x340, i++) {
                 NpcEntry* npc = (NpcEntry*)((char*)npcGetWorkPtr()->entries + off);
                 u32 flags = (u32)npc->flags;
-                if ((flags & NPC_FLAG_USED) && !(npc->jumpFlags & 4) && (flags & NPC_FLAG_KOOPA_MODE) && (flags & NPC_FLAG_ENEMY)) {
+                if ((flags & NPC_FLAG_USED) && !(npc->jumpFlags & NPC_STATUS_DEAD) && (flags & NPC_FLAG_KOOPA_MODE) && (flags & NPC_FLAG_ENEMY)) {
                     npcGroupDead(npc, 0x20);
                 }
             }
@@ -5672,7 +5681,7 @@ USER_FUNC(evt_mobj_koopa_pole) {
     hata->state = 0;
     strcpy(hata->linkedName, name);
     if (hata->hitObj[0].hitObject) {
-        hata->hitObj[0].hitObject->flags |= 1;
+        hata->hitObj[0].hitObject->flags |= HIT_FLAG_OFF;
     }
     return EVT_RETURN_DONE;
 }

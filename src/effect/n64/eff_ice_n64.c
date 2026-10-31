@@ -35,12 +35,14 @@ typedef struct EffIceN64Work {
     EffIceN64Piece pieces[8]; // 0x30
 } EffIceN64Work;
 
+/** Large 32x32 ice shard with texture 7, used by the even-numbered (spinning) shards. */
 effN64Vtx ice_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
     {16, -16, 0, 2048, 0, 0, 0, 0, 255},
     {16, 16, 0, 2048, 2048, 0, 0, 0, 255},
     {-16, 16, 0, 0, 2048, 0, 0, 0, 255},
 };
+/** Small 8x8 ice shard with texture 8, used by the odd-numbered (plain) shards. */
 effN64Vtx ice_s_vtx[] = {
     {-4, -4, 0, 0, 0, 0, 0, 0, 255},
     {4, -4, 0, 2048, 0, 0, 0, 0, 255},
@@ -88,7 +90,7 @@ EffectEntry* effIceN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_lifetimes off
 /** Fades the shards in, then out over the last 10 frames, and moves each shard with gravity, drag and spin. */
 static void effIceMain(EffectEntry* effect) {

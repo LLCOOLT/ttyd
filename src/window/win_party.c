@@ -29,6 +29,10 @@
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
 
+/**
+ * The four battle moves the party menu lists for each partner, used by party_list below:
+ * Goombella, Koops, Flurrie, Yoshi, Vivian, Bobbery and Ms. Mowz.
+ */
 BattleWeapon* chri_waza[4] = {
     &partyWeapon_ChristineNormalAttack,
     &partyWeapon_ChristineMonosiri,
@@ -72,6 +76,11 @@ BattleWeapon* chu_waza[4] = {
     &partyWeapon_ChuchurinaKiss,
 };
 
+/**
+ * The seven partners in Party screen order (Goombella, Koops, Flurrie, Yoshi, Vivian, Bobbery, Ms. Mowz):
+ * partner id, name icon and name, help text, menu model, its poses and move list.
+ * The Party screen's setup and drawing read it; Yoshi's name icon is switched to match his colour.
+ */
 WindowPartyDt winPartyDt[7] = {
     {1, ICON_155, "name_party0", "msg_menu_party_kuri", "EFF_m_kuriko", "W_1", "d_mario", "R_2", chri_waza},
     {2, ICON_156, "name_party1", "msg_menu_party_noko", "EFF_m_noko", "W_1", "d_mario", "R_3", noko_waza},
@@ -99,9 +108,9 @@ void winPartyInit(WindowWork* wp) {
     wp->party.count = 0;
     for (i = 0; i < 7; i++) {
         for (j = 0; j < 8; j++) {
-            if (j == winPartyDt[i].partyId && (pouch->partyData[j].flags & 1) &&
-                !(pouch->partyData[j].flags & 2)) {
-                if (wp->flags & 0x2000) {
+            if (j == winPartyDt[i].partyId && (pouch->partyData[j].flags & POUCH_PARTY_FLAG_JOINED) &&
+                !(pouch->partyData[j].flags & POUCH_PARTY_FLAG_AWAY)) {
+                if (wp->flags & WIN_FLAG_8BIT_MARIO) {
                     poseName = winPartyDt[i].poseName2;
                     switch (pouchGetPartyColor(4)) {
                         case 0:
@@ -345,6 +354,10 @@ void winPartyMain2(WindowWork* wp) {
     wp->party.angle += (wp->party.angleTarget - wp->party.angle) / 4.0f;
 }
 
+/**
+ * White (icons, textures, edged text) and black (HP numbers and plain text) used
+ * when drawing the Party screen.
+ */
 static const GXColor winPartyWhiteC = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor winPartyBlackC = {0x00, 0x00, 0x00, 0xFF};
 /**
@@ -498,7 +511,7 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
                     break;
                 }
             }
-            if (wp->flags & 0x2000) {
+            if (wp->flags & WIN_FLAG_8BIT_MARIO) {
                 animName = winPartyDt[j].animName2;
                 if (winPartyDt[j].partyId == 4) {
                     switch (pouchGetPartyColor(4)) {
@@ -544,7 +557,7 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
                     break;
                 }
             }
-            if (wp->flags & 0x2000) {
+            if (wp->flags & WIN_FLAG_8BIT_MARIO) {
                 animName = winPartyDt[j].animName2;
                 if (winPartyDt[j].partyId == 4) {
                     switch (pouchGetPartyColor(4)) {

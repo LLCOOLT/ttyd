@@ -7,6 +7,11 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 
+// Unit work slots of the test enemy.
+enum {
+    UW_TEST_FLIPPED_TURNS = 0, // turns left on its back after being flipped (0: upright)
+};
+
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static BattleUnitDefense defence_turn;
@@ -24,42 +29,62 @@ static EvtWord wakeup_event[67];
 static EvtWord attack_event[190];
 static EvtWord wait_event[7];
 
+/** Defence of the test unit `test`: none, every hit does its full damage. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element modifiers of the test unit `test`: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Defence of the test unit `test` while it is flipped on its back: none, every hit does its full damage.
+ */
 static BattleUnitDefense defence_turn = {{0, 0, 0, 0, 0}};
 
+/**
+ * Pose table of the test unit `test`: maps each battle pose (waiting, hurt, running...) to one of its NKT_*
+ * animations.
+ */
 static PoseTableEntry pose_table[] = {
-    {28, "NKT_S_1"},
+    {BTL_POSE_NORMAL, "NKT_S_1"},
     {29, "NKT_Q_1A"},
     {30, "NKT_Q_1B"},
     {31, "NKT_S_1"},
-    {39, "NKT_D_1"},
-    {40, "NKT_W_1"},
+    {BTL_POSE_DAMAGE, "NKT_D_1"},
+    {BTL_POSE_WALK, "NKT_W_1"},
     {BTL_POSE_STAY_DEFAULT, "NKT_W_1"},
 };
 
+/**
+ * Pose table of the test unit `test` while it is flipped on its back:
+ * maps each battle pose (waiting, hurt, running...) to one of its NKT_* animations.
+ */
 static PoseTableEntry pose_table_turn[] = {
-    {28, "NKT_B_1"},
+    {BTL_POSE_NORMAL, "NKT_B_1"},
     {29, "NKT_Q_1A"},
     {30, "NKT_Q_1B"},
     {31, "NKT_S_1"},
-    {39, "NKT_B_1"},
+    {BTL_POSE_DAMAGE, "NKT_B_1"},
     {BTL_POSE_STAY_DEFAULT, "NKT_B_1"},
 };
 
+/** Data table of the test unit `test`: reaction scripts for being flipped over. */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {0, NULL},
 };
 
+/** Body part of the test unit `test`: a single part using the nokonoko model. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_test", "nokonoko", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x1009, 0, pose_table},
+    {1, "btl_un_test", "nokonoko", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_SHELLED, 0, pose_table},
 };
 
+/** Status vulnerability of the test unit `test`: every status lands at the normal rate. */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Unit definition of the test unit `test`: 2 HP and level 1, with its sizes, damage sounds,
+ * status vulnerability, parts and init script.
+ */
 BattleUnitKind unit_test = {
     187,
     "btl_un_test",
@@ -118,7 +143,7 @@ BattleUnitKind unit_test = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -126,6 +151,7 @@ BattleUnitKind unit_test = {
     data_table,
 };
 
+/** Attack data of the test unit `test`: it deals no direct damage. */
 static BattleWeapon weapon_test_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -144,7 +170,7 @@ static BattleWeapon weapon_test_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -171,7 +197,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TEST_FLIPPED_TURNS, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -193,7 +219,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_SetUnitWork, LW(10), 0, 2)
+    CALL(btlevtcmd_SetUnitWork, LW(10), UW_TEST_FLIPPED_TURNS, 2)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("NKT_D_1"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -210,9 +236,9 @@ EVT_END()
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, LW(10), UW_TEST_FLIPPED_TURNS, LW(0))
     SUBTRACT(LW(0), 1)
-    CALL(btlevtcmd_SetUnitWork, LW(10), 0, LW(0))
+    CALL(btlevtcmd_SetUnitWork, LW(10), UW_TEST_FLIPPED_TURNS, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -236,7 +262,7 @@ EVT_END()
  * on a miss it bounces past the target, waits half a second and jumps home.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TEST_FLIPPED_TURNS, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN

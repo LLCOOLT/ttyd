@@ -24,8 +24,6 @@
 
 static f32 _intplGetFloat(s32 mode, f32 t);
 
-extern char* strcat(char* dest, const char* src);
-
 #pragma optimize_for_size on
 
 #ifdef __MWERKS__
@@ -449,7 +447,7 @@ USER_FUNC(evt_npc_set_rotate_offset) {
  * Walks an NPC to x = args[1], z = args[2], in args[3] milliseconds
  * or at args[4] units per second (time alone derives the speed; neither gives speed 1),
  * playing its footstep sounds; blocks until it arrives.
- * args[5] flags: 0x2 sets the NPC's jump flag 0x1000, 0x4 gives up after 5 frames against a wall.
+ * args[5] flags: 0x2 sets NPC_STATUS_NO_FIND_EVENT, 0x4 gives up after 5 frames against a wall.
  */
 USER_FUNC(evt_npc_move_position) {
     EvtWord* args = event->args;
@@ -467,9 +465,9 @@ USER_FUNC(evt_npc_move_position) {
     f32 step;
     s32 sfxFlag;
 
-    npc->jumpFlags |= 0x10;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
     if (moveFlags & 0x2) {
-        npc->jumpFlags |= 0x1000;
+        npc->jumpFlags |= NPC_STATUS_NO_FIND_EVENT;
     }
 
     if (isFirstCall) {
@@ -534,20 +532,20 @@ USER_FUNC(evt_npc_move_position) {
     }
 
     // Re-aim at the target each frame unless direction is locked
-    if ((npc->flags & NPC_FLAG_USED) && !(npc->jumpFlags & 0x1)) {
+    if ((npc->flags & NPC_FLAG_USED) && !(npc->jumpFlags & NPC_STATUS_AIRBORNE)) {
         npc->moveDir = angleABf(0.0f, 0.0f, diff.x, diff.z);
     }
 
     // Turn the body toward travel (unless mid battle-transition states 5/6)
-    if ((npc->jumpFlags & 0x2) && npc->moveSpeed > 0.1f) {
+    if ((npc->jumpFlags & NPC_STATUS_FACE_MOVE_DIR) && npc->moveSpeed > 0.1f) {
         if (npc != fbatGetPointer()->target || (fbatGetPointer()->mode != 5 && fbatGetPointer()->mode != 6)) {
             npcTuningRy(npc, npc->moveDir);
         }
     }
 
-    // Integrate move offset along heading (flag 0x10000 freezes it; the demo has no freeze flag)
+    // Integrate move offset along heading (NPC_STATUS_FROZEN freezes it; the demo has no freeze flag)
 #if VERSION >= VERSION_JP
-    if (!(npc->jumpFlags & 0x10000))
+    if (!(npc->jumpFlags & NPC_STATUS_FROZEN))
 #endif
     {
         f32 temp = (f32)sin(npc->moveDir * 6.2831855f / 360.0f);
@@ -559,7 +557,7 @@ USER_FUNC(evt_npc_move_position) {
     // Footstep SFX
     sfxFlag = 0;
     if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
-        if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+        if (!(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
             sfxFlag = 0x10000;
         }
     }
@@ -613,8 +611,8 @@ USER_FUNC(evt_npc_jump_position) {
     s32 sfxFlag;
     f32 temp;
 
-    npc->jumpFlags |= 0x10;
-    npc->jumpFlags |= 0x1000;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
+    npc->jumpFlags |= NPC_STATUS_NO_FIND_EVENT;
 
     if (isFirstCall) {
         npc->moveTicks = 0;
@@ -635,7 +633,7 @@ USER_FUNC(evt_npc_jump_position) {
         npc->moveOffset.y = 0.0f;
 
         sfxFlag = 0;
-        if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX && !(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+        if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX && !(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
             sfxFlag = 0x10000;
         }
         if (npc->jumpSfx != 0) {
@@ -724,7 +722,7 @@ USER_FUNC(evt_npc_jump_position) {
     }
 
     // ---- per-frame ----
-    if ((npc->jumpFlags & 0x2) && npc->moveSpeed > 0.1f) {
+    if ((npc->jumpFlags & NPC_STATUS_FACE_MOVE_DIR) && npc->moveSpeed > 0.1f) {
         if (npc != fbatGetPointer()->target || (fbatGetPointer()->mode != 5 && fbatGetPointer()->mode != 6)) {
             npcTuningRy(npc, npc->moveDir);
         }
@@ -735,7 +733,7 @@ USER_FUNC(evt_npc_jump_position) {
     temp = (f32)cos(npc->moveDir * 6.2831855f / 360.0f);
     npc->moveOffset.z += npc->moveDt * (npc->moveSpeed * -temp);
 
-    if (npc->jumpFlags & 0x1) {
+    if (npc->jumpFlags & NPC_STATUS_AIRBORNE) {
         return EVT_RETURN_BLOCK; // still airborne
     }
 
@@ -747,7 +745,7 @@ USER_FUNC(evt_npc_jump_position) {
 
     sfxFlag = 0;
     if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
-        if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+        if (!(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
             sfxFlag = 0x10000;
         }
     }
@@ -787,7 +785,7 @@ USER_FUNC(evt_npc_jump_position_nohit) {
         npc->flags &= ~NPC_FLAG_SHADOW_NO_COLLISION;
 
         if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
-            if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+            if (!(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
                 sfxFlag = 0x10000;
             }
         }
@@ -811,7 +809,7 @@ USER_FUNC(evt_npc_jump_position_nohit) {
 
     sfxFlag = 0;
     if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
-        if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+        if (!(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
             sfxFlag = 0x10000;
         }
     }
@@ -846,9 +844,9 @@ USER_FUNC(evt_npc_glide_position) {
     BOOL finished;
     s32 sfxFlag;
 
-    npc->jumpFlags |= 0x10;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
     if (!(moveFlags & 0x2)) {
-        npc->jumpFlags |= 0x1000;
+        npc->jumpFlags |= NPC_STATUS_NO_FIND_EVENT;
     }
 
     if (isFirstCall) {
@@ -912,7 +910,7 @@ USER_FUNC(evt_npc_glide_position) {
     npc->moveOffset.z += dz * delta;
 
     // Turn the body toward travel (unless mid battle-transition states 5/6)
-    if (npc->jumpFlags & 0x2) {
+    if (npc->jumpFlags & NPC_STATUS_FACE_MOVE_DIR) {
         if (dx || dz) {
             if (npc != fbatGetPointer()->target ||
                 (fbatGetPointer()->mode != 5 && fbatGetPointer()->mode != 6)) {
@@ -932,7 +930,7 @@ USER_FUNC(evt_npc_glide_position) {
     // Footstep SFX
     sfxFlag = 0;
     if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
-        if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+        if (!(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
             sfxFlag = 0x10000;
         }
     }
@@ -969,7 +967,7 @@ USER_FUNC(evt_npc_return_interrupt) {
 
     name = (const char*)evtGetValue(event, args[0]);
     npc = evtNpcNameToPtr(event, name);
-    npc->interruptFlags |= 0x10000000;
+    npc->interruptFlags |= NPC_INTERRUPT_MOVE;
     return EVT_RETURN_YIELD;
 }
 
@@ -993,7 +991,7 @@ USER_FUNC(evt_npc_homing_target) {
     BOOL finished;
     s32 sfxFlag;
 
-    npc->jumpFlags |= 0x10;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
 
     if (isFirstCall) {
         npc->moveTicks = 0;
@@ -1022,7 +1020,7 @@ USER_FUNC(evt_npc_homing_target) {
         npc->moveTime = moveTime;
 
         // Turn the body toward travel (unless mid battle-transition states 5/6)
-        if ((npc->jumpFlags & 0x2) && npc->moveSpeed) {
+        if ((npc->jumpFlags & NPC_STATUS_FACE_MOVE_DIR) && npc->moveSpeed) {
             if (npc != fbatGetPointer()->target ||
                 (fbatGetPointer()->mode != 5 && fbatGetPointer()->mode != 6)) {
                 npcTuningRy(npc, npc->moveDir);
@@ -1035,7 +1033,7 @@ USER_FUNC(evt_npc_homing_target) {
     }
 
     dist = 1000.0f;
-    if (!(npc->jumpFlags & 0x1)) {
+    if (!(npc->jumpFlags & NPC_STATUS_AIRBORNE)) {
         // track the target's current position
         if (event->userdata[0] == 0) {
             MarioWork* mario = event->userdatap[1];
@@ -1067,7 +1065,7 @@ USER_FUNC(evt_npc_homing_target) {
             npc->moveDir = reviseAngle(npc->moveDir);
         }
 
-        if ((npc->jumpFlags & 0x2) && npc->moveSpeed) {
+        if ((npc->jumpFlags & NPC_STATUS_FACE_MOVE_DIR) && npc->moveSpeed) {
             if (npc != fbatGetPointer()->target ||
                 (fbatGetPointer()->mode != 5 && fbatGetPointer()->mode != 6)) {
                 npcTuningRy(npc, npc->moveDir);
@@ -1099,7 +1097,7 @@ USER_FUNC(evt_npc_homing_target) {
     // Footstep SFX
     sfxFlag = 0;
     if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
-        if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {
+        if (!(animPoseGetMaterialFlag(npc->poseId) & (ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2))) {
             sfxFlag = 0x10000;
         }
     }
@@ -1660,7 +1658,7 @@ USER_FUNC(evt_npc_restart_regular_event) {
 
     name = (const char*)evtGetValue(event, args[0]);
     npc = evtNpcNameToPtr(event, name);
-    npc->interruptFlags |= 0x10000000;
+    npc->interruptFlags |= NPC_INTERRUPT_MOVE;
     npcCheckInterrupt(npc);
     return EVT_RETURN_DONE;
 }
@@ -2239,7 +2237,7 @@ USER_FUNC(evt_npc_set_unitwork) {
 }
 
 /**
- * Blocks for args[1] milliseconds while marking NPC args[0] busy with a script move (jump flag 0x10),
+ * Blocks for args[1] milliseconds while marking NPC args[0] busy with a script move (NPC_STATUS_CLOCK_RUNNING),
  * e.g. between steps of a scripted walk.
  */
 USER_FUNC(evt_npc_wait_msec) {
@@ -2249,7 +2247,7 @@ USER_FUNC(evt_npc_wait_msec) {
 
     s32 temp;
     OSTime lifetime = event->lifetime;
-    npc->jumpFlags |= 0x10;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
 
     if (isFirstCall) {
         event->userdata[0] = evtGetValue(event, args[1]);
@@ -2597,9 +2595,9 @@ USER_FUNC(evt_npc_kamek_move_position) {
     f32 dist1, dist2;
     f32 step;
 
-    npc->jumpFlags |= 0x10;
+    npc->jumpFlags |= NPC_STATUS_CLOCK_RUNNING;
     if (moveFlags & 0x2) {
-        npc->jumpFlags |= 0x1000;
+        npc->jumpFlags |= NPC_STATUS_NO_FIND_EVENT;
     }
 
     if (isFirstCall) {
@@ -2660,12 +2658,12 @@ USER_FUNC(evt_npc_kamek_move_position) {
     }
 
     // Re-aim at the target each frame unless direction is locked
-    if ((moveFlags & 0x1) && !(npc->jumpFlags & 0x1)) {
+    if ((moveFlags & 0x1) && !(npc->jumpFlags & NPC_STATUS_AIRBORNE)) {
         npc->moveDir = angleABf(0.0f, 0.0f, diff.x, diff.z);
     }
 
     // Turn the body toward travel (unless mid battle-transition states 5/6)
-    if ((npc->jumpFlags & 0x2) && npc->moveSpeed > 0.1f) {
+    if ((npc->jumpFlags & NPC_STATUS_FACE_MOVE_DIR) && npc->moveSpeed > 0.1f) {
         if (npc != fbatGetPointer()->target || (fbatGetPointer()->mode != 5 && fbatGetPointer()->mode != 6)) {
             npcTuningRy(npc, npc->moveDir);
         }
@@ -2884,17 +2882,17 @@ USER_FUNC(evt_npc_sound_data_set) {
     return EVT_RETURN_DONE;
 }
 
-/**
- * Guess: lets the field NPCs be saved and released when a battle starts, so they can be restored after.
- * Sets (args[0] nonzero) or clears field NPC work flag 0x2, which npcReleaseFiledNpc checks.
- */
+/** Sets (args[0] nonzero) or clears NPC_WORK_RELEASE_FIELD: with it set, the next battle start (seq_battle)
+ * saves the field NPCs' models and animations and frees their poses (npcReleaseFiledNpc);
+ * npcRecoveryFiledNpc rebuilds them after. Set before scripted boss battles (las_29, mri_01, muj_00, muj_01).
+ * Guess: to free animation memory. */
 USER_FUNC(evt_npc_release_filednpc) {
     BOOL set = evtGetValue(event, *event->args);
     NpcWork* wp = npcGetWorkPtr();
     if (set) {
-        wp->flags |= 2;
+        wp->flags |= NPC_WORK_RELEASE_FIELD;
     } else {
-        wp->flags &= ~2;
+        wp->flags &= ~NPC_WORK_RELEASE_FIELD;
     }
     return EVT_RETURN_DONE;
 }

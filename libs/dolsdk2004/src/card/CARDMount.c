@@ -4,10 +4,14 @@
 #include "os/__os.h"
 #include "__card.h"
 
+/**
+ * Sector (erase block) size in bytes for each size code in bits 11-13 of the card's EXI ID; 0 for unused codes.
+ */
 static u32 SectorSizeTable[8] = {
     8 * 1024, 16 * 1024, 32 * 1024, 64 * 1024, 128 * 1024, 256 * 1024, 0, 0,
 };
 
+/** Access latency for each code in bits 8-10 of the card's EXI ID, stored in the card's control block. */
 static u32 LatencyTable[8] = {
     4, 8, 16, 32, 64, 128, 256, 512,
 };

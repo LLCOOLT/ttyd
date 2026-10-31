@@ -1085,6 +1085,7 @@ void THPGXYuv2RgbDraw(u8* y_data, u8* u_data, u8* v_data, s16 x, s16 y, s16 text
 
 #include "gxsub.h"
 
+/** Pointer to the demo sequence state (work, above); the demo scenes read and write it through wp. */
 static SeqDemoWork* wp = &work;
 
 static void demoDisp(CameraId cameraId, void* param);

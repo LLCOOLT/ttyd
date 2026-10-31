@@ -6,6 +6,16 @@
 #include "dolphin/types.h"
 #include "battle/battle_unit.h"
 
+// Unit work slots of Vivian (btlevtcmd_SetUnitWork / GetUnitWork). Slots 0-2 are also read by btlDispMain (battle_disp.c)
+// to draw her shadow tail, and UW_VIVIAN_VEIL_TURNS by BtlUnit_CheckShadowGuard (battle_unit.c).
+enum {
+    UW_VIVIAN_SHADOW_X = 0,   // floor position of her shadow tail, kept by vivian_shadow_tail_event
+    UW_VIVIAN_SHADOW_Y = 1,   // (y of the same position)
+    UW_VIVIAN_SHADOW_Z = 2,   // (z of the same position)
+    UW_VIVIAN_AWAY = 3,       // 1 while Shade Fist has her away from her spot: the shadow tail stays where it was
+    UW_VIVIAN_VEIL_TURNS = 4, // Veil: turns left hidden in the shadow; while above 0 she cannot be hit
+};
+
 USER_FUNC(battle_evt_majo_disp_off);
 USER_FUNC(battle_evt_majo_disp_on);
 extern BattleWeapon partyWeapon_VivianCharmKissAttack;

@@ -51,6 +51,7 @@ static EVT_BEGIN(bero_custom)
     RETURN
 EVT_END()
 
+/** Exit of mri_04: east road e_bero to mri_03 (w_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -121,6 +122,7 @@ static EVT_BEGIN(chibitoge_talk)
     RETURN
 EVT_END()
 
+/** The single NPC of the room, Jabble (ちびトゲ), the little Jabbi. */
 static NpcSetupInfo npcEnt[] = {
     {
         "ちびトゲ", // name
@@ -167,6 +169,7 @@ static USER_FUNC(evt_chuchu_back_loop) {
  * the scene plays the conversation (stg2_mri_e13_00 to 05) and hands the story on from there.
  */
 static EVT_BEGIN(chuchurina_sogu)
+    // Mario enters through the loading zone; Ms. Mowz and an X-Naut underling are already in the room.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
 #if VERSION >= VERSION_JP
@@ -227,6 +230,7 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_bero_exec_wait, 65536)
     WAIT_MS(1500)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    // Ms. Mowz's theme plays as she greets Mario with a kiss and tells him about the badges in the tree.
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_CYUCYURINA1"))
     CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -283,6 +287,7 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_R_1"))
     CALL(evt_npc_move_position, STRING("チュチュリーナ"), 65, 0, 0, FLOAT(120.0f), 0)
     CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_S_1"))
+    // She says the Crystal Star is near the bottom of the tree and that the cell key is in the room.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e13_03"), 0, STRING("チュチュリーナ"))
     CALL(evt_cam3d_evt_set, FLOAT(137.39941f), FLOAT(25.299805f), FLOAT(635.6992f), FLOAT(36.69922f), FLOAT(131.19922f), FLOAT(-83.69922f), 400, 11)
     BEGIN_INLINE_EVENT
@@ -322,6 +327,7 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI5"))
     CALL(evt_cam3d_evt_set, 125, 90, 262, 125, 40, 0, 0, 11)
     WAIT_FRAMES(1)
+    // The music ends; Mario's partner reacts and Ms. Mowz slips away.
     CALL(evt_msg_print_party, STRING("stg2_mri_e13_06"))
     CALL(evt_mario_set_dir, 270, 100, 0)
     WAIT_MS(500)
@@ -338,6 +344,7 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     WAIT_MS(500)
+    // The X-Naut underling gets up and blames Mario for his bruises.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e13_07"), 0, STRING("第三勢力部下"))
     CALL(evt_npc_set_anim, STRING("第三勢力部下"), STRING("R_1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -347,6 +354,7 @@ static EVT_BEGIN(chuchurina_sogu)
         CALL(evt_npc_move_position, STRING("第三勢力部下"), LW(0), LW(2), 0, FLOAT(180.0f), 0)
     END_INLINE_EVENT
     WAIT_MS(400)
+    // The battle with the underling (battle info 5) starts and the script waits for it to end.
     CALL(evt_npc_set_battle_info, STRING("第三勢力部下"), 5)
     CALL(evt_npc_battle_start, STRING("第三勢力部下"))
     CALL(evt_npc_wait_battle_end)
@@ -354,8 +362,10 @@ static EVT_BEGIN(chuchurina_sogu)
     SET_VALUE(LW(10), STRING("第三勢力部下"))
     SPAWN_EVENT(enemy_event_dead_event_sub)
     WAIT_MS(500)
+    // He drops the Red Key, which pops out of him.
     CALL(evt_item_entry, STRING("item_key"), ITEM_RED_KEY, 60, 0, 0, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MRI04_RED_KEY_TAKEN), 0)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_JOIN)
+    // The story advances and Mario regains control.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_13_MS_MOWZ)
 #if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
@@ -459,6 +469,10 @@ static EVT_BEGIN(evt_ueki_02)
     RETURN
 EVT_END()
 
+/**
+ * Plants Mario can search in mri_04: A_ueki01, A_ueki02 (runs evt_ueki_02 when searched), A_ueki04,
+ * A_ueki05.
+ */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki01", "S_ueki01", NULL},
     {1, "A_ueki02", "S_ueki02", evt_ueki_02},

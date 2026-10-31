@@ -27,11 +27,13 @@ typedef struct EffButterflyN64Work {
     Vec velocity; // 0x3C
 } EffButterflyN64Work;
 
+/** Bob height of the butterfly over its 30-step cycle: dips 19 units and comes back up. */
 static s8 y_data[30] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -17, -15, -13, -11, -9, -7, -5, -3, -1, 0, 0};
 
 static void effButterflyMain(EffectEntry* effect);
 static void effButterflyDisp(CameraId cameraId, EffectEntry* effect);
 
+/** Butterfly wing poses: one six-vertex set per bob step, with the wing tips rising set by set so the wings flap. */
 effN64Vtx but_02_v[] = {
     {0, 0, 250, 0, 2048, 255, 255, 255, 255},
     {318, 31, 250, 1024, 2048, 255, 255, 255, 255},
@@ -324,7 +326,8 @@ static void effButterflyMain(EffectEntry* effect) {
 
 /**
  * Draws the butterfly facing its heading, bobbing with y_data.
- * bobIdx also selects the vertex set (but_02_v), Guess: so it steps through the wing-flap poses.
+ * bobIdx also selects the six-vertex set in but_02_v;
+ * the wing tips rise from set to set (y 31, 42, 58, 79 ...), so the wings flap.
  */
 static void effButterflyDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;

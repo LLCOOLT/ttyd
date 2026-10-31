@@ -28,10 +28,14 @@ typedef struct EffHoraoSpellN64Work {
     f32 scale;    // 0x38
 } EffHoraoSpellN64Work;
 
+/** Red of the glow ribbon's colour at each of its 17 points, shifting along the ribbon. */
 static u8 colr[17] = {0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4, 0xAA, 0xA0, 0x96, 0x8C, 0x82};
+/** Green of the glow ribbon's colour at each of its 17 points. */
 static u8 colg[17] = {0xAA, 0xA0, 0x96, 0x8C, 0x82, 0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4};
+/** Blue of the glow ribbon's colour at each of its 17 points (always full). */
 static u8 colb[17] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
+/** Template points of a glow ribbon: top and bottom vertex pairs that are copied and swayed each frame. */
 effN64Vtx horao_spell_vtx[] = {
     {0, -8, 0, 0, 0, 0, 0, 0, 0},
     {0, 8, 0, 0, 1024, 0, 0, 0, 0},
@@ -72,7 +76,9 @@ static void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect);
 
 /**
  * Spawns the horao spell effect at (x, y, z) for lifetime frames (0 = until soft-deleted).
- * Unknown: what horao refers to; the only caller is event scripts through evt_eff.
+ * Reached only through evt_eff64; no script in the tree spawns it.
+ * The effect table labels it バトル・ホラオウ (battle horaou), next to magic_horao_n64 (ホラオウバトル).
+ * Unknown: what horaou refers to.
  */
 EffectEntry* effHoraoSpellN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;

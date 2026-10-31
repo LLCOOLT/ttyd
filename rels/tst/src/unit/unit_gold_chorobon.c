@@ -16,6 +16,13 @@
 #include "tst.h"
 #include "version.h"
 
+// Unit work slots of the Gold Fuzzy (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_GOLD_CHOROBON_HORDE_CALLED = 0, // 1 once the Fuzzy Horde has been spawned and called in
+    UW_GOLD_CHOROBON_HORDE_GONE = 1,   // 1 once the horde has been sent away (so it only happens once)
+    UW_GOLD_CHOROBON_HORDE_UNIT = 2,   // unit id of the spawned Fuzzy Horde
+};
+
 USER_FUNC(get_gold_chorobon_id);
 
 BattleUnitKind unit_gold_chorobon;
@@ -41,6 +48,10 @@ static EvtWord return_event[24];
 static EvtWord attack_event[500];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of Gold Fuzzy: 10 max HP, level 27. The battle engine reads it when the unit spawns:
+ * size, offsets, sounds, status vulnerability, parts, init script and event table.
+ */
 BattleUnitKind unit_gold_chorobon = {
     20,
     "btl_un_gold_chorobon",
@@ -99,7 +110,7 @@ BattleUnitKind unit_gold_chorobon = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -107,12 +118,27 @@ BattleUnitKind unit_gold_chorobon = {
     data_table,
 };
 
+/**
+ * Defence of Gold Fuzzy per element (normal, fire, ice, explosion, electric), subtracted from each hit:
+ * none.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of Gold Fuzzy: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of Gold Fuzzy, as the percent chance a status takes hold:
+ * immune to Sleep, Stop, Dizzy, Confuse, Freeze, Tiny, Attack Down, Defense Down, Allergic, Fright,
+ * Gale Force, Slow and instant KO; always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up,
+ * Fast, Dodgy and Invisible.
+ */
 static StatusVulnerability regist = {0, 0, 0, 100, 0, 100, 100, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 0};
 
+/**
+ * Pose table of Gold Fuzzy: maps its battle pose types (stay, walk, hurt, dead, talk and so on) to
+ * animation names, 18 entries such as CBN_N_1, CBN_Y_1, CBN_K_1, CBN_X_1.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "CBN_N_1"},
     {2, "CBN_Y_1"},
@@ -120,20 +146,24 @@ static PoseTableEntry pose_table[] = {
     {5, "CBN_K_1"},
     {4, "CBN_X_1"},
     {3, "CBN_X_1"},
-    {28, "CBN_S_1"},
+    {BTL_POSE_NORMAL, "CBN_S_1"},
     {29, "CBN_Q_1"},
     {30, "CBN_Q_1"},
     {31, "CBN_S_1"},
-    {39, "CBN_D_1"},
+    {BTL_POSE_DAMAGE, "CBN_D_1"},
     {50, "CBN_A_1"},
-    {42, "CBN_R_1"},
-    {40, "CBN_W_1"},
-    {56, "CBN_X_1"},
-    {57, "CBN_X_1"},
+    {BTL_POSE_RUN, "CBN_R_1"},
+    {BTL_POSE_WALK, "CBN_W_1"},
+    {BTL_POSE_DANGER, "CBN_X_1"},
+    {BTL_POSE_PERIL, "CBN_X_1"},
     {BTL_POSE_TALK, "CBN_T_1"},
     {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
+/**
+ * Event table of Gold Fuzzy: maps event tags to the scripts that react to them (counter_damage_event);
+ * tag 0 ends it.
+ */
 static BattleDataEntry data_table[] = {
     {24, counter_damage_event},
     {26, counter_damage_event},
@@ -152,10 +182,15 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Body parts of Gold Fuzzy: a single part (model c_chorobon_k) holding its hit box.
+ * Each part names its defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_gold_chorobon", "c_chorobon_k", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_gold_chorobon", "c_chorobon_k", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Attack data of Gold Fuzzy's attack: base damage 1, 100% accuracy. */
 BattleWeapon weapon_gold_chorobon_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -174,7 +209,7 @@ BattleWeapon weapon_gold_chorobon_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -192,6 +227,11 @@ BattleWeapon weapon_gold_chorobon_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Sound cues of Gold Fuzzy's animations: for each of its 4 animation names,
+ * the sound effect that plays with it (SFX_BOSS_G_CHORO_MOVE1, SFX_BOSS_G_CHORO_WAIT2 and
+ * SFX_BOSS_G_CHORO_WAIT1).
+ */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"CBN_S_1", 0.5833333f, NULL, "SFX_BOSS_G_CHORO_MOVE1", 0, 1},
     {"CBN_S_1", 0.8333333f, NULL, "SFX_BOSS_G_CHORO_WAIT2", 0, 1},
@@ -200,8 +240,8 @@ static PoseSoundTiming pose_sound_timing_table[] = {
 };
 
 /**
- * Guess: gold Fuzzy hops sideways toward the x in LW(5) in rabbit-like squash-and-stretch jumps (scale animated
- * each frame) until it is within LW(8) units of it.
+ * Hops the Gold Fuzzy along x toward LW(5) in hops of LW(8) units at height LW(6), squashing before each,
+ * then makes a final jump onto (LW(5), LW(6), LW(7)) with SFX_BOSS_G_CHORO_ATTACK1.
  */
 EVT_BEGIN(gold_chorobon_rabbit_move)
     LOOP(2)
@@ -245,6 +285,10 @@ EVT_BEGIN(gold_chorobon_rabbit_move)
     RETURN
 EVT_END()
 
+/**
+ * Spawn setup for a unit that the Gold Fuzzy script adds to the battle mid-fight:
+ * unit kind unit_chorobon_gundan, parked far off screen until its script moves it.
+ */
 BattleUnitSetup entry_chorogun = {
     &unit_chorobon_gundan, // unitKindParams
     1, // alliance
@@ -284,8 +328,11 @@ EVT_BEGIN(call_chorogun_event)
 EVT_END()
 
 /**
- * Guess: after a 2 second wait the Gold Fuzzy sends the swarm away (once, tracked in its work[1])
- * and makes the Horde flee.
+ * Run by the Fuzzy Horde's damage event after a lethal hit, as the Horde: waits 2 seconds;
+ * from JP on it stops if the Horde is gone or the Gold Fuzzy's unit work 1 is already set, and otherwise sets it
+ * and pays out the Horde's coins and EXP (chorogun_dead_reward).
+ * Then every swarm Fuzzy runs away (chorogun_escape_all) and a second later the Horde unit (the Gold Fuzzy's
+ * unit work 2) is removed; the demos only set the flag at the end.
  */
 EVT_BEGIN(escape_chorogun_event)
     WAIT_MS(2000)
@@ -295,20 +342,20 @@ EVT_BEGIN(escape_chorogun_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, LW(4), 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, LW(4), UW_GOLD_CHOROBON_HORDE_GONE, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
-    CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(4), UW_GOLD_CHOROBON_HORDE_GONE, 1)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(10))
     CALL_CHILD(chorogun_dead_reward)
 #endif
     CALL(chorogun_escape_all)
     WAIT_MS(1000)
-    CALL(btlevtcmd_GetUnitWork, LW(4), 2, LW(3))
+    CALL(btlevtcmd_GetUnitWork, LW(4), UW_GOLD_CHOROBON_HORDE_UNIT, LW(3))
     CALL(btlevtcmd_KillUnit, LW(3), 0)
 #if VERSION <= VERSION_DEMO_US
-    CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(4), UW_GOLD_CHOROBON_HORDE_GONE, 1)
 #endif
     RETURN
 EVT_END()
@@ -326,8 +373,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     CALL_CHILD(chorogun_entry)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_CALLED, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_GONE, 0)
     CALL(btlevtcmd_AnimeSetPoseSoundTable, BTL_UNIT_SELF, 1, PTR(pose_sound_timing_table))
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_BOSS_G_CHORO_MOVE1"), STRING("SFX_BOSS_G_CHORO_LANDING1"))
     RETURN
@@ -345,30 +392,30 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
 #if VERSION >= VERSION_JP
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_UNIT, LW(0))
     CALL(btlevtcmd_GetUnitId, LW(0), LW(1))
     IF_INT_NOT_EQUAL(LW(1), -1)
 #endif
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_GONE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+            CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
-                CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+                CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_CALLED, LW(0))
                     IF_INT_NOT_EQUAL(LW(0), 0)
 #if VERSION >= VERSION_JP
-                        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+                        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_GONE, 1)
                         CALL(btlevtcmd_WaitAttackEnd)
-                        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(10))
+                        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_UNIT, LW(10))
                         CALL_CHILD(chorogun_dead_reward)
                         SET_VALUE(LW(10), -2)
 #endif
                         CALL(chorogun_escape_all)
-                        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
+                        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_UNIT, LW(3))
                         CALL(btlevtcmd_KillUnit, LW(3), 0)
 #if VERSION <= VERSION_DEMO_US
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_GONE, 1)
 #else
                     END_IF
 #endif
@@ -377,7 +424,7 @@ static EVT_BEGIN(damage_event)
         END_IF
     END_IF
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_CALLED, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 7)
@@ -386,9 +433,9 @@ static EVT_BEGIN(damage_event)
                 CALL(btlevtcmd_WaitAttackEnd)
 #endif
                 CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_chorogun), 0)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(3))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_UNIT, LW(3))
                 CALL_CHILD(call_chorogun_event)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_CALLED, 1)
                 GOTO(99)
             END_IF
         END_IF
@@ -420,7 +467,7 @@ EVT_END()
  * or a counter hit.
  */
 static EVT_BEGIN(return_event)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
     SET_VALUE(LW(8), 40)
@@ -434,6 +481,7 @@ EVT_END()
  * after which it bounces twice on the target and hops home with return_event.
  */
 static EVT_BEGIN(attack_event)
+    // The Gold Fuzzy first checks whether to use a held item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -441,10 +489,11 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // It picks a target; with none, it ends the turn (or flusters when confused).
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_gold_chorobon_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_gold_chorobon_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -452,6 +501,7 @@ static EVT_BEGIN(attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_gold_chorobon_attack))
+    // The attack is declared and paid for, and the camera follows the Fuzzy.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_gold_chorobon_attack))
@@ -459,7 +509,8 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 100)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // It hops toward the target and jumps up onto it.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(5), LW(6), LW(7))
     SET_VALUE(LW(6), 0)
@@ -469,12 +520,13 @@ static EVT_BEGIN(attack_event)
     WAIT_FRAMES(20)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 60, 0, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SUBTRACT(LW(2), 2)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_gold_chorobon_attack), 256, LW(5))
+    // The damage check decides between a miss and a hit.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_gold_chorobon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -496,6 +548,7 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // On a miss it bounces off the target and lands in front of it.
     LABEL(90)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
@@ -510,6 +563,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("CBN_N_1"))
     WAIT_MS(1000)
     GOTO(98)
+    // On a hit the camera shakes, the action-command defence is resolved and the Fuzzy damages the target.
     LABEL(91)
     LOOP(4)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.07910156f), FLOAT(-0.119140625f), 0)
@@ -519,13 +573,14 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_gold_chorobon_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_gold_chorobon_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_gold_chorobon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     LOOP(4)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(-0.07910156f), FLOAT(0.119140625f), 0)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 40)
+    // It bounces twice on the target.
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
@@ -564,6 +619,7 @@ static EVT_BEGIN(attack_event)
     END_LOOP
     WAIT_FRAMES(10)
     GOTO(98)
+    // It hops back home and the camera resets.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)

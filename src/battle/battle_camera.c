@@ -10,7 +10,7 @@
 #include <string.h>
 #include "libc_decls.h"
 
-// inlining off for battleCameraInit, battleCameraMain, battleCameraMoveTo and 16 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 18 functions change length, e.g. battleCameraMain 1422 -> 1775 instructions
 #pragma dont_inline on
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on

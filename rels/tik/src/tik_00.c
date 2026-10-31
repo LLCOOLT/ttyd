@@ -165,6 +165,10 @@ extern EvtWord kurihakase_event[];
 extern EvtWord hashira_bomb_sub[];
 extern EvtWord hashira_bomb[];
 
+/**
+ * Doors of the underground town: the west exit to tik_07,
+ * the east exit to tik_01 and the teleporter pad (tensou) that lands back in this map.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -217,6 +221,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** The shop's six item stands: each pairs a goods model with its hit area. */
 static ShopObj obj_list[] = {
     {"sina_1", "a_sina1"},
     {"sina_2", "a_sina_2"},
@@ -226,6 +231,10 @@ static ShopObj obj_list[] = {
     {"sina_6", "a_sina_6"},
 };
 
+/**
+ * Items the shop sells and their prices: Slow Shroom 15, Gradual Syrup 15, Ultra Shroom 200, Jammin' Jelly 200,
+ * Gold Bar 110 and Gold Bar x3 350.
+ */
 static ShopItem goods_list[] = {
     {ITEM_SLOW_SHROOM, 15},
     {ITEM_GRADUAL_SYRUP, 15},
@@ -235,6 +244,7 @@ static ShopItem goods_list[] = {
     {ITEM_GOLD_BAR_X3, 350},
 };
 
+/** Prices the shop pays when Mario sells it items, per item. */
 static ShopDb trade_list[] = {
     {ITEM_SLOW_SHROOM, 7, 0},
     {ITEM_GRADUAL_SYRUP, 7, 0},
@@ -250,6 +260,10 @@ static ShopDb trade_list[] = {
     {0},
 };
 
+/**
+ * Shopkeeper data: the clerk's name and the message keys (tik_shop_00 onward) for the shop's greetings
+ * and replies.
+ */
 static ShopperData35 shopper_data = {
     "店員", // name
     NULL, NULL, // fook_evt..buy_evt
@@ -261,6 +275,10 @@ static ShopperData35 shopper_data = {
 typedef struct UranaiTag {
     s8 s[4];
 } UranaiTag;
+/**
+ * Four-byte copy of the string "pos", placed here so the string sits
+ * before the fortune-teller scripts' strings in read-only data.
+ */
 static const UranaiTag uranaisi_pos_tag = {"pos"};
 #endif
 
@@ -434,6 +452,10 @@ EVT_BEGIN(uranaisi_supercoin_evt)
     RETURN
 EVT_END()
 
+/**
+ * The nine fortune-telling cards (card_1 to card_9),
+ * each with the group that decides how it moves in the card animation.
+ */
 static CardName name_tbl[] = {
     {"card_1", 0},
     {"card_2", 1},
@@ -871,6 +893,7 @@ EVT_END()
  * Merluvlee is hidden during the flip and shown again at the end.
  */
 EVT_BEGIN(uranai_main)
+    // The cards fly up from below the table, spinning in, while Merluvlee is hidden behind them.
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
         CALL(evt_snd_sfxon, STRING("SFX_EVT_FORTUNE_CARD_MOVE1"), 0)
@@ -890,6 +913,7 @@ EVT_BEGIN(uranai_main)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // The nine cards are dealt out one by one, each sliding in from the side to its place in the row.
     SET_FLOAT_VALUE(LW(8), FLOAT(0.0f))
     SET_INT_READ_ADDR(PTR(&name_tbl))
     LOOP(9)
@@ -934,6 +958,7 @@ EVT_BEGIN(uranai_main)
         ADD_FLOAT(LW(8), FLOAT(0.19921875f))
         WAIT_MS(300)
     END_LOOP
+    // The row of cards tips up to stand.
     WAIT_MS(1000)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_FORTUNE_CARD_MOVE3"), 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, 600, 1000)
@@ -954,6 +979,7 @@ EVT_BEGIN(uranai_main)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // The cards are shuffled and fanned out in a stack.
     CALL(evt_sub_intpl_msec_init, 11, 600, -600, 1500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -982,6 +1008,7 @@ EVT_BEGIN(uranai_main)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // The cards fly off the table one by one; the middle one stays behind.
     SET_FLOAT_VALUE(LW(8), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(9), FLOAT(0.0f))
     SET_INT_READ_ADDR(PTR(&name_tbl))
@@ -1014,6 +1041,7 @@ EVT_BEGIN(uranai_main)
         ADD_FLOAT(LW(8), FLOAT(0.19921875f))
         ADD_FLOAT(LW(9), FLOAT(1.0f))
     END_LOOP
+    // The chosen card is brought to the front, spins and rises, showing its face.
     WAIT_MS(1200)
     CALL(card_camid, STRING("card_omote_5"), 4)
     CALL(card_camid, STRING("card_ura_5"), 4)
@@ -1079,6 +1107,7 @@ EVT_BEGIN(uranai_main)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+    // The card finishes spinning, Merluvlee reappears and the animation ends.
     WAIT_MS(2500)
     DELETE_EVENT(LW(9))
     SET_VALUE(LW(0), GW(15))
@@ -1126,6 +1155,7 @@ EVT_END()
  * Declining or not having enough coins ends the talk.
  */
 EVT_BEGIN(uranaisi_table_talk)
+    // Mario walks up to the table and Merluvlee turns to face him; the party waits.
     CALL(setmertn, STRING("うらない師"))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1134,6 +1164,8 @@ EVT_BEGIN(uranaisi_table_talk)
 #if VERSION >= VERSION_JP
     LOOP(0)
 #endif
+        // Merluvlee greets him: the full introduction the first time, a short welcome on a later visit,
+        // and "shall I see anything else?" after a reading.
         IF_INT_EQUAL(GSWF(GSWF_TIK00_MERLUVLEE_SESSION), 0)
             IF_INT_EQUAL(GSWF(GSWF_TIK00_MERLUVLEE_MET), 0)
                 CALL(evt_msg_print, 0, STRING("uranaisi_00"), 0, STRING("me"))
@@ -1147,6 +1179,7 @@ EVT_BEGIN(uranaisi_table_talk)
                     CALL(evt_msg_print, 0, STRING("uranaisi_19"), 0, STRING("me"))
                 END_IF
             END_IF
+            // She asks whether he wants a reading; "No" ends the talk.
             CALL(evt_msg_select, 0, STRING("uranaisi_03"))
             IF_INT_EQUAL(LW(0), 1)
                 CALL(evt_msg_print_add, 0, STRING("uranaisi_06"))
@@ -1156,6 +1189,8 @@ EVT_BEGIN(uranaisi_table_talk)
         ELSE
             CALL(evt_msg_print, 0, STRING("uranaisi_02"), 0, STRING("me"))
         END_IF
+        // A menu lists the three readings with their prices (My Next Path, Star Pieces, Shine Sprites);
+        // cancelling ends the talk.
         SET_VALUE(GSWF(GSWF_TIK00_MERLUVLEE_SESSION), 1)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_unitwin_alloc)
@@ -1177,6 +1212,7 @@ EVT_BEGIN(uranaisi_table_talk)
             CALL(evt_msg_print_add, 0, STRING("uranaisi_06"))
             GOTO(0)
         END_IF
+        // If Mario cannot afford the chosen reading, she says her visions need coins and the talk ends.
         CALL(uranaisi_ryokin, LW(0), LW(2))
         CALL(evt_pouch_get_coin, LW(1))
         IF_INT_LESS(LW(1), LW(2))
@@ -1189,6 +1225,7 @@ EVT_BEGIN(uranaisi_table_talk)
 #endif
             GOTO(0)
         END_IF
+        // She agrees to look for what he seeks and the price is paid in coins.
         SWITCH(LW(0))
             CASE_EQUAL(0)
             CALL(evt_msg_print_add, 0, STRING("uranaisi_08"))
@@ -1211,6 +1248,7 @@ EVT_BEGIN(uranaisi_table_talk)
 #else
         CALL(evt_win_coin_off, LW(12))
 #endif
+        // The card ritual: Merluvlee chants and the cards animate.
         CALL_CHILD(uranai_init)
         CALL(evt_msg_print, 0, STRING("uranaisi_12"), 0, STRING("me"))
         BEGIN_INLINE_EVENT
@@ -1221,6 +1259,8 @@ EVT_BEGIN(uranaisi_table_talk)
         CALL_CHILD(uranai_main)
         CALL(evt_npc_set_anim, STRING("me"), STRING("D_1"))
         WAIT_MS(170)
+        // The chosen reading follows: the next step in the story, where the Star Pieces are,
+        // or where the Shine Sprites are.
         SWITCH(LW(0))
             CASE_EQUAL(0)
             CALL_CHILD(uranaisi_next_evt)
@@ -1229,6 +1269,7 @@ EVT_BEGIN(uranaisi_table_talk)
             CASE_EQUAL(2)
             CALL_CHILD(uranaisi_supercoin_evt)
         END_SWITCH
+        // The table is cleared and Mario is free to move again.
         CALL_CHILD(uranai_exit)
 #if VERSION >= VERSION_JP
     END_LOOP
@@ -1282,6 +1323,7 @@ EVT_END()
  * Prices and rewards come from the trade table.
  */
 EVT_BEGIN(starmaniac_talk)
+    // If Dazzle has no badges left to trade, he apologises and the talk ends.
     CALL(evt_badgeShop_starmaniac_get_kind_cnt, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 0)
         CALL(evt_msg_print, 0, STRING("starmaniac_02"), 0, STRING("me"))
@@ -1290,12 +1332,14 @@ EVT_BEGIN(starmaniac_talk)
 #if VERSION >= VERSION_JP
     CALL(tik_snd_off)
 #endif
+    // Dazzle introduces himself: the full pitch on the first talk, a short one afterwards.
     IF_INT_EQUAL(GSWF(GSWF_TIK00_DAZZLE_FIRST_TALK), 0)
         CALL(evt_msg_print, 0, STRING("starmaniac_00"), 0, STRING("me"))
         SET_VALUE(GSWF(GSWF_TIK00_DAZZLE_FIRST_TALK), 1)
     ELSE
         CALL(evt_msg_print, 0, STRING("starmaniac_01"), 0, STRING("me"))
     END_IF
+    // He asks if Mario wants to trade; "No way!" sends him off with a farewell.
     CALL(evt_msg_select, 0, STRING("starmaniac_03"))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_05"))
@@ -1304,6 +1348,7 @@ EVT_BEGIN(starmaniac_talk)
 #endif
         RETURN
     END_IF
+    // Mario has no Star Pieces: Dazzle accuses him of trying to swindle him and ends the talk.
     CALL(evt_pouch_get_starpiece, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_06"))
@@ -1312,6 +1357,7 @@ EVT_BEGIN(starmaniac_talk)
 #endif
         RETURN
     END_IF
+    // Mario picks which badge to trade for from the list; backing out earns a "LAME!" and ends the talk.
     CALL(evt_msg_print_add, 0, STRING("starmaniac_07"))
     LABEL(0)
     CALL(evt_win_coin_on, 2, LW(12))
@@ -1324,6 +1370,8 @@ EVT_BEGIN(starmaniac_talk)
 #endif
         RETURN
     END_IF
+    // Dazzle names the badge and the Star Piece price (and the BP it needs) and asks for confirmation;
+    // declining returns to the list.
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_print_insert, 0, STRING("starmaniac_09"), 0, STRING("me"), LW(2), LW(3), LW(4))
 #elif VERSION == VERSION_JP
@@ -1350,6 +1398,8 @@ EVT_BEGIN(starmaniac_talk)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_11"))
         GOTO(0)
     END_IF
+    // Mario is out of badge room: Dazzle sends him away; otherwise the badge is handed over
+    // and the Star Pieces are paid.
     CALL(evt_pouch_add_item, LW(1), LW(0))
     IF_INT_EQUAL(LW(0), -1)
         CALL(evt_win_coin_off, LW(12))
@@ -1365,6 +1415,7 @@ EVT_BEGIN(starmaniac_talk)
     CALL(evt_win_coin_wait, LW(12))
     WAIT_MS(500)
     CALL(evt_win_coin_off, LW(12))
+    // If Dazzle is out of badges, or Mario out of Star Pieces, he cheers and the talk ends.
     CALL(evt_badgeShop_starmaniac_get_kind_cnt, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("starmaniac_12"))
@@ -1381,6 +1432,7 @@ EVT_BEGIN(starmaniac_talk)
 #endif
         RETURN
     END_IF
+    // Otherwise he offers another trade: accepting loops back to the badge list, declining ends the talk.
     CALL(evt_msg_print_add, 0, STRING("starmaniac_13"))
     CALL(evt_msg_select, 0, STRING("starmaniac_10"))
     IF_INT_EQUAL(LW(0), 1)
@@ -1509,7 +1561,10 @@ EVT_BEGIN(kuribo5_talk)
     RETURN
 EVT_END()
 
-/** Init script for resident chusan4; places him at (-175, -19, 235) and sets his NPC status flags. */
+/**
+ * Init script for resident chusan4; places him at (-175, -19, 235) and sets NPC status bit 2
+ * (he turns to face his travel direction).
+ */
 EVT_BEGIN(chusan4_init)
     CALL(evt_npc_set_position, STRING("me"), -175, -19, 235)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -1682,6 +1737,10 @@ EVT_BEGIN(master_2_talk)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the underground town: Merluvlee the fortune-teller, Dazzle the Star Piece collector, the shop clerk,
+ * the informant and the other townsfolk.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "うらない師", // name
@@ -1821,7 +1880,8 @@ EVT_END()
 /**
  * Folds the first wall panel (ie_1_1) of Merluvlee's house flat or back up when Mario enters
  * or leaves (LW(1) = 0 on entry: 0 to 180 degrees over 500 ms), with the house-moving sound effect.
- * Guess: the three panels are staggered by 100 to 300 ms so they drop one after another.
+ * The three panels are staggered: on entry ie_1_1, ie_1_2 and ie_1_3 start after 0, 100 and 200 ms,
+ * on exit after 300, 200 and 100 ms, so they drop and rise one after another.
  */
 EVT_BEGIN(evt_wall_01_00)
     BEGIN_INLINE_EVENT
@@ -1907,6 +1967,7 @@ EVT_BEGIN(evt_wall_01_02)
     RETURN
 EVT_END()
 
+/** NPCs inside the first house (Merluvlee's): shown when Mario goes in. */
 static const char* door_data_01_npc[] = {
     "うらない師",
     NULL,
@@ -1967,6 +2028,10 @@ EVT_BEGIN(evt_close_01)
     RETURN
 EVT_END()
 
+/**
+ * Door of the first house (Merluvlee's): its door and house models, the hit areas inside and out,
+ * and the script that runs when Mario goes in.
+ */
 static DoorParam door_data_01 = {
     2, // flags
     3, // type
@@ -2117,6 +2182,7 @@ static EVT_BEGIN(evt_wall_02)
     RETURN
 EVT_END()
 
+/** NPCs inside the shop house: the clerk. */
 static const char* mise_npc[] = {
     "店員",
     NULL,
@@ -2138,6 +2204,10 @@ EVT_BEGIN(evt_close_02)
     RETURN
 EVT_END()
 
+/**
+ * Door of the second house (the shop): its door and house models, the hit areas inside and out,
+ * and the script that runs when Mario goes in.
+ */
 static DoorParam door_data_02 = {
     2, // flags
     3, // type
@@ -2288,6 +2358,7 @@ static EVT_BEGIN(evt_wall_03)
     RETURN
 EVT_END()
 
+/** NPCs inside the third house: the informant, a Bandit, a Pink Bob-omb and the master. */
 static const char* door_data_03_npc[] = {
     "情報屋ケチ",
     "ボロドー４",
@@ -2312,11 +2383,16 @@ EVT_BEGIN(evt_close_03)
     RETURN
 EVT_END()
 
+/** Map object (kururin1) that belongs to the third house. */
 static const char* door_data_03_mobj[] = {
     "kururin1",
     NULL,
 };
 
+/**
+ * Door of the third house: its door and house models, the hit areas inside and out,
+ * and the script that runs when Mario goes in.
+ */
 static DoorParam door_data_03 = {
     2, // flags
     3, // type
@@ -2446,9 +2522,10 @@ EVT_BEGIN(evt_open_04_open)
 EVT_END()
 
 /**
- * Guess: runs when Mario leaves the teleporter house:
- * restores the music and ambience, and, after the hideout explosion (chapter 7) the partner comments
- * tik_00_tensou_1 on the way out. Guess: the exact comment condition is the story step range.
+ * Close callback (evtClose) of the teleporter house door (door_data_04): restores the music and ambience;
+ * before STORY_STG7_26_THE_HIDEOUT_EXPLODES, the first time only (GSWF_TIK00_TELEPORT_ROOM_COMMENT), the partner
+ * says they are under Rogueport and that the X-Nauts used the machine to come from the moon (tik_00_tensou_1);
+ * at STORY_STG7_26 exactly it plays Professor Frankly's scene (kurihakase_event) instead.
  */
 static EVT_BEGIN(evt_door_04_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -2486,6 +2563,10 @@ static EVT_BEGIN(evt_door_04_close)
     RETURN
 EVT_END()
 
+/**
+ * Door of the fourth house: its door and house models, the hit areas inside and out,
+ * and the scripts that run when Mario goes in and out.
+ */
 static DoorParam door_data_04 = {
     0, // flags
     3, // type

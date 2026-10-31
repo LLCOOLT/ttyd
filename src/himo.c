@@ -31,7 +31,9 @@ static void vivihimoDisp(CameraId camId, HimoWork* w);
  * Draws the ribbon (himo) of a Vivian-flagged model part between matrices a and b:
  * builds a 4-point spline that sags sideways and wobbles with the retrace count (speed sets the wobble rate,
  * scale its size), with offA/offB lifting the two ends, then draws it.
- * Called from animdrv when a pose part has ANIM_POSE_FLAG_VIVIAN. Guess: the streamer on Vivian's hat.
+ * Called from animdrv when a pose has ANIM_POSE_FLAG_VIVIAN, for its tail group (vivihimoTailGroupNo):
+ * it is the ghostly tail of the Shadow Sirens (c_vivian, c_maririn, c_majyorin), drawn from that group
+ * to the point animPoseVivianMain stored in the pose matrix (for partner Vivian, the floor below her).
  */
 void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB) {
     HimoWork w;

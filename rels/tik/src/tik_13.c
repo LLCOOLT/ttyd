@@ -10,6 +10,7 @@
 
 static BeroEntry bero_entry_data[2];
 
+/** Doors of this room: the east exit back to tik_02. */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName

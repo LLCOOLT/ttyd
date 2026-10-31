@@ -7,6 +7,7 @@
 #include "memory.h"
 #include <stdlib.h>
 #include "version.h"
+#include "eff/n64/eff_vapor_n64.h"
 
 typedef struct EffSnowmanN64Work {
     s32 type;     // 0x0
@@ -29,14 +30,18 @@ typedef struct EffSnowmanN64Work {
     s32 phase;    // 0x5C
 } EffSnowmanN64Work;
 
-// FAKE: local prototype: effVaporN64Entry declares the parameters as (s32, f32 x4, s32) (eff_vapor_n64.h: (s32, s32, f32 x4), same registers); this file was compiled with it and the header prototype changes the code.
-EffectEntry* effVaporN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 delay);
-
+/**
+ * Width of the snowman in percent over a hop: it crouches, stretches as it leaves the ground,
+ * then settles. The height is set to the opposite, so it keeps its volume.
+ */
 static s8 jump_hscale_data[] = {100, 90, 82, 76, 72, 70, 74, 89, 103, 116, 118, 120, 120, 120, 120, 118, 114, 110};
+/** Width in percent over the 27-frame landing squash, written as characters ('d' is 100). */
 static u8 land_hscale_data[] = "dZRLHFJYdlnlf`_`ceddddddddd";
 
+/** Width in percent over the long spinning hop: a long crouch, then the stretch as it takes off. */
 static u8 jump2_hscale_data[] = {100, 90, 82, 76, 72, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 74, 89, 103, 116, 118, 120, 120, 120, 120, 118, 114, 110};
 
+/** Turn in degrees over the long spinning hop: two sways back and forth before it leaves the ground. */
 static s8 jump2_ry_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 #if VERSION <= VERSION_DEMO_US
@@ -49,6 +54,9 @@ typedef struct SnowmanJumpStep {
     u8 hscale;
 } SnowmanJumpStep;
 
+/**
+ * The demo's unused hop table: position, rise and width/height in percent per frame of a slide-in and bounce.
+ */
 static SnowmanJumpStep adata[] = {
     {-200, 200, 30, 100, 100}, {-180, 180, 30, 100, 100}, {-160, 160, 30, 100, 100}, {-140, 140, 30, 100, 100},
     {-120, 120, 30, 100, 100}, {-100, 100, 30, 100, 100}, {-80, 80, 30, 100, 100}, {-60, 60, 30, 100, 100},
@@ -251,9 +259,7 @@ static void effSnowmanMain(EffectEntry* effect) {
             break;
     }
     if ((frame & 7) == 1) {
-        effVaporN64Entry(2, work->position.x + work->offset.x + (f32)(rand() % 60) - 30.0f,
-                         50.0f + (work->position.y + work->offset.y + (f32)(rand() % 100)),
-                         work->position.z + work->offset.z, 4.0f, 40);
+        effVaporN64Entry(2, 40, work->position.x + work->offset.x + (f32)(rand() % 60) - 30.0f, 50.0f + (work->position.y + work->offset.y + (f32)(rand() % 100)), work->position.z + work->offset.z, 4.0f);
         effSnowDustN64Entry(1, 10, 30, work->position.x + work->offset.x, 10.0f + (work->position.y + work->offset.y),
                             60.0f + (work->position.z + work->offset.z), 60.0f, 100.0f, 2.0f);
     }

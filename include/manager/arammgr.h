@@ -4,6 +4,16 @@
 #include <dolphin/ar.h>
 #include <dolphin/arq.h>
 
+// ARAMEntry.flags bits.
+enum ARAMEntryFlags {
+    ARAM_ENTRY_IN_USE = 0x1,        // the entry slot is taken
+    ARAM_ENTRY_TO_ARAM = 0x2,       // an upload to ARAM was posted
+    ARAM_ENTRY_TO_ARAM_DONE = 0x4,  // the upload finished (arqCallbackToAram)
+    ARAM_ENTRY_TO_MRAM = 0x8,       // a download back to main RAM was posted
+    ARAM_ENTRY_TO_MRAM_DONE = 0x10, // the download finished (arqCallbackToMram)
+    ARAM_ENTRY_SPENT = 0x20,        // read back; the next compaction frees the entry
+};
+
 typedef struct ARAMEntry {
     vu16 flags;             // 0x0
     u8 pad_0x2[2];          // 0x2

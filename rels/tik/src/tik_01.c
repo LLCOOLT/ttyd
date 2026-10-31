@@ -69,6 +69,11 @@ EVT_BEGIN(dokan_2_in_evt)
     RETURN
 EVT_END()
 
+/**
+ * Doors of this room: the west exit to tik_00, two east exits to tik_02 (the lower one behind the second
+ * bombable wall), the pipe to tik_15, the pipe up to Rogueport (gor_02), two pairs of pipes that link spots
+ * inside the room, the door to the power-down shop (tik_11) and the door to the charm-caster's house (tik_12).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
@@ -275,6 +280,7 @@ EVT_END()
  * story progress is set to STORY_STG0_11_3_GOOMBA_GOONS, the save-block hit area opens and the music returns.
  */
 EVT_BEGIN(gorotuki_sanninngumi)
+    // The three Goombas wait on the ledge until Mario walks past X = -100.
     CALL(evt_npc_set_position, STRING("クリボー１"), 110, 75, 65)
     CALL(evt_npc_set_position, STRING("クリボー２"), 140, 95, 35)
     CALL(evt_npc_set_position, STRING("クリボー３"), 155, 75, 85)
@@ -288,6 +294,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // A Goomba calls out; Mario and Goombella turn toward the gang, startled.
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("mac_0_086"), 0, STRING("クリボー１"))
@@ -302,6 +309,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 30)
     CALL(evt_eff_fukidashi, 3, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 30)
     WAIT_MS(800)
+    // The camera frames the gang and Mario and Goombella are lined up facing them.
     CALL(evt_cam3d_evt_set, 125, 148, 360, 125, 110, 37, 500, 11)
     WAIT_MS(400)
     SET_VALUE(LW(0), -100)
@@ -313,6 +321,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_party_set_pos, 1, LW(0), 0, LW(2))
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_party_set_dir, 0, 90, -1)
+    // The Goombas flirt with Goombella, she turns them down flat, and they decide to fight.
     CALL(evt_msg_print, 0, STRING("mac_0_087"), 0, STRING("クリボー２"))
     CALL(evt_msg_print, 0, STRING("mac_0_088"), 0, STRING("クリボー３"))
     CALL(evt_cam3d_evt_set, -140, 65, 310, -140, 33, 37, 0, 11)
@@ -324,6 +333,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_msg_print, 0, STRING("mac_0_091"), 0, STRING("クリボー２"))
     CALL(evt_msg_print, 0, STRING("mac_0_092"), 0, STRING("クリボー３"))
     CALL(evt_cam3d_evt_off, 500, 11)
+    // All three jump down at Mario and the battle against the Goomba, Spiky Goomba and Paragoomba starts.
     BEGIN_INLINE_EVENT_GET_ID(LW(10))
         SPAWN_EVENT_GET_ID(PTR(ashioto), LW(10))
         CALL(evt_npc_set_run_anim, STRING("クリボー１"))
@@ -364,6 +374,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
     DELETE_EVENT(LW(10))
     DELETE_EVENT(LW(11))
     DELETE_EVENT(LW(12))
+    // After the battle the beaten Goombas are put back on the floor in their hurt pose.
     CALL(evt_npc_set_position, STRING("クリボー１"), -65, 0, 65)
     CALL(evt_npc_set_position, STRING("クリボー２"), -55, 20, 35)
     CALL(evt_npc_set_position, STRING("クリボー３"), -55, 0, 85)
@@ -374,6 +385,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_cam3d_evt_set, -120, 150, 588, -120, 55, 37, 0, 11)
     WAIT_MS(500)
     CALL(evt_npc_flag_onoff, 0, STRING("クリボー１"), NPC_FLAG_TALK_ANIM)
+    // The first Goomba wails and the three flee off the left edge while Mario and Goombella watch.
     CALL(evt_msg_print, 0, STRING("mac_0_093"), 0, STRING("クリボー１"))
     SET_VALUE(GF(0), 1)
     SET_VALUE(GF(1), 1)
@@ -421,6 +433,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_WHILE(GF(1))
+    // Goombella gloats; Mario is then warned that more enemies lie ahead and told to strike first in the field.
     WAIT_MS(200)
     CALL(evt_cam3d_evt_set, -140, 65, 310, -140, 33, 37, 0, 11)
     WAIT_MS(200)
@@ -430,6 +443,7 @@ EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
+    // The Goomba gang is marked done, the save block opens and the sewer music returns.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_11_3_GOOMBA_GOONS)
     CALL(evt_hitobj_onoff, STRING("a_rec"), 1, 0)
     CALL(evt_mario_key_onoff, 1)

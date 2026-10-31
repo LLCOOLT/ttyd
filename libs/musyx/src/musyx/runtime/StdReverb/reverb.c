@@ -135,12 +135,15 @@ bool ReverbHIModify(struct _SND_REVHI_WORK* rv, float coloration, float time, fl
 #endif
 
 #ifdef __MWERKS__
+/**
+ * Constants for the standard reverb: filter gains 0.3 and 0.6, and the integer-to-float conversion constant.
+ */
 static const float value0_3 = 0.3f;
 static const float value0_6 = 0.6f;
 static const double i2fMagic = 4.503601774854144E15;
 
 /* clang-format off */
-/* TODO: Properly rework these to use input arguments and cleanup ASM */
+/* Original MusyX asm: stays asm (project rule); empty stubs for other compilers. */
 static asm void DoCrossTalk(s32* a, s32* b, f32 start, f32 end) {
   nofralloc
   stwu r1, -0x30(r1)
@@ -252,7 +255,7 @@ L_00000710:
 #else
 /* clang-format on */
 static void DoCrossTalk(s32* a, s32* b, f32 start, f32 end) {
-  // TODO: Reimplement in C
+  // No C version: the original MusyX asm above stays asm (project rule).
 }
 #endif
 
@@ -616,7 +619,7 @@ L_00000C6C:
 /* clang-format on */
 #else
 static void HandleReverb(s32*, SND_AUX_REVERBHI* rev, s32) {
-  // TODO: Reimplement in C
+  // No C version: the original MusyX asm above stays asm (project rule).
 }
 #endif
 

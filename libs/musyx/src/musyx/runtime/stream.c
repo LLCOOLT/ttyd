@@ -781,7 +781,7 @@ void sndStreamMixParameterVolume(u32 stid, u8 vol, u8 auxa, u8 auxb) {
   hwEnableIrq();
 }
 #endif
-
+// inline_depth(3) as in the upstream MusyX source; not a fake.
 #pragma push
 #pragma inline_depth(3)
 /** Public: sets a stream's sample rate in Hz and updates the voice's pitch if it is playing (and the partner's). */

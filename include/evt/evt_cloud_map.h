@@ -1,8 +1,7 @@
-#pragma once
-
 // Map-side copy of the Flurrie cloud-breath effect (evt_cloud.c) that gon_11, las_14 and mri_00 each
 // carry: a map group hidden behind a captured cloud image that Flurrie's breath blows away. Unlike
 // evt_cloud.c's CloudWork, one entry covers up to 8 map groups.
+#pragma once
 
 #include "evt/evt_word.h"
 #include "manager/evtmgr.h"

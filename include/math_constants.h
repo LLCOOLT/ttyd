@@ -1,3 +1,4 @@
+// PI, TWO_PI, DEG_TO_RAD and the other float constants the game code is compiled with.
 #pragma once
 
 // Maths constants shared by the game code.

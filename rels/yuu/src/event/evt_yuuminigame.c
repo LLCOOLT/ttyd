@@ -14,14 +14,6 @@
 static s32 dataadr[32];
 s32 stackt[4];
 s32 stackp;
-void yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall);
-void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall);
 static void evt_yuuminigame_disp_func(CameraId camera, void* param);
 
 static EvtWord main_evt[4];

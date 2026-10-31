@@ -18,6 +18,13 @@
 #include "evt/evt_msg.h"
 #include "statuswindow.h"
 
+// Unit work slots of Professor Frankly in the Star Power lesson (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_LECTURE_FRANKLI_SAC_STEP = 0,         // lesson step (0 to 3)
+    UW_LECTURE_FRANKLI_SAC_GOOD_RESULTS = 1, // good action command results he has commented on
+    UW_LECTURE_FRANKLI_SAC_BAD_RESULTS = 2   // missed action commands he has commented on
+};
+
 u8 dark;
 s32 darkCount;
 f32 point[4];
@@ -40,6 +47,10 @@ extern EvtWord actend_event[];
 static EvtWord damage_event[75];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of Prof. Frankly:
+ * 10 HP, level 1, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 BattleUnitKind unit_lecture_frankli_sac = {
     179,
     "btl_un_frankli",
@@ -106,12 +117,19 @@ BattleUnitKind unit_lecture_frankli_sac = {
     data_table,
 };
 
+/** Defence of Prof. Frankly's body per damage type: 0 against every damage type. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Prof. Frankly's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Status vulnerability of Prof. Frankly: immune to every status. */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Pose table of Prof. Frankly:
+ * the animation played for each pose type (idle, hurt, walk, run, attack and so on).
+ */
 static PoseTableEntry pose_table[] = {
     {27, "D_1"},
     {28, "S_1"},
@@ -120,10 +138,12 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Event table of Prof. Frankly: empty, so it has no special reactions. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body part of Prof. Frankly: a single part using the model "c_kuri_h". */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_frankli", "c_kuri_h", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x880009, 0, pose_table},
 };
@@ -166,9 +186,11 @@ static USER_FUNC(_battle_set_lecture_unit_id) {
 }
 
 /**
- * Guess: script helper that sets up the Star Power lecture's audience:
- * turns on the first break slot flag, freezes the audience,
- * removes everyone and seats ten members (and a special seat 48 that cannot leave) in the fixed seats.
+ * Script helper run by Professor Frankly's init_event to set up the Star Power lecture's audience:
+ * sets BREAK_SLOT_FLAG_LECTURE
+ * (the bingo reels always show card 3), freezes the audience,
+ * removes everyone and seats ten Toads in seats
+ * 5 to 14 and a Hammer Bro in seat 48 that never runs away (the one who later threatens to throw his hammer).
  */
 static USER_FUNC(lecture_init) {
     BreakSlotWork* slot = BattleBreakSlotGetPtr();
@@ -177,7 +199,7 @@ static USER_FUNC(lecture_init) {
     s32 seat;
     s32 i;
 
-    slot->flags |= 1;
+    slot->flags |= BREAK_SLOT_FLAG_LECTURE;
     aud->flags |= AUDIENCE_FLAG_FROZEN;
     for (i = 0; i < 200; i++) {
         BattleAudience_Delete(i);
@@ -247,14 +269,14 @@ static USER_FUNC(hammer_on) {
 static USER_FUNC(aud_attack_init) {
     BattleWork* wp = _battleWorkPointer;
 
-    wp->lectureFlags |= 1;
+    wp->lectureFlags |= LECTURE_FLAG_CONTINUE_WINDOW;
     wp->lectureWindowId = event->printWindowId;
     return EVT_RETURN_DONE;
 }
 
 /** Script helper that ends the audience attack part: sets the lecture flag. */
 static USER_FUNC(aud_attack_end) {
-    _battleWorkPointer->lectureFlags |= 1;
+    _battleWorkPointer->lectureFlags |= LECTURE_FLAG_CONTINUE_WINDOW;
     return EVT_RETURN_DONE;
 }
 
@@ -346,7 +368,7 @@ EVT_BEGIN(stop_wait_event)
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_PARTNER)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
 #if VERSION <= VERSION_DEMO_US
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), BTL_POSE_STAY)
 #else
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_PARTNER, LW(0))
 #endif
@@ -369,9 +391,9 @@ static EVT_BEGIN(init_event)
     CALL(_battle_set_lecture_unit_id, LW(0))
     CALL(_set_actend_event, BTL_UNIT_MARIO, PTR(actend_event))
     CALL(_set_actend_event, BTL_UNIT_PARTNER, PTR(actend_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_LECTURE_FRANKLI_SAC_STEP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_LECTURE_FRANKLI_SAC_GOOD_RESULTS, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_LECTURE_FRANKLI_SAC_BAD_RESULTS, 0)
     CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -407,7 +429,7 @@ static EVT_BEGIN(phase_event)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
             CALL(btlevtcmd_onoff_battleflag, 1, 67108864)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_LECTURE_FRANKLI_SAC_STEP, 1)
             GOTO(99)
         END_IF
     END_IF
@@ -416,18 +438,23 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 /**
- * Guess: act-end event of Mario and his partner in the Star Power lecture:
- * after each action it moves the lecture along (the audience cheers,
- * Frankly explains the gauge and the Star Power menu,
- * mac_0_b_t3_003 to 014_1) depending on the lecture progress in the unit work.
+ * Act-end event of Mario and his partner in the Star Power lecture (hooked by init_event): after each action it
+ * moves the lecture along by the lecture unit's work 0.
+ * After the first special move (act type 4) Frankly shows the
+ * emptied gauge and asks to be attacked (mac_0_b_t3_003 to 005);
+ * after each attack he praises or scolds the action
+ * command result (006 to 010, the audience growing or shrinking) and, once the icons match,
+ * explains the bingo and
+ * the hammer-throwing audience member (013 to 014_3); at step 3 he ends the lecture (014_4, 015).
  */
 EVT_BEGIN(actend_event)
 #if VERSION >= VERSION_JP
     CALL_CHILD(stop_wait_event)
 #endif
+    // After a special move: Frankly points to the emptied Star Power gauge and says it can be filled again.
     CALL(get_actkind, LW(0))
     IF_INT_EQUAL(LW(0), 4)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_STEP, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             WAIT_MS(1000)
             CALL_CHILD(stop_wait_event)
@@ -436,6 +463,8 @@ EVT_BEGIN(actend_event)
             CALL(evt_btl_camera_set_mode, 0, 3)
             CALL(evt_btl_camera_set_moveto, 0, 92, 94, 320, 92, 44, 13, 1, 11)
             WAIT_MS(500)
+            // Frankly shows the emptied gauge and the audience,
+            // and explains how a lively crowd builds Star Power.
             CALL(evt_msg_print, 2, STRING("mac_0_b_t3_003"), 0, BTL_UNIT_LECTURE)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
@@ -463,22 +492,25 @@ EVT_BEGIN(actend_event)
             CALL(evt_msg_print, 2, STRING("mac_0_b_t3_005"), 0, BTL_UNIT_LECTURE)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
+            // Now he asks Mario and Goombella to attack and get the audience excited.
             CALL(btlevtcmd_onoff_battleflag, 0, 67108864)
             CALL(btlevtcmd_onoff_battleflag, 1, 268435456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_LECTURE, 0, 2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_STEP, 2)
             GOTO(99)
         END_IF
     END_IF
     IF_INT_NOT_EQUAL(LW(0), 9)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_STEP, LW(0))
         IF_INT_EQUAL(LW(0), 2)
             WAIT_MS(200)
             CALL_CHILD(stop_wait_event)
+            // After their attacks: the action command result is judged.
             CALL(get_ac_result, LW(0))
             IF_INT_EQUAL(LW(0), 1)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 1, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_GOOD_RESULTS, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
                     WAIT_MS(2000)
+                    // Good result: the audience cheers and fills part of the gauge; Frankly praises it.
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_006"), 0, BTL_UNIT_LECTURE)
                     CALL(btlevtcmd_StatusWindowOnOff, 1)
@@ -487,23 +519,26 @@ EVT_BEGIN(actend_event)
                     CALL(blinkAP)
                     CALL(spot_square, -105, 172, 206, 128, 20, 120)
                     WAIT_FRAMES(30)
-                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, 1, 1)
+                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_GOOD_RESULTS, 1)
                     GOTO(99)
                 END_IF
                 IF_INT_EQUAL(LW(0), 1)
                     CALL(aud_inc)
                     WAIT_MS(2000)
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
+                    // Frankly adds that livelier battles draw bigger crowds.
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_007"), 0, BTL_UNIT_LECTURE)
                     CALL(evt_btl_camera_set_mode, 0, 0)
                     WAIT_FRAMES(60)
                     CALL(spot_square, -295, -145, -175, -215, 20, 120)
                     WAIT_FRAMES(30)
                     CALL(btlevtcmd_StatusWindowOnOff, 1)
-                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, 1, 1)
+                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_GOOD_RESULTS, 1)
                     GOTO(99)
                 END_IF
                 IF_INT_EQUAL(LW(0), 2)
+                    // Three matching icons: the crowd goes wild; Frankly explains the bingo
+                    // and the Appeal command.
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_013"), 0, BTL_UNIT_LECTURE)
                     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -511,6 +546,7 @@ EVT_BEGIN(actend_event)
                     WAIT_FRAMES(30)
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_014"), 0, BTL_UNIT_LECTURE)
                     CALL(evt_btl_camera_set_mode, 0, 0)
+                    // A member of the audience pulls out a hammer and Frankly warns Mario about it.
                     WAIT_MS(1600)
                     CALL(hammer_on)
                     WAIT_MS(1000)
@@ -526,20 +562,22 @@ EVT_BEGIN(actend_event)
                     CALL(evt_btl_camera_set_moveSpeedLv, 0, 3)
                     WAIT_FRAMES(30)
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_014_3"), 0, BTL_UNIT_LECTURE)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_LECTURE, 0, 3)
+                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_STEP, 3)
+                    // Frankly explains that audience throws can be stopped with a button press.
                     CALL(aud_attack_init)
                     CALL(btlevtcmd_onoff_battleflag, 0, 268435456)
                     CALL(btlevtcmd_onoff_battleflag, 1, 8388608)
                     GOTO(99)
                 END_IF
             ELSE
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 2, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_BAD_RESULTS, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
+                    // Bad result: the audience feels cheated and shrinks; Frankly scolds the miss.
                     CALL(btlevtcmd_StatusWindowOnOff, 0)
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_008"), 0, BTL_UNIT_LECTURE)
                     CALL(btlevtcmd_StatusWindowOnOff, 1)
                     CALL(evt_btl_camera_set_mode, 0, 0)
-                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, 2, 1)
+                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_BAD_RESULTS, 1)
                     GOTO(99)
                 END_IF
                 IF_INT_EQUAL(LW(0), 1)
@@ -549,7 +587,7 @@ EVT_BEGIN(actend_event)
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_009"), 0, BTL_UNIT_LECTURE)
                     CALL(btlevtcmd_StatusWindowOnOff, 1)
                     CALL(evt_btl_camera_set_mode, 0, 0)
-                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, 2, 1)
+                    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_BAD_RESULTS, 1)
                     GOTO(99)
                 END_IF
                 IF_INT_EQUAL(LW(0), 2)
@@ -561,11 +599,12 @@ EVT_BEGIN(actend_event)
             END_IF
         END_IF
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, UW_LECTURE_FRANKLI_SAC_STEP, LW(0))
     IF_INT_EQUAL(LW(0), 3)
         WAIT_MS(200)
         CALL(aud_attack_end)
         CALL_CHILD(stop_wait_event)
+        // Frankly sums up the defence against thrown objects and ends the lecture.
         CALL(evt_msg_print, 2, STRING("mac_0_b_t3_014_4"), 0, BTL_UNIT_LECTURE)
         CALL(evt_btl_camera_set_mode, 0, 3)
         CALL(evt_btl_camera_set_moveto, 0, 92, 94, 320, 92, 44, 13, 30, 11)
@@ -589,9 +628,9 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_LECTURE_FRANKLI_SAC_STEP, LW(0))
     IF_INT_EQUAL(LW(0), 2)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_LECTURE_FRANKLI_SAC_GOOD_RESULTS, LW(0))
         IF_INT_EQUAL(LW(0), 2)
             WAIT_MS(1000)
             CALL(get_ac_result, LW(0))

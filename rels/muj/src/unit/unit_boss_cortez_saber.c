@@ -1,4 +1,4 @@
-// Keelhaul Key (muj) battle unit: Cortez's saber (cortez_saber), one of his weapons: its parts, defence/status tables,
+// Keelhaul Key (muj) battle unit: Cortez Sabre (cortez_saber), Cortez's saber, one of his weapons: its parts, defence/status tables,
 // and attack events.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -10,6 +10,12 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
 #include "muj.h"
+
+// Unit work slots of Cortez's saber (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BOSS_CORTEZ_SABER_REVIVE_COUNTDOWN = 1, // turns until it rises again while knocked down; 0 when up
+    UW_BOSS_CORTEZ_SABER_FORMATION_SLOT = 2    // its slot (0 to 3) in Cortez's weapon formation
+};
 
 BattleUnitKind unit_boss_cortez_saber;
 static BattleUnitDefense defence;
@@ -31,6 +37,10 @@ static EvtWord attack_event[414];
 static EvtWord wait_event[10];
 static EvtWord cortez_damage_sub_event[25];
 
+/**
+ * Unit data of Cortez Sabre: 4 HP, 120x50 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_boss_cortez_saber = {
     98,
     "btl_un_cortez_saber",
@@ -97,16 +107,31 @@ BattleUnitKind unit_boss_cortez_saber = {
     data_table,
 };
 
+/** Defence of Cortez Sabre: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Cortez Sabre: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of Cortez Sabre (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; resists freeze (50%),
+ * Defense Down (50%), allergic (50%), Slow (50%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 50, 0, 0, 100, 0, 100, 50, 50, 0, 90, 100, 50, 0, 0, 0};
 #else
+/**
+ * Retail builds: Status vulnerability of Cortez Sabre (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; resists allergic (50%),
+ * Slow (50%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
 #endif
 
+/**
+ * Weapon of Cortez Sabre (float attack): targets one unit for 3 damage; used by attack_event.
+ */
 BattleWeapon weapon_cortez_saber_float_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -125,7 +150,7 @@ BattleWeapon weapon_cortez_saber_float_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -143,6 +168,7 @@ BattleWeapon weapon_cortez_saber_float_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of Cortez Sabre: maps its battle poses to its animations (KRT_*). */
 static PoseTableEntry pose_table[] = {
 #if VERSION >= VERSION_JP
     {2, "KRT_Z_1"},
@@ -154,6 +180,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "KRT_S_1"},
 };
 
+/** Pose table of Cortez Sabre once it is broken off: only the lying pose KRT_Z_1. */
 static PoseTableEntry pose_table_break[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
@@ -161,6 +188,12 @@ static PoseTableEntry pose_table_break[] = {
     {BTL_POSE_STAY_DEFAULT, "KRT_Z_1"},
 };
 
+/**
+ * Event table of Cortez Sabre: cortez_damage_sub_event (tag 9), cortez_weapon_dead_event (tag 49),
+ * cortez_weapon_break_event (tags 70, 71), cortez_weapon_blow_dead_event (tag 58),
+ * cortez_weapon_counter_damage_event (tags 36, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35),
+ * avoid_thorn_event (tags 39, 37, 38).
+ */
 static BattleDataEntry data_table[] = {
     {9, cortez_damage_sub_event},
     {49, cortez_weapon_dead_event},
@@ -189,26 +222,27 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of Cortez Sabre: 1 part (model c_buki1). */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_cortez_saber", "c_buki1", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0x6, pose_table},
 };
 
 /**
- * Init event of Cortez's saber weapon: sets the unit flag 0x1000000, installs its wait, phase, unison phase,
+ * Init event of Cortez's saber weapon: sets UNIT_FLAG_NO_BACKFACE_FLIP, installs its wait, phase, unison phase,
  * attack, damage and (default) confusion events,
  * stores weapon number 1 in unit work 2 and clears unit work 1 (the flag that makes it sit out its attack),
  * and allows no movement.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(cortez_weapon_phase_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(cortez_weapon_unison_phase_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_SABER_FORMATION_SLOT, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_SABER_REVIVE_COUNTDOWN, 0)
     CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -223,8 +257,8 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Guess: shows the toge_flush spike flash at the saber's hit position on part 1,
- * offset forward by 40 and back by 5 in z, when a spiky attacker is avoided.
+ * Data event (tags 37 to 39) run when an attacker is hurt by the saber's spikes:
+ * shows the toge_flush spike flash at its hit position on part 1, 40 forward and 5 back in z.
  */
 static EVT_BEGIN(avoid_thorn_event)
     CALL(btlevtcmd_GetHitPos, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2))
@@ -235,15 +269,17 @@ static EVT_BEGIN(avoid_thorn_event)
 EVT_END()
 
 /**
- * Guess: attack event of Cortez's saber while it flies free (unit work 1 is 0;
- * otherwise it just restarts the wait event): it picks a target with weapon_cortez_saber_float_attack,
+ * Attack event of Cortez's saber; while knocked down (unit work 1, its revive countdown, is not 0) it only
+ * restarts the wait event.
+ * Otherwise it picks a target with weapon_cortez_saber_float_attack,
  * winds up with a tilt of 60 degrees and a swing of 135,
  * dives onto the target and slashes down with the sword-dance sound.
  * It plays the avoid pose on a dodge, or applies the damage with the action command defence check,
- * then returns home and straightens.
+ * A superguarded saber recoils home at once; otherwise it returns home and straightens.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    // While the Sabre is knocked down it only goes back to idling.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_SABER_REVIVE_COUNTDOWN, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -261,6 +297,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 38, 15, 0)
+    // The Sabre tilts back 60 degrees and winds up with a swing of 135 degrees.
     BEGIN_SIBLING_EVENT
         CALL(evt_sub_intpl_init, 0, 0, -60, 20)
         LOOP(20)
@@ -277,6 +314,7 @@ static EVT_BEGIN(attack_event)
     END_SIBLING_EVENT
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 35)
+    // It dives onto the target.
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 50, -10, 4, 0, -1)
     WAIT_MS(200)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
@@ -287,6 +325,7 @@ static EVT_BEGIN(attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // It slashes down with a whooshing sound.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOR_SWORD_DANCE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(7)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
@@ -306,12 +345,15 @@ static EVT_BEGIN(attack_event)
         CASE_DEFAULT
         GOTO(91)
     END_SWITCH
+    // The slash misses or is blocked: the Sabre plays its dodge reaction.
     LABEL(90)
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     GOTO(95)
+    // The slash lands: the Action Command defence result and damage are applied.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    // If the target Superguarded, the Sabre is repelled: it tumbles backwards and recoils home at once.
     IF_INT_EQUAL(LW(5), 21)
         DELETE_EVENT(LW(15))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -349,6 +391,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
         RETURN
     END_IF
+    // Otherwise it straightens up and returns home after a short pause.
     LABEL(95)
     CALL(btlevtcmd_WaitEventEnd, LW(15))
     WAIT_MS(500)

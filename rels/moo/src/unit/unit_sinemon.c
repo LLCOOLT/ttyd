@@ -28,6 +28,10 @@ static EvtWord dmg_turn_event[96];
 static EvtWord attack_event[454];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Moon Cleft: 6 HP, 26x32 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_sinemon = {
     114,
     "btl_un_sinemon",
@@ -94,22 +98,45 @@ BattleUnitKind unit_sinemon = {
     data_table,
 };
 
+/**
+ * Defence of the Moon Cleft: 5 against normal, ice, explosion and electric hits;
+ * immune to fire (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{5, 99, 5, 5, 5}};
 
+/** Defence attributes of the Moon Cleft: immune to fire hits. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
+/**
+ * Defence of the Moon Cleft while it is flipped over onto its back: 0
+ * against every kind of hit (set by dmg_turn_event).
+ */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Moon Cleft (percent chance each status takes hold):
+ * immune to burn; resists sleep (30%), stop (70%), dizzy (30%), confusion (30%), freeze (50%), Tiny (50%),
+ * Attack Down (50%), Defense Down (60%), allergic (60%), fright (30%), Gale Force (10%), Slow (60%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {30, 70, 30, 100, 30, 100, 0, 50, 100, 50, 100, 50, 100, 60, 60, 30, 10, 100, 60, 100, 100, 95};
 #else
+/**
+ * Retail builds: Status vulnerability of the Moon Cleft (percent chance each status takes hold):
+ * immune to burn; resists sleep (30%), dizzy (30%), confusion (30%), freeze (50%), Tiny (60%),
+ * Attack Down (60%), allergic (50%), fright (30%), Gale Force (20%), Slow (50%); the rest take hold at 80%
+ * or better.
+ */
 static StatusVulnerability regist = {30, 80, 30, 100, 30, 100, 0, 50, 100, 60, 100, 60, 100, 100, 50, 30, 20, 100, 50, 100, 100, 95};
 #endif
 
+/** Parts of the Moon Cleft: 1 part (model c_sinemon). */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_sinemon", "c_sinemon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0x1, pose_table},
 };
 
+/** Weapon of the Moon Cleft (attack): targets one unit for 5 damage; used by attack_event. */
 static BattleWeapon weapon_sinemon_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -128,7 +155,7 @@ static BattleWeapon weapon_sinemon_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -146,6 +173,7 @@ static BattleWeapon weapon_sinemon_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Moon Cleft: maps its battle poses to its animations (SIN_*). */
 static PoseTableEntry pose_table[] = {
     {1, "SIN_N_1"},
     {2, "SIN_Y_1"},
@@ -167,6 +195,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "SIN_S_1"},
 };
 
+/** Poses of the Moon Cleft while it lies flipped over on its back (set by dmg_turn_event). */
 static PoseTableEntry pose_table_turn[] = {
     {1, "SIN_N_2"},
     {2, "SIN_Y_2"},
@@ -185,6 +214,7 @@ static PoseTableEntry pose_table_turn[] = {
     {BTL_POSE_STAY_DEFAULT, "SIN_D_2"},
 };
 
+/** Event table of the Moon Cleft: dmg_turn_event (tag 13), dmg_avoid_counter_thorn_head_event (tag 37). */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
@@ -216,13 +246,13 @@ EVT_END()
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
         ADD(LW(1), 45)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 7)
         ADD(LW(1), 25)
@@ -269,7 +299,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -282,7 +312,7 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, -10, 0)
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     RETURN
 EVT_END()
 
@@ -303,14 +333,14 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("SIN_S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, 0, 0)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -325,11 +355,13 @@ EVT_END()
  * The pre-damage check decides between a dodge and a hit with the action-command result, then it hops back home.
  */
 static EVT_BEGIN(attack_event)
+    // If the Moon Cleft is lying flipped on its back, it spends the turn getting back up (wakeup_event).
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // In a first strike it goes straight for the first-strike target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -348,7 +380,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sinemon_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -363,7 +395,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_sinemon_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // It lines up with the target's row, walking with a footstep sound.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -380,12 +413,14 @@ static EVT_BEGIN(attack_event)
             WAIT_FRAMES(7)
         END_LOOP
     END_SIBLING_EVENT
+    // It crouches to wind up while the camera pulls in.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(750)
     CALL(evt_btl_camera_set_mode, 0, 3)
+    // The dash: it rushes at the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_DASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -414,11 +449,14 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The dash misses or is blocked: it rushes past the target, then stops after a short pause.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 50)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_MS(500)
     GOTO(98)
+    // The dash hits: the camera shakes, the Action Command defence result is applied, damage is dealt, and it
+    // bounces back in two hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -436,9 +474,10 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // It walks back to its home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)

@@ -1,4 +1,4 @@
-// Smorg (moamoa): tentacle C part of the boss battle unit, used on the Excess Express.
+// Smorg Miasma (moamoa_tentacle_c), Smorg's tentacle C part of the boss battle unit, used on the Excess Express.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -11,6 +11,11 @@
 #include "battle/battle_sub.h"
 #include "rsh.h"
 #include "version.h"
+
+// Unit work slots of this unit (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BOSS_MOAMOA_TENTACLE_C_BODY = 0, // unit id of Smorg's main body
+};
 
 BattleUnitKind unit_boss_moamoa_tentacle_c;
 static BattleUnitDefense defence;
@@ -31,6 +36,10 @@ const char* C_of_C_Attack_back[8];
 static EvtWord evt_attack[387];
 static EvtWord wait_event[32];
 
+/**
+ * Unit kind of the Smorg Miasma (HP 4, level 0):
+ * its size, offsets, damage sounds, status vulnerability, parts and init event.
+ */
 BattleUnitKind unit_boss_moamoa_tentacle_c = {
     108,
     "btl_un_moamoa_tentacle_a",
@@ -93,7 +102,7 @@ BattleUnitKind unit_boss_moamoa_tentacle_c = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x200000,
+    UNIT_ATTR_NO_KNOCKBACK_POSE,
     &regist,
     1,
     parts,
@@ -101,28 +110,40 @@ BattleUnitKind unit_boss_moamoa_tentacle_c = {
     data_table,
 };
 
+/** Defence of the Smorg Miasma: 1 damage points off every hit. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element reactions of the Smorg Miasma: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the Smorg Miasma (percent chance to take each status):
+ * immune to sleep, stop, dizzy, poison, confusion, electric shock, burn, freeze, growing huge, shrinking,
+ * attack up, attack down, defence up, defence down, allergy, fright, gale force, speed up, slow, dodgy,
+ * invisibility and instant kill.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/** Pose table of the Smorg Miasma: maps each battle pose to the animation it plays (S_* animations). */
 static PoseTableEntry pose_table[] = {
-    {28, "S_1C_1"},
+    {BTL_POSE_NORMAL, "S_1C_1"},
     {31, "D_1C_1"},
-    {39, "D_1C_1"},
+    {BTL_POSE_DAMAGE, "D_1C_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1C_1"},
 };
 
+/** Data table of the Smorg Miasma: event handlers for being defeated. */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/** Body part of the Smorg Miasma (model c_g_moamoa_b): hit position, defences, attributes and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_moamoa_tentacle_c", "c_g_moamoa_b", 0.0f, 0.0f, 0.0f, 88.0f, 88.0f, 10.0f, 93.0f, 93.0f, 10.0f, 20, 30, 255, &defence, &defence_attr, 0x600001, 0, pose_table},
+    {1, "btl_un_moamoa_tentacle_c", "c_g_moamoa_b", 0.0f, 0.0f, 0.0f, 88.0f, 88.0f, 10.0f, 93.0f, 93.0f, 10.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 };
 
+/** Weapon of the Smorg Miasma's attack: 5 damage. */
 static BattleWeapon weapon_moamoa_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -145,7 +166,7 @@ static BattleWeapon weapon_moamoa_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -196,7 +217,7 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1C"))
     WAIT_FRAMES(1)
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MOAMOA_TENTACLE_C_BODY, LW(1))
     CALL(btlevtcmd_SetUnitWork, LW(1), 3, -1)
     CALL(btlevtcmd_GetUnitWork, LW(1), 5, LW(0))
     IF_INT_EQUAL(LW(0), -1)
@@ -205,7 +226,7 @@ static EVT_BEGIN(dead_event)
             CALL(btlevtcmd_GetUnitWork, LW(1), 3, LW(0))
             IF_INT_EQUAL(LW(0), -1)
                 CALL(btlevtcmd_SetPartsDefenceTable, LW(1), 1, PTR(moamoa_defence_no_parts))
-                CALL(btlevtcmd_OffPartsAttribute, LW(1), 1, 536870912)
+                CALL(btlevtcmd_OffPartsAttribute, LW(1), 1, PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS)
                 CALL(btlevtcmd_AnimeSetPoseTable, LW(1), 1, PTR(moamoa1_weakness_pose_table))
                 CALL(btlevtcmd_SetHitOffset, LW(1), 1, 0, 32, 0)
                 CALL(btlevtcmd_SetHitCursorOffset, LW(1), 1, 0, 41, 0)
@@ -240,10 +261,11 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 /**
- * Guess: plays a list of poses (read with READ_INT from the table whose address is in LW(1),
- * a NULL entry meaning a pause) on the other part named in LW(0), with the arm-move sound running,
- * then waits until that part's unit work 0 is no longer 0 and plays the list again.
- * Spawned by evt_attack for each part that moves with the attacker.
+ * Moves another tentacle along with this one's attack: plays the first section of the pose list at LW(1)
+ * (sections end at a NULL entry) on part LW(5) of unit LW(0) with the arm-move sound running,
+ * waits until the main
+ * body (LW(6)) has unit work 0 set back to non-zero (done by evt_attack after its damage check), then plays the
+ * next section. Spawned by evt_attack for each of the other two tentacles that is still alive.
  */
 static EVT_BEGIN(evt_attack_other_arm)
     SET_INT_READ_ADDR(LW(1))
@@ -279,18 +301,21 @@ static EVT_BEGIN(evt_attack_other_arm)
     RETURN
 EVT_END()
 
+/** Animation names tentacle A plays, in order, while tentacle C attacks (A holds its pose). */
 const char* A_of_C_Attack[] = {
     "S_1A_1",
     NULL,
     NULL,
 };
 
+/** Animation names tentacle B plays, in order, while tentacle C attacks (B holds its pose). */
 const char* B_of_C_Attack[] = {
     "S_1B_1",
     NULL,
     NULL,
 };
 
+/** Animation names tentacle C plays, in order, for its swing when the target stands in front. */
 const char* C_of_C_Attack_front[] = {
     "A_1C_1",
     "A_1C_2",
@@ -302,6 +327,7 @@ const char* C_of_C_Attack_front[] = {
     NULL,
 };
 
+/** Animation names tentacle C plays, in order, for its swing when the target stands toward the back. */
 const char* C_of_C_Attack_back[] = {
     "A_1C_5",
     "A_1C_6",
@@ -314,22 +340,29 @@ const char* C_of_C_Attack_back[] = {
 };
 
 /**
- * Guess: smorg tentacle C's attack: checks front or rear stage position, marks the main body busy,
- * sends tentacles A and B through their poses (evt_attack_other_arm) while C swings through its own pose lists,
- * damage-checks the targets and returns to the S_1_1 pose, setting unit work 0 back to 1.
+ * Smorg tentacle C's attack: samples the targets of weapon_moamoa_attack and picks its own front
+ * or back pose list
+ * (C_of_C_Attack_front or _back) by whether the target in LW(3) stands at x -120 or more
+ * (boss_moamoa_check_zenei_kouei); sets the main body's unit work 0 to 0 and its pose to S_1_1,
+ * sends tentacles A
+ * and B (main body unit work 5 and 4, when still alive) through their own lists (evt_attack_other_arm), swings
+ * through its list section by section with the arm-move sounds, damage-checks every selected target, sets the
+ * main body's unit work 0 back to 1 and finishes the list.
  */
 static EVT_BEGIN(evt_attack)
+    // Choose the target for the tentacle's swat; a confused tentacle is flustered when there is none.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_moamoa_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_moamoa_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         RETURN
     END_IF
+    // The camera closes in on the tentacle and its target, and the attack is announced.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -338,13 +371,15 @@ static EVT_BEGIN(evt_attack)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_moamoa_attack))
+    // The swing is chosen by where the target stands: in front (the near side) or toward the back.
     CALL(boss_moamoa_check_zenei_kouei, LW(3), LW(1))
     IF_INT_EQUAL(LW(1), 0)
         SET_VALUE(LF(0), 0)
     ELSE
         SET_VALUE(LF(0), 1)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(6))
+    // The main body freezes its idle animation, and the other two tentacles that are still alive swing along.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MOAMOA_TENTACLE_C_BODY, LW(6))
     CALL(btlevtcmd_SetUnitWork, LW(6), 0, 0)
     CALL(btlevtcmd_AnimeChangePose, LW(6), 1, STRING("S_1_1"))
     SET_VALUE(LW(15), 0)
@@ -360,6 +395,7 @@ static EVT_BEGIN(evt_attack)
         SET_VALUE(LW(5), 1)
         SPAWN_EVENT(evt_attack_other_arm)
     END_IF
+    // The tentacle's arm sound starts, and it sweeps back and forth through its swing animation.
     IF_INT_EQUAL(LF(0), 0)
         SET_INT_READ_ADDR(PTR(&C_of_C_Attack_front))
         SET_VALUE(LW(15), 1)
@@ -387,6 +423,7 @@ static EVT_BEGIN(evt_attack)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     END_LOOP
+    // A pause, a heavy arm-slam sound, then the swat comes down.
     WAIT_MS(1000)
     IF_INT_EQUAL(LF(0), 0)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -427,11 +464,12 @@ static EVT_BEGIN(evt_attack)
         END_SIBLING_EVENT
         WAIT_MS(70)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_moamoa_attack), 256, LW(5))
+    // The swat's hit is checked: a target that dodges is missed, otherwise it takes the damage.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_moamoa_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_EQUAL(1)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_moamoa_attack))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_moamoa_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_moamoa_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_EQUAL(4)
         CASE_EQUAL(3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -440,6 +478,7 @@ static EVT_BEGIN(evt_attack)
         CASE_EQUAL(2)
         CALL(btlevtcmd_StartAvoid, LW(3), 40)
     END_SWITCH
+    // The main body resumes idling and the tentacle finishes its animation.
     CALL(btlevtcmd_SetUnitWork, LW(6), 0, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
     IF_INT_EQUAL(LW(15), 0)

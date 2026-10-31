@@ -41,6 +41,12 @@ typedef struct CloudWork {
     f32 lastFrame;            // 0xC4
 } CloudWork;
 
+// CloudWork.flags bits.
+enum CloudFlags {
+    CLOUD_FLAG_USED = 0x1,        // the slot is in use
+    CLOUD_FLAG_MULTI_GROUP = 0x2, // groupNames lists several map groups (evt_cloud_entry's first argument)
+};
+
 static CloudWork cloud[16];
 static u8 cloud_once_flag;
 static CloudWork* cloud_p;
@@ -111,7 +117,7 @@ static USER_FUNC(evt_cloud_main) {
             cloud_once_flag = 1;
             animPaperPoseEntry(wp->animName, group);
             offscreenEntry(wp->offscreenName);
-            if (!(wp->flags & 2)) {
+            if (!(wp->flags & CLOUD_FLAG_MULTI_GROUP)) {
                 mapGrpSetOffScreen(wp->groupName, wp->offscreenName);
             } else {
                 char** p = wp->groupNames;
@@ -171,7 +177,7 @@ static USER_FUNC(evt_cloud_main) {
             }
             imgEntry(wp->imgName, group);
             img = imgNameToPtr(wp->imgName, group);
-            img->flags |= 2;
+            img->flags |= IMG_FLAG_HIDDEN;
             img->poseId = animPaperPoseGetId(wp->animName, group);
             img->animTime = animTimeGetTime(group);
             evt.args = args;
@@ -191,10 +197,10 @@ static USER_FUNC(evt_cloud_main) {
         }
         case 3:
             img = imgNameToPtr(wp->imgName, group);
-            img->flags &= ~2;
+            img->flags &= ~IMG_FLAG_HIDDEN;
             img->animName = "A_1";
             img->animTime = animTimeGetTime(group);
-            mapGrpFlagOn(wp->groupName, 1);
+            mapGrpFlagOn(wp->groupName, MAPOBJ_FLAG_HIDE);
             wp->timer = 30;
             wp->state++;
             wp->lastFrame = 0.0f;
@@ -226,7 +232,7 @@ static USER_FUNC(evt_cloud_main) {
             }
             break;
         case 10:
-            mapGrpFlagOff(wp->groupName, 1);
+            mapGrpFlagOff(wp->groupName, MAPOBJ_FLAG_HIDE);
             wp->state = 99;
             break;
         case 20:
@@ -237,7 +243,7 @@ static USER_FUNC(evt_cloud_main) {
             img = imgNameToPtr(wp->imgName, group);
             img->animName = "A_2";
             img->animTime = animTimeGetTime(group);
-            hitObjFlagOn(wp->hitName, 1);
+            hitObjFlagOn(wp->hitName, HIT_FLAG_OFF);
             wp->timer = 60;
             wp->state++;
             break;
@@ -252,7 +258,7 @@ static USER_FUNC(evt_cloud_main) {
             break;
         case 99:
             img = imgNameToPtr(wp->imgName, group);
-            if (!(wp->flags & 2)) {
+            if (!(wp->flags & CLOUD_FLAG_MULTI_GROUP)) {
                 mapGrpClearOffScreen(wp->groupName);
             } else {
                 char** p = wp->groupNames;
@@ -306,7 +312,7 @@ USER_FUNC(evt_cloud_ent) {
     endEvt = (void*)evtGetValue(event, args[3]);
 
     for (i = 0; i < 16; i++) {
-        if (!(cloud[i].flags & 1)) {
+        if (!(cloud[i].flags & CLOUD_FLAG_USED)) {
             break;
         }
     }
@@ -314,7 +320,7 @@ USER_FUNC(evt_cloud_ent) {
         return EVT_RETURN_DONE;
     }
     wp = &cloud[i];
-    wp->flags |= 1;
+    wp->flags |= CLOUD_FLAG_USED;
     strncpy(wp->animName, "P_oof_cloud_1", 0x20);
     if (multi == 0) {
         strncpy(wp->groupName, groupName, 0x20);
@@ -334,7 +340,7 @@ USER_FUNC(evt_cloud_ent) {
     cloud_p = wp;
     if (multi != 0) {
         wp->groupNames = (char**)groupName;
-        wp->flags |= 2;
+        wp->flags |= CLOUD_FLAG_MULTI_GROUP;
     }
     return EVT_RETURN_DONE;
 }

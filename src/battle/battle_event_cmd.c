@@ -8,6 +8,7 @@
 #include "battle/battle_acrobat.h"
 #include "battle/battle_disp.h"
 #include "battle/battle_sub.h"
+#include "battle/battle_enemy_item.h"
 // FAKE: battle_event_cmd.c calls intpl_sub through this prototype (the argument order it was compiled with) instead of the one in battle/battle_sub.h; same registers, behaviour-identical.
 typedef f32 (*IntplSubArgOrderFn)(s32 mode, f32 start, f32 end, s32 cur, s32 steps);
 #include "battle/battle_unit.h"
@@ -2022,7 +2023,7 @@ USER_FUNC(btlevtcmd_CheckDamagePattern) {
 /**
  * Script: finds a unit whose home position lies within args[4..6] of (args[1..3]) on any axis with a non-zero
  * bound and returns its id in args[0], or -1; used to find a free spot when spawning.
- * The alliance test is the constant UNIT_ALLIANCE_PARTY, so every unit is checked.
+ * Only units of alliance 1 (the enemy side) are checked.
  */
 USER_FUNC(btlevtcmd_CheckSpace) {
     EvtWord* args = event->args;
@@ -2045,7 +2046,7 @@ USER_FUNC(btlevtcmd_CheckSpace) {
     for (i = 0; i < BATTLE_UNIT_MAX; ++i) {
         found = FALSE;
         unit = BattleGetUnitPtr(wp, i);
-        if (unit && UNIT_ALLIANCE_PARTY) {
+        if (unit && UNIT_ALLIANCE_ENEMY) {
             BtlUnit_GetHomePos(unit, &x, &y, &z);
             ix = x;
             iy = y;
@@ -3527,7 +3528,6 @@ USER_FUNC(btlevtcmd_PartsFaceDirectionSub) {
 /* first-half (target order 1..153) functions, generated block */
 #include <string.h>
 #include "data/item_data.h"
-s32 BattleEnemyUseItemCheck(BattleUnit* unit);
 #include "driver/animdrv.h"
 static void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work);
 static void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z);
@@ -3721,7 +3721,7 @@ USER_FUNC(btlevtcmd_CommandFlyItem) {
         cmd = &wp->commandMenu;
         unit = BattleGetUnitPtr(wp, id);
         kind = unit->currentKind;
-        if (kind == 0xDE || (kind >= 0xE0 && kind < 0xE7)) {
+        if (kind == UNIT_MARIO || (kind >= UNIT_GOOMBELLA && kind < UNIT_MAX)) {
             item = cmd->weapon[cmd->cursor[11].absPos].itemId;
         } else {
             item = unit->heldItem;
@@ -3744,9 +3744,9 @@ USER_FUNC(btlevtcmd_CommandFlyItem) {
         event->userdatap[1] = itemEntry(pos.x, pos.y, pos.z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
         effItemGetEntry(10, pos.x, 12.0f + pos.y, pos.z - 5.0f);
 #endif
-        if (kind == 0xDE) {
+        if (kind == UNIT_MARIO) {
             psndSFXOn_3D("SFX_ITEM_MARIO_USE1", &pos);
-        } else if (kind >= 0xE0 && kind < 0xE7) {
+        } else if (kind >= UNIT_GOOMBELLA && kind < UNIT_MAX) {
             psndSFXOn_3D("SFX_ITEM_PARTY_USE1", &pos);
         } else {
             psndSFXOn_3D("SFX_ENM_ITEM_USE1", &pos);
@@ -3829,7 +3829,7 @@ USER_FUNC(btlevtcmd_ConsumeItemReserve) {
             }
         }
     } else {
-        if (unit->heldItem == 0x97) {
+        if (unit->heldItem == ITEM_LIFE_SHROOM) {
             unit->heldItem = 0;
         }
         goto end;
@@ -4180,7 +4180,8 @@ USER_FUNC(btlevtcmd_SetEventPhase) {
 
 /**
  * Script: sets the unit args[0]'s unison phase event to args[1].
- * Guess: the phase event that runs together with the other units' phase events, from the name.
+ * At each phase change battle_seq.c starts every unit's unison phase script at once and waits for all of them,
+ * before running the plain phase scripts one unit at a time.
  */
 USER_FUNC(btlevtcmd_SetEventUnisonPhase) {
     EvtWord* args = event->args;
@@ -6378,7 +6379,7 @@ USER_FUNC(btlevtcmd_CommandGetWeaponAddress) {
     index = args[1];
     unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, id));
     kind = (s32)unit->currentKind;
-    if (kind == 0xDE || (kind >= 0xE0 && kind < 0xE7)) {
+    if (kind == UNIT_MARIO || (kind >= UNIT_GOOMBELLA && kind < UNIT_MAX)) {
         weapon = BattleGetSelectWeapon(wp);
     } else {
         weapon = itemDataTable[(s32)unit->heldItem].battle_params;
@@ -6826,7 +6827,7 @@ USER_FUNC(btlevtcmd_SetPartsJumpSound) {
     return EVT_RETURN_DONE;
 }
 
-// inlining off for _UnitMoveSoundControl, _PartsMoveSoundControl, _MoveSoundControlCore and 3 more, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it 7 functions change length, e.g. btlevtcmd_DivePartsPosition 595 -> 690 instructions
 #pragma dont_inline on
 /** Per-frame movement sound for a moving unit, at its position. */
 static void _UnitMoveSoundControl(BattleUnit* unit) {
@@ -6896,10 +6897,15 @@ static void _PartsMoveSoundControlEnd(BattleUnitPart* part) {
     _MoveSoundControlEndCore(part->owner, &part->moveSnd);
 }
 
+/** Mario's voice clips for acrobatic moves; btlevtcmd_snd_voice type 1 plays one at random. */
 const char* _mario_acrobat_voice_table[5] = {
     "SFX_VOICE_MARIO_AC3_1", "SFX_VOICE_MARIO_AC3_2", "SFX_VOICE_MARIO_AC3_3",
     "SFX_VOICE_MARIO_AC3_4", "SFX_VOICE_MARIO_AC3_5",
 };
+/**
+ * Mario's voice clips for ordinary attacks, two sets of five;
+ * btlevtcmd_snd_voice type 2 plays one at random.
+ */
 const char* _mario_attack_voice_table[10] = {
     "SFX_VOICE_MARIO_AC1_1", "SFX_VOICE_MARIO_AC1_2", "SFX_VOICE_MARIO_AC1_3",
     "SFX_VOICE_MARIO_AC1_4", "SFX_VOICE_MARIO_AC1_5", "SFX_VOICE_MARIO_AC2_1",
@@ -7013,7 +7019,7 @@ USER_FUNC(btlevtcmd_EnemyItemUseCheck) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     index = args[1];
-    evtSetValue(event, index, BattleEnemyUseItemCheck(unit));
+    evtSetValue(event, index, (EvtWord)BattleEnemyUseItemCheck(unit));
     return EVT_RETURN_DONE;
 }
 

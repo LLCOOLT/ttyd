@@ -4,6 +4,7 @@
 
 #include "__demo.h"
 
+/** Bit mask for each of the four controller ports. */
 static u32 PadChanMask[4] = {
     PAD_CHAN0_BIT,
     PAD_CHAN1_BIT,

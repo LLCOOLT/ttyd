@@ -37,11 +37,11 @@ extern EvtWord puni_nakama[];
 extern EvtWord tik03_switch_evt[];
 
 /**
- * Custom entry hook for the exit bero_05.
+ * Enter event of the dokan pipe that leads to Boggly Woods (win_06), run when Mario arrives through it.
  * Once the chapter 2 boss is beaten it records that Mario left the Great Tree (GSWF_MRI_LEFT_TREE_AFTER_STG2)
  * and clears the gift flags GSWF_MRI04_JABBI_MUSHROOM_GIVEN and GSWF_MRI01_PETUNI_QUIZ_EGG_GIVEN
- * so those items can be given again. Returns 0 in LW(0).
- * Guess: the flags belong to the Great Tree side of this exit.
+ * so those items can be given again; mri_00's out_dokan_1 does the same on the Great Tree's own pipe.
+ * Returns 0 in LW(0).
  */
 EVT_BEGIN(bero_05_custom_in)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
@@ -72,6 +72,10 @@ EVT_BEGIN(bero_05_custom_out)
     RETURN
 EVT_END()
 
+/**
+ * Doors of this room: the exits up to tik_04 (four of them in the demo builds, one in the later releases)
+ * and the pipe to Boggly Woods (win_06), which plays its own pipe scene on arrival.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero_1", // hitName
@@ -159,6 +163,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Stand-in for the Boggly Woods pipe until chapter 2 has begun: it leads to the chapter 2 title screen
+ * (sys_01, stg_2) instead. Swapped in by the map init script.
+ */
 static BeroEntry bero_entry_data2[] = {
     {
         "dokan", // hitName
@@ -215,6 +223,7 @@ static EVT_BEGIN(guide_talk)
     RETURN
 EVT_END()
 
+/** NPCs of this room: Punio, the Puni who leads Mario to Boggly Woods. */
 static NpcSetupInfo npcEnt[] = {
     {
         "ガイド", // name
@@ -251,6 +260,7 @@ EVT_END()
  * Ends with the music back to the sewer theme and story progress STORY_STG1_33_A_PUNI_PLEA_FOR_HELP.
  */
 EVT_BEGIN(puni_soguu_3)
+    // Mario arrives; Punio spots him and scurries off to the west end of the room.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
@@ -270,6 +280,7 @@ EVT_BEGIN(puni_soguu_3)
     CALL(evt_npc_move_position, STRING("ガイド"), -455, 59, 0, FLOAT(180.0f), 0)
     DELETE_EVENT(LW(10))
     SET_VALUE(GW(0), 0)
+    // When Mario follows him west, Punio turns back and forth in a panic until Mario catches up.
     BEGIN_INLINE_EVENT
         LOOP(0)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -297,6 +308,7 @@ EVT_BEGIN(puni_soguu_3)
         CALL(evt_npc_reverse_ry, STRING("ガイド"))
         WAIT_MS(800)
     END_LOOP
+    // Mario and the partner walk up to Punio, the music changes, and he begs them not to eat him.
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         ADD(LW(0), 30)
@@ -321,6 +333,7 @@ EVT_BEGIN(puni_soguu_3)
     CALL(evt_mario_set_pose, STRING("M_I_2"))
     WAIT_MS(800)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // Punio asks if they are bullies; answering "Guess again, nerd!" scares him and the partner scolds Mario.
     CALL(evt_msg_print, 0, STRING("mac_1_013"), 0, STRING("ガイド"))
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
@@ -337,6 +350,7 @@ EVT_BEGIN(puni_soguu_3)
         CALL(evt_msg_print_party, STRING("mac_1_017"))
         CALL(evt_msg_print, 0, STRING("mac_1_018"), 0, STRING("ガイド"))
     END_IF
+    // The partner asks why a Puni from Boggly Woods is here; Punio tells of the X-Nauts in the Great Tree.
     WAIT_MS(333)
     CALL(evt_msg_print_party, STRING("mac_1_020"))
     CALL(evt_cam3d_evt_set, -435, -78, 289, -435, -130, -7, 500, 11)
@@ -350,6 +364,7 @@ EVT_BEGIN(puni_soguu_3)
     CALL(evt_msg_print, 0, STRING("mac_1_023"), 0, STRING("ガイド"))
     CALL(evt_cam3d_evt_set, -400, -33, 432, -400, -105, 24, 500, 11)
     WAIT_MS(333)
+    // The partner links them to the Crystal Star; Punio asks for help and Mario nods twice to agree.
     CALL(evt_msg_print_party, STRING("mac_1_024"))
     CALL(evt_cam3d_evt_set, -445, -90, 257, -445, -141, -42, 0, 11)
     WAIT_MS(200)
@@ -372,6 +387,7 @@ EVT_BEGIN(puni_soguu_3)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // Punio thanks them, gives his name and leads the way east as Mario and the partner turn to follow.
     CALL(evt_msg_print_party, STRING("mac_1_028"))
     CALL(evt_msg_print, 0, STRING("mac_1_029"), 0, STRING("ガイド"))
     CALL(evt_cam3d_evt_set, 100, -23, 432, 100, -95, 24, 3000, 11)
@@ -406,6 +422,7 @@ EVT_BEGIN(puni_soguu_3)
     CALL(evt_msg_print, 0, STRING("mac_1_029_00"), 0, STRING("ガイド"))
     CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     WAIT_MS(800)
+    // The sewer music and control return, and story progress moves on to Punio's plea for help.
     CALL(evt_cam3d_evt_off, 0, 11)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))

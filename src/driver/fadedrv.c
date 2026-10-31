@@ -22,6 +22,7 @@
 #if VERSION >= VERSION_US
 // US-only named constant (dispdrv reads it by name), followed by a zero word
 #pragma force_active on
+/** 1.0 and 0.0 kept as named constants: the screen draw (dispdrv) reads the 1.0 for its depth scale. */
 const f32 fadeConstOne = 1.0f;
 const f32 fadeConstZero = 0.0f;
 #pragma force_active reset
@@ -433,8 +434,10 @@ void fadeEntry(s32 type, s32 duration, GXColor color) {
 }
 
 /**
- * Turns on the tec screen overlay (fade.tpl image 2 drawn over the 2D layer).
- * Guess: the scan-line monitor look of the scenes on TEC's screens, from the name; set by the evt_fade helpers.
+ * Turns on the tec screen overlay: disp_tec draws a dark blue-grey (25, 35, 42) layer over the 2D camera,
+ * shaped by the alpha of fade.tpl image 2.
+ * Scripts set it with evt_fade_tec_onoff in Peach's X-Naut Fortress scenes (aji_10 Grodus's room,
+ * aji_16 her room, aji_17 TEC's room). Guess: named after TEC.
  */
 void fadeTecOn(void) {
     wp->flags |= FADE_WORK_TEC;
@@ -1465,9 +1468,10 @@ static void disp_maku(CameraId camId, void* param) {
 }
 
 /**
- * Unknown: stores pi into f[0]; nothing calls it.
- * It probably exists only so a constant lands in the file's constant pool.
+ * Stand-in for a function the linker stripped: it is in no version's symbols and nothing calls it,
+ * so the link drops it; it only creates pi in the file's float pool at this point.
  */
+// FAKE: uncalled stand-in for a stripped function; puts pi ahead of 0.5f and 180.0f in .sdata2
 void fadeStrippedPool(f32* f) {
     f[0] = 3.141592f;
 }

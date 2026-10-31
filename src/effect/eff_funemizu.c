@@ -22,6 +22,7 @@ typedef struct ColorEntry {
 } ColorEntry;
 
 #if VERSION >= VERSION_JP
+/** Water tint used when the current map has no entry in funemizu_color_tbl: plain white. */
 static const GXColor funemizu_default_color = {0xFF, 0xFF, 0xFF, 0xFF};
 #endif
 
@@ -35,13 +36,22 @@ static u8 funemizu_color0_tbl[] __attribute__((aligned(32))) = {0x00, 0x00, 0x00
 static u8 funemizu_dl_0_0[] __attribute__((aligned(32))) = {0x98, 0x00, 0x0A, 0x09, 0x00, 0x01, 0x0A, 0x00, 0x00, 0x00, 0x02, 0x0A, 0x00, 0x01, 0x09, 0x05, 0x00, 0x01, 0x01, 0x0B, 0x00, 0x01, 0x0B, 0x06, 0x00, 0x01, 0x04, 0x0C, 0x00, 0x01, 0x0C, 0x07, 0x00, 0x01, 0x06, 0x0D, 0x00, 0x01, 0x0D, 0x08, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static u8 funemizu_dl_0_1[] __attribute__((aligned(32))) = {0x98, 0x00, 0x07, 0x04, 0x00, 0x00, 0x07, 0x08, 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x05, 0x07, 0x00, 0x01, 0x06, 0x02, 0x00, 0x00, 0x03, 0x06, 0x00, 0x01, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00};
 static u8 funemizu_dl_0_2[] __attribute__((aligned(32))) = {0x98, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0x00, 0x05, 0x00, 0x01, 0x01, 0x06, 0x00, 0x01, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+/** The three display lists of the type 0 wake's base layer, drawn with the sizes below. */
 static u8* funemizu_dl_0_tbl[] = {funemizu_dl_0_0, funemizu_dl_0_1, funemizu_dl_0_2};
+/**
+ * Sizes in 32-byte units of the three display lists of the type 0 wake's base layer (the wake of
+ * Mario's paper boat and of ships); used by funemizuCallDL.
+ */
 static u8 funemizu_dl_0_size_tbl[] = {0x02, 0x01, 0x01};
 static u8 funemizu_dl_1_0[] __attribute__((aligned(32))) = {0x98, 0x00, 0x0A, 0x16, 0x00, 0x01, 0x17, 0x0E, 0x00, 0x00, 0x10, 0x17, 0x00, 0x01, 0x16, 0x13, 0x00, 0x01, 0x0F, 0x18, 0x00, 0x01, 0x18, 0x14, 0x00, 0x01, 0x12, 0x19, 0x00, 0x01, 0x19, 0x15, 0x00, 0x01, 0x14, 0x1A, 0x00, 0x01, 0x1A, 0x12, 0x00, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static u8 funemizu_dl_1_1[] __attribute__((aligned(32))) = {0x98, 0x00, 0x04, 0x12, 0x00, 0x00, 0x15, 0x15, 0x00, 0x01, 0x14, 0x11, 0x00, 0x00, 0x13, 0x10, 0x00, 0x00, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static u8 funemizu_dl_1_2[] __attribute__((aligned(32))) = {0x98, 0x00, 0x04, 0x0E, 0x00, 0x00, 0x10, 0x0F, 0x00, 0x00, 0x0E, 0x13, 0x00, 0x01, 0x0F, 0x14, 0x00, 0x01, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static u8 funemizu_dl_1_3[] __attribute__((aligned(32))) = {0x98, 0x00, 0x04, 0x15, 0x00, 0x01, 0x14, 0x14, 0x00, 0x01, 0x12, 0x10, 0x00, 0x00, 0x11, 0x0F, 0x00, 0x00, 0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static u8* funemizu_dl_1_tbl[] = {funemizu_dl_1_0, funemizu_dl_1_1, funemizu_dl_1_2, funemizu_dl_1_3};
+/**
+ * Sizes in 32-byte units of the four display lists of the type 0 wake's stretched, scrolling outer layer;
+ * used by effFunemizuDisp.
+ */
 static u8 funemizu_dl_1_size_tbl[] = {0x02, 0x01, 0x01, 0x01};
 static s16 gor_fune_vertex_tbl[] __attribute__((aligned(32))) = {23605, 0, 0, 16368, 0, 0, 12081, 0, 0, 8184, 0, 0, 4287, 0, 0, 0, 0, 0, 24198, 333, 0, 17754, 3291, 0, 13886, 6565, 0, 10323, 9024, 0, 6398, 9314, 0, 0, 0, 0, 24139, 2048, 0, 18190, 4665, 0, 14467, 8397, 0, 10977, 11084, 0, 7124, 11603, 0, 2223, 9774, 0, 23605, 0, 0, 16368, 0, 0, 12081, 0, 0, 8184, 0, 0, 4287, 0, 0, 0, 0, 0, 24198, 200, 0, 17754, 1974, 0, 13886, 4553, 0, 10323, 6438, 0, 6398, 6612, 0, 0, 0, 0, 24139, 1229, 0, 18190, 2799, 0, 14467, 5652, 0, 10977, 7674, 0, 7124, 7986, 0, 2966, 6422, 0};
 static s16 gor_fune_texcoord0_tbl[] __attribute__((aligned(32))) = {-3325, 16384, -3325, 6276, -11004, 6276, -11004, 16384, 4352, 16384, 4352, 6276, 12031, 16384, 12031, 6276, 19709, 16384, 19709, 6276, 27388, 16384, 27388, 6276, -3325, 1024, -11004, 512, 4352, 1024, 12031, 1024, 19709, 1024, 27388, 512, -3325, 15564, -11004, 15564, 4352, 15564, 12031, 15564, 19709, 15564, 27388, 15564};
@@ -56,7 +66,13 @@ static s8 gor_fune_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64};
 static s8 gor_fune_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
 static u8 gor_fune_color0_tbl[] __attribute__((aligned(32))) = {0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+/** The two base-layer display lists of the type 2 wake, drawn with the sizes below. */
 static u8* gor_fune_dl_0_tbl[] = {gor_fune_dl_0_0, gor_fune_dl_0_1};
+/**
+ * Sizes in 32-byte units of the base-layer display lists of the type 2 wake, the second wake mesh gor_00
+ * shows beside the ship arriving in Rogueport harbour; used by effFunemizuDisp.
+ * The outer layer's lists and sizes follow.
+ */
 static u8 gor_fune_dl_0_size_tbl[] = {0x02, 0x02};
 static u8* gor_fune_dl_1_tbl[] = {gor_fune_dl_1_0, gor_fune_dl_1_1};
 static u8 gor_fune_dl_1_size_tbl[] = {0x02, 0x02};
@@ -160,12 +176,12 @@ EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw) 
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
-    work->f18 = 0.0f;
-    work->f1c = 0.0f;
-    work->f20 = 0.0f;
-    work->f24 = 0.0f;
-    work->f2c = 0.0f;
-    work->f28 = 0.0f;
+    work->layer1Width = 0.0f;
+    work->layer2Width = 0.0f;
+    work->layer1Height = 0.0f;
+    work->layer2Height = 0.0f;
+    work->layer2Scroll = 0.0f;
+    work->layer1Scroll = 0.0f;
     work->timer = 0;
     work->scale = 1.0f;
     work->cam = CAMERA_3D;
@@ -173,10 +189,10 @@ EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw) 
         p->position.x = 0.0f;
         p->position.y = 0.0f;
         p->position.z = 0.0f;
-        p->f10 = size / 2;
-        p->f14 = yaw;
-        p->f34 = p->f10 + irand(2);
-        p->f38 = 0.1f + irand(10) / 100.0f;
+        p->speed = size / 2;
+        p->yaw = yaw;
+        p->velY = p->speed + irand(2);
+        p->gravity = 0.1f + irand(10) / 100.0f;
         p->delay = irand(5);
         p->alpha = 255;
     }
@@ -209,7 +225,7 @@ static void effFunemizuMain(EffectEntry* effect) {
         work->timer -= 1000;
     }
     if (work->type == 0 || work->type == 2) {
-        f = work->f10;
+        f = work->speed;
         a = f;
         b = f - 1.0f;
         if (a < 0.0f) {
@@ -224,38 +240,38 @@ static void effFunemizuMain(EffectEntry* effect) {
         if (b > 1.0f) {
             b = 1.0f;
         }
-        work->f18 += (a - work->f18) / 10.0f;
-        work->f1c += (b - work->f1c) / 10.0f;
-        if (work->f10 > 1.0f) {
-            work->f20 += (a - work->f20) / 10.0f;
-            work->f24 += (b - work->f24) / 10.0f;
+        work->layer1Width += (a - work->layer1Width) / 10.0f;
+        work->layer2Width += (b - work->layer2Width) / 10.0f;
+        if (work->speed > 1.0f) {
+            work->layer1Height += (a - work->layer1Height) / 10.0f;
+            work->layer2Height += (b - work->layer2Height) / 10.0f;
         } else {
-            work->f20 += (a - work->f20) / 2;
-            work->f24 += (b - work->f24) / 2;
+            work->layer1Height += (a - work->layer1Height) / 2;
+            work->layer2Height += (b - work->layer2Height) / 2;
         }
-        work->f28 += 0.05f * work->f18;
-        work->f2c += 0.1f * work->f1c;
-        if (work->f10 > 0.1f && work->timer % 10 == 0) {
-            t = 6.2831855f * (work->f14 - camGetPtr(CAMERA_3D)->viewYaw) / 360.0f;
+        work->layer1Scroll += 0.05f * work->layer1Width;
+        work->layer2Scroll += 0.1f * work->layer2Width;
+        if (work->speed > 0.1f && work->timer % 10 == 0) {
+            t = 6.2831855f * (work->yaw - camGetPtr(CAMERA_3D)->viewYaw) / 360.0f;
             s = sin(t);
             c = cos(t);
-            effFunemizuEntry(1, work->position.x - 14.0f * c, work->position.y, work->position.z - 14.0f * s, work->f10, work->f14);
+            effFunemizuEntry(1, work->position.x - 14.0f * c, work->position.y, work->position.z - 14.0f * s, work->speed, work->yaw);
         }
     } else {
         EffFunemizuWork* p;
-        work->f18 = 1.0f;
+        work->layer1Width = 1.0f;
         for (i = 1, work++; i < effect->count; i++, work++) {
             if (work->position.y < 0.0f) {
                 dead++;
             } else if (work->delay) {
                 work->delay--;
             } else {
-                c = cos(6.2831855f * work->f14 / 360.0f);
-                work->position.x += work->f10 * c;
-                s = sin(6.2831855f * work->f14 / 360.0f);
-                work->position.z += work->f10 * -s;
-                work->position.y += work->f34;
-                work->f34 -= work->f38;
+                c = cos(6.2831855f * work->yaw / 360.0f);
+                work->position.x += work->speed * c;
+                s = sin(6.2831855f * work->yaw / 360.0f);
+                work->position.z += work->speed * -s;
+                work->position.y += work->velY;
+                work->velY -= work->gravity;
                 work->alpha -= 8;
                 if (work->alpha < 0) {
                     work->alpha = 0;
@@ -322,6 +338,7 @@ static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     GXGetViewportv(vp);
     GXProject(work->position.x, work->position.y, work->position.z, cam->view, proj, vp, &sx, &sy, &sz);
     if (sx > 0.0f && sx < 608.0f && sy > 0.0f && sy < 480.0f) {
+        // FAKE: unprototyped call: the SDK u16 parameters would add two narrowings (FAKES.md)
         ((void (*)())GXPeekARGB)((s32)sx, (s32)sy, argb);
         if (type == 0) {
             {
@@ -373,7 +390,7 @@ static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
-    PSMTXRotRad(rot, 'y', MTXDegToRad(work->f14 - camGetPtr(cameraId)->viewYaw));
+    PSMTXRotRad(rot, 'y', MTXDegToRad(work->yaw - camGetPtr(cameraId)->viewYaw));
     PSMTXScale(scale, work->scale, work->scale, work->scale);
     PSMTXConcat(trans, rot, trans);
     PSMTXConcat(trans, scale, trans);
@@ -402,11 +419,11 @@ static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(mtx, trans, trans);
         PSMTXScale(scale, 1.0f, 1.0f, z);
         PSMTXConcat(trans, scale, trans);
-        PSMTXScale(scale, work->f18, work->f20, work->f18);
+        PSMTXScale(scale, work->layer1Width, work->layer1Height, work->layer1Width);
         PSMTXConcat(trans, scale, scale);
         GXLoadPosMtxImm(scale, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
-        PSMTXTrans(scale, work->f28, 0.0f, 0.0f);
+        PSMTXTrans(scale, work->layer1Scroll, 0.0f, 0.0f);
         GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
         if (type == 0) {
             GXClearVtxDesc();
@@ -441,11 +458,11 @@ static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
                 GXCallDisplayList(gor_fune_dl_0_tbl[u], gor_fune_dl_0_size_tbl[u] * 32);
             }
         }
-        PSMTXScale(scale, work->f1c, work->f24, work->f1c);
+        PSMTXScale(scale, work->layer2Width, work->layer2Height, work->layer2Width);
         PSMTXConcat(trans, scale, scale);
         GXLoadPosMtxImm(scale, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
-        PSMTXTrans(scale, work->f2c, 0.0f, 0.0f);
+        PSMTXTrans(scale, work->layer2Scroll, 0.0f, 0.0f);
         GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
         if (type == 0) {
             GXClearVtxDesc();
@@ -504,7 +521,7 @@ static void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
-    PSMTXRotRad(rot, 'y', MTXDegToRad(work->f14 - camGetPtr(cameraId)->viewYaw));
+    PSMTXRotRad(rot, 'y', MTXDegToRad(work->yaw - camGetPtr(cameraId)->viewYaw));
     PSMTXConcat(trans, rot, trans);
     PSMTXConcat(cam->view, trans, mtx);
     GXSetNumChans(1);

@@ -14,8 +14,10 @@ static u32 numBumpmapTextures;
 static u32 numColor0Textures;
 static u32 numColor1Textures;
 static u32 numColorTextures;
+/** Colour channel currently being checked by the transform verifier, or -1 for none. */
 static s32 XFChannel = -1;
 
+/** Texture coordinate attributes TEX0 to TEX7, indexed by texture number. */
 static GXAttr TextureEnums[8] = {
     GX_VA_TEX0,
     GX_VA_TEX1,
@@ -27,6 +29,7 @@ static GXAttr TextureEnums[8] = {
     GX_VA_TEX7,
 };
 
+/** Matrix index attributes, the position/normal matrix first and then one per texture coordinate. */
 static GXAttr MtxIdxEnums[9] = {
     GX_VA_PNMTXIDX,
     GX_VA_TEX0MTXIDX,
@@ -39,6 +42,7 @@ static GXAttr MtxIdxEnums[9] = {
     GX_VA_TEX7MTXIDX,
 };
 
+/** Debug names of the lighting registers, printed by the transform verifier. */
 static u8 lightRegisterNames[13][256] = {
     "Light Color RGBA",
     "Cosine Attenuation A0",
@@ -539,7 +543,8 @@ static void CheckLight(u32 lightSource) {
  * Checks lighting channel COLOR0: that its colour and alpha control registers and the material
  * and ambient registers it reads were written, that the lights it uses are loaded,
  * that specular lights and the diffuse function agree,
- * and that lit channels get normals and a loaded normal matrix. NONMATCHING
+ * and that lit channels get normals and a loaded normal matrix. Not built in TTYD (debug-only
+ * verifier); upstream marks it as not matching.
  */
 static void CheckColor0(void) {
     char Preamble[256];
@@ -649,7 +654,8 @@ static void CheckColor0(void) {
  * Checks lighting channel COLOR1: that its colour and alpha control registers and the material
  * and ambient registers it reads were written, that the lights it uses are loaded,
  * that specular lights and the diffuse function agree,
- * and that lit channels get normals and a loaded normal matrix. NONMATCHING
+ * and that lit channels get normals and a loaded normal matrix. Not built in TTYD (debug-only
+ * verifier); upstream marks it as not matching.
  */
 static void CheckColor1(void) {
     u8 usingColor1;

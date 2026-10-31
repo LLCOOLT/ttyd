@@ -63,6 +63,10 @@ static const char* str_teresa[] = {"テレサ", "影の女王・衝撃波", NULL
 static const char* str_gonbaba_breath[] = {"通常", "ポイズン", "メガ", "コールド", "混乱", "眠り", "ミニミニ", "クッパ", NULL};
 static const char* str_ultra_hammer[] = {"左回り", "右回り", NULL};
 
+/**
+ * Every effect that event scripts can start by name (smoke, confetti, speech bubbles, butterflies, ...) with its
+ * id; the demo also keeps each one's Japanese name and type names. effGetSet looks scripts' effect names up here.
+ */
 EffectSet eff_set_table[] = {
     { 0, "kemuri", "けむり", str_kemuri },
     { 1, "confetti", "紙ふぶき", str_confetti },
@@ -148,6 +152,10 @@ EffectSet eff_set_table[] = {
     { -1, NULL, NULL, NULL },
 };
 #else
+/**
+ * Every effect that event scripts can start by name (smoke, confetti, speech bubbles, butterflies, ...) with
+ * its id; effGetSet looks the effect names of evt_eff script calls up here.
+ */
 EffectSet eff_set_table[] = {
     { 0, "kemuri" },
     { 1, "confetti" },

@@ -1,5 +1,6 @@
 #include "fdlibm.h"
 
+/** Large constant used to raise the inexact flag in floor. */
 static const double huge = 1.0e300;
 
 /** Largest integer value not greater than x, computed by masking off the fraction bits of the double. */

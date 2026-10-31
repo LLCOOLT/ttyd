@@ -203,9 +203,9 @@ EffectEntry* effMObjBrokenEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-// lifetimes optimisation off for effMObjBrokenMain: the original register allocation and scheduling need it
+// FAKE: lifetimes optimisation off for effMObjBrokenMain: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 /**
  * Per frame: throws each fragment outward with gravity, fades it and releases its pose;

@@ -2,6 +2,7 @@
 #include <dolphin/os.h>
 #include <dolphin/mix.h>
 
+/** One cycle of a sine wave in 64 steps, from 0 to 1 and back, for the sine LFO. */
 f32 AXARTSine[64] = {
    0.0f, 0.09802f, 0.19509f, 0.29028f, 0.38268f, 0.4714f, 0.55557f, 0.63439f,
    0.70711f, 0.77301f, 0.83147f, 0.88192f, 0.92388f, 0.95694f, 0.98079f, 0.99518f,
@@ -13,6 +14,7 @@ f32 AXARTSine[64] = {
    -0.70711f, -0.63439f, -0.55557f, -0.4714f, -0.38268f, -0.29028f, -0.19509f, -0.09802f,
 };
 
+/** One cycle of a square wave in 64 steps, for the square LFO. */
 static f32 AXARTSquare[64] = {
    1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
    1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
@@ -24,6 +26,7 @@ static f32 AXARTSquare[64] = {
    -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
 };
 
+/** One cycle of a rising sawtooth wave in 64 steps, for the sawtooth LFO. */
 static f32 AXARTSaw[64] = {
    -1.0f, -0.96875f, -0.9375f, -0.90625f, -0.875f, -0.84375f, -0.8125f, -0.78125f,
    -0.75f, -0.71875f, -0.6875f, -0.65625f, -0.625f, -0.59375f, -0.5625f, -0.53125f,
@@ -35,6 +38,7 @@ static f32 AXARTSaw[64] = {
    0.75f, 0.78125f, 0.8125f, 0.84375f, 0.875f, 0.90625f, 0.9375f, 0.96875f,
 };
 
+/** One cycle of a falling sawtooth wave in 64 steps, for the reverse sawtooth LFO. */
 static f32 AXARTReverseSaw[64] = {
    1.0f, 0.96875f, 0.9375f, 0.90625f, 0.875f, 0.84375f, 0.8125f, 0.78125f,
    0.75f, 0.71875f, 0.6875f, 0.65625f, 0.625f, 0.59375f, 0.5625f, 0.53125f,
@@ -46,6 +50,7 @@ static f32 AXARTReverseSaw[64] = {
    -0.75f, -0.78125f, -0.8125f, -0.84375f, -0.875f, -0.90625f, -0.9375f, -0.96875f,
 };
 
+/** One cycle of a triangle wave in 64 steps, for the triangle LFO. */
 static f32 AXARTTriangle[64] = {
    0.0f, 0.0625f, 0.125f, 0.1875f, 0.25f, 0.3125f, 0.375f, 0.4375f,
    0.5f, 0.5625f, 0.625f, 0.6875f, 0.75f, 0.8125f, 0.875f, 0.9375f,
@@ -57,6 +62,7 @@ static f32 AXARTTriangle[64] = {
    -0.5f, -0.4375f, -0.375f, -0.3125f, -0.25f, -0.1875f, -0.125f, -0.0625f,
 };
 
+/** 64 fixed pseudo-random values between -1 and 1, for the noise LFO. */
 static f32 AXARTNoise[64] = {
    -0.759363f, -0.805919f, -0.62015f, -0.78302f, 0.263439f, 0.467792f, -0.102506f, 0.700646f,
    0.852924f, 0.586413f, 0.32763f, 0.313143f, 0.66009f, 0.778686f, -0.698379f, -0.635841f,

@@ -1,8 +1,10 @@
 #include <dolphin/gd.h>
 #include <dolphin/os.h>
 
+/** Converts a GX minification filter to the hardware's filter field. */
 u8 GD2HWFiltConv[] = {0, 4, 1, 5, 2, 6};
 
+/** Register addresses of the texture mode, image and TLUT registers of the eight texture maps. */
 u8 GDTexMode0Ids[8] = {128, 129, 130, 131, 160, 161, 162, 163};
 u8 GDTexMode1Ids[8] = {132, 133, 134, 135, 164, 165, 166, 167};
 u8 GDTexImage0Ids[8] = {136, 137, 138, 139, 168, 169, 170, 171};

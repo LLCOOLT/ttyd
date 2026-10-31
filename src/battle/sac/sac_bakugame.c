@@ -4,7 +4,7 @@
 #include "icon_ids.h"
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-// inlining off for GetBakuGamePtr, USER_FUNC, USER_FUNC and 11 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 14 functions change length, e.g. bakuGameMain 1990 -> 2548 instructions
 #pragma dont_inline on
 #include "battle/battle.h"
 #include "battle/battle_audience.h"
@@ -134,6 +134,10 @@ static void bakuGameDisp2D(CameraId cam, void* param);
 static void bakuGameDisp3D(CameraId cam, void* param);
 static void bakuGameDispStar(CameraId cam, void* param);
 
+/**
+ * Clock Out's weapon template (2 SP): bakuGameDecideWeapon copies it and sets the Stop chance and length
+ * from the minigame result; the template's own Stop (100% for 1 turn) is 0 in the demos.
+ */
 static BattleWeapon weapon = {
     "btl_wn_sac_bakugame", // name
     ICON_198, // icon
@@ -155,7 +159,7 @@ static BattleWeapon weapon = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_sac_3", // acHelpMsg
@@ -279,8 +283,9 @@ static USER_FUNC(end_bakugame) {
  * Builds the move's weapon from the game result.
  * args[0] is the gauge (read but unused), args[1] the stop level from bakuGameMain (-1 = gauge empty: no Stop),
  * args[2] receives the weapon.
- * Stop lasts level - 1 turns (1 to 3); the chance is 100,
- * or 127 with a full gauge (Guess: 127 gets past Stop resistance).
+ * Stop lasts level - 1 turns (1 to 3); the chance is 100, or 127 with a full gauge.
+ * BattleSetStatusDamage scales the chance by the target's Stop rate,
+ * so 127 still lands for sure on targets with a rate of 79% or more.
  */
 static s32 bakuGameDecideWeapon(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
@@ -1350,8 +1355,9 @@ static void bakuGameEnemySurprise(void) {
 
 /**
  * The bomb lands in the crowd: waiting audience members come under event control;
- * the throwing seats play anim 3, the others anim 7 facing a random way (Guess: the throwers get ready, the rest
- * panic).
+ * the throwing seats play anim 3 (the back-facing hop of idle status 3),
+ * the others anim 7 (the walk of status 11) facing the stage or away at random.
+ * Guess: the throwers brace while the rest scramble.
  */
 static void bakuGameAudienceSurprise(void) {
     s32 i;
@@ -1572,20 +1578,20 @@ EVT_BEGIN(hitCheck_MarioTeam)
     IF_INT_EQUAL(LW(3), -1)
         GOTO(50)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INSTANT_KILL, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         GOTO(50)
     END_IF
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
     CALL(btlevtcmd_ACSuccessEffect, LW(2), LW(10), LW(11), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(50)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_MARIO, LW(3))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INSTANT_KILL, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
@@ -1596,7 +1602,7 @@ EVT_BEGIN(hitCheck_MarioTeam)
             CALL(btlevtcmd_AddRotate, LW(3), 0, 18, 0)
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         LOOP(5)
             CALL(btlevtcmd_AddRotate, LW(3), 0, 18, 0)
             WAIT_FRAMES(1)
@@ -1608,7 +1614,7 @@ EVT_BEGIN(hitCheck_MarioTeam)
     IF_INT_NOT_EQUAL(LW(2), -1)
         CALL(btlevtcmd_ACSuccessEffect, LW(2), LW(10), LW(11), LW(12))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(99)
     RETURN
 EVT_END()
@@ -1623,7 +1629,7 @@ EVT_BEGIN(hitCheck_EnemyTeam)
         IF_INT_NOT_EQUAL(LW(2), -1)
             CALL(btlevtcmd_ACSuccessEffect, LW(2), LW(10), LW(11), LW(12))
         END_IF
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -1633,8 +1639,8 @@ EVT_BEGIN(hitCheck_EnemyTeam)
 EVT_END()
 
 /**
- * The bomb blew up in the crowd: every audience member under system control in a normal state switches to status
- * 13 (evt_audience_abnormal_natural_all at 100%; Guess: knocked out or fleeing), and the success effect shows.
+ * The bomb blew up in the crowd: every audience member under system control in a normal state falls asleep
+ * (status 13 via evt_audience_abnormal_natural_all at 100%), and the success effect shows.
  */
 EVT_BEGIN(hitCheck_AudienceTeam)
     CALL(evt_audience_abnormal_natural_all, 100)

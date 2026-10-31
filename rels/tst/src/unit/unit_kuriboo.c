@@ -27,6 +27,7 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[492];
 static EvtWord wait_event[6];
 
+/** Unit definition of the Goomba: 2 HP, level 7, 1 part, with its sounds, init script and data table. */
 BattleUnitKind unit_kuriboo = {
     1,
     "btl_un_kuriboo",
@@ -93,6 +94,10 @@ BattleUnitKind unit_kuriboo = {
     data_table,
 };
 
+/**
+ * Pose table of the Goomba: its 20 battle poses (status, hurt and action) and the animation each one plays;
+ * the idle animation is `KUR_S_1`.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "KUR_N_1"},
     {2, "KUR_Y_1"},
@@ -116,25 +121,40 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
+/** Data table of the Goomba: event 48 does nothing (btldefaultevt_Dummy). */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/** Defence of the Goomba: none, so it takes full damage from every kind of attack. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type modifiers of the Goomba: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Goomba (100% is the normal chance): weak to Stop 120%, Fright 120%, Gale Force
+ * 120% and instant KO 150%.
+ */
 static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
 #else
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
 #endif
 
+/**
+ * Body of the Goomba: one targetable part, the model `c_kuribo`, with its hit box, defence tables and pose
+ * table.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_kuriboo", "c_kuribo", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Attack data of the Goomba's headbutt: hits one opposing unit for 1 damage; flips shelled enemies over;
+ * knocks flying enemies out of the air.
+ */
 static BattleWeapon weapon_kuriboo_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -153,7 +173,7 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -171,7 +191,11 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-/** Guess: init event of the Goomba: sets its work values and pose tables. */
+/**
+ * Init script of the Goomba: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack), sets its run,
+ * walk and jump sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -184,7 +208,9 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-/** Guess: damage event of the Goomba: runs the default damage flow. */
+/**
+ * Damage handler of the Goomba: runs the default damage script (btldefaultevt_Damage) for itself, part 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -192,16 +218,22 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-/** Guess: phase event of the Goomba (empty). */
+/** Phase script of the Goomba: does nothing (and init_event never installs it). */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
 /**
- * Guess: attack event of the Goomba: may use an item,
- * otherwise runs at one target and headbutts it for the weapon damage.
+ * Attack script of the Goomba: the target is the First Strike target in a battle-flag-2 battle,
+ * else a sampled enemy; it uses an enemy item instead if it decides to.
+ * It walks to 100 units in front of the target,
+ * then leaps onto it in a 32-frame arc while tilting along the flight path (krb_get_dir)
+ * and applies the guard result and the damage (weapon_kuriboo_attack, 1 damage);
+ * a miss carries it on with two small hops, a hit bounces it back. It then walks home.
  */
 static EVT_BEGIN(attack_event)
+    // Picks the target: the preset first-attack target when battle flag 2 is set, otherwise a random opposing unit;
+    // with no target it does nothing (or is flustered when confused).
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -212,19 +244,21 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_kuriboo_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Uses a held item if it has one to use.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // Declares the attack and pays its cost while the camera zooms in on the target.
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.5996094f))
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
@@ -234,17 +268,19 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_kuriboo_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // Wind-up: the Goomba runs past the target and out the far side, then turns around to face it.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(170)
+    // It curls up and spins as it leaps in a 32-frame jump at the target (the spin follows its direction of travel).
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
     BEGIN_INLINE_EVENT
@@ -268,6 +304,8 @@ static EVT_BEGIN(attack_event)
     END_INLINE_EVENT
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 32, -1)
+    // Checks the outcome of the hit: a miss, dodge or guard goes to the no-damage branch; a connecting hit applies
+    // the Action Command defence result and deals the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -290,6 +328,7 @@ static EVT_BEGIN(attack_event)
         GOTO(91)
         CASE_END
     END_SWITCH
+    // Miss branch: the jump is cut short and it hops back away from the target in two small bounces.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -302,6 +341,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
     WAIT_MS(500)
     GOTO(95)
+    // Hit branch: the camera shakes and pulls in, the headbutt lands with the attack sound, the defence result is
+    // read and the damage is applied, and the Goomba bounces back in three hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -321,6 +362,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 6, -1)
     GOTO(95)
+    // Walks back to its home position.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 3, 3, 0, 0)
@@ -357,7 +399,7 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
-/** Guess: wait (idle) event of the Goomba: sets the idle pose. */
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

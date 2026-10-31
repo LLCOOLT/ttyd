@@ -1,6 +1,5 @@
-#pragma once
-
 // Declarations shared by the win.rel units (ふしぎの森, Boggly Woods).
+#pragma once
 
 #include "dolphin/types.h"
 #include "driver/npcdrv.h"

@@ -14,6 +14,13 @@
 #include "data_tables.h"
 #include "battle/battle_sub.h"
 
+// Unit work slots of the Parabuzzy's Buzzy Beetle form (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_PATAMET_ON_CEILING = 0, // non-zero: hangs from the ceiling (battle setup); 0 once on the floor
+    UW_PATAMET_SPIN_STOP = 1,  // 1 stops the spin loop of the shell attack
+    UW_PATAMET_SPIN_SPEED = 2  // rotation per frame of that spin
+};
+
 BattleUnitKind unit_patamet;
 static BattleWeapon weapon_patamet_attack;
 static BattleUnitDefense defence_pata;
@@ -58,6 +65,7 @@ static EvtWord ceil_fall_ready_event[158];
 static EvtWord attack_event_ceil[467];
 static EvtWord wait_event_ceil[6];
 
+/** Unit data of the Parabuzzy: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_patamet = {
     89,
     "btl_un_patamet",
@@ -124,6 +132,7 @@ BattleUnitKind unit_patamet = {
     data_table_pata,
 };
 
+/** Attack data for the Parabuzzy's dive from the air: 3 damage. */
 static BattleWeapon weapon_patamet_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -142,7 +151,7 @@ static BattleWeapon weapon_patamet_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -160,16 +169,27 @@ static BattleWeapon weapon_patamet_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Defence of the Parabuzzy while it still has its wings: 4 against normal, ice and electric hits;
+ * immune to fire and explosions (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence_pata = {{4, 99, 4, 99, 4}};
 
+/** Element response of the Parabuzzy, flying form: it is immune to fire and explosions. */
 static BattleUnitDefenseAttr defence_attr_pata = {{0, 2, 0, 2, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Parabuzzy, flying form (percent, 0 is immune): immune to burn. Demo values. */
 static StatusVulnerability regist_pata = {75, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 95, 100, 75, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Parabuzzy, flying form (percent, 0 is immune): immune to burn. Released game
+ * values.
+ */
 static StatusVulnerability regist_pata = {75, 90, 105, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 90, 100, 75, 100, 100, 95};
 #endif
 
+/** Pose table of the Parabuzzy, flying form: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_pata[] = {
     {1, "PMT_N_1"},
     {2, "PMT_Y_1"},
@@ -177,30 +197,36 @@ static PoseTableEntry pose_table_pata[] = {
     {5, "PMT_K_1"},
     {4, "PMT_X_1"},
     {3, "PMT_X_1"},
-    {28, "PMT_S_1"},
+    {BTL_POSE_NORMAL, "PMT_S_1"},
     {29, "PMT_Q_1"},
     {30, "PMT_Q_1"},
     {31, "PMT_S_1"},
-    {39, "PMT_D_1"},
+    {BTL_POSE_DAMAGE, "PMT_D_1"},
     {50, "PMT_A_1"},
-    {42, "PMT_R_1"},
-    {40, "PMT_W_1"},
-    {56, "PMT_X_1"},
-    {57, "PMT_X_1"},
+    {BTL_POSE_RUN, "PMT_R_1"},
+    {BTL_POSE_WALK, "PMT_W_1"},
+    {BTL_POSE_DANGER, "PMT_X_1"},
+    {BTL_POSE_PERIL, "PMT_X_1"},
     {BTL_POSE_TALK, "PMT_S_1"},
     {BTL_POSE_STAY_DEFAULT, "PMT_S_1"},
 };
 
+/**
+ * Data table of the Parabuzzy, flying form: event handlers keyed by tag (dmg_fall_event_pata,
+ * dmg_first_attack_pos_event_pata).
+ */
 static BattleDataEntry data_table_pata[] = {
     {14, dmg_fall_event_pata},
     {48, dmg_first_attack_pos_event_pata},
     {0, NULL},
 };
 
+/** Body part of the Parabuzzy, flying form: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts_pata[] = {
     {1, "btl_un_patamet", "c_met", 0.0f, 0.0f, 0.0f, 0.0f, 20.0f, 0.0f, 0.0f, 25.0f, 0.0f, 20, 30, 255, &defence_pata, &defence_attr_pata, 0x600809, 0, pose_table_pata},
 };
 
+/** Sound table of the Parabuzzy: the sound each animation plays while it runs. */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"PMT_S_1", 0.01f, NULL, "SFX_ENM_PATAMET_WAIT1", 0, 1},
     {"PMT_W_1", 0.01f, NULL, "SFX_ENM_PATAMET_WAIT1", 0, 1},
@@ -243,15 +269,15 @@ EVT_END()
 static EVT_BEGIN(dmg_fall_event_pata)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_OffAttribute, LW(10), 4)
-    CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 2048)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+    CALL(btlevtcmd_OffAttribute, LW(10), UNIT_ATTR_FLOATING)
+    CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), PART_ATTR_WINGED)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table))
     CALL(btlevtcmd_ReplaceParts, LW(10), LW(11), PTR(parts), 1)
-    CALL(btlevtcmd_OnUnitFlag, LW(10), 4)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), UNIT_FLAG_KIND_CHANGED)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)
     CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
@@ -261,11 +287,11 @@ static EVT_BEGIN(dmg_fall_event_pata)
     CALL(btlevtcmd_GetHpDamageCount, LW(10), LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
         CALL_CHILD(init_event)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
         RETURN
     ELSE
         CALL_CHILD(init_event)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
         CALL_CHILD(dmg_turn_event)
     END_IF
     RETURN
@@ -291,6 +317,8 @@ EVT_END()
  * then flies back up and returns to its home position. If it has no target it can be flustered when confused.
  */
 static EVT_BEGIN(attack_event_pata)
+    // After a First Strike it attacks right away; otherwise it uses an item if it has one, or picks a target
+    // (a confused Parabuzzy with nobody to hit gets flustered).
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -306,7 +334,7 @@ static EVT_BEGIN(attack_event_pata)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_patamet_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -318,18 +346,21 @@ static EVT_BEGIN(attack_event_pata)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_patamet_attack))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_patamet_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It flaps up over the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PATAMET_MOVE1"), EVT_NULLPTR, 0, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, FLOAT(1.0f), 0, 0, -1)
     WAIT_MS(250)
     CALL(evt_snd_sfxoff, LW(15))
+    // It folds its wings and dives straight at the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PATAMET_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(9.0f))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
@@ -337,7 +368,8 @@ static EVT_BEGIN(attack_event_pata)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 10)
     SUBTRACT(LW(1), 30)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -10, 0, 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patamet_attack), 256, LW(5))
+    // Find out whether the dive connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patamet_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -359,6 +391,7 @@ static EVT_BEGIN(attack_event_pata)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss or dodge: it swoops past and hovers there for a moment.
     LABEL(90)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -367,15 +400,17 @@ static EVT_BEGIN(attack_event_pata)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 0, 0, -1)
     WAIT_MS(300)
     GOTO(98)
+    // Hit: the damage is dealt.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_patamet_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patamet_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patamet_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PATAMET_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // It flies back up and home.
     LABEL(98)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -10, 0, 0, -1)
@@ -391,6 +426,7 @@ static EVT_BEGIN(wait_event_pata)
     RETURN
 EVT_END()
 
+/** Pose table of the Parabuzzy: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "MET_N_1"},
     {2, "MET_Y_1"},
@@ -398,20 +434,21 @@ static PoseTableEntry pose_table[] = {
     {5, "MET_K_1"},
     {4, "MET_X_1"},
     {3, "MET_X_1"},
-    {28, "MET_S_1"},
+    {BTL_POSE_NORMAL, "MET_S_1"},
     {29, "MET_Q_1"},
     {30, "MET_Q_1"},
     {31, "MET_A_1"},
-    {39, "MET_D_1"},
+    {BTL_POSE_DAMAGE, "MET_D_1"},
     {50, "MET_A_1"},
-    {40, "MET_W_1"},
-    {42, "MET_R_1"},
-    {56, "MET_X_1"},
-    {57, "MET_X_1"},
+    {BTL_POSE_WALK, "MET_W_1"},
+    {BTL_POSE_RUN, "MET_R_1"},
+    {BTL_POSE_DANGER, "MET_X_1"},
+    {BTL_POSE_PERIL, "MET_X_1"},
     {BTL_POSE_TALK, "MET_T_1"},
     {BTL_POSE_STAY_DEFAULT, "MET_S_1"},
 };
 
+/** Pose table of the Parabuzzy, on the ceiling: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_ceil[] = {
     {1, "SMT_N_1"},
     {2, "SMT_Y_1"},
@@ -419,20 +456,21 @@ static PoseTableEntry pose_table_ceil[] = {
     {5, "SMT_K_1"},
     {4, "SMT_X_1"},
     {3, "SMT_X_1"},
-    {28, "SMT_S_1"},
+    {BTL_POSE_NORMAL, "SMT_S_1"},
     {29, "SMT_Q_1"},
     {30, "SMT_Q_1"},
     {31, "SMT_A_1"},
-    {39, "SMT_D_1"},
+    {BTL_POSE_DAMAGE, "SMT_D_1"},
     {50, "SMT_A_1"},
-    {40, "SMT_W_1"},
-    {42, "SMT_R_1"},
-    {56, "SMT_X_1"},
-    {57, "SMT_X_1"},
+    {BTL_POSE_WALK, "SMT_W_1"},
+    {BTL_POSE_RUN, "SMT_R_1"},
+    {BTL_POSE_DANGER, "SMT_X_1"},
+    {BTL_POSE_PERIL, "SMT_X_1"},
     {BTL_POSE_TALK, "SMT_S_1"},
     {BTL_POSE_STAY_DEFAULT, "SMT_S_1"},
 };
 
+/** Pose table of the Parabuzzy, flipped on its back: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_turn[] = {
     {1, "MET_N_2"},
     {2, "MET_Y_2"},
@@ -440,27 +478,29 @@ static PoseTableEntry pose_table_turn[] = {
     {5, "MET_K_2"},
     {4, "MET_X_2"},
     {3, "MET_X_2"},
-    {28, "MET_S_2"},
+    {BTL_POSE_NORMAL, "MET_S_2"},
     {29, "MET_Q_2"},
     {30, "MET_Q_2"},
     {31, "MET_A_1"},
-    {39, "MET_D_3"},
+    {BTL_POSE_DAMAGE, "MET_D_3"},
 #if VERSION >= VERSION_JP
     {50, "MET_A_1"},
-    {40, "MET_W_1"},
+    {BTL_POSE_WALK, "MET_W_1"},
 #endif
-    {56, "MET_X_2"},
-    {57, "MET_X_2"},
+    {BTL_POSE_DANGER, "MET_X_2"},
+    {BTL_POSE_PERIL, "MET_X_2"},
     {BTL_POSE_TALK, "MET_S_2"},
     {BTL_POSE_STAY_DEFAULT, "MET_S_2"},
 };
 
+/** Data table of the Parabuzzy: event handlers keyed by tag (dmg_turn_event). */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0},
 };
 
+/** Data table of the Parabuzzy, on the ceiling: event handlers keyed by tag (counter_damage_event_ceil). */
 static BattleDataEntry data_table_ceil[] = {
     {26, counter_damage_event_ceil},
     {25, counter_damage_event_ceil},
@@ -478,6 +518,7 @@ static BattleDataEntry data_table_ceil[] = {
     {0},
 };
 
+/** Attack data for the Parabuzzy's spiked shell roll: 3 damage. */
 static BattleWeapon weapon_met_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -496,7 +537,7 @@ static BattleWeapon weapon_met_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -514,6 +555,7 @@ static BattleWeapon weapon_met_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Parabuzzy's drop from the ceiling: 4 damage. */
 static BattleWeapon weapon_met_ceil_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -532,7 +574,7 @@ static BattleWeapon weapon_met_ceil_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -550,20 +592,30 @@ static BattleWeapon weapon_met_ceil_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Defence of the Parabuzzy once it has lost its wings: 4 against normal, ice and electric hits;
+ * immune to fire and explosions (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{4, 99, 4, 99, 4}};
 
+/** Element response of the Parabuzzy: it is immune to fire and explosions. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 2, 0}};
 
+/** Damage reduction of the Parabuzzy, flipped on its back: none, every attack type does full damage. */
 static BattleUnitDefense defence_turn = {0};
 
+/** Element response of the Parabuzzy, flipped on its back: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Parabuzzy (percent, 0 is immune): immune to burn. Demo values. */
 static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 65, 100, 75, 100, 100, 95};
 #else
+/** Status vulnerability of the Parabuzzy (percent, 0 is immune): immune to burn. Released game values. */
 static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 30, 100, 75, 100, 100, 95};
 #endif
 
+/** Body part of the Parabuzzy: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
     {
         1, // partNum
@@ -588,7 +640,7 @@ static BattleUnitKindPart parts[] = {
  * runs init_event2 to set up the handlers for its current position (floor or ceiling), then starts it waiting.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_PATAMET_ON_CEILING, LW(15))
     CALL_CHILD(init_event2)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -606,19 +658,19 @@ EVT_END()
  * Both cases set the run and walk sounds and clear its flip count.
  */
 static EVT_BEGIN(init_event2)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_PATAMET_ON_CEILING, LW(15))
     IF_INT_EQUAL(LW(15), 0)
         CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
         CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
         CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
         CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
         CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 4096)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELLED)
         CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     ELSE
-        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 2)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+        CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_ceil))
         CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_ceil))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -659,9 +711,9 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 1)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(4)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
@@ -689,7 +741,7 @@ static EVT_BEGIN(wakeup_event)
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -712,11 +764,14 @@ EVT_END()
  * Afterwards it walks home. If it has no target it can be flustered when confused.
  */
 static EVT_BEGIN(attack_event)
+    // If the Parabuzzy is lying on its back it gets up instead of attacking.
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // Pick the target (the First Strike target, or an enemy item use, or a sampled enemy); a confused
+    // Parabuzzy with nobody to hit gets flustered.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -733,7 +788,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_met_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -745,12 +800,14 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_met_attack))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_met_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(100)
+    // It hops, curls into its shell and starts spinning.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -758,25 +815,26 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_ATTACK2"), EVT_NULLPTR, 0, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_STOP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_SPEED, 0)
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_STOP, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_SPEED, 10)
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_SPEED, 20)
     WAIT_MS(100)
+    // It slides along the floor toward the target, trailing smoke.
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -791,7 +849,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 0)
     DELETE_EVENT(LW(13))
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), 256, LW(5))
+    // Find out whether the roll connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -813,14 +872,15 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss or dodge: it skids past, stops spinning and hops back upright.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 100)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0, 0)
     WAIT_MS(250)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_SPEED, 10)
     WAIT_MS(250)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_STOP, 1)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
@@ -829,11 +889,12 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     GOTO(98)
+    // Hit: the damage is dealt and the Parabuzzy bounces off in two hops.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_met_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_SPEED, 10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
@@ -844,10 +905,11 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_SPIN_STOP, 1)
     GOTO(98)
+    // Walk back home.
     LABEL(98)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -872,9 +934,9 @@ static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -883,7 +945,7 @@ static EVT_BEGIN(damage_event_ceil)
     IF_INT_EQUAL(LW(12), 0)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(ceil_fall_ready_event)
     END_IF
@@ -897,12 +959,12 @@ EVT_END()
  * re-runs init_event2 and runs the shared counter-damage script.
  */
 static EVT_BEGIN(counter_damage_event_ceil)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_ON_CEILING, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 12, 15, 0)
@@ -929,12 +991,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 15, LW(2), 15, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_LANDING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_turn))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_ON_CEILING, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 12, 15, 0)
@@ -945,7 +1007,7 @@ static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 1)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -963,6 +1025,8 @@ EVT_END()
  * hops back to its original x position and runs init_event2 to continue as a floor unit.
  */
 static EVT_BEGIN(attack_event_ceil)
+    // Pick the target (the First Strike target, or an enemy item use, or a sampled enemy); a confused
+    // Parabuzzy with nobody to hit gets flustered.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -978,7 +1042,7 @@ static EVT_BEGIN(attack_event_ceil)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_met_ceil_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -992,17 +1056,20 @@ static EVT_BEGIN(attack_event_ceil)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_met_ceil_attack))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_met_ceil_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(100)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // It crawls along the ceiling until it is above the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(11), LW(12), 60, -1, 1)
+    // It curls up and drops onto the target with a falling sound.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     WAIT_MS(250)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1013,7 +1080,8 @@ static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 18, LW(2), 15, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_LANDING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), 256, LW(5))
+    // Find out whether the drop connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1037,10 +1105,12 @@ static EVT_BEGIN(attack_event_ceil)
     END_SWITCH
     LABEL(90)
     GOTO(98)
+    // Hit: the damage is dealt.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_met_ceil_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_met_ceil_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
+    // The Parabuzzy wobbles on the floor, then leaves the ceiling for good and goes back to its floor tables.
     LABEL(98)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, -18, 0)
     SET_FLOAT_VALUE(LW(12), FLOAT(30.0f))
@@ -1054,12 +1124,12 @@ static EVT_BEGIN(attack_event_ceil)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_CEILING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_PATAMET_ON_CEILING, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 12, 15, 0)
@@ -1068,13 +1138,14 @@ static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 25)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Two hops back to its old column, then it walks home and restarts as a floor unit.
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.5f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 25)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(7), 0, LW(9))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(7), 0, LW(9), 0, -1, 0)

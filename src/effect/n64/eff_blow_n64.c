@@ -30,6 +30,7 @@ typedef struct EffBlowN64Work {
     s32 delay;    // 0x64
 } EffBlowN64Work;
 
+/** Camera-facing 16x16 quad each blown streak is stretched and rotated from. */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF},
     {8, -8, 0, 1024, 0, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -143,8 +144,8 @@ EffectEntry* effBlowN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 dx, f
 /**
  * Launches streaks in waves (two frames apart per group of five):
  * each moves along the direction with drag, widens and shortens late in its life, then loses speed and alpha.
- * Streaks respawn while state is 0; the effect ends once state reaches 2 (Unknown: what sets state to 1,
- * nothing in this file does).
+ * Streaks respawn while state is 0; the effect ends once state goes from 1 to 2.
+ * Nothing in the tree sets state 1 (and no script spawns blow_n64), so as built it runs until deleted.
  */
 static void effBlowMain(EffectEntry* effect) {
     EffBlowN64Work* work = effect->userdata;

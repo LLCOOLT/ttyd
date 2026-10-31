@@ -27,6 +27,10 @@ typedef struct V3 {
 } V3;
 #define KPW(m) ((m)->kpaWork)
 
+/**
+ * Bowser's walk and dash speeds per power-up level in 3D stages (kpa_walk, kpa_dash), then the walk animation
+ * rates stored with them (all 0), then the scale-flicker steps of the power-up and power-down motions.
+ */
 f32 _walkSpdTbl[4] = {0.6f, 1.4f, 1.4f, 1.4f};
 f32 _dashSpdTbl[4] = {1.2f, 2.0f, 2.0f, 2.0f};
 s32 _rateTbl[4] = {0, 0, 0, 0};
@@ -200,7 +204,7 @@ void kpa_stay(void) {
         mario->multiTimer = 0;
         mario->currSubMotionId = 0;
         if (kpaGetAttackMode() == 0) {
-            if (!(KPW(mario)->flags & 0x1000000)) {
+            if (!(KPW(mario)->flags & KPA_WORK_FLAG_WEARY)) {
                 kpaChgPose("KPA_S_1", "KPA2_S_1");
             } else {
                 kpaChgPose("KPA_S_2", "KPA2_S_1");
@@ -251,7 +255,7 @@ void kpa_walk(void) {
         if (kpaGetStageViewType() == 0) {
             if (m->controlStickSensitivity) {
                 kpaChgPose("KPA_W_1", "KPA2_W_1");
-            } else if (!(KPW(m)->flags & 0x1000000)) {
+            } else if (!(KPW(m)->flags & KPA_WORK_FLAG_WEARY)) {
                 kpaChgPose("KPA_W_1", "KPA2_W_1");
             } else {
                 kpaChgPose("KPA_W_2", "KPA2_W_1");
@@ -260,7 +264,7 @@ void kpa_walk(void) {
             kpaChgPose("KPA_W_1", "KPA2_W_1");
         }
 #else
-        if (!(KPW(m)->flags & 0x1000000)) {
+        if (!(KPW(m)->flags & KPA_WORK_FLAG_WEARY)) {
             kpaChgPose("KPA_W_1", "KPA2_W_1");
         } else {
             kpaChgPose("KPA_W_2", "KPA2_W_1");
@@ -499,12 +503,12 @@ void kpa_fall(void) {
     }
     mario->airTimer++;
     if (kpaGetStageType() == 1 && kpaGetBodyStatus() <= 1) {
-        KPW(mario)->flags |= 0x100;
+        KPW(mario)->flags |= KPA_WORK_FLAG_SPLASH_PENDING;
     }
     if (kpaGetBodyStatus() == 2) {
         mario = marioGetPtr();
         if (mario->currMotionId != MARIO_MOTION_KPA_SWIM) {
-            marioChgMot2(0x25);
+            marioChgMot2(MARIO_MOTION_KPA_SWIM);
         }
         kpaClearHitobjRide();
         mario->flags &= ~MARIO_FLAG_IS_JUMPING;
@@ -569,7 +573,7 @@ void kpa_hip(void) {
             if (hit) {
                 mario->hitobjStandOn = hit;
                 mario->hitobjJumpFrom = NULL;
-                mario->currMotionId = 0x11;
+                mario->currMotionId = MARIO_MOTION_HIP_2;
                 mario->currSubMotionId = 0x15;
                 mario->multiTimer = 0x14;
                 mario->position.y = y;
@@ -618,7 +622,9 @@ BOOL kpaPowUp(void) {
 /**
  * Damage: shrinks Bowser one level with the power-down motion and 3 seconds without hits, returning TRUE;
  * at the smallest level sets KpaWork flag 0x10000000 instead and returns FALSE.
- * Guess: that flag means he loses a life. Called from the NPC contact code.
+ * Called from the NPC contact code.
+ * That flag is Bowser's death: the Super Koopa Bros. stage scripts poll it with evt_koopa_chk_dead
+ * and run kpa_dead, which plays his defeat and restarts the stage.
  */
 BOOL kpaPowDown(void) {
     MarioWork* mario = marioGetPtr();
@@ -629,7 +635,7 @@ BOOL kpaPowDown(void) {
         marioChgMot(MARIO_MOTION_KPA_POW_DOWN);
         return TRUE;
     }
-    KPW(mario)->flags |= 0x10000000;
+    KPW(mario)->flags |= KPA_WORK_FLAG_DEAD;
     return FALSE;
 }
 
@@ -846,7 +852,7 @@ void kpa_swim(void) {
         mario->currSubMotionId = 0;
         mario->baseSpeed = 0.0f;
         mario->kpaSpeed = 0.0f;
-        KPW(marioGetPtr())->flags |= 0x10;
+        KPW(marioGetPtr())->flags |= KPA_WORK_FLAG_NO_HIP_ATTACK;
     }
     if (mario->buttonTrg & PAD_BUTTON_B) {
         kpaAttackStart2();
@@ -938,7 +944,7 @@ void kpa_swim(void) {
             }
             break;
         case 20:
-            KPW(mario)->flags |= 0x100;
+            KPW(mario)->flags |= KPA_WORK_FLAG_SPLASH_PENDING;
             mario->flags &= ~MARIO_FLAG_IS_FALLING;
             mario->flags |= MARIO_FLAG_IS_JUMPING;
             kpaChgPose("KPA_J_1A", "KPA2_J_1A");
@@ -964,8 +970,8 @@ void kpa_swim(void) {
     }
     switch ((s32)mario->currSubMotionId) {
         case 0x1E:
-            if (KPW(mario)->flags & 0x100) {
-                KPW(mario)->flags &= ~0x100;
+            if (KPW(mario)->flags & KPA_WORK_FLAG_SPLASH_PENDING) {
+                KPW(mario)->flags &= ~KPA_WORK_FLAG_SPLASH_PENDING;
                 psndSFXOn_3D((const char*)0x827, &mario->position);
             }
             if (kpaGetAttackMode() == 0) {

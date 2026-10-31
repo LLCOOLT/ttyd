@@ -33,8 +33,9 @@ USER_FUNC(lect_set_systemlevel) {
 }
 
 /**
- * Unknown: reads the system level with marioStGetSystemLevel and discards the result; no arguments.
- * Likely a leftover debug check.
+ * Has no effect: reads the system level with marioStGetSystemLevel and discards the result; no arguments.
+ * The lecture scripts of every area (evt_lect_dou, evt_lect_gor, evt_lect_tik ...) still call it.
+ * Guess: a leftover debug check.
  */
 USER_FUNC(lect_test_systemlevel) {
     marioStGetSystemLevel();

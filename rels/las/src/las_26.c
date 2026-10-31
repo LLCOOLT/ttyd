@@ -61,6 +61,7 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/** Exits of las_26: west door w_bero to las_25 (e_bero_1); south entrance s_bero to las_28 (from26). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -115,6 +116,7 @@ EVT_END()
  * throws up the Star Key chest, and the story moves to STORY_STG8_04_GLOOMTAIL.
  */
 EVT_BEGIN(bonbaba_evt)
+    // Mario and his partner walk into the garden and the door shuts behind them.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -144,6 +146,7 @@ EVT_BEGIN(bonbaba_evt)
         END_IF
     END_LOOP
     WAIT_MS(500)
+    // A voice from the dark calls to them; Mario and his partner are startled and the danger music starts.
     CALL(evt_msg_print, 0, STRING("stg8_las_44"), 0, STRING("ボンババ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
@@ -157,6 +160,7 @@ EVT_BEGIN(bonbaba_evt)
     WAIT_MS(1000)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
     BEGIN_INLINE_EVENT
+        // Gloomtail roars and steps into view, shaking the ground with each step.
         CALL(evt_snd_sfxon_3d_ex, STRING("SFX_STG8_GNB_ROAR1"), -400, 30, 0, 255, 255, 4300, 16, 0)
         CALL(evt_npc_set_anim, STRING("ボンババ"), STRING("GNB_U_1"))
         CALL(evt_npc_wait_anim, STRING("ボンババ"), FLOAT(1.0f))
@@ -178,6 +182,7 @@ EVT_BEGIN(bonbaba_evt)
     ADD(LW(0), -200)
     ADD(LW(1), 100)
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
+    // He threatens Mario and his partner answers (stg8_las_45 to stg8_las_48).
     CALL(evt_msg_print, 0, STRING("stg8_las_45"), 0, STRING("ボンババ"))
     CALL(evt_party_stop, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kesu"), MAPOBJ_FLAG_HIDE)
@@ -204,6 +209,7 @@ EVT_BEGIN(bonbaba_evt)
 #if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
 #endif
+    // The battle with Gloomtail starts and the script waits for it to end.
     CALL(evt_npc_set_battle_info, STRING("ボンババ"), 14)
     CALL(evt_npc_battle_start, STRING("ボンババ"))
     CALL(evt_npc_wait_battle_end)
@@ -214,6 +220,7 @@ EVT_BEGIN(bonbaba_evt)
     CALL(evt_cam3d_evt_set, 0, 25, 845, 0, 100, 150, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_npc_set_position, STRING("ボンババ"), 0, 70, -100)
+    // Beaten, Gloomtail collapses in the middle of the room with a heavy thud.
     CALL(evt_snd_sfxon, STRING("SFX_STG8_GNB_DOWN1"), 0)
     CALL(evt_npc_set_anim, STRING("ボンババ"), STRING("GNB_H_1"))
     CALL(evt_mario_set_pos, 25, 10, 150)
@@ -250,6 +257,7 @@ EVT_BEGIN(bonbaba_evt)
     WAIT_MS(600)
     CALL(evt_cam3d_evt_set, 255, 220, 648, 255, 170, 150, 1000, 11)
     WAIT_MS(1000)
+    // His mouth opens and he spits out the chest holding the Star Key.
     CALL(evt_mobj_itembox, STRING("box"), 270, 60, 0, 0, 0, PTR(box_evt), GSWF(GSWF_LAS26_STAR_KEY_CHEST_OPENED))
     CALL(evt_mobj_flag_onoff, 0, STRING("box"), MOBJ_FLAG_FALL)
     BEGIN_INLINE_EVENT
@@ -326,6 +334,7 @@ EVT_BEGIN(bonbaba_evt)
     CALL(evt_eff_fukidashi, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60)
 #endif
     WAIT_MS(1000)
+    // Mario notices the chest; the story advances and he regains control.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_04_GLOOMTAIL)
     CALL(evt_hitobj_onoff, STRING("baba"), 1, 1)
     CALL(evt_npc_flag_onoff, 1, STRING("ボンババ"), NPC_FLAG_INTANGIBLE)
@@ -369,6 +378,7 @@ static USER_FUNC(bonbaba_wait_landon) {
     return npcNameToPtr("\x83\x7B\x83\x93\x83\x6F\x83\x6F")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** The single NPC of the room, Gloomtail (ボンババ), who always stays visible and never turns to face Mario. */
 static NpcSetupInfo npcEnt[] = {
     {
         "ボンババ", // name

@@ -56,8 +56,12 @@ typedef struct PendulumWork {
 
 #define PC_PARAMS(work) ((PendulumParams*)&(work)->actionCommands)
 
-// inlining off for battleAcMain_PendulumCraneTiming, battleAcResult_PendulumCraneTiming, battleAcDisp_PendulumCraneTiming and 4 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 2 functions change length, e.g. battleAcDisp_PendulumCraneTiming 64 -> 341 instructions
 #pragma dont_inline on
+/**
+ * Shell Shield HP by swing position, as pairs of (upper end of the position range 0-100, HP):
+ * 2 at the ends rising to 8 in the middle. Used by Koops's Shell Shield and to colour its gauge.
+ */
 u16 _hp_tbl[] = {20, 2, 35, 4, 45, 6, 55, 8, 65, 6, 80, 4, 100, 2};
 
 static s32 _get_angle_hp(s32 hp);
@@ -208,7 +212,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             }
             break;
         case 1002:
-            ac->doneFlags |= 1;
+            ac->doneFlags |= AC_DONE_FLAG_FINISHED;
             cw->endTimer = 60;
             if (cw->sfxId != 0xFFFFFFFF) {
                 psndSFXOff(cw->sfxId);
@@ -274,7 +278,7 @@ void battleAcDisp_PendulumCraneTiming(CameraId cameraId, void* param) {
 
 /** Called by btlevtcmd_StopAC: unless the command already finished, stops its sound and starts the end wait. */
 void battleAcDelete_PendulumCraneTiming(BattleWork* work) {
-    if ((u32)work->actionCommands.doneFlags & 1) {
+    if ((u32)work->actionCommands.doneFlags & AC_DONE_FLAG_FINISHED) {
         return;
     }
     work->actionCommands.acState = 1002;

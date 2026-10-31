@@ -29,6 +29,10 @@ static EvtWord song_event[300];
 static EvtWord escape_event[96];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Amazy Dayzee in the Pit of 100 Trials: 20 HP, level 100;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_twinkling_pansy = {
     70,
     "btl_un_twinkling_pansy",
@@ -95,20 +99,42 @@ BattleUnitKind unit_twinkling_pansy = {
     data_table,
 };
 
+/**
+ * Defence of the Amazy Dayzee against each element (normal, fire, ice, explosion, electric):
+ * 1 against every element, so each hit is cut by 1.
+ */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/**
+ * Damage modifiers of the Amazy Dayzee per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of the Amazy Dayzee:
+ * percent chance that each status takes hold (100 is normal);
+ * strongly resistant to Stop, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist = {95, 10, 10, 100, 10, 100, 100, 10, 100, 10, 100, 10, 100, 10, 10, 100, 80, 100, 10, 100, 100, 10};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of the Amazy Dayzee:
+ * percent chance that each status takes hold (100 is normal);
+ * strongly resistant to Stop, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist = {50, 10, 10, 100, 30, 100, 100, 10, 100, 10, 100, 10, 100, 10, 10, 100, 60, 100, 10, 100, 100, 10};
 #endif
 
+/** Part of the Amazy Dayzee: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_twinkling_pansy", "c_kpansy", 0.0f, 0.0f, 0.0f, 0.0f, 29.0f, 0.0f, 0.0f, 34.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_twinkling_pansy", "c_kpansy", 0.0f, 0.0f, 0.0f, 0.0f, 29.0f, 0.0f, 0.0f, 34.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Weapon of the Amazy Dayzee's song, which hits the whole party: damage 20; inflicts Sleep (75%). */
 static BattleWeapon weapon_twinkling_pansy_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -131,7 +157,7 @@ static BattleWeapon weapon_twinkling_pansy_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -182,6 +208,9 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Pose table of the Amazy Dayzee: animation names for each pose type (idle, walk, hurt, attack and so on).
+ */
 static PoseTableEntry pose_table[] = {
     {1, "PAN_N_1"},
     {2, "PAN_Y_1"},
@@ -203,6 +232,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "PAN_S_1"},
 };
 
+/**
+ * Data table of the Amazy Dayzee: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
@@ -245,7 +278,7 @@ LABEL(99)
 RETURN
 EVT_END()
 
-/** Guess: damage event of a sword: runs the default damage reaction. */
+/** Damage event of the Amazy Dayzee: runs the default damage reaction (btldefaultevt_Damage) for its part 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -254,17 +287,20 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Guess: the Amazy Dayzee's song attack: it picks targets with the weapon in LW(9),
- * turns to face them and sings (ATTACK1 sound, music-note effects drifting the way it faces)
- * while the screen darkens with a map blend, then the damage check runs on every target in turn (PreCheckDamage,
+ * The Amazy Dayzee's song attack (weapon_twinkling_pansy_attack: hits every target,
+ * 75% chance of Sleep for 5 turns):
+ * it picks targets with the weapon in LW(9), turns to face them and sings (ATTACK1 sound, music-note effects
+ * drifting the way it faces) while map blend 0 tints the stage (red channel down to 192),
+ * then the damage check runs on every target in turn (PreCheckDamage,
  * avoid poses, CheckDamage with the defence result on the first) and the lighting fades back to normal.
  */
 static EVT_BEGIN(song_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -272,6 +308,7 @@ static EVT_BEGIN(song_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -287,6 +324,7 @@ static EVT_BEGIN(song_event)
         SUBTRACT(LW(0), 2)
         WAIT_FRAMES(1)
     END_LOOP
+    // The Amazy Dayzee sings: music notes drift out while the stage tints darker.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     BEGIN_SIBLING_EVENT
@@ -303,8 +341,9 @@ static EVT_BEGIN(song_event)
     WAIT_FRAMES(120)
     SET_VALUE(LW(6), 0)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+    // Check every target in turn: a miss makes it dodge, a hit deals damage.
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -326,14 +365,17 @@ static EVT_BEGIN(song_event)
         GOTO(97)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     GOTO(97)
+    // The attack connects.
     LABEL(91)
     IF_INT_EQUAL(LW(6), 0)
+        // Deal the damage, reduced by the action command defence.
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -341,6 +383,7 @@ static EVT_BEGIN(song_event)
         GOTO(98)
     END_IF
     GOTO(10)
+    // All targets done: the stage lighting fades back to normal.
     LABEL(98)
     SET_VALUE(LW(0), 192)
     SET_VALUE(LW(1), 255)
@@ -356,6 +399,7 @@ static EVT_BEGIN(song_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
+    // The attack is over; back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -372,7 +416,7 @@ static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 180, 0)
     WAIT_MS(250)
     CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, 1, 255, 255, 255, 255, 100, 100, 100, 100, 0)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 67108864)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ESCAPE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
@@ -380,13 +424,13 @@ static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ESCAPE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(9.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, 300, LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 67108864)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
     WAIT_MS(500)
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN
 EVT_END()
 
-/** Guess: wait (idle) event of horde group 2: keeps the default idle pose. */
+/** Wait event of the Amazy Dayzee: hands part 1 back to its pose table (the idle pose for its current state). */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

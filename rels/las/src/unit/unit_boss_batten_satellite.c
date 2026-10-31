@@ -1,4 +1,4 @@
-// Palace of Shadow battle unit: the Grodus X, the satellites Sir Grodus summons (`boss_batten_satellite`): parts, stats, poses and AI scripts.
+// Palace of Shadow battle unit: Grodus X, the satellites Sir Grodus summons (`boss_batten_satellite`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -35,6 +35,7 @@ static EvtWord attack_event[10];
 extern EvtWord batten_satellite_attack_attack_event[];
 static EvtWord wait_event[6];
 
+/** Weapon of Grodus X's attack: damage 4. */
 BattleWeapon weapon_batten_satellite_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -53,7 +54,7 @@ BattleWeapon weapon_batten_satellite_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -71,6 +72,10 @@ BattleWeapon weapon_batten_satellite_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Unit data of Grodus's satellite (Grodus X) in the Palace of Shadow: 3 HP;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_boss_batten_satellite = {
     147,
     "btl_un_batten_satellite",
@@ -134,7 +139,7 @@ BattleUnitKind unit_boss_batten_satellite = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     1,
     parts,
@@ -142,16 +147,38 @@ BattleUnitKind unit_boss_batten_satellite = {
     data_table,
 };
 
+/**
+ * Defence of Grodus's satellite (Grodus X) against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of Grodus's satellite (Grodus X) per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Grodus's satellite (Grodus X):
+ * percent chance that each status takes hold (100 is normal); immune to Sleep, Poison, Fright;
+ * strongly resistant to Confuse.
+ */
 static StatusVulnerability regist = {0, 75, 75, 0, 10, 100, 100, 75, 100, 75, 100, 75, 100, 75, 75, 0, 75, 100, 75, 100, 100, 90};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Grodus's satellite (Grodus X):
+ * percent chance that each status takes hold (100 is normal); immune to Sleep, Poison, Fright;
+ * strongly resistant to Confuse.
+ */
 static StatusVulnerability regist = {0, 75, 90, 0, 10, 100, 100, 75, 100, 75, 100, 75, 100, 95, 75, 0, 90, 100, 75, 100, 100, 90};
 #endif
 
+/**
+ * Pose table of Grodus's satellite (Grodus X): animation names for each pose type (idle, walk, hurt, attack
+ * and so on).
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -173,6 +200,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Data table of Grodus's satellite (Grodus X): event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {24, dmg_counter_event},
     {25, dmg_counter_event},
@@ -198,7 +229,7 @@ static BattleDataEntry data_table[] = {
  * and turns the satellite to face the hit direction, and starts it falling with acceleration 1.
  */
 EVT_BEGIN(dmg_counter_event)
-    CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), UNIT_FLAG_SHOW_HP_GAUGE)
     SWITCH(LW(0))
         CASE_EQUAL(43)
         CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS3"), 0)
@@ -223,9 +254,9 @@ EVT_BEGIN(dmg_counter_event)
     CALL(btlevtcmd_DivePosition, LW(10), LW(2), LW(3), LW(4), 10, 0, 0, 0, -1)
     WAIT_MS(500)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, LW(10), 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -244,8 +275,9 @@ EVT_BEGIN(dmg_counter_event)
     RETURN
 EVT_END()
 
+/** Part of Grodus's satellite (Grodus X): its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_batten_satellite", "c_shuryo_p", 0.0f, 0.0f, 0.0f, -4.0f, -2.0f, 0.0f, -6.0f, 1.0f, 0.0f, 14, 14, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
+    {1, "btl_un_batten_satellite", "c_shuryo_p", 0.0f, 0.0f, 0.0f, -4.0f, -2.0f, 0.0f, -6.0f, 1.0f, 0.0f, 14, 14, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 };
 
 /**
@@ -258,7 +290,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_SetHpGaugeOffset, BTL_UNIT_SELF, -5, -13)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 3145728)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT | UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -306,20 +338,23 @@ EVT_END()
  * and plays SFX_BOSS_SATELLITE_ATTACK1; if no target was found it ends, flustered if confused.
  */
 EVT_BEGIN(batten_satellite_attack_attack_event)
+    // The satellite shows its F_1 pose and looks for a target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("F_1"))
     WAIT_MS(400)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -331,6 +366,7 @@ EVT_BEGIN(batten_satellite_attack_attack_event)
         CALL(bts_wariai_enzan_1, LW(8), 9, LW(0), LW(13), LW(10))
         CALL(bts_wariai_enzan_1, LW(8), 9, LW(1), LW(6), LW(11))
         CALL(bts_wariai_enzan_1, LW(8), 9, LW(2), LW(7), LW(12))
+        // It dashes toward the target in a straight line.
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
         WAIT_FRAMES(1)
     END_LOOP
@@ -354,7 +390,8 @@ EVT_BEGIN(batten_satellite_attack_attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -376,11 +413,15 @@ EVT_BEGIN(batten_satellite_attack_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     GOTO(98)
+    // The attack connects.
     LABEL(91)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // Return to its place.
     LABEL(98)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SATELLITE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))

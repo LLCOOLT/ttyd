@@ -10,6 +10,11 @@
 #include "battle/battle_event_cmd.h"
 #include "evt/evt_msg.h"
 
+// Unit work slots of the Goomba in Professor Frankly's lecture.
+enum {
+    UW_LECTURE_FRANKLI_KURIBOO_SPIKE_TIP_GIVEN = 0, // 1 once Frankly explained the spiky Goomba's spike (set by unit_togekuri)
+};
+
 static USER_FUNC(_battle_set_lecture_unit_id);
 static USER_FUNC(lecture_init);
 
@@ -46,6 +51,11 @@ static USER_FUNC(_battle_set_lecture_unit_id) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit kind of the Goomba in Prof.
+ * Frankly's lecture (HP 10, level 1): its size, offsets, damage sounds, status vulnerability,
+ * parts and init event.
+ */
 BattleUnitKind unit_lecture_frankli_kuriboo = {
     180,
     "btl_un_frankli",
@@ -104,7 +114,7 @@ BattleUnitKind unit_lecture_frankli_kuriboo = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x12000000,
+    UNIT_ATTR_NO_HP_GAUGE | UNIT_ATTR_IGNORE_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -112,26 +122,44 @@ BattleUnitKind unit_lecture_frankli_kuriboo = {
     data_table,
 };
 
+/** Defence of the Goomba in Prof. Frankly's lecture: no damage reduction. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of the Goomba in Prof. Frankly's lecture: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the Goomba in Prof.
+ * Frankly's lecture (percent chance to take each status):
+ * immune to sleep, stop, dizzy, poison, confusion, electric shock, burn, freeze, growing huge, shrinking,
+ * attack up, attack down, defence up, defence down, allergy, fright, gale force, speed up, slow, dodgy,
+ * invisibility and instant kill.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Pose table of the Goomba in Prof.
+ * Frankly's lecture: maps each battle pose to the animation it plays (D_* animations).
+ */
 static PoseTableEntry pose_table[] = {
     {27, "D_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {31, "D_2"},
-    {39, "D_2"},
+    {BTL_POSE_DAMAGE, "D_2"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Data table of the Goomba in Prof. Frankly's lecture: empty; it has no event hooks. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Body part of the Goomba in Prof.
+ * Frankly's lecture (model c_kuri_h): hit position, defences, attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_frankli", "c_kuri_h", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x890009, 0, pose_table},
+    {1, "btl_un_frankli", "c_kuri_h", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_UNTATTLEABLE | PART_ATTR_NO_HP_LOSS, 0, pose_table},
 };
 
 /**
@@ -147,7 +175,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     CALL(_battle_set_lecture_unit_id, LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_LECTURE_FRANKLI_KURIBOO_SPIKE_TIP_GIVEN, 0)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 0, -1000, 0)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)

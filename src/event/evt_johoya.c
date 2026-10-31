@@ -98,8 +98,9 @@ USER_FUNC(johoya_data_free) {
 }
 
 /**
- * Counts the rumours in the current list not yet bought (no ketiRead flag) and writes the count to args[0].
- * Guess: "keti" is kechi, the informant who charges coins for rumours.
+ * Counts the rumours in the current list not yet bought (no ketiRead flag) and writes the count to args[0];
+ * johoyaketi_talk (tik_00) offers a new tip when it is not 0, after tik_00_init_evt built the list (jketi_code).
+ * The keti tables belong to Wonky, the Rogueport Sewers informant who sells tips for coins (johoyaketi_01).
  */
 USER_FUNC(johoya_keti_newjoho_check) {
     InformantWork* wp = &_jdt;
@@ -173,7 +174,7 @@ USER_FUNC(johoya_keti_newjoho_makelabel) {
 USER_FUNC(johoya_keti_newjoho_setreadflag) {
     s32 cur = _jdt.curIndex;
     johoya_set(_jdt.readFlags.ketiRead, _jdt.info[cur].storyId, 1);
-    _jdt.info[cur].flags |= 1;
+    _jdt.info[cur].flags |= INFORMANT_FLAG_HEARD;
     return 2;
 }
 
@@ -186,7 +187,7 @@ USER_FUNC(johoya_keti_oldspeak_check) {
     s32 i;
 
     for (i = 0; i < wp->count; i++) {
-        if (johoya_get(table, wp->info[i].storyId) != 0 && (wp->info[i].flags & 1) == 0) {
+        if (johoya_get(table, wp->info[i].storyId) != 0 && (wp->info[i].flags & INFORMANT_FLAG_HEARD) == 0) {
             count++;
         }
     }
@@ -208,7 +209,7 @@ USER_FUNC(johoya_keti_oldspeak_makelabel) {
     s32 i;
 
     for (i = 0; i < wp->count; i++) {
-        if (johoya_get(table, wp->info[i].storyId) != 0 && (wp->info[i].flags & 1) == 0) {
+        if (johoya_get(table, wp->info[i].storyId) != 0 && (wp->info[i].flags & INFORMANT_FLAG_HEARD) == 0) {
             if (target == n) {
                 sprintf((char*)wp->infoEnd, "%s_%04d", wp->prefix, wp->info[i].storyId);
                 evtSetValue(event, args[1], (EvtWord)wp->infoEnd);
@@ -231,13 +232,14 @@ USER_FUNC(johoya_keti_oldspeak_makelabel) {
 
 /** Marks the rumour picked by the last makelabel as heard on this visit (InformantInfo flag 1). */
 USER_FUNC(johoya_keti_oldspeak_setreadflag) {
-    _jdt.info[_jdt.curIndex].flags |= 1;
+    _jdt.info[_jdt.curIndex].flags |= INFORMANT_FLAG_HEARD;
     return 2;
 }
 
 /**
  * Sets the perfectRead flag for the rumour picked by the last makelabel.
- * Unknown: which character or script uses this table; no caller in the C code.
+ * Called by johoyaperfect_talk in gor_02 after Mario pays Grifty, the travelling minstrel, for a tale
+ * (johoyaperfect_00/01).
  */
 USER_FUNC(johoya_perfect_newjoho_setreadflag) {
     johoya_set(_jdt.readFlags.perfectRead, _jdt.info[_jdt.curIndex].storyId, 1);
@@ -246,7 +248,7 @@ USER_FUNC(johoya_perfect_newjoho_setreadflag) {
 
 /**
  * Sets the luigiRead flag for the rumour picked by the last makelabel.
- * Guess: Luigi's adventure stories; no caller in the C code.
+ * Called by luigi_gor_first_talk (gor.c) after Mario picks one of Luigi's adventure stories (gor_luigi_talk).
  */
 USER_FUNC(johoya_luigi_newjoho_setreadflag) {
     johoya_set(_jdt.readFlags.luigiRead, _jdt.info[_jdt.curIndex].storyId, 1);

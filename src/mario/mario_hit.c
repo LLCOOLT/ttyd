@@ -34,6 +34,7 @@ static HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w);
 
 static HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang);
 
+/** Zero vectors that start the ray position and direction of Mario's collision checks and landing ray. */
 static const Vec zv0 = {0.0f, 0.0f, 0.0f};
 static const Vec zv1 = {0.0f, 0.0f, 0.0f};
 
@@ -44,7 +45,7 @@ static const Vec zv1 = {0.0f, 0.0f, 0.0f};
  */
 static inline BOOL marioChkBeroSub(s32 attr) {
     BOOL r = TRUE;
-    if (attr & 0x80) {
+    if (attr & HIT_ATTR_ALWAYS_SOLID) {
         r = FALSE;
         if (marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) {
             r = TRUE;
@@ -57,18 +58,18 @@ static inline BOOL marioChkBeroSub(s32 attr) {
 static inline BOOL marioChkBeroInl(HitEntry* hit) {
     s32 attr = hitGetAttr(hit);
     MarioWork* mario = marioGetPtr();
-    if ((attr & 0x80000) && !(mario->flags & MARIO_FLAG_TUBE_MODE)) {
+    if ((attr & HIT_ATTR_TUBE_PASS) && !(mario->flags & MARIO_FLAG_TUBE_MODE)) {
         return FALSE;
     }
-    if (!(attr & 0x80)) {
-        return (attr & 0x800000) ? 1 : 0;
+    if (!(attr & HIT_ATTR_ALWAYS_SOLID)) {
+        return (attr & HIT_ATTR_PARTY_PASS) ? 1 : 0;
     }
     return mario->currMotionId == MARIO_MOTION_SHIP;
 }
 
 /** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub2(s32 attr) {
-    if (!(attr & 0x80)) {
+    if (!(attr & HIT_ATTR_ALWAYS_SOLID)) {
         return TRUE;
     }
     return marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
@@ -76,13 +77,13 @@ static inline BOOL marioChkBeroSub2(s32 attr) {
 
 /** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub3(s32 attr) {
-    return (attr & 0x80) ? (marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) : TRUE;
+    return (attr & HIT_ATTR_ALWAYS_SOLID) ? (marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) : TRUE;
 }
 
 /** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub4(s32 attr) {
     BOOL r = TRUE;
-    if (attr & 0x80) {
+    if (attr & HIT_ATTR_ALWAYS_SOLID) {
         r = marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
     }
     return r;
@@ -91,7 +92,7 @@ static inline BOOL marioChkBeroSub4(s32 attr) {
 /** Unused variant of marioChkBeroSub that reads the attribute from the hit itself. */
 static inline BOOL marioChkBeroSub5(HitEntry* hit) {
     s32 attr = hitGetAttr(hit);
-    if (!(attr & 0x80)) {
+    if (!(attr & HIT_ATTR_ALWAYS_SOLID)) {
         return TRUE;
     }
     return marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
@@ -99,7 +100,7 @@ static inline BOOL marioChkBeroSub5(HitEntry* hit) {
 
 /** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub6(s32 attr) {
-    if (attr & 0x80) {
+    if (attr & HIT_ATTR_ALWAYS_SOLID) {
         return marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
     } else {
         return TRUE;
@@ -178,9 +179,9 @@ void marioHitCheckWidth(void) {
 }
 
 /**
- * Ray filter (TRUE = test this hit): skips hits that have none of query->user0's attribute bits
+ * Ray filter (TRUE = test this hit): tests hits that have none of query->user0's attribute bits
  * or any of user1's.
- * marioHitCheckAttr2Inl passes 0x4 / 0x800000, so only 0x4 surfaces without 0x800000 are tested.
+ * marioHitCheckAttr2Inl passes 0x4 / 0x800000, so only 0x4 surfaces without 0x800000 are skipped.
  */
 static BOOL chkFilterAttr2(HitCheckQuery* query, HitEntry* entry) {
     s32 ret = 0;
@@ -198,13 +199,13 @@ static BOOL chkFilterAttr2(HitCheckQuery* query, HitEntry* entry) {
  */
 static BOOL chkfilterVec(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
-    if (entry->attributes & 0x80080) {
+    if (entry->attributes & (HIT_ATTR_ALWAYS_SOLID | HIT_ATTR_TUBE_PASS)) {
         return TRUE;
     }
-    if (!(entry->attributes & 0x800000) && (entry->attributes & 0x4)) {
+    if (!(entry->attributes & HIT_ATTR_PARTY_PASS) && (entry->attributes & HIT_ATTR_PASS_THROUGH)) {
         return FALSE;
     }
-    if (!(entry->attributes & 0x80000000)) {
+    if (!(entry->attributes & HIT_ATTR_MOBJ)) {
         return TRUE;
     }
     mobj = mobjHitObjPtrToPtr(entry);
@@ -222,13 +223,13 @@ static BOOL chkfilterVec(HitCheckQuery* query, HitEntry* entry) {
  */
 static BOOL chkfilterVecRoll(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
-    if (entry->attributes & 0x80) {
+    if (entry->attributes & HIT_ATTR_ALWAYS_SOLID) {
         return TRUE;
     }
-    if (!(entry->attributes & 0x800000) && (entry->attributes & 0x80004)) {
+    if (!(entry->attributes & HIT_ATTR_PARTY_PASS) && (entry->attributes & (HIT_ATTR_PASS_THROUGH | HIT_ATTR_TUBE_PASS))) {
         return FALSE;
     }
-    if (!(entry->attributes & 0x80000000)) {
+    if (!(entry->attributes & HIT_ATTR_MOBJ)) {
         return TRUE;
     }
     mobj = mobjHitObjPtrToPtr(entry);
@@ -246,10 +247,10 @@ static BOOL chkfilterVecRoll(HitCheckQuery* query, HitEntry* entry) {
  */
 static BOOL chkfilterVecVivian(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
-    if ((entry->attributes & 0x80804) && !(entry->attributes & 0x800000)) {
+    if ((entry->attributes & (HIT_ATTR_PASS_THROUGH | HIT_ATTR_SPIKES | HIT_ATTR_TUBE_PASS)) && !(entry->attributes & HIT_ATTR_PARTY_PASS)) {
         return FALSE;
     }
-    if (!(entry->attributes & 0x80000000)) {
+    if (!(entry->attributes & HIT_ATTR_MOBJ)) {
         return TRUE;
     }
     mobj = mobjHitObjPtrToPtr(entry);
@@ -404,9 +405,10 @@ static inline HitEntry* marioHitCheckAttr2Inl(Vec* pos, Vec* dir, Vec* outPos, V
 
 /**
  * The ceiling ray of marioSearchHead and marioSearchHead_jabara:
- * while Mario is not falling (or in the Spring Jump's state 1) it only hits 0x4 surfaces
- * (marioHitCheckAttr2Inl), otherwise it uses the normal filters.
- * Guess: 0x4 marks surfaces Mario only bumps from below, such as the hidden blocks chkfilterVec lets him pass.
+ * while Mario is not falling (or in the Spring Jump's state 1) it uses marioHitCheckAttr2Inl,
+ * which tests every surface except 0x4 ones without 0x800000; unlike the normal filter (chkfilterVec)
+ * it does not skip the hidden ? / badge / 10-coin blocks, so his head finds them on the way up.
+ * Otherwise it uses the normal filters.
  */
 static HitEntry* marioHitCheck2(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     HitEntry* hit;
@@ -442,17 +444,19 @@ void clear_hitobj_ride(void) {
 /**
  * TRUE if Mario passes through this hit instead of being stopped:
  * 0x800000 hits, 0x80 hits only in boat motion, and 0x80000 hits never outside tube mode.
- * Used by the wall, tube, balloon and Yoshi checks.
- * Guess: named after bero (map exits), whose walls Mario walks into.
+ * Used by the wall, tube, balloon and Yoshi checks; the front-wall check keeps moving Mario into such a hit
+ * and records it as the wall he pushes.
+ * Named after bero (map exits), whose walls Mario walks into: dou_03 gives its exit wall s_bero 0x80,
+ * so only the boat passes.
  */
 BOOL marioChkBero(HitEntry* hit) {
     s32 attr = hitGetAttr(hit);
     MarioWork* mario = marioGetPtr();
-    if ((attr & 0x80000) && !(mario->flags & MARIO_FLAG_TUBE_MODE)) {
+    if ((attr & HIT_ATTR_TUBE_PASS) && !(mario->flags & MARIO_FLAG_TUBE_MODE)) {
         return FALSE;
     }
-    if (!(attr & 0x80)) {
-        return (attr & 0x800000) ? 1 : 0;
+    if (!(attr & HIT_ATTR_ALWAYS_SOLID)) {
+        return (attr & HIT_ATTR_PARTY_PASS) ? 1 : 0;
     }
     return mario->currMotionId == MARIO_MOTION_SHIP;
 }
@@ -621,7 +625,7 @@ void marioChkGnd(void) {
         }
         return;
     }
-    if (mario->currMotionId != MARIO_MOTION_DAMAGE && mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & 0x200)) {
+    if (mario->currMotionId != MARIO_MOTION_DAMAGE && mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_DEEP_WATER)) {
 #if VERSION <= VERSION_DEMO_US
         if (mario->jumpVelocityY == 0.0f) {
 #else
@@ -633,7 +637,7 @@ void marioChkGnd(void) {
         marioChgMot(MARIO_MOTION_DAMAGE);
         return;
     }
-    if (mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & 0x800)) {
+    if (mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_SPIKES)) {
         if (vivianGetStatus() != 2 && vivianGetStatus() != 1 && vivianGetStatus() != 3) {
             set_damage_root_ypos(mario->position.y);
             marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
@@ -1378,21 +1382,21 @@ void marioChkToge(void) {
     }
     if (mario->hitobjFront != NULL) {
         attr = hitGetAttr(mario->hitobjFront);
-        if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & 0x800) && mario->frontWallDist < 0.5f * mario->wPlayerCollisionBox.x) {
+        if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & HIT_ATTR_SPIKES) && mario->frontWallDist < 0.5f * mario->wPlayerCollisionBox.x) {
             set_damage_root_ypos(mario->position.y);
             marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
         }
     }
     if (mario->hitobjWall != NULL) {
         attr = hitGetAttr(mario->hitobjWall);
-        if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & 0x800)) {
+        if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & HIT_ATTR_SPIKES)) {
             set_damage_root_ypos(mario->position.y);
             marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
         }
     }
     if (mario->hitobjHead != NULL) {
         attr = hitGetAttr(mario->hitobjHead);
-        if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & 0x800)) {
+        if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE && (attr & HIT_ATTR_SPIKES)) {
             set_damage_root_ypos(mario->position.y);
             marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
         }
@@ -1773,7 +1777,7 @@ static inline BOOL marioChkHeadBlock(HitEntry* hit) {
     if (!hit) {
         return FALSE;
     }
-    if (!(hitGetAttr(hit) & 0x80000000)) {
+    if (!(hitGetAttr(hit) & HIT_ATTR_MOBJ)) {
         return FALSE;
     }
     mobj = (MobjNameView*)mobjHitObjPtrToPtr(hit);
@@ -1798,7 +1802,8 @@ static inline f32 marioGetHeightInl(void) {
 }
 
 #if VERSION >= VERSION_JP // the demo's 18.0f is marioHitCheckWidth's own
-/** Never called. Guess: stands in for a function the original link stripped, so 18.0f keeps its float-pool slot. */
+/** Stand-in for a stripped function (in no version's symbols, never called): keeps 18.0f in its pool slot. */
+// FAKE: uncalled stand-in for a stripped function; keeps 18.0f in its .sdata2 slot
 void marioHitStrippedPool2(f32* f) {
     f[0] = 18.0f;
 }
@@ -2181,7 +2186,7 @@ HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
  * Ceiling check for the Spring Jump: eight rays up along a line across Mario.
  * A 0x40000 hit counts on any ray and *side says which side it was on;
  * any other ceiling only counts on the middle ray. Outputs as marioSearchHead.
- * Guess: 0x40000 marks the ceilings the Spring Jump can catch on from the side.
+ * 0x40000 marks the ceilings Mario can hang from at full charge (mot_jabara).
  */
 HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, s32* side, f32 d) {
     Vec v, dir, outPos, outNrm;
@@ -2205,7 +2210,7 @@ HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, s32* side, f32 d) {
             v.y = 0.5f + pos->y;
             hit = marioHitCheck2(&v, &dir, &outPos, &outNrm, &dist);
             if (hit) {
-                if (hitGetAttr(hit) & 0x40000) {
+                if (hitGetAttr(hit) & HIT_ATTR_SPRING_GRAB) {
                     if (pos->y + base >= outPos.y) {
                         pos->y = outPos.y;
                         *h = 0.0f;
@@ -2284,7 +2289,7 @@ void marioCheckWall(f32 dx, f32 dz) {
                 s32 lim = strncmp(hitGetName(hit), "dokan", 5) != 0 ? 20 : 10;
                 if (++mario->wallPushTimer >= lim) {
                     mario->wallPushTimer = lim;
-                    if (!(hitGetAttr(hit) & 0x80) ? TRUE : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) {
+                    if (!(hitGetAttr(hit) & HIT_ATTR_ALWAYS_SOLID) ? TRUE : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) {
                         mario->hitobjPush = hit;
                     }
                 }
@@ -2292,7 +2297,7 @@ void marioCheckWall(f32 dx, f32 dz) {
 #else
             if (++mario->wallPushTimer >= 20) {
                 mario->wallPushTimer = 20;
-                if (!(hitGetAttr(hit) & 0x80) ? TRUE : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) {
+                if (!(hitGetAttr(hit) & HIT_ATTR_ALWAYS_SOLID) ? TRUE : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) {
                     mario->hitobjPush = hit;
                 }
             }
@@ -2445,7 +2450,7 @@ void marioCheckWall_roll(f32 dx, f32 dz) {
             mario->hitobjWall = hit;
             if (++mario->wallPushTimer >= 20) {
                 mario->wallPushTimer = 20;
-                if (!(hitGetAttr(hit) & 0x80) ? 1 : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) {
+                if (!(hitGetAttr(hit) & HIT_ATTR_ALWAYS_SOLID) ? 1 : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) {
                     mario->hitobjPush = hit;
                 }
             }
@@ -2593,7 +2598,7 @@ static HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
     mario = marioGetPtr();
 #if VERSION <= VERSION_DEMO_US
     // The demo hands the wall search of the stage-flag-1 Bowser to koopa_motion.c.
-    if (mario->characterId == 2 && (mario->stageFlags & 1)) {
+    if (mario->characterId == 2 && (mario->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW)) {
         return kpaSearchWallFront(pos, h, dx, dz);
     }
 #endif
@@ -2628,7 +2633,7 @@ static HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
     }
 #else
     if (mario->characterId == 2) {
-        if (mario->stageFlags & 1) {
+        if (mario->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW) {
             count = 3;
             heights[0] = 0.75f * mario->wPlayerCollisionBox.y;
             heights[1] = 0.5f * mario->wPlayerCollisionBox.y;
@@ -2769,20 +2774,20 @@ HitEntry* dou10_yoko_yari(f32* out) {
             Vec dir = {0.0f, -1.0f, 0.0f};
             hit = marioHitCheckVecInl(&pos2, &dir, &outPos, &outNrm, &d);
         }
-        if (hit && (hitGetAttr(hit) & 0x800)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
             mario->hitobjFront = hit;
             *out = 0.8f;
         }
         pos = mario->position;
         hit = searchFrontWall(&pos, &h, 20.0f, 0.0f, 20.0f);
-        if (hit && (hitGetAttr(hit) & 0x800)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
             mario->hitobjFront = hit;
             *out = 0.8f;
         }
         pos = mario->position;
         movePos(&pos.x, &pos.z, step, 270.0f);
         hit = searchFrontWall(&pos, &h, 20.0f, 0.0f, 20.0f);
-        if (hit && (hitGetAttr(hit) & 0x800)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
             mario->hitobjFront = hit;
             *out = 0.8f;
         }
@@ -2791,7 +2796,7 @@ HitEntry* dou10_yoko_yari(f32* out) {
         pos = mario->position;
         movePos(&pos.x, &pos.z, step, 90.0f);
         hit = searchFrontWall(&pos, &h, 20.0f, 0.0f, 20.0f);
-        if (hit && (hitGetAttr(hit) & 0x800)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
             mario->hitobjFront = hit;
             *out = 0.8f;
         }
@@ -2818,27 +2823,27 @@ HitEntry* dou10_yoko_yari2(f32* out) {
         Vec dir = {0.0f, -1.0f, 0.0f};
         hit = marioHitCheckVecInl(&pos2, &dir, &outPos, &outNrm, &d);
     }
-    if (hit && (hitGetAttr(hit) & 0x800)) {
+    if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
         mario->hitobjFront = hit;
         *out = 0.8f;
     }
     pos = mario->position;
     hit = searchFrontWall(&pos, &h, 20.0f, 0.0f, 20.0f);
-    if (hit && (hitGetAttr(hit) & 0x800)) {
+    if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
         mario->hitobjFront = hit;
         *out = 0.8f;
     }
     pos = mario->position;
     movePos(&pos.x, &pos.z, 8.0f, 270.0f);
     hit = searchFrontWall(&pos, &h, 20.0f, 0.0f, 20.0f);
-    if (hit && (hitGetAttr(hit) & 0x800)) {
+    if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
         mario->hitobjFront = hit;
         *out = 0.8f;
     }
     pos = mario->position;
     movePos(&pos.x, &pos.z, 8.0f, 90.0f);
     hit = searchFrontWall(&pos, &h, 20.0f, 0.0f, 20.0f);
-    if (hit && (hitGetAttr(hit) & 0x800)) {
+    if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
         mario->hitobjFront = hit;
         *out = 0.8f;
     }
@@ -2994,10 +2999,10 @@ static HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
 }
 
 /**
- * Never called.
- * Guess: stands in for a function the original link stripped,
- * so its float constants (0.75, -1, pi, 0.1, 2) keep their float-pool order.
+ * Stand-in for a function the original link stripped (in no version's symbols, never called):
+ * it keeps its float constants (0.75, -1, pi, 0.1, 2) in their float-pool order.
  */
+// FAKE: uncalled stand-in for a stripped function; orders 0.75f, -1.0f, pi, 0.1f, 2.0f in .sdata2
 void marioHitStrippedPool(f32* f) {
     f[0] = 0.75f;
     f[1] = -1.0f;
@@ -3162,8 +3167,9 @@ BOOL marioChkWallAround(Vec* pos, s32 mode, f32 unused, f32 dir, f32 w, f32 h) {
 
 /**
  * TRUE when walls within 13 units (at three heights) surround Mario
- * so that no three neighbouring directions of eight are all open. Used by the slit and tube motions.
- * Guess: tells whether he is wedged in a gap and may not turn back.
+ * so that no three neighbouring directions of eight are all open.
+ * While it is TRUE the paper (slit) and tube motions keep Mario in that form
+ * and starting the tube is refused, so he cannot change form in a gap.
  */
 BOOL marioSlitChkWallAround(void) {
     s32 flags[8];
@@ -3287,7 +3293,7 @@ void marioCheckWallShip(f32 dx, f32 dz) {
                 BOOL r;
                 mario->wallPushTimer = 20;
                 attr = hitGetAttr(hit);
-                r = !(attr & 0x80) ? TRUE : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
+                r = !(attr & HIT_ATTR_ALWAYS_SOLID) ? TRUE : marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
                 if (r)
                     mario->hitobjPush = hit;
             }

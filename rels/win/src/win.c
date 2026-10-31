@@ -143,8 +143,10 @@ EVT_BEGIN(_tree_anime)
 EVT_END()
 
 /**
- * Guess: registers hammerable trees: reads a table of (tree object, leaves object, ...) entries
- * until a 0 terminator and installs _tree_anime as the hammer case event on each trunk.
+ * Registers hammerable trees from the table at LW(0):
+ * reads rows of four words (hit object, trunk, leaves, extra script)
+ * until a hit object of 0 and installs _tree_anime as the hammer case script on each hit object.
+ * Nothing in the tree calls it (the win maps use evt_sub_tree_access_entry).
  */
 EVT_BEGIN(win_tree_entry)
     SET_INT_READ_ADDR(LW(0))
@@ -159,8 +161,9 @@ EVT_BEGIN(win_tree_entry)
 EVT_END()
 
 /**
- * Guess: loops forever playing the Puni walking sound at the position of the NPC "ガイド" (the Puni guide) every 5
- * frames.
+ * Loops forever playing the Puni walking sound at the position of the NPC "ガイド" (the Puni guide's stand-in in
+ * guide_bigtree)
+ * every 5 frames; guide_bigtree spawns it for each walk and deletes it after.
  */
 EVT_BEGIN(win_puni_walk_se)
     LOOP(0)

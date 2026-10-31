@@ -40,6 +40,7 @@ static void itemUseDisp(WinMgrEntry* entry);
 static void itemUseDisp2(WinMgrEntry* entry);
 static void item_disp(WindowWork* w, f32 xo, f32 yo);
 
+/** Pages of Super Luigi volume 1 for the book reader in the item menu, ending with NULL. */
 static const char* luigi_book_1[] = {
     "msg_luigi_book1_txt1",
     "msg_luigi_book1_txt2",
@@ -56,6 +57,7 @@ static const char* luigi_book_1[] = {
     NULL,
 };
 
+/** Pages of Super Luigi volume 2 ("Allies in Adventure"). */
 static const char* luigi_book_2[] = {
     "msg_luigi_book2_txt1",
     "msg_luigi_book2_txt2",
@@ -72,6 +74,7 @@ static const char* luigi_book_2[] = {
     NULL,
 };
 
+/** Pages of Super Luigi volume 3 ("The Voice of a Princess"). */
 static const char* luigi_book_3[] = {
     "msg_luigi_book3_txt1",
     "msg_luigi_book3_txt2",
@@ -88,6 +91,7 @@ static const char* luigi_book_3[] = {
     NULL,
 };
 
+/** Pages of Super Luigi volume 4 ("The Shards of Truth"). */
 static const char* luigi_book_4[] = {
     "msg_luigi_book4_txt1",
     "msg_luigi_book4_txt2",
@@ -104,6 +108,7 @@ static const char* luigi_book_4[] = {
     NULL,
 };
 
+/** Pages of Super Luigi volume 5 ("Journey's End"). */
 static const char* luigi_book_5[] = {
     "msg_luigi_book5_txt1",
     "msg_luigi_book5_txt2",
@@ -120,11 +125,23 @@ static const char* luigi_book_5[] = {
     NULL,
 };
 
+/**
+ * The five Super Luigi books, indexed by item id minus ITEM_SUPER_LUIGI1;
+ * using one in the item menu opens the book reader.
+ */
 const char** luigi_book_list[] = {luigi_book_1, luigi_book_2, luigi_book_3, luigi_book_4, luigi_book_5};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo: key items left out of the Important Items list (as below, plus the Strange Sack);
+ * winMakeSkipList reads it.
+ */
 u16 menu_skip_list[] = {1, 9, 10, 11, 6, 7, 8, 5, 3, 2, 4, 0x32, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78};
 #else
+/**
+ * Key items left out of the Important Items list because other menu screens show them: the curses, boots,
+ * hammers, Magical Map and the seven Crystal Stars. winMakeSkipList reads it.
+ */
 u16 menu_skip_list[] = {9, 10, 11, 6, 7, 8, 5, 3, 2, 4, 0x32, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78};
 #endif
 #define MENU_SKIP_NUM (sizeof(menu_skip_list) / sizeof(menu_skip_list[0]))
@@ -134,6 +151,10 @@ u16 menu_skip_list[] = {9, 10, 11, 6, 7, 8, 5, 3, 2, 4, 0x32, 0x72, 0x73, 0x74, 
 #define WI_MAIL_TPL "%s/w/jp/mail.tpl"
 #endif
 
+/**
+ * Windows opened when an item is used from the menu: the target list of Mario and his partners, and the
+ * small orange "Use it on whom?" title above it.
+ */
 static WinMgrDesc window_desc[2] = {
     {0, 0, 8, -70, 150, 350, 264, {0xF0, 0xF0, 0xF0, 0xFF}, 0, itemUseDisp},
     {2, 0, 8, -280, 145, 200, 50, {0xFF, 0x99, 0x00, 0xFF}, 0, itemUseDisp2},
@@ -331,26 +352,26 @@ s32 winItemMain(WindowWork* w) {
                     }
                 } else {
                     c = w->item.skip[w->item.cursor[mode]];
-                    if ((u32)(c - 0x37) <= 3 || c == 0x3B) {
+                    if ((u32)(c - ITEM_SUPER_LUIGI1) <= 3 || c == ITEM_SUPER_LUIGI5) {
                         w->item.state = 100;
                         w->item.bookTgtX = -170.0f;
                         w->item.bookTgtY = 160.0f;
 #if VERSION >= VERSION_JP
-                        w->flags |= 0x8000;
+                        w->flags |= WIN_FLAG_BOOK_OPEN;
 #endif
-                        book = luigi_book_list[c - 0x37];
-                        w->item.bookIdx = c - 0x37;
+                        book = luigi_book_list[c - ITEM_SUPER_LUIGI1];
+                        w->item.bookIdx = c - ITEM_SUPER_LUIGI1;
                         w->item.bookPage = 0;
                         for (w->item.bookPages = 0; book[w->item.bookPages] != NULL; w->item.bookPages++) {
                         }
                         w->item.bookPages = (w->item.bookPages + 1) / 2;
                         psndSFXOn(SFX_NAME_WORD(0x20012));
-                    } else if (c == 0x36 && pouchReceiveMailCount()) {
+                    } else if (c == ITEM_MAILBOX_SP && pouchReceiveMailCount()) {
                         w->item.state = 200;
                         w->item.mailTgtX = -144.0f;
                         w->item.mailTgtY = 180.0f;
                         psndSFXOn(SFX_NAME_WORD(0x20012));
-                    } else if (c == 0x4E) {
+                    } else if (c == ITEM_RAGGED_DIARY) {
                         w->item.useItem = c;
                         psndSFXOn(SFX_NAME_WORD(0x20012));
                         return -2;
@@ -424,7 +445,7 @@ s32 winItemMain(WindowWork* w) {
                     w->item.bookTgtX = 320.0f;
                     w->item.bookTgtY = -240.0f;
 #if VERSION >= VERSION_JP
-                    w->flags &= ~0x8000;
+                    w->flags &= ~WIN_FLAG_BOOK_OPEN;
                     w->helpX = w->helpTgtX;
                     w->helpY = w->helpTgtY;
 #endif
@@ -438,7 +459,7 @@ s32 winItemMain(WindowWork* w) {
                     w->item.bookTgtX = 320.0f;
                     w->item.bookTgtY = -240.0f;
 #if VERSION >= VERSION_JP
-                    w->flags &= ~0x8000;
+                    w->flags &= ~WIN_FLAG_BOOK_OPEN;
                     w->helpX = w->helpTgtX;
                     w->helpY = w->helpTgtY;
 #endif
@@ -447,7 +468,7 @@ s32 winItemMain(WindowWork* w) {
                 w->item.bookTgtX = 320.0f;
                 w->item.bookTgtY = -240.0f;
 #if VERSION >= VERSION_JP
-                w->flags &= ~0x8000;
+                w->flags &= ~WIN_FLAG_BOOK_OPEN;
                 w->helpX = w->helpTgtX;
                 w->helpY = w->helpTgtY;
 #endif
@@ -470,12 +491,12 @@ s32 winItemMain(WindowWork* w) {
 #if VERSION <= VERSION_DEMO_US
                 w->item.mailLines += 7;
                 w->item.mailLine = 0;
-                if (mail->flags & 0x1000) {
+                if (mail->flags & MAIL_FLAG_PICTURE) {
                     w->item.mailLines += 7;
                 }
 #else
                 w->item.mailLine = 0;
-                if (mail->flags & 0x1000) {
+                if (mail->flags & MAIL_FLAG_PICTURE) {
                     w->item.mailLines += 10;
                 }
 #endif
@@ -542,7 +563,7 @@ s32 winItemMain(WindowWork* w) {
             break;
         case 201:
             mail = mailGetPtr(w->item.mail[w->item.mailSel].id);
-            if (mail->flags & 0x1000) {
+            if (mail->flags & MAIL_FLAG_PICTURE) {
 #if VERSION >= VERSION_US
                 w->mailRes = fileAsyncf(4, 0, "%s/w/%s/mail.tpl", getMarioStDvdRoot(), (u32)gp->language == 0 ? "jp" : "us");
 #else
@@ -642,8 +663,8 @@ s32 winItemMain(WindowWork* w) {
                 for (i = 0; i < 7; i++) {
 #if VERSION == VERSION_EU
                     // PAL lists only the other partners that have joined (flag 1) and are not away (flag 2)
-                    if (party != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 1) &&
-                        !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 2)) {
+                    if (party != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_JOINED) &&
+                        !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_AWAY)) {
 #else
                     if (party != winPartyDt[i].partyId) {
 #endif
@@ -876,6 +897,10 @@ static void item_disp(WindowWork* w, f32 xo, f32 yo) {
 }
 
 #if VERSION >= VERSION_US
+/**
+ * HP and FP labels by game language: Japanese (full-width), English, German, French, Spanish, Italian,
+ * and an unused seventh row.
+ */
 static const char* hpfp_name_table[7][2] = {
     {"ＨＰ", "ＦＰ"},
     {"HP", "FP"},
@@ -931,8 +956,8 @@ static void itemUseDisp(WinMgrEntry* entry) {
         for (i = 0; i < 7; i++) {
 #if VERSION == VERSION_EU
             // PAL lists only the other partners that have joined (flag 1) and are not away (flag 2)
-            if (party != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 1) &&
-                !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & 2)) {
+            if (party != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_JOINED) &&
+                !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_AWAY)) {
 #else
             if (party != winPartyDt[i].partyId) {
 #endif

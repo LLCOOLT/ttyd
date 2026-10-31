@@ -36,6 +36,7 @@ EVT_BEGIN(peach_init)
     RETURN
 EVT_END()
 
+/** NPCs of the ending ship scene: Peach. */
 static NpcSetupInfo npcEnt[] = {
     {
         "ピーチ姫", // name
@@ -72,10 +73,15 @@ EVT_BEGIN(fune_yure)
 EVT_END()
 
 /**
- * Guess: the ending on the ship at dawn: the ending music plays,
- * Mario stays on the deck as Princess Peach speaks to him (ep_27 to ep_30) and the ship sails to Rogueport.
+ * The ending on the ship as it sails away from Rogueport ("Sail Away"):
+ * BGM_ENDING5 plays while Princess Peach talks with Mario on the deck about the people of Rogueport
+ * and thanks him (ep_27 to ep_29).
+ * Then the dawn animation (ake) and sunlight play, the music changes to BGM_ENDING3,
+ * the sea and sun glints fade in, and Peach points out Rogueport shining in the sunrise (ep_30)
+ * before the map fades to gor_12.
  */
 static EVT_BEGIN(epilogue_evt)
+    // The ending voyage: the music starts and Mario and Peach stand on the ship's deck.
     CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_ENDING5"), 800)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_END_MUJ2"))
     CALL(evt_mario_key_onoff, 0)
@@ -92,6 +98,7 @@ static EVT_BEGIN(epilogue_evt)
     WAIT_MS(2000)
     CALL(evt_npc_flag_onoff, 0, STRING("ピーチ姫"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_autotalkpose, STRING("ピーチ姫"), STRING("P_S_7"), STRING("P_T_13"))
+    // Peach tells Mario how lovely the people of Rogueport are, and how little she liked it at first.
     CALL(evt_msg_print, 0, STRING("ep_27"), 0, STRING("ピーチ姫"))
     CALL(evt_npc_set_ry, STRING("ピーチ姫"), 270)
     WAIT_FRAMES(1)
@@ -100,6 +107,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_msg_print, 0, STRING("ep_28"), 0, STRING("ピーチ姫"))
     CALL(evt_cam3d_evt_set, 44, 137, 380, 44, 79, 50, 1000, 11)
     WAIT_MS(1000)
+    // Peach remembers how frightened she was when taken captive.
     CALL(evt_msg_print, 0, STRING("ep_29"), 0, STRING("ピーチ姫"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAND_UP1_3"), LW(0), LW(1), LW(2), 0)
@@ -117,6 +125,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_map_playanim, STRING("ake"), 0, 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
+        // The sun comes up and the music changes.
         CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
@@ -159,6 +168,7 @@ static EVT_BEGIN(epilogue_evt)
     SUBTRACT(LW(1), 8000)
     WAIT_MS(LW(1))
     CALL(evt_npc_set_autotalkpose, STRING("ピーチ姫"), STRING("P_S_5"), STRING("P_T_5"))
+    // Peach spots Rogueport ahead and the ship heads there.
     CALL(evt_msg_print, 0, STRING("ep_30"), 0, STRING("ピーチ姫"))
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 1000, FADE_IN_BLACK, 1000)
     CALL(evt_bero_mapchange, STRING("gor_12"), STRING(""))
@@ -220,13 +230,13 @@ static USER_FUNC(fune_eff) {
     ((EffFunemizuWork*)eff1->userdata)->position.x = pos.x - 81.3f;
     ((EffFunemizuWork*)eff1->userdata)->position.y = pos.y - 51.0f;
     ((EffFunemizuWork*)eff1->userdata)->position.z = pos.z - 38.9f;
-    ((EffFunemizuWork*)eff1->userdata)->f10 = 1.0f;
-    ((EffFunemizuWork*)eff1->userdata)->f14 = 270.0f;
+    ((EffFunemizuWork*)eff1->userdata)->speed = 1.0f;
+    ((EffFunemizuWork*)eff1->userdata)->yaw = 270.0f;
     ((EffFunemizuWork*)eff2->userdata)->position.x = pos.x - 49.5f;
     ((EffFunemizuWork*)eff2->userdata)->position.y = pos.y - 51.0f;
     ((EffFunemizuWork*)eff2->userdata)->position.z = 70.7f + pos.z;
-    ((EffFunemizuWork*)eff2->userdata)->f10 = 1.0f;
-    ((EffFunemizuWork*)eff2->userdata)->f14 = 305.0f;
+    ((EffFunemizuWork*)eff2->userdata)->speed = 1.0f;
+    ((EffFunemizuWork*)eff2->userdata)->yaw = 305.0f;
     if (gp->retraceCount % 15 == 0) {
         effWaterDamageN64Entry(5, 30, 106.1f + pos.x, pos.y - 50.0f, 106.1f + pos.z, 2.0f);
     }

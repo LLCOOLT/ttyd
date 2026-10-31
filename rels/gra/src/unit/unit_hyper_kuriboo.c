@@ -14,6 +14,11 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 
+// Unit work slots of the Hyper Goomba.
+enum {
+    UW_HYPER_KURIBOO_CHARGED = 0, // 1 while it holds a charge from its charge move
+};
+
 static USER_FUNC(krb_get_dir);
 
 BattleUnitKind unit_hyper_kuriboo;
@@ -30,6 +35,10 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[638];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the Hyper Goomba:
+ * 8 HP, level 15, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 BattleUnitKind unit_hyper_kuriboo = {
     66,
     "btl_un_hyper_kuriboo",
@@ -88,7 +97,7 @@ BattleUnitKind unit_hyper_kuriboo = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -96,6 +105,10 @@ BattleUnitKind unit_hyper_kuriboo = {
     data_table,
 };
 
+/**
+ * Pose table of the Hyper Goomba:
+ * the animation played for each pose type (idle, hurt, walk, run, attack and so on).
+ */
 static PoseTableEntry pose_table[] = {
     {1, "KUR_N_1"},
     {2, "KUR_Y_1"},
@@ -103,41 +116,54 @@ static PoseTableEntry pose_table[] = {
     {5, "KUR_K_1"},
     {4, "KUR_I_1"},
     {3, "KUR_I_1"},
-    {28, "KUR_S_1"},
+    {BTL_POSE_NORMAL, "KUR_S_1"},
     {29, "KUR_Q_1"},
     {30, "KUR_Q_1"},
     {31, "KUR_S_1"},
-    {39, "KUR_D_1"},
+    {BTL_POSE_DAMAGE, "KUR_D_1"},
     {50, "KUR_A_1"},
     {51, "KUR_A_2"},
-    {42, "KUR_R_1"},
+    {BTL_POSE_RUN, "KUR_R_1"},
     {41, "KUR_R_2"},
-    {40, "KUR_W_1"},
-    {56, "KUR_I_1"},
-    {57, "KUR_I_1"},
+    {BTL_POSE_WALK, "KUR_W_1"},
+    {BTL_POSE_DANGER, "KUR_I_1"},
+    {BTL_POSE_PERIL, "KUR_I_1"},
     {BTL_POSE_TALK, "KUR_T_1"},
     {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
+/** Event table of the Hyper Goomba: nothing special on a First Strike. */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/** Defence of the Hyper Goomba's body per damage type: 0 against every damage type. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of the Hyper Goomba's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Hyper Goomba in the demo, as a percent of the normal chance:
+ * sleep 80%, freeze 80%, instant kill 95% (and 7 other statuses lowered).
+ */
 static StatusVulnerability regist = {80, 100, 80, 100, 80, 100, 100, 80, 100, 80, 100, 80, 100, 80, 80, 100, 100, 100, 80, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Hyper Goomba in the retail versions, as a percent of the normal chance:
+ * sleep 80%, stop 90%, freeze 80%, instant kill 95% (and 9 other statuses lowered).
+ */
 static StatusVulnerability regist = {80, 90, 80, 100, 80, 100, 100, 80, 100, 95, 100, 95, 100, 95, 80, 90, 80, 100, 80, 100, 100, 95};
 #endif
 
+/** Body part of the Hyper Goomba: a single part using the model "c_kuribo_h". */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_hyper_kuriboo", "c_kuribo_h", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_hyper_kuriboo", "c_kuribo_h", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Hyper Goomba's attack: 2 damage to a single target, a jump-style hit. */
 static BattleWeapon weapon_kuriboo_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -156,7 +182,7 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -174,6 +200,7 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Hyper Goomba's charge-up move (no damage, used on itself). */
 static BattleWeapon weapon_kuriboo_charge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -191,7 +218,7 @@ static BattleWeapon weapon_kuriboo_charge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -221,7 +248,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 6, 6)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 6, 6)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_JUMP1"), STRING("SFX_ENM_KURI_LANDING1"))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_KURIBOO_CHARGED, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -247,6 +274,7 @@ EVT_END()
  * with the pre-damage check choosing between a dodge and a hit.
  */
 static EVT_BEGIN(attack_event)
+    // Target: the first-strike target if the battle opened that way, otherwise one picked for its attack.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -256,24 +284,28 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_kuriboo_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_kuriboo_attack), LW(3), LW(4))
     END_IF
+    // No target: a confused one flusters, otherwise the attack ends.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
+    // Already charged: it goes straight to the headbutt.
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CHARGE, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(10)
     END_IF
+    // It may use an enemy item instead of acting.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // It draws lots between spending the turn charging up and attacking.
     CALL(btlevtcmd_get_turn, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
         CALL(btlevtcmd_DrawLots, LW(0), 2, 25, 75)
@@ -283,7 +315,7 @@ static EVT_BEGIN(attack_event)
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_kuriboo_charge))
         CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_KURIBOO_CHARGED, 1)
         CALL(evt_btl_camera_set_mode, 0, 7)
         CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -292,6 +324,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 15)
         ADD(LW(2), 10)
+        // Charge-up: the charge sound and a crystal effect play while it hops in place.
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(evt_eff64, STRING(""), STRING("crystal_n64"), 7, LW(0), LW(1), LW(2), FLOAT(1.5f), 60, 0, 0, 0, 0, 0, 0)
         WAIT_MS(1000)
@@ -303,9 +336,11 @@ static EVT_BEGIN(attack_event)
             WAIT_MS(500)
             CALL(evt_btl_camera_set_mode, 0, 0)
         END_INLINE_EVENT
+        // The charge weapon applies the charged state to itself and the turn ends.
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
         RETURN
     END_IF
+    // Headbutt: the attack is declared.
     LABEL(10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.5996094f))
     CALL(evt_btl_camera_set_mode, 0, 8)
@@ -316,16 +351,18 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_kuriboo_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // It runs up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Wind-up: a short pause, then it leaps at the target, spinning in the air.
     WAIT_MS(170)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
@@ -349,6 +386,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, LW(15))
     END_INLINE_EVENT
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    // The leap comes down on the target; the pre-damage check decides between a dodge and a hit.
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 32, -1)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
     SWITCH(LW(5))
@@ -372,6 +410,7 @@ static EVT_BEGIN(attack_event)
         GOTO(91)
         CASE_END
     END_SWITCH
+    // Miss: it hops on past the target, which dodges for some kinds of miss.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -384,6 +423,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
     WAIT_MS(500)
     GOTO(95)
+    // Hit: the attack lands for its damage and the Goomba bounces back off the target.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -403,6 +443,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 6, -1)
     GOTO(95)
+    // It walks back to its home position.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 3, 3, 0, 0)

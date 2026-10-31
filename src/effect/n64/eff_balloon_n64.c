@@ -35,6 +35,7 @@ void effSetVtxDescN64(effN64Vtx* vtx);
 // FAKE: local prototype: tri1 is declared without parameters (eff_n64.h: (u16, u16, u16, u16)); this file was compiled with it and the header prototype changes the code.
 void tri1();
 
+/** Template vertices of the balloon, copied each frame before the 20 outline points are wobbled around it. */
 static effN64Vtx balloon_vtx[] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 255},
     {0, 0, 0, 0, 480, 0, 0, 0, 255},

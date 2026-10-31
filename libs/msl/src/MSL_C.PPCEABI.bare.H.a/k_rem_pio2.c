@@ -2,8 +2,10 @@
 
 double ldexp(double, int);
 
+/** Number of terms to start with for each precision level of the angle reduction. */
 static const int init_jk[] = {2, 3, 4, 6};
 
+/** Pi/2 split into 24-bit pieces for the angle reduction. */
 static const double PIo2[] = {
     1.57079625129699707031e+00,
     7.54978941586159635335e-08,

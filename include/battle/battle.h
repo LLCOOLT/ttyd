@@ -93,6 +93,17 @@ typedef enum BattleBadgeFlags {
     BADGE_FLAG_ATTACK_FX_P = 1 << 12,
 } BattleBadgeFlags;
 
+// BattleWork.dispFlags
+typedef enum BattleDispFlags {
+    BATTLE_DISP_FLAG_COMMAND_MENU = 1 << 0, // the command menu is up (battle_seq_command); veiled units show translucent
+    BATTLE_DISP_FLAG_STAR_POINTS = 1 << 1,  // the Star Point counter is drawn (btlDispInit on, battle end off)
+} BattleDispFlags;
+
+// BattleWork.lectureFlags
+typedef enum BattleLectureFlags {
+    LECTURE_FLAG_CONTINUE_WINDOW = 1 << 0, // Frankly's lecture (aud_attack_init/end): an audience attack continues msgWindow lectureWindowId
+} BattleLectureFlags;
+
 typedef struct BattleDebugCtrl {
     s32 flags;        // 0x0, BattleDebugFlags
     s32 reserved_04;  // 0x4, never accessed
@@ -230,7 +241,7 @@ struct BattleWork {
     s32 lectureUnitId;                                       // 0x424, unit id -6 resolves to (_battle_set_lecture_unit_id); its weapons replace the menu weapons, -1 = none
     BattleWorkWeaponTargets weaponTargets;                   // 0x428
     u32 flags;                                               // 0xEF4
-    s32 dispFlags;                                           // 0xEF8
+    s32 dispFlags;                                           // 0xEF8, BattleDispFlags
     s32 ruleDispTimer;                                       // 0xEFC
     s32 stockExp;                                            // 0xF00, BattleStoreExp/BattleGetStockExp
     s32 stockExpDisp;                                        // 0xF04, counts up to stockExp in BattleStockExpDisp
@@ -294,7 +305,7 @@ struct BattleWork {
     s32 curtainSfxId;      // 0x19060
     u8 lastAcSuccess;      // 0x19064 (US 0x19074), 1 after a successful action command (btlevtcmd_ResultACDefence)
     BattleDebugCtrl debug; // 0x19068 (US 0x19078), debug overrides read by the audience and break slot
-    u32 lectureFlags;      // 0x19080 (US 0x19090), bit 0 set by the Frankly lecture (aud_attack_init/end); continues msgWindow lectureWindowId
+    u32 lectureFlags;      // 0x19080 (US 0x19090), BattleLectureFlags
     s32 lectureWindowId;   // 0x19084 (US 0x19094)
 };
 extern BattleWork* _battleWorkPointer;

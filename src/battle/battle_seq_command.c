@@ -29,6 +29,8 @@
 #include "battle/battle_disp.h"
 #include "battle/battle_message.h"
 #include "system.h"
+#include "battle/battle_attack_audience.h"
+#include <string.h>
 // FAKE: battle_seq_command.c calls windowDispGX_Waku_col through this prototype (the types it was compiled with) instead of the one in driver/windowdrv.h; same registers, behaviour-identical.
 typedef void (*WindowDispWakuColFloatsFirstFn)(f32, f32, f32, f32, f32, u16, GXColor);
 
@@ -36,7 +38,6 @@ void BattleCommandDisplay_ActMenuEnd(BattleWork* wp);
 static void _btlcmd_MakeMultiItemTable(BattleWork* wp);
 static void _btlcmd_MakeOperationTable(BattleWork* wp);
 static void _btlcmd_MakeActClassTable(BattleWork* wp);
-unsigned long strlen(const char* s);
 static BOOL BattleCommandAttackAudienceCheck(void);
 void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* param);
 static USER_FUNC(_get_msg);
@@ -74,7 +75,9 @@ static void _btlcmd_UpdateSelectWeaponTable(BattleWork* wp, s32 type);
 static s32 _getJumpIconId(void);
 static s32 _getHammerIconId(void);
 
+/** Jump badges listed in Mario's Jump menu, in menu order, when equipped (_btlcmd_MakeSelectWeaponTable). */
 s32 _jump_badge_table[8] = {ITEM_POWER_JUMP, ITEM_MULTIBOUNCE, ITEM_SHRINK_STOMP, ITEM_SLEEPY_STOMP, ITEM_SOFT_STOMP, ITEM_TORNADO_JUMP, ITEM_POWER_BOUNCE, ITEM_MEGA_JUMP};
+/** Hammer badges listed in Mario's Hammer menu, in menu order, when equipped (_btlcmd_MakeSelectWeaponTable). */
 s32 _hammer_badge_table[9] = {ITEM_POWER_SMASH, ITEM_PIERCING_BLOW, ITEM_HAMMER_THROW, ITEM_HEAD_RATTLE, ITEM_ICE_SMASH, ITEM_FIRE_DRIVE, ITEM_QUAKE_HAMMER, ITEM_MEGA_SMASH, ITEM_MEGA_QUAKE};
 
 /**
@@ -347,7 +350,7 @@ static void _btlcmd_GetCursorPtr(BattleCommand* cmd, u32 type, BattleCursor** ou
     }
 }
 
-// inlining off for _getJumpIconId, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _getJumpIconId is inlined into _btlcmd_MakeSelectWeaponTable (852 -> 891 instructions)
 #pragma dont_inline on
 /** Icon of the jump moves in the weapon list: normal, Super or Ultra Boots by the pouch jumpLevel. */
 static s32 _getJumpIconId(void) {
@@ -362,7 +365,7 @@ static s32 _getJumpIconId(void) {
 }
 #pragma dont_inline reset
 
-// inlining off for _getHammerIconId, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _getHammerIconId is inlined into _btlcmd_MakeSelectWeaponTable (852 -> 891 instructions)
 #pragma dont_inline on
 /** Icon of the hammer moves in the weapon list: normal, Super or Ultra Hammer by the pouch hammerLevel. */
 static s32 _getHammerIconId(void) {
@@ -692,6 +695,10 @@ static s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
     return num;
 }
 
+/**
+ * Partner list for the battle's change-partner menu: unit kind, name, menu icon and help message for each partner
+ * (entry 0 empty). _btlcmd_MakePartyTable lists the ones Mario has; _battleGetPartyIcon reads the icons.
+ */
 BattleCheckPartyEntry _checkPartyTable[8] = {
     {0, NULL, 0, NULL},
     {UNIT_GOOMBELLA, "btl_cmd_pt_christine", ICON_155, "btl_hlp_cmd_operation_party1"},
@@ -1020,7 +1027,7 @@ static void _btlcmd_MakeMultiItemTable(BattleWork* wp) {
 }
 #pragma opt_propagation reset
 
-// inlining off for _battleGetPartyIcon, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _battleGetPartyIcon is inlined into _btlcmd_MakeOperationTable (274 -> 315 instructions; one other caller grows)
 #pragma dont_inline on
 /**
  * Menu icon of a partner kind from _checkPartyTable; Yoshi's follows the colour he hatched with.
@@ -1060,8 +1067,8 @@ static u16 _battleGetPartyIcon(s32 kind) {
 #pragma dont_inline reset
 
 /**
- * Fills the Change Partner list with each partner whose pouch entry carries the joined flag (tested as
- * UNIT_FLAG_SHOW_HP_GAUGE), with name, icon and HP.
+ * Fills the Change Partner list with each partner whose pouch entry carries POUCH_PARTY_FLAG_JOINED,
+ * with name, icon and HP.
  * The partner already out and KO'd partners are greyed out, and the cursor starts on the current one.
  * Returns the count, 0 when there is no partner out.
  */
@@ -1096,7 +1103,7 @@ static s32 _btlcmd_MakePartyTable(BattleWork* wp) {
             continue;
         }
         party = &pouch->partyData[BattleTransPartyId(kind)];
-        if (!(party->flags & UNIT_FLAG_SHOW_HP_GAUGE)) {
+        if (!(party->flags & POUCH_PARTY_FLAG_JOINED)) {
             continue;
         }
         cmd->party[num].kind = kind;
@@ -1127,7 +1134,7 @@ static s32 _btlcmd_MakePartyTable(BattleWork* wp) {
     return num;
 }
 
-// inlining off for _btlcmd_SelectWeaponDecide, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _btlcmd_SelectWeaponDecide is inlined into BattleCommandInput (526 -> 595 instructions; 2 other callers grow)
 #pragma dont_inline on
 /**
  * Rebuilds the weapon list and samples the targets of the chosen weapon into wp->weaponTargets,
@@ -1250,7 +1257,7 @@ s32 BattleCommandInput(void* work) {
                     }
                 }
                 cmd->cancelled = 0;
-                wp->dispFlags |= 1;
+                wp->dispFlags |= BATTLE_DISP_FLAG_COMMAND_MENU;
                 BtlUnit_SetCommandAnimPose(unit);
                 if ((s8)(u8)unit->moveState >= 5 && (s8)(u8)unit->moveState <= 9) {
                     BattleStageOnLightInCommand();
@@ -1276,7 +1283,7 @@ s32 BattleCommandInput(void* work) {
                 break;
             case 3:
                 cmd->state = 4;
-                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, 0x20)->eventId;
+                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, EVENT_START_NOW)->eventId;
             case 4:
                 if (!evtCheckID(cmd->errorEvtId)) {
                     cmd->errorEvtId = 0;
@@ -1315,7 +1322,7 @@ s32 BattleCommandInput(void* work) {
                 break;
             case 8:
                 cmd->state = 9;
-                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, 0x20)->eventId;
+                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, EVENT_START_NOW)->eventId;
             case 9:
                 if (!evtCheckID(cmd->errorEvtId)) {
                     cmd->errorEvtId = 0;
@@ -1433,7 +1440,7 @@ s32 BattleCommandInput(void* work) {
                 break;
             case 17:
                 cmd->state = 18;
-                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, 0x20)->eventId;
+                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, EVENT_START_NOW)->eventId;
             case 18:
                 if (!evtCheckID(cmd->errorEvtId)) {
                     cmd->errorEvtId = 0;
@@ -1457,7 +1464,7 @@ s32 BattleCommandInput(void* work) {
                 break;
             case 22:
                 cmd->state = 23;
-                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, 0x20)->eventId;
+                cmd->errorEvtId = evtEntry(_btl_cmd_error_msg_event, 0, EVENT_START_NOW)->eventId;
             case 23:
                 if (!evtCheckID(cmd->errorEvtId)) {
                     cmd->errorEvtId = 0;
@@ -1498,7 +1505,7 @@ s32 BattleCommandInput(void* work) {
             case 29:
                 _btlcmd_SetAttackEvent(unit, cmd);
                 cmd->flags &= ~CMD_MENU_FLAG_SHOW_ALL_ENEMY_HP;
-                wp->dispFlags &= ~1;
+                wp->dispFlags &= ~BATTLE_DISP_FLAG_COMMAND_MENU;
                 BattleStageOffLightInCommand(0, 0);
                 return 1;
         }
@@ -1509,8 +1516,6 @@ s32 BattleCommandInput(void* work) {
     }
     return 0;
 }
-
-#pragma dont_inline reset
 
 /**
  * Registers this frame's draw callbacks for the command input (from battle_disp.c):
@@ -1551,7 +1556,7 @@ void BattleCommandDisplay(BattleWork* wp) {
     }
 }
 
-// inlining off for _cursor_init, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _cursor_init is inlined into BattleCommandDisplay_ActMenuSetup (its nine calls become 18 stores; same length, 20 instructions differ)
 #pragma dont_inline on
 /** Puts a menu cursor back on the first entry. */
 static void _cursor_init(BattleCursor* cursor) {
@@ -1560,7 +1565,7 @@ static void _cursor_init(BattleCursor* cursor) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandDisplay_ActMenuSetup, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_ActMenuSetup is inlined into BattleCommandInput (526 -> 577 instructions)
 #pragma dont_inline on
 /**
  * Opens the action menu: rebuilds its entries, starts the menu display (a = 1 when coming back from a submenu)
@@ -1778,7 +1783,7 @@ void BattleCommandDisplay_ActMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_ActSelect_Disp(wp);
 }
 
-// inlining off for BattleCommandDisplay_ActMenuEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_ActMenuEnd is inlined into BattleCommandDisplay_ActMenuMain (290 -> 302 instructions; one other caller grows)
 #pragma dont_inline on
 /** Closes the action menu display and clears CMD_MENU_FLAG_ACT. */
 void BattleCommandDisplay_ActMenuEnd(BattleWork* wp) {
@@ -1787,7 +1792,7 @@ void BattleCommandDisplay_ActMenuEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandDisplay_WeaponSelectMenuSetup, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_WeaponSelectMenuSetup is inlined into BattleCommandInput (526 -> 569 instructions)
 #pragma dont_inline on
 /** Opens the weapon list of menu type `type`: builds it, starts its display (a is passed on) and shows all enemy HP. */
 void BattleCommandDisplay_WeaponSelectMenuSetup(BattleWork* wp, s32 type, s32 a) {
@@ -1910,7 +1915,7 @@ void BattleCommandDisplay_WeaponSelectMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_WeaponSelect_Disp(param);
 }
 
-// inlining off for BattleCommandDisplay_WeaponSelectMenuEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_WeaponSelectMenuEnd is inlined into BattleCommandDisplay_WeaponSelectMenuMain (215 -> 233 instructions)
 #pragma dont_inline on
 /** Closes the weapon list display and clears CMD_MENU_FLAG_WEAPON_SELECT. */
 void BattleCommandDisplay_WeaponSelectMenuEnd(BattleWork* wp) {
@@ -1919,7 +1924,7 @@ void BattleCommandDisplay_WeaponSelectMenuEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandDisplay_WeaponMultiItemCancelCheckSetup, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_WeaponMultiItemCancelCheckSetup is inlined into BattleCommandInput (526 -> 529 instructions)
 #pragma dont_inline on
 /**
  * Resets the Yes/No cursor of the prompt shown when B is pressed in the item list in the middle of a Double
@@ -2032,7 +2037,7 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
     iconDispGx(&pos, ICON_FLAG_2D | ICON_FLAG_FLIP_X, ICON_1F0, 1.0f);
 }
 
-// inlining off for BattleCommandDisplay_OperationMenuSetup, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_OperationMenuSetup is inlined into BattleCommandInput (526 -> 538 instructions)
 #pragma dont_inline on
 /** Opens the Tactics menu: builds its entries, starts its display (a is passed on) and shows all enemy HP. */
 void BattleCommandDisplay_OperationMenuSetup(BattleWork* wp, s32 a) {
@@ -2144,7 +2149,7 @@ void BattleCommandDisplay_OperationMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_Operation_Disp(param);
 }
 
-// inlining off for BattleCommandDisplay_OperationMenuEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_OperationMenuEnd is inlined into BattleCommandDisplay_OperationMenuMain (179 -> 191 instructions)
 #pragma dont_inline on
 /** Closes the Tactics menu display and clears CMD_MENU_FLAG_OPERATION. */
 void BattleCommandDisplay_OperationMenuEnd(BattleWork* wp) {
@@ -2153,7 +2158,7 @@ void BattleCommandDisplay_OperationMenuEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandDisplay_MultiItemMenuSetup, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_MultiItemMenuSetup is inlined into BattleCommandInput (526 -> 536 instructions)
 #pragma dont_inline on
 /** Opens the Double/Triple Dip menu: builds its entries and starts its display (a is passed on). */
 void BattleCommandDisplay_MultiItemMenuSetup(BattleWork* wp, s32 a) {
@@ -2244,7 +2249,7 @@ void BattleCommandDisplay_MultiItemMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_MultiItem_Disp(param);
 }
 
-// inlining off for BattleCommandDisplay_MultiItemMenuEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_MultiItemMenuEnd is inlined into BattleCommandDisplay_MultiItemMenuMain (153 -> 165 instructions)
 #pragma dont_inline on
 /** Closes the Double/Triple Dip menu display and clears CMD_MENU_FLAG_MULTI_ITEM. */
 void BattleCommandDisplay_MultiItemMenuEnd(BattleWork* wp) {
@@ -2333,7 +2338,7 @@ void BattleCommandDisplay_ChangePartySelectMenuDisp(CameraId camId, void* param)
     BattleMenuDisp_ChangePartySelect_Disp(param);
 }
 
-// inlining off for BattleCommandDisplay_ChangePartySelectMenuEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_ChangePartySelectMenuEnd is inlined into BattleCommandDisplay_ChangePartySelectMenuMain (137 -> 146 instructions)
 #pragma dont_inline on
 /** Closes the Change Partner list display and clears CMD_MENU_FLAG_CHANGE_PARTY. */
 void BattleCommandDisplay_ChangePartySelectMenuEnd(BattleWork* wp) {
@@ -2342,11 +2347,11 @@ void BattleCommandDisplay_ChangePartySelectMenuEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandDisplay_TargetSelectMenuSetup, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_TargetSelectMenuSetup is inlined into BattleCommandDisplay_WeaponSelectMenuMain (215 -> 226 instructions; one other caller grows)
 #pragma dont_inline on
 /**
  * Starts target selection: sets CMD_MENU_FLAG_TARGET_SELECT
- * and gives the acting unit's body animation type 0x28. Guess: 0x28 is the ready-to-attack pose.
+ * and plays pose type 0x28 (BTL_POSE_WALK, the walk pose such as PKR_W_1) on the acting unit's body.
  */
 void BattleCommandDisplay_TargetSelectMenuSetup(BattleWork* wp) {
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
@@ -2474,7 +2479,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
     btl_camera_set_mode(0, 0);
 }
 
-// inlining off for BattleCommandDisplay_TargetSelectMenuEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_TargetSelectMenuEnd is inlined into BattleCommandInput (526 -> 562 instructions)
 #pragma dont_inline on
 /** Ends target selection: resets the battle camera and clears the target-select and show-all-enemy-HP flags. */
 void BattleCommandDisplay_TargetSelectMenuEnd(BattleWork* wp) {
@@ -2488,7 +2493,7 @@ void BattleCommandDisplay_TargetSelectMenuEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandDisplay_ProtectPartnerSelectMenuSetup, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_ProtectPartnerSelectMenuSetup is inlined into BattleCommandInput (526 -> 536 instructions)
 #pragma dont_inline on
 /**
  * Starts the protect-partner choice (Tactics type 4):
@@ -2528,7 +2533,7 @@ void BattleCommandDisplay_ProtectPartnerSelectMenuDisp(CameraId camId, void* par
     FontDrawString(3.0f + icon.x - w, 77.0f + icon.y, msgSearch(unit->kindParams->name));
 }
 
-// inlining off for BattleCommandDisplay_ProtectPartnerSelectMenuEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_ProtectPartnerSelectMenuEnd is inlined into BattleCommandInput (526 -> 528 instructions)
 #pragma dont_inline on
 /** Ends the protect-partner choice (clears CMD_MENU_FLAG_PROTECT_PARTNER). */
 void BattleCommandDisplay_ProtectPartnerSelectMenuEnd(BattleWork* wp) {
@@ -2536,7 +2541,7 @@ void BattleCommandDisplay_ProtectPartnerSelectMenuEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandDisplay_AllEnd, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandDisplay_AllEnd is inlined into _check_present_item (126 -> 129 instructions)
 #pragma dont_inline on
 /**
  * Hides every command menu except the Double Dip menu at once;
@@ -2547,8 +2552,6 @@ void BattleCommandDisplay_AllEnd(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
-void* btlataudGetAttackEventPtr(s32 id);
-void* btlataudGetMoveEventPtr(s32 id);
 static s32 _check_weapon_type_attack(BattleWeapon* weapon);
 #define WEVT(w) ((w)->attackEvtScript)
 
@@ -2763,7 +2766,7 @@ static void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
             } else {
                 BtlActRec_AddCount(&wp->actRecord.partnerAudienceAttacks);
             }
-            if (wp->lectureFlags & 1) {
+            if (wp->lectureFlags & LECTURE_FLAG_CONTINUE_WINDOW) {
                 msgWindow_Continue(wp->lectureWindowId);
             }
             break;
@@ -2782,7 +2785,9 @@ static void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
                     unit->moveState = 4;
                     break;
             }
-            unit->attackEventCode = btlataudGetMoveEventPtr(unit->unitId);
+            // FAKE: called through a cast that passes unit->unitId: btlataudGetMoveEventPtr takes no argument, but the
+            // target loads the id into r3 for the call (the plain call is one instruction short).
+            unit->attackEventCode = ((EvtWord * (*)(s32)) btlataudGetMoveEventPtr)(unit->unitId);
             unit->attackEventFlags = ATTACK_EVENT_KEEP_STATUS_WINDOW | ATTACK_EVENT_IGNORE_STATUS;
             break;
         case 13:
@@ -2929,7 +2934,7 @@ void BattleDrawEnemyHP(CameraId camId, void* param) {
 void BattleAcHelpSetDispType(s32 type);
 s32 irand(s32 scalar);
 
-// inlining off for BattleDrawEnemyHPBar, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleDrawEnemyHPBar is inlined into BattleDrawEnemyHP (145 -> 234 instructions)
 #pragma dont_inline on
 /**
  * Draws one HP bar at screen position pos: the frame texture, then the fill by barRatio,
@@ -3156,13 +3161,16 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
     }
 }
 
-// inlining off for _commandRestoreRec, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _commandRestoreRec is inlined into BattleCommandInput (526 -> 630 instructions)
 #pragma dont_inline on
 /**
  * Records the current menu state in cmd->recCommand;
  * while an audience action is pending, clears it
  * and the pending action once the menu is back at the recorded state.
- * Guess: lets input resume where it was after an audience interruption.
+ * The command loop calls it after each state while attackAudience is set (from an X audience attack) and
+ * then re-runs the states at once,
+ * with BattleMenuKeyOKInACT letting input through, until it is back at the recorded state.
+ * Guess: this rebuilds the menu where the player was after the audience interruption.
  */
 static void _commandRestoreRec(void) {
     BattleWork* wp = _battleWorkPointer;
@@ -3178,7 +3186,7 @@ static void _commandRestoreRec(void) {
 }
 #pragma dont_inline reset
 
-// inlining off for BattleCommandAttackAudienceCheck, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it BattleCommandAttackAudienceCheck is inlined into BattleCommandDisplay_ActMenuMain (290 -> 331 instructions; 6 other callers grow)
 #pragma dont_inline on
 /**
  * X during command input: unless in zero gravity or Mario is veiled,

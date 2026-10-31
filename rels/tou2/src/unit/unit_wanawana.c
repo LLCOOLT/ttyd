@@ -37,6 +37,10 @@ static f32 tanFloat(f32 x) {
     return tan(x);
 }
 
+/**
+ * Unit data of the Trap: 2 HP and level 1, with its parts, status vulnerability, init event and event data
+ * table.
+ */
 BattleUnitKind unit_wanawana = {
     199,
     "btl_un_wanawana",
@@ -103,12 +107,22 @@ BattleUnitKind unit_wanawana = {
     data_table,
 };
 
+/**
+ * Defense of the Trap against normal, fire, ice, explosion and electric attacks: none, so it takes full
+ * damage from every element.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type reactions of the Trap: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the Trap, as the percent chance each status takes hold: every status lands at
+ * the normal rate.
+ */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/** Pose table of the Trap: maps each battle pose (idle, hurt, attacking and so on) to its animation. */
 static PoseTableEntry pose_table[] = {
     {28, "S_1"},
     {31, "S_1"},
@@ -116,17 +130,25 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Event data table of the Trap: no custom reactions, so the standard battle handlers run for every event. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Parts of the Trap: a single body part (part 1, model nakayama_test4), each with its defense tables,
+ * attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_wanawana", "nakayama_test4", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_wanawana", "nakayama_test4", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
 /**
- * Guess: draw callback that renders the floor under the trap from above into a texture (a top-down camera over
- * the part's bounding box) so the trap can show the ground it sits on.
+ * Shadow-camera draw callback queued by replace_evt:
+ * points the camera straight down over the trap part, sized to
+ * its pose's bounding box, draws the map objects flagged MAPOBJ_FLAG_KURURING_PASS (the S_yuka floor group, see
+ * init_event) with test_kururing_mapdisp and copies the result into the trap's half-size RGB5A3 texture,
+ * then restores the camera and marks the texture ready.
  */
 static void replace_disp(CameraId camera, void* param) {
     WanaWork* wp = param;
@@ -173,8 +195,8 @@ static void replace_disp(CameraId camera, void* param) {
 }
 
 /**
- * Guess: part display callback: while the floor texture is ready,
- * binds it as the part's paper texture (type 0) and resets the paper texture afterwards.
+ * Display callback of the trap part (set by replace_evt): once the floor texture is ready it binds it as the
+ * paper texture with an identity matrix for draw type 0 and clears the paper texture for any other type.
  */
 static void replace_callback(BattleUnitPart* part, s32 type) {
     WanaWork* wp = (WanaWork*)part->owner->countersetWeapon;
@@ -194,8 +216,11 @@ static void replace_callback(BattleUnitPart* part, s32 type) {
 }
 
 /**
- * Guess: script helper that sets up the wanawana trap's floor-copy texture:
- * allocates the texture and work area, enables the texture overlay on the part and queues replace_disp.
+ * Script helper that sets up the wanawana trap's floor-copy texture:
+ * allocates the work (kept in the unit's countersetWeapon slot) and an RGB5A3 texture as wide
+ * and deep as the part's
+ * bounding box, turns on ANIM_POSE_FLAG_TEX_OVERLAY for its pose, installs replace_callback and queues
+ * replace_disp.
  */
 static USER_FUNC(replace_evt) {
     BattleUnitPart* part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
@@ -237,7 +262,8 @@ static USER_FUNC(replace_evt) {
  * Init script of the unused wanawana trap unit:
  * registers its wait, attack and damage handlers (confusion uses the default handler),
  * turns on the MAPOBJ_FLAG_KURURING_PASS flag of the S_yuka map object group,
- * runs replace_evt and starts the idle event. Guess: the map object flag is about the floor the trap sits on.
+ * runs replace_evt and starts the idle event.
+ * The flag makes test_kururing_mapdisp draw the S_yuka floor objects into the trap's texture (replace_disp).
  */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))

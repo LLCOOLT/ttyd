@@ -1,4 +1,5 @@
-// tou_11 (闘技場, Glitz Pit): the passage beside the arena; exits to tou_03, tou_04, tou_09.
+// tou_11 (闘技場, Glitz Pit): an empty minor-league locker room, hidden behind the tou_09 lockers, where Mario is
+// shut in before the title match; exits to tou_04 and tou_09 (the shut-in scenes iris out to tou_03).
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -23,7 +24,7 @@
 #include "driver/mapdrv.h"
 
 /**
- * Door animation callback for the passage door (door_1), opening: LW(0) is the swing angle;
+ * Door animation callback for the north door (door_1), opening: LW(0) is the swing angle;
  * turns door_1 about the Y axis by 0.44 times the angle.
  */
 static EVT_BEGIN(n_door_open)
@@ -33,7 +34,7 @@ static EVT_BEGIN(n_door_open)
 EVT_END()
 
 /**
- * Door animation callback for the passage door (door_1), closing:
+ * Door animation callback for the north door (door_1), closing:
  * turns door_1 about the Y axis by -0.44 times the angle.
  */
 static EVT_BEGIN(n_door_close)
@@ -62,6 +63,7 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/** Doors of this room: the north door to the main corridor tou_04 and the east door to tou_09. */
 static BeroEntry bero_data[] = {
     {
         "n_bero", // hitName
@@ -102,6 +104,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/** NPCs of this room: the guard who brings Mario here before the title match (evt_tojikome). */
 static NpcSetupInfo npcEnt[] = {
     {
         "ガードマン", // name
@@ -116,11 +119,14 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 /**
- * Guess: shut-in scene on Mario's first visit: a guard walks in,
- * the door locks behind him (set GSWF_TOU11_LOCKED_IN_SEEN) and he explains that the passage is closed;
- * Mario and the partner react.
+ * Arrival before the title match (GSWF_TOU_TITLE_MATCH_RESERVED), played once (GSWF_TOU11_LOCKED_IN_SEEN):
+ * a guard (ガードマン) brings Mario and the partner in,
+ * tells them to wait here (stg3_tou_409) and leaves through the door.
+ * The partner wonders why they were brought to a locker room and where everyone is,
+ * worried they will miss the match (stg3_tou_409_01), then the screen irises out to tou_03.
  */
 EVT_BEGIN(evt_tojikome)
+    // Plays only once, with the music stopped.
     IF_INT_EQUAL(GSWF(GSWF_TOU11_LOCKED_IN_SEEN), 1)
         RETURN
     END_IF
@@ -133,6 +139,7 @@ EVT_BEGIN(evt_tojikome)
     CALL(evt_npc_set_position, STRING("ガードマン"), 0, 0, -160)
     CALL(evt_npc_status_onoff, 1, STRING("ガードマン"), 2)
     CALL(evt_seq_wait, 2)
+    // The guard opens the door and leads Mario and the partner into the room.
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
@@ -175,6 +182,7 @@ EVT_BEGIN(evt_tojikome)
     CALL(evt_mario_mov_pos2, 0, -80, FLOAT(60.0f))
     CALL(evt_mario_mov_pos2, 30, -80, FLOAT(60.0f))
     CALL(evt_mario_set_dir_npc, STRING("ガードマン"))
+    // The guard tells them to wait here and they look puzzled.
     CALL(evt_msg_print, 0, STRING("stg3_tou_409"), 0, STRING("ガードマン"))
     WAIT_MS(300)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -182,6 +190,7 @@ EVT_BEGIN(evt_tojikome)
     CALL(evt_eff_fukidashi, 0, STRING("m"), 0, 1, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff_fukidashi, 3, STRING("p"), 0, 1, 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(500)
+    // He leaves through the door, which shuts behind him.
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -100, 0, FLOAT(70.0f), 1)
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
@@ -207,6 +216,7 @@ EVT_BEGIN(evt_tojikome)
         END_LOOP
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -200, 0, FLOAT(70.0f), 1)
+    // The partner wonders why they are in a minor-league locker room, then the scene irises to the arena.
     CALL(evt_party_stop, 0)
     CALL(evt_msg_print_party, STRING("stg3_tou_409_01"))
     WAIT_MS(1000)
@@ -216,8 +226,9 @@ EVT_BEGIN(evt_tojikome)
 EVT_END()
 
 /**
- * Guess: second shut-in scene: the partner tries the door (stg3_tou_409_02),
- * it will not open (stg3_tou_410) and Mario is sent back to tou_03.
+ * Second visit (entrance "nidome"): the partner complains they are ridiculously late
+ * and goes to check (stg3_tou_409_02), the door will not open (locked-door sound),
+ * the partner panics that they are locked in (stg3_tou_410), and the screen irises out to tou_03.
  */
 EVT_BEGIN(evt_tojikome_nidome)
     CALL(evt_snd_bgm_scope, 0, 0)
@@ -288,7 +299,7 @@ EVT_BEGIN(evt_postar)
 EVT_END()
 
 /**
- * Map init for tou_11, the passage beside the arena:
+ * Map init for tou_11, the empty minor-league locker room:
  * NPCs, the blowable poster (pos_1), the shut-in message at n_bero, music,
  * and Mario's and the partner's entry positions (and the title match entry if reserved).
  */

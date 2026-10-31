@@ -34,6 +34,7 @@ typedef struct EffPokopiPipoN64Work {
     s32 duration; // 0x68
 } EffPokopiPipoN64Work;
 
+/** 32x32 camera-facing quad drawn for the lobbed blob. */
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
     {16, -16, 0, 1024, 0, 0, 0, 0, 255},
@@ -41,6 +42,7 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, 16, 0, 0, 1024, 0, 0, 0, 255},
 };
 
+/** Width and height in percent over the squash-and-stretch the blob plays when it lands. */
 static u8 w_scale_data[7] = {110, 150, 130, 110, 100, 95, 100};
 static u8 h_scale_data[7] = {80, 60, 80, 100, 120, 110, 100};
 

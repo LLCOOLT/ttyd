@@ -25,6 +25,11 @@
 #include "evt/evt_npc.h"
 #include "libc_decls.h"
 
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_CHOROBON_GUNDAN_FEW_LEFT = 0, // 1 once a hit finds 50 or fewer Fuzzies left in the horde
+};
+
 Chorogun* chorogun;
 s32 chorogun_targetId;
 
@@ -86,6 +91,10 @@ BattleUnit* chorogun_get_ptr(void) {
     return NULL;
 }
 
+/**
+ * Unit kind of Fuzzy Horde: 20 max HP, level 19. The battle engine reads it when the unit spawns:
+ * size, offsets, sounds, status vulnerability, parts, init script and event table.
+ */
 BattleUnitKind unit_chorobon_gundan = {
     21,
     "btl_un_chorobon_gundan",
@@ -145,9 +154,9 @@ BattleUnitKind unit_chorobon_gundan = {
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
 #if VERSION <= VERSION_DEMO_US
-    0x2240000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR | UNIT_ATTR_NO_KNOCKBACK_POSE | UNIT_ATTR_NO_HP_GAUGE,
 #else
-    0x240000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR | UNIT_ATTR_NO_KNOCKBACK_POSE,
 #endif
     &regist.v,
     1,
@@ -156,12 +165,22 @@ BattleUnitKind unit_chorobon_gundan = {
     data_table,
 };
 
+/**
+ * Defence of Fuzzy Horde per element (normal, fire, ice, explosion, electric), subtracted from each hit:
+ * none.
+ */
 static DefencePad defence = {{{0, 0, 0, 0, 0}}, {0}};
 
+/** Element reactions of Fuzzy Horde: none, every element hits normally. */
 static DefenceAttrPad defence_attr = {{{0, 0, 0, 0, 0}}, {0}};
 
+/** Status vulnerability of Fuzzy Horde: immune to every status effect. */
 static RegistPad regist = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0}};
 
+/**
+ * Pose table of Fuzzy Horde: maps its battle pose types (stay, walk, hurt, dead, talk and so on) to
+ * animation names, 15 entries such as CBN_N_1, CBN_Y_1, CBN_K_1, CBN_X_1.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "CBN_N_1"},
     {2, "CBN_Y_1"},
@@ -169,26 +188,35 @@ static PoseTableEntry pose_table[] = {
     {5, "CBN_K_1"},
     {4, "CBN_X_1"},
     {3, "CBN_X_1"},
-    {28, "CBN_S_1"},
+    {BTL_POSE_NORMAL, "CBN_S_1"},
     {29, "CBN_Q_1"},
     {30, "CBN_Q_1"},
     {31, "CBN_S_1"},
-    {39, "CBN_D_1"},
+    {BTL_POSE_DAMAGE, "CBN_D_1"},
     {50, "CBN_A_1"},
-    {42, "CBN_R_1"},
-    {40, "CBN_W_1"},
+    {BTL_POSE_RUN, "CBN_R_1"},
+    {BTL_POSE_WALK, "CBN_W_1"},
     {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
+/**
+ * Event table of Fuzzy Horde: maps event tags to the scripts that react to them (no custom reactions);
+ * tag 0 ends it.
+ */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/**
+ * Body parts of Fuzzy Horde: a single part (model c_chorobon) holding its hit box.
+ * Each part names its defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_chorobon_gundan", "c_chorobon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence.v, &defence_attr.v, 0x3000009, 0, pose_table},
+    {1, "btl_un_chorobon_gundan", "c_chorobon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence.v, &defence_attr.v, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, 0, pose_table},
 };
 
+/** Attack data of Fuzzy Horde's attack: base damage 1, 100% accuracy. */
 BattleWeapon weapon_chorobon_gundan_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -207,7 +235,7 @@ BattleWeapon weapon_chorobon_gundan_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_FLOATING | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -261,7 +289,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHOROBON_GUNDAN_FEW_LEFT, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -280,18 +308,18 @@ static EVT_BEGIN(damage_event)
         END_IF
         CALL(chorogun_get_alive_num, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), 50)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_CHOROBON_GUNDAN_FEW_LEFT, 1)
         ELSE
             CALL(chorogun_escape)
         END_IF
         ADD(LW(0), 1)
     END_LOOP
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
 #if VERSION <= VERSION_DEMO_US
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_CHOROBON_GUNDAN_FEW_LEFT, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_btl_camera_set_mode, 0, 0)
         CALL(chorogun_escape)
@@ -316,6 +344,7 @@ EVT_END()
  * Misses wait one second; the swarm then returns (chorogun_after_attack).
  */
 static EVT_BEGIN(attack_event)
+    // The Fuzzy Horde first checks whether to use a held item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -323,12 +352,14 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // It picks a target; with none, it ends the turn (or flusters when confused).
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_gundan_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_chorobon_gundan_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_chorobon_gundan_attack))
+    // The attack is declared and paid for, and the camera follows the swarm.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_chorobon_gundan_attack))
@@ -337,7 +368,8 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(chorogun_set_target_id, LW(3))
     CALL(chorogun_approach_target)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_gundan_attack), 256, LW(5))
+    // The swarm flies in toward the target; the damage check decides between a miss and a hit.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_gundan_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -359,9 +391,11 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // On a miss the swarm hovers for a second.
     LABEL(90)
     WAIT_MS(1000)
     GOTO(98)
+    // On a hit it dives onto the target several times, depending on how many Fuzzies are left, with a guard check each time.
     LABEL(91)
     CALL(chorogun_get_alive_num, LW(15))
     ADD(LW(15), 100)
@@ -378,7 +412,7 @@ static EVT_BEGIN(attack_event)
         WAIT_FRAMES(30)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_chorobon_gundan_attack))
         IF_INT_EQUAL(LW(14), LW(15))
-            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_gundan_attack), 256, LW(5))
+            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_gundan_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
         ELSE
             CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_chorobon_gundan_attack), 0, LW(5))
         END_IF
@@ -391,6 +425,7 @@ static EVT_BEGIN(attack_event)
         WAIT_FRAMES(30)
     END_LOOP
     GOTO(98)
+    // The last dive deals the damage; the swarm flies back home and the camera resets.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(chorogun_after_attack)
@@ -406,6 +441,10 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Texture entries for the Fuzzy Horde swarm: 20 copies of the Fuzzy model animation CBN_W_1 with start
+ * offsets 0, 2, 4 ... 38 frames, so the swarm does not wiggle in step; the {0} entry ends the list.
+ */
 ExtTexInfo chorogun_ext_entry_data[] = {
     {"c_chorobon", "CBN_W_1", 0.0f},
     {"c_chorobon", "CBN_W_1", 2.0f},
@@ -488,8 +527,11 @@ void chorogun_ext_init(void) {
 }
 
 /**
- * Guess: per-frame update of the swarm: runs each Fuzzy's state machine (appear, approach the target, dive,
- * bounce, escape) and writes the result to its pose matrix, then queues chorogun_ext_disp.
+ * Per-frame update of the swarm: runs each Fuzzy's state machine and moves its pose matrix:
+ * entrance (1 to 21: drop from a random spot in the sky, hop to its slot and keep hopping with the Horde unit),
+ * hopping over to the target (30 to 40), a dive (45), a bounce off the target (46), a knock-back from a counter
+ * (48), the regroup after an attack (50) and running away off the right edge (60 to 99).
+ * Then it queues chorogun_ext_disp.
  */
 void chorogun_ext_main(void) {
     BattleWork* wp;

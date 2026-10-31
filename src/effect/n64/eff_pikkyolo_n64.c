@@ -27,6 +27,10 @@ typedef struct EffPikkyoloN64Work {
     s16 a1;       // 0x3A
 } EffPikkyoloN64Work;
 
+/**
+ * Four 16x16 quads, one per animation cell of the fragment texture,
+ * that each tumbling fragment steps through.
+ */
 static effN64Vtx size16x16_tex16x16_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, 512, 0, 0, 0, 0, 255},

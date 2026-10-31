@@ -62,6 +62,7 @@ EVT_BEGIN(bero_02_into_event)
     RETURN
 EVT_END()
 
+/** Exits of mri_17: west road w_bero to mri_12 (e_bero_2); dokan1 (scripted pipe); dokan2 (scripted pipe). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -147,6 +148,7 @@ static EVT_BEGIN(rival_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the cage trap scene: the guide Puni, his sister and the rival Puni. */
 static NpcSetupInfo npcEnt[] = {
     {
         "ガイド", // name
@@ -187,6 +189,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Plants Mario can search in mri_17: A_f1_ueki01, A_f1_ueki02, A_f1_ueki03. */
 static KusaAccess ueki_access_data[] = {
     {1, "A_f1_ueki01", "S_f1_ueki01", NULL},
     {1, "A_f1_ueki02", "S_f1_ueki02", NULL},
@@ -194,6 +197,7 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/** Scattered (x, z) spots, as pairs of 16-bit values, where the caged Punies are placed. */
 s16 trap_position[] = {
     69, -22, 70, -9, 64, -11, 46, -34,
     39, -45, 56, -31, 64, -15, 39, -6,
@@ -378,6 +382,7 @@ EVT_BEGIN(trap_event)
     CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ａ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("第三勢力部下Ｂ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    // Mario and his partner walk in with the Puni Orb in place; Punio runs ahead.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     WAIT_MS(500)
@@ -418,8 +423,10 @@ EVT_BEGIN(trap_event)
     DELETE_EVENT(LW(9))
     CALL(evt_cam3d_evt_set, 13, 110, 326, 13, 56, 20, 500, 11)
     WAIT_MS(500)
+    // The cage falls on the Punies and Punio wonders what happened.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_01"), 0, STRING("ガイド"))
     CALL(evt_msg_toge, 2, 5, 230, 0)
+    // Lord Crump laughs and drops in with two X-Naut grunts in front of the cage.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_3RD_ENEMY"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_02"), 0, 0)
     CALL(evt_cam3d_evt_set, 50, 164, 624, 50, 56, 7, 500, 11)
@@ -477,6 +484,7 @@ EVT_BEGIN(trap_event)
     CALL(evt_npc_sound_data_reset, STRING("第三勢力幹部"))
     CALL(evt_cam3d_evt_set, 50, 121, 451, 50, 43, 7, 500, 11)
     WAIT_MS(500)
+    // Crump taunts the party, boasts about the trap and says he can now take the Crystal Star.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_03"), 0, STRING("第三勢力幹部"))
     CALL(evt_cam3d_evt_set, 50, 151, 548, 50, 56, 7, 500, 11)
     WAIT_MS(500)
@@ -520,6 +528,7 @@ EVT_BEGIN(trap_event)
     WAIT_MS(500)
     CALL(evt_npc_set_ry, STRING("ガイド"), 90)
     CALL(evt_mario_set_dir, 270, 200, 0)
+    // The X-Nauts leave and Punio asks Mario what to do.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_05"), 0, STRING("ガイド"))
     CALL(evt_npc_get_position, STRING("ガイド"), LW(0), LW(1), LW(2))
     CALL(evt_puni_flag_onoff, 1, 1, 262144)
@@ -527,6 +536,7 @@ EVT_BEGIN(trap_event)
 #if VERSION >= VERSION_JP
     CALL(evt_puni_set_mode, 1, PUNI_MODE_TRAP)
 #endif
+    // The story advances and Mario regains control; later the partner and Punio urge him to think of a plan.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_PUNIES_VS_JABBIES_2)
     SET_VALUE(GF(1), 0)
     CALL(evt_cam3d_evt_off, 300, 11)

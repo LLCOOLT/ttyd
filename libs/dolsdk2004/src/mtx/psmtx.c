@@ -102,8 +102,8 @@ exit:
 }
 
 /**
- * Guess: two-matrix skinning; transforms each point by both ROMtx m0 and m1
- * and blends them with the per-vertex weight from wtBase.
+ * Two-matrix skinning: for each of count points it builds m0 + w * (m1 - m0) from the point's weight w in wtBase
+ * and transforms the point from srcBase by that blended ROMtx into dstBase. Assembly.
  */
 asm void PSMTXROSkin2VecArray(const register ROMtx m0, const register ROMtx m1, const register f32* wtBase, const register Vec* srcBase, register Vec* dstBase, register u32 count) {
     nofralloc

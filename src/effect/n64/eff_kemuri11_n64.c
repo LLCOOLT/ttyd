@@ -30,6 +30,7 @@ typedef struct EffKemuri11N64Work {
     u8 pad[2];     // 0x56
 } EffKemuri11N64Work;
 
+/** Smoke body mesh (54 vertices) each puff of smoke effect 11 is drawn with. */
 static effN64Vtx stg_thruhammer_v[] = {
     {-34, -2, 20, 4267, 1024, 255, 255, 255, 255},
     {-52, 50, 0, 3840, 2048, 255, 255, 255, 0},

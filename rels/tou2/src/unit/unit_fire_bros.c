@@ -14,6 +14,12 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_sub.h"
 
+// Unit work slots of this unit (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_FIRE_BROS_THROWN = 0,   // fireballs thrown so far in the barrage (nagemakuri) attack
+    UW_FIRE_BROS_FINISHED = 1, // fireballs whose flight has finished (fire_move_event counts them)
+};
+
 BattleUnitKind unit_fire_bros;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -96,6 +102,10 @@ static USER_FUNC(fire_bros_nagemakuri_set_target) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit data of the Fire Bro: 7 HP and level 20, with its parts, status vulnerability, init event and event
+ * data table.
+ */
 BattleUnitKind unit_fire_bros = {
     58,
     "btl_un_fire_bros",
@@ -163,23 +173,42 @@ BattleUnitKind unit_fire_bros = {
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Defence of the Fire Bro: 1 against normal, ice, explosion and electric hits;
+ * immune to fire (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{1, 99, 1, 1, 1}};
 #else
+/** Defense of the Fire Bro against normal, fire, ice, explosion and electric attacks: 1, 1, 1, 1, 1. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/** Damage-type reactions of the Fire Bro: immune to fire. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 #else
+/** Damage-type reactions of the Fire Bro: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Fire Bro (both demos), as the percent chance each status takes hold: resists
+ * 13 statuses (down to 40% of the normal chance).
+ */
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 40, 60, 100, 80, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Fire Bro (the retail releases), as the percent chance each status takes
+ * hold: resists 13 statuses (down to 60% of the normal chance).
+ */
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 95, 80, 70, 60, 100, 80, 100, 100, 95};
 #endif
 
+/**
+ * Pose table of the Fire Bro: maps each battle pose (idle, hurt, attacking and so on) to its animation,
+ * named BRO_*.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "BRO_N_1"},
     {2, "BRO_Y_1"},
@@ -188,33 +217,42 @@ static PoseTableEntry pose_table[] = {
     {4, "BRO_X_1"},
     {3, "BRO_X_1"},
     {27, "BRO_D_1"},
-    {28, "BRO_S_1"},
+    {BTL_POSE_NORMAL, "BRO_S_1"},
     {29, "BRO_Q_1"},
     {30, "BRO_Q_1"},
     {31, "BRO_S_1"},
-    {39, "BRO_D_1"},
-    {42, "BRO_R_1"},
-    {40, "BRO_W_1"},
-    {56, "BRO_X_1"},
-    {57, "BRO_X_1"},
+    {BTL_POSE_DAMAGE, "BRO_D_1"},
+    {BTL_POSE_RUN, "BRO_R_1"},
+    {BTL_POSE_WALK, "BRO_W_1"},
+    {BTL_POSE_DANGER, "BRO_X_1"},
+    {BTL_POSE_PERIL, "BRO_X_1"},
     {BTL_POSE_TALK, "BRO_T_1"},
     {BTL_POSE_STAY_DEFAULT, "BRO_S_1"},
 };
 
+/**
+ * Event data table of the Fire Bro: no custom reactions, so the standard battle handlers run for every
+ * event.
+ */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Parts of the Fire Bro: 7 parts: parts 1 to 7 (model c_burosu_f), each with its defense tables,
+ * attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
-    {2, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {3, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {4, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {5, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {6, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {7, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
+    {2, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {3, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {4, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {5, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {6, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {7, "btl_un_fire_bros", "c_burosu_f", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Weapon record of the Fire Bro's fireball throw: 3 damage and inflicts burn (30%). */
 BattleWeapon weapon_fire_bros_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -233,7 +271,7 @@ BattleWeapon weapon_fire_bros_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -254,6 +292,7 @@ BattleWeapon weapon_fire_bros_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon record of the Fire Bro's rapid-fire fireball throws: 2 damage and inflicts burn (30%). */
 BattleWeapon weapon_fire_bros_renzoku_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -272,7 +311,7 @@ BattleWeapon weapon_fire_bros_renzoku_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -293,6 +332,10 @@ BattleWeapon weapon_fire_bros_renzoku_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon record of the Fire Bro's fireball barrage on the whole party: 1 damage, can hit several targets
+ * and inflicts burn (30%).
+ */
 BattleWeapon weapon_fire_bros_nagemakuri_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -311,7 +354,7 @@ BattleWeapon weapon_fire_bros_nagemakuri_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -333,7 +376,7 @@ BattleWeapon weapon_fire_bros_nagemakuri_attack = {
 };
 
 /**
- * Init event of the Boomerang Bro: registers its wait, attack,
+ * Init event of the Fire Bro: registers its wait, attack,
  * damage and confusion events and starts the wait event.
  */
 static EVT_BEGIN(init_event)
@@ -402,13 +445,13 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 /**
- * Guess: shared damage check for the Fire Bro's fireballs:
+ * Shared hit check for the Fire Bro's fireballs:
  * LW(6) is the weapon, LW(3) and LW(4) the target and part,
- * LW(7) = 1 marks the last hit and LW(8) = 1 the all-target attack.
- * It pre-checks the hit, returns LW(0) = 1 when it hit,
- * notes the hit in the fireball parts' work values
- * so later fireballs aimed at the same target know about it (for the two-shot attack in part 2's work 10)
- * and applies the damage with the last-hit flag if requested.
+ * LW(7) = 1 marks the last hit and LW(8) = 1 the barrage.
+ * It pre-checks the hit and sets LW(0) = 1 only on a hit; a dodge or miss lets the fireball fly on.
+ * On a hit it records it, in part 2's work 10 for the two-shot attack,
+ * or for the barrage in work 10 of the first fireball part (2 to 7) aimed at this target,
+ * then applies the damage with the guard result, as the last hit when LW(7) is 1.
  */
 static EVT_BEGIN(damage_check_sub)
     SET_VALUE(LW(0), 0)
@@ -468,7 +511,7 @@ static EVT_BEGIN(damage_check_sub)
     LABEL(98)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(6))
     IF_INT_EQUAL(LW(7), 1)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), DAMAGE_FLAG_LAST_HIT, LW(5))
     ELSE
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 0, LW(5))
     END_IF
@@ -484,10 +527,11 @@ static EVT_BEGIN(damage_check_no_last)
 EVT_END()
 
 /**
- * Guess: final damage check of the Fire Bro's attacks:
- * works out whether an earlier fireball already hit the same target (for the two-shot attack from part 2's work
- * 10, for the all-target attack from the fireball parts' work values).
- * If one did, the target takes the last hit; if none did, it runs damage_check_sub with the last-hit flag.
+ * Hit check for the last fireball aimed at a target:
+ * if an earlier fireball of the same attack already hit it (part 2's work 10 for the two-shot attack,
+ * the matching fireball part's work 10 for the barrage),
+ * the target takes the last hit with the guard result straight away;
+ * otherwise it runs damage_check_sub with LW(7) = 1.
  */
 static EVT_BEGIN(damage_check_last)
     IF_INT_EQUAL(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
@@ -526,7 +570,7 @@ static EVT_BEGIN(damage_check_last)
     LABEL(10)
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(6))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), DAMAGE_FLAG_LAST_HIT, LW(5))
     ELSE
         SET_VALUE(LW(7), 1)
         CALL_CHILD(damage_check_sub)
@@ -535,12 +579,16 @@ static EVT_BEGIN(damage_check_last)
 EVT_END()
 
 /**
- * Guess: flight of one Fire Bro fireball (part LW(15)):
- * plays the throw sound, puts the fireball at the thrower
- * and moves it along a flat arc towards the target at LW(3)/LW(4),
- * with a sibling loop that spins it and handles the hit.
+ * Flight of one Fire Bro fireball (part LW(15)) at the target in LW(3)/LW(4):
+ * it starts at the Bro and bounces along the floor in 100-unit hops (five hops, of height 6 or 5 chosen at
+ * random), spinning, with a bounce sound each hop.
+ * A sibling loop checks the target as the fireball passes its hit position (damage_check_last when LW(14) is 1,
+ * else damage_check_no_last); a hit hides the fireball and ends the flight,
+ * a miss lets it bounce on until it leaves the stage (x beyond 250).
+ * At the end the part is hidden and unit work 1 (fireballs finished) goes up by one.
  */
 EVT_BEGIN(fire_move_event)
+    // The Fire Bro throws a fireball: it appears in its hand and starts spinning.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FIREB_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, LW(15), 15, 0)
@@ -549,11 +597,12 @@ EVT_BEGIN(fire_move_event)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, -180)
     CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, LW(15), 0, 0, 0)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(9), LW(10), LW(11))
     SUBTRACT(LW(9), LW(0))
     SET_VALUE(LW(10), 0)
+    // In parallel, the fireball is checked against the party every frame; it ends if it hits someone or leaves the screen.
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
@@ -576,8 +625,8 @@ EVT_BEGIN(fire_move_event)
                     CALL_CHILD(damage_check_last)
                 END_IF
                 IF_INT_EQUAL(LW(0), 1)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
                     SET_VALUE(LW(10), 2)
                 ELSE
                     SET_VALUE(LW(10), 1)
@@ -586,13 +635,13 @@ EVT_BEGIN(fire_move_event)
                 CASE_EQUAL(1)
                 CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, LW(15), LW(11), LW(12), LW(13))
                 IF_INT_GREATER_OR_EQUAL(LW(11), 250)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
                     SET_VALUE(LW(10), 2)
                 END_IF
                 IF_INT_LESS_OR_EQUAL(LW(11), -250)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
                     SET_VALUE(LW(10), 2)
                 END_IF
                 CASE_END
@@ -603,6 +652,7 @@ EVT_BEGIN(fire_move_event)
             END_SWITCH
         END_LOOP
     END_SIBLING_EVENT
+    // The fireball spins as it travels.
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
@@ -612,6 +662,7 @@ EVT_BEGIN(fire_move_event)
     CALL(evt_sub_random, 1, LW(11))
     IF_INT_EQUAL(LW(11), 0)
         CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
+        // The fireball bounces along the ground in a series of hops, with a sizzle on each landing, until it is used up.
         CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, LW(15), 0, 6, FLOAT(0.5996094f))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 100)
         CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, LW(15), LW(0), 0, LW(2), 0, -1)
@@ -690,11 +741,12 @@ EVT_BEGIN(fire_move_event)
         END_IF
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FIREB_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
+    // The fireball disappears and the throw is counted as finished.
     LABEL(99)
     WAIT_FRAMES(6)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
-    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, 1)
     RETURN
 EVT_END()
 
@@ -712,7 +764,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_fire_bros_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -726,7 +778,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_fire_bros_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_1A"))
     WAIT_FRAMES(40)
     SET_VALUE(LW(15), 2)
@@ -736,7 +788,7 @@ static EVT_BEGIN(normal_attack_event)
     SPAWN_EVENT(fire_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             BREAK_LOOP
         END_IF
@@ -757,7 +809,7 @@ static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_fire_bros_renzoku_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_fire_bros_renzoku_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -771,7 +823,7 @@ static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_fire_bros_renzoku_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 2, 10, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(20)
@@ -790,7 +842,7 @@ static EVT_BEGIN(renzoku_attack_event)
     SPAWN_EVENT(fire_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 2)
             BREAK_LOOP
         END_IF
@@ -802,17 +854,19 @@ static EVT_BEGIN(renzoku_attack_event)
 EVT_END()
 
 /**
- * Guess: the Fire Bro's all-target fireball barrage (nagemakuri, "throwing spree"):
- * selects every enemy, loads one fireball part (parts 2 to 7) with each target's data using
- * fire_bros_nagemakuri_set_target, and then throws the fireballs one after another with fire_move_event,
- * working through them as earlier ones finish, until all have hit or missed.
+ * The Fire Bro's barrage (weapon_fire_bros_nagemakuri_attack, every target):
+ * after declaring the attack it stores a target from fire_bros_nagemakuri_set_target in the work of each
+ * fireball part 2 to 7, then throws the six fireballs one after another (BRO_A_2A, 15 frames apart),
+ * each with nagemakuri_judge_last_attack_event deciding whether it is the last at its target
+ * and fire_move_event flying it. It waits until unit work 1 shows all six have finished.
  */
 static EVT_BEGIN(nagemakuri_attack_event)
+    // Choose the targets for the Fire Bro's barrage of fireballs.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_fire_bros_nagemakuri_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_fire_bros_nagemakuri_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -821,10 +875,12 @@ static EVT_BEGIN(nagemakuri_attack_event)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_fire_bros_nagemakuri_attack))
+    // The attack on the whole party is announced.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_fire_bros_nagemakuri_attack))
     SET_VALUE(LW(10), 2)
+    // Aim up to eight fireballs, each at a target in the party.
     LOOP(0)
         IF_INT_GREATER(LW(10), 7)
             BREAK_LOOP
@@ -850,17 +906,18 @@ static EVT_BEGIN(nagemakuri_attack_event)
     WAIT_FRAMES(12)
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), 5)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    // Throw the fireballs one by one: the Fire Bro turns to the next target, winds up and flings a fireball.
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_THROWN, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, 0)
     LOOP(0)
         SET_VALUE(LW(15), 2)
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_THROWN, LW(1))
             IF_INT_GREATER_OR_EQUAL(LW(1), 6)
                 LOOP(0)
                     WAIT_FRAMES(1)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(2))
+                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_THROWN, LW(1))
+                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, LW(2))
                     SUBTRACT(LW(1), 6)
                     IF_INT_GREATER(LW(2), LW(1))
                         WAIT_FRAMES(3)
@@ -878,7 +935,7 @@ static EVT_BEGIN(nagemakuri_attack_event)
             SET_VALUE(LW(6), PTR(&weapon_fire_bros_nagemakuri_attack))
             SET_VALUE(LW(8), 1)
             SPAWN_EVENT(fire_move_event)
-            CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_THROWN, 1)
             WAIT_FRAMES(15)
             ADD(LW(15), 1)
             IF_INT_GREATER(LW(15), 7)
@@ -887,26 +944,29 @@ static EVT_BEGIN(nagemakuri_attack_event)
         END_LOOP
         ADD(LW(10), 1)
         ADD(LW(11), 1)
+        // Wait until every fireball has finished, then the Fire Bro relaxes.
         IF_INT_GREATER(LW(10), 0)
             BREAK_LOOP
         END_IF
     END_LOOP
     LOOP(0)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FIRE_BROS_FINISHED, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 6)
             BREAK_LOOP
         END_IF
     END_LOOP
     WAIT_FRAMES(30)
+    // The Fire Bro goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
- * Guess: decides whether the fireball just resolved was the last of the barrage:
- * LW(14) = 1 if so, 0 if more fireballs are still pending for other targets.
+ * Decides whether the fireball about to be thrown (part LW(15), target LW(3)/LW(4)) is the last one of the
+ * barrage at its target: LW(14) = 0 if a later fireball part (up to part 7) is aimed at the same target,
+ * otherwise 1.
  */
 EVT_BEGIN(nagemakuri_judge_last_attack_event)
     SET_VALUE(LW(0), LW(10))

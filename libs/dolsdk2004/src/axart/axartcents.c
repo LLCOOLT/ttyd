@@ -2,6 +2,7 @@
 #include <dolphin/os.h>
 #include <dolphin/mix.h>
 
+/** Pitch ratios for 0 to 99 cents, used to turn an LFO value into a pitch multiplier. */
 static f32 __AXLFOCentsTable[100] = {
     1.000000f,
     1.000578f,
@@ -105,11 +106,13 @@ static f32 __AXLFOCentsTable[100] = {
     1.058851f,
 };
 
+/** Pitch ratios for 0 to 11 octaves up (powers of two). */
 static f32 __AXLFOOctavesTableUp[12] = {
    1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f,
    256.0f, 512.0f, 1024.0f, 2048.0f,
 };
 
+/** Pitch ratios for 0 to 11 semitones up. */
 static f32 __AXLFOSemitonesTableUp[12] = {
     1.000000f,
     1.059463f,
@@ -125,6 +128,7 @@ static f32 __AXLFOSemitonesTableUp[12] = {
     1.887749f,
 };
 
+/** Pitch ratios for 0 to 127 semitones down. */
 static f32 __AXLFOSemitonesTableDown[128] = {
     1.000000f,
     0.943874f,

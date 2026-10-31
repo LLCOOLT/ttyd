@@ -29,6 +29,23 @@
 #include "version.h"
 #include "libc_decls.h"
 
+// Unit work slots of Magnus von Grapple (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_BOSS_MAGNUM_BATTENDER_ARMS_OUT = 0,          // 1 while his arms are fired off as rocket punch units
+    UW_BOSS_MAGNUM_BATTENDER_ARM_RETURN_TIMER = 1,  // counts down on his turns once no fired arm is left; at 0 they return
+    UW_BOSS_MAGNUM_BATTENDER_ARMS_FIRED_ONCE = 2,   // 1 after the first arm launch (its line is said only once)
+    UW_BOSS_MAGNUM_BATTENDER_ARM_0 = 3,             // unit id of the rocket punch for arm 0
+    UW_BOSS_MAGNUM_BATTENDER_ARM_1 = 4,             // unit id of the rocket punch for arm 1
+    UW_BOSS_MAGNUM_BATTENDER_STAMP_SCENE_DONE = 5,  // 1 after the first stamp, which opens with a camera scene and a line
+    UW_BOSS_MAGNUM_BATTENDER_LOW_HP_SCENE_DONE = 6, // 1 after his HP first drops to 7 or below (low-HP line) or he dies
+};
+
+// Unit work slots of a rocket punch (X-Fist), the arm unit Magnus fires off
+enum {
+    UW_ROCKET_PUNCH_ROLE = 0,       // 0 / 1: fired arm 0 / 1; 2 / 3: arm 0 / 1 flying back onto Magnus
+    UW_ROCKET_PUNCH_WAIT_TURNS = 1, // counts down each turn; it attacks only when it reaches 0, then resets to 1
+};
+
 static EffectEntry* eff_charge;
 
 static ArmWork* work[2];
@@ -83,6 +100,10 @@ static EvtWord damage_event_r[30];
 static EvtWord attack_event_r[368];
 static EvtWord wait_event_r[18];
 
+/**
+ * Unit data of Magnus: 30 HP, 120x160 units in size; ties together its sounds, parts, status vulnerability,
+ * init event and event table.
+ */
 BattleUnitKind unit_boss_magnum_battender = {
     34,
     "btl_un_magnum_battender",
@@ -154,16 +175,31 @@ BattleUnitKind unit_boss_magnum_battender = {
     data_table,
 };
 
+/** Defence of Magnus: 1 against every kind of hit. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Defence attributes of Magnus: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of Magnus (percent chance each status takes hold): immune to sleep,
+ * poison, electrified, Huge, Tiny, Attack Down, fright, Gale Force, Dodgy, Invisible, instant KO;
+ * resists stop (50%), dizzy (50%), confusion (50%), freeze (30%), Defense Down (50%), allergic (50%),
+ * Slow (40%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 50, 50, 0, 50, 0, 100, 30, 0, 0, 100, 0, 100, 50, 50, 0, 0, 100, 40, 0, 0, 0};
 #else
+/**
+ * Retail builds: Status vulnerability of Magnus (percent chance each status takes hold): immune to sleep,
+ * poison, electrified, Huge, Tiny, Attack Down, fright, Gale Force, Dodgy, Invisible, instant KO;
+ * resists stop (50%), dizzy (50%), confusion (50%), freeze (30%), allergic (50%), Slow (40%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 50, 50, 0, 50, 0, 100, 30, 0, 0, 100, 0, 100, 90, 50, 0, 0, 100, 40, 0, 0, 0};
 #endif
 
+/** Pose table of Magnus: maps its battle poses to its animations (MGN_*). */
 static PoseTableEntry pose_table[] = {
     {1, "MGN_S_1"},
     {2, "MGN_2D_1"},
@@ -176,19 +212,20 @@ static PoseTableEntry pose_table[] = {
     {4, "MGN_X_1"},
     {3, "MGN_X_1"},
 #endif
-    {28, "MGN_S_1"},
+    {BTL_POSE_NORMAL, "MGN_S_1"},
     {29, "MGN_Q_1"},
     {30, "MGN_Q_1"},
     {31, "MGN_S_1"},
-    {39, "MGN_D_1"},
-    {40, "MGN_W_1"},
+    {BTL_POSE_DAMAGE, "MGN_D_1"},
+    {BTL_POSE_WALK, "MGN_W_1"},
     {41, "MGN_W_2"},
-    {56, "MGN_S_1"},
-    {57, "MGN_S_1"},
+    {BTL_POSE_DANGER, "MGN_S_1"},
+    {BTL_POSE_PERIL, "MGN_S_1"},
     {BTL_POSE_TALK, "MGN_T_1"},
     {BTL_POSE_STAY_DEFAULT, "MGN_S_1"},
 };
 
+/** Poses of Magnus after his arm has come off to be launched as the rocket fist. */
 static PoseTableEntry pose_table_no_arm[] = {
     {1, "MGN_S_2"},
     {2, "MGN_2D_2"},
@@ -201,31 +238,33 @@ static PoseTableEntry pose_table_no_arm[] = {
     {4, "MGN_X_2"},
     {3, "MGN_X_2"},
 #endif
-    {28, "MGN_S_2"},
+    {BTL_POSE_NORMAL, "MGN_S_2"},
     {29, "MGN_Q_2"},
     {30, "MGN_Q_2"},
     {31, "MGN_S_2"},
-    {39, "MGN_D_2"},
-    {40, "MGN_W_3"},
-    {56, "MGN_S_2"},
-    {57, "MGN_S_2"},
+    {BTL_POSE_DAMAGE, "MGN_D_2"},
+    {BTL_POSE_WALK, "MGN_W_3"},
+    {BTL_POSE_DANGER, "MGN_S_2"},
+    {BTL_POSE_PERIL, "MGN_S_2"},
     {BTL_POSE_TALK, "MGN_T_2"},
     {BTL_POSE_STAY_DEFAULT, "MGN_S_2"},
 };
 
+/** Event table of Magnus: dead_event (tag 49). */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/** Parts of Magnus: 4 parts (model c_mb_robo_1b). */
 static BattleUnitKindPart parts[] = {
 #if VERSION >= VERSION_US
-    {1, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 37.0f, 103.0f, 30.0f, 37.0f, 113.0f, 61.0f, 106, 174, 255, &defence, &defence_attr, 0x600019, 0, pose_table},
+    {1, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 37.0f, 103.0f, 30.0f, 37.0f, 113.0f, 61.0f, 106, 174, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_ANY_PART_TARGET | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 #else
-    {1, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 37.0f, 103.0f, 30.0f, 37.0f, 113.0f, 61.0f, 106, 174, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
+    {1, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 37.0f, 103.0f, 30.0f, 37.0f, 113.0f, 61.0f, 106, 174, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 #endif
-    {2, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 10.0f, 10.0f, 30.0f, 10.0f, 20.0f, 61.0f, 106, 174, 255, &defence, &defence_attr, 0x3100002, 0, pose_table},
-    {3, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
+    {2, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 10.0f, 10.0f, 30.0f, 10.0f, 20.0f, 61.0f, 106, 174, 255, &defence, &defence_attr, PART_ATTR_IMPORTANT | PART_ATTR_JUMPLIKE_CANNOT_TARGET | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {3, "btl_un_magnum_battender", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
 /**
@@ -263,7 +302,7 @@ static USER_FUNC(waku_main) {
 }
 
 /**
- * Looks for a living rocket arm (X-Fist or X-Punch) on one side:
+ * Looks for a living rocket arm (X-Fist) on one side:
  * args[0] = 0 for the left (arm slot 0 or 2), 1 for the right (slot 1 or 3).
  * Writes the unit index of the first one found to args[1], or -1.
  */
@@ -278,11 +317,11 @@ static USER_FUNC(arm_check) {
     for (i = 0; i < 64; i++) {
         unit = wp->units[i];
         if (unit != NULL && (unit->currentKind == UNIT_X_FIST || unit->currentKind == UNIT_X_PUNCH)) {
-            if (side == 0 && (unit->work[0] == 0 || unit->work[0] == 2)) {
+            if (side == 0 && (unit->work[UW_ROCKET_PUNCH_ROLE] == 0 || unit->work[UW_ROCKET_PUNCH_ROLE] == 2)) {
                 found = i;
                 break;
             }
-            if (side == 1 && (unit->work[0] == 1 || unit->work[0] == 3)) {
+            if (side == 1 && (unit->work[UW_ROCKET_PUNCH_ROLE] == 1 || unit->work[UW_ROCKET_PUNCH_ROLE] == 3)) {
                 found = i;
                 break;
             }
@@ -292,6 +331,7 @@ static USER_FUNC(arm_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Weapon of Magnus (batten stamp attack): targets one unit for 2 damage; used by stamp_attack_event. */
 BattleWeapon weapon_batten_stamp_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -310,7 +350,7 @@ BattleWeapon weapon_batten_stamp_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     12, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -329,6 +369,10 @@ BattleWeapon weapon_batten_stamp_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of Magnus (batten shake attack): targets every unit for 2 damage, ignores Defense;
+ * used by shake_attack_event.
+ */
 BattleWeapon weapon_batten_shake_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -351,7 +395,7 @@ BattleWeapon weapon_batten_shake_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_NO_FLOATING_2 | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -369,6 +413,10 @@ BattleWeapon weapon_batten_shake_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Spawn setup for Magnus' rocket fist (unit_boss_rocket_punch): enemy side, placed off-screen at first;
+ * used by arm_bunri_event, arm_return_event.
+ */
 static BattleUnitSetup entry_rocket_punch = {
     &unit_boss_rocket_punch, // unitKindParams
     1, // alliance
@@ -387,7 +435,7 @@ static BattleUnitSetup entry_rocket_punch = {
  * places it at x=125 turned 55 degrees and sets its walk and run sounds.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(entry_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -396,10 +444,10 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("MGN_L_1"))
     SPAWN_EVENT(waku_event)
     CALL(arm_init)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_OUT, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_RETURN_TIMER, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_FIRED_ONCE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_STAMP_SCENE_DONE, 0)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, 125, 0, 0)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 125, 0, 0)
     CALL(btlevtcmd_SetBaseRotate, BTL_UNIT_SELF, 0, -55, 0)
@@ -434,16 +482,16 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_CheckDamagePattern, BTL_UNIT_SELF, 10, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
     END_IF
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(0))
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_LOW_HP_SCENE_DONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 7)
             CALL(btlevtcmd_WaitAttackEnd)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_LOW_HP_SCENE_DONE, 1)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             CALL(evt_btl_camera_set_prilimit, 1)
             CALL(evt_btl_camera_set_mode, 1, 3)
@@ -507,11 +555,14 @@ static USER_FUNC(eff_hokori) {
  * Defeat event of Magnus: sets work 6, creates the glow above him,
  * closes the status window and moves the camera in; Magnus speaks his last line (stg2_mri_e24_16).
  * Any rocket arm still alive on either side (from JP,
- * only if it has not already been finished off) is killed with the shared dead core and its trail removed.
- * Guess: Magnus's own death is then handled by the default code.
+ * only if its last hit did not already KO it, damage flag 0x200) is killed with the shared dead core
+ * and its trail
+ * removed. Magnus then plays the death sound, hands out coins, experience and star points,
+ * and after 2 seconds drops his held item and is KO'd without being deleted (KILL_UNIT_KEEP);
+ * the glow is removed.
  */
 static EVT_BEGIN(dead_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_LOW_HP_SCENE_DONE, 1)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 70)
     ADD(LW(2), 10)
@@ -524,8 +575,8 @@ static EVT_BEGIN(dead_event)
     SUBTRACT(LW(0), 20)
     CALL(evt_btl_camera_set_moveto, 1, LW(0), 160, 600, LW(0), 110, -100, 20, 11)
     WAIT_FRAMES(20)
-    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 39)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 39)
+    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_DAMAGE)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_DAMAGE)
     CALL(evt_msg_print, 2, STRING("stg2_mri_e24_16"), 0, BTL_UNIT_SELF)
     CALL(evt_btl_camera_set_prilimit, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -534,15 +585,15 @@ static EVT_BEGIN(dead_event)
     CALL(arm_check, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
 #if VERSION >= VERSION_JP
-        CALL(btlevtcmd_CheckDamageCode, LW(0), 512, LW(1))
+        CALL(btlevtcmd_CheckDamageCode, LW(0), DAMAGE_FLAG_KO, LW(1))
         IF_INT_EQUAL(LW(1), 0)
 #endif
             SET_VALUE(LW(10), LW(0))
             BEGIN_INLINE_EVENT
                 CALL_CHILD(subsetevt_dead_core)
                 CALL(arm_end, 0)
-                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
-                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
+                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_HIDDEN)
+                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_NO_SHADOW)
             END_INLINE_EVENT
         END_IF
 #if VERSION >= VERSION_JP
@@ -551,15 +602,15 @@ static EVT_BEGIN(dead_event)
     CALL(arm_check, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
 #if VERSION >= VERSION_JP
-        CALL(btlevtcmd_CheckDamageCode, LW(0), 512, LW(1))
+        CALL(btlevtcmd_CheckDamageCode, LW(0), DAMAGE_FLAG_KO, LW(1))
         IF_INT_EQUAL(LW(1), 0)
 #endif
             SET_VALUE(LW(10), LW(0))
             BEGIN_INLINE_EVENT
                 CALL_CHILD(subsetevt_dead_core)
                 CALL(arm_end, 1)
-                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
-                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
+                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_HIDDEN)
+                CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, PART_ATTR_NO_SHADOW)
             END_INLINE_EVENT
 #if VERSION >= VERSION_JP
         END_IF
@@ -623,14 +674,14 @@ EVT_END()
  * with the arms out it does the shaking ceiling attack (shake_attack_event).
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_OUT, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(arm_check, 0, LW(0))
         IF_INT_EQUAL(LW(0), -1)
             CALL(arm_check, 1, LW(0))
             IF_INT_EQUAL(LW(0), -1)
-                CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 1, -1)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+                CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_RETURN_TIMER, -1)
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_RETURN_TIMER, LW(0))
                 IF_INT_LESS_OR_EQUAL(LW(0), 0)
                     CALL_CHILD(arm_return_event)
                 END_IF
@@ -643,9 +694,9 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_OUT, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_STAMP_SCENE_DONE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL_CHILD(stamp_attack_event)
             GOTO(99)
@@ -655,7 +706,7 @@ static EVT_BEGIN(attack_event)
             CALL_CHILD(stamp_attack_event)
             GOTO(99)
         ELSE
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_FIRED_ONCE, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL_CHILD(arm_bunri_event)
                 GOTO(99)
@@ -694,15 +745,17 @@ EVT_BEGIN(stamp_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_batten_stamp_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_batten_stamp_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_STAMP_SCENE_DONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_STAMP_SCENE_DONE, 1)
+        // The first time, the camera swings around and Magnus shouts out the name of his attack before it
+        // starts.
         CALL(btlevtcmd_StatusWindowOnOff, 0)
         CALL(evt_btl_camera_set_prilimit, 1)
         CALL(evt_btl_camera_set_mode, 1, 3)
@@ -724,7 +777,8 @@ EVT_BEGIN(stamp_attack_event)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
+    // He steps back 50 units to give himself room.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -50, 0, 0, 120, -1, 1)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
@@ -734,6 +788,7 @@ EVT_BEGIN(stamp_attack_event)
     ELSE
         SET_VALUE(LW(15), 0)
     END_IF
+    // He lifts a leg high (MGN_A2_1) with a hydraulic whine and the mechanism creaks (MGN_A2_2).
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MBTN_LEG_UP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A2_1"))
     WAIT_MS(450)
@@ -744,6 +799,8 @@ EVT_BEGIN(stamp_attack_event)
         END_LOOP
     END_SIBLING_EVENT
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A2_2"))
+    // The leg comes slamming down on the target (MGN_A2_3 or A2_4, depending on how far away it is) and the
+    // screen shakes.
     WAIT_MS(1000)
     IF_INT_EQUAL(LW(15), 1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A2_3"))
@@ -752,7 +809,7 @@ EVT_BEGIN(stamp_attack_event)
     END_IF
     WAIT_MS(150)
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 60, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_stamp_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_stamp_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -774,12 +831,15 @@ EVT_BEGIN(stamp_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The stomp misses or is blocked: the target jumps clear.
     LABEL(90)
     GOTO(95)
+    // The stomp lands: the Action Command defence result is applied and damage is dealt.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_batten_stamp_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_stamp_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_stamp_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(95)
+    // After a pause he pulls the leg back up (MGN_A2_5 or A2_6) and returns to his place.
     LABEL(95)
     WAIT_MS(1000)
     IF_INT_EQUAL(LW(15), 1)
@@ -797,21 +857,23 @@ EVT_BEGIN(stamp_attack_event)
 EVT_END()
 
 /**
- * The shake attack: Magnus pounds the ground so the ceiling shakes.
- * Guess: it hits every target at once (quake and ceiling sounds, poses MGN_A3_3 and A3_4).
- * Mario is knocked into his pose M_I_O while it runs; the damage check applies to each target.
+ * The shake attack (weapon_batten_shake_attack, which hits every target on the other side):
+ * Magnus pounds the ground (poses MGN_A3_3 and A3_4, quake sound, camera shake) and dust falls from the ceiling.
+ * Mario, if he can act and is not Invisible, is put into his pose M_I_O while it runs;
+ * then the damage check runs on each target in turn.
  */
 static EVT_BEGIN(shake_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_batten_shake_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_batten_shake_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
+    // Magnus raises himself (MGN_A3_3) to pound the ground.
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_batten_shake_attack))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
@@ -820,18 +882,20 @@ static EVT_BEGIN(shake_attack_event)
     WAIT_MS(900)
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_MARIO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_MARIO, 18, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_MARIO, STATUS_INVISIBLE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_MARIO)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_I_O"))
         END_IF
     END_IF
+    // He slams the floor (MGN_A3_4): a quake shakes the whole room and dust rains down from the ceiling.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MBTN_QUAKE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MBTN_CAILING1"), EVT_NULLPTR, 0, LW(15))
     CALL(evt_btl_camera_shake_h, 0, 7, 0, 30, 0)
     CALL(eff_hokori, 0, 250, 0, 80)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A3_4"))
+    // Mario, if he can act, is put into his flinching pose while the quake runs.
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(20)
         CALL(eff_hokori, 100, 250, 0, 80)
@@ -854,15 +918,18 @@ static EVT_BEGIN(shake_attack_event)
         END_LOOP
         CALL(evt_btl_camera_shake_h, 0, 6, 0, 60, 0)
     END_SIBLING_EVENT
+    // After the tremors die down he straightens up and the damage is worked out for each target in turn.
     WAIT_FRAMES(120)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(6), 0)
+    // For each target: a miss means they just recover, a hit applies the damage (the Action Command result is
+    // applied once).
     LABEL(10)
     IF_INT_EQUAL(LW(3), -1)
         GOTO(95)
     END_IF
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_shake_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_shake_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -887,7 +954,7 @@ static EVT_BEGIN(shake_attack_event)
     LABEL(90)
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_MARIO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_MARIO, 18, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_MARIO, STATUS_INVISIBLE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_MARIO)
             CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
@@ -899,11 +966,12 @@ static EVT_BEGIN(shake_attack_event)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_batten_shake_attack))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_shake_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_shake_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(93)
     LABEL(93)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     GOTO(10)
+    // The camera resets after a one second pause.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(1000)
@@ -918,7 +986,7 @@ EVT_END()
  * Work 0 is set to 1 (arms out), work 2 to 1 and the counter in work 1 to 2.
  */
 static EVT_BEGIN(arm_bunri_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_FIRED_ONCE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_StatusWindowOnOff, 0)
         CALL(evt_btl_camera_set_prilimit, 1)
@@ -933,9 +1001,9 @@ static EVT_BEGIN(arm_bunri_event)
         CALL(btlevtcmd_StatusWindowOnOff, 1)
         WAIT_MS(500)
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_OUT, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_FIRED_ONCE, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_RETURN_TIMER, 2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MBTN_PUNCH_ACTIVE1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A1_1"))
     WAIT_MS(600)
@@ -952,14 +1020,14 @@ static EVT_BEGIN(arm_bunri_event)
     CALL(evt_btl_camera_shake_w, 0, 3, 0, 20, 0)
     WAIT_MS(100)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_rocket_punch), 0)
-    CALL(btlevtcmd_SetUnitWork, LW(3), 0, 0)
-    CALL(btlevtcmd_SetUnitWork, LW(3), 1, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(3))
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_ROCKET_PUNCH_ROLE, 0)
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_ROCKET_PUNCH_WAIT_TURNS, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_0, LW(3))
     CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SpawnUnit, LW(4), PTR(&entry_rocket_punch), 0)
-    CALL(btlevtcmd_SetUnitWork, LW(4), 0, 1)
-    CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
+    CALL(btlevtcmd_SetUnitWork, LW(4), UW_ROCKET_PUNCH_ROLE, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(4), UW_ROCKET_PUNCH_WAIT_TURNS, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_1, LW(4))
     CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_no_arm))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
@@ -974,16 +1042,16 @@ EVT_END()
  * the arm trails are removed, the reattach poses (MGN_A1_7 and A1_8) play and the normal pose table returns.
  */
 static EVT_BEGIN(arm_return_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARMS_OUT, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A1_6"))
     WAIT_MS(600)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_rocket_punch), 0)
-    CALL(btlevtcmd_SetUnitWork, LW(3), 0, 2)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(3))
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_ROCKET_PUNCH_ROLE, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_0, LW(3))
     CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SpawnUnit, LW(4), PTR(&entry_rocket_punch), 0)
-    CALL(btlevtcmd_SetUnitWork, LW(4), 0, 3)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
+    CALL(btlevtcmd_SetUnitWork, LW(4), UW_ROCKET_PUNCH_ROLE, 3)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAGNUM_BATTENDER_ARM_1, LW(4))
     CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MBTN_PUNCH_FLY1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
@@ -1014,6 +1082,10 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Unit data of Magnus' rocket fist: 2 HP, 50x34 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_boss_rocket_punch = {
     35,
     "btl_un_rocket_punch",
@@ -1072,7 +1144,7 @@ BattleUnitKind unit_boss_rocket_punch = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist_r,
     1,
     parts_r,
@@ -1080,16 +1152,29 @@ BattleUnitKind unit_boss_rocket_punch = {
     data_table_r,
 };
 
+/** Defence of Magnus' rocket fist: 0 against every kind of hit. */
 static BattleUnitDefense defence_r = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Magnus' rocket fist: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr_r = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of Magnus' rocket fist (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; the rest take hold at 80%
+ * or better.
+ */
 static StatusVulnerability regist_r = {0, 80, 80, 80, 80, 80, 100, 80, 0, 0, 100, 0, 100, 80, 80, 0, 110, 100, 80, 0, 0, 0};
 #else
+/**
+ * Retail builds: Status vulnerability of Magnus' rocket fist (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; the rest take hold at 80%
+ * or better.
+ */
 static StatusVulnerability regist_r = {0, 80, 80, 100, 80, 100, 100, 80, 0, 0, 100, 0, 100, 95, 80, 0, 100, 100, 80, 0, 0, 0};
 #endif
 
+/** Pose table of Magnus' rocket fist: maps its battle poses to its animations (MGN_*). */
 static PoseTableEntry pose_table_r[] = {
     {1, "MGN_A1_9"},
     {2, "MGN_A1_4"},
@@ -1097,24 +1182,29 @@ static PoseTableEntry pose_table_r[] = {
     {5, "MGN_A1_9"},
     {4, "MGN_A1_9"},
     {3, "MGN_A1_9"},
-    {28, "MGN_A1_9"},
+    {BTL_POSE_NORMAL, "MGN_A1_9"},
     {29, "MGN_A1_9"},
     {30, "MGN_A1_9"},
     {31, "MGN_A1_9"},
-    {39, "MGN_A1_9"},
-    {56, "MGN_A1_9"},
-    {57, "MGN_A1_9"},
+    {BTL_POSE_DAMAGE, "MGN_A1_9"},
+    {BTL_POSE_DANGER, "MGN_A1_9"},
+    {BTL_POSE_PERIL, "MGN_A1_9"},
     {BTL_POSE_STAY_DEFAULT, "MGN_A1_9"},
 };
 
+/** Event table of Magnus' rocket fist: it has no special event scripts. */
 static BattleDataEntry data_table_r[] = {
     {0, NULL},
 };
 
+/** Parts of Magnus' rocket fist: 1 part (model c_mb_robo_1b). */
 static BattleUnitKindPart parts_r[] = {
-    {1, "btl_un_rocket_punch", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 10.0f, 0.0f, 106, 174, 255, &defence_r, &defence_attr_r, 0x600009, 0, pose_table_r},
+    {1, "btl_un_rocket_punch", "c_mb_robo_1b", 0.0f, 0.0f, 0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 10.0f, 0.0f, 106, 174, 255, &defence_r, &defence_attr_r, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table_r},
 };
 
+/**
+ * Weapon of Magnus (batten rocket attack): targets one unit for 4 damage; used by attack_event_r.
+ */
 static BattleWeapon weapon_batten_rocket_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1133,7 +1223,7 @@ static BattleWeapon weapon_batten_rocket_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1156,20 +1246,20 @@ static BattleWeapon weapon_batten_rocket_attack = {
 };
 
 /**
- * Init script of a rocket arm (X-Fist or X-Punch):
+ * Init script of a rocket arm (X-Fist), run when arm_bunri_event spawns it:
  * plays its pose, sets its base rotation, creates the trail effect for its side, starts the arm_event loop and,
  * depending on which arm it is, flies it out from beside Magnus with the fly sound
- * and settles it at its resting place. Guess: the first flight is the arms being fired off.
+ * and settles it at its resting place: the flight of the arm being fired off.
  */
 static EVT_BEGIN(init_event_r)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A1_4"))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_r))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_r))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event_r))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_SetBaseRotate, BTL_UNIT_SELF, 0, -90, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_ROLE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(arm_init2, 0)
     END_IF
@@ -1183,7 +1273,7 @@ static EVT_BEGIN(init_event_r)
         CALL(arm_init2, 1)
     END_IF
     SPAWN_EVENT(arm_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_ROLE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 30, 100, -40)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, -100, 150, -60, 20, 0, 4, 0, -1)
@@ -1217,7 +1307,7 @@ static EVT_BEGIN(arm_event)
         CALL_CHILD(arm_event_end)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_ROLE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(arm_main, BTL_UNIT_SELF, 0)
     END_IF
@@ -1237,7 +1327,7 @@ EVT_END()
 
 /** Ends the trail effects of arm slots 0 and 1 (each of the two arm units owns one). */
 static EVT_BEGIN(arm_event_end)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_ROLE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(arm_end, 0)
     END_IF
@@ -1258,9 +1348,9 @@ static EVT_BEGIN(damage_event_r)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL_CHILD(arm_event_end)
         END_IF
@@ -1269,29 +1359,34 @@ static EVT_BEGIN(damage_event_r)
 EVT_END()
 
 /**
- * Attack event of a rocket arm.
- * Guess: the arm picks a target, flies out with the fly sound,
- * comes down on the target (the damage and result checks run) and returns to its side of the stage.
+ * Attack event of a rocket arm (weapon_batten_rocket_attack): it acts only every other turn (unit work 1 counts
+ * down).
+ * It picks a target and, by a coin flip, either swoops in low in front of it and shoots through it off the
+ * left edge, or dives on it from high behind; the damage check runs as it passes the target.
+ * It then re-enters from the right edge (x 300) and flies back to its resting place.
  */
 static EVT_BEGIN(attack_event_r)
-    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 1, -1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    // The rocket fist only acts every other turn (a counter in unit work 1 counts down).
+    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_WAIT_TURNS, -1)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_WAIT_TURNS, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_WAIT_TURNS, 1)
+    // It picks a target; a confused fist with no target is flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_batten_rocket_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_batten_rocket_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // A coin flip decides whether it comes in low in front of its target or dives from high behind it.
     CALL(evt_sub_random, 1, LW(6))
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_batten_rocket_attack))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
@@ -1301,8 +1396,9 @@ static EVT_BEGIN(attack_event_r)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // The fist aims itself (MGN_A1_4).
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A1_4"))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_rocket_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_rocket_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1326,6 +1422,8 @@ static EVT_BEGIN(attack_event_r)
     END_SWITCH
     LABEL(90)
     GOTO(95)
+    // As the fist passes the target, the Action Command defence result and damage are applied and the screen
+    // shakes.
     LABEL(91)
     BEGIN_SIBLING_EVENT
         LOOP(0)
@@ -1333,7 +1431,7 @@ static EVT_BEGIN(attack_event_r)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
             IF_INT_LESS_OR_EQUAL(LW(10), LW(0))
                 CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_batten_rocket_attack))
-                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_rocket_attack), 256, LW(5))
+                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_batten_rocket_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
                 CALL(evt_btl_camera_shake_w, 0, 3, 0, 10, 0)
                 BREAK_LOOP
             END_IF
@@ -1341,6 +1439,8 @@ static EVT_BEGIN(attack_event_r)
         END_LOOP
     END_SIBLING_EVENT
     GOTO(95)
+    // The fist flies on past its target in one of two ways (low and straight through, or in a dive from
+    // above) and off the left edge.
     LABEL(95)
     IF_INT_EQUAL(LW(6), 0)
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -1362,8 +1462,9 @@ static EVT_BEGIN(attack_event_r)
     END_IF
     WAIT_MS(250)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ROCKET_PUNCH_ROLE, LW(10))
     IF_INT_EQUAL(LW(10), 0)
+        // It reappears from the right edge of the screen (x 300).
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 300, LW(1), -100)
     ELSE
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 300, LW(1), 100)
@@ -1371,6 +1472,7 @@ static EVT_BEGIN(attack_event_r)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MBTN_PUNCH_FLY1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, 0, 4, 0, -1)
+    // The fist settles back at its resting place and the camera resets.
     LABEL(99)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

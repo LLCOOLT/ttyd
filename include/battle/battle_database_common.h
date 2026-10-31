@@ -116,6 +116,16 @@ typedef enum BattleWeaponTargetWeightFlags {
     TARGET_WEIGHT_RANDOM = 0x80000000,  // pick by weighted chance instead of the highest weight
 } BattleWeaponTargetWeightFlags;
 
+// BattleWeapon.element: picks the target part's defence and defence attribute (defenses[element]) and the hit
+// type in BattleCalculateDamage; fire, explosion and electric set off explosive counters.
+typedef enum BattleWeaponElement {
+    ELEMENT_NORMAL = 0,    // DAMAGE_HIT_NORMAL
+    ELEMENT_FIRE = 1,      // DAMAGE_HIT_FIRE; Ice Power reduces it; SPECIAL_FIERY_IF_BURNED switches to it
+    ELEMENT_ICE = 2,       // DAMAGE_HIT_ICE
+    ELEMENT_EXPLOSION = 3, // DAMAGE_HIT_EXPLOSION
+    ELEMENT_ELECTRIC = 4,  // DAMAGE_HIT_ELECTRIC
+} BattleWeaponElement;
+
 typedef struct BattleWeapon {
     const char* name;                 // 0x0, msg tag
     u16 icon;                         // 0x4
@@ -137,7 +147,7 @@ typedef struct BattleWeapon {
     u32 fpDamageWork[8];              // 0x44
     u32 targetClassFlags;             // 0x64
     u32 targetPropertyFlags;          // 0x68
-    u8 element;                       // 0x6C
+    u8 element;                       // 0x6C, BattleWeaponElement
     u8 damagePattern;                 // 0x6D
     s8 acLevel;                       // 0x6E
     s8 reserved_6F;                   // 0x6F, 2 in every weapon table, never read

@@ -3,11 +3,14 @@
 #include "__card.h"
 
 #if DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __CARDVersion = "<< Dolphin SDK - CARD\tdebug build: Apr  5 2004 03:56:53 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __CARDVersion = "<< Dolphin SDK - CARD\trelease build: Apr  5 2004 04:15:35 (0x2301) >>";
 #endif
 
+/** EXI clock used for memory card transfers (16 MHz). */
 u32 __CARDFreq = EXI_FREQ_16M;
 
 CARDControl __CARDBlock[2];
@@ -24,6 +27,7 @@ static s32 Retry(s32 chan);
 static void UnlockedCallback(s32 chan, s32 result);
 static BOOL OnReset(BOOL f);
 
+/** Registers OnReset (priority 127) with the OS so cards are unmounted before a reset. */
 static OSResetFunctionInfo ResetFunctionInfo = {OnReset, 127};
 
 /** No-op completion callback used when an API call has no callback of its own. */
@@ -530,7 +534,7 @@ s32 __CARDReadSegment(s32 chan, CARDCallback callback) {
     } else if (result >= 0) {
         if (!EXIImmEx(chan, card->cmd, card->cmdlen, EXI_WRITE) ||
             !EXIImmEx(chan, (u8* )card->workArea + sizeof(CARDID), card->latency,
-            EXI_WRITE) || // XXX use DMA if possible
+            EXI_WRITE) || // DMA could be used here instead
             !EXIDma(chan, card->buffer, 512, card->mode, __CARDTxHandler))
         {
             card->txCallback = NULL;

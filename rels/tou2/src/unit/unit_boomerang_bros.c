@@ -11,6 +11,18 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_sub.h"
 
+// Unit work slots of the Boomerang Bro (btlevtcmd_SetUnitWork / GetUnitWork / AddUnitWork).
+enum {
+    UW_BOOMERANG_BROS_RETURNED = 0,      // boomerangs back in his hand this attack
+    UW_BOOMERANG_BROS_TARGET_1 = 1,      // unit id of the first target (-1 if none)
+    UW_BOOMERANG_BROS_TARGET_2 = 2,      // unit id of the second target (-1 if none)
+    UW_BOOMERANG_BROS_TARGET_PART_1 = 3, // part of the first target
+    UW_BOOMERANG_BROS_TARGET_PART_2 = 4, // part of the second target
+    UW_BOOMERANG_BROS_RESULT_1 = 5,      // result of the outbound hit on the first target
+    UW_BOOMERANG_BROS_RESULT_2 = 6,      // result of the outbound hit on the second target
+    UW_BOOMERANG_BROS_AC_DONE = 7,       // 1 once the action-command defence result has been taken for this pass
+};
+
 BattleUnitKind unit_boomerang_bros;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -27,6 +39,10 @@ static EvtWord renzoku_attack_event[178];
 extern EvtWord normal_attack_event_confuse[];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the Boomerang Bro (HP 7, level 20):
+ * its size, offsets, damage sounds, status vulnerability, parts and init event.
+ */
 BattleUnitKind unit_boomerang_bros = {
     57,
     "btl_un_boomerang_bros",
@@ -93,16 +109,21 @@ BattleUnitKind unit_boomerang_bros = {
     data_table,
 };
 
+/** Defence of the Boomerang Bro: 1 damage points off every hit. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element reactions of the Boomerang Bro: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Boomerang Bro (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 40, 60, 100, 80, 100, 100, 95};
 #else
+/** Status vulnerability of the Boomerang Bro (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 95, 80, 70, 60, 100, 80, 100, 100, 95};
 #endif
 
+/** Pose table of the Boomerang Bro: maps each battle pose to the animation it plays (BRO_* animations). */
 static PoseTableEntry pose_table[] = {
     {1, "BRO_N_1"},
     {2, "BRO_Y_1"},
@@ -111,30 +132,33 @@ static PoseTableEntry pose_table[] = {
     {4, "BRO_X_1"},
     {3, "BRO_X_1"},
     {27, "BRO_D_1"},
-    {28, "BRO_S_1"},
+    {BTL_POSE_NORMAL, "BRO_S_1"},
     {29, "BRO_Q_1"},
     {30, "BRO_Q_1"},
     {31, "BRO_S_1"},
-    {39, "BRO_D_1"},
-    {42, "BRO_R_1"},
-    {40, "BRO_W_1"},
-    {56, "BRO_X_1"},
-    {57, "BRO_X_1"},
+    {BTL_POSE_DAMAGE, "BRO_D_1"},
+    {BTL_POSE_RUN, "BRO_R_1"},
+    {BTL_POSE_WALK, "BRO_W_1"},
+    {BTL_POSE_DANGER, "BRO_X_1"},
+    {BTL_POSE_PERIL, "BRO_X_1"},
     {BTL_POSE_TALK, "BRO_T_1"},
     {BTL_POSE_STAY_DEFAULT, "BRO_S_1"},
 };
 
+/** Data table of the Boomerang Bro: empty; it has no event hooks. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of the Boomerang Bro (4 parts): hit positions, defences, attributes and pose tables. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
-    {2, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {3, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {4, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
+    {2, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {3, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {4, "btl_un_boomerang_bros", "c_burosu_b", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Weapon of the Boomerang Bro's attack: 2 damage. */
 BattleWeapon weapon_boomerang_bros_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -153,7 +177,7 @@ BattleWeapon weapon_boomerang_bros_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -171,6 +195,7 @@ BattleWeapon weapon_boomerang_bros_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Boomerang Bro's rapid-fire attack: 2 damage. */
 BattleWeapon weapon_boomerang_bros_renzoku_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -189,7 +214,7 @@ BattleWeapon weapon_boomerang_bros_renzoku_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -235,8 +260,8 @@ EVT_END()
  * every other turn it uses normal_attack_event.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 0)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, 0)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
@@ -298,13 +323,13 @@ static EVT_BEGIN(damage_check_sub)
     LABEL(90)
     GOTO(99)
     LABEL(91)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, LW(8))
     IF_INT_EQUAL(LW(8), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(6))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, 1)
     END_IF
     IF_INT_EQUAL(LW(7), 1)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), DAMAGE_FLAG_LAST_HIT, LW(5))
     ELSE
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 0, LW(5))
     END_IF
@@ -327,12 +352,12 @@ EVT_END()
  */
 static EVT_BEGIN(damage_check_last)
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, LW(8))
         IF_INT_EQUAL(LW(8), 0)
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(6))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, 1)
         END_IF
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), DAMAGE_FLAG_LAST_HIT, LW(5))
     ELSE
         SET_VALUE(LW(7), 1)
         CALL_CHILD(damage_check_sub)
@@ -341,12 +366,17 @@ static EVT_BEGIN(damage_check_last)
 EVT_END()
 
 /**
- * Guess: flight of the Boomerang Bro's boomerang (part LW(15)):
- * plays the throw sound and spin pose, places the boomerang at the thrower
- * and makes its sibling loop steer the part out towards the target and back,
- * keeping the thrower's unit work flags in step so the attack script knows when it has returned.
+ * Flight of one boomerang (part LW(15), weapon LW(6)):
+ * plays the throw sound, spins the part and sends it out to x = -200 and back to the thrower.
+ * A sibling loop hits the first target (unit work 1 and 3) and
+ * then the second (unit work 2 and 4) as the boomerang passes them on the way out,
+ * keeping the results in unit work 5 and 6, and hits them again in reverse order on the way back,
+ * the final check counting as the last hit when LW(14) is 1;
+ * unit work 7, the guard-result flag, is cleared before the return hits.
+ * Once back the part is hidden again and unit work 0 (boomerangs returned) goes up by one.
  */
 EVT_BEGIN(boomerang_move_event)
+    // The boomerang is thrown: its throw sound plays and it appears spinning above the Boomerang Bro's hand.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -354,20 +384,22 @@ EVT_BEGIN(boomerang_move_event)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, -180)
     CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, LW(15), 0, 0, 0)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
     SET_VALUE(LW(9), 0)
+    // As it flies out, it hits the first target it passes, then the second;
+    // on the way back it hits them again in reverse order.
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
             CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, LW(15), LW(10), LW(12), LW(13))
             IF_INT_EQUAL(LW(9), 2)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 0)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, 0)
             END_IF
             SWITCH(LW(9))
                 CASE_EQUAL(0)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_1, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_PART_1, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 1)
                     BREAK_SWITCH
@@ -378,11 +410,11 @@ EVT_BEGIN(boomerang_move_event)
                 END_IF
                 CALL_CHILD(damage_check_no_last)
                 SET_VALUE(LW(9), 1)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_1, LW(0))
                 CASE_END
                 CASE_EQUAL(1)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_2, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_PART_2, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 2)
                     BREAK_SWITCH
@@ -393,11 +425,11 @@ EVT_BEGIN(boomerang_move_event)
                 END_IF
                 CALL_CHILD(damage_check_no_last)
                 SET_VALUE(LW(9), 2)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_2, LW(0))
                 CASE_END
                 CASE_EQUAL(2)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_2, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_PART_2, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 3)
                     BREAK_SWITCH
@@ -406,7 +438,7 @@ EVT_BEGIN(boomerang_move_event)
                 IF_INT_LESS(LW(10), LW(11))
                     BREAK_SWITCH
                 END_IF
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_2, LW(0))
                 IF_INT_EQUAL(LW(14), 0)
                     CALL_CHILD(damage_check_no_last)
                 ELSE
@@ -415,8 +447,8 @@ EVT_BEGIN(boomerang_move_event)
                 SET_VALUE(LW(9), 3)
                 CASE_END
                 CASE_EQUAL(3)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(4))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_1, LW(3))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_TARGET_PART_1, LW(4))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(9), 4)
                     BREAK_SWITCH
@@ -425,7 +457,7 @@ EVT_BEGIN(boomerang_move_event)
                 IF_INT_LESS(LW(10), LW(11))
                     BREAK_SWITCH
                 END_IF
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_1, LW(0))
                 IF_INT_EQUAL(LW(14), 0)
                     CALL_CHILD(damage_check_no_last)
                 ELSE
@@ -440,22 +472,25 @@ EVT_BEGIN(boomerang_move_event)
             LABEL(10)
         END_LOOP
     END_SIBLING_EVENT
+    // The boomerang spins in the air.
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
             CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, 64)
         END_LOOP
     END_SIBLING_EVENT
+    // It flies out to the edge of the stage and curves back to the thrower.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK2"), EVT_NULLPTR, 0, LW(8))
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), -200, LW(1), LW(2), 40, FLOAT(-20.0f), 4, 0, -1)
     CALL(evt_snd_sfxoff, LW(8))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK3"), EVT_NULLPTR, 0, LW(8))
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2), 40, FLOAT(20.0f), 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(8))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+    // It disappears into the Boomerang Bro's hand and the thrown count goes up.
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RETURNED, 1)
     RETURN
 EVT_END()
 
@@ -467,7 +502,7 @@ EVT_END()
  * A confused Bro aimed at its own side runs normal_attack_event_confuse instead.
  */
 static EVT_BEGIN(normal_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -476,7 +511,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_boomerang_bros_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -493,12 +528,12 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_attack))
-    SET_VALUE(LW(0), 1)
-    SET_VALUE(LW(1), 3)
+    SET_VALUE(LW(0), UW_BOOMERANG_BROS_TARGET_1)
+    SET_VALUE(LW(1), UW_BOOMERANG_BROS_TARGET_PART_1)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RETURNED, 0)
     LABEL(10)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), LW(3))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(1), LW(4))
@@ -518,7 +553,7 @@ static EVT_BEGIN(normal_attack_event)
     SPAWN_EVENT(boomerang_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RETURNED, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             BREAK_LOOP
         END_IF
@@ -540,7 +575,7 @@ static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_boomerang_bros_renzoku_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_boomerang_bros_renzoku_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -557,12 +592,12 @@ static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_renzoku_attack))
-    SET_VALUE(LW(0), 1)
-    SET_VALUE(LW(1), 3)
+    SET_VALUE(LW(0), UW_BOOMERANG_BROS_TARGET_1)
+    SET_VALUE(LW(1), UW_BOOMERANG_BROS_TARGET_PART_1)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RESULT_2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RETURNED, 0)
     LABEL(10)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), LW(3))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(1), LW(4))
@@ -588,7 +623,7 @@ static EVT_BEGIN(renzoku_attack_event)
     SPAWN_EVENT(boomerang_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_RETURNED, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 2)
             BREAK_LOOP
         END_IF
@@ -600,11 +635,15 @@ static EVT_BEGIN(renzoku_attack_event)
 EVT_END()
 
 /**
- * Guess: confused version of the Boomerang Bro's normal attack:
- * the throw animation and boomerang sound play, but the boomerang is not sent out at a selected enemy;
- * used when the Bro is confused (set as its confusion attack event).
+ * Attack of a Boomerang Bro whose chosen target is on its own side (confusion),
+ * run from normal_attack_event and renzoku_attack_event:
+ * it turns around and throws the boomerang (part 2) out to x 250 and back to its home position,
+ * without the per-target tracking of boomerang_move_event.
+ * Then for each selected target a dodge plays the matching avoid reaction,
+ * and a hit gets two damage checks 30 to 39 frames apart (the guard result is taken once, unit work 7).
  */
 EVT_BEGIN(normal_attack_event_confuse)
+    // The attack is announced and the guard timing is awaited, with the targets being those of its own side.
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_attack))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
@@ -612,10 +651,12 @@ EVT_BEGIN(normal_attack_event_confuse)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_attack))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
+    // The Boomerang Bro turns around and winds up.
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
+    // The boomerang spins out from its hand across the stage and curves back to its home spot.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -623,8 +664,8 @@ EVT_BEGIN(normal_attack_event_confuse)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, -180)
     CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, LW(15), 0, 0, 0)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
     BEGIN_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
@@ -641,11 +682,12 @@ EVT_BEGIN(normal_attack_event_confuse)
     ADD(LW(1), 20)
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2), 15, FLOAT(-10.0f), 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(8))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Each target is checked in turn.
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -667,14 +709,16 @@ EVT_BEGIN(normal_attack_event_confuse)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A target that dodges plays its dodge reaction.
     LABEL(90)
     GOTO(97)
+    // A target that is hit takes the damage twice, a moment apart, from the boomerang's out and back passes.
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, LW(8))
         IF_INT_EQUAL(LW(8), 0)
             CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_boomerang_bros_attack))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, 1)
         END_IF
         ADD(LW(10), 1)
     END_IF
@@ -683,7 +727,7 @@ EVT_BEGIN(normal_attack_event_confuse)
         CALL(evt_sub_random, 10, LW(0))
         ADD(LW(0), 30)
         WAIT_FRAMES(LW(0))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_SIBLING_EVENT
     GOTO(97)
     LABEL(97)
@@ -691,6 +735,7 @@ EVT_BEGIN(normal_attack_event_confuse)
     IF_INT_NOT_EQUAL(LW(3), -1)
         GOTO(0)
     END_IF
+    // After the last target the boomerang is done and the Bro waits for the effects to settle.
     LABEL(99)
     WAIT_FRAMES(100)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -698,11 +743,13 @@ EVT_BEGIN(normal_attack_event_confuse)
 EVT_END()
 
 /**
- * Guess: confused version of the Boomerang Bro's two-throw attack:
- * throws and recalls the boomerang twice, spinning it out to 250 and back to home,
- * then runs the usual damage checks.
+ * Confused version of the two-throw attack: throws the boomerang out to x 250 and back twice,
+ * then for each selected target a dodge plays the avoid reaction
+ * and a hit gets four damage checks 30 to 39 frames apart.
+ * Nothing in this unit runs it; renzoku_attack_event uses normal_attack_event_confuse instead.
  */
 EVT_BEGIN(renzoku_attack_event_confuse)
+    // The attack is announced and the guard timing is awaited, with the targets being those of its own side.
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_renzoku_attack))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
@@ -710,6 +757,7 @@ EVT_BEGIN(renzoku_attack_event_confuse)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_boomerang_bros_renzoku_attack))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
+    // The Boomerang Bro turns around and throws the boomerang out across the stage and back, twice in a row.
     LOOP(2)
         CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, 1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
@@ -722,8 +770,8 @@ EVT_BEGIN(renzoku_attack_event_confuse)
         CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, LW(15), 0, 0, -180)
         CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, LW(15), 0, 0, 0)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
         BEGIN_SIBLING_EVENT
             LOOP(0)
                 WAIT_FRAMES(1)
@@ -740,12 +788,13 @@ EVT_BEGIN(renzoku_attack_event_confuse)
         ADD(LW(1), 20)
         CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, LW(15), LW(0), LW(1), LW(2), 15, FLOAT(-10.0f), 1, 0, -1)
         CALL(evt_snd_sfxoff, LW(8))
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 33554432)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_NO_SHADOW)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_LOOP
+    // Each target is checked in turn.
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -767,14 +816,16 @@ EVT_BEGIN(renzoku_attack_event_confuse)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A target that dodges plays its dodge reaction.
     LABEL(90)
     GOTO(97)
+    // A target that is hit takes the damage four times, a moment apart, as the boomerang whips past.
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, LW(8))
         IF_INT_EQUAL(LW(8), 0)
             CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_boomerang_bros_renzoku_attack))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOOMERANG_BROS_AC_DONE, 1)
         END_IF
         ADD(LW(10), 1)
     END_IF
@@ -785,7 +836,7 @@ EVT_BEGIN(renzoku_attack_event_confuse)
             ADD(LW(0), 30)
             WAIT_FRAMES(LW(0))
         END_LOOP
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_boomerang_bros_renzoku_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_SIBLING_EVENT
     GOTO(97)
     LABEL(97)
@@ -793,6 +844,7 @@ EVT_BEGIN(renzoku_attack_event_confuse)
     IF_INT_NOT_EQUAL(LW(3), -1)
         GOTO(0)
     END_IF
+    // After the last target the Bro waits for the effects to settle.
     LABEL(99)
     WAIT_FRAMES(160)
     CALL(evt_btl_camera_set_mode, 0, 0)

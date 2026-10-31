@@ -32,7 +32,8 @@ static void effSheepMain(EffectEntry* effect);
 /**
  * Spawns the flock: 50 sheep records after the header, placed off to the left at random depth, scale,
  * speed and delay; about one in five hops.
- * Used by evt_eff "sheep" (Guess: the Sleepy Sheep item); `type` is unused later.
+ * Used by evt_eff "sheep", whose only caller is the Sleepy Sheep item script (ItemEvent_Nemure_Yoikoyo);
+ * `type` is unused later.
  */
 EffectEntry* effSheepEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;

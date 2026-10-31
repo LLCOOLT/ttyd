@@ -207,8 +207,8 @@ const static f32 value0_3 = 0.3f;
 const static f32 value0_6 = 0.6f;
 
 /**
- * Assembly helper that mixes the left and right buffers into each other (each keeps invcross of itself and gets
- * cross of the other) before the reverb runs. Guess: the exact mix, read from its arguments. Original assembly.
+ * Assembly helper that mixes the 160-sample left and right buffers into each other: left becomes invcross * left
+ * + cross * right and right becomes cross * left + invcross * right. Original assembly.
  */
 asm static void DoCrossTalk(register s32* l, register s32* r, register f32 cross, register f32 invcross) {
     nofralloc
@@ -317,9 +317,9 @@ loop:
 
 /**
  * Assembly inner loop of the high-quality reverb for output k (0 left, 1 right, 2 surround) over the 160-sample
- * buffer sptr: pre-delay, comb and all-pass delay lines and a damping low-pass,
- * mixed with the dry signal by the mix level. Guess: the exact filter topology, read from the data it touches.
- * Original assembly.
+ * buffer sptr: optional pre-delay, three parallel comb filters summed, two all-pass filters, a 0.3 scale,
+ * a one-pole low-pass (damping), a third all-pass, then 0.6 * level of that plus 0.6 * (1 - level) of the dry
+ * input. Original assembly.
  */
 asm static void HandleReverb(register s32* sptr, register AXFX_REVHI_WORK* rv, register s32 k) {
     nofralloc

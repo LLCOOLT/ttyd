@@ -60,6 +60,11 @@ static EvtWord attack_event[2];
 static EvtWord wait_event[6];
 static EvtWord party_win_reaction[11];
 
+/**
+ * Body Slam (btl_wn_pwd_normal), Flurrie's free basic move, run by partyClaudaAttack_NormalAttack: she drops onto
+ * one enemy after the line-up-the-cursors command, power from her rank. Shatters ice, flips shelled enemies,
+ * knocks winged ones down and is usable while confused.
+ */
 BattleWeapon partyWeapon_ClaudaNormalAttack = {
     "btl_wn_pwd_normal", // name
 #if VERSION >= VERSION_US
@@ -83,7 +88,7 @@ BattleWeapon partyWeapon_ClaudaNormalAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     10, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -102,6 +107,11 @@ BattleWeapon partyWeapon_ClaudaNormalAttack = {
     {0, 20, 20, 100, 20, 10, 2, 5, 10, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Gale Force (btl_wn_pwd_lv1, 4 FP), run by partyClaudaAttack_BreathAttack: no damage, hits every enemy and can
+ * blow them out of the battle. The script applies a copy of it (_make_breath_weapon) whose gale chance comes
+ * from the press-and-release command.
+ */
 BattleWeapon partyWeapon_ClaudaBreathAttack = {
     "btl_wn_pwd_lv1", // name
 #if VERSION >= VERSION_US
@@ -126,7 +136,7 @@ BattleWeapon partyWeapon_ClaudaBreathAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     25, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -150,6 +160,11 @@ BattleWeapon partyWeapon_ClaudaBreathAttack = {
 #endif
 };
 
+/**
+ * Lip Lock (btl_wn_pwd_lv2, 3 FP), run by partyClaudaAttack_PredationAttack: a kiss on one enemy that pierces
+ * defence; the damage comes from the press-on-the-light command (the script's copy, _make_kiss_weapon), and
+ * Flurrie regains the HP she drains.
+ */
 BattleWeapon partyWeapon_ClaudaPredationAttack = {
     "btl_wn_pwd_lv2", // name
 #if VERSION >= VERSION_US
@@ -178,7 +193,7 @@ BattleWeapon partyWeapon_ClaudaPredationAttack = {
     {3, 3, 0, 0, 0, 0, 0, 0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_ac_sexy_kiss", // acHelpMsg
@@ -196,6 +211,10 @@ BattleWeapon partyWeapon_ClaudaPredationAttack = {
     {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Dodgy Fog (btl_wn_pwd_lv3, 4 FP), run by partyClaudaAttack_KumoGuard: always hits one ally, no damage, and makes
+ * it Dodgy; the script's copy (_make_kumoguard_weapon) sets the turns from the timed stick command.
+ */
 BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
     "btl_wn_pwd_lv3", // name
 #if VERSION >= VERSION_US
@@ -220,7 +239,7 @@ BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_ac_kumogakure", // acHelpMsg
@@ -240,12 +259,19 @@ BattleWeapon partyWeapon_ClaudaKumogakureAttack = {
     {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Flurrie's defence: 0 against every element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Flurrie's element reactions: none special, every element hits her normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Flurrie's status vulnerabilities: base rate (100) for every status. */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Flurrie's pose table: battle pose types mapped to her c_windy animations
+ * (PWD_S_1 floating, PWD_R_1 and PWD_W_1 moving, PWD_D_* hurt, PWD_O_1 appeal...).
+ */
 PoseTableEntry pose_table_clauda_stay[] = {
     {9, "PWD_D_5"},
     {2, "PWD_D_5"},
@@ -254,26 +280,31 @@ PoseTableEntry pose_table_clauda_stay[] = {
     {5, "PWD_X_1"},
     {1, "PWD_N_1"},
     {27, "PWD_D_3"},
-    {28, "PWD_S_1"},
+    {BTL_POSE_NORMAL, "PWD_S_1"},
     {37, "PWD_G_2"},
     {31, "PWD_G_1"},
-    {39, "PWD_D_1"},
-    {40, "PWD_W_1"},
-    {42, "PWD_R_1"},
-    {57, "PWD_D_2"},
-    {56, "PWD_D_2"},
+    {BTL_POSE_DAMAGE, "PWD_D_1"},
+    {BTL_POSE_WALK, "PWD_W_1"},
+    {BTL_POSE_RUN, "PWD_R_1"},
+    {BTL_POSE_PERIL, "PWD_D_2"},
+    {BTL_POSE_DANGER, "PWD_D_2"},
     {BTL_POSE_ESCAPE_FAIL, "PWD_D_3"},
     {BTL_POSE_ESCAPE_FAIL_END, "PWD_D_2"},
     {BTL_POSE_TALK, "PWD_T_1"},
-    {52, "PWD_I_1"},
+    {BTL_POSE_ITEM_USE, "PWD_I_1"},
     {BTL_POSE_COMMAND_WAIT, "PWD_C_1"},
     {BTL_POSE_APPEAL, "PWD_O_1"},
     {BTL_POSE_ZERO_GRAVITY, "PWD_X_1"},
     {49, "PWD_A4_3"},
-    {45, "PWD_G_1"},
+    {BTL_POSE_DEFEND, "PWD_G_1"},
     {BTL_POSE_STAY_DEFAULT, "PWD_S_1"},
 };
 
+/**
+ * Flurrie's battle data events: Appeal (5), the reaction when an audience member is attacked (6), her move
+ * menu builder (1), nothing on a First Strike (48), the victory pose (64), an empty step run after a move's
+ * cost is paid (7) and the default spin when she superguards an attack (47).
+ */
 static BattleDataEntry data_table[] = {
     {5, clauda_appeal_event},
     {6, attack_audience_event},
@@ -285,10 +316,16 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Flurrie's single body part: model c_windy with her defence, element and pose tables. */
 BattleUnitKindPart unitpartsdata_Party_Clauda[] = {
     {1, "btl_un_clauda", "c_windy", 0.0f, 0.0f, 0.0f, 16.0f, 44.0f, 5.0f, 0.0f, 44.0f, 0.0f, 26, 50, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table_clauda_stay},
 };
 
+/**
+ * Flurrie's battle unit (name btl_un_clauda), used whenever she is the partner in a fight: size, hurt sounds,
+ * status table, body part and init script. She floats, and no HP gauge is drawn over her; her HP comes from the
+ * partner stats.
+ */
 BattleUnitKind unitdata_Party_Clauda = {
     227,
     "btl_un_clauda",
@@ -364,7 +401,7 @@ static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     WAIT_FRAMES(40)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_SUBHANG1"), STRING("SFX_PARTY_BATTLE_SUBHANG1"), 0, 9, 3, 0, 0)
@@ -419,6 +456,7 @@ EVT_END()
  * the action command deciding whether the slam connects at full strength, then floats back home.
  */
 EVT_BEGIN(partyClaudaAttack_NormalAttack)
+    // Find the chosen enemy and pay for the move; with no target, skip to the end.
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -430,6 +468,7 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
+    // Camera follows her and the target; she faces it and the line-up-the-cursors command is set up.
     CALL(evt_btl_camera_set_mode, 0, 11)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -442,11 +481,13 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
     CALL(btlevtcmd_AcSetParamAll, LW(3), LW(4), 180, LW(0), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_AcSetFlag, 0)
     CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 8, 1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // She hovers while the command runs.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     WAIT_FRAMES(20)
     CALL(btlevtcmd_StartAC, 1)
     CALL(btlevtcmd_ResultAC)
     CALL(btlevtcmd_StopAC)
+    // She stops floating and drops onto the enemy; after a failed command she lands off to one side at random.
     CALL(btlevtcmd_OffUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A1_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -464,7 +505,8 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
     END_IF
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -1)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+    // Check whether the enemy can be hit; only a good command goes on to the slam.
+    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 1)
         GOTO(10)
     END_IF
@@ -473,6 +515,7 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
         GOTO(20)
     END_IF
     SET_VALUE(LW(5), 1)
+    // Miss: the enemy's dodge plays if it has one, she flops down with a squash and the move ends.
     LABEL(10)
     IF_INT_NOT_EQUAL(LW(5), 1)
         IF_INT_EQUAL(LW(5), 3)
@@ -526,20 +569,22 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
     GOTO(95)
+    // Slam: crash sounds and the damage, with the rating effect after a good command.
     LABEL(20)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_ATT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetResultAC, LW(0))
     IF_BITS_SET(LW(0), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
         CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
     ELSE
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
     END_IF
+    // She bounces on the enemy with a screen shake and a squash and stretch, with a stylish window.
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 16, 16, 20)
@@ -584,6 +629,7 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
         CALL(evt_audience_acrobat_notry)
         GOTO(95)
     END_IF
+    // Stylish hit: she hops up off the enemy and poses.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
     ADD(LW(1), 20)
@@ -594,14 +640,16 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_Y_1"))
     WAIT_MS(500)
     CALL(btlevtcmd_WaitEventEnd, LW(15))
+    // She floats back to her home spot.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), FLOAT(6.0f), LW(15))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(15), 0, 4, 0, -1)
+    // End of the move: audience AP, face forward, apply the HP and FP drain badges, back to idle.
     LABEL(99)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
@@ -617,6 +665,7 @@ EVT_END()
  * then tried against each enemy.
  */
 EVT_BEGIN(partyClaudaAttack_BreathAttack)
+    // Declare the move on all enemies and pay for it; with no target, skip to the end.
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
@@ -627,6 +676,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
+    // Camera on her; set up the press-and-release command (before JP its speed depends on the difficulty).
     WAIT_FRAMES(20)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
@@ -672,6 +722,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(btlevtcmd_AcGetDifficulty, LW(1))
     CALL(btlevtcmd_AcSetParamAll, 1, LW(0), 4, 40, 60, 80, 100, LW(1))
     CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 14, 1, 0)
+    // She takes a deep breath while the camera holds still.
     CALL(_clauda_breath_effect_ready)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A2_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_BREATH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -681,6 +732,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
     CALL(evt_btl_camera_nomove_z_onoff, 0, 1)
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
+    // Camera back to normal; she blows, and any fog on the stage clears.
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 0)
@@ -692,6 +744,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         WAIT_MS(500)
         CALL(btlevtcmd_StageDispellFog)
     END_INLINE_EVENT
+    // The wind effect and sound start.
     CALL(_clauda_breath_effect_fire, LW(13))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_BREATH2"), EVT_NULLPTR, 0, LW(14))
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
@@ -701,6 +754,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         WAIT_FRAMES(1)
         GOTO(5)
     END_SIBLING_EVENT
+    // Every enemy that can be blown away starts shaking in the wind.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -713,6 +767,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         GOTO(8)
     END_IF
+    // The command runs while she blows; its result sets the blow-away chance of a copy of the weapon.
     CALL(btlevtcmd_StartAC, 1)
     CALL(btlevtcmd_ResultAC)
     DELETE_EVENT(LW(15))
@@ -722,6 +777,8 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     SET_VALUE(LW(12), PTR(&partyWeapon_ClaudaBreathAttack))
     CALL(btlevtcmd_AcGetOutputParam, 2, LW(0))
     CALL(_make_breath_weapon, LW(12), LW(0))
+    // For each enemy: if it can be reached, try to blow it away (the rating shows when it flies off);
+    // otherwise its dodge plays.
     WAIT_FRAMES(60)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
@@ -729,7 +786,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     SET_VALUE(LW(10), 0)
     LABEL(10)
     CALL(btlevtcmd_SetDispOffset, LW(3), 0, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -747,7 +804,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     END_IF
     CALL(btlevtcmd_GetResultAC, LW(0))
     IF_BITS_SET(LW(0), 2)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131328, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
         CALL(btlevtcmd_GetDamageCode, LW(3), LW(0))
         IF_INT_EQUAL(LW(0), 29)
             CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
@@ -756,9 +813,10 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
         END_IF
     ELSE
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
     END_IF
+    // Next enemy.
     LABEL(50)
     WAIT_MS(300)
     LABEL(51)
@@ -771,6 +829,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
             GOTO(10)
         END_IF
     END_IF
+    // Let the wind finish, then stop it; a stylish window as she settles.
     LABEL(80)
     WAIT_MS(1500)
     LABEL(90)
@@ -778,7 +837,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_snd_sfxoff, LW(14))
     CALL(evt_eff_delete_ptr, LW(13))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 25, 25, 20)
     CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
     IF_INT_NOT_EQUAL(LW(6), 2)
@@ -786,9 +845,11 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
         WAIT_MS(500)
         GOTO(99)
     END_IF
+    // Stylish hit: she poses.
     CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_Y_1"))
     WAIT_MS(1000)
+    // End of the move: audience AP, face forward, apply the HP and FP drain badges, back to idle.
     LABEL(99)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
@@ -803,6 +864,7 @@ EVT_END()
  * healing herself by the HP damage dealt, then floats back.
  */
 EVT_BEGIN(partyClaudaAttack_PredationAttack)
+    // Find the chosen enemy and pay for the move; with no target, skip to the end.
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -814,6 +876,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
+    // Camera follows her and the target; set up the press-on-the-light command from the difficulty and her rank.
     CALL(evt_btl_camera_set_mode, 0, 11)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -927,7 +990,9 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     CALL(btlevtcmd_AcSetFlag, 0)
     CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 17, 1, 60)
     WAIT_FRAMES(22)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+    // Against an enemy with pre-emptive front spikes (pre-check result 5) she first floats up in front of it,
+    // and the damage check there pricks her on the spikes.
+    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
         MULTIPLY_FLOAT(LW(6), 40)
@@ -936,11 +1001,12 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
         CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, 0, 5, 0, -1)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
+    // She floats to the kiss point on the enemy and puckers up.
     CALL(_get_clauda_kiss_hit_position, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
     MULTIPLY_FLOAT(LW(6), 20)
@@ -953,7 +1019,8 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A3_1"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+    // She cannot reach it: the enemy's dodge plays and the move ends.
+    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(2)
         CASE_OR_EQUAL(3)
@@ -977,6 +1044,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
         GOTO(90)
     END_IF
+    // If the enemy would counter, the kiss is resolved at once.
     CALL(btlevtcmd_CommandPreCheckCounter, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(0))
     SWITCH(LW(0))
         CASE_OR_EQUAL(7)
@@ -989,9 +1057,10 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CASE_OR_EQUAL(14)
         CASE_OR_EQUAL(15)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A3_2"))
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_END
     END_SWITCH
+    // She plants the kiss; the command runs while the enemy turns pale.
     CALL(btlevtcmd_OffUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_KISS1"), EVT_NULLPTR, 0, LW(14))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A3_2"))
@@ -1023,6 +1092,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // Rating from the command's output.
     CALL(btlevtcmd_ResultAC)
     CALL(evt_snd_sfxoff, LW(14))
     DELETE_EVENT(LW(15))
@@ -1048,14 +1118,16 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     ELSE
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
     END_IF
+    // The enemy's colour comes back and the kiss damage is dealt by a copy of the weapon with the command's power;
+    // a little later she regains the HP drained.
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_SetRGB, LW(3), LW(4), 255, 255, 255)
     CALL(btlevtcmd_AcGetOutputParam, 0, LW(0))
     CALL(_make_kiss_weapon, LW(12), LW(0))
     IF_BITS_SET(LW(9), 2)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131328, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
     ELSE
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetHpDamage, LW(3), LW(0))
@@ -1069,6 +1141,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             CALL(evt_eff, STRING(""), STRING("recovery"), 7, LW(5), LW(6), LW(7), LW(0), 0, 0, 0, 0, 0, 0, 0)
         END_IF
     END_SIBLING_EVENT
+    // She lets go with a smack, with a stylish window.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_KISS2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A3_3"))
     WAIT_FRAMES(5)
@@ -1082,6 +1155,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CALL(evt_audience_acrobat_notry)
         WAIT_FRAMES(60)
     END_IF
+    // Audience AP; she floats back home.
     LABEL(90)
     CALL(btlevtcmd_StopAC)
     CALL(evt_audience_ap_recovery)
@@ -1089,9 +1163,10 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, 0, 5, 0, -1)
+    // End of the move: face forward, apply the HP and FP drain badges, back to idle.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
@@ -1149,14 +1224,14 @@ EVT_BEGIN(partyClaudaAttack_KumoGuard)
     CALL(_make_kumoguard_weapon, LW(12), LW(0))
     CALL(btlevtcmd_AcGetOutputParam, 0, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131328, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
         SUBTRACT(LW(0), 1)
         CALL(btlevtcmd_GetResultPrizeLv, BTL_UNIT_SELF, LW(0), LW(6))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
     ELSE
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
     END_IF
     CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 29, 29, 20)
@@ -1229,6 +1304,7 @@ EVT_END()
  * she body slams it with a squash-and-stretch landing, then floats home.
  */
 EVT_BEGIN(attack_bad_audience_event)
+    // She stops floating and the camera follows her to the chosen audience member.
     CALL(btlevtcmd_OffUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A1_1"))
     CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
@@ -1239,6 +1315,7 @@ EVT_BEGIN(attack_bad_audience_event)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
         CALL(evt_btl_camera_set_zoom, 0, 200)
     END_SIBLING_EVENT
+    // She jumps onto the audience member and slams down on it.
     SET_VALUE(LW(5), LW(1))
     ADD(LW(1), 28)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 5)
@@ -1255,6 +1332,7 @@ EVT_BEGIN(attack_bad_audience_event)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SIBLING_EVENT
     CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6), 0, 0)
+    // The audience member is knocked out; the screen shakes and she squashes and stretches on landing.
     CALL(_attack_aud, LW(3), 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
@@ -1297,6 +1375,7 @@ EVT_BEGIN(attack_bad_audience_event)
         END_LOOP
     END_SIBLING_EVENT
     CALL(btlevtcmd_WaitEventEnd, LW(14))
+    // She hops off, starts floating again and floats back home; the camera returns to the stage.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
     ADD(LW(1), 20)
@@ -1305,7 +1384,7 @@ EVT_BEGIN(attack_bad_audience_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 18, -1)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
     WAIT_MS(400)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 16, 0, 4, 0, 0)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
@@ -1356,7 +1435,7 @@ EVT_BEGIN(attack_good_audience_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A3_3"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     WAIT_MS(300)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 16, 0, 4, 0, 0)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))

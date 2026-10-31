@@ -221,9 +221,10 @@ EVT_BEGIN(sanders_nakama)
 EVT_END()
 
 /**
- * Guess: init event of Bobbery (Sanders) at the skull rock:
- * his NPC type changes with the story, a weak "heroheroi" version before STORY_STG5_15_RUNAWAY_SAILORS
- * and a recovered one later.
+ * Init event of Bobbery (サンダース): before STORY_STG5_18_BOBBERY_RESCUE_2 he uses the worn-out tribe (サンダースへろへろ,
+ * pose D_2), from STORY_STG5_15_RUNAWAY_SAILORS placed at (-114, 22, 22);
+ * at STORY_STG5_18_BOBBERY_RESCUE_2 he is placed there asleep (サンダースねむる) with sanders_nakama as his interrupt
+ * event.
  */
 static EVT_BEGIN(sanders_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -242,6 +243,7 @@ static EVT_BEGIN(sanders_init)
     RETURN
 EVT_END()
 
+/** Items the player may offer Bobbery in the Chuckola Cola scene: the Chuckola Cola only, ended by -1. */
 static s32 itemsel_table01[] = {
     ITEM_CHUCKOLA_COLA, -1,
 };
@@ -271,10 +273,12 @@ EVT_BEGIN(sanders_talk_sub)
 EVT_END()
 
 /**
- * Guess: talk event of Bobbery: between STORY_STG5_15_RUNAWAY_SAILORS
- * and STORY_STG5_17_WINE_OBTAINED he asks for a drink,
- * checks for a Chuckola Cola in the pouch and takes it through the item window;
- * later he talks about the rescue (stg5_muj_47 on) and his recruitment (sanders_nakama).
+ * Talk event of Bobbery: between STORY_STG5_15_RUNAWAY_SAILORS
+ * and STORY_STG5_17_WINE_OBTAINED he begs for the Chuckola Cola (stg5_muj_34_03) unless Mario has one,
+ * in which case the item window takes it and sanders_talk_sub runs.
+ * At STORY_STG5_18_BOBBERY_RESCUE_2 he lies silent the first time (stg5_muj_47,
+ * GSWF_MUJ05_BOBBERY_FIRST_TALK_238); after that he snores (stg5_muj_48) while the music slows and fades,
+ * and the partner says he is just sleeping (stg5_muj_49).
  */
 static EVT_BEGIN(sanders_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -336,9 +340,8 @@ static EVT_BEGIN(sanders_talk)
 EVT_END()
 
 /**
- * Guess: init event of Marco at the skull rock:
- * at STORY_STG5_18_03_MARCOS_JEWEL he is placed and, until the humming has been stopped,
- * starts his humming loop.
+ * Init event of Flavio at the skull rock: at STORY_STG5_18_03_MARCOS_JEWEL he is placed at (279, 0, -67) facing
+ * right and, until GSWF_MUJ05_FLAVIO_HUMMING_STOPPED is set, starts marco_hanauta (id in GW(2)).
  */
 static EVT_BEGIN(marco_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -353,8 +356,13 @@ static EVT_BEGIN(marco_init)
 EVT_END()
 
 /**
- * Guess: talk event of Marco at the skull rock:
- * at STORY_STG5_18_03_MARCOS_JEWEL he stops the humming and talks about the Skull Gem.
+ * Talk event of Flavio at the skull rock at STORY_STG5_18_03_MARCOS_JEWEL: stops his humming for good.
+ * Before the Skull Gem is placed: if Mario lacks it, Flavio sings his skull-captain song (stg5_muj_93_02) and,
+ * once the rock has been examined, asks what Mario wants (stg5_muj_93_03);
+ * asking for the Skull Gem makes him lend it. If Mario has it he sings again (stg5_muj_93_05).
+ * After the gem is placed he cheers Mario on (stg5_muj_93_06),
+ * or says stg5_muj_93_07 once after a failed attempt (GW(12) set by penalty_event).
+ * At STORY_STG5_19_SKULL_ROCK he says stg5_muj_93_09.
  */
 static EVT_BEGIN(marco_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -408,7 +416,7 @@ static EVT_BEGIN(marco_talk)
     RETURN
 EVT_END()
 
-/** Guess: regular event of the Embers at the skull rock (empty). */
+/** Regular event of the Embers エルモス１ and エルモス２: it only waits forever, so they do nothing on their own. */
 static EVT_BEGIN(erumosu_regl)
     WAIT_WHILE(1)
     RETURN
@@ -436,6 +444,7 @@ EVT_BEGIN(erumosu_b_dead)
     RETURN
 EVT_END()
 
+/** NPCs of the skull rock before the Embers are beaten: Bobbery, Flavio and the two Embers. */
 static NpcSetupInfo npcEnt[] = {
     {
         "サンダース", // name
@@ -498,6 +507,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** NPCs of the skull rock once the Embers have been beaten: Bobbery and Flavio. */
 NpcSetupInfo npcEnt_after[] = {
     {
         "サンダース", // name
@@ -526,6 +536,7 @@ NpcSetupInfo npcEnt_after[] = {
     {0},
 };
 
+/** Doors and exits of muj_05: w_bero to muj_04; e_bero to dou_00 (Pirate's Grotto). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -701,14 +712,20 @@ EVT_BEGIN(sanders_kyushutsu)
     RETURN
 EVT_END()
 
-/** Guess: Marco's humming (hanauta) loop; the script body is empty here. */
+/**
+ * Flavio's humming event (hanauta), tracked in GW(2) and deleted when he is talked to;
+ * its body is only RETURN, so it does nothing.
+ */
 EVT_BEGIN(marco_hanauta)
     RETURN
 EVT_END()
 
 /**
- * Guess: Marco and the jewel: when Mario passes x = 500 the scene takes control
- * and the extra party member (Marco) speaks (stg5_muj_93_00) about the Skull Gem.
+ * Flavio reaches the skull rock (STORY_STG5_18_02_FLAVIOS_FAVOR_2):
+ * once Mario passes x = 500, Flavio (following as the extra party member) steps forward
+ * and says this must be the skull rock Bobbery spoke of (stg5_muj_93_00),
+ * walks back to (279, -67) and stays there as an NPC;
+ * he leaves the party and the story moves to STORY_STG5_18_03_MARCOS_JEWEL.
  */
 EVT_BEGIN(marco_and_jewel)
     LOOP(0)
@@ -788,10 +805,12 @@ EVT_BEGIN(dokuroiwa_flush)
     RETURN
 EVT_END()
 
+/** The correct sequence of the seven eye strikes on the skull rock, in order. */
 s32 command_seikai[] = {
     2, 2, 2, 1, 1, 1, 1,
 };
 
+/** Items the player may offer at the skull rock: the Skull Gem only, ended by -1. */
 static s32 itemsel_table[] = {
     ITEM_SKULL_GEM, -1,
 };
@@ -889,8 +908,11 @@ EVT_BEGIN(case_event_delete)
 EVT_END()
 
 /**
- * Guess: the penalty for a wrong eye sequence: the dialogue closes,
- * the three Embers fly in and Mario fights them (battle info 7) while Marco's humming is killed.
+ * The penalty for a wrong eye sequence: Flavio's humming stops,
+ * the three Embers (A, B, C) glide down beside Mario,
+ * he turns to them with a "!" bubble and fights them (battle info 7).
+ * Afterwards they are hidden, the sequence is reset, GW(12) is set so Flavio comments on the failure,
+ * the humming restarts and the case events are registered again.
  */
 EVT_BEGIN(penalty_event)
     CALL(evt_mario_key_onoff, 0)
@@ -944,7 +966,10 @@ EVT_BEGIN(penalty_event)
     RETURN
 EVT_END()
 
-/** Guess: shakes the 3D camera a little for as long as the skull rock opens, using a timed interpolation. */
+/**
+ * Builds up the skull rock's opening shake: shakes the 3D camera sideways with a strength rising from 0 to 0.01
+ * over 30 steps; answer_event runs it during the opening and deletes it.
+ */
 static EVT_BEGIN(cam_shake)
     CALL(evt_sub_intpl_init, 11, 0, 10, 30)
     LABEL(0)
@@ -958,7 +983,10 @@ static EVT_BEGIN(cam_shake)
     RETURN
 EVT_END()
 
-/** Guess: a second, stronger camera shake used in the skull rock scene. */
+/**
+ * Winds down the skull rock's opening shake: the sideways strength falls from 0.01 to 0 over 30 steps;
+ * answer_event runs it after cam_shake.
+ */
 static EVT_BEGIN(cam_shake2)
     CALL(evt_sub_intpl_init, 11, 10, 0, 30)
     LABEL(0)
@@ -1130,9 +1158,10 @@ EVT_BEGIN(iwa02_nonride_a)
 EVT_END()
 
 /**
- * Guess: the skull rock blows apart with a bomb:
- * the rock is captured into an off-screen image,
- * folded away with the paper animation A_1 and hidden together with its hit box, then control returns.
+ * Breaks the skull rock (S_dokuro_iwa) with the bomb-wall paper effect:
+ * plays the wall-break sound, captures the rock into an off-screen image
+ * and plays the OFF_d_bom_ver2 animation A_1 on it, hides the rock and turns off its hit (A_dokuro_iwa),
+ * then waits until no partner action is running before giving control back.
  */
 static EVT_BEGIN(bombwall_bomb)
     CALL(evt_mario_key_onoff, 0)
@@ -1181,9 +1210,13 @@ static EVT_BEGIN(bombwall_bomb)
 EVT_END()
 
 /**
- * Guess: the skull rock's finale after the puzzle is solved:
- * success music, the gem drops out of the rock and bounces (ITEM_SKULL_GEM), Marco comments (stg5_muj_93_08),
- * and the story advances to STORY_STG5_19_SKULL_ROCK.
+ * Bobbery's bomb at the opened skull rock (case event on A_dkr_iwa_02_oku_01):
+ * opens the cave entrance e_bero, plays the success jingle,
+ * shakes the camera and breaks the rock with bombwall_bomb.
+ * Flavio stops humming, jumps for joy at the cave entrance (stg5_muj_93_08),
+ * then the Skull Gem falls out and bounces; he picks it up (stg5_muj_93_08_01),
+ * says he must head back to camp (stg5_muj_93_08_02) and leaves,
+ * and the story moves to STORY_STG5_19_SKULL_ROCK.
  */
 EVT_BEGIN(dokuroiwa_bomb)
     CALL(evt_mario_key_onoff, 0)
@@ -1426,6 +1459,7 @@ static EVT_BEGIN(evt_kusa_1)
     RETURN
 EVT_END()
 
+/** Trees of muj_05 that Mario can shake with his hammer (5 in all). */
 static TreeAccess tree_tbl[] = {
     {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
     {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
@@ -1435,6 +1469,7 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/** Bushes of muj_05 that Mario can check for hidden things (7 in all); A_kuwa_move_01 runs evt_kusa_1. */
 static KusaAccess kusa_tbl[] = {
     {1, "A_kuwa_move_01", "S_kuwa_move_01", evt_kusa_1},
     {1, "A_kuwa_move_02", "S_kuwa_move_02", NULL},

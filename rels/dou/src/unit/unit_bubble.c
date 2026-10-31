@@ -1,4 +1,4 @@
-// Bubble (bubble): battle unit used in Pirate's Grotto.
+// Lava Bubble (bubble): battle unit used in Pirate's Grotto.
 #include "battle/battle_unit.h"
 #include "eff/eff_fire.h"
 #include "evt/evt_cmd.h"
@@ -47,7 +47,7 @@ static EvtWord fire_attack_event[365];
 static EvtWord wait_event[6];
 
 /**
- * Script helper used when a Bubble splits (friend_event):
+ * Script helper used when a Lava Bubble splits (friend_event):
  * copies the current HP (capped at the new unit's maximum)
  * and the size-change state from unit args[0] to the freshly spawned unit args[1]
  * and resets the new unit's HP gauge to match.
@@ -72,6 +72,7 @@ static USER_FUNC(bubble_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/** Unit data of the Lava Bubble: 6 HP, level 21; the battle starts it from init_event. */
 BattleUnitKind unit_bubble = {
     85,
     "btl_un_bubble",
@@ -130,7 +131,7 @@ BattleUnitKind unit_bubble = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     2,
     parts,
@@ -138,16 +139,32 @@ BattleUnitKind unit_bubble = {
     data_table,
 };
 
+/** Defence of the Lava Bubble: none against any element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Elemental reactions of the Lava Bubble: takes 1 extra damage from ice and explosion attacks; is healed by
+ * fire attacks.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 3, 1, 1, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Lava Bubble (percent, 100 is normal) in the demo builds: immune to burn;
+ * resists most statuses (25-95%).
+ */
 static StatusVulnerability regist = {50, 90, 75, 25, 75, 100, 0, 50, 100, 75, 100, 75, 100, 75, 75, 50, 90, 100, 75, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Lava Bubble (percent, 100 is normal) in the retail builds: immune to burn;
+ * resists most statuses (50-95%); is extra vulnerable to dizzy (105%).
+ */
 static StatusVulnerability regist = {50, 90, 105, 100, 75, 100, 0, 50, 100, 90, 100, 90, 100, 95, 75, 50, 90, 100, 75, 100, 100, 95};
 #endif
 
+/**
+ * Pose table of the Lava Bubble: the animation each battle pose (idle, hurt, walk, attack and so on) plays.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -155,20 +172,24 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_2B"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Event table of the Lava Bubble: a fire hit (damage_fire_explosion_event, tag 11), the attacker being burned
+ * by its flames (avoid_fire_event, tag 40) and the First Strike reaction (does nothing).
+ */
 static BattleDataEntry data_table[] = {
     {11, damage_fire_explosion_event},
     {40, avoid_fire_event},
@@ -176,11 +197,13 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of the Lava Bubble: part 1 is its body (the target) and part 2 is the fireball it spits. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_bubble", "c_bubble", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x109, 0x10, pose_table},
-    {2, NULL, "c_bubble", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_bubble", "c_bubble", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_WEAK_TO_ICE_POWER, COUNTER_ATTR_FIERY, pose_table},
+    {2, NULL, "c_bubble", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Weapon data for the Lava Bubble's body charge: 4 damage, fire element, one target. */
 static BattleWeapon weapon_bubble_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -199,7 +222,7 @@ static BattleWeapon weapon_bubble_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -223,6 +246,7 @@ static BattleWeapon weapon_bubble_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the Lava Bubble's fireball: 3 damage, fire element, one target, may inflict burn (75%). */
 static BattleWeapon weapon_bubble_fire_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -241,7 +265,7 @@ static BattleWeapon weapon_bubble_fire_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -266,6 +290,7 @@ static BattleWeapon weapon_bubble_fire_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Setup for the Lava Bubble that splits off when the Lava Bubble is hit by fire or an explosion. */
 static BattleUnitSetup entry_bubble = {
     &unit_bubble, // unitKindParams
     1, // alliance
@@ -277,7 +302,10 @@ static BattleUnitSetup entry_bubble = {
     NULL, // itemDropTable
 };
 
-/** Guess: init event of the Ember: sets its work values and pose tables. */
+/**
+ * Init event of the Lava Bubble: registers its wait, attack (also used when confused) and damage events
+ * and moves its position and home position to height 10.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -290,7 +318,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-/** Guess: damage event of a sword: runs the default damage reaction. */
+/** Damage event of the Lava Bubble: runs the default damage reaction (btldefaultevt_Damage) for itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -298,7 +326,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-/** Event run when the Ember is hit by fire: plays its fire sound and the A_2B pose. */
+/**
+ * Data-table event 40, which the default damage event runs
+ * when an attacker was burned by the Lava Bubble's fiery
+ * body (counter hit 0x22): plays its fire sound and the A_2B pose.
+ */
 static EVT_BEGIN(avoid_fire_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -306,7 +338,11 @@ static EVT_BEGIN(avoid_fire_event)
     RETURN
 EVT_END()
 
-/** Guess: explosion damage event of the Ember: plays the A_2B pose and flings it back, checking the space behind it. */
+/**
+ * Data-table event 11, which the default damage event runs when the Lava Bubble takes fire damage
+ * (DAMAGE_HIT_FIRE): plays the A_2B pose and looks for a free spot, first behind it then in front of it
+ * (40 units per step); if it finds one it splits there (friend_event).
+ */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -346,8 +382,10 @@ static EVT_BEGIN(damage_fire_explosion_event)
 EVT_END()
 
 /**
- * Splitting event of the Ember: when it is hit it splits,
- * spawning a bubble unit (entry_bubble) at its position with the same HP and size status.
+ * Splitting event of the Lava Bubble, run when fire damage hits it (damage_fire_explosion_event):
+ * spawns a new Lava Bubble (entry_bubble) at its position with the same HP and size status and jumps it,
+ * spinning,
+ * to the free spot.
  */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("S_1"))
@@ -378,7 +416,7 @@ static EVT_BEGIN(friend_event)
 EVT_END()
 
 /**
- * Attack event of the Phantom Ember: can use an item;
+ * Attack event of the Lava Bubble: can use an item;
  * otherwise draws 0 to 99 and uses the body charge (weapon_bubble_attack) for 70
  * and the fire ball (weapon_bubble_fire_attack) for 30.
  */
@@ -406,9 +444,14 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-/** Guess: normal attack of the Ember: it flies at one target and hits it for the weapon damage. */
+/**
+ * Body charge of the Lava Bubble (weapon_bubble_attack, fire element, one target):
+ * it hops to the target, flares up
+ * (A_1B) and hits it with the usual dodge and guard checks, then hops back home.
+ */
 static EVT_BEGIN(normal_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // Choose the target: the First Strike victim, otherwise a sampled opposing unit.
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -416,24 +459,28 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No valid target: a confused unit is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // It turns to the target and the camera follows.
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
+    // Wind-up: it bubbles toward the target in two hops.
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_FRAMES(120)
@@ -457,6 +504,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, 0, 4, 0, -1)
     DELETE_EVENT(LW(15))
     WAIT_FRAMES(30)
+    // Hit check: a miss or dodge flares up in front of the target, a hit goes on to the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -480,6 +528,7 @@ static EVT_BEGIN(normal_attack_event)
         CASE_END
     END_SWITCH
     LABEL(90)
+    // Miss: it flares up four times in front of the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LOOP(4)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
@@ -487,13 +536,14 @@ static EVT_BEGIN(normal_attack_event)
     END_LOOP
     GOTO(98)
     LABEL(91)
+    // Hit: the camera shakes, the flame flares on the target and the damage is dealt.
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(10)
     LOOP(3)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
@@ -501,6 +551,7 @@ static EVT_BEGIN(normal_attack_event)
     END_LOOP
     GOTO(98)
     LABEL(98)
+    // Retreat: it hops past the target and back to its home position.
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
@@ -525,7 +576,7 @@ static EVT_BEGIN(normal_attack_event)
 EVT_END()
 
 /**
- * Script helper, run as a sibling event for the Bubble's fire attack:
+ * Script helper, run as a sibling event for the Lava Bubble's fire attack:
  * creates a fire effect on the first call and keeps it at part 2's position,
  * growing it by 0.1 per frame up to the unit's size multiplier. Never finishes; the attack script ends it.
  */
@@ -563,9 +614,15 @@ static USER_FUNC(eff_fire) {
     return EVT_RETURN_BLOCK;
 }
 
-/** Guess: fire attack of the Ember: it spits fire at one target (eff_fire) for the weapon damage. */
+/**
+ * Fireball of the Lava Bubble (weapon_bubble_fire_attack, fire element, one target): it lobs its fireball part
+ * (part 2, with the growing eff_fire flame) at the target in arcs and hits it with the usual dodge
+ * and guard checks
+ * (75% chance of a 3-turn burn), with a smoke puff at the target.
+ */
 static EVT_BEGIN(fire_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // Choose the target: the First Strike victim, otherwise a sampled opposing unit.
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -573,14 +630,16 @@ static EVT_BEGIN(fire_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No valid target: a confused unit is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
@@ -588,19 +647,22 @@ static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 0)
+    // Wind-up: it puffs itself up (T_1) before spitting.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("T_1"))
         WAIT_FRAMES(30)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     END_SIBLING_EVENT
+    // It spits a fireball (part 2) with a growing flame.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 5)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
     BEGIN_SIBLING_EVENT
         CALL(eff_fire, BTL_UNIT_SELF)
     END_SIBLING_EVENT
+    // The fireball arcs over to the target in two lobs.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 0)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
@@ -625,7 +687,8 @@ static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 30, 0, 1, 0, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
+    // Hit check: a miss or dodge ends the attack, a hit goes on to the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -651,12 +714,14 @@ static EVT_BEGIN(fire_attack_event)
     LABEL(90)
     GOTO(98)
     LABEL(91)
+    // Hit: a puff of smoke bursts at the target and the damage is dealt.
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 16, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
     LABEL(98)
+    // Retreat: the camera returns and it waits a moment.
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(400)
     LABEL(99)
@@ -665,7 +730,7 @@ static EVT_BEGIN(fire_attack_event)
 EVT_END()
 
 /**
- * Script helper for the Bubble's all-target fire attack: args[1] is the flame index 0 to 9;
+ * Script helper for the Lava Bubble's all-target fire attack: args[1] is the flame index 0 to 9;
  * creates a flame in front of the unit (24 units further for each index,
  * in the facing direction) with a size from a rising and falling table (1.0 to 2.25), and keeps its position.
  * Never finishes.
@@ -694,7 +759,7 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
-/** Guess: sub-event of the fire wall attack: lights one fire (eff_all_fire) in the row. */
+/** Sub-event of all_fire_attack_event: lights flame LW(0) of the row (eff_all_fire). */
 static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, BTL_UNIT_SELF, LW(0))
@@ -704,11 +769,13 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
 EVT_END()
 
 /**
- * Guess: fire wall attack of the Ember: lights a row of ten growing fires in front of itself that burn everyone
- * on the other side.
+ * Unused fire-wall attack of the Lava Bubble (attack_event never picks it): it hops to x = -40, shakes,
+ * lights a row of ten flames in front of itself (all_fire_attackEvent_sub) and hits every target with the weapon
+ * in LW(9), then hops home.
  */
 static EVT_BEGIN(all_fire_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // Choose a target (this move reaches every opposing unit).
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -716,14 +783,16 @@ static EVT_BEGIN(all_fire_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No valid target: a confused unit is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared on all targets; the camera pulls back and the guard window opens.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -732,6 +801,7 @@ static EVT_BEGIN(all_fire_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
+    // It hops to the side of the stage to line up the shot.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -742,6 +812,7 @@ static EVT_BEGIN(all_fire_attack_event)
 #endif
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It shakes and builds up flames.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     LOOP(20)
@@ -750,6 +821,7 @@ static EVT_BEGIN(all_fire_attack_event)
         CALL(btlevtcmd_AddPos, BTL_UNIT_SELF, -2, 0, 0)
         WAIT_FRAMES(2)
     END_LOOP
+    // A row of ten flames shoots out in front of it, one after another.
     BEGIN_SIBLING_EVENT
         SET_VALUE(LW(0), 0)
         LOOP(10)
@@ -764,6 +836,7 @@ static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(0)
+    // Each target in turn gets the hit check and then the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -792,7 +865,7 @@ static EVT_BEGIN(all_fire_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -801,6 +874,7 @@ static EVT_BEGIN(all_fire_attack_event)
         GOTO(0)
     END_IF
     LABEL(98)
+    // Retreat: after a pause it hops back to its home position.
     WAIT_FRAMES(180)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -813,7 +887,7 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
-/** Guess: wait (idle) event of Cortez: sets the idle pose from the current mode's pose table. */
+/** Wait (idle) event of the Lava Bubble: sets its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

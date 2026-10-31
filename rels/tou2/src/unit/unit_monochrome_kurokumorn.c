@@ -1,4 +1,4 @@
-// unit_monochrome_kurokumorn: monochrome kurokumorn battle unit (Puff family).
+// unit_monochrome_kurokumorn: Dark Puff (`monochrome_kurokumorn`), battle unit.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -13,6 +13,12 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
 #include "version.h"
+
+// Unit work slots of the Dark Puff.
+enum {
+    UW_MONOCHROME_KUROKUMORN_LOW = 0,    // 1 while it hovers low (y 10), in reach of hammers and shell tosses; 0 while high (y 40)
+    UW_MONOCHROME_KUROKUMORN_UNUSED = 1, // cleared by init_event; nothing reads it
+};
 
 BattleUnitKind unit_monochrome_kurokumorn;
 static BattleUnitDefense defence;
@@ -34,8 +40,12 @@ static EvtWord normal_attack_event[386];
 static EvtWord charge_event[58];
 static EvtWord wait_event[12];
 
+/**
+ * Unit data of the Dark Puff: 3 HP and level 10, with its parts, status vulnerability, init event and
+ * event data table.
+ */
 BattleUnitKind unit_monochrome_kurokumorn = {
-    24,
+    UNIT_DARK_PUFF,
     "btl_un_monochrome_kurokumorn",
     3,
     0,
@@ -92,7 +102,7 @@ BattleUnitKind unit_monochrome_kurokumorn = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     1,
     parts,
@@ -100,20 +110,39 @@ BattleUnitKind unit_monochrome_kurokumorn = {
     data_table,
 };
 
+/**
+ * Defense of the Dark Puff against normal, fire, ice, explosion and electric attacks: none, so it takes
+ * full damage from every element.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type reactions of the Dark Puff: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Dark Puff (both demos), as the percent chance each status takes hold:
+ * resists 9 statuses (down to 90% of the normal chance); extra vulnerable to dizziness and Gale Force.
+ */
 static StatusVulnerability regist = {100, 100, 110, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 90, 110, 100, 90, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Dark Puff (the retail releases), as the percent chance each status takes
+ * hold: resists 10 statuses (down to 80% of the normal chance); extra vulnerable to dizziness and Gale
+ * Force.
+ */
 static StatusVulnerability regist = {95, 95, 105, 100, 90, 100, 100, 100, 100, 95, 100, 95, 100, 95, 80, 90, 105, 100, 90, 100, 100, 95};
 #endif
 
+/**
+ * Parts of the Dark Puff: a single body part (part 1, model c_kmoon_wb), each with its defense tables,
+ * attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_monochrome_kurokumorn", "c_kmoon_wb", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
+    {1, "btl_un_monochrome_kurokumorn", "c_kmoon_wb", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 };
 
+/** Weapon record of the Dark Puff's swoop: 2 damage. */
 static BattleWeapon weapon_kurokumorn_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -132,7 +161,7 @@ static BattleWeapon weapon_kurokumorn_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -150,6 +179,10 @@ static BattleWeapon weapon_kurokumorn_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon record of the Dark Puff's lightning attack on the whole party: 2 damage, can hit several targets
+ * and ignores Defense.
+ */
 static BattleWeapon weapon_kurokumorn_thunder_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -172,7 +205,7 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    4, // element
+    ELEMENT_ELECTRIC, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -206,7 +239,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_kurokumorn_thunder_attack))
         CALL_CHILD(thunder_event)
@@ -231,16 +264,18 @@ EVT_END()
 
 /**
  * The Dark Puff's charged thunder attack with the weapon in LW(9):
- * it clears the charged flag, rears up (A_2B to A_3B) and calls down pokopi_thunder_n64 bolts on the target and
- * then the units behind it in turn (re-running the pre- damage and damage checks per target)
+ * it clears the charged flag, plays poses A_2B to A_3B, calls down eight pokopi_thunder_n64 bolts over the
+ * targets' side of the stage, then resolves the first target and each one after it in turn
+ * (pre-damage and damage checks)
  * before dropping back to its resting pose.
  */
 static EVT_BEGIN(thunder_event)
+    // Dark Puff gets ready to strike the whole party with lightning.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -248,12 +283,14 @@ static EVT_BEGIN(thunder_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack on every target is announced.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Dark Puff gathers a charge: the charge sound plays with its A_2B, A_3A and A_3B poses.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     WAIT_FRAMES(30)
@@ -261,7 +298,8 @@ static EVT_BEGIN(thunder_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC)
+    // Bolts of lightning crackle down in sequence while the thunder sounds.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
         IF_INT_EQUAL(LW(10), 0)
@@ -321,8 +359,9 @@ static EVT_BEGIN(thunder_event)
     WAIT_FRAMES(10)
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 30, 0)
     SET_VALUE(LW(6), 0)
+    // For each target in turn, find out how it reacts to the bolt.
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -344,21 +383,25 @@ static EVT_BEGIN(thunder_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A bolt that misses is dodged or lands harmlessly.
     LABEL(90)
     GOTO(97)
+    // A bolt that hits applies its damage (unless the target blocked it).
     LABEL(91)
     IF_INT_EQUAL(LW(6), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
+    // Move on to the next target, or finish.
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(98)
     END_IF
     GOTO(0)
+    // Dark Puff settles back into its idle pose.
     LABEL(98)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
@@ -368,26 +411,31 @@ static EVT_BEGIN(thunder_event)
     RETURN
 EVT_END()
 
+/** Pose table of the Dark Puff: maps each battle pose (idle, hurt, attacking and so on) to its animation. */
 static PoseTableEntry pose_table[] = {
-    {1, "N_1"},
-    {2, "Y_1"},
-    {9, "Y_1"},
-    {5, "K_1"},
-    {4, "X_1"},
-    {3, "X_1"},
-    {28, "S_1"},
+    {STATUS_SLEEP, "N_1"},
+    {STATUS_STOP, "Y_1"},
+    {STATUS_FREEZE, "Y_1"},
+    {STATUS_CONFUSE, "K_1"},
+    {STATUS_POISON, "X_1"},
+    {STATUS_DIZZY, "X_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_1"},
-    {39, "D_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Event data table of the Dark Puff: scripts that replace the standard handling for its counter hook (tag
+ * 42) and the battle opening with a First Strike on it (tag 48).
+ */
 static BattleDataEntry data_table[] = {
     {42, counter_event},
     {48, dmg_first_attack_pos},
@@ -404,8 +452,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MONOCHROME_KUROKUMORN_LOW, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MONOCHROME_KUROKUMORN_UNUSED, 0)
     SPAWN_EVENT(barrier_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -422,7 +470,7 @@ static EVT_BEGIN(barrier_event)
     IF_INT_EQUAL(LW(0), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(1), 20)
@@ -461,10 +509,10 @@ EVT_END()
 
 /**
  * Start-of-turn event of the Dark Puff (not while it is charged or unable to act):
- * 50% of the time it toggles between two states,
- * switching the attribute bits 0x600000 of its body part off with SFX_ENM_KUMO_MOVE5 (unit work 0 = 1)
- * or back on with SFX_ENM_KUMO_MOVE4 (work 0 = 0).
- * Guess: this makes the Puff drift out of and back into range of ground attacks.
+ * 50% of the time it changes height.
+ * From up high it sinks to height 10 with SFX_ENM_KUMO_MOVE5 and clears PART_ATTR_HAMMERLIKE_CANNOT_TARGET and
+ * PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET on its body, so hammers and shell attacks reach it (unit work 0 = 1);
+ * from down low it rises back to height 40 with SFX_ENM_KUMO_MOVE4 and sets them again (work 0 = 0).
  */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
@@ -475,29 +523,29 @@ static EVT_BEGIN(unison_phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
     CALL(evt_sub_random, 99, LW(0))
     IF_INT_LESS(LW(0), 50)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_MONOCHROME_KUROKUMORN_LOW, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE4"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 40)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MONOCHROME_KUROKUMORN_LOW, 0)
         ELSE
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE5"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 10)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MONOCHROME_KUROKUMORN_LOW, 1)
         END_IF
     END_IF
     LABEL(99)
@@ -510,6 +558,7 @@ EVT_END()
  * the damage check decides between a miss and a hit, then it returns to S_1.
  */
 static EVT_BEGIN(normal_attack_event)
+    // Use the target of the opening first attack if there was one, otherwise choose a target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -519,7 +568,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -527,6 +576,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack is announced.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -536,6 +586,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
+    // Dark Puff shudders and shrinks as it gathers itself for a swoop.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         LOOP(10)
@@ -552,6 +603,7 @@ static EVT_BEGIN(normal_attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // It pulls back, then dives at the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -565,6 +617,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 40, -40, 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(15))
+    // Find out how the target reacts to the dive.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -588,15 +641,18 @@ static EVT_BEGIN(normal_attack_event)
         SET_VALUE(LW(15), 1)
         CASE_END
     END_SWITCH
+    // The dive missed: Dark Puff sweeps on past the target.
     LABEL(90)
     GOTO(98)
+    // The dive connects: the damage is applied.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
+    // Dark Puff floats back to its home position and relaxes.
     LABEL(98)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
@@ -627,7 +683,7 @@ static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 300)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ELECTRIC)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))

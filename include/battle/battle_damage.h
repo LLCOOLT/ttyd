@@ -42,6 +42,7 @@ typedef enum BattleDamageCode {
     DAMAGE_FLAG_LIFE_SHROOM = 0x800,     // ... and a Life Shroom will revive it
     DAMAGE_FLAG_GUARDING = 0x1000,       // the target used the Defend command
     DAMAGE_FLAG_HEAL = 0x2000,           // the target absorbs the hit as healing (defense attribute 3)
+    DAMAGE_FLAG_BACKFIRE = 0x4000,       // btldefaultevt_Damage then runs _backfire; nothing in the damage code sets it
     DAMAGE_FLAG_SHATTER = 0x8000,        // the frozen target shatters (never happens: the chance is 0)
     DAMAGE_FLAG_AC_SUCCESS = 0x20000,    // the attacker's action command succeeded
     DAMAGE_FLAG_GUARDED = 0x40000,       // the target guarded (A at the right time)

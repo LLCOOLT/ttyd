@@ -6,6 +6,7 @@
 #include <dolphin/mtx.h>
 #include "driver/dispdrv.h"
 #include "driver/mapdrv.h"
+#include "driver/animdrv.h"
 #include "evt/evt_cmd.h"
 #include "manager/dvdmgr.h"
 #include "manager/evtmgr_cmd.h"
@@ -332,7 +333,7 @@ void iconEntry(const char* name, u16 iconId) {
         entry->uflags |= ICON_FLAG_PENDING_BIN;
     }
     entry->uflags |= ICON_FLAG_USED;
-    if (mapGetWork()->entries[0].flags & 2) {
+    if (mapGetWork()->entries[0].flags & MAPENT_FLAG_BLEND) {
 #if VERSION <= VERSION_DEMO_US
         entry->uflags |= ICON_FLAG_NO_MAP_BLEND;
 #else
@@ -378,7 +379,7 @@ void iconEntry2D(const char* name, s16 iconId) {
     } else {
         entry->uflags |= ICON_FLAG_PENDING_BIN;
     }
-    entry->uflags |= 1 | ICON_FLAG_2D;
+    entry->uflags |= ICON_FLAG_USED | ICON_FLAG_2D;
 }
 
 /** Frees the icon with this name. */
@@ -657,7 +658,7 @@ static void iconGX(Mtx mtx, IconEntry* entry) {
     }
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     if (!(entry->uflags & ICON_FLAG_2D)) {
-        mapSetMaterialLight(4, pos);
+        mapSetMaterialLight(ANIM_MATERIAL_LIGHT_NO_VTX_COLOR, pos);
     } else {
         GXSetNumChans(1);
         GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -703,10 +704,10 @@ static void iconGX(Mtx mtx, IconEntry* entry) {
         GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
 #if VERSION <= VERSION_DEMO_US
         if (!(entry->uflags & ICON_FLAG_2D) && !(entry->uflags & ICON_FLAG_NO_MAP_BLEND) &&
-            (mapGetWork()->entries[0].flags & 2)) {
+            (mapGetWork()->entries[0].flags & MAPENT_FLAG_BLEND)) {
 #else
-        if (!(entry->uflags & ICON_FLAG_2D) && !(entry->uflags & ICON_FLAG_NO_MAP_BLEND) && !(entry->uflags & 0x80) &&
-            (mapGetWork()->entries[0].flags & 2)) {
+        if (!(entry->uflags & ICON_FLAG_2D) && !(entry->uflags & ICON_FLAG_NO_MAP_BLEND) && !(entry->uflags & ICON_FLAG_ITEM_NO_BLEND) &&
+            (mapGetWork()->entries[0].flags & MAPENT_FLAG_BLEND)) {
 #endif
             GXColor blend;
             mapGetBlend(&blend);
@@ -856,6 +857,7 @@ void iconSetAlpha(const char* name, u8 alpha) {
     }
 }
 
+/** Icons of the digits 0 to 9, large and small, used by the number drawing (iconNumberDispGx). */
 static u16 suuji[] = {ICON_1D9, ICON_1DB, ICON_1DD, ICON_1DF, ICON_1E1, ICON_1E3, ICON_1E5, ICON_1E7, ICON_1E9, ICON_1EB}; // 0-9
 u16 suuji_s[] = {ICON_1DA, ICON_1DC, ICON_1DE, ICON_1E0, ICON_1E2, ICON_1E4, ICON_1E6, ICON_1E8, ICON_1EA, ICON_1EC};      // 0-9 small
 

@@ -12,6 +12,10 @@
 #include "party/party_vivian.h"
 #include "version.h"
 
+/**
+ * One entry per partner id (empty for 0): the partner's field model and the functions that set it up, move it,
+ * use its field ability and remove it; partyEntryMain and the other party calls read it by partner id.
+ */
 PartyData partyDataTbl[] = {
     {0},
     {"c_pkr", kuribo_init, partyMoveWalk, kuribo_use, kuribo_use_post, kuribo_bye, NULL, NULL, NULL, NULL},
@@ -60,6 +64,11 @@ char* partyPoseTbl[20][15] = {
     {"PCH_Z_1", "PCH_S_1", "PCH_W_1", "PCH_R_1", "PCH_J_1A", "PCH_J_1B", "PCH_N_1", "PCH_T_1", "PCH_S_1", "PCH_D_1", "PCH_S_1", "PCH_S_1", "PCH_D_2", "PCH_R_2", "PCH_W_2"},
 };
 
+/**
+ * The demo's pose names for each partner inside the 8-bit (Famicom) pipe, by party member and pose index,
+ * with the same columns as partyPoseTbl; Yoshi uses yoshiDotPoseTbl.
+ * Here the low-HP poses 13 and 14 stand still.
+ */
 char* partyDotPoseTbl[8][15] = {
     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
     {"Z_2", "Z_2", "W_2", "R_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2"},
@@ -71,6 +80,7 @@ char* partyDotPoseTbl[8][15] = {
     {"Z_14", "Z_14", "W_14", "R_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14"},
 };
 
+/** The demo's 8-bit pose names for Yoshi, one row per Yoshi colour (pouchGetPartyColor). */
 char* yoshiDotPoseTbl[7][15] = {
     {"Z_5", "Z_5", "W_5", "R_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5"},
     {"Z_6", "Z_6", "W_6", "R_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6"},
@@ -81,6 +91,10 @@ char* yoshiDotPoseTbl[7][15] = {
     {"Z_11", "Z_11", "W_11", "R_11", "Z_11", "Z_11", "Z_11", "Z_11", "Z_11", "Z_11", "Z_11", "Z_11", "Z_11", "Z_11", "Z_11"},
 };
 #else
+/**
+ * Pose names for each party member in the field, by party member id (row) and pose index (column);
+ * party.c reads them. Indexes 1-3 (stand, walk, run) switch to the low-HP versions 12-14.
+ */
 char* partyPoseTbl[20][15] = {
     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
     {"PKR_Z_1", "PKR_S_1", "PKR_W_1", "PKR_R_1", "PKR_J_1A", "PKR_J_1B", "PKR_N_1", "PKR_T_1", "PKR_D_1", "PKR_D_4", "PKR_S_1", "PKR_S_1", "PKR_D_2", "PKR_W_2", "PKR_R_2"},
@@ -104,6 +118,10 @@ char* partyPoseTbl[20][15] = {
     {"PCH_Z_1", "PCH_S_1", "PCH_W_1", "PCH_R_1", "PCH_J_1A", "PCH_J_1B", "PCH_N_1", "PCH_T_1", "PCH_D_1", "PCH_F_1", "PCH_S_1", "PCH_S_1", "PCH_D_2", "PCH_R_2", "PCH_W_2"},
 };
 
+/**
+ * Pose names for each partner inside the 8-bit (Famicom) pipe, by party member and pose index;
+ * Yoshi uses yoshiDotPoseTbl.
+ */
 char* partyDotPoseTbl[8][15] = {
     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
     {"Z_2", "Z_2", "W_2", "R_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "Z_2", "W_2", "R_2"},
@@ -115,6 +133,7 @@ char* partyDotPoseTbl[8][15] = {
     {"Z_14", "Z_14", "W_14", "R_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "Z_14", "W_14", "R_14"},
 };
 
+/** 8-bit pose names for Yoshi, one row per Yoshi colour (pouchGetPartyColor). */
 char* yoshiDotPoseTbl[7][15] = {
     {"Z_5", "Z_5", "W_5", "R_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "Z_5", "W_5", "R_5"},
     {"Z_6", "Z_6", "W_6", "R_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "Z_6", "W_6", "R_6"},

@@ -3,6 +3,7 @@
 
 #include <math.h>
 
+/** Volume curve: maps a 0 to 128 volume step to a gain between 0 and 1. */
 static float musyx_vol_tab[129] = {
     0.f,           3.0518499e-05f, 0.000152593f,  0.000396741f,  0.00070192601f,
     0.00112918f,   0.001648f,      0.00222785f,   0.0029297799f, 0.00372326f,
@@ -31,6 +32,7 @@ static float musyx_vol_tab[129] = {
     0.87484401f,   0.89205599f,    0.90945202f,   0.927122f,     0.94500601f,
     0.96307302f,   0.98141402f,    1.f,           1.f,
 };
+/** Pan gains for the four surround speaker positions. */
 static float pan_tab[4] = {
     0.f,
     0.7079f,
@@ -38,6 +40,7 @@ static float pan_tab[4] = {
     1.0f,
 };
 
+/** Pan gains for Dolby Pro Logic II output. */
 static float pan_tab_dpl2[4] = {
     0.575f,
     0.7079f,

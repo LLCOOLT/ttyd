@@ -5,9 +5,9 @@
 #include "evt/evt_cmd.h"
 #include "data/mapdata.h"
 #include "rel_module.h"
+#include "end.h"
 
 extern EvtWord end_00_init_evt[];
-void end_staff_roll_exit(void);
 
 /**
  * REL prolog of the ending module (Japanese demo):

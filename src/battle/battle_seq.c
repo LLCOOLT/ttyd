@@ -86,6 +86,10 @@ static void btlseqTurn(BattleWork* wp);
 
 // static data from an inlined header function (see unit_party_sanders.c)
 
+/**
+ * Status weapon behind the Lucky Start badge: Electrified, Dodgy, HP Regen and FP Regen (2 per turn), each for
+ * three turns; _set_effect_luck keeps one of them at random and applies it to the badge wearer.
+ */
 const BattleWeapon N_weapon_lucky_start = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -98,7 +102,7 @@ const BattleWeapon N_weapon_lucky_start = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -124,9 +128,15 @@ const BattleWeapon N_weapon_lucky_start = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Black: the colour of the curtain fade when the battle starts after the Glitz Pit rule banner. */
 static const GXColor c = {0, 0, 0, 0xFF};
+/** White: the window colour of the Glitz Pit rule banner drawn by _rule_disp. */
 static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 
+/**
+ * Glitz Pit bonus-condition messages for minor-league fights, indexed by the battle's rule type ("a" = unused);
+ * _rule_disp shows the one for the fight before turn 1, e.g. "Don't use your jump!".
+ */
 const char* _rule_msg_table_2bu[] = {
     "a", "stg3_tou_cp_001", "a", "stg3_tou_cp_002", "a", "stg3_tou_cp_004", "stg3_tou_cp_008", "a",
     "a", "a", "a", "a", "a", "a", "a", "a",
@@ -139,6 +149,7 @@ const char* _rule_msg_table_2bu[] = {
     "a", "a", "a", "a",
 };
 
+/** Glitz Pit bonus-condition messages for major-league fights (top ten), by rule type; shown by _rule_disp. */
 const char* _rule_msg_table_1bu[] = {
     "test", "stg3_tou_cp_011", "a", "stg3_tou_cp_012", "a", "stg3_tou_cp_014", "stg3_tou_cp_019", "a",
     "a", "a", "a", "stg3_tou_cp_020", "a", "a", "a", "a",
@@ -151,6 +162,7 @@ const char* _rule_msg_table_1bu[] = {
     "stg3_tou_cp_023", "stg3_tou_cp_022", "a", "a",
 };
 
+/** Glitz Pit bonus-condition messages after chapter 3, by rule type; shown by _rule_disp. */
 const char* _rule_msg_table_after[] = {
     "a", "stg3_tou_cp_041", "a", "stg3_tou_cp_042", "a", "stg3_tou_cp_044", "stg3_tou_cp_049", "a",
     "a", "a", "a", "stg3_tou_cp_050", "a", "a", "a", "a",
@@ -399,7 +411,7 @@ static void btlseqFirstAct(BattleWork* wp) {
                             if ((((NpcBattleInfo*)info)->battleFlags & NPC_BATTLE_NO_PLAYER_ENTRY) && (unit->currentKind == UNIT_MARIO || (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX))) {
                                 continue;
                             }
-                            if (marioGetPtr()->currMotionId == 0x1A && unit->currentKind == UNIT_MARIO) {
+                            if (marioGetPtr()->currMotionId == MARIO_MOTION_YOSHI && unit->currentKind == UNIT_MARIO) {
                                 evt = evtEntry((s32*)BtlUnit_GetData(unit, 0x41), 10, 0);
                                 unit->entryEventId = evt->eventId;
                                 evt->unitId = unit->unitId;
@@ -435,7 +447,7 @@ static void btlseqFirstAct(BattleWork* wp) {
             BattleGetFirstAttackUnit(wp, &a, &b);
             wp->activeUnitId = a->unitId;
             a->tokenFlags |= TOKEN_FLAG_CURRENTLY_ACTING;
-            evt = evtEntry(b->damageEventCode, 10, 0x20);
+            evt = evtEntry(b->damageEventCode, 10, EVENT_START_NOW);
             if (evt) {
                 evt->unitId = b->unitId;
                 b->damageCode = 0x39;
@@ -1979,7 +1991,10 @@ static void btlseqTurn(BattleWork* wp) {
  * picks the message by FieldBattleInfo.ruleType from the 1bu table while GSW_TOU_PLAYER_RANK is below 11,
  * the 2bu table otherwise, and the 'after' table once the story is past chapter 3,
  * formats ruleParam into it and draws it in a window at the top of the screen.
- * Guess: 1bu and 2bu are the major and minor leagues.
+ * 1bu (1部) is the major league, used once fewer than 11 fighters rank above Mario (the top ten),
+ * and 2bu (2部) the minor league;
+ * the major-league conditions are harder (stg3_tou_cp_010: take damage at least five times,
+ * against three in cp_000).
  */
 static void _rule_disp(CameraId cameraId, void* param) {
     FieldBattleInfo* info = _battleWorkPointer->fbatInfo;
@@ -2907,7 +2922,8 @@ BOOL BattleCheckConcluded(BattleWork* wp) {
 
 /**
  * Sets flag 2 on every stage object on background layer `layer` (0 = map object A1, 1 = A2)
- * after its scale was changed. Guess: flag 2 tells the stage code to reapply the object's scale.
+ * after its scale was changed. BattleStageObjectMain treats flag 2 as "changed" (and clears it),
+ * so it rewrites the object's map translation and rotation on its next update.
  */
 static void _mapobj_data_touch_scale(s32 layer) {
     BattleWork* wp = _battleWorkPointer;
@@ -2922,7 +2938,7 @@ static void _mapobj_data_touch_scale(s32 layer) {
     }
 }
 
-// inlining off for the code below, as in the original (the object differs without it)
+// FAKE: inlining off from here to the end of the file (FAKES.md); without it 6 functions change length, e.g. btlseqFirstAct 510 -> 871 instructions
 #pragma dont_inline on
 /**
  * Background pop-in at the start of a normal battle (run by _default_haikei_set_entry_event):

@@ -20,6 +20,19 @@
 #include "nok.h"
 #include "version.h"
 
+// Unit work slots of the Mario actor of the stage play (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_ACT_MARIO_SELF = 0,       // its own unit id
+    UW_ACT_MARIO_CLAUDA = 1,     // unit id of Clauda (Flurrie)
+    UW_ACT_MARIO_BOO_1 = 2,      // unit id of the first Boo
+    UW_ACT_MARIO_BOO_2 = 3,      // unit id of the second Boo
+    UW_ACT_MARIO_ATOMIC_BOO = 4, // unit id of the Atomic Boo
+    UW_ACT_MARIO_TOAD_1 = 5,     // unit id of the first Toad
+    UW_ACT_MARIO_TOAD_2 = 6,     // unit id of the second Toad
+    UW_ACT_MARIO_TOADETTE = 7,   // unit id of Toadette
+    UW_ACT_MARIO_GOOMBELLA = 8   // unit id of Goombella
+};
+
 static USER_FUNC(_clauda_breath_effect_fire);
 static USER_FUNC(_clauda_breath_effect_ready);
 static USER_FUNC(_status_window_off);
@@ -42,6 +55,10 @@ extern EvtWord _act_clauda_breath_attack[];
 extern EvtWord _act_teresa_attack[];
 extern EvtWord _act_atmic_teresa_press_attack[];
 
+/**
+ * Unit kind of the Mario actor (HP 10, level 1):
+ * its size, offsets, damage sounds, status vulnerability, parts and init event.
+ */
 BattleUnitKind unit_act_mario = {
     181,
     "btl_un_act_mario",
@@ -108,12 +125,21 @@ BattleUnitKind unit_act_mario = {
     data_table,
 };
 
+/** Defence of the Mario actor: no damage reduction. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of the Mario actor: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the Mario actor (percent chance to take each status):
+ * immune to sleep, stop, dizzy, poison, confusion, electric shock, burn, freeze, growing huge, shrinking,
+ * attack up, attack down, defence up, defence down, allergy, fright, gale force, speed up, slow, dodgy,
+ * invisibility and instant kill.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/** Pose table of the Mario actor: maps each battle pose to the animation it plays (EM_* animations). */
 static PoseTableEntry pose_table[] = {
     {28, "EM_S_1"},
     {31, "KNP_S_1"},
@@ -124,10 +150,12 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
+/** Data table of the Mario actor: empty; it has no event hooks. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body part of the Mario actor (model c_mario): hit position, defences, attributes and pose table. */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_act_mario", "c_mario", 0.0f, 0.0f, 0.0f, -5.0f, 30.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
@@ -169,6 +197,10 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Cast of Flurrie's epilogue stage play: Flurrie as Clauda, two Boos, the Atomic Boo, two Toads,
+ * Toadette and Goombella, with their starting spots.
+ */
 BattleUnitSetup entry_unit_data[] = {
     {
         &unit_act_clauda, // unitKindParams
@@ -253,11 +285,13 @@ BattleUnitSetup entry_unit_data[] = {
 };
 
 /**
- * Guess: entry of the stage play: hides the status window,
- * places Mario's actor and moves the real Mario off to the left edge of the stage,
- * spawns the eight other actors of entry_unit_data (Clauda, two Boos, the Atomic Boo, two Toads,
- * Toadette and Christine), keeping their unit ids in unit work 1 to 8, starts _battle_event,
- * prints ep_39 after two seconds and sets battle flag 32.
+ * Entry of Flurrie's stage play "Paper Mario" (her epilogue):
+ * hides the status window, places Mario's actor at Mario's spot
+ * and moves the real Mario off the left edge of the stage, and keeps its own unit id in unit work 0.
+ * It spawns the eight other actors of entry_unit_data (Flurrie as Clauda, two Boos, the Atomic Boo, two Toads,
+ * Toadette and Goombella), keeping their unit ids in unit work 1 to 8, and starts _battle_event.
+ * After two seconds the narration (ep_39) tells of Flurrie's hit play about the adventure,
+ * with Doopliss in the troupe; then battle flag 32 is set.
  */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
@@ -270,26 +304,26 @@ static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_MARIO, LW(6), LW(1), LW(2))
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_SELF, LW(0))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[0]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_CLAUDA, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[1]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_1, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[2]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_2, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[3]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_ATOMIC_BOO, LW(3))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[4]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_TOAD_1, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[5]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_TOAD_2, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[6]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_TOADETTE, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_unit_data[7]), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, LW(3))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_GOOMBELLA, LW(3))
     CALL(btlevtcmd_ChangeFaceDirection, LW(3), 1)
     SPAWN_EVENT(_battle_event)
     WAIT_MS(2000)
@@ -300,16 +334,17 @@ static EVT_BEGIN(battle_entry_event)
 EVT_END()
 
 /**
- * Guess: Looping stage-play script: Mario jumps on an enemy,
- * then Clauda attacks (a press or a breath, picked at random),
- * then the two Boos (Teresas) and the Atomic Boo each take a turn, with the supporting actors posing in between.
- * It repeats forever until the epilogue ends the battle.
+ * Looping stage-play script: Mario jumps on an enemy actor,
+ * then Flurrie (Clauda) attacks (a body press or her breath, 50/50) and strikes a pose,
+ * then the two Boos (Teresas) and the Atomic Boo each take a turn,
+ * and a Toad and Toadette each say a line (talk pose).
+ * It repeats forever; nothing in it ends the battle.
  */
 EVT_BEGIN(_battle_event)
     LABEL(0)
     CALL_CHILD(_act_mario_jump_attack)
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_CLAUDA, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
     CALL(evt_sub_random, 1, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -319,35 +354,35 @@ EVT_BEGIN(_battle_event)
     END_IF
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("PWD_A_7"))
     WAIT_MS(1000)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_1, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
     WAIT_MS(1000)
     CALL_CHILD(_act_teresa_attack)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_2, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
     WAIT_MS(1000)
     CALL_CHILD(_act_teresa_attack)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_ATOMIC_BOO, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
     WAIT_MS(1000)
     CALL_CHILD(_act_atmic_teresa_press_attack)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_TOAD_1, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
     WAIT_MS(1500)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_TOADETTE, LW(5))
     CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
     WAIT_MS(1500)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
     GOTO(0)
     RETURN
 EVT_END()
@@ -360,11 +395,11 @@ EVT_BEGIN(_act_target_enemy)
     CALL(evt_sub_random, 2, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_1, LW(3))
         CASE_EQUAL(1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_2, LW(3))
         CASE_DEFAULT
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_ATOMIC_BOO, LW(3))
     END_SWITCH
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     RETURN
@@ -378,18 +413,18 @@ EVT_BEGIN(_act_target_mario)
     CALL(evt_sub_random, 1, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_SELF, LW(3))
         CASE_DEFAULT
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_CLAUDA, LW(3))
     END_SWITCH
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     RETURN
 EVT_END()
 
 /**
- * Guess: Mario's part of the play: he steps back,
- * jumps on a random enemy actor (which gets a hit effect, applause and a knocked-over pose),
- * hops back with a few smaller bounces and runs to his home position.
+ * Mario's part of the play: after a talk pose he runs up
+ * and jumps on a random enemy actor (which gets a hit effect, a cheer from the audience and its hurt pose),
+ * bounces back with a few smaller hops and runs to his home position.
  */
 EVT_BEGIN(_act_mario_jump_attack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
@@ -397,7 +432,7 @@ EVT_BEGIN(_act_mario_jump_attack)
     WAIT_MS(1000)
     CALL_CHILD(_act_target_enemy)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     SET_VALUE(LW(0), -20)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 0)
@@ -419,7 +454,7 @@ EVT_BEGIN(_act_mario_jump_attack)
         ADD(LW(2), 5)
         CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
         CALL(evt_audience_joy_ending)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         WAIT_MS(1000)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_SIBLING_EVENT
@@ -444,22 +479,26 @@ EVT_BEGIN(_act_mario_jump_attack)
 EVT_END()
 
 /**
- * Guess: Clauda's stomp: Clauda (unit in LW(5), body in LW(6)) leaps onto a random enemy actor
- * and squashes it flat, then lands and takes a bow with the audience cheering; the victim springs back up.
+ * Flurrie's (Clauda's) body press: Flurrie (unit in LW(5), body in LW(6)) leaps onto a random enemy actor
+ * and squashes it flat while she squashes and stretches,
+ * then bounces off and poses (PWD_Y_1) with the audience cheering and floats home; the victim springs back up.
  */
 EVT_BEGIN(_act_clauda_press_attack)
+    // Flurrie pauses on stage, picks a random actor to flatten and turns toward it.
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
     WAIT_MS(1000)
     CALL_CHILD(_act_target_enemy)
     CALL(btlevtcmd_CalculateFaceDirection, LW(5), -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, LW(5), LW(15))
+    // She leaps high over the stage and comes down on the victim.
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("PWD_A1_1"))
     CALL(btlevtcmd_SetFallAccel, LW(5), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(2), 5)
     CALL(btlevtcmd_JumpPosition, LW(5), LW(0), LW(1), LW(2), 60, -1)
+    // The victim is squashed flat, stays pressed for a moment, then springs back up to its full height.
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         CALL(evt_sub_intpl_init_float, 5, FLOAT(1.0f), FLOAT(0.14941406f), 10)
         LOOP(11)
             CALL(evt_sub_intpl_get_float, LW(7), EVT_NULLPTR)
@@ -483,8 +522,9 @@ EVT_BEGIN(_act_clauda_press_attack)
             WAIT_FRAMES(1)
         END_LOOP
         WAIT_MS(500)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 28)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_NORMAL)
     END_SIBLING_EVENT
+    // Flurrie squashes on landing and stretches wide as she bounces off.
     CALL(btlevtcmd_JumpContinue, LW(5))
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         CALL(evt_sub_intpl_init_float, 11, FLOAT(1.0f), FLOAT(0.39941406f), 10)
@@ -518,6 +558,7 @@ EVT_BEGIN(_act_clauda_press_attack)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // She hops off the victim, strikes her victory pose and the audience cheers.
     CALL(btlevtcmd_GetPos, LW(5), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(5), LW(0), 20)
     ADD(LW(1), 20)
@@ -528,19 +569,21 @@ EVT_BEGIN(_act_clauda_press_attack)
     CALL(evt_audience_joy_ending)
     WAIT_MS(500)
     CALL(btlevtcmd_WaitEventEnd, LW(14))
+    // She floats back to her spot on stage.
     CALL(btlevtcmd_SetMoveSpeed, LW(5), FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 40)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, LW(5), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetMoveFrame, LW(5), LW(0), LW(1), LW(2), FLOAT(6.0f), LW(9))
     CALL(btlevtcmd_DivePosition, LW(5), LW(0), LW(1), LW(2), LW(9), 0, 4, 0, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
     CALL(btlevtcmd_WaitEventEnd, LW(15))
     RETURN
 EVT_END()
 
 /**
- * Guess: Clauda's breath: she charges (blue-violet smoke puffs), breathes at all three enemy actors,
- * who shake while the breath lasts, then the effect is removed, she poses and the audience cheers.
+ * Flurrie's (Clauda's) breath: she winds up (blue-violet smoke puffs), breathes at all three enemy actors,
+ * who each get a hit effect and a cheer and shake while the breath lasts, then the effect is removed,
+ * she poses and the audience cheers.
  */
 EVT_BEGIN(_act_clauda_breath_attack)
     CALL(btlevtcmd_JumpSetting, LW(5), 20, FLOAT(0.0f), FLOAT(0.69921875f))
@@ -553,70 +596,71 @@ EVT_BEGIN(_act_clauda_breath_attack)
     CALL(btlevtcmd_AnimeWaitPlayComplete, LW(5), LW(6))
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("PWD_A2_3"))
     CALL(_clauda_breath_effect_fire, LW(12))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_1, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         ADD(LW(2), 5)
         CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
         CALL(evt_audience_joy_ending)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         LOOP(30)
             CALL(btlevtcmd_SetDispOffset, LW(3), 2, 0, 0)
             WAIT_FRAMES(2)
             CALL(btlevtcmd_SetDispOffset, LW(3), 0, 0, 0)
             WAIT_FRAMES(2)
         END_LOOP
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 28)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_NORMAL)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_BOO_2, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         ADD(LW(2), 5)
         CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
         CALL(evt_audience_joy_ending)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         LOOP(30)
             CALL(btlevtcmd_SetDispOffset, LW(3), 2, 0, 0)
             WAIT_FRAMES(2)
             CALL(btlevtcmd_SetDispOffset, LW(3), 0, 0, 0)
             WAIT_FRAMES(2)
         END_LOOP
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 28)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_NORMAL)
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_ATOMIC_BOO, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         ADD(LW(2), 5)
         CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
         CALL(evt_audience_joy_ending)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         LOOP(30)
             CALL(btlevtcmd_SetDispOffset, LW(3), 2, 0, 0)
             WAIT_FRAMES(2)
             CALL(btlevtcmd_SetDispOffset, LW(3), 0, 0, 0)
             WAIT_FRAMES(2)
         END_LOOP
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 28)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_NORMAL)
     END_SIBLING_EVENT
     WAIT_FRAMES(120)
     CALL(evt_eff_delete_ptr, LW(12))
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("PWD_Y_1"))
     CALL(evt_audience_joy_ending)
     WAIT_MS(1000)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 28)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_NORMAL)
     RETURN
 EVT_END()
 
 /**
- * Guess: A Boo's attack: the Boo (unit in LW(5), body in LW(6)) fades out, reappears next to Mario or Clauda,
- * hits it, and floats back home; the target gets a hit effect and the audience cheers.
+ * A Boo's attack in the play: the Boo (unit in LW(5), body in LW(6)) fades out,
+ * reappears beside Mario or Flurrie (picked at random), hits it, and floats back home;
+ * the target gets a hit effect and its hurt pose and the audience cheers.
  */
 EVT_BEGIN(_act_teresa_attack)
     CALL_CHILD(_act_target_mario)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 42)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_RUN)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_SetAlpha, LW(5), LW(6), 255)
         SET_VALUE(LW(7), 256)
@@ -649,27 +693,27 @@ EVT_BEGIN(_act_teresa_attack)
         ADD(LW(2), 5)
         CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
         CALL(evt_audience_joy_ending)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         WAIT_MS(1000)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_SIBLING_EVENT
     WAIT_MS(500)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 42)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_RUN)
     CALL(btlevtcmd_AddPartsRotate, LW(5), LW(6), 0, 180, 0)
     CALL(btlevtcmd_GetHomePos, LW(5), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, LW(5), LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
     CALL(btlevtcmd_SetPartsRotate, LW(5), LW(6), 0, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 28)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_NORMAL)
     CALL(btlevtcmd_WaitEventEnd, LW(15))
     RETURN
 EVT_END()
 
 /**
- * Guess: The Atomic Boo's attack: it drops in from above and presses Mario and Clauda flat,
- * with a hit effect and applause, then returns to its home position.
+ * The Atomic Boo's attack in the play: it rises above the left side of the stage and drops onto Mario
+ * and Flurrie, both getting a hit effect, their hurt pose and a cheer, then it returns to its home position.
  */
 EVT_BEGIN(_act_atmic_teresa_press_attack)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_SELF, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("R_1"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -678,26 +722,26 @@ EVT_BEGIN(_act_atmic_teresa_press_attack)
     CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("Z_1"))
     CALL(btlevtcmd_DivePosition, LW(5), -125, 0, LW(2), 30, 0, 1, 0, -1)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_SELF, LW(3))
         CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
         CALL(btlevtcmd_StopWaitEvent, LW(3))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         ADD(LW(2), 5)
         CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
         CALL(evt_audience_joy_ending)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         WAIT_MS(1000)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_SIBLING_EVENT
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ACT_MARIO_CLAUDA, LW(3))
         CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
         CALL(btlevtcmd_StopWaitEvent, LW(3))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         ADD(LW(2), 5)
         CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
         CALL(evt_audience_joy_ending)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
         WAIT_MS(1000)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_SIBLING_EVENT

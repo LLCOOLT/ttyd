@@ -31,9 +31,9 @@ EVT_BEGIN(gra_05_in_01)
 EVT_END()
 
 /**
- * Guess: exit event of the first hole (A_ana_1) of gra_05:
- * the partner walks to the hole, then Mario and both partners are placed at (250, -50, 0) and jump out to x 310,
- * with the camera released.
+ * Exit event of the first hole (A_ana_1) of gra_05, a bero entry with no next map: the partner walks to the hole
+ * (JP and later), then Mario and both partners are placed below the floor at (250, -50, 0) and jump back out to
+ * x 310, with the camera released (JP and later also record the spot as the fall-respawn position).
  */
 EVT_BEGIN(gra_05_out_01)
 #if VERSION >= VERSION_JP
@@ -101,8 +101,8 @@ EVT_BEGIN(gra_05_in_02)
 EVT_END()
 
 /**
- * Guess: exit event of the second hole (A_ana_2) of gra_05, like gra_05_out_01:
- * the partner walks to the hole, then Mario and both partners are placed below the floor at x 0 and jump out.
+ * Exit event of the second hole (A_ana_2) of gra_05, like gra_05_out_01: the partner walks to the hole (JP and
+ * later), then Mario and both partners are placed below the floor at (0, -50, 0) and jump back out to x -60.
  */
 EVT_BEGIN(gra_05_out_02)
 #if VERSION >= VERSION_JP
@@ -295,6 +295,11 @@ static EVT_BEGIN(out_evt2)
     RETURN
 EVT_END()
 
+/**
+ * Doors of this room: the west exit (w_bero) to gra_04, the east exit (e_bero) to gra_06, the hole (ana_1)
+ * to gra_05, the hole (ana_2) to gra_05, the hole (A_ana_1), which only runs its own script and the hole
+ * (A_ana_2), which only runs its own script.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -497,6 +502,10 @@ EVT_BEGIN(evt_break_floor)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the map objects (the floor cover S_futa, S_kura and the grass S_gra04_kusa) that the cloud effect
+ * covers until the story passes STORY_STG4_06_01_BLOW_THE_FLOOR.
+ */
 static const char* fukitobashi_tbl[] = {
     "S_futa",
     "S_kura",

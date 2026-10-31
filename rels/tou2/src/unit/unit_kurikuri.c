@@ -1,4 +1,4 @@
-// unit_kurikuri: Goomba, Glitz Pit tag-match variant (with Koopa messages), battle unit.
+// unit_kurikuri: Goomba Bros. (`kurikuri`), the Goomba pair of a Glitz Pit match (with Koopa messages), battle unit.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -15,6 +15,11 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_story.h"
 
+// Unit work slots of the Glitz Pit Goomba (btlevtcmd_GetUnitWork).
+enum {
+    UW_KURIKURI_INTRO_LEADER = 0, // non-zero on the Goomba that plays the turn-1 intro (set by the battle setup)
+};
+
 static USER_FUNC(krb_get_dir);
 
 BattleUnitKind unit_kurikuri;
@@ -30,6 +35,10 @@ static EvtWord phase_event[122];
 static EvtWord attack_event[492];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Goomba Bros.: hit points, level, size, sounds, parts, status vulnerability, init event
+ * and event data table.
+ */
 BattleUnitKind unit_kurikuri = {
     36,
 #if VERSION <= VERSION_DEMO_US
@@ -92,7 +101,7 @@ BattleUnitKind unit_kurikuri = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -100,6 +109,10 @@ BattleUnitKind unit_kurikuri = {
     data_table,
 };
 
+/**
+ * Pose table of the Goomba Bros.: maps each battle pose (idle, hurt, attacking and so on) to its
+ * animation, named KUR_*.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "KUR_N_1"},
     {2, "KUR_Y_1"},
@@ -107,41 +120,63 @@ static PoseTableEntry pose_table[] = {
     {5, "KUR_K_1"},
     {4, "KUR_I_1"},
     {3, "KUR_I_1"},
-    {28, "KUR_S_1"},
+    {BTL_POSE_NORMAL, "KUR_S_1"},
     {29, "KUR_Q_1"},
     {30, "KUR_Q_1"},
     {31, "KUR_S_1"},
-    {39, "KUR_D_1"},
+    {BTL_POSE_DAMAGE, "KUR_D_1"},
     {50, "KUR_A_1"},
     {51, "KUR_A_2"},
-    {42, "KUR_R_1"},
+    {BTL_POSE_RUN, "KUR_R_1"},
     {41, "KUR_R_2"},
-    {40, "KUR_W_1"},
-    {56, "KUR_I_1"},
-    {57, "KUR_I_1"},
+    {BTL_POSE_WALK, "KUR_W_1"},
+    {BTL_POSE_DANGER, "KUR_I_1"},
+    {BTL_POSE_PERIL, "KUR_I_1"},
     {BTL_POSE_TALK, "KUR_T_1"},
     {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
+/**
+ * Event data table of the Goomba Bros.: no custom reactions, so the standard battle handlers run for every
+ * event.
+ */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/**
+ * Defense of the Goomba Bros. against normal, fire, ice, explosion and electric attacks: none, so it takes
+ * full damage from every element.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type reactions of the Goomba Bros.: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Goomba Bros. (both demos), as the percent chance each status takes hold:
+ * extra vulnerable to stop, Fright, Gale Force and instant KO.
+ */
 static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
 #else
+/**
+ * Status vulnerability of the Goomba Bros. (the retail releases), as the percent chance each status takes
+ * hold: extra vulnerable to stop, Fright and instant KO.
+ */
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
 #endif
 
+/**
+ * Parts of the Goomba Bros.: a single body part (part 1, model c_kuribo), each with its defense tables,
+ * attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_kuriboo", "c_kuribo", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_kuriboo", "c_kuribo", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Weapon record of the Goomba Bros.' leaping attack: 1 damage and counts as a jump-type hit. */
 static BattleWeapon weapon_kuriboo_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -160,7 +195,7 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -209,12 +244,12 @@ EVT_END()
 /**
  * Intro of the Goomba pair in the Glitz Pit (runs once, on turn 1, for the unit with work 0 set,
  * while GSWF_TOU_GOOMBA_BROS_FIRST_STRIKE_SEEN is clear):
- * pans the camera, has the partner say a line chosen by its kind (224 stg3_tou_83_kur, 225 stg3_tou_83_nok,
- * 227 stg3_tou_83_win; Guess: Goombella, Koops and Flurrie) and the Goomba answer with stg3_tou_84,
- * then sets the flag.
+ * pans the camera, has the partner complain about the attack before the bell (Goombella stg3_tou_83_kur,
+ * Koops stg3_tou_83_nok, Flurrie stg3_tou_83_win, by unit kind 224, 225, 227) and the Goomba answer that it was
+ * a welcome gift for the rookie (stg3_tou_84), then sets the flag.
  */
 static EVT_BEGIN(phase_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_KURIKURI_INTRO_LEADER, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         IF_INT_EQUAL(GSWF(GSWF_TOU_GOOMBA_BROS_FIRST_STRIKE_SEEN), 0)
             CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
@@ -230,11 +265,11 @@ static EVT_BEGIN(phase_event)
                     WAIT_FRAMES(30)
                     CALL(btlevtcmd_GetUnitKind, BTL_UNIT_PARTNER, LW(0))
                     SWITCH(LW(0))
-                        CASE_EQUAL(224)
+                        CASE_EQUAL(UNIT_GOOMBELLA)
                         CALL(evt_msg_print, 2, STRING("stg3_tou_83_kur"), 0, BTL_UNIT_PARTNER)
-                        CASE_EQUAL(225)
+                        CASE_EQUAL(UNIT_KOOPS)
                         CALL(evt_msg_print, 2, STRING("stg3_tou_83_nok"), 0, BTL_UNIT_PARTNER)
-                        CASE_EQUAL(227)
+                        CASE_EQUAL(UNIT_FLURRIE)
                         CALL(evt_msg_print, 2, STRING("stg3_tou_83_win"), 0, BTL_UNIT_PARTNER)
                     END_SWITCH
                     CALL(evt_btl_camera_set_moveto, 1, 91, 74, 334, 91, 52, 0, 30, 4)
@@ -252,12 +287,14 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 /**
- * The Goomba's attack: picks a target (or uses an item), tumbles through the air with its body rotated,
- * then comes back to its stance.
- * A miss ends the move with the pose reset; a hit plays SFX_ENM_KURI_ATTACK1
- * and applies the damage (Guess: the rolling attack of a Goomba Bros. fighter).
+ * The Goomba's headbonk (weapon_kuriboo_attack): picks a target (or uses an item), walks up to it and jumps onto
+ * it with its body tilted along the arc (krb_get_dir).
+ * A miss carries the jump on past the target and it lands with two hops; a hit plays SFX_ENM_KURI_ATTACK1,
+ * applies the damage and bounces it back in three hops.
+ * It then walks home.
  */
 static EVT_BEGIN(attack_event)
+    // In a first strike it waits, then uses the target of that strike; otherwise it chooses a target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -268,13 +305,14 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_kuriboo_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // A Goomba Bros. uses an enemy item if one fits.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -287,17 +325,19 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_kuriboo_attack))
+    // The attack is announced.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_kuriboo_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    // It walks around behind its target, then turns back to face it and pauses.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(170)
@@ -306,6 +346,7 @@ static EVT_BEGIN(attack_event)
     BEGIN_INLINE_EVENT
         CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
         SET_VALUE(LW(8), 0)
+        // It leaps at the target, spinning in the air as it goes.
         LOOP(32)
             CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(9), LW(10), LW(11))
             CALL(krb_get_dir, LW(5), LW(6), LW(9), LW(10), LW(8))
@@ -324,7 +365,8 @@ static EVT_BEGIN(attack_event)
     END_INLINE_EVENT
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 32, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
+    // Find out how the target reacts to the leap.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -346,6 +388,7 @@ static EVT_BEGIN(attack_event)
         GOTO(91)
         CASE_END
     END_SWITCH
+    // The leap missed: it lands past the target and hops on in two small steps.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -358,13 +401,14 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
     WAIT_MS(500)
     GOTO(95)
+    // The leap connects: the damage is applied and it bounces back in three shrinking hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_kuriboo_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(15), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, LW(15))
@@ -377,6 +421,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 6, -1)
     GOTO(95)
+    // It walks back to its home position.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 3, 3, 0, 0)
@@ -397,9 +442,10 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 /**
- * Guess: script helper: arg0/arg1 = x/z of one point, arg2/arg3 = x/z of another;
- * arg4 receives the angle (degrees) of the vector between them,
- * or keeps its incoming value when the points coincide.
+ * Script helper: arg0/arg1 = x/y of the previous position, arg2/arg3 = x/y of the current one;
+ * arg4 receives the angle (degrees) of the step between them, or keeps its incoming value when the points
+ * coincide.
+ * The headbonk uses it each frame as the Goomba's z rotation, so it leans along its jump arc.
  */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;

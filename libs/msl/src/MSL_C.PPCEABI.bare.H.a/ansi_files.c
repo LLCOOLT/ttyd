@@ -15,6 +15,7 @@ unsigned char stdin_buff[console_buff_size];
 unsigned char stdout_buff[console_buff_size];
 unsigned char stderr_buff[console_buff_size];
 
+/** The standard C streams (stdin, stdout, stderr) the library sets up statically. */
 FILE __files[_STATIC_FILES] = {
     {0, {must_exist, read_mode, line_buffered, __console_file, __unoriented, 0}, {__neutral, 0, 0, 0}, 0, 0, 0, {0, 0}, {0, 0}, 0, stdin_buff, console_buff_size, stdin_buff, 0, 0, 0, 0, NULL, __read_console, __write_console, __close_console, NULL, &__files[1]},
     {1, {must_exist, write_mode, line_buffered, __console_file, __unoriented, 0}, {__neutral, 0, 0, 0}, 0, 0, 0, {0, 0}, {0, 0}, 0, stdout_buff, console_buff_size, stdout_buff, 0, 0, 0, 0, NULL, __read_console, __write_console, __close_console, NULL, &__files[2]},

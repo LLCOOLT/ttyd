@@ -5,8 +5,15 @@
 #include "dolphin/types.h"
 
 // One point of the trail a partner follows (a ring of 80 per follower, written each frame Mario moves).
+// PartyFootmark.flags bits; retail partyPutFootmark takes the same bits as its argument.
+enum PartyFootmarkFlag {
+    PARTY_FOOTMARK_JUMP = 0x1,          // the leader was jumping here
+    PARTY_FOOTMARK_DEMO_ARG_SLIT = 0x2, // demo: partyPutFootmark's argument bit for PARTY_FOOTMARK_SLIT
+    PARTY_FOOTMARK_SLIT = 0x4,          // Mario was passing through a paper slit here (marioChkSlitThrouh)
+};
+
 typedef struct PartyFootmark {
-    u8 flags;  // 0x0, 1: Mario was jumping here, 4: slit floor
+    u8 flags;  // 0x0, PartyFootmarkFlag bits
     u8 pad[3]; // 0x1
     Vec pos;   // 0x4
 } PartyFootmark;

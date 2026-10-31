@@ -4,7 +4,7 @@
 
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-// inlining off for BtlActRec_AddCount, BtlActRec_AddPoint, BtlActRec_JudgeTurnRuleKeep and 5 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 2 functions change length, e.g. BtlActRec_JudgeRuleKeep 508 -> 1226 instructions
 #pragma dont_inline on
 static s32 _check_turn_count_0_end(s32 n);
 static s32 _check_turn_count_0_turn(s32 n);
@@ -67,8 +67,9 @@ void BtlActRec_JudgeTurnRuleKeep(void) {
 /**
  * Judges the battle condition (fbatInfo->ruleType, e.g. "don't use the hammer",
  * "use 3 items") from the action record when the battle ends
- * and stores the outcome in fbatInfo->ruleKeepResult (6 = condition kept, 1/2 = broken),
- * which field scripts read back to decide the Glitz Pit bonus.
+ * and stores the outcome in fbatInfo->ruleKeepResult: 6 = kept, 2 = missed but within the looser bound
+ * ruleParam2, 1 = broken. The Glitz Pit reads it back (evt_tou_set_rule_result) and tests only bit 0x4,
+ * so 1 and 2 both count as broken there.
  */
 void BtlActRec_JudgeRuleKeep(void) {
     s32 v;

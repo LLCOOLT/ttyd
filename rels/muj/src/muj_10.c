@@ -117,6 +117,7 @@ static EVT_BEGIN(megane_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the hidden dock: the bespectacled sailor. */
 static NpcSetupInfo npcEnt[] = {
     {
         "めがね水夫", // name
@@ -133,14 +134,21 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-/** Guess: closes the hold door (S_b_doa) of the ship: turns it back to shut over a short interpolation. */
+/**
+ * Enter hook of the door to the corridor (A_b_bero03 to muj_11, enter anime type 5):
+ * turns S_b_doa to LW(0) x -0.444 degrees; the door code feeds 180 down to 0,
+ * so the door stands 80 degrees open and swings shut.
+ */
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_b_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-/** Guess: opens the hold door (S_b_doa) of the ship by turning it over a short interpolation. */
+/**
+ * Exit hook of the same door: turns S_b_doa to LW(0) x 0.444 degrees;
+ * the door code feeds 0 up to 180, so it swings 80 degrees open the other way as Mario leaves.
+ */
 static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_b_doa"), 0, LW(0), 0)
@@ -148,8 +156,10 @@ static EVT_BEGIN(e_open)
 EVT_END()
 
 /**
- * Guess: custom door entrance of the hidden dock:
- * reads the entrance animation and, if it names an event, runs it then walks Mario in.
+ * Copy of the engine's door enter animation type 5 (bero_play_enter_anime) with a longer wait:
+ * if the entry has an enter hook (LW(12)), runs it at angle 180 (door open), lets Mario walk in,
+ * waits 1.5 s instead of 0.5 s so the partners can follow,
+ * plays the door-closing sound and swings the door shut (angle 180 to 0 over 500 ms).
  */
 static EVT_BEGIN(door_custom)
     CALL(evt_bero_get_info_anime, LW(1), LW(10), LW(11), LW(12), LW(13))
@@ -176,8 +186,9 @@ static EVT_BEGIN(door_custom)
 EVT_END()
 
 /**
- * Guess: entrance event of the dock: at STORY_STG5_41_RETURN_TO_THE_GROTTO it runs door_custom
- * and holds the party until the entrance has finished.
+ * Enter event of both exits: at STORY_STG5_41_RETURN_TO_THE_GROTTO it runs door_custom and walks Mario
+ * and both partners in from the corridor door (-46, 45, -287) one after another,
+ * returning LW(0) = 1 so the normal walk-in is skipped (evt_bero_mario_enter); otherwise it returns LW(0) = 0.
  */
 static EVT_BEGIN(bero_in_event)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_41_RETURN_TO_THE_GROTTO)
@@ -208,6 +219,7 @@ static EVT_BEGIN(bero_in_event)
     RETURN
 EVT_END()
 
+/** Doors and exits of muj_10: w_bero to dou_11 (Pirate's Grotto); A_b_bero03 to muj_11. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -345,6 +357,10 @@ EVT_BEGIN(oidasare_event)
     RETURN
 EVT_END()
 
+/**
+ * Mass-NPC figure table of the crowd on the hidden dock: model, animation set and start offset of each sailor
+ * (c_boro_k) and Ember (c_elmos).
+ */
 ExtTexInfo test_ext_entry_data[] = {
     {"c_boro_k", "S_1", 0.0f},
     {"c_boro_k", "S_1", 2.0f},
@@ -379,6 +395,7 @@ ExtTexInfo test_ext_entry_data[] = {
     {0},
 };
 
+/** Frame sequence of the sailors on the hidden dock, ended by -1. */
 static s16 suifu_animtbl[] = {
     0, 0, 1, 1, 2, 2, 3, 3,
     4, 4, 5, 5, 6, 6, 7, 7,
@@ -392,6 +409,7 @@ static s16 suifu_animtbl[] = {
 #endif
 };
 
+/** Frame sequence of the Embers on the hidden dock, ended by -1. */
 static s16 elmos_animtbl[] = {
     20, 20, 21, 21, 22, 22, 23, 23,
     24, 24, 25, 25, 26, 26, 27, 27,
@@ -402,6 +420,7 @@ static s16 elmos_animtbl[] = {
 #endif
 };
 
+/** Positions (x, y, z, facing) of the 95 sailors on the hidden dock, placed by senin_event. */
 s32 senin_event_suifupos[] = {
     8, 120, -206, 269, -17, 120, -283, 270,
     21, 120, -308, 270, 33, 120, -308, 270,
@@ -453,6 +472,7 @@ s32 senin_event_suifupos[] = {
     -218, 69, -152, 90,
 };
 
+/** Positions (x, y, z) of the 60 Embers around the hidden dock, placed by senin_event. */
 s32 senin_event_erumospos[] = {
     -128, 167, -132, -121, 191, -133, -117, 157,
     -93, -112, 145, -78, -114, 167, -79, -143,
@@ -484,6 +504,7 @@ s32 senin_event_erumospos[] = {
  * senin_event_suifupos and bobs them up and down with the ship via muj_ship_puka.
  */
 EVT_BEGIN(senin_event)
+    // The crew is driven out: Mario loses control and the dock crowd is placed.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_nannpc_init, PTR(test_ext_entry_data), 0, 0, 0, 155)
     CALL(evt_nannpc_set_subfunc, 1, PTR(nannpc_ext_main_sub_fast))
@@ -515,6 +536,7 @@ EVT_BEGIN(senin_event)
     END_LOOP
     SET_RAW_VALUE(LW(0), GW(0))
     SET_FLOAT_VALUE(LW(1), FLOAT(1.5f))
+    // The ship starts to bob.
     SPAWN_EVENT(muj_ship_puka)
     CALL(evt_hit_bind_mapobj, STRING("A_b"), STRING("S_b"))
     BEGIN_INLINE_EVENT
@@ -582,13 +604,16 @@ EVT_BEGIN(senin_event)
     CALL(evt_cam3d_evt_set, -71, 178, 259, -71, 83, -282, 0, 11)
     CALL(evt_bero_exec_wait, 65536)
     WAIT_MS(1000)
+    // The sailors say they are coming too.
     CALL(evt_msg_print, 0, STRING("stg5_dou_19_01"), 0, STRING("水夫D"))
     CALL(evt_msg_print, 0, STRING("stg5_dou_19_02"), 0, STRING("モニー"))
     CALL(evt_msg_print, 0, STRING("stg5_dou_19_03"), 0, STRING("ガラの悪い水夫"))
     CALL(evt_cam3d_evt_set, -150, 300, 682, -150, 150, -175, 500, 11)
     WAIT_MS(500)
     CALL(evt_npc_set_position, STRING("コルテス"), -215, 120, -160)
+    // Cortez appears on the dock.
     CALL_CHILD(korutesu_apper)
+    // Cortez speaks after a millennium and the Embers appear.
     CALL(evt_msg_print, 0, STRING("stg5_dou_19_04"), 0, STRING("コルテス"))
     CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_APPEAR3"), 0)
     SET_VALUE(LW(0), 95)
@@ -597,6 +622,7 @@ EVT_BEGIN(senin_event)
         ADD(LW(0), 1)
     END_LOOP
     WAIT_MS(3000)
+    // The story advances and the crew boards the ship at muj_00.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_41_01_ALL_ABOARD)
     CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     CALL(evt_bero_mapchange, STRING("muj_00"), STRING(""))
@@ -638,7 +664,10 @@ EVT_BEGIN(korutesu_appear_event)
 EVT_END()
 #endif
 
-/** Guess: dust effect (hokori) spawned at random spots by a repeating timer during the ship scene. */
+/**
+ * Run by the map init from STORY_STG5_40_TRUE_IDENTITY until STORY_STG5_41_RETURN_TO_THE_GROTTO:
+ * every 1.5 to 4 seconds the camera shakes slightly and dust (hokori_n64) falls from 250 units above Mario.
+ */
 static EVT_BEGIN(dai3_shurai_after)
     LOOP(0)
         CALL(evt_sub_random, 2500, LW(10))
@@ -654,6 +683,7 @@ static EVT_BEGIN(dai3_shurai_after)
     RETURN
 EVT_END()
 
+/** Return points of the hazard-water floors of the hidden dock. */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"A_yuka01", {0.0f, -1000.0f, 0.0f}},
     {"A_yuka02", {0.0f, -1000.0f, 0.0f}},

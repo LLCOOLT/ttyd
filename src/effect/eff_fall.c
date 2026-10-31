@@ -16,6 +16,7 @@
 #include "eff/eff_fall.h"
 #include "evt/evt_cam.h"
 #include "libc_decls.h"
+#include <dolphin/os.h>
 
 typedef struct EffFallWork {
     s32 type;     // 0x0
@@ -166,42 +167,11 @@ static inline f32 fall_cosf(f32 x) {
     return a;
 }
 
-void DCFlushRange(void* addr, u32 nBytes);
-void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
-void GXCallDisplayList(void* list, u32 nbytes);
-void GXClearVtxDesc(void);
-u16 GXGetTexObjHeight(const GXTexObj* to);
-void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
-void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
-void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
-void GXSetArray(GXAttr attr, void* base_ptr, u8 stride);
-void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
-void GXSetChanMatColor(GXChannelID chan, GXColor mat_color);
-void GXSetCullMode(GXCullMode mode);
-void GXSetCurrentMtx(u32 id);
-void GXSetNumChans(u8 nChans);
-void GXSetNumTevStages(u8 nStages);
-void GXSetNumTexGens(u8 nTexGens);
-void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
-void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevColor(GXTevRegID id, GXColor color);
-void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d);
-void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevOp(GXTevStageID id, GXTevMode mode);
-void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
-void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
-void GXSetVtxDesc(GXAttr attr, GXAttrType type);
-void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
-void PSMTXIdentity(Mtx m);
-void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad);
-void PSMTXRotRad(Mtx m, char axis, f32 rad);
-void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
-void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
 /**
  * Spawns a falling stage object: 0/1 bugs (num of them), 2 fork, 3 water, 4/5 bucket and tub, 6 Koopa, 7 meteor,
  * 8 light. width and drop give the spread and fall height; duration is the lifetime.
- * Guess: the type names come from the animation each uses.
+ * The names follow the models (EFF_Baketu, EFF_Tarai, EFF_koopa, EFF_inseki, EFF_light) and sounds
+ * (SFX_BTL_STAGE_FALL_BUG1/2, FALL_WATER1, DAMAGE_FORK1) each type uses.
  * Spawned by the battle stage objects (battle_stage_object.c).
  */
 EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f32 dir, s32 num, s32 duration) {
@@ -349,9 +319,9 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f3
     }
     return effect;
 }
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-// lifetimes optimisation off for effFallRelease, effFallMain: the original register allocation and scheduling need it
+// FAKE: lifetimes optimisation off for effFallRelease, effFallMain: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 
 /** Releases every element's animation poses and stops its sound effect. */
@@ -1142,6 +1112,7 @@ static void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Opaque white, the tint register colour the falling water is drawn with in effFallDispWater. */
 static const GXColor white255 = {255, 255, 255, 255};
 /** Draws the falling water (type 3) as translucent quads. */
 static void effFallDispWater(CameraId cameraId, EffectEntry* effect) {

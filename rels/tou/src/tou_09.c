@@ -1,4 +1,5 @@
-// tou_09 (闘技場, Glitz Pit): the side corridor; exits to tou_04 and tou_11; the shut-in "tojikome" scene.
+// tou_09 (闘技場, Glitz Pit): the second major-league locker room; exits to tou_04 and, behind the lockers,
+// the hidden room tou_11; the shut-in "tojikome" scene.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -87,8 +88,10 @@ static EVT_BEGIN(w_door_close)
 EVT_END()
 
 /**
- * Guess: entrance scene for tou_09: Mario and the partner are placed by the door and walk in,
- * with the partner facing right.
+ * Enter event of the door from tou_11 (a_door_9_omote):
+ * Mario and the partner (facing east) are placed in the doorway with the door (R_door_9) wide open;
+ * it swings shut with the closing sound after 0.5 s while Mario walks in to (-160, 130)
+ * and the partner to (-180, 120). It sets LW(0) = 1, which tells the entrance code to skip its own walk-in.
  */
 EVT_BEGIN(evt_in)
     CALL(evt_mario_set_pos, -235, 12, 135)
@@ -118,6 +121,10 @@ EVT_BEGIN(evt_in)
     RETURN
 EVT_END()
 
+/**
+ * Doors of this room: the north door to the main corridor tou_04 (kept shut by the map init),
+ * the toilet pipe to tou_04's restroom and the west door to tou_11.
+ */
 static BeroEntry bero_data[] = {
     {
         "n_bero", // hitName
@@ -316,7 +323,8 @@ static EVT_BEGIN(evt_tojikome_msg)
 EVT_END()
 
 /**
- * Map init for tou_09, the side corridor: music by story stage, door and restroom case scripts,
+ * Map init for tou_09, the second major-league locker room:
+ * music by story stage, door and restroom case scripts,
  * and the "shut in" message at the n_bero exit.
  */
 EVT_BEGIN(tou_09_init_evt)

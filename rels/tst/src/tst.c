@@ -8,8 +8,9 @@
 #include "rel_module.h"
 
 /**
- * Script helper: calls mobjKoopaOn(); the map-object test maps (tst_moj_00 and tst_moj_01) use it
- * before placing their objects. Guess: it enables the objects that react to Koops' shell.
+ * Script helper: calls mobjKoopaOn(), which switches the map objects to the separate 128-entry table of Bowser's
+ * side-scrolling stages; the map-object test maps (tst_moj_00 and tst_moj_01) call it before placing their
+ * objects.
  */
 USER_FUNC(tst_mobj_koopa_on) {
     mobjKoopaOn();

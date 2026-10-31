@@ -6,7 +6,7 @@
 #include "battle/battle.h"
 #include "mario/mariost.h"
 
-// inlining off for BattlePadInit, BattlePadManager, BtlPad_WorkInit and 13 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 6 functions change length, e.g. BattlePadInit 19 -> 40 instructions
 #pragma dont_inline on
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on

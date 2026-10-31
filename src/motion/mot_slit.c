@@ -16,9 +16,14 @@
 #include "party/party_motion.h"
 #include <dolphin/pad.h>
 
+// Bits of MarioWork.mot.slit.flags.
+enum MotSlitFlag {
+    SLIT_FLAG_DASH_CUT = 0x1, // slitLimitSpeed cut a dash to walking speed; cleared at the next camera reset
+    SLIT_FLAG_RESUME = 0x10,  // demo: resumeState holds the state motSlitContinue2 returns to
+};
+
 double fabs(double);
 
-int __abs(int);
 #define abs __abs
 
 #if VERSION >= VERSION_JP
@@ -319,7 +324,7 @@ void motSlitContinue(void) {
 void motSlitContinue2(void) {
     MarioWork* mario = marioGetPtr();
     marioChgMot2(MARIO_MOTION_SLIT);
-    if (!(mario->mot.slit.flags & 0x10)) {
+    if (!(mario->mot.slit.flags & SLIT_FLAG_RESUME)) {
         mario->slitState = 0x64;
     } else {
         mario->slitState = mario->mot.slit.resumeState;
@@ -386,7 +391,7 @@ BOOL marioGetMotSlitCancel3(void) {
     return r;
 }
 
-#define CLR_DISP 0xFEFFF3FF
+#define CLR_DISP ~(MARIO_DISP_FLAG_SLIT | MARIO_DISP_FLAG_FIXED_MIRRORED | MARIO_DISP_FLAG_FIXED_UNMIRRORED)
 /**
  * Sets the sideways facing for Paper Mode: 260 or 280 degrees depending on
  * which side of the camera Mario is moving to.
@@ -498,14 +503,14 @@ void mot_slit_post(void) {
     u16 id;
     if (m->slitState >= 10) {
         id = m->currMotionId;
-        if (id == 0x15 || (u16)(id - 0xb) <= 1 || m->currMotionId <= 7 || m->currMotionId == MARIO_MOTION_JUMP_3) {
+        if (id == MARIO_MOTION_SLIT || (u16)(id - MARIO_MOTION_FALL_2) <= 1 || m->currMotionId <= MARIO_MOTION_JUMP_2 || m->currMotionId == MARIO_MOTION_JUMP_3) {
             return;
         }
     }
 #else
     MarioWork* m = marioGetPtr();
     u16 id = m->currMotionId;
-    if (id == 0x15 || (u16)(id - 0xb) <= 1 || m->currMotionId <= 7 || m->currMotionId == MARIO_MOTION_JUMP_3) {
+    if (id == MARIO_MOTION_SLIT || (u16)(id - MARIO_MOTION_FALL_2) <= 1 || m->currMotionId <= MARIO_MOTION_JUMP_2 || m->currMotionId == MARIO_MOTION_JUMP_3) {
         return;
     }
 #endif
@@ -547,7 +552,7 @@ void mot_slit_post(void) {
         }
         m->flags &= ~MARIO_FLAG_PARTY_WALK_DISABLED;
         m->flags &= ~MARIO_FLAG_GONE_THROUGH_BARS;
-        m->dispFlags &= 0xFEFFF3FF;
+        m->dispFlags &= CLR_DISP;
         m->dispFlags &= CLR_DISP;
         marioPaperOff();
         mapResetPaperAmbColor();
@@ -660,7 +665,7 @@ static inline void slitLimitSpeed(MarioWork* mario) {
     if (!(mario->trigFlags & MARIO_TRIG_FLAG_EVT_POSE)) {
         marioChgPose("M_R_1");
     }
-    mario->mot.slit.flags |= 1;
+    mario->mot.slit.flags |= SLIT_FLAG_DASH_CUT;
 }
 
 /**
@@ -847,10 +852,10 @@ void mot_slit(void) {
             if (strcmp(m->animName, "M_I_Y") == 0) {
                 marioChgPose("M_W_1");
             }
-            if (!(m->mot.slit.flags & 1)) {
+            if (!(m->mot.slit.flags & SLIT_FLAG_DASH_CUT)) {
                 slitCamReset();
             } else {
-                m->mot.slit.flags &= ~1;
+                m->mot.slit.flags &= ~SLIT_FLAG_DASH_CUT;
                 slitCamReset();
             }
             m->baseSpeed = slitWalkSpeed();
@@ -1017,7 +1022,7 @@ void mot_slit(void) {
     if (m->flags & MARIO_FLAG_PAPER_MODE) {
         if (m->hitobjPush != NULL) {
 #if VERSION <= VERSION_DEMO_US
-            if (hitGetAttr(m->hitobjPush) & 0x2000) {
+            if (hitGetAttr(m->hitobjPush) & HIT_ATTR_PAPER_SLIT) {
                 HitCheckQuery q;
                 f32 sn, cs;
                 d = revise360(m->controlStickAngle - m->targetYaw);
@@ -1047,7 +1052,7 @@ void mot_slit(void) {
             }
 #else
             if (m->hitobjStandOn != NULL && m->currMotionId == MARIO_MOTION_SLIT) {
-                if (hitGetAttr(m->hitobjPush) & 0x2000) {
+                if (hitGetAttr(m->hitobjPush) & HIT_ATTR_PAPER_SLIT) {
                     HitCheckQuery q;
                     HitCheckQuery* qp;
                     f32 sn, cs;
@@ -1095,7 +1100,7 @@ void mot_slit(void) {
 #endif
         } else {
             st = m->slitState;
-            if (!(st >= 0x5a && st <= 0x5e) && m->hitobjStandOn != NULL && (hitGetAttr(m->hitobjStandOn) & 0x2000)) {
+            if (!(st >= 0x5a && st <= 0x5e) && m->hitobjStandOn != NULL && (hitGetAttr(m->hitobjStandOn) & HIT_ATTR_PAPER_SLIT)) {
                 m->mot.slit.counter += 3;
                 marioChgPaper("PM_S_1H");
 #if VERSION <= VERSION_DEMO_US
@@ -1196,7 +1201,7 @@ void mot_slit(void) {
             m->flags &= ~MARIO_FLAG_GONE_THROUGH_BARS;
 #if VERSION <= VERSION_DEMO_US
             m->mot.slit.resumeState = m->slitState;
-            m->mot.slit.flags |= 0x10;
+            m->mot.slit.flags |= SLIT_FLAG_RESUME;
 #endif
             m->slitTimer2 = 0;
             m->flags &= ~MARIO_FLAG_PAPER_MODE;
@@ -1306,7 +1311,7 @@ void mot_slit(void) {
             m->flags &= ~MARIO_FLAG_WALLS_DISABLED;
 #if VERSION <= VERSION_DEMO_US
             m->mot.slit.resumeState = m->slitState;
-            m->mot.slit.flags |= 0x10;
+            m->mot.slit.flags |= SLIT_FLAG_RESUME;
 #endif
             m->slitTimer2 = 0;
             m->flags &= ~MARIO_FLAG_PAPER_MODE;
@@ -1355,7 +1360,7 @@ void mot_slit(void) {
         case 0x78:
 #if VERSION <= VERSION_DEMO_US
             m->mot.slit.resumeState = m->slitState;
-            m->mot.slit.flags |= 0x10;
+            m->mot.slit.flags |= SLIT_FLAG_RESUME;
 #endif
             m->slitTimer2 = 0;
             m->flags &= ~MARIO_FLAG_PAPER_MODE;

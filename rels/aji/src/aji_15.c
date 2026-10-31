@@ -53,6 +53,7 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/** Exit of this room: the east door to aji_10. */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -115,6 +116,7 @@ static USER_FUNC(peach_set_pos) {
 EVT_BEGIN(peach_evt_syawa_main)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(30))
     CALL(evt_snd_envoff, PSND_FADE_HOLD)
+    // The music dips and Peach is led to the tub.
     CALL(evt_mario_key_onoff, 0)
     CALL(peach_chk_aftershower, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -122,6 +124,7 @@ EVT_BEGIN(peach_evt_syawa_main)
     ELSE
         CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_2"), STRING("P_T_2"))
     END_IF
+    // She comments on the shower (peach_aji_35, or 35_1 when she has already showered).
     IF_INT_EQUAL(GSWF(GSWF_AJI15_PEACH_SHOWER_TAKEN), 0)
         CALL(evt_msg_print, 0, STRING("peach_aji_35"), 0, STRING("mario"))
     ELSE
@@ -142,6 +145,7 @@ EVT_BEGIN(peach_evt_syawa_main)
     IF_INT_GREATER_OR_EQUAL(LW(0), 25)
         CALL(evt_mario_mov_pos2, 25, -41, FLOAT(48.0f))
     END_IF
+    // Peach walks up to the tub.
     BEGIN_INLINE_EVENT
         CALL(evt_mario_mov_pos2, -28, -45, FLOAT(48.0f))
     END_INLINE_EVENT
@@ -188,6 +192,7 @@ EVT_BEGIN(peach_evt_syawa_main)
     CALL(evt_mapobj_trans, 1, STRING("p_fuku"), 0, -10, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("p_fuku"), MAPOBJ_FLAG_HIDE)
     CALL(evt_sub_intpl_msec_init, 0, -10, 0, 100)
+    // She hangs her dress on the hook.
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
         CALL(evt_mapobj_trans, 1, STRING("p_fuku"), 0, LW(0), 0)
@@ -212,6 +217,7 @@ EVT_BEGIN(peach_evt_syawa_main)
         GOTO(0)
     END_IF
     WAIT_MS(500)
+    // She showers, humming, as steam rises.
     SPAWN_EVENT_GET_ID(PTR(peach_evt_yuge), LW(9))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_sub_random, 2, LW(3))
@@ -235,6 +241,7 @@ EVT_BEGIN(peach_evt_syawa_main)
         GOTO(1)
     END_IF
     WAIT_MS(300)
+    // She comments on the shower (peach_aji_36 and 37) and changes clothes.
     CALL(evt_msg_print, 0, STRING("peach_aji_36"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_SHOWER1"), -40, 0, -30, 0)
@@ -347,6 +354,7 @@ EVT_BEGIN(peach_evt_syawa_main)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_2"), STRING("P_T_2"))
     CALL(evt_msg_print, 0, STRING("peach_aji_37"), 0, STRING("mario"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
+    // The music returns, the shower-taken flag is set and Peach gets control back.
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
@@ -422,7 +430,7 @@ EVT_END()
 static USER_FUNC(peach_chk_aftershower) {
     EvtWord* args = event->args;
 
-    if (marioGetPtr()->peachFlags & 0x10) {
+    if (marioGetPtr()->peachFlags & PEACH_FLAG_AFTER_SHOWER) {
         evtSetValue(event, args[0], 1);
     } else {
         evtSetValue(event, args[0], 0);

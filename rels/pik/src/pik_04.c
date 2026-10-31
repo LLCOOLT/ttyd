@@ -43,6 +43,7 @@ static DoorParam door_2;
 static NpcSetupInfo npc_data[9];
 static KinopioData kino_dt;
 
+/** Doors and exits of pik_04: nw_bero to pik_00; se_bero to pik_01. */
 static BeroEntry bero_data[] = {
     {
         "nw_bero", // hitName
@@ -79,6 +80,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/** Return points of the hazard floors (the mod_N hit areas) of the street. */
 static HitDamageReturn dmgReturnPt[] = {
     {"mod_1", {0.0f, -1000.0f, 0.0f}},
     {"mod_2", {0.0f, -1000.0f, 0.0f}},
@@ -91,6 +93,7 @@ static HitDamageReturn dmgReturnPt[] = {
     {0},
 };
 
+/** Map objects of the arrow signs (yajirusi_N) that evt_pik_yajirushi animates. */
 static const char* name_tbl[] = {
     "yajirusi_1",
     "yajirusi_2",
@@ -128,6 +131,7 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
+/** NPCs inside the house at ie_3: two of the Ta-kun (ターくん), Herringway's relatives from Shiver City. */
 const char* ie_3_npc[] = {
     "ターくん１",
     "ターくん２",
@@ -153,6 +157,7 @@ static EVT_BEGIN(door_1_close)
     RETURN
 EVT_END()
 
+/** Door of the house at ie_3: the outer door, its hit areas and the inside room. */
 static DoorParam door_1 = {
     0, // flags
     1, // type
@@ -174,9 +179,8 @@ static DoorParam door_1 = {
 };
 
 /**
- * Guess: door-open animation of the hotel's double door (door_h_a and door_h_b):
- * the opening angle LW(0) is scaled and applied to door_h_a as a rotation about y,
- * and the mirror angle to door_h_b.
+ * Door callback (evtIn of door_2, the hotel's double door door_h): the opening angle LW(0) is scaled by
+ * -0.5546875 and applied to door_h_a as a rotation about y, and the mirror angle to door_h_b.
  */
 EVT_BEGIN(evt_door_h)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5546875f))
@@ -187,8 +191,9 @@ EVT_BEGIN(evt_door_h)
 EVT_END()
 
 /**
- * Guess: second door animation of the hotel doors (evtOut):
- * the scaled angle in LW(0) is applied as a rotation about x to both door_h_a and door_h_b.
+ * Alternative door callback for the hotel doors:
+ * half the angle in LW(0) is applied as a rotation about x to both
+ * door_h_a and door_h_b. Nothing in this file refers to it (door_2's evtOut is NULL).
  */
 EVT_BEGIN(evt_door2_h)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
@@ -198,8 +203,8 @@ EVT_BEGIN(evt_door2_h)
 EVT_END()
 
 /**
- * Guess: wall animation of the hotel entrance: rotates the front wall hotel_kabe_1 about y by LW(0) scaled by
- * -0.75, so the wall opens up as Mario enters.
+ * Wall callback (evtWall of door_2, the hotel entrance): rotates the front wall hotel_kabe_1 about y by LW(0)
+ * scaled by -0.75, so the wall swings open as Mario goes in.
  */
 EVT_BEGIN(evt_wall_h)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.75f))
@@ -207,6 +212,7 @@ EVT_BEGIN(evt_wall_h)
     RETURN
 EVT_END()
 
+/** NPCs inside the hotel: the receptionist and the French-accented dandy (キザ野郎) who is smitten with her. */
 const char* hotel_npc[] = {
     "店員女",
     "キザ野郎",
@@ -235,6 +241,7 @@ static EVT_BEGIN(door_2_close)
     RETURN
 EVT_END()
 
+/** Door of the hotel: the outer door, its hit areas and the inside room. */
 static DoorParam door_2 = {
     0, // flags
     3, // type
@@ -256,8 +263,8 @@ static DoorParam door_2 = {
 };
 
 /**
- * Guess: sets up the image capture used to fade the hotel interior in
- * and out (a paper "OFF_hei_07" image bound to an offscreen buffer of 608 by 480), and leaves it off.
+ * Called by the map init: sets up the image capture used by imgstart and imgend to fade the hotel lobby out and
+ * in (a paper "OFF_hei_07" image bound to an offscreen buffer of 608 by 480), and leaves it off.
  */
 EVT_BEGIN(imginit)
     CALL(evt_paper_entry, STRING("OFF_hei_07"))
@@ -273,10 +280,10 @@ EVT_BEGIN(imginit)
 EVT_END()
 
 /**
- * Guess: cross-fade used when Mario leaves the elevator in the hotel's upper floor:
- * the lobby objects (hotel_naka, door_h) and the clerk and the dandy NPC are rendered to the offscreen buffer
- * and shown through the capture image, which fades out over one second (255 to 0 alpha) to reveal the real
- * scene. In JP and later the breakfast item fades too.
+ * Fades the hotel lobby out when an elevator ride starts (spawned by evt_up and evt_down as the doors close):
+ * the lobby objects (hotel_naka, door_h), the clerk (店員女) and the dandy (キザ野郎) are hidden and rendered to
+ * the offscreen buffer instead, shown through the capture image as it fades from 255 to 0 alpha over one second;
+ * they stay hidden afterwards. In JP and later the breakfast item fades with them.
  */
 EVT_BEGIN(imgstart)
     CALL(evt_mapobj_set_offscreen, 1, STRING("hotel_naka"), STRING("offscreen"))
@@ -312,9 +319,9 @@ EVT_BEGIN(imgstart)
 EVT_END()
 
 /**
- * Guess: reverse of imgstart: the same objects are captured
- * and the image fades in from 0 to 255 alpha over one second, then the real objects are hidden and shown again,
- * covering the change between floors.
+ * Reverse of imgstart, spawned by evt_up and evt_down when the box arrives:
+ * the same objects are captured and the
+ * image fades in from 0 to 255 alpha over one second, then the real objects are shown again.
  */
 EVT_BEGIN(imgend)
     CALL(evt_mapobj_set_offscreen, 1, STRING("hotel_naka"), STRING("offscreen"))
@@ -356,6 +363,7 @@ EVT_END()
 /** The demo's elevator keeps the field camera and carries Mario and the partner from where they stand. */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_up)
+    // The ride up: the elevator doors slide open.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(10))
@@ -373,12 +381,14 @@ EVT_BEGIN(evt_up)
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_hitobj_onoff, STRING("a_door_2"), 1, 0)
     BEGIN_INLINE_EVENT
+        // Mario steps into the elevator box.
         CALL(evt_mario_mov_pos2, 435, 45, FLOAT(80.0f))
         CALL(evt_mario_set_dir, 90, 200, 0)
     END_INLINE_EVENT
     CALL(evt_party_stop, 0)
     CALL(evt_party_move_pos2, 0, 410, 67, FLOAT(80.0f))
     CALL(evt_party_set_dir, 0, 270, 200)
+    // The street fades out as the doors close.
     SPAWN_EVENT(imgstart)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(10))
@@ -406,6 +416,7 @@ EVT_BEGIN(evt_up)
         SET_FLOAT_VALUE(LW(6), LW(3))
         SET_FLOAT_VALUE(LW(7), LW(4))
     END_IF
+    // The elevator box rises.
     CALL(evt_hit_bind_mapobj, STRING("a_hako"), STRING("hako"))
     CALL(evt_snd_sfxon, STRING("SFX_STG6_PIK_ELEVATOR_MOVE1"), LW(10))
     CALL(evt_sub_intpl_msec_init, 11, 0, 13250, 10000)
@@ -428,6 +439,7 @@ EVT_BEGIN(evt_up)
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
+    // The upper floor fades in and its doors open.
     SPAWN_EVENT(imgend)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(10))
@@ -443,6 +455,7 @@ EVT_BEGIN(evt_up)
         END_IF
     END_LOOP
     CALL(evt_snd_sfxoff, LW(10))
+    // Mario walks out onto the upper floor.
     CALL(evt_mario_mov_pos2, 383, -10, FLOAT(80.0f))
     CALL(evt_party_move_pos2, 0, 360, 10, FLOAT(80.0f))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -471,6 +484,7 @@ EVT_END()
  * and the doors open on the upper floor and Mario walks out.
  */
 EVT_BEGIN(evt_up)
+    // The ride up: the elevator doors slide open.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ERE"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -490,6 +504,7 @@ EVT_BEGIN(evt_up)
     CALL(evt_hitobj_onoff, STRING("a_door_2"), 1, 0)
     CALL(evt_cam3d_evt_set, FLOAT(-78.0f), FLOAT(133.0f), FLOAT(-450.0f), FLOAT(307.0f), FLOAT(56.5f), FLOAT(-65.0f), 800, 11)
     BEGIN_INLINE_EVENT
+        // Mario steps into the elevator box.
         CALL(evt_mario_mov_pos2, 435, 45, FLOAT(80.0f))
         CALL(evt_mario_set_dir, 90, 200, 0)
     END_INLINE_EVENT
@@ -500,6 +515,7 @@ EVT_BEGIN(evt_up)
     CALL(evt_party_set_pos, 0, 410, LW(1), 67)
     CALL(evt_party_set_dir, 0, 270, 200)
     CALL(evt_party_stop, 0)
+    // The street fades out as the doors close.
     SPAWN_EVENT(imgstart)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(10))
@@ -519,6 +535,7 @@ EVT_BEGIN(evt_up)
     CALL(evt_cam3d_evt_set, FLOAT(-78.0f), FLOAT(1463.0f), FLOAT(-450.0f), FLOAT(307.0f), FLOAT(1386.5f), FLOAT(-65.0f), 10000, 11)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
+    // The elevator box rises.
     CALL(evt_hit_bind_mapobj, STRING("a_hako"), STRING("hako"))
     CALL(evt_snd_sfxon, STRING("SFX_STG6_PIK_ELEVATOR_MOVE1"), LW(9))
     CALL(evt_sub_intpl_msec_init, 11, 0, 13250, 10000)
@@ -540,6 +557,7 @@ EVT_BEGIN(evt_up)
     CALL(evt_snd_sfxoff, LW(9))
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
+    // The upper floor fades in and its doors open.
     SPAWN_EVENT(imgend)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(9))
@@ -559,6 +577,7 @@ EVT_BEGIN(evt_up)
         WAIT_MS(300)
         CALL(evt_cam3d_evt_off, 800, 11)
     END_INLINE_EVENT
+    // Mario walks out onto the upper floor.
     CALL(evt_mario_mov_pos2, 383, -10, FLOAT(80.0f))
     CALL(evt_party_move_pos2, 0, 360, 10, FLOAT(80.0f))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -584,6 +603,7 @@ EVT_END()
 /** The demo's ride down, like evt_up. */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_down)
+    // The ride down: the elevator doors slide open.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(10))
@@ -601,12 +621,14 @@ EVT_BEGIN(evt_down)
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_hitobj_onoff, STRING("a_door_3"), 1, 0)
     BEGIN_INLINE_EVENT
+        // Mario steps into the elevator box.
         CALL(evt_mario_mov_pos2, 435, 45, FLOAT(80.0f))
         CALL(evt_mario_set_dir, 90, 200, 0)
     END_INLINE_EVENT
     CALL(evt_party_stop, 0)
     CALL(evt_party_move_pos2, 0, 410, 67, FLOAT(80.0f))
     CALL(evt_party_set_dir, 0, 270, 200)
+    // The upper floor fades out as the doors close.
     SPAWN_EVENT(imgstart)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(10))
@@ -636,6 +658,7 @@ EVT_BEGIN(evt_down)
     END_IF
     SUBTRACT_FLOAT(LW(3), FLOAT(1325.0f))
     SUBTRACT_FLOAT(LW(6), FLOAT(1325.0f))
+    // The elevator box sinks.
     CALL(evt_hit_bind_mapobj, STRING("a_hako"), STRING("hako"))
     CALL(evt_snd_sfxon, STRING("SFX_STG6_PIK_ELEVATOR_MOVE1"), LW(10))
     CALL(evt_sub_intpl_msec_init, 11, 13250, 0, 10000)
@@ -658,6 +681,7 @@ EVT_BEGIN(evt_down)
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
+    // The street fades in and its doors open.
     SPAWN_EVENT(imgend)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(10))
@@ -673,6 +697,7 @@ EVT_BEGIN(evt_down)
         END_IF
     END_LOOP
     CALL(evt_snd_sfxoff, LW(10))
+    // Mario walks out onto the street.
     CALL(evt_mario_mov_pos2, 383, -10, FLOAT(80.0f))
     CALL(evt_party_move_pos2, 0, 360, 10, FLOAT(80.0f))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -699,6 +724,7 @@ EVT_END()
  * The camera follows the box down, the doors open at the bottom and Mario walks out onto the street.
  */
 EVT_BEGIN(evt_down)
+    // The ride down: the elevator doors slide open.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(9))
@@ -718,6 +744,7 @@ EVT_BEGIN(evt_down)
     CALL(evt_hitobj_onoff, STRING("a_door_3"), 1, 0)
     CALL(evt_cam3d_evt_set, FLOAT(-78.0f), FLOAT(1463.0f), FLOAT(-450.0f), FLOAT(307.0f), FLOAT(1386.5f), FLOAT(-65.0f), 800, 11)
     BEGIN_INLINE_EVENT
+        // Mario steps into the elevator box.
         CALL(evt_mario_mov_pos2, 435, 45, FLOAT(80.0f))
         CALL(evt_mario_set_dir, 90, 200, 0)
     END_INLINE_EVENT
@@ -728,6 +755,7 @@ EVT_BEGIN(evt_down)
     CALL(evt_party_set_pos, 0, 410, LW(1), 67)
     CALL(evt_party_set_dir, 0, 270, 200)
     CALL(evt_party_stop, 0)
+    // The upper floor fades out as the doors close.
     SPAWN_EVENT(imgstart)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(9))
@@ -748,6 +776,7 @@ EVT_BEGIN(evt_down)
     CALL(evt_cam3d_evt_set, FLOAT(-78.0f), FLOAT(133.0f), FLOAT(-450.0f), FLOAT(307.0f), FLOAT(56.5f), FLOAT(-65.0f), 10000, 11)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
+    // The elevator box sinks.
     CALL(evt_hit_bind_mapobj, STRING("a_hako"), STRING("hako"))
     CALL(evt_snd_sfxon, STRING("SFX_STG6_PIK_ELEVATOR_MOVE1"), LW(9))
     CALL(evt_sub_intpl_msec_init, 11, 13250, 0, 10000)
@@ -769,6 +798,7 @@ EVT_BEGIN(evt_down)
     CALL(evt_snd_sfxoff, LW(9))
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
+    // The street fades in and its doors open.
     SPAWN_EVENT(imgend)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PIK_ELEVATOR_DOOR1"), LW(0), LW(1), LW(2), LW(9))
@@ -786,6 +816,7 @@ EVT_BEGIN(evt_down)
     END_LOOP
     CALL(evt_snd_sfxoff, LW(9))
     CALL(evt_cam3d_evt_off, 800, 11)
+    // Mario walks out onto the street.
     CALL(evt_mario_mov_pos2, 383, -10, FLOAT(80.0f))
     CALL(evt_party_move_pos2, 0, 360, 10, FLOAT(80.0f))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -809,7 +840,10 @@ EVT_BEGIN(evt_down)
 EVT_END()
 #endif
 
-/** Guess: init for the souvenir-shop NPC (the girl at the stall in the street): places her at (-363, 10, 142). */
+/**
+ * Init for the souvenir stall owner (土産屋), who sells Fresh Pasta at the stall a_roten (evt_roten): places the
+ * owner at (-363, 10, 142) (y 15 in the demos).
+ */
 EVT_BEGIN(init_miyage)
 #if VERSION >= VERSION_US
     CALL(evt_npc_set_position, STRING("me"), -363, 10, 142)
@@ -819,12 +853,12 @@ EVT_BEGIN(init_miyage)
     RETURN
 EVT_END()
 
-/** Guess: talk script of the same NPC: empty. */
+/** Talk script of the souvenir stall owner: empty; the sale runs through the stall's case event evt_roten. */
 EVT_BEGIN(talk_miyage)
     RETURN
 EVT_END()
 
-/** Talk script for the three girls (３人娘１ to ３): they speak stg7_pik_clear_10, 11 and 12 in turn. */
+/** Talk script for the Traveling Sisters 3 (３人娘１ to ３): they speak stg7_pik_clear_10, 11 and 12 in turn. */
 static EVT_BEGIN(talk_musume)
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_10"), 0, STRING("３人娘１"))
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_11"), 0, STRING("３人娘２"))
@@ -880,13 +914,13 @@ EVT_BEGIN(talk_musume3)
     RETURN
 EVT_END()
 
-/** Init for Tar-kun 1: nothing to do. */
+/** Init for Ta-kun 1: nothing to do. */
 EVT_BEGIN(init_takun1)
     RETURN
 EVT_END()
 
 /**
- * Talk script for Tar-kun 1: story-progress dependent line (before the Thousand-Year Door,
+ * Talk script for Ta-kun 1: story-progress dependent line (before the Thousand-Year Door,
  * up to the end of chapter 8, and afterwards).
  */
 EVT_BEGIN(talk_takun1)
@@ -901,12 +935,12 @@ EVT_BEGIN(talk_takun1)
     RETURN
 EVT_END()
 
-/** Init for Tar-kun 2: nothing to do. */
+/** Init for Ta-kun 2: nothing to do. */
 EVT_BEGIN(init_takun2)
     RETURN
 EVT_END()
 
-/** Talk script for Tar-kun 2: story-progress dependent line, same schedule as Tar-kun 1. */
+/** Talk script for Ta-kun 2: story-progress dependent line, same schedule as Ta-kun 1. */
 EVT_BEGIN(talk_takun2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -919,13 +953,13 @@ EVT_BEGIN(talk_takun2)
     RETURN
 EVT_END()
 
-/** Init for Tar-kun 3: turns on the walk and talk animations and lets him hop on the floor. */
+/** Init for Ta-kun 3: turns on the walk and talk animations and lets him hop on the floor. */
 EVT_BEGIN(init_takun3)
     CALL(evt_npc_flag_onoff, 1, STRING("ターくん３"), NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
     RETURN
 EVT_END()
 
-/** Talk script for Tar-kun 3: story-progress dependent line, same schedule as Tar-kun 1. */
+/** Talk script for Ta-kun 3: story-progress dependent line, same schedule as Ta-kun 1. */
 EVT_BEGIN(talk_takun3)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -939,8 +973,8 @@ EVT_BEGIN(talk_takun3)
 EVT_END()
 
 /**
- * Guess: init for the show-off NPC (キザ): from STORY_STG6_70_THOUSAND_YEAR_DOOR on,
- * moves him off the map to (0, -1000, 0).
+ * Init for the dandy hotel guest (キザ野郎, who in stg7_pik_clear_19 says he is courting the receptionist):
+ * from STORY_STG6_70_THOUSAND_YEAR_DOOR on, moves him off the map to (0, -1000, 0).
  */
 static EVT_BEGIN(init_kiza)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -950,12 +984,16 @@ static EVT_BEGIN(init_kiza)
     RETURN
 EVT_END()
 
-/** Talk script for the show-off NPC: stg7_pik_clear_19. */
+/** Talk script for the dandy in the hotel, who is smitten with the receptionist (stg7_pik_clear_19). */
 static EVT_BEGIN(talk_kiza)
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_19"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the street: the souvenir shop owner, the Traveling Sisters 3, two of the Ta-kun (Herringway's
+ * relatives), the hotel receptionist and the French-accented dandy (キザ野郎).
+ */
 static NpcSetupInfo npc_data[] = {
     {
         "土産屋", // name
@@ -1132,6 +1170,10 @@ EVT_BEGIN(evt_kinopio_from_bed)
     RETURN
 EVT_END()
 
+/**
+ * Inn data of the hotel: the price of a night, the bed, the bedside and camera positions, the clerk and the
+ * 14 inn messages.
+ */
 static KinopioData kino_dt = {
     221, // breakfastItem
     {360.0f, 33.0f, -235.0f}, // breakfastPos
@@ -1152,9 +1194,9 @@ static KinopioData kino_dt = {
 };
 
 /**
- * Guess: creates the epilogue's X-Naut cast: Grodus (シュリョー, c_shuryo) and Lord Crump (カンブー, c_kanbu_ibt),
- * and the soldiers 軍団Ａ to Ｅ (grunts, a researcher, an elite and others) with their positions,
- * facings and animations.
+ * Creates the epilogue cast: Grodus (シュリョー, c_shuryo, tribe 第三勢力総統), Lord Crump (カンブー, c_kanbu_ibt), the
+ * X-Nauts 軍団Ａ to Ｅ (A and D plain X-Nauts, B a researcher, C and E elites) and Pennington (ポワン, c_powan),
+ * with their positions and facings.
  */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("シュリョー"), STRING("c_shuryo"))
@@ -1198,9 +1240,10 @@ static EVT_BEGIN(epilogue_npc_entry)
 EVT_END()
 
 /**
- * Guess: choreography beside the epilogue: Grodus hops up and down three times, Crump turns and calls,
- * the X-Naut soldiers start their P_1 animation with the BATTEN sound,
- * and the group moves about (jumps, turns) in loops.
+ * Background action for the epilogue narration (ep_44, about Crump and Grodus still being around):
+ * Grodus hops in place three times and Crump plays his T_1 talk animation for 1.5 s,
+ * then the five X-Nauts play P_1 to the SFX_EVT_EPILOGUE_3RD_BATTEN1 sound,
+ * and the Grodus hops and Crump talk repeat forever.
  */
 static EVT_BEGIN(epilogue_evt_sub)
     WAIT_MS(500)

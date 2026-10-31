@@ -11,6 +11,7 @@
 static void effBreathFireMain(EffectEntry* effect);
 static void effBreathFireDisp(CameraId cameraId, EffectEntry* effect);
 
+/** Mesh of a fire-breath flame: two stacked quads whose texture strip frame advances as the flame ages. */
 static effN64Vtx stg_fire_breath_v[] = {
     {100, -100, 0, 3072, 0, 0, 0, 0, 255},
     {100, 100, 0, 3072, 1024, 0, 0, 0, 255},

@@ -1,4 +1,4 @@
-// Pokey Mummy (sambo_mummy): enemy battle unit; Riverside Station's copy of the unit data and scripts.
+// Poison Pokey (sambo_mummy): enemy battle unit; Riverside Station's copy of the unit data and scripts.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -12,6 +12,12 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
+
+// Unit work slots of the Dry Pokey (LW(10) in the damage scripts and the summoned LW(3) are Dry Pokeys too).
+enum {
+    UW_SAMBO_MUMMY_SEGMENTS = 0,   // body segments left, 4 down to 1; sets its height (_body_param_set)
+    UW_SAMBO_MUMMY_GENERATION = 1, // 0 for a Dry Pokey that starts the battle, the caller's plus one when summoned; only 0 and 1 call friends
+};
 
 BattleUnitKind unit_sambo_mummy;
 static BattleUnitDefense defence;
@@ -48,8 +54,9 @@ static EvtWord wait_event[36];
 static EvtWord sambo_rabbit_move[74];
 static EvtWord _body_param_set[49];
 
+/** Unit data of the Poison Pokey: 8 HP, level 23; the battle starts it from init_event. */
 BattleUnitKind unit_sambo_mummy = {
-    104,
+    UNIT_POISON_POKEY,
     "btl_un_sambo_mummy",
     8,
     0,
@@ -114,16 +121,30 @@ BattleUnitKind unit_sambo_mummy = {
     data_table,
 };
 
+/** Defence of the Poison Pokey: none against any element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Elemental reactions of the Poison Pokey: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Poison Pokey (percent, 100 is normal) in the demo builds: resists most statuses
+ * (30-95%).
+ */
 static StatusVulnerability regist = {70, 60, 60, 100, 70, 100, 100, 30, 100, 70, 100, 70, 100, 70, 70, 80, 70, 100, 70, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Poison Pokey (percent, 100 is normal) in the retail builds: resists most
+ * statuses (40-95%).
+ */
 static StatusVulnerability regist = {75, 60, 60, 100, 70, 100, 100, 40, 100, 85, 100, 85, 100, 90, 70, 80, 70, 100, 70, 100, 100, 95};
 #endif
 
+/**
+ * Weapon data for the Poison Pokey's head slam when it has 4 segments: 4 damage, one target, may inflict
+ * poison (60%).
+ */
 static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -146,7 +167,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -167,6 +188,10 @@ static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon data for the Poison Pokey's head slam when it has 3 segments: 4 damage, one target, may inflict
+ * poison (60%).
+ */
 static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -189,7 +214,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -210,6 +235,10 @@ static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon data for the Poison Pokey's head slam when it has 2 segments: 4 damage, a shell-toss-type hit, one
+ * target, may inflict poison (60%).
+ */
 static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -232,7 +261,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -253,6 +282,10 @@ static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon data for the Poison Pokey's lone-head hop attack, used when it has one segment left: 5 damage, a
+ * shell-toss-type hit, one target, may inflict poison (60%).
+ */
 static BattleWeapon weapon_sambo_mummy_head_attack_1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -271,7 +304,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -292,6 +325,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_1 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the Poison Pokey's segment throw when it has 4 segments: 3 damage, one target. */
 static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -314,7 +348,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -332,6 +366,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the Poison Pokey's segment throw when it has 3 segments: 3 damage, one target. */
 static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -354,7 +389,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -372,6 +407,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the Poison Pokey's segment throw when it has 2 segments: 3 damage, one target. */
 static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -394,7 +430,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -412,102 +448,116 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Poison Pokey while it stands with 4 segments. */
 static PoseTableEntry pose_table_body4[] = {
-    {1, "SNB_N_1"},
-    {2, "SNB_Y_1"},
-    {9, "SNB_Y_1"},
-    {5, "SNB_K_1"},
-    {4, "SNB_X_1"},
-    {3, "SNB_X_1"},
-    {28, "SNB_S_1"},
+    {STATUS_SLEEP, "SNB_N_1"},
+    {STATUS_STOP, "SNB_Y_1"},
+    {STATUS_FREEZE, "SNB_Y_1"},
+    {STATUS_CONFUSE, "SNB_K_1"},
+    {STATUS_POISON, "SNB_X_1"},
+    {STATUS_DIZZY, "SNB_X_1"},
+    {BTL_POSE_NORMAL, "SNB_S_1"},
     {29, "SNB_Q_1"},
     {30, "SNB_Q_1"},
     {31, "SNB_S_1"},
-    {39, "SNB_D_1"},
+    {BTL_POSE_DAMAGE, "SNB_D_1"},
     {47, "SNB_W_1"},
-    {42, "SNB_W_1"},
-    {40, "SNB_W_1"},
-    {56, "SNB_X_1"},
-    {57, "SNB_X_1"},
+    {BTL_POSE_RUN, "SNB_W_1"},
+    {BTL_POSE_WALK, "SNB_W_1"},
+    {BTL_POSE_DANGER, "SNB_X_1"},
+    {BTL_POSE_PERIL, "SNB_X_1"},
     {BTL_POSE_TALK, "SNB_T_1"},
     {BTL_POSE_STAY_DEFAULT, "SNB_S_1"},
 };
 
+/** Pose table of the Poison Pokey while it stands with 3 segments. */
 static PoseTableEntry pose_table_body3[] = {
-    {1, "SNB_N_2"},
-    {2, "SNB_Y_2"},
-    {9, "SNB_Y_2"},
-    {5, "SNB_K_2"},
-    {4, "SNB_X_2"},
-    {3, "SNB_X_2"},
-    {28, "SNB_S_2"},
+    {STATUS_SLEEP, "SNB_N_2"},
+    {STATUS_STOP, "SNB_Y_2"},
+    {STATUS_FREEZE, "SNB_Y_2"},
+    {STATUS_CONFUSE, "SNB_K_2"},
+    {STATUS_POISON, "SNB_X_2"},
+    {STATUS_DIZZY, "SNB_X_2"},
+    {BTL_POSE_NORMAL, "SNB_S_2"},
     {29, "SNB_Q_2"},
     {30, "SNB_Q_2"},
     {31, "SNB_S_2"},
-    {39, "SNB_D_2"},
+    {BTL_POSE_DAMAGE, "SNB_D_2"},
     {47, "SNB_W_2"},
     {50, "SNB_A_1A"},
     {51, "SNB_A_1B"},
-    {42, "SNB_W_2"},
-    {40, "SNB_W_2"},
-    {56, "SNB_X_2"},
-    {57, "SNB_X_2"},
+    {BTL_POSE_RUN, "SNB_W_2"},
+    {BTL_POSE_WALK, "SNB_W_2"},
+    {BTL_POSE_DANGER, "SNB_X_2"},
+    {BTL_POSE_PERIL, "SNB_X_2"},
     {BTL_POSE_TALK, "SNB_T_2"},
     {BTL_POSE_STAY_DEFAULT, "SNB_S_2"},
 };
 
+/** Pose table of the Poison Pokey while it stands with 2 segments. */
 static PoseTableEntry pose_table_body2[] = {
-    {1, "SNB_N_3"},
-    {2, "SNB_Y_3"},
-    {9, "SNB_Y_3"},
-    {5, "SNB_K_3"},
-    {4, "SNB_X_3"},
-    {3, "SNB_X_3"},
-    {28, "SNB_S_3"},
+    {STATUS_SLEEP, "SNB_N_3"},
+    {STATUS_STOP, "SNB_Y_3"},
+    {STATUS_FREEZE, "SNB_Y_3"},
+    {STATUS_CONFUSE, "SNB_K_3"},
+    {STATUS_POISON, "SNB_X_3"},
+    {STATUS_DIZZY, "SNB_X_3"},
+    {BTL_POSE_NORMAL, "SNB_S_3"},
     {29, "SNB_Q_3"},
     {30, "SNB_Q_3"},
     {31, "SNB_S_3"},
-    {39, "SNB_D_3"},
+    {BTL_POSE_DAMAGE, "SNB_D_3"},
     {47, "SNB_W_3"},
     {50, "SNB_A_2A"},
     {51, "SNB_A_2B"},
-    {42, "SNB_W_3"},
-    {40, "SNB_W_3"},
-    {56, "SNB_X_3"},
-    {57, "SNB_X_3"},
+    {BTL_POSE_RUN, "SNB_W_3"},
+    {BTL_POSE_WALK, "SNB_W_3"},
+    {BTL_POSE_DANGER, "SNB_X_3"},
+    {BTL_POSE_PERIL, "SNB_X_3"},
     {BTL_POSE_TALK, "SNB_T_3"},
     {BTL_POSE_STAY_DEFAULT, "SNB_S_3"},
 };
 
+/** Pose table of the Poison Pokey while it stands with 1 segment. */
 static PoseTableEntry pose_table_body1[] = {
-    {1, "SNB_N_4"},
-    {2, "SNB_Y_4"},
-    {9, "SNB_Y_4"},
-    {5, "SNB_K_4"},
-    {4, "SNB_X_4"},
-    {3, "SNB_X_4"},
-    {28, "SNB_S_4"},
+    {STATUS_SLEEP, "SNB_N_4"},
+    {STATUS_STOP, "SNB_Y_4"},
+    {STATUS_FREEZE, "SNB_Y_4"},
+    {STATUS_CONFUSE, "SNB_K_4"},
+    {STATUS_POISON, "SNB_X_4"},
+    {STATUS_DIZZY, "SNB_X_4"},
+    {BTL_POSE_NORMAL, "SNB_S_4"},
     {29, "SNB_Q_4"},
     {30, "SNB_Q_4"},
     {31, "SNB_S_4"},
-    {39, "SNB_D_4"},
+    {BTL_POSE_DAMAGE, "SNB_D_4"},
     {47, "SNB_W_4"},
     {50, "SNB_A_3A"},
     {51, "SNB_A_3B"},
-    {42, "SNB_W_4"},
-    {40, "SNB_W_4"},
-    {56, "SNB_X_4"},
-    {57, "SNB_X_4"},
+    {BTL_POSE_RUN, "SNB_W_4"},
+    {BTL_POSE_WALK, "SNB_W_4"},
+    {BTL_POSE_DANGER, "SNB_X_4"},
+    {BTL_POSE_PERIL, "SNB_X_4"},
     {BTL_POSE_TALK, "SNB_T_4"},
     {BTL_POSE_STAY_DEFAULT, "SNB_S_4"},
 };
 
+/**
+ * Pose table of the Poison Pokey's hidden body parts and the thrown segment: they all just show the segment
+ * pose (SNB_B_1).
+ */
 static PoseTableEntry pose_table_parts[] = {
-    {28, "SNB_B_1"},
-    {39, "SNB_B_1"},
+    {BTL_POSE_NORMAL, "SNB_B_1"},
+    {BTL_POSE_DAMAGE, "SNB_B_1"},
     {BTL_POSE_STAY_DEFAULT, "SNB_B_1"},
 };
 
+/**
+ * Event table of the Poison Pokey: the spike counters (tags 37 and 39, dmg_avoid_counter_thorn_side_event),
+ * knockback hits (damage patterns 15 and 17) (damage_event_bodylost, tag 19), Super Hammer and Ultra Hammer
+ * knockback (damage_event_bodylost_blow, tag 18), Koops' shell hits (damage_event_bodylost, tag 16), the
+ * First Strike reaction (does nothing) and Yoshi's Gulp (damage_swallow_body, tag 54).
+ */
 static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_side_event},
     {39, dmg_avoid_counter_thorn_side_event},
@@ -519,16 +569,20 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Parts of the Poison Pokey: parts 1 to 4 are its body as it stands with 4, 3, 2 and 1 segments (only the
+ * current one can be targeted) and part 5 is the segment it throws or loses.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 84.0f, 0.0f, 0.0f, 90.0f, 0.0f, 20, 90, 255, &defence, &defence_attr, 0x9, 0x5, pose_table_body4},
-    {2, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 64.0f, 0.0f, 0.0f, 70.0f, 0.0f, 20, 70, 255, &defence, &defence_attr, 0x3010000, 0x5, pose_table_body3},
-    {3, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 44.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 50, 255, &defence, &defence_attr, 0x3010000, 0x5, pose_table_body2},
-    {4, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 24.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010000, 0x5, pose_table_body1},
-    {5, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_parts},
+    {1, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 84.0f, 0.0f, 0.0f, 90.0f, 0.0f, 20, 90, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_TOP_SPIKY | COUNTER_ATTR_FRONT_SPIKY, pose_table_body4},
+    {2, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 64.0f, 0.0f, 0.0f, 70.0f, 0.0f, 20, 70, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, COUNTER_ATTR_TOP_SPIKY | COUNTER_ATTR_FRONT_SPIKY, pose_table_body3},
+    {3, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 44.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 50, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, COUNTER_ATTR_TOP_SPIKY | COUNTER_ATTR_FRONT_SPIKY, pose_table_body2},
+    {4, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 24.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, COUNTER_ATTR_TOP_SPIKY | COUNTER_ATTR_FRONT_SPIKY, pose_table_body1},
+    {5, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table_parts},
 };
 
 /**
- * Init script of the Pokey Mummy.
+ * Init script of the Poison Pokey.
  * Registers its wait, attack, damage and confusion scripts, starts it with 4 body segments (unit work 0),
  * sets its height from that count through _body_param_set,
  * clears unit work 1 (the number of friends it has called), and sets its run and walk sounds.
@@ -538,9 +592,9 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 4)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, 4)
     CALL_CHILD(_body_param_set)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_GENERATION, 0)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 5, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_MOVE1"), STRING("SFX_ENM_SAMBO_MOVE1"), 0, 6, 6)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_MOVE1"), STRING("SFX_ENM_SAMBO_MOVE1"), 0, 6, 6)
@@ -549,7 +603,9 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Shown when an attacker avoids counter damage from the Pokey Mummy's thorns (data table entry):
+ * Data-table events 37 and 39, which the default damage event runs
+ * when an attacker was hurt by the Poison Pokey's
+ * top or front spikes (counter hits 0x1F and 0x21):
  * plays the side-hit pose 47 and flashes the toge_flush thorn effect at the height of the stack (unit height
  * scaled by its status scale), then waits 60 frames.
  */
@@ -568,12 +624,13 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_side_event)
 EVT_END()
 
 /**
- * Damage reaction of the Pokey Mummy: picks the part index to damage from the number of body segments left (unit
+ * Damage reaction of the Poison Pokey: picks the part index to damage from the number of body segments left
+ * (unit
  * work 0: 1 segment is part 4, 2 is 3, 3 is 2, otherwise 1) and runs the default damage script.
  */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
         SET_VALUE(LW(11), 4)
@@ -589,14 +646,14 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Damage reaction that knocks a segment off the Pokey Mummy's stack.
+ * Damage reaction that knocks a segment off the Poison Pokey's stack.
  * With one segment left (unit work 0 is 1) it only plays the damage pose;
  * otherwise it drops one segment (unit work 0 minus 1), recomputes the height with _body_param_set,
  * moves the status icon, cut and kiss offsets for the shorter stack and hands the hit to the next part down.
  * The lost segment (part 5) hops to the floor twice and blinks 40 times before disappearing.
  */
 static EVT_BEGIN(damage_event_bodylost)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_GetDamage, LW(10), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -611,9 +668,9 @@ static EVT_BEGIN(damage_event_bodylost)
         END_IF
     ELSE
         SET_VALUE(LW(12), LW(11))
-        CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, LW(10), UW_SAMBO_MUMMY_SEGMENTS, LW(0))
         SUBTRACT(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, LW(10), 0, LW(0))
+        CALL(btlevtcmd_SetUnitWork, LW(10), UW_SAMBO_MUMMY_SEGMENTS, LW(0))
         CALL_CHILD(_body_param_set)
         SWITCH(LW(0))
             CASE_EQUAL(1)
@@ -639,10 +696,10 @@ static EVT_BEGIN(damage_event_bodylost)
             CALL(btlevtcmd_SetCutBaseOffset, BTL_UNIT_SELF, 0, 40, 0)
             CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 10, 52, 0)
         END_SWITCH
-        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(12), 9)
-        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(12), 50397184)
-        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 9)
-        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 16842752)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(12), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(12), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN)
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(4)
@@ -650,7 +707,7 @@ static EVT_BEGIN(damage_event_bodylost)
         END_SIBLING_EVENT
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPartsPos, LW(10), 5, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsFallAccel, LW(10), 5, FLOAT(0.39941406f))
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), 25)
@@ -659,18 +716,18 @@ static EVT_BEGIN(damage_event_bodylost)
         CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), 16)
         CALL(btlevtcmd_JumpPartsPosition, LW(10), 5, LW(0), LW(1), LW(2), 12, -1)
         LOOP(40)
-            CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, 16777216)
+            CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, 16777216)
+            CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
     END_IF
     RETURN
 EVT_END()
 
 /**
- * Shared helper for the Pokey Mummy's segment loss:
+ * Shared helper for the Poison Pokey's segment loss:
  * plays the hurt pose (LW(14)), lifts the unit 18 units and lets it drop
  * and wobble back to its height over about 20 frames in small SetPos steps.
  */
@@ -718,14 +775,18 @@ static EVT_BEGIN(subset_dmg_sambo_fall)
 EVT_END()
 
 /**
- * Like damage_event_bodylost, but for the Ultra Hammer style blow-away damage.
+ * Data-table event 18, which the damage subset runs for a Super Hammer (damage pattern 14) or Ultra Hammer
+ * (pattern 16) hit: like damage_event_bodylost, but the segment is knocked away.
  * With one segment left it plays the shot-damage subscript;
  * otherwise it removes a segment as before, then sends the lost segment (part 5) bouncing from enemy to enemy,
- * damaging each with the Ultra Hammer (or Spin Hammer, Guess: for damage pattern 15) weapon data,
- * until it lands off the stage.
+ * damaging each with marioWeapon_UltraHammerInvolved (marioWeapon_KaitenHammerInvolved, the Super Hammer's
+ * knock-on weapon, when the damage pattern is 15), until it lands off the stage; after an Ultra Hammer hit
+ * the Pokey also takes marioWeapon_UltraHammerFinish.
  */
 static EVT_BEGIN(damage_event_bodylost_blow)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    // With only the head left (unit work 0 is 1) the hit just plays the shot reaction, or the no-damage
+    // flinch.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_GetDamage, LW(10), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -734,11 +795,14 @@ static EVT_BEGIN(damage_event_bodylost_blow)
             CALL_CHILD(subsetevt_nodamage_motion)
         END_IF
     ELSE
+        // Otherwise the Pokey loses its top segment: its segment count drops by one.
         SET_VALUE(LW(12), LW(11))
-        CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, LW(10), UW_SAMBO_MUMMY_SEGMENTS, LW(0))
         SUBTRACT(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, LW(10), 0, LW(0))
+        CALL(btlevtcmd_SetUnitWork, LW(10), UW_SAMBO_MUMMY_SEGMENTS, LW(0))
         CALL_CHILD(_body_param_set)
+        // The shorter stack gets its own status icon, cut and kiss offsets, and the next segment down becomes
+        // the top.
         SWITCH(LW(0))
             CASE_EQUAL(1)
             SET_VALUE(LW(11), 4)
@@ -763,18 +827,22 @@ static EVT_BEGIN(damage_event_bodylost_blow)
             CALL(btlevtcmd_SetCutBaseOffset, BTL_UNIT_SELF, 0, 40, 0)
             CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 10, 52, 0)
         END_SWITCH
-        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(12), 9)
-        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(12), 50397184)
-        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 9)
-        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 16842752)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(12), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(12), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN)
+        // The remaining segments drop down a level.
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(4)
             CALL_CHILD(subset_dmg_sambo_fall)
         END_SIBLING_EVENT
+        // The knocked-off segment (part 5) starts flying from the Pokey, hit by the hammer.
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPartsPos, LW(10), 5, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
+        // A Super Hammer hit (damage pattern 15) uses the Super Hammer knock-on weapon; an Ultra Hammer hit
+        // uses the Ultra Hammer one.
         CALL(btlevtcmd_CheckDamagePattern, LW(10), 15, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(13), PTR(&marioWeapon_KaitenHammerInvolved))
@@ -793,6 +861,7 @@ static EVT_BEGIN(damage_event_bodylost_blow)
             CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
             GOTO(0)
         END_IF
+        // The segment flies from unit to unit, damaging each one it lands on.
         LABEL(10)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_INT_EQUAL(LW(3), -1)
@@ -803,8 +872,9 @@ static EVT_BEGIN(damage_event_bodylost_blow)
         ADD(LW(1), 15)
         CALL(btlevtcmd_JumpPartsSetting, LW(10), 5, 0, FLOAT(5.0f), FLOAT(0.009765625f))
         CALL(btlevtcmd_JumpPartsPosition, LW(10), 5, LW(0), LW(1), LW(2), 0, -1)
-        CALL(btlevtcmd_CheckDamage, LW(10), LW(3), LW(4), LW(13), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, LW(10), LW(3), LW(4), LW(13), DAMAGE_FLAG_LAST_HIT, LW(5))
         GOTO(10)
+        // It finally sails off the stage and lands out of sight.
         LABEL(50)
         CALL(btlevtcmd_GetStageSize, LW(5), EVT_NULLPTR, EVT_NULLPTR)
         SET_VALUE(LW(0), 0)
@@ -812,17 +882,18 @@ static EVT_BEGIN(damage_event_bodylost_blow)
         CALL(btlevtcmd_GetPos, LW(10), EVT_NULLPTR, LW(1), EVT_NULLPTR)
         CALL(btlevtcmd_JumpPartsSetting, LW(10), 5, 0, FLOAT(5.0f), FLOAT(0.009765625f))
         CALL(btlevtcmd_JumpPartsPosition, LW(10), 5, LW(0), LW(1), LW(2), 0, -1)
-        CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
+        // After an Ultra Hammer hit the Pokey itself also takes the finishing hit.
         CALL(btlevtcmd_CheckDamagePattern, LW(10), 16, LW(5))
         IF_INT_NOT_EQUAL(LW(5), 0)
-            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), PTR(marioWeapon_UltraHammerFinish), 131328, LW(5))
+            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), PTR(marioWeapon_UltraHammerFinish), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
         END_IF
     END_IF
     RETURN
 EVT_END()
 
 /**
- * Damage reaction when the Pokey Mummy is swallowed (Yoshi's Gulp):
+ * Damage reaction when the Poison Pokey is swallowed (Yoshi's Gulp):
  * with one segment left it plays the hurt pose 39,
  * otherwise the segment handling of damage_event_bodylost applies (a segment is dropped,
  * the height and hit offsets shrink to the shorter stack,
@@ -831,7 +902,7 @@ EVT_END()
 static EVT_BEGIN(damage_swallow_body)
     SET_VALUE(LW(14), 39)
     SET_VALUE(LW(15), -1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_GetDamage, LW(10), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -847,9 +918,9 @@ static EVT_BEGIN(damage_swallow_body)
     ELSE
         WAIT_FRAMES(3)
         SET_VALUE(LW(12), LW(11))
-        CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, LW(10), UW_SAMBO_MUMMY_SEGMENTS, LW(0))
         SUBTRACT(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, LW(10), 0, LW(0))
+        CALL(btlevtcmd_SetUnitWork, LW(10), UW_SAMBO_MUMMY_SEGMENTS, LW(0))
         CALL_CHILD(_body_param_set)
         SWITCH(LW(0))
             CASE_EQUAL(1)
@@ -877,10 +948,10 @@ static EVT_BEGIN(damage_swallow_body)
         END_SWITCH
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(3)
-            CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(12), 9)
-            CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(12), 50397184)
-            CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 9)
-            CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 16842752)
+            CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(12), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+            CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(12), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
+            CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+            CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN)
             CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
             WAIT_FRAMES(1)
             CALL_CHILD(subset_dmg_sambo_fall)
@@ -888,19 +959,19 @@ static EVT_BEGIN(damage_swallow_body)
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPartsPos, LW(10), 5, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 25)
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 5, LW(0), LW(1), LW(2), 5, 0, 0, 0, -1)
-        CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, LW(10), 5, PART_ATTR_HIDDEN)
         WAIT_FRAMES(20)
     END_IF
     RETURN
 EVT_END()
 
 /**
- * Turn script of the Pokey Mummy. After an item-use check it works from the segment count (unit work 0).
+ * Turn script of the Poison Pokey. After an item-use check it works from the segment count (unit work 0).
  * With a full stack of 4 and at most one friend called so far,
  * it has a 20 percent chance to call a friend (call_friend_event) if there is room beside it.
  * With 2 or more segments it then rolls 0 to 69 and, on 30 or less,
@@ -915,7 +986,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(10))
     SWITCH(LW(10))
         CASE_EQUAL(1)
         SET_VALUE(LW(11), 4)
@@ -927,7 +998,7 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(11), 1)
     END_SWITCH
     IF_INT_EQUAL(LW(10), 4)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_GENERATION, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 1)
             CALL(evt_sub_random, 99, LW(0))
             IF_INT_LESS(LW(0), 20)
@@ -977,14 +1048,15 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 /**
- * The Pokey Mummy's attack with its top segments.
+ * The Poison Pokey's attack with its top segments.
  * It picks the weapon for the current segment count (weapon_sambo_mummy_head_attack_2 to _4),
  * samples a target and attacks it, with the avoid,
  * hit and guard results taken from the pre-damage check and the action command defence.
  */
 static EVT_BEGIN(attack_head_2_event)
     SET_VALUE(LW(6), LW(11))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(5))
+    // The attack depends on how many segments the Pokey has (4, 3 or 2): pick the weapon and a target.
     SWITCH(LW(10))
         CASE_EQUAL(4)
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -999,14 +1071,16 @@ static EVT_BEGIN(attack_head_2_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sambo_mummy_head_attack_2))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_mummy_head_attack_2), LW(3), LW(4))
     END_SWITCH
+    // No valid target: a confused Pokey is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens; the weapon cost is paid.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     SWITCH(LW(10))
@@ -1020,10 +1094,12 @@ static EVT_BEGIN(attack_head_2_event)
         CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_sambo_mummy_head_attack_2))
         CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_mummy_head_attack_2))
     END_SWITCH
+    // The camera follows the Pokey.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // It walks up to the target; the taller the stack, the farther back it stops.
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     SWITCH(LW(10))
         CASE_EQUAL(4)
@@ -1045,14 +1121,15 @@ static EVT_BEGIN(attack_head_2_event)
             CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 14)
         END_IF
     END_SWITCH
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), BTL_POSE_WALK)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(2.0f))
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), BTL_POSE_STAY)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
+    // Wind-up: it leans back, away from the target.
     SET_VALUE(LW(14), 40)
     IF_INT_EQUAL(LW(15), -1)
         SET_VALUE(LW(14), -40)
@@ -1067,6 +1144,7 @@ static EVT_BEGIN(attack_head_2_event)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
+    // It whips its stack forward, slamming its top segments down toward the target.
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     SET_VALUE(LW(13), 40)
     SET_VALUE(LW(14), -90)
@@ -1085,12 +1163,13 @@ static EVT_BEGIN(attack_head_2_event)
     END_IF
     SWITCH(LW(10))
         CASE_EQUAL(4)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_4), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_4), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_EQUAL(3)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_3), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_3), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_EQUAL(2)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_2), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_2), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_SWITCH
+    // Hit check: a miss lets the target avoid, a hit goes on to the damage.
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1113,6 +1192,7 @@ static EVT_BEGIN(attack_head_2_event)
         CASE_END
     END_SWITCH
     LABEL(90)
+    // The stack swings back up toward upright.
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     SET_VALUE(LW(14), -90)
     IF_INT_EQUAL(LW(15), -1)
@@ -1129,19 +1209,21 @@ static EVT_BEGIN(attack_head_2_event)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+    // The damage is dealt with the action-command result.
     SWITCH(LW(10))
         CASE_EQUAL(4)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_mummy_head_attack_4))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_4), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_4), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_EQUAL(3)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_mummy_head_attack_3))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_3), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_3), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_EQUAL(2)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_mummy_head_attack_2))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_2), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_2), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_SWITCH
+    // It flops over, then slowly pulls itself upright again.
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 90)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), BTL_POSE_STAY)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     SET_VALUE(LW(14), -90)
@@ -1157,6 +1239,7 @@ static EVT_BEGIN(attack_head_2_event)
         GOTO(5)
     END_IF
     LABEL(98)
+    // Retreat: it walks back to its home position.
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), 41)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
@@ -1169,22 +1252,25 @@ static EVT_BEGIN(attack_head_2_event)
 EVT_END()
 
 /**
- * The attack of a Pokey Mummy with a single segment left (weapon_sambo_mummy_head_attack_1):
+ * The attack of a Poison Pokey with a single segment left (weapon_sambo_mummy_head_attack_1):
  * it hops toward its target with sambo_rabbit_move, then hits it, with avoid,
  * guard and hit results from the pre-damage check and the action command defence, and hops home.
  */
 static EVT_BEGIN(attack_head_1_event)
+    // A Pokey reduced to a single segment attacks alone: it chooses a target.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sambo_mummy_head_attack_1))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_mummy_head_attack_1), LW(3), LW(4))
+    // No valid target: a confused Pokey is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens; the camera follows the Pokey.
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sambo_mummy_head_attack_1))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
@@ -1193,6 +1279,7 @@ static EVT_BEGIN(attack_head_1_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Wind-up: the head hops across the floor toward the target in short bounces.
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(2.0f))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(5), LW(6), LW(7))
@@ -1201,7 +1288,8 @@ static EVT_BEGIN(attack_head_1_event)
     SET_VALUE(LW(8), 35)
     CALL_CHILD(sambo_rabbit_move)
     WAIT_FRAMES(10)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_1), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_1), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // Hit check: a miss lets the target avoid, a hit goes on to the damage.
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1224,6 +1312,7 @@ static EVT_BEGIN(attack_head_1_event)
         CASE_END
     END_SWITCH
     LABEL(90)
+    // Miss: the head springs over the target, somersaulting, and lands behind it.
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 5)
@@ -1277,6 +1366,7 @@ static EVT_BEGIN(attack_head_1_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     GOTO(98)
     LABEL(91)
+    // Hit: the head leaps at the target and butts into it; the camera shakes and the damage is dealt.
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(1), 10)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
@@ -1302,8 +1392,9 @@ static EVT_BEGIN(attack_head_1_event)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sambo_mummy_head_attack_1))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_1), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_head_attack_1), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(evt_btl_camera_set_mode, 0, 0)
+    // It lands and bounces back in four shrinking hops.
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.89941406f))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1320,9 +1411,10 @@ static EVT_BEGIN(attack_head_1_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 4, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 4, BTL_POSE_STAY)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
+    // Retreat: it hops back to its home position.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 4, 41)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
@@ -1336,12 +1428,15 @@ static EVT_BEGIN(attack_head_1_event)
 EVT_END()
 
 /**
- * Spike attack of the Pokey Mummy (weapon_sambo_mummy_spike_attack_2 to _4, by segment count).
- * Guess: the stack bends over (SNB_B_1) and slams its spiked top onto the target, with the avoid,
- * guard and hit results from the pre- damage check and the action command defence.
+ * Spike attack of the Poison Pokey (weapon_sambo_mummy_spike_attack_2 to _4, by segment count).
+ * The Poison Pokey throws one of its segments: it loses a segment (unit work 0 drops by one, the body is resized
+ * by _body_param_set), and the thrown segment (part 5, pose SNB_B_1) hops off its top and flies at the target,
+ * which dodges, guards or takes the hit (pre-damage check and action-command defence). On a hit the segment
+ * bounces back and rolls away; on a miss it flies on off the stage. It is hidden afterwards.
  */
 static EVT_BEGIN(attack_spike_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
+    // The throw depends on how many segments the Pokey has left (unit work 0): pick the weapon and a target.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(10))
     SWITCH(LW(10))
         CASE_EQUAL(4)
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -1356,14 +1451,16 @@ static EVT_BEGIN(attack_spike_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sambo_mummy_spike_attack_2))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_mummy_spike_attack_2), LW(3), LW(4))
     END_SWITCH
+    // No valid target: a confused Pokey is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens; the weapon cost is paid.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     SWITCH(LW(10))
@@ -1379,15 +1476,18 @@ static EVT_BEGIN(attack_spike_event)
     END_SWITCH
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(0))
+    // The thrown segment is drawn smaller when the Pokey is shrunk.
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_SetPartsScale, BTL_UNIT_SELF, 5, FLOAT(0.69921875f), FLOAT(0.69921875f), FLOAT(1.0f))
     ELSE
         CALL(btlevtcmd_SetPartsScale, BTL_UNIT_SELF, 5, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
+    // The Pokey gives up its top segment: the stack shrinks by one and its parts, icons and hit offsets are
+    // resized.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(10))
     SUBTRACT(LW(10), 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(10))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(10))
     CALL_CHILD(_body_param_set)
     SWITCH(LW(10))
         CASE_EQUAL(3)
@@ -1411,11 +1511,12 @@ static EVT_BEGIN(attack_spike_event)
         CALL(btlevtcmd_SetCutBaseOffset, BTL_UNIT_SELF, 0, 10, 0)
         CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 10, 16, 0)
     END_SWITCH
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(7), 9)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), 50397184)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(6), 9)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(6), 16842752)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(7), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(6), PART_ATTR_MAIN | PART_ATTR_GUARD_COVER)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(6), PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(5))
+    // The segment (part 5) hops off the top of the stack.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         IF_INT_EQUAL(LW(5), 0)
@@ -1429,11 +1530,12 @@ static EVT_BEGIN(attack_spike_event)
         SUBTRACT(LW(9), LW(11))
         ADD(LW(1), LW(9))
         CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 5, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 5, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsFallAccel, BTL_UNIT_SELF, 5, FLOAT(0.5996094f))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, STRING("SNB_B_1"))
         CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 5, LW(0), LW(1), LW(2), 30, -1)
     END_SIBLING_EVENT
+    // The Pokey winds up and hurls the segment at the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_ATTACK3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), 50)
     WAIT_FRAMES(24)
@@ -1444,12 +1546,13 @@ static EVT_BEGIN(attack_spike_event)
     WAIT_FRAMES(5)
     SWITCH(LW(10))
         CASE_EQUAL(3)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_spike_attack_4), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_spike_attack_4), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_EQUAL(2)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_spike_attack_3), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_spike_attack_3), DAMAGE_FLAG_LAST_HIT, LW(5))
         CASE_EQUAL(1)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_spike_attack_2), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sambo_mummy_spike_attack_2), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_SWITCH
+    // Hit check: a miss lets the target avoid, a hit goes on to the damage.
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1472,6 +1575,7 @@ static EVT_BEGIN(attack_spike_event)
         CASE_END
     END_SWITCH
     LABEL(90)
+    // Miss: the segment sails past the target and off the edge of the stage, then is hidden.
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(0), EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(9))
@@ -1481,9 +1585,10 @@ static EVT_BEGIN(attack_spike_event)
     CALL(btlevtcmd_SetPartsFallAccel, BTL_UNIT_SELF, 5, FLOAT(0.099609375f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 5, LW(0), LW(1), LW(2), 0, -1)
     CALL(evt_snd_sfxoff, LW(14))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, PART_ATTR_HIDDEN)
     GOTO(99)
     LABEL(91)
+    // Hit: the segment crashes into the target, the camera shakes and the damage is dealt.
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPartsMoveSpeed, BTL_UNIT_SELF, 5, FLOAT(10.0f))
     CALL(btlevtcmd_SetPartsFallAccel, BTL_UNIT_SELF, 5, FLOAT(0.099609375f))
@@ -1500,8 +1605,9 @@ static EVT_BEGIN(attack_spike_event)
         SET_VALUE(LW(12), PTR(&weapon_sambo_mummy_spike_attack_2))
     END_SWITCH
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), 43)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(6), BTL_POSE_STAY)
+    // On a Superguard the segment ricochets back and hits the Pokey itself.
     IF_INT_EQUAL(LW(5), 21)
         CALL(evt_snd_sfxoff, LW(14))
         CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(11))
@@ -1522,11 +1628,12 @@ static EVT_BEGIN(attack_spike_event)
             CALL(btlevtcmd_SetPartsMoveSpeed, BTL_UNIT_SELF, 5, FLOAT(1.5f))
             CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
             CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 5, LW(0), LW(1), LW(2), 0, 20, 0, 0, -1)
-            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
+            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, PART_ATTR_HIDDEN)
         END_INLINE_EVENT
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, LW(11), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, LW(11), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
+    // Otherwise the segment bounces off the target and rolls away across the floor, then is hidden.
     CALL(evt_snd_sfxoff, LW(14))
     CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 5, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 55)
@@ -1540,7 +1647,7 @@ static EVT_BEGIN(attack_spike_event)
     CALL(btlevtcmd_SetPartsMoveSpeed, BTL_UNIT_SELF, 5, FLOAT(1.5f))
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 20)
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 5, LW(0), LW(1), LW(2), 0, 20, 0, 0, -1)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, 16777216)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 5, PART_ATTR_HIDDEN)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     LABEL(99)
@@ -1550,11 +1657,12 @@ static EVT_BEGIN(attack_spike_event)
 EVT_END()
 
 /**
- * The Pokey Mummy calls a friend: it sways its stack in several rotation steps with SFX_ENM_SAMBO_SEND_GROUP
- * sounds, shakes the camera, spawns a new Pokey Mummy beside it with SpawnUnit,
+ * The Poison Pokey calls a friend: it sways its stack in several rotation steps with SFX_ENM_SAMBO_SEND_GROUP
+ * sounds, shakes the camera, spawns a new Poison Pokey beside it with SpawnUnit,
  * adds one to its own called-friends counter (unit work 1) and settles back upright.
  */
 static EVT_BEGIN(call_friend_event)
+    // The Pokey rocks its stack from side to side, with a calling sound for each swing.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("SNB_S_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_SEND_GROUP1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_sub_intpl_init, 11, 0, -20, 40)
@@ -1596,6 +1704,8 @@ static EVT_BEGIN(call_friend_event)
     BEGIN_INLINE_EVENT
         CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
     END_INLINE_EVENT
+    // A new Pokey pops up out of the ground beside the caller in a puff of smoke, and the caller counts one
+    // more friend called (unit work 1).
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_sambo), 0)
     SET_VALUE(LW(0), LW(6))
     SET_VALUE(LW(1), LW(7))
@@ -1615,9 +1725,10 @@ static EVT_BEGIN(call_friend_event)
         WAIT_FRAMES(40)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(4))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_GENERATION, LW(4))
     ADD(LW(4), 1)
-    CALL(btlevtcmd_SetUnitWork, LW(3), 1, LW(4))
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_SAMBO_MUMMY_GENERATION, LW(4))
+    // The caller straightens back up.
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_sub_intpl_init, 4, 90, -30, 14)
     LABEL(4)
@@ -1640,6 +1751,7 @@ static EVT_BEGIN(call_friend_event)
     RETURN
 EVT_END()
 
+/** Setup for the new Poison Pokey a Poison Pokey calls in with its call-for-help move. */
 static BattleUnitSetup entry_sambo = {
     &unit_sambo_mummy, // unitKindParams
     1, // alliance
@@ -1652,12 +1764,12 @@ static BattleUnitSetup entry_sambo = {
 };
 
 /**
- * Wait script of the Pokey Mummy: shows the idle pose that matches its remaining body segments (unit work 0
+ * Wait script of the Poison Pokey: shows the idle pose that matches its remaining body segments (unit work 0
  * picks the part index 1 to 4).
  */
 static EVT_BEGIN(wait_event)
     SET_VALUE(LW(10), -2)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
         SET_VALUE(LW(11), 4)
@@ -1673,7 +1785,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 /**
- * Script helper for the Pokey Mummy's hopping approach.
+ * Script helper for the Poison Pokey's hopping approach.
  * Hops toward the x position in LW(5) in steps of LW(8) units, playing SFX_ENM_SAMBO_MOVE2 on every hop,
  * then makes the final hop onto (LW(5), LW(6), LW(7)).
  */
@@ -1703,11 +1815,11 @@ static EVT_BEGIN(sambo_rabbit_move)
 EVT_END()
 
 /**
- * Sets the Pokey Mummy's height and cut height to 20, 40, 60 or 80 units for 1, 2,
+ * Sets the Poison Pokey's height and cut height to 20, 40, 60 or 80 units for 1, 2,
  * 3 or 4 body segments (unit work 0).
  */
 static EVT_BEGIN(_body_param_set)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_SAMBO_MUMMY_SEGMENTS, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
         CALL(btlevtcmd_SetHeight, BTL_UNIT_SELF, 20)

@@ -1,4 +1,4 @@
-// unit_iron_sinemon: Iron Shinemon (Iron Cleft-type armoured fighter), battle unit.
+// unit_iron_sinemon: Iron Cleft (`iron_sinemon`), battle unit.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -17,6 +17,12 @@
 #include "evt/evt_msg.h"
 #include "version.h"
 #include "evt/evt_story.h"
+
+// Unit work slots of the Iron Cleft (the two of a pair point at each other).
+enum {
+    UW_IRON_SINEMON_SECOND = 0,  // 0 for the first Cleft of the pair (init_event1), which runs the phase script; 1 for the second
+    UW_IRON_SINEMON_PARTNER = 1, // unit id of the other Iron Cleft
+};
 
 static USER_FUNC(get_id);
 static USER_FUNC(yoshi_exist);
@@ -42,8 +48,12 @@ static EvtWord phase_event[188];
 static EvtWord attack_event[385];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Iron Cleft: 6 HP and level 18, with its parts, status vulnerability, init event and
+ * event data table.
+ */
 BattleUnitKind unit_iron_sinemon = {
-    61,
+    UNIT_IRON_CLEFT_RED,
     "btl_un_iron_sinemon",
     6,
     0,
@@ -100,7 +110,7 @@ BattleUnitKind unit_iron_sinemon = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -108,18 +118,40 @@ BattleUnitKind unit_iron_sinemon = {
     data_table,
 };
 
+/**
+ * Defense of the Iron Cleft against normal, fire, ice, explosion and electric attacks: none, so it takes
+ * full damage from every element.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage-type reactions of the Iron Cleft: immune to normal, fire, ice, explosion and electric unless the
+ * attack pierces.
+ */
 static BattleUnitDefenseAttr defence_attr = {{4, 4, 4, 4, 4}};
 
+/**
+ * Defense of the Iron Cleft against normal, fire, ice, explosion and electric attacks while it is flipped
+ * onto its back: none, so it takes full damage from every element.
+ */
 static BattleUnitDefense defence_turn = {0};
 
+/**
+ * Status vulnerability of the Iron Cleft, as the percent chance each status takes hold: immune to sleep,
+ * stop, dizziness, poison, confusion, shock, burn, freeze, Huge, Tiny, Attack Up, Attack Down, Defense Up,
+ * Defense Down, allergy, Fright, Gale Force, Fast, Slow, Dodgy, Invisible and instant KO.
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Parts of the Iron Cleft: a single body part (part 1, model c_sinemon_a), each with its defense tables,
+ * attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_iron_sinemon", "c_sinemon_a", 0.0f, 0.0f, 0.0f, 0.0f, 37.0f, 0.0f, 0.0f, 45.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
+    {1, "btl_un_iron_sinemon", "c_sinemon_a", 0.0f, 0.0f, 0.0f, 0.0f, 37.0f, 0.0f, 0.0f, 45.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_TOP_SPIKY, pose_table},
 };
 
+/** Weapon record of the Iron Cleft's charge: 4 damage, counts as a hammer-type hit and ignores Defense. */
 static BattleWeapon weapon_iron_sinemon_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -142,7 +174,7 @@ static BattleWeapon weapon_iron_sinemon_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -160,27 +192,35 @@ static BattleWeapon weapon_iron_sinemon_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Pose table of the Iron Cleft: maps each battle pose (idle, hurt, attacking and so on) to its animation,
+ * named SIN_*.
+ */
 static PoseTableEntry pose_table[] = {
-    {1, "SIN_N_1"},
-    {2, "SIN_Y_1"},
-    {9, "SIN_Y_1"},
-    {5, "SIN_K_1"},
-    {4, "SIN_I_1"},
-    {3, "SIS_I_1"},
-    {28, "SIN_S_1"},
+    {STATUS_SLEEP, "SIN_N_1"},
+    {STATUS_STOP, "SIN_Y_1"},
+    {STATUS_FREEZE, "SIN_Y_1"},
+    {STATUS_CONFUSE, "SIN_K_1"},
+    {STATUS_POISON, "SIN_I_1"},
+    {STATUS_DIZZY, "SIS_I_1"},
+    {BTL_POSE_NORMAL, "SIN_S_1"},
     {29, "SIN_Q_1"},
     {30, "SIN_Q_1"},
     {31, "SIN_A_1a"},
-    {39, "SIN_D_1"},
+    {BTL_POSE_DAMAGE, "SIN_D_1"},
     {50, "SIN_A_1a"},
-    {40, "SIN_W_1"},
-    {42, "SIN_R_1"},
+    {BTL_POSE_WALK, "SIN_W_1"},
+    {BTL_POSE_RUN, "SIN_R_1"},
     {BTL_POSE_TALK, "SIN_T_1"},
-    {56, "SIN_I_1"},
-    {57, "SIN_I_1"},
+    {BTL_POSE_DANGER, "SIN_I_1"},
+    {BTL_POSE_PERIL, "SIN_I_1"},
     {BTL_POSE_STAY_DEFAULT, "SIN_S_1"},
 };
 
+/**
+ * Event data table of the Iron Cleft: scripts that replace the standard handling for an attacker being
+ * hurt by its spiked head (tag 37).
+ */
 static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {48, btldefaultevt_Dummy},
@@ -193,9 +233,9 @@ static BattleDataEntry data_table[] = {
  * then the shared setup init_event_sub.
  */
 static EVT_BEGIN(init_event1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_SECOND, 0)
     CALL(get_id, LW(0), LW(1))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(1))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_PARTNER, LW(1))
     CALL_CHILD(init_event_sub)
     RETURN
 EVT_END()
@@ -206,9 +246,9 @@ EVT_END()
  * then the shared setup init_event_sub.
  */
 static EVT_BEGIN(init_event2)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_SECOND, 1)
     CALL(get_id, LW(0), LW(1))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_PARTNER, LW(0))
     CALL_CHILD(init_event_sub)
     RETURN
 EVT_END()
@@ -237,13 +277,13 @@ EVT_END()
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
         ADD(LW(1), 67)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 14)
         ADD(LW(1), 37)
@@ -271,7 +311,7 @@ static EVT_BEGIN(damage_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_SECOND, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
@@ -288,7 +328,7 @@ static EVT_BEGIN(damage_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_msg_print, 2, STRING("stg3_tou_272"), 0, BTL_UNIT_SELF)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_PARTNER, LW(0))
     CALL(evt_msg_print, 2, STRING("stg3_tou_273"), 0, LW(0))
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     SET_VALUE(GSWF(GSWF_TOU_IRON_CLEFTS_WEAKNESS_SEEN), 1)
@@ -307,7 +347,7 @@ EVT_END()
  * or 270 and 271 when Yoshi is in the party. It sets GSWF_TOU_IRON_CLEFTS_INTRO_SEEN.
  */
 static EVT_BEGIN(phase_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_SECOND, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
@@ -351,7 +391,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
                 CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY_DEFAULT)
                 CALL(evt_msg_print, 2, STRING("stg3_tou_268"), 0, BTL_UNIT_SELF)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_PARTNER, LW(0))
                 CALL(btlevtcmd_SetTalkPoseType, LW(0), BTL_POSE_TALK)
                 CALL(btlevtcmd_SetStayPoseType, LW(0), BTL_POSE_STAY_DEFAULT)
                 CALL(evt_msg_print, 2, STRING("stg3_tou_269"), 0, LW(0))
@@ -359,7 +399,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
                 CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY_DEFAULT)
                 CALL(evt_msg_print, 2, STRING("stg3_tou_270"), 0, BTL_UNIT_SELF)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_IRON_SINEMON_PARTNER, LW(0))
                 CALL(btlevtcmd_SetTalkPoseType, LW(0), BTL_POSE_TALK)
                 CALL(btlevtcmd_SetStayPoseType, LW(0), BTL_POSE_STAY_DEFAULT)
                 CALL(evt_msg_print, 2, STRING("stg3_tou_271"), 0, LW(0))
@@ -384,6 +424,7 @@ EVT_END()
  * Then it returns home.
  */
 static EVT_BEGIN(attack_event)
+    // The Iron Cleft uses an enemy item if it holds one that fits.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -391,10 +432,11 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Otherwise it chooses a target.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_iron_sinemon_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_iron_sinemon_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -406,11 +448,13 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_iron_sinemon_attack))
+    // The attack is announced.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_iron_sinemon_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It stamps up beside the target, each step sounding heavily.
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         LOOP(0)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ISIN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -419,6 +463,7 @@ static EVT_BEGIN(attack_event)
             WAIT_FRAMES(7)
         END_LOOP
     END_SIBLING_EVENT
+    // It rears up for three quarters of a second.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ISIN_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(evt_btl_camera_set_zoom, 0, 300)
@@ -429,7 +474,8 @@ static EVT_BEGIN(attack_event)
     SUBTRACT(LW(2), FLOAT(30.0f))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 25)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_iron_sinemon_attack), 256, LW(5))
+    // Then it charges into the target; find out how the target reacts.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_iron_sinemon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -451,18 +497,20 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The charge missed: the Iron Cleft runs on past the target.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 75)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_MS(500)
     GOTO(98)
+    // The charge connects: the damage is applied and the Iron Cleft bounces off in two heavy hops.
     LABEL(91)
     CALL(evt_btl_camera_noshake, 0)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_iron_sinemon_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_iron_sinemon_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_iron_sinemon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(1.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 75)
@@ -476,9 +524,10 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 20, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ISIN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // The Iron Cleft walks back to its home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -508,10 +557,10 @@ static USER_FUNC(get_id) {
     for (i = 0; i < 64; i++) {
         BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
         if (unit != NULL) {
-            if (unit->currentKind == 0x3D) {
+            if (unit->currentKind == UNIT_IRON_CLEFT_RED) {
                 id1 = i;
             }
-            if (unit->currentKind == 0x3E) {
+            if (unit->currentKind == UNIT_IRON_CLEFT_GREEN) {
                 id2 = i;
             }
         }
@@ -526,7 +575,7 @@ static USER_FUNC(yoshi_exist) {
     PouchData* pouch = pouchGetPtr();
     s32 exist = 0;
 
-    if (pouch->partyData[4].flags & 1) {
+    if (pouch->partyData[PARTNER_YOSHI].flags & POUCH_PARTY_FLAG_JOINED) {
         exist = 1;
     }
     evtSetValue(event, args[0], exist);

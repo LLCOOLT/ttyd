@@ -76,7 +76,7 @@ s32 marioUseParty(void) {
     if ((mario->dispFlags & MARIO_DISP_FLAG_SLIT) || party->slitOn == 1) {
         return 0;
     }
-    if (partyGetPtr(marioGetPartyId())->flags & 0x100) {
+    if (partyGetPtr(marioGetPartyId())->flags & PARTY_FLAG_IS_BEING_USED) {
         return 0;
     }
     party = partyGetPtr(marioGetPartyId());
@@ -236,7 +236,7 @@ s32 marioUseParty(void) {
     if (mario->dispFlags & MARIO_DISP_FLAG_SLIT) {
         return 0;
     }
-    if (partyGetPtr(marioGetPartyId())->flags & 0x100) {
+    if (partyGetPtr(marioGetPartyId())->flags & PARTY_FLAG_IS_BEING_USED) {
         return 0;
     }
     party = partyGetPtr(marioGetPartyId());
@@ -339,7 +339,7 @@ s32 marioGetExtraPartyId(void) {
  */
 void partyJoin(PartyId partnerId) {
     if (partnerId < 8) {
-        pouchGetPtr()->partyData[partnerId].flags |= 1; // obtained
+        pouchGetPtr()->partyData[partnerId].flags |= POUCH_PARTY_FLAG_JOINED; // obtained
     }
 }
 
@@ -350,7 +350,7 @@ void partyJoin(PartyId partnerId) {
  */
 void partyLeft(PartyId partnerId) {
     if (partnerId < 8) {
-        pouchGetPtr()->partyData[partnerId].flags &= ~1;
+        pouchGetPtr()->partyData[partnerId].flags &= ~POUCH_PARTY_FLAG_JOINED;
     }
 }
 
@@ -358,7 +358,7 @@ void partyLeft(PartyId partnerId) {
 BOOL partyChkJoin(PartyId partnerId) {
     BOOL ret = FALSE;
     if (partnerId < 8) {
-        u32 joined = pouchGetPtr()->partyData[partnerId].flags & 1;
+        u32 joined = pouchGetPtr()->partyData[partnerId].flags & POUCH_PARTY_FLAG_JOINED;
         ret = joined;
     }
     return ret;
@@ -377,7 +377,8 @@ s32 partyGetHp(PartyId partnerId) {
 }
 
 /**
- * Guess: the partner's rank (pouch techLevel: 0 normal, 1 Super, 2 Ultra from Merlon's Shine Sprite upgrades).
+ * The partner's rank (pouch techLevel: 0 unranked, 1 and 2 the rank-ups Merlon sells for Shine Sprites in
+ * gor_02, which unitwin_setpartylank applies to HP, attack and tech levels together).
  * The partner battle units read it to pick their moves; 0 for invalid ids.
  */
 s32 partyGetTechLv(PartyId partnerId) {

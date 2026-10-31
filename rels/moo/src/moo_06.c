@@ -20,6 +20,7 @@
 
 static BeroEntry bero_entry_data[3];
 
+/** Exits of moo_06: west road w_bero to moo_02 (e_bero); east road e_bero to moo_07 (w_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName

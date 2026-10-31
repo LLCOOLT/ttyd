@@ -5,6 +5,7 @@
 #include "os/__os.h"
 #include "__dvd.h"
 
+/** The 18 known drive error codes; ErrorCode2Num turns a code into its index here. */
 static u32 ErrorTable[18] = {
     0x00000000,
     0x00023A00,

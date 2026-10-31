@@ -43,6 +43,10 @@ static void marioMoveMain(void);
 
 //.data
 #if VERSION >= VERSION_JP
+/**
+ * Mario's 8-bit pose names, one row per outfit colour
+ * and one column per pose (idle, stand, walk, run, jump); see toDotMarioPose.
+ */
 const char* dotMarioPose[4][6] = {
     {"Z_1", "S_1", "W_1", "R_1", "U_1", "J_1"},
     {"Z_15", "S_2", "W_15", "R_15", "U_2", "J_2"},
@@ -155,7 +159,7 @@ void marioSetCharMode(s32 mode) {
         wp->characterId = 1;
         peachPreInit();
         marioCharPoseRelease(wp);
-        if (!(wp->peachFlags & 0x2000)) {
+        if (!(wp->peachFlags & PEACH_FLAG_XNAUT_DISGUISE)) {
             wp->paperAnimGroupId[0] = animPoseEntry("c_peach", 2);
             wp->paperAnimGroupId[1] = animPoseEntry("c_peach_r", 2);
             npcSetMarioAutoTalkPose("P_S_1", "P_T_1");
@@ -453,8 +457,8 @@ static inline BOOL marioKeyDisable(void) {
 }
 
 /**
- * Guess: TRUE while Mario rides Yoshi (yoshiGetStatus 1), in the normal game sequence with keys on;
- * lets the pause menu open during the ride.
+ * TRUE while Mario rides Yoshi on the ground (yoshiGetStatus 1), in the normal game sequence with keys on;
+ * marioCheckMenuDisable then lets the pause menu open even though Yoshi's ride holds the keys.
  */
 static inline BOOL marioChkYoshiKey(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
@@ -520,7 +524,7 @@ BOOL marioCheckMenuDisable(void) {
     }
 #if VERSION >= VERSION_US
     if (vivianGetStatus()) {
-        if (!(partyGetPtr(marioGetPartyId())->flags & 0x80000000)) {
+        if (!(partyGetPtr(marioGetPartyId())->flags & PARTY_FLAG_IS_EVT_USE)) {
             if (vivianGetStatus() == 2) {
                 return FALSE;
             }
@@ -1009,7 +1013,7 @@ void marioReInit(void) {
     }
     dotFlag = wp->flags & MARIO_FLAG_IS_8_BIT;
 #else
-    dotFlag = (wp = mp)->flags & 0x80000000;
+    dotFlag = (wp = mp)->flags & MARIO_FLAG_IS_8_BIT;
 #endif
     camId = marioGetCamId();
     charId = wp->characterId;
@@ -1358,14 +1362,14 @@ void marioMain(void) {
             return;
         }
         flags = wp->flags;
-        if (flags & 0x40000) {
+        if (flags & MARIO_FLAG_IS_STEPPING) {
             marioMove();
             marioChkOverhead();
             if (wp->airTimer > 100) {
                 marioChgMot(MARIO_MOTION_FALL);
                 marioSetFallPara();
             }
-        } else if (flags & 0x10000) {
+        } else if (flags & MARIO_FLAG_IS_JUMPING) {
             marioJump();
             marioChkOverhead();
             marioMove();
@@ -1376,7 +1380,7 @@ void marioMain(void) {
 #endif
                 marioChkGnd2();
             }
-        } else if (flags & 0x20000) {
+        } else if (flags & MARIO_FLAG_IS_FALLING) {
             if (wp->currMotionId != MARIO_MOTION_SHIP) {
                 marioMove();
                 if (wp->currMotionId == MARIO_MOTION_HIP) {
@@ -1677,10 +1681,10 @@ static void marioMoveMain(void) {
     }
     spd = wp->baseSpeed;
     if (wp->hitobjStandOn) {
-        if (hitGetAttr(wp->hitobjStandOn) & 0x40000000) {
+        if (hitGetAttr(wp->hitobjStandOn) & HIT_ATTR_DAMAGE_RETURN) {
             wp->damageHit = wp->hitobjStandOn;
         }
-        if (hitGetAttr(wp->hitobjStandOn) & 0x100) {
+        if (hitGetAttr(wp->hitobjStandOn) & HIT_ATTR_SHALLOW_WATER) {
             wp->flags |= MARIO_FLAG_IN_SHALLOW_WATER;
             spd *= 0.75f;
         } else {
@@ -1744,7 +1748,7 @@ static void marioMoveMain(void) {
 #if VERSION >= VERSION_JP
         // FAKE: called with an argument the function does not take (one more instruction, loading r3)
         ((NDou10YokoYari3ArgFn)N_dou10_yoko_yari3)(&wp->frontWallDist);
-        if (wp->hitobjFront && (hitGetAttr(wp->hitobjFront) & 0x800)) {
+        if (wp->hitobjFront && (hitGetAttr(wp->hitobjFront) & HIT_ATTR_SPIKES)) {
             set_damage_root_ypos(wp->position.y);
             marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
             return;
@@ -1809,7 +1813,7 @@ void marioChgEvtPose(const char* name) {
         animName = mp->animName;
         if (!animName || strcmp(animName, name)) {
             wp->animName = name;
-            wp->dispFlags &= ~0x20000000;
+            wp->dispFlags &= ~MARIO_DISP_FLAG_POSE_UNUSED;
             wp->dispFlags |= MARIO_DISP_FLAG_ANIM_SET_2;
             wp->trigFlags |= MARIO_TRIG_FLAG_CHG_ANIM;
         }
@@ -1863,14 +1867,14 @@ void marioChgPose(const char* name) {
             if (!(wp->flags & MARIO_FLAG_IS_8_BIT)) {
                 wp->animName = name;
                 wp->poseTime = 0;
-                wp->dispFlags &= ~0x30000000;
+                wp->dispFlags &= ~(MARIO_DISP_FLAG_ANIM_SET_2 | MARIO_DISP_FLAG_POSE_UNUSED);
                 wp->trigFlags |= MARIO_TRIG_FLAG_CHG_ANIM;
             } else {
                 dot = toDotMarioPose(name);
                 if (dot) {
                     wp->animName = dot;
                     wp->poseTime = 0;
-                    wp->dispFlags &= ~0x30000000;
+                    wp->dispFlags &= ~(MARIO_DISP_FLAG_ANIM_SET_2 | MARIO_DISP_FLAG_POSE_UNUSED);
                     wp->trigFlags |= MARIO_TRIG_FLAG_CHG_ANIM;
                 }
             }
@@ -1888,7 +1892,7 @@ void marioChgPoseTime(const char* name, s16 frames) {
         if (!animName || strcmp(animName, name)) {
             wp->animName = name;
             wp->poseTime = frames;
-            wp->dispFlags &= ~0x30000000;
+            wp->dispFlags &= ~(MARIO_DISP_FLAG_ANIM_SET_2 | MARIO_DISP_FLAG_POSE_UNUSED);
             wp->trigFlags |= MARIO_TRIG_FLAG_CHG_ANIM;
         }
     }
@@ -1903,7 +1907,7 @@ void marioChgPaper(const char* name) {
     s32 flags = wp->dispFlags;
     const char* animName;
 
-    if (flags & 0x40000000 && !(flags & 2) && !(mp->flags & MARIO_FLAG_IS_8_BIT)) {
+    if (flags & MARIO_DISP_FLAG_PAPER_ON && !(flags & MARIO_DISP_FLAG_POSE_LOCK) && !(mp->flags & MARIO_FLAG_IS_8_BIT)) {
         animName = mp->paperAnimName;
         if (!animName || strcmp(animName, name)) { // if different, do stuff
             wp->paperAnimName = name;
@@ -2164,7 +2168,7 @@ static void marioRearAnime(void) {
     const char* name;
     f32 diff;
 
-    if (!(wp->dispFlags & 0x70000004) && !(wp->flags & MARIO_FLAG_IS_CARRYING_BOBBERY)) {
+    if (!(wp->dispFlags & (MARIO_DISP_FLAG_FRONT_POSE | MARIO_DISP_FLAG_ANIM_SET_2 | MARIO_DISP_FLAG_POSE_UNUSED | MARIO_DISP_FLAG_PAPER_ON)) && !(wp->flags & MARIO_FLAG_IS_CARRYING_BOBBERY)) {
         diff = revise360(wp->moveDirection - wp->targetYaw);
         if (diff >= 290.0f || diff <= 70.0f) {
             name = toRearPose(wp->animName);
@@ -2551,7 +2555,7 @@ static void marioDisp(CameraId camId, void* param) {
 /** Returns the back-facing version of a Mario or Peach pose name, or NULL if it has none; PAL adds M_I_3. */
 static const char* toRearPose(const char* name) {
     const char* rear = NULL;
-    if (mp->characterId == 1 && !(mp->peachFlags & 0x2000)) {
+    if (mp->characterId == 1 && !(mp->peachFlags & PEACH_FLAG_XNAUT_DISGUISE)) {
         if (!strcmp(name, "P_Z_1")) {
             rear = "P_Z_1R";
         } else if (!strcmp(name, "P_S_1")) {
@@ -2655,7 +2659,7 @@ static const char* toRearPose(const char* name) {
 /** Returns the front-facing version of a back-facing pose name (the reverse of toRearPose), or NULL. */
 static const char* toFrontPose(const char* name) {
     const char* front = NULL;
-    if (mp->characterId == 1 && !(mp->peachFlags & 0x2000)) {
+    if (mp->characterId == 1 && !(mp->peachFlags & PEACH_FLAG_XNAUT_DISGUISE)) {
         if (!strcmp(name, "P_Z_1R")) {
             front = "P_Z_1";
         } else if (!strcmp(name, "P_S_1R")) {

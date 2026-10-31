@@ -30,6 +30,7 @@ static EvtWord jump_attack_event[324];
 static EvtWord dekadeka_event[125];
 static EvtWord wait_event[6];
 
+/** Unit data of the Elite X-Naut: 10 HP, level 28; the battle starts it from init_event. */
 BattleUnitKind unit_gundan_zako_elite = {
     120,
     "btl_un_gundan_zako_elite",
@@ -96,16 +97,29 @@ BattleUnitKind unit_gundan_zako_elite = {
     data_table,
 };
 
+/** Defence of the Elite X-Naut: 1 against every element. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Elemental reactions of the Elite X-Naut: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Elite X-Naut (percent, 100 is normal) in the demo builds: resists most statuses
+ * (60-95%).
+ */
 static StatusVulnerability regist = {60, 70, 60, 100, 70, 100, 100, 60, 100, 65, 100, 65, 100, 60, 60, 80, 70, 100, 60, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Elite X-Naut (percent, 100 is normal) in the retail builds: resists most
+ * statuses (60-95%).
+ */
 static StatusVulnerability regist = {70, 70, 70, 100, 70, 100, 100, 60, 100, 85, 100, 85, 100, 85, 60, 80, 60, 100, 60, 100, 100, 95};
 #endif
 
+/**
+ * Pose table of the Elite X-Naut: the animation each battle pose (idle, hurt, walk, attack and so on) plays.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -125,14 +139,17 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Event table of the Elite X-Naut: empty, it has no special reactions. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body part of the Elite X-Naut, model c_zako_e: its one target part. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_gundan_zako_elite", "c_zako_e", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_gundan_zako_elite", "c_zako_e", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Weapon data for the Elite X-Naut's run-up strike: 5 damage, a hammer-type hit, one target. */
 static BattleWeapon weapon_gundan_zako_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -151,7 +168,7 @@ static BattleWeapon weapon_gundan_zako_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -169,6 +186,7 @@ static BattleWeapon weapon_gundan_zako_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the Elite X-Naut's jump attack: 5 damage, a jump-type hit, one target. */
 static BattleWeapon weapon_gundan_zako_jump_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -187,7 +205,7 @@ static BattleWeapon weapon_gundan_zako_jump_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -205,6 +223,9 @@ static BattleWeapon weapon_gundan_zako_jump_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon data for the Elite X-Naut's size-up bottle: no damage, one target, may inflict size change (100%).
+ */
 static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -222,7 +243,7 @@ static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -275,7 +296,7 @@ EVT_END()
  * 30% jump attack and 20% to drink the size-up bottle (dekadeka_event), re-rolling if it is already enlarged.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
@@ -305,7 +326,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     ADD(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(2))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(2))
         IF_INT_EQUAL(LW(2), 0)
             CALL_CHILD(dekadeka_event)
             GOTO(99)
@@ -390,7 +411,8 @@ EVT_END()
  */
 static EVT_BEGIN(normal_attack_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_attack))
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // Choose the target: the First Strike victim, otherwise a sampled opposing unit.
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -398,15 +420,18 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No valid target: a confused X-Naut is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Wind-up: it runs up to the target (attack_common_event1).
     CALL_CHILD(attack_common_event1)
+    // It springs at the target with a shout.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -415,6 +440,7 @@ static EVT_BEGIN(normal_attack_event)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0)
     END_SIBLING_EVENT
+    // It flies through the air until it reaches the target's position.
     LOOP(0)
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), EVT_NULLPTR, EVT_NULLPTR)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
@@ -429,6 +455,7 @@ static EVT_BEGIN(normal_attack_event)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Hit check: a miss or dodge goes on to the stumble, a hit to the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -451,6 +478,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
         LABEL(90)
+        // Miss: it lands with a whiff, stumbles forward and sits down dazed (D_2, D_3).
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD1_MISS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_2"))
@@ -463,11 +491,13 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(10)
         GOTO(98)
         LABEL(91)
+        // Hit: the camera shakes and the damage is dealt with the action-command result.
         CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
         CALL(evt_btl_camera_add_zoom, 0, -50)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        // It rebounds off the target and lands back on its feet (J_1B, S_1).
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 48)
         CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(2.0f), FLOAT(0.099609375f))
@@ -479,6 +509,7 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(20)
         GOTO(98)
         LABEL(98)
+        // Retreat: it runs back to its home position (attack_common_event2).
         CALL_CHILD(attack_common_event2)
         RETURN
 EVT_END()
@@ -494,7 +525,7 @@ static EVT_BEGIN(jump_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN

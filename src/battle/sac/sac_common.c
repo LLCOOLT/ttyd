@@ -27,7 +27,7 @@ u8 volPer;
 EVT_BEGIN(sac_start_camera_evt)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_btl_camera_set_zoom, 0, 100)
     ELSE
@@ -44,7 +44,7 @@ EVT_END()
  * removed again by sac_mario_item_on_end_evt.
  */
 EVT_BEGIN(sac_mario_item_on_evt)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 5, -1, 0)
@@ -96,7 +96,7 @@ EVT_END()
 
 /** Walks Mario back to his home position after the opening pose. */
 EVT_BEGIN(sac_mario_back_home)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 5, -1, 0)
     RETURN
@@ -250,7 +250,7 @@ USER_FUNC(sac_enemy_slide_go) {
     for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         unit = BattleGetUnitPtr(wp, i);
         if (unit && unit->alliance == 1) {
-            evt = evtEntry(enemy_slide_go_evt, 0, 0x20);
+            evt = evtEntry(enemy_slide_go_evt, 0, EVENT_START_NOW);
             evt->unitId = i;
         }
     }
@@ -271,7 +271,7 @@ USER_FUNC(sac_enemy_slide_return) {
     for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         unit = BattleGetUnitPtr(wp, i);
         if (unit && unit->alliance == 1) {
-            evt = evtEntry(enemy_slide_return_evt, 0, 0x20);
+            evt = evtEntry(enemy_slide_return_evt, 0, EVENT_START_NOW);
             evt->unitId = i;
 #if VERSION == VERSION_EU
             unit->slideReturnEventId = evt->eventId;

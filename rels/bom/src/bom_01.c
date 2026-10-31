@@ -56,6 +56,7 @@
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 #include "driver/casedrv.h"
+#include "sound.h"
 
 typedef struct SightWork {
     FileEntry* tpl;
@@ -69,15 +70,6 @@ SightWork* sight_wp;
 // make_name's sprintf buffer (a static local in the demo map: name$915); file scope so .bss keeps the target order
 // lp, name, sight_wp (a function static is emitted first)
 static char name[64];
-// The part of SoundWork (sound.h) bom_01 reads for the microphone level; sound.h does not compile in this unit\'s include set.
-typedef struct BomSoundWork {
-    u8 pad_0[0x330];
-    u16 sampleBank;
-    u8 pad_332[0x5C0 - 0x332];
-    s16 samples[2][0x400];
-    u32 sampleIndex;
-} BomSoundWork;
-extern BomSoundWork sound;
 static void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
 static void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot);
 static void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale);
@@ -374,10 +366,11 @@ enum { SIGHT_TEX_ARROW_ON = 6,
        SIGHT_TEX_ARROW_OFF = 7 };
 
 /**
- * Guess: debug-style overlay of the cannon sight (taihou.tpl):
- * spinning corner frames, arrow indicators for the direction set by sight_dir,
- * a bar graph of the microphone level, and frame-timing counters.
- * It is only drawn once sight_dir has moved off the idle value 5, so it does not appear in normal play.
+ * Draws the cannon's targeting display (taihou.tpl) over the aiming part of evt_taihou ("Sighting! Target is the
+ * moon!"): corner frames that spin with the sight direction, blinking inner frames, the four direction arrows
+ * with the one set by sight_dir lit (its counter ticking up), a five-bar level meter fed by the game's sound
+ * output (sound.samples), and running number readouts made from the render time and retrace count.
+ * sight queues it only while the direction is not 5 (idle).
  */
 static void disp_sight(CameraId camera, void* param) {
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -694,6 +687,7 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
+/** Actors that pass through the village house door during its scenes: General White and his crew. */
 const char* door_npc[] = {
     "ホワイト",
     "ペントリット",
@@ -715,6 +709,7 @@ static EVT_BEGIN(door_close)
     RETURN
 EVT_END()
 
+/** The village house door on the square, with the map objects it swaps and its open and close handlers. */
 DoorParam door = {
     0, // flags
     3, // type
@@ -736,6 +731,7 @@ DoorParam door = {
     door_close, // evtClose
 };
 
+/** Exits of this room: the west door to bom_04 and the east door to bom_02. */
 static BeroEntry bero_entry_data[] = {
     {
         ("w_bero"), // hitName
@@ -888,7 +884,7 @@ EVT_BEGIN(evt_bom_01_karakara)
     RETURN
 EVT_END()
 
-// ext_init, ext_main and depthDisp are built with copy propagation and lifetime analysis off;
+// FAKE: ext_init, ext_main and depthDisp are built with copy propagation and lifetime analysis off;
 // without either pragma the register use and load order change.
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -1093,6 +1089,10 @@ static void ext_dispent(void) {
     }
 }
 
+/**
+ * Sprite animation table for the Bob-omb crowd (c_bom_sen); it is filled in at run time for the cannon
+ * scene.
+ */
 static ExtTexInfo ext_data[] = {
     {0},
     {0},
@@ -1362,11 +1362,13 @@ EVT_BEGIN(open_hatch)
     RETURN
 EVT_END()
 
+/** Control points of the camera path (a spline) used in the cannon launch scene. */
 static f32 spline_dt[] = {
     -200.0f, 0.0f, 650.0f, 590.0f, 200.0f, -2150.0f, 1380.0f, 100.0f,
     -4950.0f,
 };
 
+/** The cannon crew: each name with the message key of his drill call (stg7_bom_65_a to d). */
 const char* oh_data[] = {
     "ニトロ", "stg7_bom_65_a",
     "ペントリット", "stg7_bom_65_b",
@@ -1376,13 +1378,17 @@ const char* oh_data[] = {
 
 /**
  * The cannon scene (taihou = cannon) started by talking to the mayor before STORY_STG7_05_THE_CANNON:
- * the mayor explains the plan (stg7_bom_63 to 91) while the camera switches between the room and the outside,
- * the screen shakes and the hatches open (Guess: the Bob-omb soldiers ready the huge gun),
+ * the mayor places Mario and asks General White whether the big bomb cannon is ready (stg7_bom_63 to 64_01),
+ * and White's crew (ニトロ, ペントリット, スラリー and ボムヘイD, oh_data) load and aim it on his orders
+ * (stg7_bom_65 to 86: guidance system online, hatches and shutters open, sighting the moon with the disp_sight
+ * display) while the camera switches between the room and the outside and the screen shakes;
+ * the mayor orders everyone in and fires it (stg7_bom_81, 87),
  * the partner reacts in its damage pose, Mario is fired from the cannon,
  * the Goldbob guide (ITEM_GOLDBOB_GUIDE) is taken from the pouch and the map changes to moo_03.
  */
 static EVT_BEGIN(evt_taihou)
     CALL(evt_mario_key_onoff, 0)
+    // The scene starts in the cannon room; the music stops.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_msg_print, 0, STRING("stg7_bom_63"), 0, STRING("me"))
     WAIT_MS(300)
@@ -1468,9 +1474,11 @@ static EVT_BEGIN(evt_taihou)
     WAIT_MS(300)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_ry, STRING("me"), 90)
+    // The mayor asks General White whether the big bomb cannon is ready, and White calls his crew to the drill.
     CALL(evt_msg_print, 0, STRING("stg7_bom_64"), 0, STRING("me"))
     CALL(evt_msg_print, 0, STRING("stg7_bom_64_01"), 0, STRING("ホワイト"))
     SET_INT_READ_ADDR(PTR(&oh_data))
+    // The four crew members shout their drill calls in turn (Ho, Hup, Hut, Boom).
     LOOP(4)
         READ_INT2(LW(0), LW(1))
         BEGIN_INLINE_EVENT
@@ -1484,6 +1492,7 @@ static EVT_BEGIN(evt_taihou)
         WAIT_MS(300)
     END_LOOP
     WAIT_MS(500)
+    // White orders positions, and the crew answer (stg7_bom_66 and 67).
     CALL(evt_msg_print, 0, STRING("stg7_bom_66"), 0, STRING("me"))
     SET_VALUE(GF(0), 0)
     CALL(evt_npc_flag_onoff, 0, STRING("ホワイト"), NPC_FLAG_TALK_ANIM)
@@ -1571,6 +1580,7 @@ static EVT_BEGIN(evt_taihou)
     END_INLINE_EVENT
     SET_VALUE(GF(0), 0)
     SET_VALUE(LW(0), PTR(&door))
+    // The cannon-room doors slide open.
     SPAWN_EVENT(evt_door_open_bom_01)
     LOOP(0)
         IF_INT_EQUAL(GF(0), 1)
@@ -1609,6 +1619,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_cam3d_evt_set, -160, 125, -100, 10, 55, -427, 1000, 11)
     WAIT_MS(1000)
     CALL(evt_set_dir_to_target, STRING("ホワイト"), STRING("ペントリット"))
+    // System check: the guidance system is brought online (stg7_bom_68 to 72).
     CALL(evt_msg_print, 0, STRING("stg7_bom_68"), 0, STRING("ホワイト"))
     WAIT_MS(300)
     CALL(evt_set_dir_to_target, STRING("ペントリット"), STRING("ホワイト"))
@@ -1637,6 +1648,8 @@ static EVT_BEGIN(evt_taihou)
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
         CALL(evt_msg_toge, 1, 0, 0, 0)
+        // The detonation sequence is announced and the outer hatch and inner shutter open, with the camera
+        // cutting between inside and outside (stg7_bom_73 to 76).
         CALL(evt_msg_print, 0, STRING("stg7_bom_73"), 0, STRING("ホワイト"))
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
@@ -1656,6 +1669,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_msg_print, 0, STRING("stg7_bom_74"), 0, STRING("ホワイト"))
     WAIT_MS(300)
     CALL(evt_snd_sfxoff, LW(10))
+    // The cannon's theme starts and the screen shakes.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG7_HUGE_GUN1"))
     CALL(evt_cam3d_evt_set, 0, 350, 1224, 0, 125, 250, 0, 11)
     CALL_CHILD(cam_outside)
@@ -1788,6 +1802,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_snd_sfxon, STRING("SFX_STG7_CANNON_SYS_ACTIVE2"), LW(10))
     CALL_CHILD(cam_inside)
     WAIT_MS(300)
+    // White sights the moon and reads out the aim and wind figures (stg7_bom_77 to 80).
     CALL(evt_msg_print, 0, STRING("stg7_bom_77"), 0, STRING("ホワイト"))
     WAIT_MS(300)
     SET_VALUE(GW(5), 70)
@@ -1891,6 +1906,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_snd_sfxoff, LW(8))
     CALL(evt_cam3d_evt_set, 21, 175, 781, 9, 42, 265, 0, 11)
     WAIT_FRAMES(1)
+    // The mayor orders everyone in; the crowd squeezes into the chamber, grumbling (stg7_bom_81 to 85_6).
     CALL(evt_msg_print, 0, STRING("stg7_bom_81"), 0, STRING("村長"))
     WAIT_MS(300)
     CALL(evt_snd_sfxon, STRING("SFX_STG7_BOMB_TOGETHER1"), LW(8))
@@ -1945,6 +1961,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_snd_sfxon, STRING("SFX_STG7_CANNON_SYS_ACTIVE2"), LW(10))
     CALL_CHILD(cam_inside)
     WAIT_MS(300)
+    // White reports all green and the mayor gives the order to fire (stg7_bom_86 and 87).
     CALL(evt_msg_print, 0, STRING("stg7_bom_86"), 0, STRING("ホワイト"))
     WAIT_MS(300)
     CALL(evt_snd_sfxoff, LW(10))
@@ -1954,6 +1971,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_msg_print, 0, STRING("stg7_bom_87"), 0, STRING("村長"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 200, 0, 2483, 200, 550, 0, 0, 11)
+    // Mario is fired out of the cannon.
     SPAWN_EVENT(mario_shot)
     WAIT_MS(800)
     CALL_CHILD(effect_delete)
@@ -1975,6 +1993,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_AC3_4"), 200, 0, -650, LW(4))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_MARIO_FLY1"), 200, 0, -650, LW(5))
     SET_FLOAT_VALUE(LW(6), FLOAT(0.0f))
+    // He flies toward the Moon along the camera spline, then vanishes in a flash of light.
     CALL(evt_sub_spline_init, 1, 11, PTR(spline_dt), 3, 0, 2000)
     LABEL(20)
     CALL(evt_sub_spline_get_value, LW(0), LW(1), LW(2), LW(3))
@@ -2002,6 +2021,7 @@ static EVT_BEGIN(evt_taihou)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_msg_toge, 2, 340, 200, -590)
+        // The crowd cheers (stg7_bom_88 to 90).
         CALL(evt_msg_print, 0, STRING("stg7_bom_88"), 0, 0)
         CALL(evt_msg_toge, 2, 400, 160, -590)
         CALL(evt_msg_print, 0, STRING("stg7_bom_89"), 0, 0)
@@ -2016,6 +2036,7 @@ static EVT_BEGIN(evt_taihou)
     CALL(evt_npc_flag_onoff, 1, STRING("村長"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, -60, 26, 493, 22, 33, 257, 0, 11)
     WAIT_MS(2000)
+    // The mayor wishes Mario luck, the Goldbob guide is taken from the pouch and the map changes to moo_03.
     CALL(evt_msg_print, 0, STRING("stg7_bom_91"), 0, STRING("村長"))
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     WAIT_MS(300)
@@ -2355,6 +2376,7 @@ static EVT_BEGIN(musume_c_entry)
     RETURN
 EVT_END()
 
+/** The cast of the village square: the mayor, Nitro and the Bob-omb soldier D. */
 static NpcSetupInfo npcEnt[] = {
     {
         "村長", // name
@@ -2527,9 +2549,9 @@ static inline f32 dd_cos(f32 x) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 /**
- * Guess: full-screen blur or glow.
- * Copies the frame buffer into a texture and redraws it as eight overlapping copies,
- * each shifted by GW(5)/100 in a ring (45 degrees apart) and blended at 1/8 strength.
+ * Full-screen blur: copies the frame buffer into a texture and redraws it as eight overlapping copies,
+ * each shifted by GW(5)/10000 of the screen in a ring (45 degrees apart) and blended at 1/8 strength.
+ * evt_taihou sets GW(5) to 70 while the cannon sights the moon and eases it to 0 to bring the view into focus.
  */
 static void depthDisp(CameraId camera, void* param) {
     f32 amp = evtGetValue(NULL, GW(5)) / 100.0f;

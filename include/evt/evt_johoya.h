@@ -4,8 +4,13 @@
 #include "evt/evt_cmd.h"
 #include <dolphin/types.h>
 
+// InformantInfo.flags bits.
+enum InformantInfoFlags {
+    INFORMANT_FLAG_HEARD = 0x1, // heard on this visit (johoya_keti_newjoho_setreadflag)
+};
+
 typedef struct {
-    u16 flags;        // 0x0, bit 1 = already heard (read flag)
+    u16 flags;        // 0x0, InformantInfoFlags
     s16 labelId;      // 0x2
     char* initEndPos; // 0x4, rumor text after the tag (evt var holds it as s32)
     s16 tagEndPos;    // 0x8

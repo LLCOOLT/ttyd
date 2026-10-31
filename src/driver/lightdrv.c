@@ -79,6 +79,7 @@ void lightReInit(void) {
     memset(wp->entries, 0, sizeof(LightEntry) * wp->count);
 }
 
+/** The camera's forward axis; lightMain turns it into world space to place the paper characters' light. */
 static const Vec camDir = {0.0f, 0.0f, 1.0f};
 
 /**
@@ -114,6 +115,10 @@ void lightMain(void) {
     booLight.position = (Vec){0.0f, 1000.0f, 0.0f};
 }
 
+/**
+ * Distance falloff of a map light by its attenuation type: none, linear, quadratic, quadratic
+ * (constant, linear and squared coefficients); lightEntry copies the chosen row into the light.
+ */
 static const Vec decay_tbl[] = {
     {1.0f, 0.0f, 0.0f},
     {0.0f, 0.1f, 0.0f},
@@ -133,7 +138,7 @@ s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor
 
     entry = wp->entries;
     for (i = 0; i < wp->count; i++, entry++) {
-        if (entry->flags & 1 && !strcmp(entry->name, name)) {
+        if (entry->flags & LIGHT_ENABLED && !strcmp(entry->name, name)) {
             break;
         }
     }
@@ -144,7 +149,7 @@ s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor
             entry = wp->entries;
             name = uniqueName; // BUG: a second clash formats uniqueName into itself and stacks suffixes
             for (i = 0; i < wp->count; i++, entry++) {
-                if (entry->flags & 1 && !strcmp(entry->name, name)) {
+                if (entry->flags & LIGHT_ENABLED && !strcmp(entry->name, name)) {
                     break;
                 }
             }
@@ -156,7 +161,7 @@ s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor
 
     entry = wp->entries;
     for (n = 0; n < wp->count; n++, entry++) {
-        if (!(entry->flags & 1)) {
+        if (!(entry->flags & LIGHT_ENABLED)) {
             break;
         }
     }
@@ -171,7 +176,7 @@ s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor
     entry->attenDistCoef.x = decay_tbl[attenType].x;
     entry->attenDistCoef.y = decay_tbl[attenType].y;
     entry->attenDistCoef.z = decay_tbl[attenType].z;
-    entry->flags |= 1;
+    entry->flags |= LIGHT_ENABLED;
     switch (type) {
         case 0:
             entry->flags |= LIGHT_AMBIENT;
@@ -199,7 +204,7 @@ LightEntry* lightNameToPtr(const char* name) {
     s32 i;
 
     for (i = 0; i < wp->count; i++, entry++) {
-        if (entry->flags & 1 && !strcmp(name, entry->name)) {
+        if (entry->flags & LIGHT_ENABLED && !strcmp(name, entry->name)) {
             return entry;
         }
     }

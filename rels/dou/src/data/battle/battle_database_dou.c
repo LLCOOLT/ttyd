@@ -90,6 +90,10 @@ NpcSetupBattleInfo btlsetup_dou_tbl[28];
 NpcTerritoryInfo btl_dou_setup_no_tbl[28];
 extern EvtWord bgset_dou_wave_event[];
 
+/**
+ * Props of the Pirate's Grotto battle stage: each entry names a model of the backdrop and where it stands,
+ * the last entries being the background layers.
+ */
 BattleStageObjectData dou_btlobject_data[] = {
     {"taki", 2, 2, {0}, 0, 60, {0}},
     {"B_kabe", 2, 2, {0}, 10, 50, {0}},
@@ -144,6 +148,10 @@ BattleStageObjectData dou_btlobject_data[] = {
     {"nami_01", 2, 3, {0}, 0, 60, {0}},
 };
 
+/**
+ * Battle stage of Pirate's Grotto: the stage model directories, the props above, the backdrop weapons and the
+ * background event that runs during the fight.
+ */
 BattleStageData dou_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -231,6 +239,10 @@ BattleStageData dou_btlstage_data[] = {
     },
 };
 
+/**
+ * Enemy party of battle dou_00_01 in Pirate's Grotto: 3 x Goomba (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_00_01_off_1[] = {
     {
         &unit_kuriboo, // unitKindParams
@@ -264,6 +276,10 @@ BattleUnitSetup btlparty_dou_dou_00_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_00_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_00_01_off_1 = {
     3, // numEnemies
     btlparty_dou_dou_00_01_off_1, // enemyData
@@ -275,6 +291,10 @@ BattleGroupSetup btlgrp_dou_dou_00_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_01_01 in Pirate's Grotto: 3 x Ember (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_01_01_off_01[] = {
     {
         &unit_hermos, // unitKindParams
@@ -308,6 +328,10 @@ BattleUnitSetup btlparty_dou_dou_01_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_01_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_01_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_01_01_off_01, // enemyData
@@ -319,6 +343,10 @@ BattleGroupSetup btlgrp_dou_dou_01_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_02_01 in Pirate's Grotto: 2 x Lava Bubble (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_02_01_off_01[] = {
     {
         &unit_bubble, // unitKindParams
@@ -342,6 +370,10 @@ BattleUnitSetup btlparty_dou_dou_02_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_02_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_02_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_02_01_off_01, // enemyData
@@ -353,6 +385,10 @@ BattleGroupSetup btlgrp_dou_dou_02_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_02_02 in Pirate's Grotto: 4 x Lava Bubble (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_02_02_off_01[] = {
     {
         &unit_bubble, // unitKindParams
@@ -396,6 +432,10 @@ BattleUnitSetup btlparty_dou_dou_02_02_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_02_02 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_02_02_off_01 = {
     4, // numEnemies
     btlparty_dou_dou_02_02_off_01, // enemyData
@@ -407,6 +447,10 @@ BattleGroupSetup btlgrp_dou_dou_02_02_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_03_01 in Pirate's Grotto: Bill Blaster and Bulky Bob-omb (start positions and
+ * item drop tables included).
+ */
 BattleUnitSetup btlparty_dou_dou_03_01_off_01[] = {
     {
         &unit_killer_cannon, // unitKindParams
@@ -430,6 +474,10 @@ BattleUnitSetup btlparty_dou_dou_03_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_03_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_03_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_03_01_off_01, // enemyData
@@ -441,6 +489,10 @@ BattleGroupSetup btlgrp_dou_dou_03_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_03_99 in Pirate's Grotto: 2 x Bullet Bill (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_03_99_off_01[] = {
     {
         &unit_killer, // unitKindParams
@@ -464,6 +516,10 @@ BattleUnitSetup btlparty_dou_dou_03_99_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_03_99 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_03_99_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_03_99_off_01, // enemyData
@@ -475,6 +531,10 @@ BattleGroupSetup btlgrp_dou_dou_03_99_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_03_02 in Pirate's Grotto: 2 x Bulky Bob-omb (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_03_02_off_01[] = {
     {
         &unit_heavy_bom, // unitKindParams
@@ -498,6 +558,10 @@ BattleUnitSetup btlparty_dou_dou_03_02_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_03_02 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_03_02_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_03_02_off_01, // enemyData
@@ -509,6 +573,10 @@ BattleGroupSetup btlgrp_dou_dou_03_02_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_03_03 in Pirate's Grotto: 3 x Bulky Bob-omb (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_03_03_off_01[] = {
     {
         &unit_heavy_bom, // unitKindParams
@@ -542,6 +610,10 @@ BattleUnitSetup btlparty_dou_dou_03_03_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_03_03 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_03_03_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_03_03_off_01, // enemyData
@@ -553,6 +625,10 @@ BattleGroupSetup btlgrp_dou_dou_03_03_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_05_01 in Pirate's Grotto: 2 x Ember (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_05_01_off_01[] = {
     {
         &unit_hermos, // unitKindParams
@@ -576,6 +652,10 @@ BattleUnitSetup btlparty_dou_dou_05_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_05_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_05_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_05_01_off_01, // enemyData
@@ -587,6 +667,10 @@ BattleGroupSetup btlgrp_dou_dou_05_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_05_02 in Pirate's Grotto: 2 x Parabuzzy (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_05_02_off_01[] = {
     {
         &unit_patamet, // unitKindParams
@@ -610,6 +694,10 @@ BattleUnitSetup btlparty_dou_dou_05_02_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_05_02 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_05_02_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_05_02_off_01, // enemyData
@@ -621,6 +709,10 @@ BattleGroupSetup btlgrp_dou_dou_05_02_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_06_01 in Pirate's Grotto: 3 x Parabuzzy (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_06_01_off_01[] = {
     {
         &unit_patamet, // unitKindParams
@@ -654,6 +746,10 @@ BattleUnitSetup btlparty_dou_dou_06_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_06_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_06_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_06_01_off_01, // enemyData
@@ -665,6 +761,10 @@ BattleGroupSetup btlgrp_dou_dou_06_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_06_02 in Pirate's Grotto: 3 x Parabuzzy and Lava Bubble (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_dou_dou_06_02_off_01[] = {
     {
         &unit_patamet, // unitKindParams
@@ -708,6 +808,10 @@ BattleUnitSetup btlparty_dou_dou_06_02_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_06_02 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_06_02_off_01 = {
     4, // numEnemies
     btlparty_dou_dou_06_02_off_01, // enemyData
@@ -719,6 +823,10 @@ BattleGroupSetup btlgrp_dou_dou_06_02_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_06_03 in Pirate's Grotto: Parabuzzy (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_06_03_off_01[] = {
     {
         &unit_patamet, // unitKindParams
@@ -732,6 +840,10 @@ BattleUnitSetup btlparty_dou_dou_06_03_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_06_03 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_06_03_off_01 = {
     1, // numEnemies
     btlparty_dou_dou_06_03_off_01, // enemyData
@@ -743,6 +855,10 @@ BattleGroupSetup btlgrp_dou_dou_06_03_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_07_01 in Pirate's Grotto: 3 x Ember (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_07_01_off_01[] = {
     {
         &unit_hermos, // unitKindParams
@@ -776,6 +892,10 @@ BattleUnitSetup btlparty_dou_dou_07_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_07_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_07_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_07_01_off_01, // enemyData
@@ -787,6 +907,10 @@ BattleGroupSetup btlgrp_dou_dou_07_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_08_01 in Pirate's Grotto: 4 x Bulky Bob-omb (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_08_01_off_01[] = {
     {
         &unit_heavy_bom, // unitKindParams
@@ -830,6 +954,10 @@ BattleUnitSetup btlparty_dou_dou_08_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_08_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_08_01_off_01 = {
     4, // numEnemies
     btlparty_dou_dou_08_01_off_01, // enemyData
@@ -841,6 +969,10 @@ BattleGroupSetup btlgrp_dou_dou_08_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_09_01 in Pirate's Grotto: 2 x Lava Bubble and Ember (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_dou_dou_09_01_off_01[] = {
     {
         &unit_bubble, // unitKindParams
@@ -874,6 +1006,10 @@ BattleUnitSetup btlparty_dou_dou_09_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_09_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_09_01_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_09_01_off_01, // enemyData
@@ -885,6 +1021,10 @@ BattleGroupSetup btlgrp_dou_dou_09_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_09_02 in Pirate's Grotto: 2 x Ember and Lava Bubble (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_dou_dou_09_02_off_01[] = {
     {
         &unit_hermos, // unitKindParams
@@ -918,6 +1058,10 @@ BattleUnitSetup btlparty_dou_dou_09_02_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_09_02 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_09_02_off_01 = {
     3, // numEnemies
     btlparty_dou_dou_09_02_off_01, // enemyData
@@ -929,6 +1073,10 @@ BattleGroupSetup btlgrp_dou_dou_09_02_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_12_01 in Pirate's Grotto: 2 x Bill Blaster (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_12_01_off_01[] = {
     {
         &unit_killer_cannon, // unitKindParams
@@ -952,6 +1100,10 @@ BattleUnitSetup btlparty_dou_dou_12_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_12_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_12_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_12_01_off_01, // enemyData
@@ -963,6 +1115,10 @@ BattleGroupSetup btlgrp_dou_dou_12_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_12_99 in Pirate's Grotto: 2 x Bullet Bill (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_12_99_off_01[] = {
     {
         &unit_killer, // unitKindParams
@@ -986,6 +1142,10 @@ BattleUnitSetup btlparty_dou_dou_12_99_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_12_99 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_12_99_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_12_99_off_01, // enemyData
@@ -997,6 +1157,10 @@ BattleGroupSetup btlgrp_dou_dou_12_99_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_13_01 in Pirate's Grotto: 2 x Bill Blaster (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_13_01_off_01[] = {
     {
         &unit_killer_cannon, // unitKindParams
@@ -1020,6 +1184,10 @@ BattleUnitSetup btlparty_dou_dou_13_01_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_13_01 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_13_01_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_13_01_off_01, // enemyData
@@ -1031,6 +1199,10 @@ BattleGroupSetup btlgrp_dou_dou_13_01_off_01 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle dou_13_99 in Pirate's Grotto: 2 x Bullet Bill (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_dou_dou_13_99_off_01[] = {
     {
         &unit_killer, // unitKindParams
@@ -1054,6 +1226,10 @@ BattleUnitSetup btlparty_dou_dou_13_99_off_01[] = {
     },
 };
 
+/**
+ * Enemy group of battle dou_13_99 in Pirate's Grotto: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_dou_dou_13_99_off_01 = {
     2, // numEnemies
     btlparty_dou_dou_13_99_off_01, // enemyData
@@ -1065,141 +1241,172 @@ BattleGroupSetup btlgrp_dou_dou_13_99_off_01 = {
     5, // reserved_1C
 };
 
+/** Developer test battle 1 in Pirate's Grotto: always fights dou_00_01_off_1. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_test1_off[] = {
     {50, &btlgrp_dou_dou_00_01_off_1, &dou_btlstage_data[3]},
     {0},
 };
 
+/** Developer test battle 2 in Pirate's Grotto: always fights dou_00_01_off_1. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_test2_off[] = {
     {50, &btlgrp_dou_dou_00_01_off_1, dou_btlstage_data},
     {0},
 };
 
+/** Developer test battle 3 in Pirate's Grotto: always fights dou_00_01_off_1. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_test3_off[] = {
     {50, &btlgrp_dou_dou_00_01_off_1, &dou_btlstage_data[2]},
     {0},
 };
 
+/** Battle 01_01 in Pirate's Grotto always fights one group, dou_01_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_01_01_off[] = {
     {20, &btlgrp_dou_dou_01_01_off_01, dou_btlstage_data},
     {0},
 };
 
+/** Battle 02_01 in Pirate's Grotto always fights one group, dou_02_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_02_01_off[] = {
     {20, &btlgrp_dou_dou_02_01_off_01, &dou_btlstage_data[3]},
     {0},
 };
 
+/** Battle 02_02 in Pirate's Grotto always fights one group, dou_02_02_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_02_02_off[] = {
     {20, &btlgrp_dou_dou_02_02_off_01, &dou_btlstage_data[3]},
     {0},
 };
 
+/** Battle 03_01 in Pirate's Grotto always fights one group, dou_03_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_03_01_off[] = {
     {20, &btlgrp_dou_dou_03_01_off_01, dou_btlstage_data},
     {0},
 };
 
+/** Battle 03_99 in Pirate's Grotto always fights one group, dou_03_99_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_03_99_off[] = {
     {20, &btlgrp_dou_dou_03_99_off_01, dou_btlstage_data},
     {0},
 };
 
+/** Battle 03_02 in Pirate's Grotto always fights one group, dou_03_02_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_03_02_off[] = {
     {20, &btlgrp_dou_dou_03_02_off_01, dou_btlstage_data},
     {0},
 };
 
+/** Battle 03_03 in Pirate's Grotto always fights one group, dou_03_03_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_03_03_off[] = {
     {20, &btlgrp_dou_dou_03_03_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
+/** Battle 05_01 in Pirate's Grotto always fights one group, dou_05_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_05_01_off[] = {
     {20, &btlgrp_dou_dou_05_01_off_01, dou_btlstage_data},
     {0},
 };
 
+/** Battle 05_02 in Pirate's Grotto always fights one group, dou_05_02_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_05_02_off[] = {
     {20, &btlgrp_dou_dou_05_02_off_01, dou_btlstage_data},
     {0},
 };
 
+/** Battle 06_01 in Pirate's Grotto always fights one group, dou_06_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_06_01_off[] = {
     {20, &btlgrp_dou_dou_06_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/** Battle 06_02 in Pirate's Grotto always fights one group, dou_06_02_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_06_02_off[] = {
     {20, &btlgrp_dou_dou_06_02_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/** Battle 06_03 in Pirate's Grotto always fights one group, dou_06_03_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_06_03_off[] = {
     {20, &btlgrp_dou_dou_06_03_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/** Battle 07_01 in Pirate's Grotto always fights one group, dou_07_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_07_01_off[] = {
     {20, &btlgrp_dou_dou_07_01_off_01, dou_btlstage_data},
     {0},
 };
 
+/** Battle 08_01 in Pirate's Grotto always fights one group, dou_08_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_08_01_off[] = {
     {20, &btlgrp_dou_dou_08_01_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
+/** Battle 09_01 in Pirate's Grotto always fights one group, dou_09_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_09_01_off[] = {
     {20, &btlgrp_dou_dou_09_01_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
+/** Battle 09_02 in Pirate's Grotto always fights one group, dou_09_02_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_09_02_off[] = {
     {20, &btlgrp_dou_dou_09_02_off_01, &dou_btlstage_data[4]},
     {0},
 };
 
+/** Battle 12_01 in Pirate's Grotto always fights one group, dou_12_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_12_01_off[] = {
     {20, &btlgrp_dou_dou_12_01_off_01, &dou_btlstage_data[5]},
     {0},
 };
 
+/** Battle 12_02 in Pirate's Grotto always fights one group, dou_12_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_12_02_off[] = {
     {20, &btlgrp_dou_dou_12_01_off_01, &dou_btlstage_data[5]},
     {0},
 };
 
+/** Battle 12_99 in Pirate's Grotto always fights one group, dou_12_99_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_12_99_off[] = {
     {20, &btlgrp_dou_dou_12_99_off_01, &dou_btlstage_data[5]},
     {0},
 };
 
+/** Battle 13_01 in Pirate's Grotto always fights one group, dou_13_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_13_01_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/** Battle 13_02 in Pirate's Grotto always fights one group, dou_13_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_13_02_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/** Battle 13_03 in Pirate's Grotto always fights one group, dou_13_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_13_03_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/** Battle 13_04 in Pirate's Grotto always fights one group, dou_13_01_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_13_04_off[] = {
     {20, &btlgrp_dou_dou_13_01_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/** Battle 13_99 in Pirate's Grotto always fights one group, dou_13_99_off_01. */
 NpcBattleSelect btlgrpsel_dou_btlno_dou_13_99_off[] = {
     {20, &btlgrp_dou_dou_13_99_off_01, &dou_btlstage_data[1]},
     {0},
 };
 
+/**
+ * Field battle setups of Pirate's Grotto: one entry per battle id in btl_dou_setup_no_tbl, giving the stage,
+ * the group selection and the battle music.
+ */
 NpcSetupBattleInfo btlsetup_dou_tbl[] = {
     {
         "マップstg_05_3", // name
@@ -1474,6 +1681,10 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
     {0},
 };
 
+/**
+ * Battle ids of Pirate's Grotto (BTLNO_DOU_*) and their index into btlsetup_dou_tbl; handed to the battle
+ * system by relSetBtlAddr.
+ */
 NpcTerritoryInfo btl_dou_setup_no_tbl[] = {
     {"BTLNO_DOU_TEST1", 0},
     {"BTLNO_DOU_TEST2", 1},

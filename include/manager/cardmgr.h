@@ -26,6 +26,12 @@ typedef struct {
     u32 checksum2;               // 0x1FFC
 } CardMetadata;
 
+// CardSaveSlot.data.flags bits.
+enum CardSaveFlags {
+    CARD_SAVE_FLAG_EMPTY = 0x1,   // a blank slot made by the card set-up: the file menu shows New Game; saving clears it
+    CARD_SAVE_FLAG_CORRUPT = 0x2, // neither copy of the slot passed its checksum: shown as broken; saving clears it
+};
+
 typedef struct {
     struct {
         u16 flags;                // 0x0
@@ -83,7 +89,7 @@ typedef struct {
     s32 opStep;             // 0xD8, step within the current operation
     u8 pad_DC[0xE0 - 0xDC]; // 0xDC
     s32 op;                 // 0xE0, current operation (0 = idle, 8 = finishing/error)
-    s32 prevInserted;       // 0xE4, last CARDProbe result; a change sets flag 0x4000
+    s32 prevInserted;       // 0xE4, last CARDProbe result; a change sets CARD_FLAG_INSERT_CHANGED
     u8 pad_E8[0xEC - 0xE8]; // 0xE8
     s32 busyFrames;         // 0xEC, counts down; nonzero keeps cardIsExec returning TRUE
 } CardWork;

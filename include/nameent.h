@@ -4,8 +4,14 @@
 #include "manager/filemgr.h"
 #include <dolphin/types.h>
 
+// NameEntryWork.flags.
+enum NameEntryFlags {
+    NAMEENT_FLAG_INPUT_ON = 0x1,  // nameEntWait: the screen takes button input (nameMain)
+    NAMEENT_FLAG_CANCELLED = 0x2, // the player backed out with B on an empty file name (nameEntIsCancel)
+};
+
 typedef struct NameEntryWork {
-    u16 flags;              // 0x0, bit0 = done/closing, bit1 = cancelled
+    u16 flags;              // 0x0, NameEntryFlags
     u8 pad_2[2];            // 0x2, padding?
     s32 loadState;          // 0x4, tpl load step (0 idle, 1 load, 3 free)
     s32 state;              // 0x8, input state; 100 = confirm, 0x65 = cancelled

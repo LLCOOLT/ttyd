@@ -40,9 +40,11 @@ static void effBrokenBarrierMain(EffectEntry* effect);
 static void effBrokenBarrierDisp(CameraId cameraId, EffectEntry* effect);
 static void main_dl(EffectEntry* effect, Mtx viewMtx);
 
+/** Shard size over its 20-frame cycle: swells to 1.5 then shrinks (the ten steps are listed twice). */
 static f32 scale_data[] = {0.2f, 0.4f, 0.8f, 1.3f, 1.5f, 1.3f, 0.9f, 0.6f, 0.4f, 0.3f,
                            0.2f, 0.4f, 0.8f, 1.3f, 1.5f, 1.3f, 0.9f, 0.6f, 0.4f, 0.3f};
 
+/** Barrier shard quads: eight cells of the shard texture strip, one picked per shard. */
 static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, 704, 0, 0, 0, 0, 255},

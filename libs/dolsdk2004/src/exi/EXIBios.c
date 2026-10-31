@@ -21,8 +21,10 @@
 #define EXI_0LENGTH_EXILENGTH_MASK 0x03FFFFE0
 
 #if DEBUG
+/** Library version string kept in the binary (debug build). */
 const char * __EXIVersion = "<< Dolphin SDK - EXI\tdebug build: Apr  5 2004 03:55:29 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char * __EXIVersion = "<< Dolphin SDK - EXI\trelease build: Apr  5 2004 04:14:14 (0x2301) >>";
 #endif
 

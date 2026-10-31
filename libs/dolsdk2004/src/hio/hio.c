@@ -7,19 +7,25 @@ static u32 Dev;
 #define HIO_DEV Dev
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __HIOVersion = "<< Dolphin SDK - HIO\tdebug build: Apr  5 2004 03:57:05 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __HIOVersion = "<< Dolphin SDK - HIO\trelease build: Apr  5 2004 04:15:47 (0x2301) >>";
 #endif
 
+/** Copyright line printed when the HIO library is enumerated. */
 static char __HIODigest1[71] = "\"HIO library - Copyright (C) 2000-2002 Nintendo. All rights reserved.\"";
 
 #ifdef DEBUG
+/** Build stamp string (debug build). */
 static char __HIODigest2[34] = "\"HIO built: Apr  5 2004 03:57:05\"";
 #else
+/** Build stamp string (release build). */
 static char __HIODigest2[34] = "\"HIO built: Apr  5 2004 04:15:47\"";
 #endif
 
+/** EXI channel of the host I/O device (-1: none found yet). */
 static s32 Chan = -1;
 static HIOCallback ExiCallback;
 static HIOCallback TxCallback;

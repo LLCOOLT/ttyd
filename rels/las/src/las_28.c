@@ -83,6 +83,7 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/** Exits of las_28: west door w_bero to las_27 (e_bero); east road e_bero to las_30 (w_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -122,8 +123,8 @@ static BeroEntry bero_entry_data[] = {
 };
 
 /**
- * Init of Princess Peach's NPC in las_28: sets status bit 2 (Unknown: its exact meaning).
- * Between STORY_STG8_14_LOCK and STORY_STG8_14_01_QUEENS_CHAMBER she is placed at (410, 25, 0), facing left,
+ * Init of Sir Grodus's NPC (シュリョー) in las_28: sets status bit 2, so he turns to face the way he moves.
+ * Between STORY_STG8_14_LOCK and STORY_STG8_14_01_QUEENS_CHAMBER he is placed at (410, 25, 0), facing left,
  * and jumping is allowed.
  */
 static EVT_BEGIN(syuryo_init)
@@ -138,7 +139,7 @@ static EVT_BEGIN(syuryo_init)
     RETURN
 EVT_END()
 
-/** Init event of Bowser (クッパ): sets the invisible status bit so he is hidden until his entrance. */
+/** Init event of Bowser (クッパ): sets status bit 2, so he turns to face the way he moves. */
 EVT_BEGIN(koopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
@@ -150,7 +151,7 @@ EVT_BEGIN(koopa_talk)
     RETURN
 EVT_END()
 
-/** Init of Kammy Koopa's NPC (ババ): sets status bit 2 (Guess: it keeps her hidden at first, as for Bowser). */
+/** Init of Kammy Koopa's NPC (ババ): sets status bit 2, so she turns to face the way she moves. */
 static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
@@ -162,6 +163,7 @@ static EVT_BEGIN(baba_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the throne room scene: Sir Grodus (シュリョー), Bowser (クッパ) and Kammy Koopa (ババ). */
 static NpcSetupInfo npcEnt[] = {
     {
         "シュリョー", // name
@@ -299,6 +301,8 @@ static USER_FUNC(syuryo_baria_recalc_pos) {
  */
 EVT_BEGIN(syuryo_thunder)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    // Grodus's lightning strikes: hit effects on Mario and his partner, then a bolt between them with thunder
+    // and a camera shake.
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -326,6 +330,7 @@ EVT_BEGIN(syuryo_thunder)
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.059570313f), 500)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+        // The partner falls into its hurt pose, spins back up and stands dazed.
         CALL(evt_party_cont_onoff, 0, 0)
         CALL(evt_mario_get_party, LW(0))
         SWITCH(LW(0))
@@ -458,6 +463,7 @@ EVT_BEGIN(syuryo_evt)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Controls off; Grodus laughs from the throne.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
 #if VERSION >= VERSION_JP
@@ -479,6 +485,8 @@ EVT_BEGIN(syuryo_evt)
     WAIT_MS(1000)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG8_3RDHEAD1"))
     WAIT_MS(500)
+    // Grodus welcomes Mario and boasts that he is the supreme leader of the X-Nauts, and why he let Mario
+    // collect the Crystal Stars.
     CALL(evt_msg_print, 0, STRING("stg8_las_52"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, 8, 80, 62, 401, 80, -10, 1000, 11)
     WAIT_MS(1000)
@@ -491,6 +499,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_mario_set_pose, STRING("M_I_Y"))
     CALL(evt_mario_dispflag_onoff, 1, 2)
     WAIT_MS(500)
+    // The partner reacts to the X-Naut leader and realizes they were used to gather the stars.
     CALL(evt_msg_print_party, STRING("stg8_las_54"))
     CALL(evt_cam3d_evt_set, 12, 140, 55, 400, 80, -16, 0, 11)
     WAIT_FRAMES(1)
@@ -511,6 +520,8 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_cam3d_evt_set, 0, 270, 1072, 0, 120, -18, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(500)
+    // Grodus mocks the Shadow Sirens' failure and announces his plan to rule the world; the partner vows to
+    // stop him.
     CALL(evt_msg_print, 0, STRING("stg8_las_60"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, -160, 67, 230, -160, 32, -18, 0, 11)
     WAIT_FRAMES(1)
@@ -541,6 +552,7 @@ EVT_BEGIN(syuryo_evt)
     WAIT_FRAMES(1)
     CALL(evt_mario_set_pos, -100, 0, 0)
     CALL(evt_party_set_pos, 0, -150, 25, 0)
+    // Grodus calls the fight.
     CALL(evt_msg_print, 0, STRING("stg8_las_64"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, 0, 270, 1072, 0, 120, -18, 1250, 1)
     SET_VALUE(GF(0), 1)
@@ -557,6 +569,7 @@ EVT_BEGIN(syuryo_evt)
 #if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
 #endif
+    // The battle with Grodus starts and the script waits for it to end.
     CALL(evt_npc_set_battle_info, STRING("シュリョー"), 15)
     CALL(evt_npc_battle_start, STRING("シュリョー"))
     CALL(evt_npc_wait_battle_end)
@@ -573,6 +586,7 @@ EVT_BEGIN(syuryo_evt)
     WAIT_FRAMES(1)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("シュリョー"), STRING("S_3"), STRING("T_4"))
+    // Beaten, Grodus says he foresaw this and prepared a surprise.
     CALL(evt_msg_print, 0, STRING("stg8_las_70"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, -80, 73, 254, -80, 35, -18, 0, 11)
     WAIT_FRAMES(1)
@@ -589,6 +603,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_hei_07"))
     CALL(evt_img_alloc_capture, STRING("img"), 0, 0, 1, 152, 88, 304, 304)
     WAIT_FRAMES(1)
+    // Princess Peach appears in a barrier of light above the floor and cries out to Mario.
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_PEACH_APPEAR1"), 420, 25, 0, 0)
     CALL(evt_img_clear_virtual_point, STRING("img"))
     CALL(evt_img_onoff, STRING("img"), 1)
@@ -672,6 +687,7 @@ EVT_BEGIN(syuryo_evt)
     WAIT_FRAMES(1)
     CALL(syuryo_baria_recalc_pos)
     WAIT_MS(500)
+    // Grodus threatens her life if Mario moves.
     CALL(evt_msg_print, 0, STRING("stg8_las_76"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, -75, 95, 328, -75, 45, -18, 0, 11)
     WAIT_FRAMES(1)
@@ -700,6 +716,7 @@ EVT_BEGIN(syuryo_evt)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_LAND_DAMAGE2"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
+    // He shocks Mario and the partner with lightning while Peach calls out.
     CALL_CHILD(syuryo_thunder)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 410, 100, 230, 410, 65, -18, 0, 11)
@@ -757,6 +774,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_cam3d_evt_set, -85, 65, 230, -85, 30, -18, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(500)
+    // The partner asks what to do; Mario chooses to attack or not and Grodus answers either way.
     CALL(evt_msg_print_party, STRING("stg8_las_82"))
     CALL(evt_msg_select, 0, STRING("stg8_las_82_yesno"))
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("S_3"))
@@ -776,6 +794,7 @@ EVT_BEGIN(syuryo_evt)
     CALL(evt_npc_set_anim, STRING("シュリョー"), STRING("A_3B"))
     WAIT_MS(250)
     CALL(evt_party_run, 0)
+    // The scene continues with Bowser's arrival (koopa_evt).
     SPAWN_EVENT(koopa_evt)
     RETURN
 EVT_END()
@@ -829,6 +848,7 @@ EVT_END()
  */
 EVT_BEGIN(koopa_evt)
     CALL(evt_party_stop, 0)
+    // The ceiling shakes and cracks; Grodus looks up in alarm.
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KOOPA_QUAKE1"), 75, 300, 0, LW(0))
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.01953125f), 1500)
     CALL(evt_snd_sfxoff, LW(0))
@@ -872,6 +892,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_npc_set_position, STRING("クッパ"), LW(2), LW(3), LW(4))
     CALL(evt_npc_set_ry, STRING("クッパ"), 270)
     CALL(evt_npc_flag_onoff, 1, STRING("クッパ"), NPC_FLAG_INTANGIBLE)
+    // Bowser smashes through the ceiling in a rain of rubble and lands on top of Grodus.
     CALL(evt_msg_print, 0, STRING("stg8_las_86"), 0, STRING("クッパ"))
     CALL(evt_npc_set_anim, STRING("クッパ"), STRING("KPA_D_1"))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_CEILING_BREAK2"), LW(2), LW(3), LW(4), 0)
@@ -882,6 +903,7 @@ EVT_BEGIN(koopa_evt)
         SET_VALUE(LW(1), 50)
         SET_VALUE(LW(2), -80)
         SET_VALUE(LW(3), 880)
+        // Rubble keeps falling around the room.
         SPAWN_EVENT(gareki_fall)
         WAIT_MS(50)
         SET_VALUE(LW(0), STRING("S_gareki8"))
@@ -988,6 +1010,7 @@ EVT_BEGIN(koopa_evt)
     END_IF
     CALL(evt_npc_get_position, STRING("クッパ"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_KOOPA_SATIATED2_1"), LW(0), LW(1), LW(2), 0)
+    // Bowser's theme starts; he gets up, dazed, with stars spinning around his head.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     BEGIN_INLINE_EVENT
@@ -1029,6 +1052,7 @@ EVT_BEGIN(koopa_evt)
     WAIT_FRAMES(1)
     CALL(syuryo_baria_recalc_pos)
     WAIT_MS(500)
+    // Peach calls to Bowser; he wonders if he put on weight, and Kammy flies in on her broom to check on him.
     CALL(evt_msg_print, 0, STRING("stg8_las_88"), 0, STRING("ピーチ姫"))
     CALL(evt_cam3d_evt_set, 75, 110, 403, 75, 50, -18, 0, 11)
     WAIT_FRAMES(1)
@@ -1115,6 +1139,7 @@ EVT_BEGIN(koopa_evt)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 75, 120, 403, 75, 60, -18, 0, 11)
     WAIT_FRAMES(1)
+    // Bowser spots Mario and Peach and is furious.
     CALL(evt_msg_print, 0, STRING("stg8_las_91"), 0, STRING("クッパ"))
     CALL(evt_npc_set_ry, STRING("ババ"), 90)
     WAIT_MS(800)
@@ -1157,6 +1182,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_mario_set_pose, STRING("M_I_Y"))
     CALL(evt_mario_dispflag_onoff, 1, 2)
     WAIT_MS(500)
+    // The partner answers him; Bowser charges.
     CALL(evt_msg_print_party, STRING("stg8_las_94"))
     CALL(evt_cam3d_evt_set, 65, 107, 279, 65, 65, -18, 0, 11)
     WAIT_FRAMES(1)
@@ -1188,6 +1214,7 @@ EVT_BEGIN(koopa_evt)
 #if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
 #endif
+    // The battle against Bowser and Kammy starts and the script waits for it to end.
     CALL(evt_npc_set_battle_info, STRING("クッパ"), 13)
     CALL(evt_npc_battle_start, STRING("クッパ"))
     CALL(evt_npc_wait_battle_end)
@@ -1213,6 +1240,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("ピーチ姫"), NPC_FLAG_HIDDEN)
     CALL(eff_guruguru, STRING("koopa_piyo"), -10, 60, -10, 20)
     CALL(eff_guruguru, STRING("baba_piyo"), 70, 30, 20, 20)
+    // Bowser and Kammy are left dazed with spinning stars while the barrier around Peach drops.
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KOOPA_PIYO1"), -10, 60, -10, 0)
     CALL(evt_cam3d_evt_set, 0, 132, 530, 0, 55, -18, 0, 11)
     WAIT_FRAMES(1)
@@ -1244,6 +1272,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_cam3d_evt_set, -40, 65, 230, -40, 30, -18, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(750)
+    // Peach cries out as the cracked Grodus staggers away.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
     BEGIN_INLINE_EVENT
         WAIT_MS(100)
@@ -1294,6 +1323,7 @@ EVT_BEGIN(koopa_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("ババ"), NPC_FLAG_NO_TURN_TO_MARIO)
     CALL(evt_npc_change_interrupt, STRING("クッパ"), 6, PTR(koopa_talk))
     CALL(evt_npc_change_interrupt, STRING("ババ"), 6, PTR(baba_talk))
+    // The story advances and Mario regains control.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
@@ -1342,6 +1372,7 @@ EVT_END()
  * or resuming Grodus's and Bowser's scenes). When entering from las_26 the player drops into the room.
  */
 EVT_BEGIN(las_28_init_evt)
+    // Music by story step: danger music before the Grodus scene, silence after it.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
 #if VERSION >= VERSION_JP
@@ -1360,6 +1391,8 @@ EVT_BEGIN(las_28_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
+        // Register the doors, then set up Grodus's light effects and the throne parts for the current story
+        // step.
         CALL_CHILD(evt_bero_info_run)
     END_IF
     CALL(evt_npc_setup, PTR(npcEnt))
@@ -1378,8 +1411,11 @@ EVT_BEGIN(las_28_init_evt)
     CALL(evt_hitobj_onoff, STRING("A_gare"), 1, 0)
     CALL_CHILD(shan_init)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
+        // First entry (the room was just locked): the opening cutscene plays.
         SPAWN_EVENT(first_evt)
     END_IF
+    // Resuming after the Grodus fight: either Bowser's scene (koopa_evt) with Mario and his partner placed in
+    // front of Grodus, or Grodus's own scene (syuryo_evt).
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_01_QUEENS_CHAMBER)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("koopa_evt"))
@@ -1406,6 +1442,7 @@ EVT_BEGIN(las_28_init_evt)
         END_IF
     END_IF
     CALL(evt_bero_get_entername, LW(0))
+    // Arriving from las_26: Mario drops into the room from above.
     IF_STR_EQUAL(LW(0), STRING("from26"))
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_cont_onoff, 0)

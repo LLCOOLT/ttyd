@@ -368,9 +368,9 @@ USER_FUNC(evt_audience_ap_recovery) {
 }
 
 /**
- * Gives every member in status 13 at sub-step 1 an args[0]% chance to move on to sub-step 2;
+ * Wakes sleeping members: gives every member in status 13 (asleep) at sub-step 1 an args[0]% chance to move on
+ * to sub-step 2, where BattleAudienceCtrlProcessKinopioSleep hops them awake and back to idle.
  * args[1] and args[2] are read but unused. Called by the quake hammers and the POW Block.
- * Guess: this wakes members out of the stopped state that evt_audience_abnormal_natural_all puts them in.
  */
 USER_FUNC(evt_audience_reflesh_natural_all) {
     EvtWord* args = event->args;
@@ -383,7 +383,7 @@ USER_FUNC(evt_audience_reflesh_natural_all) {
     i = 0;
     member = BattleAudienceGetPtr(0);
     for (; i < 200; i++, member++) {
-        if (member->flags & 1 && member->status == 13 && member->step == 1 && irand(100) < chance) {
+        if (member->flags & MEMBER_FLAG_ACTIVE && member->status == 13 && member->step == 1 && irand(100) < chance) {
             member->step = 2;
         }
     }
@@ -391,8 +391,9 @@ USER_FUNC(evt_audience_reflesh_natural_all) {
 }
 
 /**
- * Puts every active member in status 0-7 into status 13 with an args[0]% chance; args[1] and args[2] are unused.
- * Called by the Clock Out special move (sac_bakugame). Guess: status 13 is the stopped state.
+ * Puts every active member in status 0-7 to sleep (status 13, BattleAudienceCtrlProcessKinopioSleep)
+ * with an args[0]% chance; args[1] and args[2] are unused.
+ * Called by the Clock Out special move (sac_bakugame).
  */
 USER_FUNC(evt_audience_abnormal_natural_all) {
     EvtWord* args = event->args;

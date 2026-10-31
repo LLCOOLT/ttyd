@@ -47,7 +47,7 @@ static void actionCommandDisp(f32 x, f32 y);
 static void actionCommandDisp2(f32 x, f32 y);
 static u16 _get_icon_id(s8 dir);
 
-// inlining off for _GetInputDir, _CalcRollDir, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it 1 function changes length, e.g. battleAcMain_StickRotate 422 -> 567 instructions
 #pragma dont_inline on
 /**
  * Reads the Control Stick as one of eight directions, 1 up then clockwise to 8 up-left, or 0 when centred.
@@ -163,8 +163,8 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                     sw->iconB = 2;
                 }
             case 1000:
-                if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
-                    if (ac->setupFlags & 2) {
+                if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+                    if (ac->setupFlags & AC_SETUP_FLAG_RETRIES) {
                         ac->setupParam--;
                         if (ac->setupParam >= 0) {
                             break;

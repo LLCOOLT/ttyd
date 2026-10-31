@@ -9,8 +9,10 @@
 #include "__vi.h"
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __VIVersion = "<< Dolphin SDK - VI\tdebug build: Apr  7 2004 03:55:59 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __VIVersion = "<< Dolphin SDK - VI\trelease build: Apr  7 2004 04:13:59 (0x2301) >>";
 #endif
 
@@ -98,6 +100,10 @@ static volatile u16 shdwRegs[59];
 
 #define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
 
+/**
+ * Video timing parameters for each group of TV modes (NTSC, PAL, MPAL, progressive and others),
+ * returned by the mode lookup below.
+ */
 static VITiming timing[10] = {
     { 6, 240, 24, 25, 3, 2, 12, 13, 12, 13, 520, 519, 520, 519, 525, 429, 64, 71, 105, 162, 373, 122, 412 },
     { 6, 240, 24, 24, 4, 4, 12, 12, 12, 12, 520, 520, 520, 520, 526, 429, 64, 71, 105, 162, 373, 122, 412 },
@@ -111,6 +117,9 @@ static VITiming timing[10] = {
     { 12, 480, 48, 48, 6, 6, 24, 24, 24, 24, 1038, 1038, 1038, 1038, 1050, 429, 64, 71, 105, 180, 391, 122, 412 }
 };
 
+/**
+ * Coefficients of the video interface's horizontal scaling filter, written to the filter registers at init.
+ */
 static u16 taps[25] = {
     0x01F0, 0x01DC,
     0x01AE, 0x0174,
@@ -323,7 +332,7 @@ VITiming* __VISetExtraTiming(VITiming* t) {
     timingExtra = t;
     return old;
 }
-
+// dont_inline as in the original SDK source (dolsdk2001 and upstream have it around getTiming); not a fake.
 #pragma dont_inline on
 /**
  * Returns the timing table for a TV mode: NTSC (also used for EuRGB60), PAL, MPAL,
@@ -1278,7 +1287,7 @@ void __VIGetAdjustingValues(s16* x, s16* y) {
     OSRestoreInterrupts(enabled);
 }
 
-/** DEBUG NONMATCHING - wrong reg use, equivalent */
+/** Not in any TTYD DOL (unused, stripped); upstream notes different registers, same behaviour, in its debug build. */
 void __VIEnableRawPositionInterrupt(s16 x, s16 y, void (*callback)(s16, s16)) {
     BOOL enabled;
     u32 halfLine;
@@ -1408,7 +1417,7 @@ void __VISetLatchMode(u32 mode) {
     OLD_SET_REG_FIELD(2835, reg, 2, 6, mode);
     __VIRegs[1] = reg;
 }
-
+// dont_inline here and around __VIGetLatch1Position as in the upstream SDK source; not a fake.
 #pragma dont_inline on
 /**
  * If latch 0 has triggered, returns 1 and its screen position (clearing the latch);

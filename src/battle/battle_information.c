@@ -74,6 +74,11 @@ typedef struct ItemHogTable {
 #endif
 } ItemHogTable;
 
+/**
+ * Item Hog drops: Dried Shrooms (three times), Fright Mask, Mushroom, Honey Syrup, Tasty Tonic, Fire Flower,
+ * Volt Shroom and POW Block. BattleInformationSetDropMaterial picks one of the 20 (US on: 25) slots at random,
+ * so the empty slots leave about half the rolls without an item.
+ */
 const ItemHogTable N_item_hog_table = {
     {0x98, 0x98, 0x98, 0xA2, 0x94, 0x9A, 0x99, 0x84, 0x87, 0x8B}
 };

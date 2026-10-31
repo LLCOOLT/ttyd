@@ -33,8 +33,10 @@ extern void __OSInitMemoryProtection(void);
 #endif
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __OSVersion = "<< Dolphin SDK - OS\tdebug build: "BUILD_DATE" "DBUILD_TIME" (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __OSVersion = "<< Dolphin SDK - OS\trelease build: "BUILD_DATE" "RBUILD_TIME" (0x2301) >>";
 #endif
 
@@ -384,12 +386,17 @@ void OSInit(void) {
     }
 }
 
+/**
+ * Address of each PowerPC exception vector, in OS exception number order;
+ * OSExceptionInit installs a handler at each.
+ */
 static u32 __OSExceptionLocations[] = {
     0x00000100, 0x00000200, 0x00000300, 0x00000400, 0x00000500, 0x00000600, 0x00000700, 0x00000800,
     0x00000900, 0x00000C00, 0x00000D00, 0x00000F00, 0x00001300, 0x00001400, 0x00001700,
 };
 
 #if DEBUG
+/** Exception names printed by debug builds. */
 char * __OSExceptionNames[17] = {
 	"System reset",
 	"MachineCheck",

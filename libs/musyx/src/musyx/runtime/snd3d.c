@@ -576,6 +576,7 @@ typedef struct START_GROUP {
   unsigned short numRunning; // offset 0xC, size 0x2
 } START_GROUP;
 
+/** Float constants for the 3D sound maths: 16383, 127, 64 and 8192. */
 static const f32 s3d_f16383[1] = {16383.0f};
 static const f32 s3d_f127[1] = {127.0f};
 static const f32 s3d_f64[1] = {64.0f};
@@ -671,18 +672,18 @@ static RUN_LIST runList[128];
 
 /**
  * Public: updates an emitter's position and direction
- * and its maximum volume (the current volume is lowered to it if higher).
+ * and its maximum volume (the minimum volume is lowered to it if higher).
  */
 bool sndUpdateEmitter(SND_EMITTER* em, SND_FVECTOR* pos, SND_FVECTOR* dir, u8 maxVol,
                       SND_ROOM* room) {
   if (sndActive) {
     hwDisableIrq();
 
-    *(SND_FVECTOR*)((u8*)em + 0x10) = *pos;
-    *(SND_FVECTOR*)((u8*)em + 0x1c) = *dir;
-    *(f32*)((u8*)em + 0x2c) = maxVol / s3d_f127[0];
-    if (*(f32*)((u8*)em + 0x30) > *(f32*)((u8*)em + 0x2c)) {
-      *(f32*)((u8*)em + 0x30) = *(f32*)((u8*)em + 0x2c);
+    em->pos = *pos;
+    em->dir = *dir;
+    em->maxVol = maxVol / s3d_f127[0];
+    if (em->minVol > em->maxVol) {
+      em->minVol = em->maxVol;
     }
     hwEnableIrq();
     return TRUE;
@@ -694,7 +695,7 @@ bool sndUpdateEmitter(SND_EMITTER* em, SND_FVECTOR* pos, SND_FVECTOR* dir, u8 ma
 /** Public: returns TRUE while the emitter is registered (flag 0x10000 set). */
 bool sndCheckEmitter(SND_EMITTER* em) {
   if (sndActive) {
-    return (*(u32*)((u8*)em + 0xc) & 0x10000) != 0;
+    return (em->flags & 0x10000) != 0;
   }
   return FALSE;
 }

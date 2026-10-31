@@ -4,6 +4,10 @@
 
 #include "__axfx.h"
 
+/**
+ * Four-tap interpolation coefficients (128 phases of 4) the chorus uses to read its delay line at fractional
+ * positions.
+ */
 static f32 rsmpTab12khz[512] = {
     0.097503662109f,  0.802215576172f,  0.101593017578f,  -0.000976562500f, 0.093505859375f,
     0.802032470703f,  0.105804443359f,  -0.001037597656f, 0.089599609375f,  0.801696777344f,

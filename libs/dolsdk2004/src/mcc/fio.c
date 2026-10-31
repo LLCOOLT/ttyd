@@ -2,14 +2,19 @@
 #include <dolphin/mcc.h>
 
 #ifdef DEBUG
+/** Version string of the file I/O library for the debug build; it is registered with the OS. */
 const char* __FIOVersion = "<< Dolphin SDK - FIO\tdebug build: Apr  5 2004 03:57:07 (0x2301) >>";
 #else
+/** Version string of the file I/O library for the release build; it is registered with the OS. */
 const char* __FIOVersion = "<< Dolphin SDK - FIO\trelease build: Apr  5 2004 04:15:50 (0x2301) >>";
 #endif
 
 static u8 gBuf[0x2000];
 static u8 gPrintBuf[0x400];
 
+/**
+ * Transfer block size, in 8 KB units, for the file channel and its mirror (gm* is the memory-channel copy).
+ */
 static u8 gmSizeOfBlocks = 1;
 static u8 gSizeOfBlocks = 1;
 volatile static BOOL gProcDone = TRUE;

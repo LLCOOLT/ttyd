@@ -37,6 +37,7 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/** The one door of this room: the west door back to the storage room tou_06. */
 static BeroEntry bero_data[] = {
     {
         "w_bero", // hitName
@@ -141,7 +142,11 @@ static EVT_BEGIN(init_michel)
     RETURN
 EVT_END()
 
-/** Guess: NPC init for the dummy Michel NPC: placed at (175, 0, -20) until the boss battle. */
+/**
+ * NPC init for the Michel stand-in (マイケルダミー), a hidden NPC that carries Michel's talk script:
+ * before STORY_STG3_32_BOSS_BATTLE it is placed at (175, 0, -20), where the flattened Michel lies,
+ * so talking there reaches him.
+ */
 EVT_BEGIN(init_michel_dummy)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_npc_set_position, STRING("マイケルダミー"), 175, 0, -20)
@@ -172,7 +177,11 @@ static EVT_BEGIN(init_brots)
     RETURN
 EVT_END()
 
-/** Guess: NPC init for the dummy Brots NPC (ブロッツダミー): placed at (125, 4, -60) until the boss battle. */
+/**
+ * NPC init for the Brots stand-in (ブロッツダミー), a hidden NPC that carries Brots's talk script:
+ * before STORY_STG3_32_BOSS_BATTLE it is placed at (125, 4, -60), next to where the flattened Brots lies,
+ * so talking there reaches him.
+ */
 EVT_BEGIN(init_brots_dummy)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_npc_set_position, STRING("ブロッツダミー"), 125, 4, -60)
@@ -222,6 +231,10 @@ static EVT_BEGIN(talk_kinoshikowa)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of this room: the flattened King K and Bandy Andy, the hidden stand-ins that carry their talk scripts,
+ * and Jolene.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "マイケル", // name

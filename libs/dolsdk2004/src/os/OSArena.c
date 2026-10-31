@@ -4,7 +4,9 @@
 #define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
 #define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 
+/** Top of the arena, the free memory the OS has not handed out yet. */
 static void* __OSArenaHi;
+/** Bottom of the arena; -1 until OSInit sets it, which the getters assert on. */
 static void* __OSArenaLo = (void*)-1;
 
 /** Returns the top of the arena, the end of the memory the OS has not handed out yet. */

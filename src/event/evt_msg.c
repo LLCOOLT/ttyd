@@ -30,11 +30,18 @@ static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const 
 #include "mario/mario.h"
 #include "mario/mario_party.h"
 #include "party.h"
-extern float __fabsf(float);
 
 s32 BattleTransID(EventEntry* event, s32 type);
 
 // the message window's MsgWinData lives in its userdata block
+// EventEntry.printWindowFlags: the next message window's tail, set by evt_msg_toge (the kind in the low bits,
+// possibly with PRINT_WINDOW_TOGE_SCREEN_POS) and evt_msg_togelr (the top bits); _evt_msg_print uses and clears them.
+#define PRINT_WINDOW_TOGE_KIND 0x1EFFFFFF       // evt_msg_toge's tail kind: 1 no tail, 2 and 3 point at msgPos
+#define PRINT_WINDOW_TOGE_SCREEN_POS 0x01000000 // the tail target is already a screen position (tailMode 0x10)
+#define PRINT_WINDOW_TOGELR_TOP 0x20000000      // tail from the window's top edge (tailMode 8)
+#define PRINT_WINDOW_TOGELR_RIGHT 0x40000000    // tail base on the right of the window (tailMode 4)
+#define PRINT_WINDOW_TOGELR 0x80000000          // tail mode 3 forced (evt_msg_togelr)
+
 #define MSGW(w) ((MsgWinData*)(w)->userdata->address)
 
 /**
@@ -50,7 +57,7 @@ static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const 
     WindowEntry* win;
     const char* m;
     if (isFirstCall) {
-        if (!(flags & 1)) {
+        if (!(flags & MSG_PRINT_DIRECT)) {
             m = msgSearch(msg);
         } else {
             m = msg;
@@ -61,7 +68,7 @@ static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const 
         win = windowGetPointer(event->printWindowId);
         MSGW(win)->tag = msg;
         MSGW(win)->event = event;
-        if (!(flags & 2)) {
+        if (!(flags & MSG_PRINT_BATTLE_UNIT)) {
             if (event->wNpcEventType == 6) {
                 npc = event->ownerNPC;
             }
@@ -69,7 +76,7 @@ static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const 
                 npc = evtNpcNameToPtr(event, (const char*)name);
             }
             if (npc == (NpcEntry*)-1) {
-                if (!(event->printWindowFlags & 0x1EFFFFFF)) {
+                if (!(event->printWindowFlags & PRINT_WINDOW_TOGE_KIND)) {
                     PartyEntry* p = partyGetPtr(marioGetPartyId());
                     if (!p) {
                         win->speakerPos = marioGetPtr()->position;
@@ -81,7 +88,7 @@ static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const 
                 }
                 strcpy(MSGW(win)->speakerName, (const char*)name);
             } else if (npc == (NpcEntry*)-2) {
-                if (!(event->printWindowFlags & 0x1EFFFFFF)) {
+                if (!(event->printWindowFlags & PRINT_WINDOW_TOGE_KIND)) {
                     PartyEntry* p = partyGetPtr(marioGetExtraPartyId());
                     if (!p) {
                         win->speakerPos = marioGetPtr()->position;
@@ -93,25 +100,25 @@ static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const 
                 }
                 strcpy(MSGW(win)->speakerName, (const char*)name);
             } else if (npc == (NpcEntry*)-3) {
-                if (!(event->printWindowFlags & 0x1EFFFFFF)) {
+                if (!(event->printWindowFlags & PRINT_WINDOW_TOGE_KIND)) {
                     win->speakerPos = marioGetPtr()->position;
                     win->speakerPos.y += marioGetPtr()->wPlayerCollisionBox.y;
                 }
                 strcpy(MSGW(win)->speakerName, (const char*)name);
             } else if (npc) {
-                if (!(event->printWindowFlags & 0x1EFFFFFF)) {
+                if (!(event->printWindowFlags & PRINT_WINDOW_TOGE_KIND)) {
                     win->speakerPos = npc->position;
                     win->speakerPos.y += npc->height;
                 }
                 strcpy(MSGW(win)->speakerName, npc->description);
             }
         } else {
-            MSGW(win)->flags |= 8;
+            MSGW(win)->flags |= MSG_WIN_FLAG_BATTLE_UNIT;
             MSGW(win)->unitId = BattleTransID(event, name);
             BtlUnit_GetTalkTogePos(MSGW(win)->unitId, &win->speakerPos.x, &win->speakerPos.y, &win->speakerPos.z);
             win->tailMode = 3;
         }
-        switch (event->printWindowFlags & 0x1EFFFFFF) {
+        switch (event->printWindowFlags & PRINT_WINDOW_TOGE_KIND) {
             case 0:
                 if (npc) {
                     Vec scr, mscr;
@@ -143,16 +150,16 @@ static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const 
                 win->speakerPos = event->msgPosVec;
                 break;
         }
-        if (event->printWindowFlags & 0x80000000) {
+        if (event->printWindowFlags & PRINT_WINDOW_TOGELR) {
             win->tailMode = 3;
-            if (event->printWindowFlags & 0x40000000) {
+            if (event->printWindowFlags & PRINT_WINDOW_TOGELR_RIGHT) {
                 win->tailMode |= 4;
             }
-            if (event->printWindowFlags & 0x20000000) {
+            if (event->printWindowFlags & PRINT_WINDOW_TOGELR_TOP) {
                 win->tailMode |= 8;
             }
         }
-        if (event->printWindowFlags & 0x01000000) {
+        if (event->printWindowFlags & PRINT_WINDOW_TOGE_SCREEN_POS) {
             win->tailMode |= 0x10;
         }
         event->printWindowFlags = 0;
@@ -182,9 +189,18 @@ USER_FUNC(evt_msg_print) {
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
 
+/**
+ * Message label suffix of each partner, indexed by partner id (0 none, 1 Goombella, 2 Koops, 3 Bobbery, 4 Yoshi,
+ * 5 Flurrie, 6 Vivian, 7 Ms. Mowz, then the extra ids).
+ */
 const char* partyMsgStr[] = {"", "_kur", "_nok", "_bom", "_yos", "_win", "_viv", "_chu", "_jug", "_tel", "_lui"};
+/**
+ * Message label suffix of each partner battle unit, indexed by unit kind minus 0xE0
+ * (Goombella, Koops, Yoshi, Flurrie, Vivian, Bobbery, Ms. Mowz).
+ */
 const char* battlePartyMsgStr[] = {"_kur", "_nok", "_yos", "_win", "_viv", "_bom", "_chu"};
 #if VERSION == VERSION_JP
+/** Unused padding table in the Japanese release. */
 static const char* battlePartyMsgPad[6] = {0};
 #endif
 
@@ -215,8 +231,6 @@ const char* msg_es_article_cap_tbl[6] = {"Un ", "Una ", "", "", "Unos ", "Unas "
 const char* msg_es_article_tbl[6] = {"un ", "una ", "", "", "unos ", "unas "};
 #endif
 
-char* strcat(char* dst, const char* src);
-char* strstr(const char* s, const char* sub);
 
 // clang-format on
 #endif
@@ -280,7 +294,7 @@ USER_FUNC(evt_msg_print_battle_party) {
     }
     strcpy(partyLabel, msg);
     strcat(partyLabel, battlePartyMsgStr[(s32)unit->currentKind - 0xE0]);
-    return _evt_msg_print(event, isFirstCall, 2, partyLabel, 0, -4);
+    return _evt_msg_print(event, isFirstCall, MSG_PRINT_BATTLE_UNIT, partyLabel, 0, -4);
 }
 
 /**
@@ -304,7 +318,7 @@ USER_FUNC(evt_msg_print_insert) {
     }
     if (isFirstCall) {
         const char* m;
-        if (flags & 1) {
+        if (flags & MSG_PRINT_DIRECT) {
             m = msg;
         } else {
             m = msgSearch(msg);
@@ -326,7 +340,7 @@ USER_FUNC(evt_msg_print_insert) {
                 break;
         }
     }
-    return _evt_msg_print(event, isFirstCall, flags | 1, buf, c, d);
+    return _evt_msg_print(event, isFirstCall, flags | MSG_PRINT_DIRECT, buf, c, d);
 }
 
 /**
@@ -338,7 +352,7 @@ USER_FUNC(evt_msg_print_add) {
     s32 flags = evtGetValue(event, args[0]);
     const char* msg = (const char*)evtGetValue(event, args[1]);
     if (isFirstCall) {
-        if (!(flags & 1)) {
+        if (!(flags & MSG_PRINT_DIRECT)) {
             msgWindow_Add(msgSearch(msg), event->printWindowId);
         } else {
             msgWindow_Add(msg, event->printWindowId);
@@ -365,7 +379,7 @@ USER_FUNC(evt_msg_print_add_insert) {
     }
     if (isFirstCall) {
         const char* m;
-        if (flags & 1) {
+        if (flags & MSG_PRINT_DIRECT) {
             m = msg;
         } else {
             m = msgSearch(msg);
@@ -435,7 +449,7 @@ USER_FUNC(evt_msg_select) {
     const char* msg = (const char*)evtGetValue(event, args[1]);
     if (isFirstCall) {
         const char* m;
-        if (!(flags & 1)) {
+        if (!(flags & MSG_PRINT_DIRECT)) {
             m = msgSearch(msg);
         } else {
             m = msg;
@@ -460,7 +474,7 @@ USER_FUNC(evt_msg_select) {
 USER_FUNC(evt_msg_toge) {
     EvtWord* args = event->args;
     s32 v = evtGetValue(event, args[0]);
-    event->printWindowFlags &= 0xE1000000;
+    event->printWindowFlags &= PRINT_WINDOW_TOGE_SCREEN_POS | PRINT_WINDOW_TOGELR_TOP | PRINT_WINDOW_TOGELR_RIGHT | PRINT_WINDOW_TOGELR;
     event->printWindowFlags |= v;
     event->msgPos.x = evtGetFloat(event, args[1]);
     event->msgPos.y = evtGetFloat(event, args[2]);
@@ -471,18 +485,18 @@ USER_FUNC(evt_msg_toge) {
 /** Forces tail mode 3 on the next message window; args[0] adds tail bit 4 (1), bit 8 (2) or both (3). */
 USER_FUNC(evt_msg_togelr) {
     s32 v = evtGetValue(event, *event->args);
-    event->printWindowFlags |= 0x80000000;
+    event->printWindowFlags |= PRINT_WINDOW_TOGELR;
     switch (v) {
         case 0:
             break;
         case 1:
-            event->printWindowFlags |= 0x40000000;
+            event->printWindowFlags |= PRINT_WINDOW_TOGELR_RIGHT;
             break;
         case 2:
-            event->printWindowFlags |= 0x20000000;
+            event->printWindowFlags |= PRINT_WINDOW_TOGELR_TOP;
             break;
         case 3:
-            event->printWindowFlags |= 0x60000000;
+            event->printWindowFlags |= PRINT_WINDOW_TOGELR_RIGHT | PRINT_WINDOW_TOGELR_TOP;
             break;
     }
     return EVT_RETURN_DONE;

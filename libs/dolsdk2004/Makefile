@@ -101,7 +101,7 @@ PYTHON ?= python3
 # Every file has a debug version. Append D to the list.
 TARGET_LIBS_DEBUG := $(addsuffix D,$(TARGET_LIBS))
 
-# TODO, decompile
+# Every source directory is built.
 SRC_DIRS := $(shell $(FIND) src -type d)
 
 ###################### Other Tools ######################
@@ -172,7 +172,7 @@ CHARFLAGS          := -char unsigned
 RELEASE_OPTLEVEL   := -O4,p
 SYM_ON             := -sym on
 
-# why. Did some SDK libs (like CARD) prefer char signed over unsigned? TODO: Figure out consistency behind this.
+# Unknown: why these CARD files are built with -char signed while the rest of the SDK uses -char unsigned.
 build/debug/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/release/src/card/CARDRename.o: CHARFLAGS := -char signed
 build/debug/src/card/CARDOpen.o: CHARFLAGS := -char signed

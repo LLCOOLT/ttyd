@@ -89,8 +89,8 @@ typedef enum MarioFlags {
 } MarioFlags;
 #pragma enumsalwaysint on
 
-// MarioWork.dispFlags bits named so far (0x40, 0x80, 0x400, 0x800, 0x2000, 0x4000, 0x80000, 0x400000, 0x800000 and
-// 0x20000000 are still raw hex in the code).
+// MarioWork.dispFlags bits named so far (0x40, 0x80, 0x400, 0x800, 0x2000, 0x4000, 0x80000, 0x400000 and 0x800000
+// are still raw hex in the code).
 typedef enum MarioDispFlags {
     MARIO_DISP_FLAG_HIDDEN = (1 << 0),            // marioPreDisp draws nothing (set at the start of a battle and by mot_damage)
     MARIO_DISP_FLAG_POSE_LOCK = (1 << 1),         // marioChgPose, marioChgPoseTime and marioChgEvtPose leave the pose alone
@@ -114,15 +114,37 @@ typedef enum MarioDispFlags {
     MARIO_DISP_FLAG_BALLOON_EVT = (1 << 26),      // an event put the balloon up (evt_mario_balloon_*): marioBalloonMain leaves it alone
     MARIO_DISP_FLAG_BLUR = (1 << 27),             // marioPreDisp draws Mario through marioDispBlur, with motion blur
     MARIO_DISP_FLAG_ANIM_SET_2 = (1 << 28),       // the pose is in the third animation group: marioAnimeId returns 2
+    MARIO_DISP_FLAG_POSE_UNUSED = (1 << 29),      // Unknown: cleared with ANIM_SET_2 on every pose change (marioChgPose, peachChgPose); nothing sets it
     MARIO_DISP_FLAG_PAPER_ON = (1 << 30),         // a paper animation is active (marioPaperOn/Off)
     MARIO_DISP_FLAG_REAR_POSE = (1 << 31)         // showing the back-facing version of the pose (marioRearAnime)
 } MarioDispFlags;
+
+// MarioWork.peachFlags: Peach's condition (evt_peach_set_condition, peach.c) and her X-Naut disguise.
+typedef enum MarioPeachFlags {
+    PEACH_FLAG_AFTER_SHOWER = (1 << 4), // peachSetStsAftershower: the P_*_2 poses; aji_15 reads it after her shower
+    PEACH_FLAG_INVISIBLE = (1 << 5),    // peachSetStsInvisible: the P_*_3 poses, quieter footsteps at zero height
+    PEACH_FLAG_HAPPY = (1 << 6),        // peachSetStsHappy: the P_*_5 poses
+    PEACH_FLAG_UNEASY = (1 << 7),       // peachSetStsUneasy: the P_*_4 poses
+    PEACH_FLAG_ANGRY = (1 << 8),        // peachSetStsAngry: the P_*_6 poses
+    PEACH_FLAG_ORDINARY = (1 << 9),     // peachSetStsOrdinary: the P_*_7 poses (talks with TEC in aji_17)
+    PEACH_FLAG_CARRY = (1 << 10),       // peachSetStsCarry: the P_*_8 poses
+    // All seven conditions; every peachSetSts* clears these before setting its own.
+    PEACH_FLAG_CONDITION_MASK = PEACH_FLAG_AFTER_SHOWER | PEACH_FLAG_INVISIBLE | PEACH_FLAG_HAPPY | PEACH_FLAG_UNEASY |
+        PEACH_FLAG_ANGRY | PEACH_FLAG_ORDINARY | PEACH_FLAG_CARRY,
+    PEACH_FLAG_XNAUT_DISGUISE = (1 << 13), // peachTransformOn/Off: the X-Naut c_zako_n model and poses
+} MarioPeachFlags;
+
+// MarioWork.stageFlags: set by kpaPreInit for Bowser's stages.
+typedef enum MarioStageFlags {
+    MARIO_STAGE_FLAG_SIDE_VIEW = (1 << 0), // the side-scrolling stages kpa_02 to kpa_06 (kpa2DMain; kpaGetStageViewType 0)
+    MARIO_STAGE_FLAG_WATER = (1 << 1),     // kpa_03, the seaside stage with water (kpaGetStageType)
+} MarioStageFlags;
 
 #pragma enumsalwaysint off
 typedef enum MarioTrigFlags {
     MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION = (1 << 0),
     MARIO_TRIG_FLAG_USE_PARTNER = (1 << 1),
-    MARIO_TRIG_FLAG_CAM_ZOOM_UP_LEVEL = (1 << 4), // starts the level-up camera zoom (marioCamZoomUpLevelMain clears it)
+    MARIO_TRIG_FLAG_CAM_ZOOM_UP_LEVEL = (1 << 4), // starts marioCamZoomUpLevelMain's zoom (it clears it); nothing sets it
     MARIO_TRIG_FLAG_DISP_DIR_CORRECTION = (1 << 8),
     MARIO_TRIG_FLAG_DISP_DIR_LEFT = (1 << 9),
     MARIO_TRIG_FLAG_DISP_DIR_RIGHT = (1 << 10),

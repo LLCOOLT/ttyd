@@ -1,7 +1,6 @@
-#pragma once
-
 // Chorobon gundan (Fuzzy Horde) and the gold Chorobon that summons it: shared by the hei units and
 // their tst copies.
+#pragma once
 
 #include "battle/battle_database_common.h"
 #include "battle/battle_unit.h"

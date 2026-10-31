@@ -116,6 +116,12 @@ typedef struct BattleAudienceMember {
     f32 bobOffset; // 0x130, type 2: 5 * sin(phase) added to the drawn y
 } BattleAudienceMember;
 
+// BattleAudienceItem.flags (bit 0x4 is tested but never set).
+enum BattleAudienceItemFlags {
+    AUDIENCE_ITEM_FLAG_ACTIVE = 0x1,  // the slot holds a thrown item
+    AUDIENCE_ITEM_FLAG_VISIBLE = 0x2, // drawn this frame (blinks off and on before it disappears)
+};
+
 typedef struct BattleAudienceItem {
     u32 flags;                 // 0x0
     s32 state;                 // 0x4
@@ -130,6 +136,9 @@ typedef struct BattleAudienceItem {
     struct BattleUnit* target; // 0x40, unit the item is thrown at
     s32 mode;                  // 0x44, nonzero once it is a hazard (lands on a unit)
 } BattleAudienceItem;
+
+// BattleAudienceStar.flags
+#define AUDIENCE_STAR_FLAG_ACTIVE 0x1 // the slot holds a star-power sparkle
 
 typedef struct BattleAudienceStar {
     s32 flags;       // 0x0
@@ -149,6 +158,9 @@ typedef struct BattleAudienceStar {
     f32 angleSpeed;  // 0x58, spiral angle step per frame
     u8 alpha;        // 0x5C
 } BattleAudienceStar;
+
+// AudSound.flags (battle_audience.c)
+#define AUDIENCE_SOUND_FLAG_PLAYING 0x1 // the sound was started and is still fading or playing
 
 // member names are inferred from use
 typedef struct BattleAudienceSound {

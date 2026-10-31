@@ -30,13 +30,13 @@
 static BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
-    if (entry->attributes & 0x80080) {
+    if (entry->attributes & (HIT_ATTR_ALWAYS_SOLID | HIT_ATTR_TUBE_PASS)) {
         return TRUE;
     }
-    if (entry->attributes & 0x800004) {
+    if (entry->attributes & (HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS)) {
         return FALSE;
     }
-    if (!(entry->attributes & 0x80000000)) {
+    if (!(entry->attributes & HIT_ATTR_MOBJ)) {
         return TRUE;
     }
     mobj = mobjHitObjPtrToPtr(entry);
@@ -56,16 +56,16 @@ static BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
 static BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
-    if (entry->attributes & 0x80080) {
+    if (entry->attributes & (HIT_ATTR_ALWAYS_SOLID | HIT_ATTR_TUBE_PASS)) {
         return TRUE;
     }
-    if (entry->attributes & 0x800000) {
+    if (entry->attributes & HIT_ATTR_PARTY_PASS) {
         return TRUE;
     }
-    if (entry->attributes & 0x4) {
+    if (entry->attributes & HIT_ATTR_PASS_THROUGH) {
         return FALSE;
     }
-    if (!(entry->attributes & 0x80000000)) {
+    if (!(entry->attributes & HIT_ATTR_MOBJ)) {
         return TRUE;
     }
     mobj = mobjHitObjPtrToPtr(entry);
@@ -85,13 +85,13 @@ static BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
 static BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
-    if (entry->attributes & 0x800005) {
+    if (entry->attributes & (HIT_ATTR_HAMMER_PASS | HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS)) {
         return FALSE;
     }
-    if (entry->attributes & 0x80080) {
+    if (entry->attributes & (HIT_ATTR_ALWAYS_SOLID | HIT_ATTR_TUBE_PASS)) {
         return TRUE;
     }
-    if (!(entry->attributes & 0x80000000)) {
+    if (!(entry->attributes & HIT_ATTR_MOBJ)) {
         return TRUE;
     }
     mobj = mobjHitObjPtrToPtr(entry);
@@ -203,7 +203,7 @@ void partyChkGnd(PartyEntry* party) {
 #endif
         if (hit) {
             attr = hitGetAttr(hit);
-            if (attr & 0x200) {
+            if (attr & HIT_ATTR_DEEP_WATER) {
                 hit = NULL;
             }
         }
@@ -215,7 +215,7 @@ void partyChkGnd(PartyEntry* party) {
             party->gravity = -1.0f;
         } else {
             party->flags |= PARTY_FLAG_IS_GROUNDED;
-            if (attr & 0x100) {
+            if (attr & HIT_ATTR_SHALLOW_WATER) {
                 party->flags |= PARTY_FLAG_IN_SHALLOW_WATER;
             } else {
                 party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
@@ -1225,6 +1225,7 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
  * Like the other *StrippedPool stand-ins it only creates 10.0f, 0.0f, 1.0f, 0.5f,
  * 100.0f and the int-to-float double so the file's constant pools come out in the original order.
  */
+// FAKE: uncalled stand-in for a stripped function; orders its floats and the int-to-float double
 void partyHitStrippedPool(f32* f, s32 i) {
     f[0] = 10.0f;
     f[1] = 0.0f;

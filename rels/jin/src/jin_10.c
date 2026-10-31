@@ -56,6 +56,7 @@ static EVT_BEGIN(door_open)
     RETURN
 EVT_END()
 
+/** Doors of this room: the west exit (w_bero) to jin_09 and the north exit (n_bero) to jin_11. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -167,6 +168,7 @@ EVT_END()
  */
 EVT_BEGIN(unpush_evt)
     LOOP(0)
+        // Waits while Mario is pushing the gate.
         LOOP(0)
             CALL(evt_mario_get_name_hitobj_push, LW(0))
             IF_STR_NOT_EQUAL(LW(0), STRING("a_saku"))
@@ -174,6 +176,7 @@ EVT_BEGIN(unpush_evt)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
+        // Checks whether Mario, his partner or Vivian is standing in the gate's way back.
         SET_VALUE(LF(0), 1)
         CALL(evt_mapobj_get_position, STRING("saku"), LW(0), LW(1), LW(2))
         CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
@@ -224,6 +227,7 @@ EVT_BEGIN(unpush_evt)
                 BREAK_LOOP
             END_LOOP
         END_IF
+        // Slides the gate back and plays its grid-movement sound.
         IF_INT_EQUAL(LF(0), 0)
             IF_INT_EQUAL(GF(0), 1)
                 CALL(evt_snd_sfxoff, GW(3))

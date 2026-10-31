@@ -27,6 +27,10 @@ static USER_FUNC(tornade_alpha_func);
 f32 muj_ship_puka_data[16];
 extern EvtWord muj_mario_pos_osreport[];
 
+/**
+ * Height offsets of one 16-step cycle of the pirate ship bobbing on the waves, stepped through every 130 ms
+ * by muj_ship_puka.
+ */
 f32 muj_ship_puka_data[] = {
     -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f,
     -2.7f, -2.7f, -2.5f, -2.2f, -2.0f, -1.5f, -1.0f, -0.5f,

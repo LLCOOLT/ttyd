@@ -30,6 +30,7 @@ typedef struct EffMagicHoraoN64Work {
     s32 frame;       // 0x44
 } EffMagicHoraoN64Work;
 
+/** Large flat quad (6400 units wide) the horao magic draws its textures on. */
 static effN64Vtx size64x64_tex64x64_vtx[] = {
     {-3200, 0, 0, 0, 0, 0, 0, 0, 0xFF},
     {3200, 0, 0, 2048, 0, 0, 0, 0, 0xFF},

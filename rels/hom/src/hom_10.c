@@ -29,6 +29,7 @@ static ClankData clankDt[9];
 static const char* pika_tbl[15];
 static const char* pika_tbl_rsh_06[10];
 
+/** Wheels of the train that spin while it runs: map object, wheel size, speed source and spin direction. */
 static SharinData sharinDt[] = {
     {"sha_1_1", 0, 0, FLOAT(1.0f)},
     {"sha_1_2", 0, 0, FLOAT(1.0f)},
@@ -119,6 +120,10 @@ static EVT_BEGIN(evt_sharin)
     RETURN
 EVT_END()
 
+/**
+ * Connecting rods of the train's wheels that move in a circle with them (bou_1 to bou_4, and the _c copies
+ * that turn the other way).
+ */
 static ClankData clankDt[] = {
     {"bou_1", 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
     {"bou_2", 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
@@ -269,9 +274,11 @@ EVT_END()
  * Train departure at a station (shared by hom_00, gor_04 and pik_00):
  * sets the train-moving flag, clears the "train at station" flags, rings the bell twice,
  * starts the engine sound for the station and accelerates the train over 20 seconds to a speed of -15 (GW(0) is
- * the train's speed, GW(1) the speed of the passing scenery, which follows with a delay).
+ * the train's speed, which also scrolls the scenery; GW(1) drives the big drive wheels sha_1_4/sha_1_5 and rods
+ * bou_2/bou_4: it follows GW(0), and after 1.5 seconds runs up to 10 faster for 2 seconds; Guess: wheel spin).
  */
 EVT_BEGIN(hom_10_evt_resha_start)
+    // The train is marked as moving and no longer at any station; its bell rings twice.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
@@ -280,6 +287,7 @@ EVT_BEGIN(hom_10_evt_resha_start)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    // The engine sound for this station (Rogueport, the platform or Poshley Heights) starts.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("gor_04"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
@@ -294,6 +302,7 @@ EVT_BEGIN(hom_10_evt_resha_start)
     IF_STR_EQUAL(LW(0), STRING("pik_00"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_3"), 0)
     END_IF
+    // On the platform and in Rogueport the train model itself slides away from the stop.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
         BEGIN_INLINE_EVENT
@@ -315,6 +324,7 @@ EVT_BEGIN(hom_10_evt_resha_start)
             END_LOOP
         END_INLINE_EVENT
     END_IF
+    // The train accelerates over 20 seconds to full speed.
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
         CALL(evt_sub_intpl_msec_init, 11, 0, -1500, 20000)
@@ -331,6 +341,7 @@ EVT_BEGIN(hom_10_evt_resha_start)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
+    // The drive wheels follow the train's speed; after 1.5 seconds they spin up to 10 faster and settle back.
     BEGIN_INLINE_EVENT
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
         LOOP(0)
@@ -371,6 +382,7 @@ EVT_END()
 
 /** Same as hom_10_evt_resha_start but for the return trip: the train accelerates in the opposite direction to +15. */
 EVT_BEGIN(hom_10_evt_resha_start2)
+    // The train is marked as moving and no longer at any station; its bell rings twice.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
@@ -379,6 +391,7 @@ EVT_BEGIN(hom_10_evt_resha_start2)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    // The engine sound for this station starts.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("gor_04"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
@@ -389,6 +402,7 @@ EVT_BEGIN(hom_10_evt_resha_start2)
     IF_STR_EQUAL(LW(0), STRING("pik_00"))
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_3"), 0)
     END_IF
+    // The train model slides away from the stop.
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
         BEGIN_INLINE_EVENT
@@ -420,6 +434,7 @@ EVT_BEGIN(hom_10_evt_resha_start2)
             END_LOOP
         END_INLINE_EVENT
     END_IF
+    // The train accelerates over 20 seconds to full speed in the opposite direction.
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
         CALL(evt_sub_intpl_msec_init, 11, 0, 1500, 20000)
@@ -436,6 +451,7 @@ EVT_BEGIN(hom_10_evt_resha_start2)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
+    // The drive wheels follow the train's speed; after 1.5 seconds they spin up to 10 faster and settle back.
     BEGIN_INLINE_EVENT
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
         LOOP(0)
@@ -611,6 +627,10 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
+/**
+ * Map object groups of the train (pika_*) that hom_10_evt_resha_sub hooks to the TEV callback resha_tev,
+ * which adds environment effect 7 (an env.tpl reflection or shine texture) to them; NULL ends the list.
+ */
 static const char* pika_tbl[] = {
     "pika_1_1",
     "pika_1_2",
@@ -629,6 +649,7 @@ static const char* pika_tbl[] = {
     NULL,
 };
 
+/** The shorter list used instead on the map rsh_06_a: the same groups without the *_c ones. */
 static const char* pika_tbl_rsh_06[] = {
     "pika_1_1",
     "pika_1_2",

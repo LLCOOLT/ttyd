@@ -1,7 +1,6 @@
-#pragma once
-
 // Moamoa (Smorg) swarm on the field: the ext-pose swarm code that eki_00 (Riverside Station), rsh_05
 // and rsh_06 (Excess Express) each carry. rsh_00 uses only the pose tables.
+#pragma once
 
 #include "driver/mapdrv.h"
 #include "manager/evtmgr.h"

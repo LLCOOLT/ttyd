@@ -18,6 +18,7 @@ typedef struct EffBalloonHeihoN64Work {
     s32 frame;    // 0x20
 } EffBalloonHeihoN64Work;
 
+/** Camera-facing 32x64 balloon Shy Guy sprite, split into four horizontal strips. */
 static effN64Vtx size32x64_tex32x64_vtx[] = {
     {-16, 64, 0, 0, 2048, 0, 0, 0, 255},
     {16, 64, 0, 1024, 2048, 0, 0, 0, 255},

@@ -1,7 +1,6 @@
-#pragma once
-
 // Senkaron ("a thousand bones"): the swarm of up to 1000 Dull Bones drawn as ext poses in gon_03
 // (Hooktail Castle) and las_05 (Palace of Shadow).
+#pragma once
 
 #include <dolphin/types.h>
 

@@ -1,6 +1,7 @@
 #include "musyx/synth.h"
 
 
+/** Pitch ratios for 0 to 127 semitones up. */
 static float toneup_tab[128] = {
     1.0f,       1.0594635f, 1.1224623f, 1.1892071f,  1.2599211f,  1.3348398f,  1.4142141f,
     1.4983072f, 1.5874014f, 1.6817932f, 1.7817984f,  1.8877487f,  2.000001f,   2.118927f,
@@ -23,6 +24,7 @@ static float toneup_tab[128] = {
     1448.1554f, 1534.2672f,
 
 };
+/** Pitch ratios for 0 to 127 semitones down. */
 static float tonedown_tab[128] = {
     1.0f,          0.94387436f,   0.8908987f,    0.8408966f,    0.7937002f,    0.74915314f,
     0.7071066f,    0.66741943f,   0.62996006f,   0.59460354f,   0.56123066f,   0.52973175f,

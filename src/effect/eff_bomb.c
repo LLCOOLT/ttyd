@@ -21,6 +21,10 @@ typedef struct EffBombWork {
     s32 offset;   // 0x24
 } EffBombWork;
 
+/**
+ * Per-frame keys for the four straight blast rays (up, right, down, left), read by effBombMain: each triple is
+ * the texture frame in the ray strip, then X and Y stretch in percent (100% growing to 200%).
+ */
 static u8 scale_dt[] = {
     0,  100, 100, 0,  103, 103, 1,  106, 106, 1,  110, 110, 2,  113, 113, 2,  117, 117,
     3,  120, 120, 3,  124, 124, 4,  127, 127, 4,  131, 131, 5,  134, 134, 5,  137, 137,
@@ -30,6 +34,10 @@ static u8 scale_dt[] = {
     15, 200, 200, 15, 200, 200, 15, 200, 200, 15, 200, 200, 15, 200, 200, 15, 200, 200,
 };
 
+/**
+ * Per-frame keys for the four diagonal blast rays, read by effBombMain: same triples as scale_dt (texture
+ * frame, X and Y stretch in percent), but they stay hidden for four frames and grow only to about 150%.
+ */
 static u8 scale_dt2[] = {
     0,  0,   0,   0,  0,   0,   0,  0,   0,   0,  0,   0,   0,  100, 100, 0,  101, 101, 1, 103, 103,
     1,  105, 105, 2,  106, 106, 2,  108, 108, 3,  110, 110, 3,  112, 112, 4,  113, 113,

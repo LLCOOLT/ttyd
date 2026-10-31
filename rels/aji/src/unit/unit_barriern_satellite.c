@@ -11,6 +11,12 @@
 #include "battle/battle_event_cmd.h"
 #include "evt/evt_sub.h"
 
+// Unit work slots of the Mini-Yux (btlevtcmd_Get/SetUnitWork); the Yux that spawns it fills both.
+enum {
+    UW_BARRIERN_SATELLITE_PARENT_ID = 0, // unit id of the Yux that spawned it
+    UW_BARRIERN_SATELLITE_IDLE_POSE = 1, // set to 1 at spawn: the wait event plays the S_4 pose now and then
+};
+
 static USER_FUNC(battleGetBarriernSatelliteInitPos);
 
 BattleUnitKind unit_barriern_satellite;
@@ -26,6 +32,7 @@ static EvtWord unison_phase_event[5];
 static EvtWord attack_event[5];
 static EvtWord wait_event[56];
 
+/** Unit data of the Mini-Yux: 1 HP, level 0; the battle starts it from init_event. */
 BattleUnitKind unit_barriern_satellite = {
     30,
     "btl_un_barriern_satellite",
@@ -89,7 +96,7 @@ BattleUnitKind unit_barriern_satellite = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     6,
     parts,
@@ -97,25 +104,40 @@ BattleUnitKind unit_barriern_satellite = {
     data_table,
 };
 
+/** Defence of the Mini-Yux: none against any element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Elemental reactions of the Mini-Yux: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Parts of the Mini-Yux: part 1 is its body and parts 2 to 6 are the five ghost rings drawn as afterimages
+ * while it spins.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
-    {2, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {3, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {4, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {5, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {6, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {2, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {3, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {4, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {5, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {6, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Mini-Yux (percent, 100 is normal) in the demo builds: immune to poison, burn,
+ * freeze and fright; resists most statuses (80-90%).
+ */
 static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 90, 90, 0, 100, 100, 90, 100, 100, 100};
 #else
+/**
+ * Status vulnerability of the Mini-Yux (percent, 100 is normal) in the retail builds: immune to poison, burn,
+ * freeze and fright; resists most statuses (80-95%).
+ */
 static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 95, 90, 0, 100, 100, 90, 100, 100, 100};
 #endif
 
+/** Pose table of the Mini-Yux: the animation each battle pose (idle, hurt, walk, attack and so on) plays. */
 static PoseTableEntry pose_table[] = {
     {1, "N_2"},
     {2, "Y_2"},
@@ -136,6 +158,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
+/** Event table of the Mini-Yux: empty, it has no special reactions. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
@@ -150,7 +173,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 3145728)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT | UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -182,7 +205,8 @@ EVT_END()
 
 /**
  * Attack script of the Mini-Yux: does nothing but restart the wait event;
- * its rings are thrown by the parent Yux's attack scripts.
+ * the ring that starts from it in the combined attack is a part of the parent Yux,
+ * moved by the parent's scripts.
  */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -200,11 +224,11 @@ static EVT_BEGIN(wait_event)
     CALL(evt_sub_random, 120, LW(0))
     ADD(LW(0), 30)
     WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_SATELLITE_IDLE_POSE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
+            CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_4"))
                 WAIT_FRAMES(180)

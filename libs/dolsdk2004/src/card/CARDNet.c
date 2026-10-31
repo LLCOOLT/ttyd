@@ -3,7 +3,9 @@
 #include "os/__os.h"
 #include "__card.h"
 
+/** Vendor ID accepted for cards whose EXI ID is 0x80000004 (0xFFFF: none), set with the function below. */
 u16 __CARDVendorID = 0xFFFF;
+/** File permission bits a program may see and set (default 0x1C); CARDOpen masks file permissions with it. */
 u8 __CARDPermMask = 0x1C;
 
 /** Sets the vendor ID this library will accept for cards whose EXI ID is 0x80000004 and returns the previous one. */

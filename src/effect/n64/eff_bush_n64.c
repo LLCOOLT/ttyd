@@ -24,6 +24,7 @@ typedef struct EffBushN64Work {
     u8 pad[4];
 } EffBushN64Work;
 
+/** Two-sided 12x12 green leaf quad for the bush leaves. */
 static effN64Vtx size12x12_tex64x64_vtx[] = {
     {-6, -6, 0, 0, 0, 0x19, 0x55, 0x11, 0xFF},
     {6, -6, 0, 2048, 0, 0x19, 0x55, 0x11, 0xFF},

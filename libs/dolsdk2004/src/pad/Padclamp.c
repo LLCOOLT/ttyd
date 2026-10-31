@@ -2,6 +2,10 @@
 #include <dolphin.h>
 #include <dolphin/pad.h>
 
+/**
+ * Limits used to clamp raw controller readings: trigger minimum and maximum, then the same three values for
+ * each stick.
+ */
 static const PADClampRegion ClampRegion = {
     // Triggers
     30,

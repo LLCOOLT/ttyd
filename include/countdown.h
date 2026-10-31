@@ -3,8 +3,16 @@
 
 #include <dolphin/types.h>
 
+// CountdownWork.flags (also the countDownFlagOn/Off arguments).
+enum CountdownFlags {
+    COUNTDOWN_FLAG_RUNNING = 0x1, // countDownStart; cleared when the slide-out ends (countDownGetStatus -1 without it)
+    COUNTDOWN_FLAG_TIME_UP = 0x2, // the limit is reached: the display shows zero (countDownGetStatus 1)
+    COUNTDOWN_FLAG_HIDDEN = 0x4,  // countDownDisp draws nothing
+    COUNTDOWN_FLAG_FROZEN = 0x8,  // countDownStop: the clock no longer advances
+};
+
 typedef struct CountdownWork {
-    u16 flags;              // 0x0
+    u16 flags;              // 0x0, CountdownFlags
     u8 pad_2[0x8 - 0x2];    // 0x2
     s64 elapsed;            // 0x8
     s64 prevTime;           // 0x10

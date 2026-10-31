@@ -11,6 +11,7 @@
 #include <string.h>
 #include "eff/eff_n64.h"
 #include "libc_decls.h"
+#include <dolphin/os.h>
 
 #define Vec2Vtx(v, o)                 \
     do {                              \
@@ -24,30 +25,6 @@ void tri2();
 static void effKamekiTornadeMain(EffectEntry* effect);
 static void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect);
 
-void DCFlushRange(void* addr, u32 nBytes);
-void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
-void GXInvalidateVtxCache(void);
-void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
-void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
-void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
-void GXSetCullMode(GXCullMode mode);
-void GXSetCurrentMtx(u32 id);
-void GXSetNumChans(u8 nChans);
-void GXSetNumTevStages(u8 nStages);
-void GXSetNumTexGens(u8 nTexGens);
-void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
-void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevColor(GXTevRegID id, GXColor color);
-void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d);
-void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
-void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
-void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
-void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad);
-void PSMTXRotRad(Mtx m, char axis, f32 rad);
-void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
-void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
 /**
  * Spawns a Magikoopa (kameki) tornado at (x, y, z) of 8 spinning layers, scaled by scale;
  * life is in frames (0 = until soft-deleted).

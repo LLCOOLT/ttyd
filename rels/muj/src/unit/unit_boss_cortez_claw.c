@@ -1,4 +1,4 @@
-// Keelhaul Key (muj) battle unit: Cortez's claw (cortez_claw), one of his weapons: its parts, defence/status tables,
+// Keelhaul Key (muj) battle unit: Cortez Hook (cortez_claw), Cortez's claw, one of his weapons: its parts, defence/status tables,
 // and attack events.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -9,6 +9,12 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "muj.h"
+
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_BOSS_CORTEZ_CLAW_DOWN = 1,      // nonzero while the claw is knocked down; it then skips its attack
+    UW_BOSS_CORTEZ_CLAW_WEAPON_NO = 2, // Cortez's weapon number: 2 for the claw
+};
 
 BattleUnitKind unit_boss_cortez_claw;
 static BattleUnitDefense defence;
@@ -28,6 +34,10 @@ static EvtWord attack_event[353];
 static EvtWord wait_event[10];
 static EvtWord cortez_damage_sub_event[25];
 
+/**
+ * Unit data of Cortez Hook: 4 HP, 65x40 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_boss_cortez_claw = {
     95,
     "btl_un_cortez_claw",
@@ -86,7 +96,7 @@ BattleUnitKind unit_boss_cortez_claw = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x2000004,
+    UNIT_ATTR_FLOATING | UNIT_ATTR_NO_HP_GAUGE,
     &regist,
     1,
     parts,
@@ -94,16 +104,32 @@ BattleUnitKind unit_boss_cortez_claw = {
     data_table,
 };
 
+/** Defence of Cortez Hook: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Cortez Hook: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of Cortez Hook (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; resists freeze (50%),
+ * Defense Down (50%), allergic (50%), Slow (50%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 50, 0, 0, 100, 0, 100, 50, 50, 0, 90, 100, 50, 0, 0, 0};
 #else
+/**
+ * Retail builds: Status vulnerability of Cortez Hook (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; resists allergic (50%),
+ * Slow (50%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
 #endif
 
+/**
+ * Weapon of Cortez Hook (float attack): targets one unit for 2 damage, may inflict Poison (50%, 10 turns);
+ * used by attack_event.
+ */
 BattleWeapon weapon_cortez_claw_float_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -122,7 +148,7 @@ BattleWeapon weapon_cortez_claw_float_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -143,6 +169,7 @@ BattleWeapon weapon_cortez_claw_float_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of Cortez Hook: maps its battle poses to its animations (KRT_*). */
 static PoseTableEntry pose_table[] = {
 #if VERSION >= VERSION_JP
     {2, "KRT_Z_1"},
@@ -154,6 +181,11 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "KRT_S_1"},
 };
 
+/**
+ * Event table of Cortez Hook: cortez_damage_sub_event (tag 9), cortez_weapon_dead_event (tag 49),
+ * cortez_weapon_break_event (tags 70, 71), cortez_weapon_blow_dead_event (tag 58),
+ * cortez_weapon_counter_damage_event (tags 36, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35).
+ */
 static BattleDataEntry data_table[] = {
     {9, cortez_damage_sub_event},
     {49, cortez_weapon_dead_event},
@@ -179,8 +211,9 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of Cortez Hook: 1 part (model c_buki4). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_cortez_claw", "c_buki4", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0, pose_table},
+    {1, "btl_un_cortez_claw", "c_buki4", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, 0, pose_table},
 };
 
 /**
@@ -190,15 +223,15 @@ static BattleUnitKindPart parts[] = {
  * and allows no movement.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(cortez_weapon_phase_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(cortez_weapon_unison_phase_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 2)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_CLAW_WEAPON_NO, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_CLAW_DOWN, 0)
     CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -213,15 +246,17 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Guess: attack event of Cortez's claw while it flies free (unit work 1 is 0;
- * otherwise it just restarts the wait event): it picks a target with weapon_cortez_claw_float_attack,
- * swings round to the side of it, dives onto it with the sword- dance sound,
- * and hacks with a swing in z of 45 degrees.
- * It plays the avoid pose on a dodge, or applies the damage with the action command defence check,
- * then returns home and straightens.
+ * Attack event of Cortez's claw; while knocked down (unit work 1, its revive countdown, is not 0) it only
+ * restarts the wait event.
+ * Otherwise it picks a target with weapon_cortez_claw_float_attack,
+ * winds back to -135 degrees in z as it dives in front of the target,
+ * then swings forward to 45 degrees with the sword-dance sound for one hit.
+ * It plays the avoid pose on a dodge, or applies the damage with the action command defence check;
+ * a superguarded claw recoils home at once, otherwise it straightens and returns home.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    // While the Hook is knocked down it only goes back to idling.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_CLAW_DOWN, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -237,6 +272,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
+    // The Hook leans back to -135 degrees while it dives in front of its target.
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 25, 12, 0)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(20)
@@ -259,6 +295,7 @@ static EVT_BEGIN(attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // It swings forward to 45 degrees in a single slash, with a whooshing sound.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOR_SWORD_DANCE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(7)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
@@ -278,12 +315,15 @@ static EVT_BEGIN(attack_event)
         CASE_DEFAULT
         GOTO(91)
     END_SWITCH
+    // The swing misses or is blocked: the Hook plays its dodge reaction.
     LABEL(90)
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     GOTO(95)
+    // The swing lands: the Action Command defence result and damage are applied.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    // If the target Superguarded, the Hook is repelled: it tumbles backwards and recoils home at once.
     IF_INT_EQUAL(LW(5), 21)
         DELETE_EVENT(LW(15))
         CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -313,6 +353,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
         RETURN
     END_IF
+    // Otherwise it straightens up and returns home after a short pause.
     LABEL(95)
     CALL(btlevtcmd_WaitEventEnd, LW(15))
     WAIT_MS(500)

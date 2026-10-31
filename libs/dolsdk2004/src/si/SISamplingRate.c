@@ -5,6 +5,7 @@
 
 #define LATENCY 8
 
+/** Controller sampling interval in milliseconds set with SISetSamplingRate. */
 static u32 SamplingRate = 0;
 
 typedef struct XY {
@@ -12,6 +13,10 @@ typedef struct XY {
     u8 count;
 } XY;
 
+/**
+ * Poll line interval and polls per frame for each sampling interval 0-11 ms on 60 Hz (NTSC, MPAL, EURGB60)
+ * video.
+ */
 static XY XYNTSC[12] = {
     {0x00F6, 0x02},
     {0x000E, 0x13},
@@ -27,6 +32,7 @@ static XY XYNTSC[12] = {
     {0x0083, 0x02},
 };
 
+/** Poll line interval and polls per frame for each sampling interval 0-11 ms on 50 Hz PAL video. */
 static XY XYPAL[12] = {
     {0x0128, 0x02},
     {0x000F, 0x15},

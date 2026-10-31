@@ -8,12 +8,14 @@ extern "C" {
 #endif // __cplusplus
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1) && MUSY_TARGET == MUSY_TARGET_DOLPHIN
+/** Constants for fast integer-to-float conversion and square root. */
 static const double i2fMagic = 4.503601774854144E15;
 static const float sqrtConsts[] = {
     3.f,
     0.5f,
     0.f,
 };
+/** Polynomial coefficients for the sine approximation. */
 static const float _sinConsts[] = {
     -0.16666667,   // -(1/6)
     0.008333332f,  // 1/120
@@ -26,6 +28,7 @@ static const float _sinConsts[] = {
 };
 #endif
 
+/** Sine wave table of 1024 16-bit values. */
 s16 sndSintab[1024] = {
     0,    6,    12,   18,   25,   31,   37,   43,   50,   56,   62,   69,   75,   81,   87,   94,
     100,  106,  113,  119,  125,  131,  138,  144,  150,  157,  163,  169,  175,  182,  188,  194,
@@ -95,6 +98,7 @@ s16 sndSintab[1024] = {
 
 #define SINTAB_ELEMENT_COUNT (sizeof(sndSintab) / sizeof(u16) - 1)
 
+/** Seed of the sound engine's random number generator. */
 u32 last_rnd = 1;
 
 /**
@@ -272,10 +276,10 @@ skip_neg2:
   blr
 }
 #else  // __MWERKS__
-// TODO: GCC Compatible asm
+// Other compilers: plain C stand-in for the Gekko asm above (same result).
 float sndSqrt(register float x) { return sqrt(x); }
 
-// TODO: GCC Compatible asm
+// Other compilers: plain C stand-in for the Gekko asm above (same result).
 float sndCos(register float x) { return cos(x); }
 #endif // __MWERKS__
 #elif MUSY_TARGET == MUSY_TARGET_PC

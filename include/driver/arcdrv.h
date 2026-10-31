@@ -4,6 +4,7 @@
 #include <dolphin/types.h>
 #include "sdk/arc.h"
 
+#define ARC_FLAG_USED 0x1 // ArchiveEntry.flags: an archive is loaded in this slot (arcEntry)
 typedef struct ArchiveEntry {
     u16 flags;        // 0x0
     ARCHandle handle; // 0x4

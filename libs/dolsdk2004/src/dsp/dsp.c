@@ -12,8 +12,10 @@
 #endif
 
 #ifdef DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __DSPVersion = "<< Dolphin SDK - DSP\tdebug build: Apr  5 2004 03:56:49 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __DSPVersion = "<< Dolphin SDK - DSP\trelease build: Apr  5 2004 04:15:32 (0x2301) >>";
 #endif
 

@@ -17,6 +17,10 @@ f32 dou_normal_puka_data[16];
 extern EvtWord dou_puka_event_sub[];
 extern EvtWord dou_mario_pos_osreport[];
 
+/**
+ * Up-and-down offsets, in 16 steps, that make a Pirate's Grotto platform bob on the water; one step is
+ * applied every 130 ms.
+ */
 f32 dou_normal_puka_data[] = {
     -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f,
     -2.7f, -2.7f, -2.5f, -2.2f, -2.0f, -1.5f, -1.0f, -0.5f,
@@ -149,9 +153,9 @@ USER_FUNC(evt_dou_normal_puka) {
     return EVT_RETURN_DONE;
 }
 /**
- * Unknown: leftover debug helper that looks up Mario and reads the controller button trigger
- * but prints nothing in this build; it only keeps the event blocked.
- * Used only by the unused dou_mario_pos_osreport.
+ * Debug script function named for printing Mario's position with OSReport: in this build it only looks up
+ * Mario and reads the button trigger, prints nothing and blocks forever.
+ * Only the unused dou_mario_pos_osreport calls it.
  */
 static USER_FUNC(dou_mario_pos_osreport_func) {
     MarioWork* mario = marioGetPtr();

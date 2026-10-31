@@ -259,6 +259,10 @@ static ShelfMsgTbl6 access_tbl;
 extern EvtWord rsh_05_init_evt[];
 extern EvtWord rsh_05_init_evt_nidome[];
 
+/**
+ * Animation table of the swarm of small Smorgs (c_n_moa_a): the figure, its animation set and a start offset
+ * for each.
+ */
 static MoamoaData ext_moamoa_data[] = {
     {("c_n_moa_a"), ("S_1"), 0.0f},
     {("c_n_moa_a"), ("S_1"), 2.0f},
@@ -309,7 +313,7 @@ static MoamoaData ext_moamoa_data[] = {
     {0},
 };
 
-// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
+// FAKE: dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 /**
  * Builds the swarm's animation table (wp->defs) from ext_moamoa_data:
@@ -428,7 +432,7 @@ static inline void /**/ moamoa_pose_change_i(Moamoa* moa, const char* model, con
     }
 }
 
-// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
+// FAKE: dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 /**
  * Switches one Moamoa to the named model/animation pair (a swarm member with MOAMOA_FLAG_KIND_MODEL set uses the
@@ -565,7 +569,8 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
 /**
  * Script helper: args[0] turns the per-kind model on or off (MOAMOA_FLAG_KIND_MODEL),
  * args[1] applies it to every Moamoa or only to those of kind 1; each sprite then refreshes its pose.
- * Used to dress the merged Smorg in the models of the people it swallowed.
+ * rsh_06 uses it as the Smorg merges; kinds 2-9 are passenger models (c_kinodebu, c_powan, c_rose, c_papab ...).
+ * Guess: the swarm is meant to show the passengers it has swallowed.
  */
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
@@ -801,7 +806,7 @@ static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround
     pose->flags &= ~4;
 }
 
-// Built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
+// FAKE: built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -901,7 +906,7 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
-// Built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
+// FAKE: built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -1552,7 +1557,7 @@ static void ext_moamoa_dispent(void) {
     }
 }
 
-// Built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
+// FAKE: built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -1889,7 +1894,11 @@ static EVT_BEGIN(evt_moamoa_escape)
     RETURN
 EVT_END()
 
-/** Guess: init event of the conductor in the baggage car; during the Smorg stages he is held by the swarm. */
+/**
+ * Init event of the conductor (車掌) in the baggage car: from STORY_STG6_46_ENGINEER to STORY_STG6_48_SMORG_MIASMA
+ * he stands at (-115, 0, 20) ((-100, 0, 0) in the demos) with the O_1 / T_3 poses and the distressed tribe
+ * 車掌悲, begging Mario to help the waitress the Smorgs have caught; at other times he is off the map.
+ */
 static EVT_BEGIN(init_syashou)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_46_ENGINEER, STORY_STG6_48_SMORG_MIASMA)
@@ -1919,7 +1928,11 @@ static EVT_BEGIN(talk_syashou)
     RETURN
 EVT_END()
 
-/** Guess: init event of the waitress in the baggage car; during the Smorg stages she is held by the swarm. */
+/**
+ * Init event of the waitress (ウェイトレス) in the baggage car: from STORY_STG6_46_ENGINEER to
+ * STORY_STG6_48_SMORG_MIASMA she is at (50, 0, 0), caught by the Smorgs, with the P_1 / T_5 poses and the
+ * distressed tribe ウェイトレス悲; at other times she is off the map.
+ */
 static EVT_BEGIN(init_waitless)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_46_ENGINEER, STORY_STG6_48_SMORG_MIASMA)
@@ -1945,6 +1958,7 @@ static EVT_BEGIN(talk_waitless)
     RETURN
 EVT_END()
 
+/** Doors and exits of rsh_05 variant a: e_bero to rsh_04_a; w_bero to rsh_06_a. */
 static BeroEntry bero_data_a[] = {
     {
         ("e_bero"), // hitName
@@ -1983,6 +1997,7 @@ static BeroEntry bero_data_a[] = {
     {0},
 };
 
+/** Doors and exits of rsh_05 variant b: e_bero to rsh_04_b; w_bero to rsh_06_a. */
 static BeroEntry bero_data_b[] = {
     {
         ("e_bero"), // hitName
@@ -2021,6 +2036,7 @@ static BeroEntry bero_data_b[] = {
     {0},
 };
 
+/** Doors and exits of rsh_05 variant c: e_bero to rsh_04_c; w_bero to rsh_06_a. */
 static BeroEntry bero_data_c[] = {
     {
         ("e_bero"), // hitName
@@ -2059,6 +2075,7 @@ static BeroEntry bero_data_c[] = {
     {0},
 };
 
+/** NPCs of the car: the conductor. */
 static NpcSetupInfo npc_data[] = {
     {
         "車掌", // name
@@ -2114,6 +2131,7 @@ EVT_BEGIN(evt_ghost_diary_read)
     RETURN
 EVT_END()
 
+/** Shelf and crate hit areas of the car with the message each shows when Mario checks it. */
 static ShelfMsgTbl6 access_tbl = {
     {
         {"kihako_1", "stg6_rsh_275"},

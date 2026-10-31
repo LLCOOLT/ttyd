@@ -74,6 +74,10 @@ NpcBattleSelect btlgrpsel_gon_btlno_gon_11_01_off[2];
 NpcSetupBattleInfo btlsetup_gon_tbl[22];
 NpcTerritoryInfo btl_gon_setup_no_tbl[22];
 
+/**
+ * Props of the Hooktail Castle battle stage: each entry names a model of the backdrop and where it stands,
+ * the last entries being the background layers.
+ */
 BattleStageObjectData gon_btlobject_data[] = {
     {"B", 2, 2, {0}, 0, 60, {0}},
     {"C", 2, 3, {0}, 0, 60, {0}},
@@ -87,6 +91,10 @@ BattleStageObjectData gon_btlobject_data[] = {
     {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
+/**
+ * Battle stage of Hooktail Castle: the stage model directories, the props above, the backdrop weapons and the
+ * background event that runs during the fight.
+ */
 BattleStageData gon_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -140,6 +148,10 @@ BattleStageData gon_btlstage_data[] = {
     },
 };
 
+/**
+ * Enemy party of battle gon_02_02 in Hooktail Castle: 3 x Paratroopa (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_gon_gon_02_02_off_1[] = {
     {
         &unit_patapata, // unitKindParams
@@ -173,6 +185,10 @@ BattleUnitSetup btlparty_gon_gon_02_02_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_02_02 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_02_02_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_02_02_off_1, // enemyData
@@ -184,6 +200,10 @@ BattleGroupSetup btlgrp_gon_gon_02_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_02_03 in Hooktail Castle: Koopa Troopa and Paratroopa (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_02_03_off_1[] = {
     {
         &unit_nokonoko, // unitKindParams
@@ -207,6 +227,10 @@ BattleUnitSetup btlparty_gon_gon_02_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_02_03 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_02_03_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_02_03_off_1, // enemyData
@@ -218,6 +242,10 @@ BattleGroupSetup btlgrp_gon_gon_02_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_02_04 in Hooktail Castle: Paratroopa and 2 x Koopa Troopa (start positions and
+ * item drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_02_04_off_1[] = {
     {
         &unit_patapata, // unitKindParams
@@ -251,6 +279,10 @@ BattleUnitSetup btlparty_gon_gon_02_04_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_02_04 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_02_04_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_02_04_off_1, // enemyData
@@ -262,6 +294,10 @@ BattleGroupSetup btlgrp_gon_gon_02_04_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_03_01 in Hooktail Castle: Red Bones and 4 x Dull Bones (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_03_01_off_1[] = {
     {
         &unit_red_honenoko, // unitKindParams
@@ -315,6 +351,10 @@ BattleUnitSetup btlparty_gon_gon_03_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_03_01 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_03_01_off_1 = {
     5, // numEnemies
     btlparty_gon_gon_03_01_off_1, // enemyData
@@ -325,6 +365,10 @@ BattleGroupSetup btlgrp_gon_gon_03_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_04_01 in Hooktail Castle: 2 x Dull Bones (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_gon_gon_04_01_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -348,6 +392,10 @@ BattleUnitSetup btlparty_gon_gon_04_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_04_01 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_04_01_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_04_01_off_1, // enemyData
@@ -359,6 +407,10 @@ BattleGroupSetup btlgrp_gon_gon_04_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_04_02 in Hooktail Castle: 4 x Dull Bones (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_gon_gon_04_02_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -402,6 +454,10 @@ BattleUnitSetup btlparty_gon_gon_04_02_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_04_02 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_04_02_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_04_02_off_1, // enemyData
@@ -413,6 +469,10 @@ BattleGroupSetup btlgrp_gon_gon_04_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_04_03 in Hooktail Castle: 3 x Dull Bones (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_gon_gon_04_03_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -446,6 +506,10 @@ BattleUnitSetup btlparty_gon_gon_04_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_04_03 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_04_03_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_04_03_off_1, // enemyData
@@ -457,6 +521,10 @@ BattleGroupSetup btlgrp_gon_gon_04_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_06_03 in Hooktail Castle: Paragoomba and 2 x Paratroopa (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_06_03_off_1[] = {
     {
         &unit_patakuri, // unitKindParams
@@ -490,6 +558,10 @@ BattleUnitSetup btlparty_gon_gon_06_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_06_03 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_06_03_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_06_03_off_1, // enemyData
@@ -501,6 +573,10 @@ BattleGroupSetup btlgrp_gon_gon_06_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_06_04 in Hooktail Castle: Dull Bones and 2 x Paragoomba (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_06_04_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -534,6 +610,10 @@ BattleUnitSetup btlparty_gon_gon_06_04_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_06_04 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_06_04_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_06_04_off_1, // enemyData
@@ -545,6 +625,10 @@ BattleGroupSetup btlgrp_gon_gon_06_04_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_08_01 in Hooktail Castle: 2 x Dull Bones (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_gon_gon_08_01_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -568,6 +652,10 @@ BattleUnitSetup btlparty_gon_gon_08_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_08_01 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_08_01_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_08_01_off_1, // enemyData
@@ -579,6 +667,10 @@ BattleGroupSetup btlgrp_gon_gon_08_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_08_03 in Hooktail Castle: Dull Bones and Spiky Goomba (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_08_03_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -602,6 +694,10 @@ BattleUnitSetup btlparty_gon_gon_08_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_08_03 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_08_03_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_08_03_off_1, // enemyData
@@ -613,6 +709,10 @@ BattleGroupSetup btlgrp_gon_gon_08_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_08_05 in Hooktail Castle: Paragoomba and Paratroopa (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_08_05_off_1[] = {
     {
         &unit_patakuri, // unitKindParams
@@ -636,6 +736,10 @@ BattleUnitSetup btlparty_gon_gon_08_05_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_08_05 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_08_05_off_1 = {
     2, // numEnemies
     btlparty_gon_gon_08_05_off_1, // enemyData
@@ -647,6 +751,10 @@ BattleGroupSetup btlgrp_gon_gon_08_05_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_09_01 in Hooktail Castle: 2 x Koopa Troopa and Dull Bones (start positions and
+ * item drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_09_01_off_1[] = {
     {
         &unit_nokonoko, // unitKindParams
@@ -680,6 +788,10 @@ BattleUnitSetup btlparty_gon_gon_09_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_09_01 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_09_01_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_09_01_off_1, // enemyData
@@ -691,6 +803,10 @@ BattleGroupSetup btlgrp_gon_gon_09_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_09_02 in Hooktail Castle: 2 x Dull Bones and Koopa Troopa (start positions and
+ * item drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_09_02_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -724,6 +840,10 @@ BattleUnitSetup btlparty_gon_gon_09_02_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_09_02 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_09_02_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_09_02_off_1, // enemyData
@@ -735,6 +855,10 @@ BattleGroupSetup btlgrp_gon_gon_09_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_09_04 in Hooktail Castle: 2 x Dull Bones and 2 x Koopa Troopa (start positions
+ * and item drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_09_04_off_1[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -778,6 +902,10 @@ BattleUnitSetup btlparty_gon_gon_09_04_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_09_04 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_09_04_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_09_04_off_1, // enemyData
@@ -789,6 +917,10 @@ BattleGroupSetup btlgrp_gon_gon_09_04_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_10_01 in Hooktail Castle: 2 x Spiky Goomba, Koopa Troopa and Paratroopa (start
+ * positions and item drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_10_01_off_1[] = {
     {
         &unit_togekuri, // unitKindParams
@@ -832,6 +964,10 @@ BattleUnitSetup btlparty_gon_gon_10_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_10_01 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_10_01_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_10_01_off_1, // enemyData
@@ -843,6 +979,10 @@ BattleGroupSetup btlgrp_gon_gon_10_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_10_02 in Hooktail Castle: 3 x Paratroopa (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_gon_gon_10_02_off_1[] = {
     {
         &unit_patapata, // unitKindParams
@@ -876,6 +1016,10 @@ BattleUnitSetup btlparty_gon_gon_10_02_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_10_02 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_10_02_off_1 = {
     3, // numEnemies
     btlparty_gon_gon_10_02_off_1, // enemyData
@@ -887,6 +1031,10 @@ BattleGroupSetup btlgrp_gon_gon_10_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_10_03 in Hooktail Castle: Koopa Troopa, Spiky Goomba, Paragoomba and Paratroopa
+ * (start positions and item drop tables included).
+ */
 BattleUnitSetup btlparty_gon_gon_10_03_off_1[] = {
     {
         &unit_nokonoko, // unitKindParams
@@ -930,6 +1078,10 @@ BattleUnitSetup btlparty_gon_gon_10_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_10_03 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_10_03_off_1 = {
     4, // numEnemies
     btlparty_gon_gon_10_03_off_1, // enemyData
@@ -941,6 +1093,10 @@ BattleGroupSetup btlgrp_gon_gon_10_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gon_11_01 in Hooktail Castle: Hooktail (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_gon_gon_11_01_off_1[] = {
     {
         &unit_boss_gonbaba, // unitKindParams
@@ -954,6 +1110,10 @@ BattleUnitSetup btlparty_gon_gon_11_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gon_11_01 in Hooktail Castle: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gon_gon_11_01_off_1 = {
     1, // numEnemies
     btlparty_gon_gon_11_01_off_1, // enemyData
@@ -964,111 +1124,136 @@ BattleGroupSetup btlgrp_gon_gon_11_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Developer test battle 1 in Hooktail Castle: always fights gon_02_02_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_test1_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Developer test battle 2 in Hooktail Castle: always fights gon_02_02_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_test2_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, gon_btlstage_data},
     {0},
 };
 
+/** Developer test battle 3 in Hooktail Castle: always fights gon_02_02_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_test3_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, &gon_btlstage_data[1]},
     {0},
 };
 
+/** Battle 02_02 in Hooktail Castle always fights one group, gon_02_02_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_02_02_off[] = {
     {50, &btlgrp_gon_gon_02_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 02_03 in Hooktail Castle always fights one group, gon_02_03_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_02_03_off[] = {
     {10, &btlgrp_gon_gon_02_03_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 02_04 in Hooktail Castle always fights one group, gon_02_04_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_02_04_off[] = {
     {10, &btlgrp_gon_gon_02_04_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 03_01 in Hooktail Castle always fights one group, gon_03_01_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_03_01_off[] = {
     {10, &btlgrp_gon_gon_03_01_off_1, &gon_btlstage_data[4]},
     {0},
 };
 
+/** Battle 04_02 in Hooktail Castle always fights one group, gon_04_02_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_04_02_off[] = {
     {10, &btlgrp_gon_gon_04_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 04_03 in Hooktail Castle always fights one group, gon_04_03_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_04_03_off[] = {
     {10, &btlgrp_gon_gon_04_03_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 06_03 in Hooktail Castle always fights one group, gon_06_03_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_06_03_off[] = {
     {10, &btlgrp_gon_gon_06_03_off_1, &gon_btlstage_data[3]},
     {0},
 };
 
+/** Battle 06_04 in Hooktail Castle always fights one group, gon_06_04_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_06_04_off[] = {
     {10, &btlgrp_gon_gon_06_04_off_1, &gon_btlstage_data[3]},
     {0},
 };
 
+/** Battle 08_01 in Hooktail Castle always fights one group, gon_08_01_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_08_01_off[] = {
     {10, &btlgrp_gon_gon_08_01_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 08_03 in Hooktail Castle always fights one group, gon_08_03_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_08_03_off[] = {
     {10, &btlgrp_gon_gon_08_03_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 08_05 in Hooktail Castle always fights one group, gon_08_05_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_08_05_off[] = {
     {10, &btlgrp_gon_gon_08_05_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 09_01 in Hooktail Castle always fights one group, gon_09_01_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_09_01_off[] = {
     {10, &btlgrp_gon_gon_09_01_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 09_02 in Hooktail Castle always fights one group, gon_09_02_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_09_02_off[] = {
     {10, &btlgrp_gon_gon_09_02_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 09_04 in Hooktail Castle always fights one group, gon_09_04_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_09_04_off[] = {
     {10, &btlgrp_gon_gon_09_04_off_1, &gon_btlstage_data[2]},
     {0},
 };
 
+/** Battle 10_01 in Hooktail Castle always fights one group, gon_10_01_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_10_01_off[] = {
     {10, &btlgrp_gon_gon_10_01_off_1, gon_btlstage_data},
     {0},
 };
 
+/** Battle 10_02 in Hooktail Castle always fights one group, gon_10_02_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_10_02_off[] = {
     {10, &btlgrp_gon_gon_10_02_off_1, gon_btlstage_data},
     {0},
 };
 
+/** Battle 10_03 in Hooktail Castle always fights one group, gon_10_03_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_10_03_off[] = {
     {10, &btlgrp_gon_gon_10_03_off_1, gon_btlstage_data},
     {0},
 };
 
+/** Battle 11_01 in Hooktail Castle always fights one group, gon_11_01_off_1. */
 NpcBattleSelect btlgrpsel_gon_btlno_gon_11_01_off[] = {
     {20, &btlgrp_gon_gon_11_01_off_1, &gon_btlstage_data[1]},
     {0},
 };
 
+/**
+ * Field battle setups of Hooktail Castle: one entry per battle id in btl_gon_setup_no_tbl, giving the stage,
+ * the group selection and the battle music.
+ */
 NpcSetupBattleInfo btlsetup_gon_tbl[] = {
     {
         "マップstg_01_03", // name
@@ -1286,6 +1471,10 @@ NpcSetupBattleInfo btlsetup_gon_tbl[] = {
     {0},
 };
 
+/**
+ * Battle ids of Hooktail Castle (BTLNO_GON_*) and their index into btlsetup_gon_tbl; handed to the battle
+ * system by relSetBtlAddr.
+ */
 NpcTerritoryInfo btl_gon_setup_no_tbl[] = {
     {"BTLNO_GON_TEST1", 0},
     {"BTLNO_GON_TEST2", 1},

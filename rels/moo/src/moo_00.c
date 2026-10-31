@@ -39,6 +39,7 @@ static USER_FUNC(party_reset);
 static BeroEntry bero_entry_data[3];
 static f32 spline_dt[9];
 
+/** Exits of moo_00: west road w_bero to moo_07 (e_bero); east road e_bero to moo_01 (w_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -75,6 +76,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Three control points (x, y, z) of the path Mario and his partner tumble along in the crash landing: from
+ * high above the landing site down to the ground.
+ */
 static f32 spline_dt[] = {
     -320.0f, 200.0f, -170.0f, -220.0f, 100.0f, -170.0f, -120.0f, 0.0f,
     -170.0f,
@@ -137,6 +142,7 @@ EVT_END()
  * the story progress is set to STORY_STG7_06_TO_THE_MOON and the area banner for the Moon is shown (telop 14).
  */
 static EVT_BEGIN(evt_first)
+    // Controls off; the partner is put into its hurt pose.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     WAIT_FRAMES(1)
@@ -161,6 +167,7 @@ static EVT_BEGIN(evt_first)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
+        // Mario and the partner tumble down the spline toward the Moon's surface.
         CALL(evt_sub_spline_init, 1, 1, PTR(spline_dt), 3, 0, 1000)
         LABEL(10)
         CALL(evt_sub_spline_get_value, LW(0), LW(1), LW(2), LW(3))
@@ -197,6 +204,7 @@ static EVT_BEGIN(evt_first)
         GOTO(0)
     END_IF
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    // They hit the ground with a thud and lie there.
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_LAND_DAMAGE2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
@@ -240,6 +248,7 @@ static EVT_BEGIN(evt_first)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(mario_reset)
+    // Mario gets up; the partner speaks (stg7_moo_03, stg7_moo_04) and Mario nods.
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP5"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_jump_pos, LW(0), 0, LW(2), 500, 0, -1000)
     CALL(evt_mario_adjust_dir)
@@ -280,6 +289,7 @@ static EVT_BEGIN(evt_first)
 #if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
+    // Control returns, the story advances and the Moon banner appears.
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
     CALL(evt_cam3d_evt_off, 500, 11)

@@ -1,4 +1,4 @@
-// Pit of 100 Trials battle unit: the Dark Wizzerd (`mahorn_custom`): parts, stats, poses and AI scripts.
+// Pit of 100 Trials battle unit: the Elite Wizzerd (`mahorn_custom`): parts, stats, poses and AI scripts.
 
 #include "version.h"
 #include "eff/eff_mahorn2.h"
@@ -23,7 +23,15 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
 
-double __fabs(double x);
+// Unit work slots of this unit (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_MAHORN_CUSTOM_HAND = 0,         // slots 0-3: the four hand destination blocks (hand_init, hand_ctrl, hand_end)
+    UW_MAHORN_CUSTOM_IS_CLONE = 4,     // 1 for a clone (unit_mahorn_custom_bunsin), 0 for the real Wizzerd
+    UW_MAHORN_CUSTOM_KILL_CLONES = 5,  // 1 when the real one is hit while clones exist: they vanish after the damage
+    UW_MAHORN_CUSTOM_VANISHING = 6,    // 1 once a clone is being removed (it fades out only once)
+    UW_MAHORN_CUSTOM_MAGIC_EFFECT = 7, // EffectEntry of the current magic effect (eff_magic)
+};
+
 /** Absolute value of a double, wrapped so the compiler emits the same code as the original. */
 static inline double mahorn_fabs(double x) {
     return __fabs(x);
@@ -86,6 +94,7 @@ static EvtWord spawn_event[76];
 #endif
 static EvtWord wait_event[386];
 
+/** Unit data of the Elite Wizzerd: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_mahorn_custom = {
     169,
     "btl_un_mahorn_custom",
@@ -144,7 +153,7 @@ BattleUnitKind unit_mahorn_custom = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     5,
     parts,
@@ -152,6 +161,7 @@ BattleUnitKind unit_mahorn_custom = {
     data_table,
 };
 
+/** Unit data of the copies of the Elite Wizzerd that appear when it splits. */
 BattleUnitKind unit_mahorn_custom_bunsin = {
     170,
     "btl_un_mahorn_custom_bunsin",
@@ -210,7 +220,7 @@ BattleUnitKind unit_mahorn_custom_bunsin = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x400004,
+    UNIT_ATTR_FLOATING | UNIT_ATTR_NO_DAMAGE_NUMBER,
     &regist,
     5,
     parts,
@@ -218,30 +228,48 @@ BattleUnitKind unit_mahorn_custom_bunsin = {
     data_table_bunsin,
 };
 
+/** Damage reduction of the Elite Wizzerd: defence 5 against every attack type. */
 static BattleUnitDefense defence = {{5, 5, 5, 5, 5}};
 
+/** Element response of the Elite Wizzerd: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Elite Wizzerd (percent, 0 is immune): immune to sleep. Demo values. */
 static StatusVulnerability regist = {0, 30, 30, 100, 20, 100, 100, 20, 100, 20, 100, 20, 100, 20, 20, 10, 55, 100, 20, 100, 100, 20};
 #else
+/**
+ * Status vulnerability of the Elite Wizzerd (percent, 0 is immune): immune to sleep. Released game values.
+ */
 static StatusVulnerability regist = {0, 30, 80, 100, 20, 100, 100, 40, 100, 75, 100, 75, 100, 80, 20, 10, 75, 100, 20, 100, 100, 20};
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Elite Wizzerd, clone (percent, 0 is immune): immune to sleep, stop, dizzy,
+ * confuse, freeze, tiny, attack down, defence down, allergic, fright, gale force, slow, instant KO. Demo
+ * values.
+ */
 static StatusVulnerability regist_bunsin = {0, 0, 0, 100, 0, 100, 100, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 0};
 #else
+/**
+ * Status vulnerability of the Elite Wizzerd, clone (percent, 0 is immune): immune to sleep, stop, dizzy,
+ * confuse, electric, burn, freeze, huge, tiny, attack up, attack down, defence up, defence down, allergic,
+ * fright, gale force, fast, slow, dodgy, invisible, instant KO. Released game values.
+ */
 static StatusVulnerability regist_bunsin = {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
 
+/** Body parts of the Elite Wizzerd: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
-    {2, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2010009, 0, pose_table},
-    {3, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2010009, 0, pose_table},
-    {4, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2010009, 0, pose_table},
-    {5, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2010009, 0, pose_table},
+    {1, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
+    {2, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {3, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {4, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {5, "btl_un_mahorn_custom", "c_maho_w", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
 };
 
+/** Attack data for the Elite Wizzerd's single-target magic: 8 damage. */
 static BattleWeapon weapon_mahorn_attack_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -260,7 +288,7 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -282,6 +310,7 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Elite Wizzerd's magic on all enemies: 8 damage. */
 static BattleWeapon weapon_mahorn_all_attack_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -304,7 +333,7 @@ static BattleWeapon weapon_mahorn_all_attack_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    4, // element
+    ELEMENT_ELECTRIC, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -323,6 +352,7 @@ static BattleWeapon weapon_mahorn_all_attack_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Elite Wizzerd's punch flurry: 8 damage. */
 static BattleWeapon weapon_mahorn_attack_punch = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -341,7 +371,7 @@ static BattleWeapon weapon_mahorn_attack_punch = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -359,6 +389,7 @@ static BattleWeapon weapon_mahorn_attack_punch = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Elite Wizzerd's invisibility spell: no damage, 100% Invisible. */
 static BattleWeapon weapon_mahorn_trans_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -376,7 +407,7 @@ static BattleWeapon weapon_mahorn_trans_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -396,6 +427,7 @@ static BattleWeapon weapon_mahorn_trans_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Elite Wizzerd's dodgy spell: no damage, 100% Dodgy. */
 static BattleWeapon weapon_mahorn_yokeyoke_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -413,7 +445,7 @@ static BattleWeapon weapon_mahorn_yokeyoke_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -432,6 +464,7 @@ static BattleWeapon weapon_mahorn_yokeyoke_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Elite Wizzerd's size-up spell: no damage, 100% size change. */
 static BattleWeapon weapon_mahorn_dekadeka_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -449,7 +482,7 @@ static BattleWeapon weapon_mahorn_dekadeka_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -469,6 +502,7 @@ static BattleWeapon weapon_mahorn_dekadeka_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Elite Wizzerd's defence-up spell: no damage, 100% defence change. */
 static BattleWeapon weapon_mahorn_katikati_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -486,7 +520,7 @@ static BattleWeapon weapon_mahorn_katikati_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -507,6 +541,7 @@ static BattleWeapon weapon_mahorn_katikati_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Elite Wizzerd's healing spell: no damage. */
 static BattleWeapon weapon_mahorn_recover_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -524,7 +559,7 @@ static BattleWeapon weapon_mahorn_recover_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, // acHelpMsg..special
@@ -541,6 +576,10 @@ static BattleWeapon weapon_mahorn_recover_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Spawn setup for the extra Elite Wizzerd created when it splits: enemy side, parked off-screen until its
+ * script places it.
+ */
 static BattleUnitSetup entry_mahorn = {
     &unit_mahorn_custom_bunsin, // unitKindParams
     1, // alliance
@@ -553,23 +592,26 @@ static BattleUnitSetup entry_mahorn = {
 };
 
 /**
- * Attack script of the Dark Wizzerd. On a first strike it just punches. Its copies (unit work 4 set) do nothing.
+ * Attack script of the Elite Wizzerd. On a first strike it just punches.
+ * Its copies (unit work 4 set) do nothing.
  * After an item check, if it is the only unit of its side left it splits into copies (bunsin_event);
  * if it has copies it casts its single-target magic (or is flustered when confused with no target);
  * otherwise it draws a spell: punch (30 in 120), single-target magic (60), and 10 each for magic on all enemies,
  * size-up, defence-up, invisibility, dodgy and heal.
  */
 static EVT_BEGIN(attack_event)
+    // On a First Strike it just punches.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_punch))
         CALL_CHILD(attack_punch_event)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_IS_CLONE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF
+    // Use an item if it has one.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -578,20 +620,24 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(mahorn_get_live_num, LW(0))
     IF_INT_EQUAL(LW(0), 1)
+        // If it is the only unit left on its side, it splits into copies.
         CALL_CHILD(bunsin_event)
         RETURN
     ELSE
         CALL(mahorn_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
                 CALL_CHILD(subsetevt_confuse_flustered)
                 GOTO(99)
             END_IF
             SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_magic))
+            // With copies around it only casts its single-target magic.
             CALL_CHILD(attack_magic_event)
             GOTO(99)
         ELSE
+            // Otherwise it draws a move: the punch flurry, single-target magic, or one of the other spells
+            // (all-enemy magic, size-up, defence-up, invisibility, dodgy, heal).
             LABEL(10)
             SET_VALUE(LW(0), 0)
             ADD(LW(0), 30)
@@ -660,13 +706,14 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-/** Attack script of the Dark Wizzerd's copies: they do nothing but return to waiting. */
+/** Attack script of the Elite Wizzerd's copies: they do nothing but return to waiting. */
 static EVT_BEGIN(attack_event_bunsin)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/** Pose table of the Elite Wizzerd: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "MAH_N_1"},
     {2, "MAH_Y_1"},
@@ -674,19 +721,23 @@ static PoseTableEntry pose_table[] = {
     {5, "MAH_K_1"},
     {4, "MAH_X_1"},
     {3, "MAH_X_1"},
-    {28, "MAH_S_1"},
+    {BTL_POSE_NORMAL, "MAH_S_1"},
     {29, "MAH_Q_1"},
     {30, "MAH_Q_1"},
     {31, "MAH_A_1"},
-    {39, "MAH_D_1"},
-    {40, "MAH_W_1"},
-    {42, "MAH_R_1"},
-    {56, "MAH_X_1"},
-    {57, "MAH_X_1"},
+    {BTL_POSE_DAMAGE, "MAH_D_1"},
+    {BTL_POSE_WALK, "MAH_W_1"},
+    {BTL_POSE_RUN, "MAH_R_1"},
+    {BTL_POSE_DANGER, "MAH_X_1"},
+    {BTL_POSE_PERIL, "MAH_X_1"},
     {BTL_POSE_TALK, "MAH_T_1"},
     {BTL_POSE_STAY_DEFAULT, "MAH_S_1"},
 };
 
+/**
+ * Data table of the Elite Wizzerd: event handlers keyed by tag (mahorn_subset_dead_event,
+ * mahorn_subset_blow_dead_event, avoid_miss_event).
+ */
 static BattleDataEntry data_table[] = {
     {49, mahorn_subset_dead_event},
     {58, mahorn_subset_blow_dead_event},
@@ -695,6 +746,7 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Data table of the Elite Wizzerd, clone: event handlers keyed by tag (avoid_miss_event). */
 static BattleDataEntry data_table_bunsin[] = {
     {46, avoid_miss_event},
     {48, btldefaultevt_Dummy},
@@ -702,7 +754,7 @@ static BattleDataEntry data_table_bunsin[] = {
 };
 
 /**
- * Init script of the Dark Wizzerd: registers its wait, attack, damage and confusion handlers,
+ * Init script of the Elite Wizzerd: registers its wait, attack, damage and confusion handlers,
  * lifts its home position to y 20, sets up its four floating hands (hand_init) with their resting offsets,
  * starts hand_ctrl_event to animate them, and clears unit work 4 (set on its copies) and unit work 6.
  */
@@ -721,22 +773,22 @@ static EVT_BEGIN(init_event)
     CALL(set_hand_dest, BTL_UNIT_SELF, 4, FLOAT(-25.0f), FLOAT(10.0f), FLOAT(-10.0f))
     CALL(set_hand_dest, BTL_UNIT_SELF, 5, FLOAT(25.0f), FLOAT(10.0f), FLOAT(10.0f))
     SPAWN_EVENT(hand_ctrl_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_IS_CLONE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_VANISHING, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
  * Fades the unit in LW(0) out over 30 frames (all five body parts) and then hides all its parts.
- * A unit id of -1 does nothing. Used when the Dark Wizzerd vanishes to make or remove copies.
+ * A unit id of -1 does nothing. Used when the Elite Wizzerd vanishes to make or remove copies.
  */
 static EVT_BEGIN(alpha_down_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
     CALL(btlevtcmd_SetAlpha, LW(0), 1, 254)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     CALL(evt_sub_intpl_init, 0, 255, 0, 30)
     LOOP(30)
@@ -748,13 +800,13 @@ static EVT_BEGIN(alpha_down_event)
         CALL(btlevtcmd_SetAlpha, LW(0), 5, LW(1))
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(btlevtcmd_OnPartsAttribute, LW(0), 1, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, LW(0), 2, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, LW(0), 3, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, LW(0), 4, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, LW(0), 5, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, LW(0), 1, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, LW(0), 2, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, LW(0), 3, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, LW(0), 4, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, LW(0), 5, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetAlpha, LW(0), 1, 0)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     RETURN
 EVT_END()
@@ -767,13 +819,13 @@ static EVT_BEGIN(alpha_up_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
-    CALL(btlevtcmd_OffPartsAttribute, LW(0), 1, 33554432)
-    CALL(btlevtcmd_OffPartsAttribute, LW(0), 2, 33554432)
-    CALL(btlevtcmd_OffPartsAttribute, LW(0), 3, 33554432)
-    CALL(btlevtcmd_OffPartsAttribute, LW(0), 4, 33554432)
-    CALL(btlevtcmd_OffPartsAttribute, LW(0), 5, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, LW(0), 1, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OffPartsAttribute, LW(0), 2, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OffPartsAttribute, LW(0), 3, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OffPartsAttribute, LW(0), 4, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OffPartsAttribute, LW(0), 5, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetAlpha, LW(0), 1, 0)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     CALL(evt_sub_intpl_init, 0, 0, 254, 30)
     LOOP(30)
@@ -790,13 +842,13 @@ static EVT_BEGIN(alpha_up_event)
     CALL(btlevtcmd_SetAlpha, LW(0), 3, 255)
     CALL(btlevtcmd_SetAlpha, LW(0), 4, 255)
     CALL(btlevtcmd_SetAlpha, LW(0), 5, 255)
-    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, 1, 1)
+    CALL(btlevtcmd_AnimeFlagOnOff, LW(0), 1, PART_ANIM_CHANGE, 1)
     WAIT_FRAMES(1)
     RETURN
 EVT_END()
 
 /**
- * Background loop of the Dark Wizzerd, run for as long as it exists:
+ * Background loop of the Elite Wizzerd, run for as long as it exists:
  * each frame it moves the floating hands towards their targets (hand_ctrl).
  */
 static EVT_BEGIN(hand_ctrl_event)
@@ -813,7 +865,7 @@ static EVT_BEGIN(hand_ctrl_event)
 EVT_END()
 
 /**
- * Damage script of the Dark Wizzerd.
+ * Damage script of the Elite Wizzerd.
  * When the real Wizzerd is hit while copies exist it remembers that (unit work 5),
  * and after the default damage handling all its copies vanish (mahorn_subset_bunsin_all_kill).
  * When a copy is hit it disappears (bunsin_kill_event) before the damage is dealt.
@@ -821,12 +873,12 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_KILL_CLONES, 0)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_IS_CLONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(mahorn_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_KILL_CLONES, 1)
         END_IF
     ELSE
         SET_VALUE(LW(0), -2)
@@ -836,7 +888,7 @@ static EVT_BEGIN(damage_event)
     CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_KILL_CLONES, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL_CHILD(mahorn_subset_bunsin_all_kill)
         END_IF
@@ -845,12 +897,12 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Removes all of the Dark Wizzerd's copies: waits for the current attack to finish,
+ * Removes all of the Elite Wizzerd's copies: waits for the current attack to finish,
  * then has each of the up to four copies fade out and be removed (bunsin_kill_event),
  * and waits until none remain.
  */
 static EVT_BEGIN(mahorn_subset_bunsin_all_kill)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_IS_CLONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(mahorn_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -877,7 +929,7 @@ static EVT_BEGIN(mahorn_subset_bunsin_all_kill)
 EVT_END()
 
 /**
- * Defeat script of the Dark Wizzerd: it spins for 48 frames (SFX_BTL_ENEMY_DIE1_1),
+ * Defeat script of the Elite Wizzerd: it spins for 48 frames (SFX_BTL_ENEMY_DIE1_1),
  * bursts into smoke with a star-point effect, stores its coins and experience,
  * clears its statuses and makes all its copies vanish (mahorn_subset_bunsin_all_kill),
  * then it is removed from the battle.
@@ -888,7 +940,7 @@ static EVT_BEGIN(mahorn_subset_dead_event)
         CALL(btlevtcmd_RunDataEventChild, LW(10), 50)
     END_IF
     SET_VALUE(LW(0), 48)
-    CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), UNIT_FLAG_HIDE_HELD_ITEM)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LABEL(10)
     WAIT_FRAMES(1)
@@ -926,10 +978,10 @@ static EVT_BEGIN(mahorn_subset_dead_event)
     END_IF
     CALL(btlevtcmd_GetBackItem, LW(10))
     CALL(btlevtcmd_ClearAllStatus, LW(10))
-    CALL(btlevtcmd_OnAttribute, LW(10), 16777216)
-    CALL(btlevtcmd_OnAttribute, LW(10), 536870912)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_NO_SHADOW)
     CALL_CHILD(mahorn_subset_bunsin_all_kill)
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_KillUnit, LW(10), 0)
     ELSE
@@ -939,14 +991,14 @@ static EVT_BEGIN(mahorn_subset_dead_event)
 EVT_END()
 
 /**
- * Defeat script when the Dark Wizzerd is blown away (SFX_BTL_CLAUD_BREATH3):
+ * Defeat script when the Elite Wizzerd is blown away (SFX_BTL_CLAUD_BREATH3):
  * it spins off the stage, its coins and experience are stored,
  * all its copies vanish and it is removed from the battle.
  */
 static EVT_BEGIN(mahorn_subset_blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), BTL_POSE_DAMAGE)
     BEGIN_SIBLING_EVENT
         LABEL(0)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 20, 0)
@@ -968,11 +1020,11 @@ static EVT_BEGIN(mahorn_subset_blow_dead_event)
 EVT_END()
 
 /**
- * Called when an attack on the Dark Wizzerd misses.
+ * Called when an attack on the Elite Wizzerd misses.
  * If the unit is a copy (unit work 4 set) it disappears (bunsin_kill_event).
  */
 static EVT_BEGIN(avoid_miss_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_IS_CLONE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(0), -2)
         CALL_CHILD(bunsin_kill_event)
@@ -989,11 +1041,11 @@ static EVT_BEGIN(bunsin_kill_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, LW(0), 6, LW(1))
+    CALL(btlevtcmd_GetUnitWork, LW(0), UW_MAHORN_CUSTOM_VANISHING, LW(1))
     IF_INT_EQUAL(LW(1), 1)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_SetUnitWork, LW(0), 6, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(0), UW_MAHORN_CUSTOM_VANISHING, 1)
     CALL_CHILD(alpha_down_event)
     LABEL(10)
     CALL(btlevtcmd_WaitAttackEnd)
@@ -1002,12 +1054,14 @@ static EVT_BEGIN(bunsin_kill_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's punch flurry: it moves next to the target (35 units to the side), spreads its four hands,
+ * The Elite Wizzerd's punch flurry: it moves next to the target (35 units to the side), spreads its four hands,
  * which blur (SFX_ENM_MAHO_ATTACK2), and has them dart to random spots around the target for 25 rounds,
  * then pulls them back. The target is checked and takes the damage. It then returns home.
  * After a first strike it uses the first-strike target.
  */
 static EVT_BEGIN(attack_punch_event)
+    // Pick the target (after a First Strike the one already chosen, otherwise sampled from the enemies); a
+    // confused Elite Wizzerd with nobody to hit gets flustered.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -1017,7 +1071,7 @@ static EVT_BEGIN(attack_punch_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1025,6 +1079,7 @@ static EVT_BEGIN(attack_punch_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1038,6 +1093,7 @@ static EVT_BEGIN(attack_punch_event)
     CALL(set_hand_dest, BTL_UNIT_SELF, 3, FLOAT(16.0f), FLOAT(29.0f), FLOAT(5.0f))
     CALL(set_hand_dest, BTL_UNIT_SELF, 4, FLOAT(-16.0f), FLOAT(11.0f), FLOAT(-5.0f))
     CALL(set_hand_dest, BTL_UNIT_SELF, 5, FLOAT(16.0f), FLOAT(11.0f), FLOAT(5.0f))
+    // It floats next to the target and spreads its four hands.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MAHO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     IF_INT_EQUAL(LW(15), -1)
@@ -1055,9 +1111,10 @@ static EVT_BEGIN(attack_punch_event)
     SET_VALUE(LW(10), 2)
     LOOP(4)
         CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, LW(10), 255, 255, 255, 255, 255, 255, 255, 100, 0)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(10), 67108864)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(10), PART_ATTR_BLUR)
         ADD(LW(10), 1)
     END_LOOP
+    // Its hands blur and dart to random spots around the target in a flurry of punches.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MAHO_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LOOP(25)
         SET_VALUE(LW(10), 2)
@@ -1085,9 +1142,10 @@ static EVT_BEGIN(attack_punch_event)
     CALL(set_hand_dest, BTL_UNIT_SELF, 5, FLOAT(16.0f), FLOAT(11.0f), FLOAT(5.0f))
     SET_VALUE(LW(10), 2)
     LOOP(4)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(10), 67108864)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(10), PART_ATTR_BLUR)
         ADD(LW(10), 1)
     END_LOOP
+    // The hands pull back; find out whether the flurry connects.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -1112,11 +1170,13 @@ static EVT_BEGIN(attack_punch_event)
         LABEL(90)
         WAIT_FRAMES(30)
         GOTO(98)
+        // Hit: the damage is dealt.
         LABEL(91)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         WAIT_FRAMES(30)
         GOTO(98)
+        // It floats back home.
         LABEL(98)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MAHO_ATTACK1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1146,7 +1206,7 @@ static EVT_BEGIN(start_avoid)
 EVT_END()
 
 /**
- * The Dark Wizzerd's single-target spell: it and its copies (found by mahorn_get_bunsin) all charge up
+ * The Elite Wizzerd's single-target spell: it and its copies (found by mahorn_get_bunsin) all charge up
  * (SFX_ENM_MAHO_CHARGE1, attack_enemy_common_event_sub1) and cast (SFX_ENM_MAHO_MAGIC2);
  * the copies' orbs fly past the target to the edge of the stage (attack_enemy_common_event_sub_no_hit)
  * while the real one's orb flies to the target (attack_enemy_common_event_sub_hit).
@@ -1154,11 +1214,13 @@ EVT_END()
  */
 static EVT_BEGIN(attack_enemy_common_event)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // The Elite Wizzerd (and each of its copies) charges up its magic.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MAHO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(mahorn_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
     SET_VALUE(LW(15), LW(11))
@@ -1171,11 +1233,13 @@ static EVT_BEGIN(attack_enemy_common_event)
     SPAWN_EVENT(attack_enemy_common_event_sub1)
     SET_VALUE(LW(15), -2)
     CALL_CHILD(attack_enemy_common_event_sub1)
+    // Then it casts: a magic orb heads for the target.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MAHO_MAGIC2"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_FRAMES(25)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MAHO_MAGIC2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SIBLING_EVENT
+    // Find out whether the spell reaches the target.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -1194,6 +1258,7 @@ static EVT_BEGIN(attack_enemy_common_event)
         CASE_DEFAULT
         GOTO(98)
         CASE_END
+        // Miss or dodge: the target dodges as the orb arrives and the orbs fly on past.
         LABEL(90)
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(60)
@@ -1229,6 +1294,8 @@ static EVT_BEGIN(attack_enemy_common_event)
         SET_VALUE(LW(15), -2)
         CALL_CHILD(attack_enemy_common_event_sub_no_hit)
         GOTO(98)
+        // Hit: the real orb strikes the target and the damage is dealt; the copies' orbs fly past to the edge
+        // of the stage.
         LABEL(91)
         CALL(mahorn_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
         SET_VALUE(LW(15), LW(11))
@@ -1242,8 +1309,9 @@ static EVT_BEGIN(attack_enemy_common_event)
         SET_VALUE(LW(15), -2)
         CALL_CHILD(attack_enemy_common_event_sub_hit)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         GOTO(98)
+        // The copies go back to waiting.
         LABEL(98)
         CALL(mahorn_get_bunsin, LW(11), LW(12), LW(13), LW(14), LW(0))
         IF_INT_NOT_EQUAL(LW(11), -1)
@@ -1263,7 +1331,8 @@ static EVT_BEGIN(attack_enemy_common_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's spell on all enemies: it charges up (SFX_ENM_MAHO_CHARGE1, attack_enemy_common_event_sub1),
+ * The Elite Wizzerd's spell on all enemies: it charges up (SFX_ENM_MAHO_CHARGE1,
+ * attack_enemy_common_event_sub1),
  * casts (attack_enemy_common_event_sub2) and then a "thunder_n64" bolt strikes each target in turn,
  * damaging them (the defence action command result is taken once, at the first target).
  */
@@ -1317,7 +1386,7 @@ static EVT_BEGIN(attack_enemy_all_common_event)
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
             SET_VALUE(LW(6), 1)
         END_IF
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         GOTO(97)
         LABEL(97)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -1331,7 +1400,7 @@ static EVT_BEGIN(attack_enemy_all_common_event)
 EVT_END()
 
 /**
- * Charge-up of the Dark Wizzerd in LW(15) (-2 for itself):
+ * Charge-up of the Elite Wizzerd in LW(15) (-2 for itself):
  * it stops its wait script, an "akari_charge_n64" glow appears over it,
  * it takes the MAH_A_4 pose and raises its four hands (MAH_S_5A), then waits 50 frames.
  */
@@ -1357,7 +1426,7 @@ static EVT_BEGIN(attack_enemy_common_event_sub1)
 EVT_END()
 
 /**
- * Casting gesture of the Dark Wizzerd in LW(15) (-2 for itself):
+ * Casting gesture of the Elite Wizzerd in LW(15) (-2 for itself):
  * in pose MAH_A_1 its four hands sweep to and fro in turn, 20 units each way, offset by 7,
  * 10 and 15 frames from each other, before a 55-frame pause.
  */
@@ -1439,7 +1508,7 @@ static EVT_BEGIN(attack_enemy_common_event_sub2)
 EVT_END()
 
 /**
- * A copy's spell: the Dark Wizzerd in LW(15) sends its magic orb (eff_magic, 40 frames) to the far edge of the
+ * A copy's spell: the Elite Wizzerd in LW(15) sends its magic orb (eff_magic, 40 frames) to the far edge of the
  * stage and does the casting gesture (attack_enemy_common_event_sub2) with SFX_ENM_MAHO_MAGIC1 and MAGIC3,
  * so it looks like a real attack.
  */
@@ -1464,7 +1533,7 @@ static EVT_BEGIN(attack_enemy_common_event_sub_no_hit)
 EVT_END()
 
 /**
- * The real spell: the Dark Wizzerd in LW(15) sends its magic orb (eff_magic, 20 frames) at the target's hit
+ * The real spell: the Elite Wizzerd in LW(15) sends its magic orb (eff_magic, 20 frames) at the target's hit
  * position and does the casting gesture (attack_enemy_common_event_sub2) with SFX_ENM_MAHO_MAGIC1 and MAGIC3.
  */
 static EVT_BEGIN(attack_enemy_common_event_sub_hit)
@@ -1484,7 +1553,7 @@ static EVT_BEGIN(attack_enemy_common_event_sub_hit)
 EVT_END()
 
 /**
- * The Dark Wizzerd's single-target magic attack:
+ * The Elite Wizzerd's single-target magic attack:
  * picks a target (the first-strike target on a first strike),
  * casts the spell (attack_enemy_common_event) and resets its facing.
  * When confused with no target it is flustered.
@@ -1499,7 +1568,7 @@ static EVT_BEGIN(attack_magic_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1513,7 +1582,7 @@ static EVT_BEGIN(attack_magic_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's confusion spell: picks a target,
+ * The Elite Wizzerd's confusion spell: picks a target,
  * casts the single-target spell (attack_enemy_common_event) with the confuse weapon in LW(9) (50 percent chance,
  * 3 turns) and resets its facing. When confused with no target it is flustered.
  */
@@ -1522,7 +1591,7 @@ static EVT_BEGIN(confuse_magic_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1536,7 +1605,7 @@ static EVT_BEGIN(confuse_magic_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's magic attack on all enemies:
+ * The Elite Wizzerd's magic attack on all enemies:
  * picks the targets, casts the area spell (attack_enemy_all_common_event) and resets its facing.
  * When confused with no target it is flustered.
  */
@@ -1545,7 +1614,7 @@ static EVT_BEGIN(all_attack_magic_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1559,7 +1628,7 @@ static EVT_BEGIN(all_attack_magic_event)
 EVT_END()
 
 /**
- * Support spell animation of the Dark Wizzerd: it charges up (SFX_ENM_MAHO_CHARGE1, "akari_charge_n64" glow,
+ * Support spell animation of the Elite Wizzerd: it charges up (SFX_ENM_MAHO_CHARGE1, "akari_charge_n64" glow,
  * hands raised), casts (MAH_A_2A, SFX_ENM_MAHO_MAGIC4) and sparkles with the "mahorn" effect first over itself
  * and then over the target in LW(3).
  */
@@ -1604,7 +1673,7 @@ static EVT_BEGIN(support_friend_common_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's size-up spell: it casts the support spell (support_friend_common_event) on itself
+ * The Elite Wizzerd's size-up spell: it casts the support spell (support_friend_common_event) on itself
  * and grows for 3 turns (the weapon's size change, strength 2).
  */
 static EVT_BEGIN(dekadeka_magic_event)
@@ -1616,7 +1685,7 @@ static EVT_BEGIN(dekadeka_magic_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(10)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(30)
@@ -1626,7 +1695,7 @@ static EVT_BEGIN(dekadeka_magic_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's defence-up spell: it casts the support spell (support_friend_common_event) on itself
+ * The Elite Wizzerd's defence-up spell: it casts the support spell (support_friend_common_event) on itself
  * and its defence rises by 3 for 3 turns.
  */
 static EVT_BEGIN(katikati_magic_event)
@@ -1638,7 +1707,7 @@ static EVT_BEGIN(katikati_magic_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(10)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(30)
@@ -1648,7 +1717,7 @@ static EVT_BEGIN(katikati_magic_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's invisibility spell: it casts the support spell (support_friend_common_event) on itself
+ * The Elite Wizzerd's invisibility spell: it casts the support spell (support_friend_common_event) on itself
  * and turns invisible for 3 turns.
  */
 static EVT_BEGIN(trans_magic_event)
@@ -1660,7 +1729,7 @@ static EVT_BEGIN(trans_magic_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(10)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(30)
@@ -1670,7 +1739,7 @@ static EVT_BEGIN(trans_magic_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's dodgy spell: it casts the support spell (support_friend_common_event) on itself
+ * The Elite Wizzerd's dodgy spell: it casts the support spell (support_friend_common_event) on itself
  * and becomes dodgy for 3 turns.
  */
 static EVT_BEGIN(yokeyoke_magic_event)
@@ -1682,7 +1751,7 @@ static EVT_BEGIN(yokeyoke_magic_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(10)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(30)
@@ -1692,7 +1761,7 @@ static EVT_BEGIN(yokeyoke_magic_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd's heal: it casts the support spell (support_friend_common_event) on itself
+ * The Elite Wizzerd's heal: it casts the support spell (support_friend_common_event) on itself
  * and recovers 6 HP with the "recovery" effect.
  */
 static EVT_BEGIN(recover_magic_event)
@@ -1717,7 +1786,7 @@ static EVT_BEGIN(recover_magic_event)
 EVT_END()
 
 /**
- * The Dark Wizzerd makes copies of itself: it casts the support animation,
+ * The Elite Wizzerd makes copies of itself: it casts the support animation,
  * fades out (SFX_ENM_MAHO_OFFSHOOT1) and spawns up to four copies in free spots to its right and
  * then its left (spawn_event).
  * The real one and the copies are then shuffled (mahorn_shuffle) so the player cannot tell which is which,
@@ -1777,7 +1846,7 @@ static EVT_BEGIN(bunsin_event)
 EVT_END()
 
 /**
- * Spawns one copy of the Dark Wizzerd at the free spot in LW(0..2):
+ * Spawns one copy of the Elite Wizzerd at the free spot in LW(0..2):
  * an invisible Wizzerd unit that copies the real one's HP and status (mahorn_copy_status),
  * is marked as a copy in unit work 4, gets the copy attack script and the copy status vulnerabilities,
  * and is placed at that spot as its home position.
@@ -1795,24 +1864,25 @@ static EVT_BEGIN(spawn_event)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(13))
     CALL(mahorn_copy_status, LW(13), LW(3))
 #if VERSION >= VERSION_JP
-    CALL(btlevtcmd_OffAttribute, LW(3), 33554432)
+    CALL(btlevtcmd_OffAttribute, LW(3), UNIT_ATTR_NO_HP_GAUGE)
 #endif
-    CALL(btlevtcmd_SetUnitWork, LW(3), 4, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_MAHORN_CUSTOM_IS_CLONE, 1)
     CALL(btlevtcmd_SetEventAttack, LW(3), PTR(attack_event_bunsin))
     CALL(btlevtcmd_SetRegistStatus, LW(3), PTR(&regist_bunsin))
-    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, 16384)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), 1, PART_ATTR_EVASIVE)
     RETURN
 EVT_END()
 
 /**
- * Wait script of the Dark Wizzerd: unless it is a plain copy (unit work 4 set) its copies also play their idle
+ * Wait script of the Elite Wizzerd: unless it is a plain copy (unit work 4 set) its copies also play their idle
  * pose, and each of the four hands bobs between two positions and poses at random intervals of 15 to 29 frames.
  * Under statuses 1, 2 or 9 the hands hold still (MAH_Z_2).
  */
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_MAHORN_CUSTOM_IS_CLONE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(mahorn_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
+        // The Elite Wizzerd and any copies play their idle poses.
         CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
         IF_INT_NOT_EQUAL(LW(1), -1)
             CALL(btlevtcmd_AnimeChangePoseFromTable, LW(1), 1)
@@ -1827,9 +1897,10 @@ static EVT_BEGIN(wait_event)
             CALL(btlevtcmd_AnimeChangePoseFromTable, LW(4), 1)
         END_IF
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 9, LW(13))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 1, LW(14))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 2, LW(15))
+    // Under Sleep, Stop or Freeze the four hands hold still (MAH_Z_2).
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_FREEZE, LW(13))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_SLEEP, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_STOP, LW(15))
     OR(LW(15), LW(13))
     OR(LW(15), LW(14))
     IF_INT_NOT_EQUAL(LW(15), 0)
@@ -1839,6 +1910,7 @@ static EVT_BEGIN(wait_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 5, STRING("MAH_Z_2"))
     ELSE
         BEGIN_SIBLING_EVENT
+            // Each of the four hands bobs between two poses (MAH_S_4A and 4B) on its own random timer.
             LABEL(10)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("MAH_S_4A"))
             CALL(evt_sub_random, 15, LW(0))
@@ -1944,7 +2016,7 @@ static USER_FUNC(eff_magic_get_posX) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, *args++));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    EffectEntry* eff = (EffectEntry*)unit->work[7];
+    EffectEntry* eff = (EffectEntry*)unit->work[UW_MAHORN_CUSTOM_MAGIC_EFFECT];
     effMahorn2Data* work = eff->userdata;
     s32 i;
 
@@ -1981,7 +2053,7 @@ static USER_FUNC(eff_magic) {
     x += unit->sizeMultiplier * unit->faceDirection;
     y += 18.0f * unit->sizeMultiplier;
     z += 5.0f;
-    unit->work[7] = (EvtWord)effMahorn2Entry(0, x, y, z, a, y, z, unit->sizeMultiplier, mahorn_fabs((a - x) / time));
+    unit->work[UW_MAHORN_CUSTOM_MAGIC_EFFECT] = (EvtWord)effMahorn2Entry(0, x, y, z, a, y, z, unit->sizeMultiplier, mahorn_fabs((a - x) / time));
     return EVT_RETURN_DONE;
 }
 
@@ -2019,7 +2091,7 @@ static USER_FUNC(mahorn_shuffle) {
     // the real wizzerd and its copies
     for (i = 0; i < 64; i++) {
         kamecs[n] = wp->units[i];
-        if (kamecs[n] != NULL && (kamecs[n]->currentKind == 0x80 || kamecs[n]->currentKind == 0x81 || kamecs[n]->currentKind == 0xA9 || kamecs[n]->currentKind == 0xAA)) {
+        if (kamecs[n] != NULL && (kamecs[n]->currentKind == UNIT_DARK_WIZZERD || kamecs[n]->currentKind == UNIT_DARK_WIZZERD_CLONE || kamecs[n]->currentKind == UNIT_ELITE_WIZZERD || kamecs[n]->currentKind == UNIT_ELITE_WIZZERD_CLONE)) {
             n++;
         }
     }
@@ -2061,7 +2133,7 @@ static USER_FUNC(mahorn_get_bunsin) {
     // indices of the wizzerd's copies
     for (i = 0; i < 64; i++) {
         unit = wp->units[i];
-        if (unit != NULL && (unit->currentKind == 0x81 || unit->currentKind == 0xAA)) {
+        if (unit != NULL && (unit->currentKind == UNIT_DARK_WIZZERD_CLONE || unit->currentKind == UNIT_ELITE_WIZZERD_CLONE)) {
             copies[n] = i;
             n++;
         }
@@ -2104,11 +2176,11 @@ static USER_FUNC(set_hand_dest) {
     }
     hand -= 2;
     dest = (f32*)unit->work[hand];
-    if (BtlUnit_CheckStatus(unit, 10)) {
+    if (BtlUnit_CheckStatus(unit, STATUS_HUGE)) {
         dest[0] = 1.25f * -x;
         dest[1] = 1.25f * y;
         dest[2] = 1.25f * z;
-    } else if (BtlUnit_CheckStatus(unit, 11)) {
+    } else if (BtlUnit_CheckStatus(unit, STATUS_TINY)) {
         dest[0] = 0.75f * -x;
         dest[1] = 0.75f * y;
         dest[2] = 0.75f * z;
@@ -2144,15 +2216,15 @@ static USER_FUNC(hand_ctrl) {
     if (unit == NULL) {
         return EVT_RETURN_BLOCK;
     }
-    BtlUnit_GetStatus(unit, 2, &turns, &strength);
+    BtlUnit_GetStatus(unit, STATUS_STOP, &turns, &strength);
     if (turns > 0) {
         return EVT_RETURN_DONE;
     }
-    BtlUnit_GetStatus(unit, 9, &turns, &strength);
+    BtlUnit_GetStatus(unit, STATUS_FREEZE, &turns, &strength);
     if (turns > 0) {
         return EVT_RETURN_DONE;
     }
-    BtlUnit_GetStatus(unit, 1, &turns, &strength);
+    BtlUnit_GetStatus(unit, STATUS_SLEEP, &turns, &strength);
     if (turns > 0) {
         return EVT_RETURN_DONE;
     }
@@ -2230,7 +2302,7 @@ static USER_FUNC(mahorn_get_live_num) {
 
     for (i = 0; i < 64; i++) {
         unit = wp->units[i];
-        if (unit != NULL && unit->alliance == 1 && !BtlUnit_CheckStatus(unit, 0x1B)) {
+        if (unit != NULL && unit->alliance == 1 && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
             num++;
         }
     }

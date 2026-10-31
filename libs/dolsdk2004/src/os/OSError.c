@@ -7,6 +7,10 @@
 OSErrorHandler __OSErrorTable[17];
 
 #define FPSCR_ENABLE (FPSCR_VE | FPSCR_OE | FPSCR_UE | FPSCR_ZE | FPSCR_XE)
+/**
+ * Floating-point exceptions enabled in each thread's FPSCR (invalid, overflow, underflow, divide by zero,
+ * inexact).
+ */
 u32 __OSFpscrEnableBits = FPSCR_ENABLE;
 
 /** printf to the debug console; the usual log call for game and SDK code. */

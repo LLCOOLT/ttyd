@@ -163,7 +163,8 @@ typedef enum EventEntry_Flags {
     EVENT_ACTIVE = (1 << 0),
     EVENT_STOPPED = (1 << 1),
 
-    EVENT_WAITING_ON_CHILD = (1 << 4)
+    EVENT_WAITING_ON_CHILD = (1 << 4),
+    EVENT_START_NOW = (1 << 5), // started from inside evtmgrMain: evtEntry adds it to the current frame's run table
 } EventEntry_Flags;
 
 struct EventEntry {

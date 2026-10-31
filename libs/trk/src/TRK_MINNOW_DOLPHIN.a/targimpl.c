@@ -120,16 +120,22 @@ void TRKRestoreExtended1Block(void);
 void TRKUARTInterruptHandler(void);
 
 
+/**
+ * Number of the last exception the debugger stub caught. The globals below are its register, step and
+ * exception state.
+ */
 u16 TRK_saved_exceptionID = 0;
 TRKState_PPC gTRKState;
 ProcessorState_PPC gTRKCPUState;
 u8 gTRKSaveState[0x94];
 u8 TRKvalue128_temp[0x10];
 
+/** Register restore flags, exception status and single-step state of the debugger stub. */
 TRKRestoreFlags_PPC gTRKRestoreFlags = {0, 0};
 TRKExceptionStatus gTRKExceptionStatus = {{0, 0, 0}, 1, 0};
 TRKStepStatus gTRKStepStatus = {0};
 
+/** Memory the debugger may read and write: the whole 32-bit address space. */
 const memRange gTRKMemMap[1] = {{(u8*)0, (u8*)0xFFFFFFFF, 1, 1}};
 
 #define INSTR_NOP 0x60000000

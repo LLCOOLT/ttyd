@@ -25,6 +25,10 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[455];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the Spania (HP 3, level 8): its size, offsets, damage sounds, status vulnerability,
+ * parts and init event.
+ */
 BattleUnitKind unit_hannya = {
     5,
     "btl_un_hannya",
@@ -91,26 +95,44 @@ BattleUnitKind unit_hannya = {
     data_table,
 };
 
+/** Defence of the Spania: no damage reduction. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of the Spania: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Spania (percent chance to take each status): immune to dodgy and invisibility;
+ * extra prone to stop, poison, electric shock, burn, growing huge, attack up, defence up, fright, gale force,
+ * speed up and instant kill; resists most other statuses.
+ */
 static StatusVulnerability regist = {90, 110, 90, 150, 90, 150, 150, 90, 150, 90, 150, 90, 150, 90, 90, 110, 110, 150, 90, 0, 0, 150};
 #else
+/**
+ * Status vulnerability of the Spania (percent chance to take each status): immune to dodgy and invisibility;
+ * extra prone to stop, poison, electric shock, burn, growing huge, attack up, defence up, fright, gale force,
+ * speed up and instant kill.
+ */
 static StatusVulnerability regist = {100, 120, 100, 150, 100, 150, 150, 100, 150, 100, 150, 100, 150, 100, 100, 110, 110, 150, 100, 0, 0, 150};
 #endif
 
+/**
+ * Data table of the Spania: event handlers for the attacker hurt by its spikes
+ * and a First Strike on it (no reaction).
+ */
 static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/** Body part of the Spania (model c_hannya): hit position, defences, attributes and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_hannya", "c_hannya", 0.0f, 0.0f, 0.0f, 0.0f, 27.0f, 0.0f, 0.0f, 37.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
+    {1, "btl_un_hannya", "c_hannya", 0.0f, 0.0f, 0.0f, 0.0f, 27.0f, 0.0f, 0.0f, 37.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_TOP_SPIKY, pose_table},
 };
 
+/** Weapon of the Spania's attack: 1 damage, hammer-type contact attack. */
 static BattleWeapon weapon_hannya_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -129,7 +151,7 @@ static BattleWeapon weapon_hannya_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -147,6 +169,7 @@ static BattleWeapon weapon_hannya_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Spania: maps each battle pose to the animation it plays (N_* animations). */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -154,27 +177,27 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_3"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 /**
- * Guess: init event of the Spania-type spinning spiked enemy:
- * sets unit flag 0x1000000 and registers its wait, attack, damage and confusion events,
- * then starts the wait event.
+ * Init event of the Spania: sets unit flag 0x1000000 (UNIT_FLAG_NO_BACKFACE_FLIP), registers its wait, attack,
+ * damage
+ * and confusion events (the confusion event is the attack event too), then starts the wait event.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
@@ -192,12 +215,12 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 53)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 33)
         GOTO(90)
@@ -219,15 +242,18 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Guess: attack event of the Spania-type spiked enemy, a single charge.
- * It uses an enemy item if one fits (or picks a target with btlevtcmd_ChoiceSamplingEnemy),
- * shakes in place for 20 frames while the charge sound plays,
+ * Attack event of the Spania, a single spinning charge.
+ * On a first strike it takes the first-attack target;
+ * otherwise it uses an enemy item if it has one, or samples a
+ * target for its weapon. It shakes in place for 40 frames (10 one-unit wiggles) while the charge sound plays,
  * then rushes along the floor to the target (the avoid animation or the ResultACDefence/CheckDamage hit decide
  * the outcome) and carries on 500 units past it.
- * It then reappears at x=300 and glides back to its home position in four slowing steps.
+ * It then reappears at x=300 and glides back to its home position in four slowing steps (speeds 10, 5, 2, 1).
  * A flustered (confused) unit with no target runs subsetevt_confuse_flustered.
  */
 static EVT_BEGIN(attack_event)
+    // Choose the target: the First Strike target if the battle opened with one,
+    // otherwise it may use an item or pick a normal target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_FRAMES(30)
@@ -243,14 +269,16 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_hannya_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_hannya_attack), LW(3), LW(4))
     END_IF
+    // No target left: a confused Spania is flustered; either way it ends its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera frames the Spania and its target, and the attack is announced.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -259,6 +287,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_hannya_attack))
+    // It starts to spin, shaking in place while the charge sound builds.
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(14))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HANNYA_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1"))
@@ -273,12 +302,14 @@ static EVT_BEGIN(attack_event)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // It rushes along the floor straight at the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HANNYA_MOVE1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
+    // Check how the target defends against the charge.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_hannya_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -301,6 +332,7 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The target dodged: the Spania zooms on past it.
     LABEL(90)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     MULTIPLY(LW(14), 500)
@@ -308,6 +340,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     GOTO(98)
+    // The charge hits: the camera shakes, the damage is dealt and the Spania carries on past.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -320,6 +353,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     GOTO(98)
+    // It reappears from the far side of the stage and glides home in four slowing steps.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_snd_sfxoff, LW(15))

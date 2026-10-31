@@ -22,26 +22,32 @@ s32 badge_special_table[] = { //Lovely Howz of Badges
     ITEM_SUPER_APPEAL, ITEM_NULL
 };
 
+/** Badges Lovely Howz of Badges adds to its stock once Hooktail Castle (chapter 1) is cleared. */
 s32 badge_special_table_stage_1_clear[] = { //Hooktail Castle
     ITEM_CLOSE_CALL, ITEM_CLOSE_CALL_P, ITEM_SLEEPY_STOMP, ITEM_NULL
 };
 
+/** Badges added to the Lovely Howz of Badges stock after the Boggly Tree (chapter 2). */
 s32 badge_special_table_stage_2_clear[] = { //Boggly Tree
     ITEM_FIRST_ATTACK, ITEM_PRETTY_LUCKY_P, ITEM_POWER_RUSH, ITEM_NULL
 };
 
+/** Badges added to the Lovely Howz of Badges stock after the Glitz Pit (chapter 3). */
 s32 badge_special_table_stage_3_clear[] = { //Glitz Pit
     ITEM_SHRINK_STOMP, ITEM_ICE_SMASH, ITEM_POWER_RUSH_P, ITEM_NULL
 };
 
+/** Badges added to the Lovely Howz of Badges stock after the Creepy Steeple (chapter 4). */
 s32 badge_special_table_stage_4_clear[] = { //Creepy Steeple
     ITEM_SOFT_STOMP, ITEM_HEAD_RATTLE, ITEM_DAMAGE_DODGE, ITEM_NULL
 };
 
+/** Badges added to the Lovely Howz of Badges stock after Keelhaul Key (chapter 5). */
 s32 badge_special_table_stage_5_clear[] = { //Keelhaul Key
     ITEM_SUPER_APPEAL_P, ITEM_DAMAGE_DODGE_P, ITEM_FIRE_DRIVE, ITEM_NULL
 };
 
+/** Badges added to the Lovely Howz of Badges stock after Poshley Heights (chapter 6). */
 s32 badge_special_table_stage_6_clear[] = { //Poshley Heights
     ITEM_SIMPLIFIER, ITEM_UNSIMPLIFIER, ITEM_ATTACK_FX_P, ITEM_NULL
 };
@@ -54,6 +60,10 @@ s32 badge_starmaniac_table[] = { //Dazzle
     ITEM_FLOWER_SAVER_P, ITEM_POWER_PLUS, ITEM_POWER_PLUS_P, ITEM_NULL
 };
 
+/**
+ * Charlieton's Rogueport stock: the badges
+ * and items he can offer; the bargain slots store indexes into it.
+ */
 s32 badge_bottakuru_table[] = { //Charlieton Rogueport
     ITEM_SHOOTING_STAR, ITEM_EARTH_QUAKE, ITEM_BOOS_SHEET, ITEM_REPEL_CAPE,
     ITEM_STOPWATCH, ITEM_ULTRA_SHROOM, ITEM_JAMMIN_JELLY, ITEM_DRIED_SHROOM,
@@ -61,39 +71,47 @@ s32 badge_bottakuru_table[] = { //Charlieton Rogueport
     ITEM_SLOW_GO, ITEM_MEGA_RUSH, ITEM_TIMING_TUTOR, ITEM_W_EMBLEM, ITEM_NULL
 };
 
+/** Charlieton's stock in the Pit of 100 Trials: basic recovery and attack items. */
 s32 badge_bottakuru100_table[] = { //Charlieton Pit of 100 Trials
     ITEM_MUSHROOM, ITEM_SUPER_SHROOM, ITEM_HONEY_SYRUP, ITEM_MAPLE_SYRUP,
     ITEM_FIRE_FLOWER, ITEM_THUNDER_RAGE, ITEM_NULL
 };
 
+/** Prizes at the Pianta Parlor counter that are always on offer. */
 s32 badge_bteresa_table[] = { //Pianta Parlor
     ITEM_SUPER_SHROOM, ITEM_CAKE_MIX, ITEM_SUPER_APPEAL, ITEM_REFUND, ITEM_NULL
 };
 
+/** Extra Pianta Parlor prizes unlocked by the Special Card. */
 s32 badge_bteresa_table_card_special[] = { //Pianta Parlor Special Card
     ITEM_MAPLE_SYRUP, ITEM_POWER_JUMP, ITEM_HP_PLUS, ITEM_FP_PLUS, ITEM_NULL
 };
 
 #if VERSION >= VERSION_US
 // US moves Multibounce from the Gold Card list to the Silver Card list
+/** Extra Pianta Parlor prizes unlocked by the Silver Card. */
 s32 badge_bteresa_table_card_silver[] = { //Pianta Parlor Silver Card
     ITEM_GOLD_BAR_X3, ITEM_POWER_SMASH, ITEM_HP_PLUS_P, ITEM_MULTIBOUNCE, ITEM_NULL
 };
 
+/** Extra Pianta Parlor prizes unlocked by the Gold Card. */
 s32 badge_bteresa_table_card_gold[] = { //Pianta Parlor Gold Card
     ITEM_HAMMER_THROW, ITEM_POWER_RUSH, ITEM_TORNADO_JUMP, ITEM_POWER_RUSH_P, ITEM_NULL
 };
 #else
+/** Extra Pianta Parlor prizes unlocked by the Silver Card. */
 s32 badge_bteresa_table_card_silver[] = { //Pianta Parlor Silver Card
     ITEM_GOLD_BAR_X3, ITEM_POWER_SMASH, ITEM_HP_PLUS_P, ITEM_NULL
 };
 
+/** Extra Pianta Parlor prizes unlocked by the Gold Card. */
 s32 badge_bteresa_table_card_gold[] = { //Pianta Parlor Gold Card
     ITEM_HAMMER_THROW, ITEM_POWER_RUSH, ITEM_TORNADO_JUMP, ITEM_MULTIBOUNCE,
     ITEM_POWER_RUSH_P, ITEM_NULL
 };
 #endif
 
+/** Extra Pianta Parlor prizes unlocked by the Platinum Card. */
 s32 badge_bteresa_table_card_platinum[] = { //Pianta Parlor Platinum Card
     ITEM_QUAKE_HAMMER, ITEM_MONEY_MONEY, ITEM_ULTRA_SHROOM, ITEM_JAMMIN_JELLY, ITEM_NULL
 };
@@ -155,7 +173,7 @@ void badgeShop_init(void) {
     memset(bdsw->starmaniac_table, 0, sizeof(bdsw->starmaniac_table));
     memset(bdsw->bottakuru_table, 0, sizeof(bdsw->bottakuru_table));
     memset(bdsw->bteresa_table, 0, sizeof(bdsw->bteresa_table));
-    bdsw->restockFlags = 1;
+    bdsw->restockFlags = BADGESHOP_RESTOCK_PENDING;
 
     for (ptr = badge_special_table; *ptr; ++ptr) {
         badgeShop_add(bdsw->special_table, (s16)*ptr, 1);
@@ -571,7 +589,7 @@ USER_FUNC(badgeShop_getBargainTable) {
 
 /**
  * Adds one of the badge in args[0] to the Lovely Howz stock (both the special and bargain tables).
- * Guess: "throw" is from nageuri (clearance sale), the bargain list. No caller in the C code.
+ * gor_01's sell_evt calls it after Mario sells the badge, so the shop puts it back on sale.
  */
 USER_FUNC(evt_badgeShop_throw_inc) {
     s32 value;
@@ -633,7 +651,7 @@ USER_FUNC(evt_badgeShop_bottakuru_dec) {
 
 #pragma opt_common_subs reset
 #if VERSION <= VERSION_DEMO_US
-/** the demo counts the thrown badges through an inline copy of badgeShop_ThrowCheck */
+/** the demo counts the thrown badges through an inline copy of badgeShop_ThrowCheck (with its bug: always 0) */
 static inline s32 badgeShop_ThrowCount(s32 itemId) {
     int i;
     s32 count;
@@ -649,7 +667,7 @@ static inline s32 badgeShop_ThrowCount(s32 itemId) {
 
 /**
  * Counts how many different badges are left in the Lovely Howz bargain_table and writes it to args[0].
- * The demo also subtracts badgeShop_ThrowCount from each badge's stock first.
+ * The demo also subtracts badgeShop_ThrowCount from each badge's stock first, which is always 0.
  */
 USER_FUNC(evt_badgeShop_throw_get_kind_cnt) {
     EvtWord* args = event->args;
@@ -659,7 +677,7 @@ USER_FUNC(evt_badgeShop_throw_get_kind_cnt) {
 
     for (count = 0, i = 0; i < 99; i++) {
 #if VERSION <= VERSION_DEMO_US
-        // the demo leaves out the badges already picked for the bargain list
+        // the demo also subtracts badgeShop_ThrowCount, which is always 0 (the badgeShop_ThrowCheck bug)
         if ((badge = badgeShop_get(bdsw->bargain_table, (s16)(i + BADGE_MIN))) - badgeShop_ThrowCount(i + BADGE_MIN) > 0) {
 #else
         badge = badgeShop_get(bdsw->bargain_table, (s16)(i + BADGE_MIN)); // inline
@@ -752,15 +770,19 @@ USER_FUNC(evt_badgeShop_getBargainKind) {
 #endif
 
 /**
- * Guess: counts the copies of itemId already set aside,
- * subtracted from a shop's stock when the badge lists are built (winmgr.c, evt_win.c).
- * It scans bargainBadges[bargainNum..2*bargainNum-1], past the five-entry array.
+ * Counts itemId in bargainBadges[bargainNum..2*bargainNum-1];
+ * the callers (winmgr.c, evt_win.c) subtract the count from the bargain stock when they build the badge lists.
+ * Those slots lie past the five-entry array (bargainNum, reserved_110, restockFlags and padding),
+ * which never hold a badge id, so it always returns 0.
+ * Guess: it was meant to count copies already set aside.
  */
 s32 badgeShop_ThrowCheck(s32 itemId) {
     int i;
     s32 count;
 
     for (count = 0, i = 0; i < bdsw->bargainNum; i++) {
+        // BUG: reads bargainBadges[bargainNum] to [2 * bargainNum - 1], past the five-entry array from 3 picks on;
+        // none of those words ever holds a badge id, so the count is always 0.
         if (itemId == bdsw->bargainBadges[i + bdsw->bargainNum]) {
             count++;
         }

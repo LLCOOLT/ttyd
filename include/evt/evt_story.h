@@ -1019,8 +1019,10 @@ typedef enum GswfId {
     GSWF_JIN08_STEEPLE_KEY_TAKEN = 2230, // Steeple Key taken from the box in Creepy Steeple jin_08
     // Locked door between Creepy Steeple jin_08 and jin_07 (second Steeple Key) unlocked
     GSWF_JIN08_DOOR_UNLOCKED = 2231,
-    // First talk with the parrot in Creepy Steeple jin_08 (stg4_jin_43); also stops the Twilight Town gate voice scene usu01_gusun
-    GSWF_JIN08_PARROT_FIRST_TALK = 2232,
+    // The Creepy Steeple parrot (jin_08) has let slip Doopliss's name: set by its first talk with Vivian out
+    // (oumu_juyo_talk, stg4_jin_43; later talks give stg4_jin_44). usu_01 also reads it: once it is set the
+    // sniffling/shouting from the Twilight Town shop (usu01_gusun) is no longer heard
+    GSWF_JIN08_PARROT_REVEALED_DOOPLISS_NAME = 2232,
     // Breakable floor in Creepy Steeple jin_11 broken (event STG4_13_03 Breaking the Floor; only placed while GSW0<208)
     GSWF_JIN11_FLOOR_BROKEN = 2233,
     // Mario and partner's confused look-around on the looping staircase (jin_01/jin_02) played once
@@ -1038,7 +1040,8 @@ typedef enum GswfId {
     GSWF_JIN00_ATOMIC_BOO_LUCKY_START_TAKEN = 2242,
     // Arena intro done; tou_02 runs the "guard backs off" scene on arrival and clears it
     GSWF_TOU_ARENA_INTRO_TO_LOBBY = 2374,
-    // Grubba is walking Mario to the minor-league locker room (tou_05 to tou_04 handoff)
+    // Grubba's first-visit tour: set in his office (tou_05); tou_04 runs his escort to the champion's room (tou_07),
+    // which he shows off; back in the office tou_05 clears it and runs the next scene (evt_sensyu2)
     GSWF_TOU_GRUBBA_ESCORT_PENDING = 2375,
     GSWF_TOU_JOLENE_ESCORT_1_PENDING = 2376, // Jolene escort #1 from her office to tou_04 pending
     // Jolene escort to the major-league locker room pending (after promotion)

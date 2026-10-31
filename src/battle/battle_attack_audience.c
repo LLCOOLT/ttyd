@@ -107,7 +107,7 @@ s32 _check_aud_item_type(EventEntry* event, BOOL isFirstCall) {
     if (item == 0) {
         return 2;
     }
-    if (item >= 0xEC && item < 0xF0) {
+    if (item >= ITEM_AUDIENCE_CAN && item < BADGE_MIN) {
         flag = 1;
     } else {
         flag = 0;
@@ -306,7 +306,7 @@ EVT_BEGIN(btlataudevtPresentItem_Get)
     END_IF
     CALL(_get_present_item)
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-    CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 52)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_ITEM_USE)
     CALL(_get_item_announce)
     CALL(_delete_present_item, EVT_NULLPTR)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))

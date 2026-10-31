@@ -32,8 +32,13 @@ typedef struct EffFireFlowerN64Work {
     s32 flip;     // 0x50
 } EffFireFlowerN64Work;
 
+/** Fire Flower size (in percent) as it grows in over 15 frames, overshooting slightly before settling. */
 static s8 scale_data[] = "27<AFKPUZ_dgigd";
 
+/**
+ * Small red 4x4 spark quad, drawn only for a spark of type 0;
+ * every spark is spawned with type 1, so it goes unused.
+ */
 effN64Vtx size4x4_tex4x4_vtx[] = {
     {-2, -2, 0, 0, 0, 255, 0, 0, 255},
     {2, -2, 0, 512, 0, 255, 0, 0, 255},
@@ -41,6 +46,7 @@ effN64Vtx size4x4_tex4x4_vtx[] = {
     {-2, 2, 0, 0, 512, 255, 0, 0, 255},
 };
 
+/** 16x16 sprite of the fireballs the flower shoots. */
 static effN64Vtx size16x16_tex16x16_vtx[] = {
     {-8, -8, 0, 0, 0, 255, 255, 255, 255},
     {8, -8, 0, 512, 0, 255, 255, 255, 255},
@@ -48,6 +54,7 @@ static effN64Vtx size16x16_tex16x16_vtx[] = {
     {-8, 8, 0, 0, 512, 255, 255, 255, 255},
 };
 
+/** The Fire Flower itself: 32x32 quads, one vertex set per bloom stage. */
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, 0, 2, 0, 0, 255, 255, 255, 255},
     {16, 0, 2, 1024, 0, 255, 255, 255, 255},

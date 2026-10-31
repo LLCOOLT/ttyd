@@ -118,6 +118,11 @@ static EVT_BEGIN(n_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Exits of las_09: west door w_bero to las_08 (e_bero_1); east door e_bero to las_19 (w_bero); north door
+ * n_bero to las_10 (s_bero); dokan_1 (scripted pipe); dokan_2 (scripted pipe); dokan_5 (scripted pipe);
+ * dokan_4 (scripted pipe).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -240,6 +245,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Where Mario is put back after falling through any of the 58 floor panels (mod_00 and up) that fall away
+ * when the Shadow Sirens battle ends; all send him to a point far below the floor.
+ */
 static HitDamageReturn dmgRetPoint[] = {
     {"mod_00", {0.0f, -1000.0f, 0.0f}},
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
@@ -476,14 +485,17 @@ EVT_END()
  * plays a success jingle if the other switch is already pressed.
  */
 EVT_BEGIN(switch_1_evt)
+    // Controls off; the camera swings to the platforms the first switch controls.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 0, 400, 1368, 0, -40, 700, 1000, 11)
     WAIT_MS(1000)
     WAIT_MS(500)
+    // An earthquake rumbles through the room.
     CALL(evt_snd_sfxon, STRING("SFX_STG8_QUAKE2"), LW(10))
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0048828125f), 1500)
     CALL(evt_snd_sfxoff, LW(10))
     BEGIN_INLINE_EVENT
+        // The third platform segment fades in and flips into place.
         CALL(evt_mapobj_get_position, STRING("S_daizadai1_3"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_PORT_APPEAR1"), LW(0), LW(1), LW(2), 0)
         BEGIN_SIBLING_EVENT
@@ -509,6 +521,7 @@ EVT_BEGIN(switch_1_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
+        // Then the second segment.
         CALL(evt_mapobj_get_position, STRING("S_daizadai1_2"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_PORT_APPEAR1"), LW(0), LW(1), LW(2), 0)
         BEGIN_SIBLING_EVENT
@@ -533,6 +546,7 @@ EVT_BEGIN(switch_1_evt)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(600)
+    // Then the first segment, which completes the bridge.
     CALL(evt_mapobj_get_position, STRING("S_daizadai1_1"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_PORT_APPEAR2"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
@@ -556,6 +570,7 @@ EVT_BEGIN(switch_1_evt)
         END_IF
     END_LOOP
     CALL(evt_hitobj_onoff, STRING("A_daizadai1"), 0, 0)
+    // If the other switch was already pressed, a short success jingle plays over the music.
     IF_INT_EQUAL(GSWF(GSWF_LAS09_SWITCH_2_PRESSED), 1)
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
         CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
@@ -563,6 +578,7 @@ EVT_BEGIN(switch_1_evt)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_IF
+    // The harbour exit appears and the camera returns to Mario.
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change"), STRING("Ship_Change2"))
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_off, 1000, 11)
@@ -577,14 +593,17 @@ EVT_END()
  * which is made walkable.
  */
 EVT_BEGIN(switch_2_evt)
+    // Controls off; the camera swings to the platforms the second switch controls.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 0, 450, 45, 0, -75, -558, 1000, 11)
     WAIT_MS(1000)
     WAIT_MS(500)
+    // An earthquake rumbles through the room.
     CALL(evt_snd_sfxon, STRING("SFX_STG8_QUAKE2"), LW(10))
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0048828125f), 1500)
     CALL(evt_snd_sfxoff, LW(10))
     BEGIN_INLINE_EVENT
+        // The third platform segment fades in and flips into place.
         CALL(evt_mapobj_get_position, STRING("S_daizadai2_3"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_PORT_APPEAR1"), LW(0), LW(1), LW(2), 0)
         BEGIN_SIBLING_EVENT
@@ -610,6 +629,7 @@ EVT_BEGIN(switch_2_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
+        // Then the second segment.
         CALL(evt_mapobj_get_position, STRING("S_daizadai2_2"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_PORT_APPEAR1"), LW(0), LW(1), LW(2), 0)
         BEGIN_SIBLING_EVENT
@@ -634,6 +654,7 @@ EVT_BEGIN(switch_2_evt)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(600)
+    // Then the first segment, which completes the bridge.
     CALL(evt_mapobj_get_position, STRING("S_daizadai2_1"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_PORT_APPEAR2"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
@@ -656,6 +677,7 @@ EVT_BEGIN(switch_2_evt)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // If the other switch was already pressed, a short success jingle plays over the music.
     IF_INT_EQUAL(GSWF(GSWF_LAS09_SWITCH_1_PRESSED), 1)
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
         CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
@@ -663,6 +685,7 @@ EVT_BEGIN(switch_2_evt)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_IF
+    // The harbour exit appears and the camera returns to Mario.
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change1"), STRING("Ship_Change1"))
     CALL(evt_hitobj_attr_onoff, 0, 1, STRING("Ship_Change1"), 32768)
     WAIT_MS(1000)
@@ -688,8 +711,8 @@ EVT_BEGIN(goikkou_talk)
 EVT_END()
 
 /**
- * Init event of Beldam (Majolyne): clears her battle-info flag and sets the invisible status bit,
- * so she starts hidden until the cutscene calls her.
+ * Init event of Beldam (Majolyne): clears her battle-info flag and sets status bit 2,
+ * which makes her turn to face the way she moves (the evt_npc move commands check it).
  */
 EVT_BEGIN(majyorin_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
@@ -698,8 +721,8 @@ EVT_BEGIN(majyorin_init)
 EVT_END()
 
 /**
- * Init of the Marilyn NPC: clears its battle info flag and sets status bit 2 (evt_npc_status_onoff).
- * Unknown: what status bit 2 does; the Palace NPCs that start hidden or inert use it.
+ * Init of the Marilyn NPC: clears its battle info flag and sets status bit 2 (evt_npc_status_onoff),
+ * which makes it turn to face the way it moves (the evt_npc move commands check it).
  */
 static EVT_BEGIN(maririn_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
@@ -707,13 +730,14 @@ static EVT_BEGIN(maririn_init)
     RETURN
 EVT_END()
 
-/** Init event of Doopliss (Rampell): same as Beldam's, hidden until the cutscene. */
+/** Init event of Doopliss (Rampell): same as Beldam's (no battle info, turns to face the way he moves). */
 EVT_BEGIN(ranpel_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** NPCs of the Shadow Sirens scene: Beldam (マジョリン), Marilyn (マリリン) and Doopliss (ランペル). */
 static NpcSetupInfo npcEnt[] = {
     {
         "マジョリン", // name
@@ -770,6 +794,7 @@ EVT_END()
  * and the story moves to STORY_STG8_07_BELDAM_CONFRONTATION.
  */
 EVT_BEGIN(majyorin_evt_main)
+    // Controls off; Mario's partner stops and turns to face the doors.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_mario_wait_landon)
@@ -791,6 +816,7 @@ EVT_BEGIN(majyorin_evt_main)
     END_INLINE_EVENT
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_WITCH1"))
     CALL(evt_msg_toge, 1, 0, 0, 0)
+    // Beldam speaks to Mario and his partner answers; Beldam stirs up her sister.
     CALL(evt_msg_print, 0, STRING("stg8_las_12"), 0, STRING("マジョリン"))
     CALL(evt_mario_set_dir, 90, 300, 0)
     CALL(evt_cam3d_evt_set, 765, 102, 340, 765, 43, 9, 500, 11)
@@ -824,6 +850,7 @@ EVT_BEGIN(majyorin_evt_main)
     CALL(evt_npc_get_dir, STRING("にせ"), LW(3))
     SET_VALUE(LW(4), LW(2))
     ADD(LW(4), 15)
+    // In a puff of smoke the fake Frankly is revealed as Doopliss.
     CALL(evt_eff, 0, STRING("kemuri_test"), 7, LW(0), LW(1), LW(4), FLOAT(1.3994141f), 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_RANPEL_TRANSFORM1"), LW(0), LW(1), LW(4), 0)
     WAIT_MS(300)
@@ -835,6 +862,7 @@ EVT_BEGIN(majyorin_evt_main)
         CALL(evt_msg_print, 0, STRING("stg8_las_15_01"), 0, STRING("ランペル"))
     END_INLINE_EVENT
     WAIT_MS(600)
+    // Beldam, Marilyn and Doopliss gloat in turn and surround Mario.
     CALL(evt_msg_print, 0, STRING("stg8_las_15_02"), 0, STRING("マジョリン"))
     CALL(evt_msg_print, 0, STRING("stg8_las_16"), 0, STRING("マリリン"))
     CALL(evt_msg_print, 0, STRING("stg8_las_17"), 0, STRING("ランペル"))
@@ -846,6 +874,7 @@ EVT_BEGIN(majyorin_evt_main)
     CALL(evt_cam3d_evt_set, 660, 82, 338, 660, 30, 43, 0, 11)
     WAIT_FRAMES(1)
     WAIT_MS(500)
+    // The partner answers back as the camera circles the three villains.
     CALL(evt_msg_print_party, STRING("stg8_las_20"))
     CALL(evt_npc_set_ry, STRING("マジョリン"), 270)
     CALL(evt_cam3d_evt_set, 779, 104, 340, 779, 45, 9, 0, 11)
@@ -875,6 +904,7 @@ EVT_BEGIN(majyorin_evt_main)
     CALL(evt_npc_move_position, STRING("ランペル"), LW(0), LW(2), 0, FLOAT(90.0f), 0)
     CALL(evt_mario_dispflag_onoff, 0, 2)
     CALL(evt_party_run, 0)
+    // The battle against Beldam, Marilyn and Doopliss starts and the script waits for it to end.
     CALL(evt_npc_set_battle_info, STRING("マジョリン"), 8)
     CALL(evt_npc_battle_start, STRING("マジョリン"))
     CALL(evt_npc_wait_battle_end)
@@ -888,6 +918,7 @@ EVT_BEGIN(majyorin_evt_main)
     CALL(evt_npc_flag_onoff, 1, STRING("マジョリン"), NPC_FLAG_NO_TURN_TO_MARIO)
     CALL(evt_npc_flag_onoff, 1, STRING("マリリン"), NPC_FLAG_NO_TURN_TO_MARIO)
     CALL(evt_npc_flag_onoff, 1, STRING("ランペル"), NPC_FLAG_NO_TURN_TO_MARIO)
+    // Defeated, the three sit dizzy with stars spinning over their heads.
     CALL(evt_npc_set_force_regl_anim, STRING("マジョリン"), STRING("MJR_D_4"))
     CALL(evt_npc_set_force_regl_anim, STRING("マリリン"), STRING("MRR_D_4"))
     CALL(evt_npc_set_force_regl_anim, STRING("ランペル"), STRING("D_2"))
@@ -912,6 +943,7 @@ EVT_BEGIN(majyorin_evt_main)
     CALL(evt_npc_get_position, STRING("マジョリン"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_WITCH_PIYO1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(500)
+    // They make a final remark.
     CALL(evt_msg_print, 0, STRING("stg8_las_24"), 0, STRING("マジョリン"))
     CALL(evt_msg_print, 0, STRING("stg8_las_25"), 0, STRING("マリリン"))
     CALL(evt_msg_print, 0, STRING("stg8_las_26"), 0, STRING("ランペル"))
@@ -919,6 +951,7 @@ EVT_BEGIN(majyorin_evt_main)
     CALL(evt_npc_change_interrupt, STRING("マジョリン"), 6, PTR(goikkou_talk))
     CALL(evt_npc_change_interrupt, STRING("マリリン"), 6, PTR(goikkou_talk))
     CALL(evt_npc_change_interrupt, STRING("ランペル"), 6, PTR(goikkou_talk))
+    // The story advances and Mario regains control.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_07_BELDAM_CONFRONTATION)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)

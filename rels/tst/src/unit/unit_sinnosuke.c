@@ -1,4 +1,4 @@
-// Battle unit Shinnosuke (`sinnosuke`): tst.rel's copy of rels/hei/src/unit/unit_sinnosuke.c.
+// Battle unit Bald Cleft (`sinnosuke`): tst.rel's copy of rels/hei/src/unit/unit_sinnosuke.c.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -25,6 +25,10 @@ static EvtWord dmg_turn_event[91];
 static EvtWord attack_event[454];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the Bald Cleft: 2 HP and level 12, with its sizes, damage sounds, status vulnerability,
+ * parts and init script.
+ */
 BattleUnitKind unit_sinnosuke = {
     18,
     "btl_un_sinnosuke",
@@ -83,7 +87,7 @@ BattleUnitKind unit_sinnosuke = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -91,22 +95,36 @@ BattleUnitKind unit_sinnosuke = {
     data_table,
 };
 
+/**
+ * Defence of the Bald Cleft: 2 against normal, ice, explosion and electric hits;
+ * immune to fire (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{2, 99, 2, 2, 2}};
 
+/** Element modifiers of the Bald Cleft: fire hits do no damage. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
+/** Defence of the Bald Cleft while it is flipped on its back: none, every hit does its full damage. */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Bald Cleft in the demo builds: immune to burn; resists most other statuses.
+ */
 static StatusVulnerability regist = {40, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 80, 80, 50, 30, 100, 80, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Bald Cleft in the retail builds: immune to burn; resists most other statuses.
+ */
 static StatusVulnerability regist = {50, 100, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 100, 70, 50, 40, 100, 70, 100, 100, 95};
 #endif
 
+/** Body part of the Bald Cleft: a single part using the c_sinnosuke model. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_sinnosuke", "c_sinnosuke", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0, pose_table},
+    {1, "btl_un_sinnosuke", "c_sinnosuke", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_BOMB_FLIPPABLE, 0, pose_table},
 };
 
+/** Attack data of the Bald Cleft's charge: 1 damage. */
 static BattleWeapon weapon_sinnosuke_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -125,7 +143,7 @@ static BattleWeapon weapon_sinnosuke_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -143,6 +161,10 @@ static BattleWeapon weapon_sinnosuke_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Pose table of the Bald Cleft: maps each battle pose (waiting, hurt, running...) to one of its SIS_*
+ * animations.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "SIS_N_1"},
     {2, "SIS_Y_1"},
@@ -150,20 +172,24 @@ static PoseTableEntry pose_table[] = {
     {5, "SIS_K_1"},
     {4, "SIS_I_1"},
     {3, "SIS_I_1"},
-    {28, "SIS_S_1"},
+    {BTL_POSE_NORMAL, "SIS_S_1"},
     {29, "SIS_Q_1"},
     {30, "SIS_Q_1"},
     {31, "SIS_A_1a"},
-    {39, "SIS_D_1"},
+    {BTL_POSE_DAMAGE, "SIS_D_1"},
     {50, "SIS_A_1a"},
-    {40, "SIS_W_1"},
-    {42, "SIS_R_1"},
-    {56, "SIS_I_1"},
-    {57, "SIS_I_1"},
+    {BTL_POSE_WALK, "SIS_W_1"},
+    {BTL_POSE_RUN, "SIS_R_1"},
+    {BTL_POSE_DANGER, "SIS_I_1"},
+    {BTL_POSE_PERIL, "SIS_I_1"},
     {BTL_POSE_TALK, "SIS_T_1"},
     {BTL_POSE_STAY_DEFAULT, "SIS_S_1"},
 };
 
+/**
+ * Pose table of the Bald Cleft while it is flipped on its back:
+ * maps each battle pose (waiting, hurt, running...) to one of its SIS_* animations.
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "SIS_N_2"},
     {2, "SIS_Y_2"},
@@ -171,17 +197,21 @@ static PoseTableEntry pose_table_turn[] = {
     {5, "SIS_K_2"},
     {4, "SIS_K_2"},
     {3, "SIS_K_2"},
-    {28, "SIS_D_2"},
+    {BTL_POSE_NORMAL, "SIS_D_2"},
     {29, "SIS_D_2"},
     {30, "SIS_D_2"},
     {31, "SIS_D_2"},
-    {39, "SIS_D_2"},
-    {56, "SIS_K_2"},
-    {57, "SIS_K_2"},
+    {BTL_POSE_DAMAGE, "SIS_D_2"},
+    {BTL_POSE_DANGER, "SIS_K_2"},
+    {BTL_POSE_PERIL, "SIS_K_2"},
     {BTL_POSE_TALK, "SIS_D_2"},
     {BTL_POSE_STAY_DEFAULT, "SIS_D_2"},
 };
 
+/**
+ * Data table of the Bald Cleft: reaction scripts for being flipped over;
+ * a First Strike on it triggers nothing special.
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
@@ -191,7 +221,8 @@ static BattleDataEntry data_table[] = {
 /**
  * Registers the Bald Cleft's wait, attack and damage events (confusion reuses the attack event) and its walk,
  * run and jump sounds, then starts the idle loop.
- * Guess: `sinnosuke` is the Bald Cleft (2 HP, 2 defence, 1 attack, no spikes).
+ * `sinnosuke` is the Bald Cleft: 2 HP, defence 2 (immune to fire),
+ * attack 1 and no spikes (part counter attributes 0).
  */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -258,7 +289,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -290,7 +321,7 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("SIS_S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -318,13 +349,16 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // First-strike battle: the target is already fixed; otherwise one is picked from the opposing party.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
+        // The camera frames the Bald Cleft and its target.
         CALL(evt_btl_camera_set_mode, 0, 8)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 3)
         WAIT_MS(800)
     ELSE
+        // If the Bald Cleft holds an item, it uses that instead of attacking.
         CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(LW(0))
@@ -335,8 +369,9 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sinnosuke_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sinnosuke_attack), LW(3), LW(4))
     END_IF
+    // No target to attack: a confused Bald Cleft just flusters about, otherwise it skips its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -351,7 +386,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_sinnosuke_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // The Bald Cleft walks up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -369,6 +405,7 @@ static EVT_BEGIN(attack_event)
         END_LOOP
     END_SIBLING_EVENT
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // It rears back and revs up, shaking, for about three quarters of a second.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
@@ -378,8 +415,10 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
+    // It charges at the target.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, -1, 0)
     DELETE_EVENT(LW(15))
+    // Check whether the attack will connect; a miss sends the target into its dodge.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinnosuke_attack), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -402,11 +441,14 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A miss: it charges on past the target.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 50)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_MS(500)
     GOTO(98)
+    // A hit: the camera shakes, the target takes the damage and the Bald Cleft bounces back off it in two
+    // hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -426,10 +468,11 @@ static EVT_BEGIN(attack_event)
     GOTO(98)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    // Turn finished: the Bald Cleft goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

@@ -356,6 +356,7 @@ void GXDrawCube(void) {
     RestoreVertState();
 }
 
+/** The dodecahedron's 12 faces as five corner indexes into verts. */
 static u32 polygons[12][5] = {
     {  0, 12, 10, 11, 16 },
     {  1, 17,  8,  9, 13 },
@@ -371,6 +372,7 @@ static u32 polygons[12][5] = {
     { 11, 19,  7,  6, 16 },
 };
 
+/** The dodecahedron's 20 corners. */
 static f32 verts[20][3] = {
     { -0.809015f,  0.0f,       0.309015f },
     { -0.809015f,  0.0f,      -0.309015f },
@@ -424,6 +426,7 @@ void GXDrawDodeca(void) {
     RestoreVertState();
 }
 
+/** The octahedron's six corners (unit length along each axis). */
 static f32 odata[6][3] = {
     {  1.0f,  0.0f,  0.0f },
     { -1.0f,  0.0f,  0.0f },
@@ -433,6 +436,7 @@ static f32 odata[6][3] = {
     {  0.0f,  0.0f, -1.0f },
 };
 
+/** The octahedron's eight faces as corner indexes into odata. */
 static u8 ondex[8][3] = {
     { 0, 4, 2 },
     { 1, 2, 4 },
@@ -455,6 +459,7 @@ void GXDrawOctahedron(void) {
     RestoreVertState();
 }
 
+/** The icosahedron's 12 corners (unit length). */
 static f32 idata[12][3] = {
     { -0.5257311f,  0.0f,        0.8506508f },
     {  0.5257311f,  0.0f,        0.8506508f },
@@ -470,6 +475,7 @@ static f32 idata[12][3] = {
     { -0.8506508f, -0.5257311f,  0.0f },
 };
 
+/** The icosahedron's 20 faces as corner indexes into idata; GXDrawSphere1 subdivides them. */
 static u8 index[20][3] = {
     {  0,  4,  1 },
     {  0,  9,  4 },

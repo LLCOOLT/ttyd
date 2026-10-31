@@ -17,6 +17,10 @@ static StatusVulnerability regist;
 static BattleDataEntry data_table[1];
 static EvtWord init_event[25];
 
+/**
+ * Unit data of the stage switch: an invisible prop (hidden part, no HP gauge, 999 HP) that stands in for a
+ * map switch the player can hit during a battle. It never takes a turn.
+ */
 BattleUnitKind unit_object_switch = {
     UNIT_UNUSED_SWITCH,     // unitType
     "btl_un_switch",        // name
@@ -65,17 +69,29 @@ BattleUnitKind unit_object_switch = {
     data_table,             // dataTable
 };
 
+/**
+ * The switch takes no damage reduction and has no elemental defence; every hit just triggers its wobble.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+/** The switch has no status vulnerabilities (all zero). */
 static StatusVulnerability regist = {0};
 
+/**
+ * Poses of the switch: every pose uses the same still frame of the Mario model (M_S_1),
+ * apart from one slot that uses M_O_1.
+ */
 static PoseTableEntry pose_table[] = {
-    {28, "M_S_1"},
+    {BTL_POSE_NORMAL, "M_S_1"},
     {31, "M_S_1"},
-    {39, "M_O_1"},
+    {BTL_POSE_DAMAGE, "M_O_1"},
     {BTL_POSE_STAY_DEFAULT, "M_S_1"},
 };
 
+/**
+ * The switch's single part: a hidden, shadowless Mario-model body (guard cover,
+ * no HP gauge) used only as a hit target.
+ */
 static BattleUnitKindPart parts[] = {
     {
         1,                    // partNum
@@ -95,6 +111,7 @@ static BattleUnitKindPart parts[] = {
     },
 };
 
+/** The switch has no data table events. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
@@ -122,7 +139,7 @@ EVT_END()
  * on the last hit (DAMAGE_FLAG_LAST_HIT) it plays the stage's "switch_a" map animation and waits half a second.
  */
 static EVT_BEGIN(damage_event)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(_rumble_switch, BTL_UNIT_SELF)
         RETURN
@@ -143,6 +160,9 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Vertical offsets applied on successive frames by _rumble_switch: a decaying wobble that settles at zero.
+ */
 static s32 _data[] = {
     -5, 0, 15, 0, -15, 0, 14, 0, -13, 0, 12, 0, -11, 0, 10, 0, -9, 0,
 #if VERSION <= VERSION_DEMO_US

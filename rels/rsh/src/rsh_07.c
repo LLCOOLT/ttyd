@@ -23,6 +23,7 @@ static const char* access_tbl[5];
 extern EvtWord rsh_07_init_evt[];
 static const char* window_tbl[5];
 
+/** Doors and exits of rsh_07 variant a: e_bero to rsh_04_a. */
 static BeroEntry bero_data_a[] = {
     {
         "e_bero", // hitName
@@ -45,6 +46,7 @@ static BeroEntry bero_data_a[] = {
     {0},
 };
 
+/** Doors and exits of rsh_07 variant b: w_bero to rsh_04_b. */
 static BeroEntry bero_data_b[] = {
     {
         "w_bero", // hitName
@@ -67,6 +69,7 @@ static BeroEntry bero_data_b[] = {
     {0},
 };
 
+/** Doors and exits of rsh_07 variant c: w_bero to rsh_04_c. */
 static BeroEntry bero_data_c[] = {
     {
         "w_bero", // hitName
@@ -89,7 +92,7 @@ static BeroEntry bero_data_c[] = {
     {0},
 };
 
-/** Guess: init event of the driver in rsh_07; nothing special. */
+/** Init event of the driver (運転手) in rsh_07: turns him to face 270 degrees. */
 static EVT_BEGIN(init_unten)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN
@@ -112,6 +115,7 @@ static EVT_BEGIN(talk_unten)
     RETURN
 EVT_END()
 
+/** NPCs of the small room: the driver. */
 static NpcSetupInfo npc_data[] = {
     {
         "運転手", // name
@@ -128,6 +132,7 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
+/** Signboards of the room: the schedule board (nittei) and the controls, each with the message it shows. */
 static const char* access_tbl[] = {
     "nittei",
     "stg6_rsh_c_00_1",
@@ -232,6 +237,7 @@ EVT_BEGIN(rsh_07_b_init_evt)
     RETURN
 EVT_END()
 
+/** Map objects of the scenery that passes by the windows. */
 static const char* window_tbl[] = {
     "mado_uturi_1",
     "mado_uturi_2",

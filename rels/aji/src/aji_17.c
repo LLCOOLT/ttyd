@@ -170,7 +170,7 @@ EvtWord peach_evt_stg4_quiz_data[5][4];
 static NpcSetupInfo npcEnt[4];
 extern EvtWord tec_talk[];
 
-// This function is generated in source order, not deferred like the rest of the REL (removal tested).
+// FAKE: this function is generated in source order, not deferred like the rest of the REL (removal tested).
 #pragma defer_codegen off
 /**
  * Script function: returns row args[0] of the quiz table peach_evt_stg4_quiz_data in args[1] to args[4] (the
@@ -239,6 +239,7 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/** Exit of this room: the west door to aji_01. */
 static BeroEntry bero_entry_data[] = {
     {
         ("w_bero"), // hitName
@@ -405,15 +406,18 @@ EVT_END()
  * TEC's lights flicker, the party reacts (stg7_aji_46),
  * and TEC speaks over its screen with noise and fades (stg7_aji_47 to 57)
  * before the map changes to aji_16 entered as "peach" for the Last Mail scene.
- * Guess: the wording of the scene is TEC's farewell.
+ * It is TEC's farewell: it introduces itself, asks Mario to save Peach from Grodus in the Palace of Shadow,
+ * tells him to use the teleporter while backup power lasts, and says it will cease to exist.
  */
 EVT_BEGIN(evt_last)
+    // The party enters TEC's room; the music stops and the lights flicker.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_party_stop, 0)
     WAIT_MS(800)
+    // Mario and his partner react to the flickering.
     CALL(evt_msg_print_party, STRING("stg7_aji_46"))
     WAIT_MS(300)
     LOOP(3)
@@ -449,6 +453,7 @@ EVT_BEGIN(evt_last)
     WAIT_MS(LW(1))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kikai_0"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("moza"), 1, 0)
+    // TEC speaks haltingly over its screen, which flickers with noise.
     CALL(evt_msg_print, 0, STRING("stg7_aji_47"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(500)
@@ -466,6 +471,7 @@ EVT_BEGIN(evt_last)
         CALL(evt_party_set_dir, 0, 270, 200)
     END_INLINE_EVENT
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC introduces itself as the fortress's main computer.
     CALL(evt_msg_print, 0, STRING("stg7_aji_48"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -493,6 +499,7 @@ EVT_BEGIN(evt_last)
     END_LOOP
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC apologizes: most of its data was erased.
     CALL(evt_msg_print, 0, STRING("stg7_aji_49"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -506,6 +513,7 @@ EVT_BEGIN(evt_last)
     CALL(evt_fade_tec_onoff, 0, 0)
     WAIT_MS(300)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC tells Mario that Peach is no longer here.
     CALL(evt_msg_print, 0, STRING("stg7_aji_50"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -518,6 +526,7 @@ EVT_BEGIN(evt_last)
     CALL(evt_fade_tec_onoff, 1, 0)
     WAIT_MS(300)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC begs Mario to save Peach.
     CALL(evt_msg_print, 0, STRING("stg7_aji_51"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -573,6 +582,7 @@ EVT_BEGIN(evt_last)
     END_IF
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC warns that its backup power is failing.
     CALL(evt_msg_print, 0, STRING("stg7_aji_52"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -581,6 +591,7 @@ EVT_BEGIN(evt_last)
     WAIT_MS(300)
     WAIT_MS(500)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // It urges Mario to hurry to the teleporter while the power lasts.
     CALL(evt_msg_print, 0, STRING("stg7_aji_54"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -603,6 +614,7 @@ EVT_BEGIN(evt_last)
     CALL(evt_fade_tec_onoff, 1, 0)
     WAIT_MS(300)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC says it will cease to exist when the power is gone.
     CALL(evt_msg_print, 0, STRING("stg7_aji_56"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -615,6 +627,7 @@ EVT_BEGIN(evt_last)
     CALL(evt_fade_tec_onoff, 0, 0)
     WAIT_MS(300)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC tells Mario not to worry about it, and the map changes to aji_16 for the Last Mail scene.
     CALL(evt_msg_print, 0, STRING("stg7_aji_57"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -630,6 +643,7 @@ EVT_END()
  * before control returns. The partner follows once Mario moves.
  */
 EVT_BEGIN(evt_last2)
+    // The party is back in TEC's room after the Last Mail; the music stops.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_set_pos, 20, 0, 20)
@@ -645,10 +659,12 @@ EVT_BEGIN(evt_last2)
     WAIT_MS(1000)
     CALL(evt_party_stop, 0)
     WAIT_MS(300)
+    // Mario and his partner react to the machine (stg7_aji_59 to 62).
     CALL(evt_msg_print_party, STRING("stg7_aji_59"))
     WAIT_MS(300)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kikai_0"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("moza"), 1, 0)
+    // TEC replies, then its screen shrinks away as the machine fails.
     CALL(evt_msg_print, 0, STRING("stg7_aji_60"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(300)
@@ -700,6 +716,8 @@ EVT_BEGIN(evt_last2)
     WAIT_FRAMES(1)
     CALL(viewport, 0, 0, 608, 480)
     WAIT_MS(300)
+    // The emergency lights come on, a voice announces the system failure and the story advances to the Last
+    // Mail.
     SPAWN_EVENT(evt_emergency)
     CALL(evt_msg_print, 0, STRING("stg7_aji_61"), 0, 0)
     WAIT_MS(300)
@@ -785,6 +803,7 @@ EVT_END()
  */
 static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_mario_set_mode, 1)
+    // Peach is brought to TEC's room through the west door.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_mario_key_onoff, 0)
@@ -850,6 +869,7 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kikai"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("moza"), 1, 0)
     WAIT_MS(300)
+    // An unseen voice greets her: TEC speaks for the first time (peach_aji_42 to 45).
     CALL(evt_msg_print, 0, STRING("peach_aji_42"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_4"), STRING("P_T_4"))
@@ -888,6 +908,7 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_cam3d_evt_set, 0, 80, 44, 0, 130, -150, 0, 11)
     WAIT_MS(300)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC defends Sir Grodus; Peach argues back (peach_aji_48 to 52).
     CALL(evt_msg_print, 0, STRING("peach_aji_48"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_mario_set_dir, 90, 0, 0)
@@ -909,6 +930,7 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_msg_print, 0, STRING("peach_aji_52"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(500)
+    // TEC says it wants to observe Peach, and she starts to suspect what is wrong with it.
     CALL(evt_msg_print, 0, STRING("peach_aji_53"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -940,6 +962,7 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_cam3d_evt_set, 0, 80, 44, 0, 130, -150, 0, 11)
     WAIT_MS(300)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // Peach explains love to the puzzled computer (peach_aji_58 to 58_07).
     CALL(evt_msg_print, 0, STRING("peach_aji_58"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_cam3d_evt_set, 230, 45, 372, 22, 85, -25, 0, 11)
@@ -979,6 +1002,7 @@ static EVT_BEGIN(peach_evt_stg1)
     WAIT_FRAMES(1)
     WAIT_MS(500)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC says she may contact someone, and Peach types a mail to Mario (peach_aji_65 to 69).
     CALL(evt_msg_print, 0, STRING("peach_aji_65"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
@@ -1009,6 +1033,7 @@ static EVT_BEGIN(peach_evt_stg1)
     WAIT_MS(LW(1))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_meil"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC sends the mail and tells her to go back to her room.
     CALL(evt_msg_print, 0, STRING("peach_aji_70"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_mario_set_dir, 270, 200, 0)
@@ -1026,6 +1051,7 @@ static EVT_BEGIN(peach_evt_stg1)
     END_IF
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(500)
+    // Peach leaves through the door and says good night.
     CALL(evt_msg_print, 0, STRING("peach_aji_71"), 0, STRING("mario"))
     WAIT_MS(600)
     CALL(evt_mario_mov_pos, -230, 0, 1200)
@@ -1053,6 +1079,7 @@ static EVT_BEGIN(peach_evt_stg1)
         END_IF
     END_LOOP
     WAIT_MS(2000)
+    // The story advances to Peach's meeting with TEC, the game is saved and the map changes to kpa_00.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_19_PEACH_TEC)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
@@ -1073,11 +1100,16 @@ static EVT_BEGIN(peach_evt_stg1)
     RETURN
 EVT_END()
 
+/**
+ * Lighting and camera setup for drawing the hologram dancer: ambient colour, camera position, up direction
+ * and look-at point.
+ */
 static const GXColor horogram_amb = {0xFF, 0xFF, 0xFF, 0xFF};
 static const Vec horogram_pos = {0.0f, 0.0f, 20.0f};
 static const Vec horogram_up = {0.0f, 1.0f, 0.0f};
 static const Vec horogram_target = {0.0f, 0.0f, 0.0f};
 
+/** The 15 points of a circle (radius about 110) that the dance partner steps around, one per beat. */
 f32 move_pos_list[15][2] = {
     {0.0f, -80.0f},
     {39.37592f, -74.69887f},
@@ -1417,6 +1449,7 @@ EVT_BEGIN(peach_evt_dance)
     CALL(peach_set_pose, STRING("P_O_S_1"))
     CALL(horogram_set_pose, STRING("P_O_S_2"))
     WAIT_MS(1000)
+    // The waltz music starts and the dance timer begins.
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_PEACH_WALTZ1"))
     CALL(bgm_start_wait)
@@ -1458,6 +1491,7 @@ EVT_BEGIN(peach_evt_dance)
             CASE_EQUAL(2)
             SET_RAW_VALUE(LW(2), 2)
         END_SWITCH
+        // A button prompt appears on the beat.
         CALL_CHILD(dance_btn_disp)
 #if VERSION == VERSION_EU
         CALL(wait_move_end_50hz)
@@ -1503,6 +1537,7 @@ EVT_BEGIN(peach_evt_dance)
                 CALL_CHILD(dance_btn_clear)
                 SWITCH(LW(2))
                     CASE_EQUAL(1)
+                    // The right button makes the couple step, turn or reverse and scores a point.
                     SPAWN_EVENT(peach_dance_action_step)
                     CASE_EQUAL(2)
                     SPAWN_EVENT(peach_dance_action_turn)
@@ -1512,6 +1547,7 @@ EVT_BEGIN(peach_evt_dance)
                 CASE_EQUAL(2)
                 CALL(evt_npc_get_position, STRING("ホログラム"), LW(5), LW(6), LW(7))
                 CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_DANCE_NG1"), LW(5), 0, LW(7), 0)
+                // A wrong or missing press shows a cross and Peach stumbles.
                 CALL_CHILD(dance_btn_batu)
                 SPAWN_EVENT(peach_dance_action_fail)
             END_SWITCH
@@ -1540,6 +1576,7 @@ EVT_BEGIN(peach_evt_dance)
         DELETE_EVENT(LW(12))
     END_LOOP
     DELETE_EVENT(LW(13))
+    // The dance ends and the normal music returns.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_snd_envon_f, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"), 2000)
@@ -1560,6 +1597,7 @@ EVT_BEGIN(peach_evt_dance)
         GOTO(0)
     END_IF
     CALL(evt_npc_flag_onoff, 1, STRING("ホログラム"), NPC_FLAG_HIDDEN)
+    // The hologram fades out and the results are evaluated.
     CALL_CHILD(peach_dance_light)
     SET_VALUE(LW(15), LW(10))
     CALL(evt_cam3d_evt_set, 0, 105, 243, 0, 55, -53, 1500, 11)
@@ -1603,6 +1641,7 @@ EVT_END()
  */
 static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_mode, 1)
+    // The dummy Peach and two hologram Peaches are created for the dance.
     CALL(evt_npc_entry, STRING("ダミー"), STRING("c_peach"))
     CALL(evt_npc_flag_onoff, 1, STRING("ダミー"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_flag_onoff, 1, STRING("ダミー"), NPC_FLAG_INTANGIBLE)
@@ -1647,6 +1686,7 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // Peach asks TEC if her mail reached Mario, and TEC confirms it did.
     CALL(evt_msg_print, 0, STRING("peach_aji_76"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(500)
@@ -1670,6 +1710,7 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 1500, 11)
     CALL(evt_mario_mov_pos, -30, -68, 1500)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC offers to let her dance, having overheard her regret about balls (peach_aji_78 to 86).
     CALL(evt_msg_print, 0, STRING("peach_aji_78"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1717,6 +1758,7 @@ static EVT_BEGIN(peach_evt_stg2)
     END_IF
     CALL(peach_set_pose, STRING("P_B_2"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_B_2"), STRING("P_T_7"))
+    // TEC's hologram appears as a second Peach (peach_aji_91 to 92).
     CALL(evt_msg_print, 0, STRING("peach_aji_91"), 0, STRING("mario"))
     CALL(peach_set_pose, STRING("P_S_1"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
@@ -1739,8 +1781,10 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("peach_aji_93"), 0, 0)
+    // The dance minigame plays.
     CALL_CHILD(peach_evt_dance)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC thanks her for the dance, falls oddly quiet and promises to keep its word (peach_aji_96 to 98).
     CALL(evt_msg_print, 0, STRING("peach_aji_96"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_msg_print, 0, STRING("peach_aji_97"), 0, STRING("mario"))
@@ -1757,6 +1801,7 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(peach_set_pose, STRING("P_S_1R"))
     WAIT_MS(500)
+    // Peach writes another mail to Mario and TEC sends it.
     CALL(evt_msg_print, 0, STRING("peach_aji_99"), 0, STRING("mario"))
     WAIT_MS(500)
     SPAWN_EVENT(mail_sousin_se)
@@ -1785,6 +1830,7 @@ static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_7"), STRING("P_T_13"))
+    // Peach leaves and the story advances; the map changes to hei_00.
     CALL(evt_msg_print, 0, STRING("peach_aji_101"), 0, STRING("mario"))
     CALL(evt_msg_print, 0, STRING("peach_aji_101_01"), 0, 0)
     CALL(evt_mario_mov_pos, -230, 0, 1000)
@@ -1839,6 +1885,7 @@ EVT_END()
  */
 static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_key_onoff, 0)
+    // Peach is called to TEC's room again.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_mario_set_mode, 1)
@@ -1870,6 +1917,7 @@ static EVT_BEGIN(peach_evt_stg3)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 1500, 11)
     CALL(evt_mario_mov_pos, -30, -68, 1500)
+    // TEC asks her to go to where Sir Grodus is and ask him a question (peach_aji_117 to 119_02).
     CALL(evt_msg_print, 0, STRING("peach_aji_117"), 0, 0)
     CALL(evt_msg_print, 0, STRING("peach_aji_118"), 0, STRING("mario"))
     CALL(evt_cam3d_evt_set, 0, 80, 44, 0, 130, -150, 0, 11)
@@ -1891,6 +1939,7 @@ static EVT_BEGIN(peach_evt_stg3)
     WAIT_FRAMES(1)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_4"), STRING("P_T_4"))
+    // Peach worries she will be caught; TEC says she can find a soldier's uniform (peach_aji_120 to 123).
     CALL(evt_msg_print, 0, STRING("peach_aji_120"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_121"), 0, 0)
@@ -1913,6 +1962,7 @@ static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
+    // Peach agrees and the map changes to the central hall.
     CALL(evt_msg_print, 0, STRING("peach_aji_124"), 0, STRING("mario"))
     CALL(evt_cam3d_evt_set, 0, 80, 44, 0, 130, -150, 0, 11)
     WAIT_FRAMES(1)
@@ -1929,6 +1979,7 @@ EVT_END()
  */
 static EVT_BEGIN(peach_evt_stg3_1)
     CALL(evt_mario_key_onoff, 0)
+    // Peach returns to TEC's room after her errand.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_mario_set_mode, 1)
@@ -1970,6 +2021,8 @@ static EVT_BEGIN(peach_evt_stg3_1)
     END_INLINE_EVENT
     WAIT_MS(100)
     CALL(evt_mario_wait_move_end)
+    // Peach accuses TEC of aiming to conquer the world; TEC says it was built for that (peach_aji_156 to
+    // 157_01).
     CALL(evt_msg_print, 0, STRING("peach_aji_156"), 0, STRING("mario"))
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, 0, 45, 1500)
@@ -1999,6 +2052,7 @@ static EVT_BEGIN(peach_evt_stg3_1)
     CALL(evt_mario_dispflag_onoff, 1, 512)
     CALL(evt_mario_set_dispdir, 0)
     WAIT_MS(300)
+    // TEC asks whether she dislikes the world; she answers that nobody likes everything about it.
     CALL(evt_msg_print, 0, STRING("peach_aji_157_02"), 0, 0)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
     CALL(evt_msg_print, 0, STRING("peach_aji_157_03"), 0, STRING("mario"))
@@ -2012,6 +2066,7 @@ static EVT_BEGIN(peach_evt_stg3_1)
     WAIT_MS(300)
     CALL(evt_mario_dispflag_onoff, 0, 512)
     WAIT_MS(500)
+    // She asks about the Crystal Stars, but TEC cannot answer.
     CALL(evt_msg_print, 0, STRING("peach_aji_158"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_map_replayanim, 0, STRING("moza"))
@@ -2035,6 +2090,7 @@ static EVT_BEGIN(peach_evt_stg3_1)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(peach_set_pose, STRING("P_S_1R"))
     WAIT_MS(500)
+    // She asks TEC to send another mail.
     CALL(evt_msg_print, 0, STRING("peach_aji_163"), 0, STRING("mario"))
     WAIT_MS(500)
     SPAWN_EVENT(mail_sousin_se)
@@ -2044,6 +2100,7 @@ static EVT_BEGIN(peach_evt_stg3_1)
     WAIT_MS(LW(1))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_meil"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC sends it and says good night.
     CALL(evt_msg_print, 0, STRING("peach_aji_164"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_msg_print, 0, STRING("peach_aji_165"), 0, STRING("mario"))
@@ -2085,6 +2142,7 @@ static EVT_BEGIN(peach_evt_stg3_1)
         END_IF
     END_LOOP
     WAIT_MS(2000)
+    // The story advances, the game is saved and the map changes to mri_01.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_04_PEACH_BACK_TO_TEC)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_snd_envoff_f, PSND_FADE_OUT, 1000)
@@ -2105,6 +2163,10 @@ static EVT_BEGIN(peach_evt_stg3_1)
     RETURN
 EVT_END()
 
+/**
+ * TEC's quiz in Peach's chapter 4 scene: five questions, each with its lead-in message, the question, the
+ * answer menu and the number of the right answer.
+ */
 EvtWord peach_evt_stg4_quiz_data[5][4] = {
     (EvtWord)("peach_aji_174"), (EvtWord)("peach_aji_175"), (EvtWord)("peach_aji_175_sel"), 1, (EvtWord)("peach_aji_178"), (EvtWord)("peach_aji_179"), (EvtWord)("peach_aji_179_sel"), 0,
     (EvtWord)("peach_aji_180"), (EvtWord)("peach_aji_181"), (EvtWord)("peach_aji_183_sel"), 2, (EvtWord)("peach_aji_184"), (EvtWord)("peach_aji_185"), (EvtWord)("peach_aji_185_sel"), 1,
@@ -2117,6 +2179,7 @@ EvtWord peach_evt_stg4_quiz_data[5][4] = {
  */
 static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_mario_key_onoff, 0)
+    // Peach is called to TEC's room again.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_mario_set_mode, 1)
@@ -2164,6 +2227,7 @@ static EVT_BEGIN(peach_evt_stg4)
     WAIT_MS(100)
     CALL(evt_mario_wait_move_end)
     WAIT_MS(1000)
+    // TEC seems conflicted and says it wants to give Peach a quiz (peach_aji_166_01 to 169).
     CALL(evt_msg_print, 0, STRING("peach_aji_166_01"), 0, STRING("mario"))
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, 0, 45, 1500)
@@ -2230,6 +2294,7 @@ static EVT_BEGIN(peach_evt_stg4)
     LOOP(0)
         CALL(peach_evt_stg4_read_quiz_data, LW(15), LW(2), LW(3), LW(4), LW(5))
         CALL(evt_map_replayanim, 0, STRING("moza"))
+        // The quiz: five multiple-choice questions about Grodus's plan, read from the quiz table.
         CALL(evt_msg_print, 0, LW(2), 0, 0)
         CALL(evt_map_pauseanim, 0, STRING("moza"))
         CALL(peach_set_pose, STRING("P_C_1"))
@@ -2276,6 +2341,8 @@ static EVT_BEGIN(peach_evt_stg4)
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(15), 4)
                 CALL(evt_map_replayanim, 0, STRING("moza"))
+                // After the fifth right answer TEC lets her use the communicator, and she wonders if it was
+                // right for TEC to tell her such things.
                 CALL(evt_msg_print, 0, STRING("peach_aji_190"), 0, 0)
                 CALL(evt_map_pauseanim, 0, STRING("moza"))
                 BREAK_LOOP
@@ -2308,6 +2375,7 @@ static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(peach_set_pose, STRING("P_S_1R"))
     WAIT_MS(500)
+    // Peach types her mail and TEC sends it.
     CALL(evt_msg_print, 0, STRING("peach_aji_192"), 0, STRING("mario"))
     WAIT_MS(500)
     SPAWN_EVENT(mail_sousin_se)
@@ -2351,6 +2419,7 @@ static EVT_BEGIN(peach_evt_stg4)
         GOTO(1)
     END_IF
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC says good night; the story advances to the X-Naut PhD report and the map changes to gor_04.
     CALL(evt_msg_print, 0, STRING("peach_aji_195"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     WAIT_MS(1000)
@@ -2386,13 +2455,14 @@ static EVT_BEGIN(peach_evt_stg4)
 EVT_END()
 
 /**
- * Peach's chapter 5 scene with TEC: peach_aji_206 to 210 play,
- * then (peach_aji_216 and 217 are shown with the map animation moza playing,
- * Guess: TEC's screen) the story progress becomes STORY_STG5_44_PEACH_TECS_REQUEST_2
- * and control returns to the player.
+ * Peach's chapter 5 scene with TEC (peach_aji_206 to 217): TEC asks her to sneak into Grodus's room
+ * for a data disk it cannot reach over the network (peach_aji_213 to 215 run under the TEC fade),
+ * and sends her back to the elevator. The map animation moza runs only while TEC speaks (its screen).
+ * The story progress then becomes STORY_STG5_44_PEACH_TECS_REQUEST_2 and control returns to the player.
  */
 static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_mario_key_onoff, 0)
+    // Peach is called to TEC's room again.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_mario_set_mode, 1)
@@ -2449,6 +2519,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_msg_print, 0, STRING("peach_aji_208"), 0, STRING("mario"))
     WAIT_MS(2000)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC asks her to do something more dangerous this time.
     CALL(evt_msg_print, 0, STRING("peach_aji_209"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_C_1"), STRING("P_T_8"))
@@ -2458,6 +2529,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(peach_set_pose, STRING("P_S_1"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // She must sneak into Sir Grodus's room and look for a data disk (peach_aji_211 to 216).
     CALL(evt_msg_print, 0, STRING("peach_aji_211"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_cam3d_evt_set, -25, 75, 135, -25, 50, -13, 0, 11)
@@ -2484,6 +2556,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_mario_dispflag_onoff, 0, 512)
     CALL(evt_msg_print, 0, STRING("peach_aji_216"), 0, STRING("mario"))
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // TEC tells her to take the elevator, and the story advances to TEC's second request.
     CALL(evt_msg_print, 0, STRING("peach_aji_217"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_cam3d_evt_off, 1000, 11)
@@ -2498,6 +2571,7 @@ EVT_END()
  */
 static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_mario_key_onoff, 0)
+    // Peach returns to TEC's room after her search.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_mario_set_mode, 1)
@@ -2552,6 +2626,7 @@ static EVT_BEGIN(peach_evt_stg5_1)
     END_LOOP
     CALL(evt_mario_wait_move_end)
     WAIT_MS(500)
+    // TEC is still analysing the data on the disk, which is heavily encrypted.
     CALL(evt_msg_print, 0, STRING("peach_aji_260"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_map_replayanim, 0, STRING("moza"))
@@ -2574,6 +2649,7 @@ static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(peach_set_pose, STRING("P_S_1R"))
     WAIT_MS(500)
+    // Peach asks TEC to send another message and TEC sends it.
     CALL(evt_msg_print, 0, STRING("peach_aji_265"), 0, STRING("mario"))
     WAIT_MS(500)
     SPAWN_EVENT(mail_sousin_se)
@@ -2630,6 +2706,7 @@ static EVT_BEGIN(peach_evt_stg5_1)
         END_IF
     END_LOOP
     WAIT_MS(2000)
+    // The story advances, the game is saved and the map changes to usu_00.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_47_PEACH_TEC_TALK)
     CALL(evt_peach_set_condition, 0)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
@@ -2658,6 +2735,7 @@ EVT_END()
  */
 static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_key_onoff, 0)
+    // Peach visits TEC once more.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     CALL(evt_mario_set_mode, 1)
@@ -2708,6 +2786,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_dispflag_onoff, 1, 512)
     CALL(evt_mario_set_dispdir, 0)
     WAIT_MS(300)
+    // TEC doesn't sound right; it tells her of a chance to escape (peach_aji_282_04 to 287).
     CALL(evt_msg_print, 0, STRING("peach_aji_282_04"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_283"), 0, 0)
@@ -2745,6 +2824,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(peach_set_pose, STRING("P_B_2"))
     CALL(evt_fade_in, 1000)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_B_2"), STRING("P_T_7"))
+    // Peach struggles to believe the news about Grodus's plans.
     CALL(evt_msg_print, 0, STRING("peach_aji_288"), 0, STRING("mario"))
     CALL(peach_set_pose, STRING("P_C_1"))
     WAIT_MS(500)
@@ -2769,6 +2849,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_set_dispdir, 0)
     WAIT_MS(300)
     WAIT_MS(500)
+    // TEC explains where she is held and how she can escape (peach_aji_292 to 302).
     CALL(evt_msg_print, 0, STRING("peach_aji_292"), 0, 0)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_293"), 0, STRING("mario"))
@@ -2839,6 +2920,7 @@ static EVT_BEGIN(peach_evt_stg6)
         CALL(evt_npc_move_position, STRING("シュリョー"), -130, 0, 0, FLOAT(60.0f), 0)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("手下２"), -180, 0, 0, FLOAT(60.0f), 0)
+    // Sir Grodus bursts in and catches Peach; tense music starts.
     CALL(evt_msg_print, 0, STRING("peach_aji_303"), 0, STRING("シュリョー"))
     CALL(evt_snd_sfxoff, LW(15))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -2874,6 +2956,7 @@ static EVT_BEGIN(peach_evt_stg6)
     END_INLINE_EVENT
     WAIT_MS(500)
     CALL(evt_map_replayanim, 0, STRING("moza"))
+    // Grodus confronts TEC, who insists it is normal, while Peach protests (peach_aji_306 to 312).
     CALL(evt_msg_print, 0, STRING("peach_aji_306"), 0, 0)
     CALL(evt_map_pauseanim, 0, STRING("moza"))
     CALL(evt_cam3d_evt_set, 0, 140, 332, 0, 75, -13, 0, 11)
@@ -2949,6 +3032,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(peach_set_pose, STRING("P_C_1"))
     WAIT_MS(300)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_C_1"), STRING("P_T_8"))
+    // TEC's last mail goes out as it is shut down (peach_aji_313 and 314).
     CALL(evt_msg_print, 0, STRING("peach_aji_314"), 0, 0)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 0, 75, 387, 0, 75, -13, 0, 11)
@@ -2973,6 +3057,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("monihiraku"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
+    // Peach cries out for TEC and rebukes Grodus (peach_aji_316 to 321).
     CALL(evt_msg_print, 0, STRING("peach_aji_316"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_317"), 0, STRING("シュリョー"))
@@ -2991,6 +3076,7 @@ static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_cam3d_evt_set, -35, 100, 184, -35, 65, -13, 800, 11)
     WAIT_MS(800)
     CALL(evt_msg_print, 0, STRING("peach_aji_321"), 0, STRING("シュリョー"))
+    // The story advances to TEC's deletion, the game is saved and the map changes to gor_01.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_01_PEACH_TEC_DELETED)
     WAIT_MS(2000)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
@@ -3012,27 +3098,28 @@ static EVT_BEGIN(peach_evt_stg6)
     RETURN
 EVT_END()
 
-/** Init of an X-Naut underling in TEC's room: runs the common NPC init and sets NPC status 2. */
+/** Init of an X-Naut underling in TEC's room: runs the common NPC init and sets NPC_STATUS_FACE_MOVE_DIR. */
 static EVT_BEGIN(teshita1_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-/** Init of a second X-Naut underling in TEC's room: common NPC init plus NPC status 2. */
+/** Init of a second X-Naut underling in TEC's room: common NPC init plus NPC_STATUS_FACE_MOVE_DIR. */
 static EVT_BEGIN(teshita2_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-/** Init of Grodus (シュリョー) in TEC's room: common NPC init plus NPC status 2. */
+/** Init of Grodus (シュリョー) in TEC's room: common NPC init plus NPC_STATUS_FACE_MOVE_DIR. */
 static EVT_BEGIN(syuryo_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Cast of TEC's room besides TEC: two X-Naut underlings and Sir Grodus. */
 static NpcSetupInfo npcEnt[] = {
     {
         "手下１", // name
@@ -3095,6 +3182,7 @@ EVT_BEGIN(aji_17_init_evt)
     SET_VALUE(LW(0), STRING("S_camera_1"))
     SET_VALUE(LW(1), -30)
     SET_VALUE(LW(2), 60)
+    // The camera sweep over TEC's room starts.
     SPAWN_EVENT(evt_camera)
     SET_VALUE(LW(0), STRING("S_camera_2"))
     SET_VALUE(LW(1), -60)
@@ -3105,6 +3193,7 @@ EVT_BEGIN(aji_17_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("polySurface1161_q00063"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("polySurface1168_q00065"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_scale, 0, STRING("ren2"), 5, 5, 1)
+    // Peach's scenes: each story point from chapter 1 to chapter 6 starts its own conversation with TEC.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
         SPAWN_EVENT(peach_evt_stg1)
     END_IF
@@ -3133,6 +3222,8 @@ EVT_BEGIN(aji_17_init_evt)
         CALL(evt_shuryolight_run_evt, PTR(shuryolight_pow_normal), PTR(shuryolight_head_normal), PTR(shuryolight_tue_normal))
         SPAWN_EVENT(peach_evt_stg6)
     END_IF
+    // Mario's visits: at the story point after the Moon, the first visit restores HP and FP and plays TEC's
+    // farewell (evt_last); the second plays the aftermath (evt_last2).
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
         IF_INT_EQUAL(GSWF(GSWF_AJI17_POST_BOSS_SCENE_STARTED), 0)
             CALL(evt_mario_get_party, LW(15))
@@ -3159,6 +3250,7 @@ EVT_BEGIN(aji_17_init_evt)
             RETURN
         END_IF
     END_IF
+    // Otherwise the emergency lights start and the room's entrances are set up.
     SPAWN_EVENT(evt_emergency)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -3173,9 +3265,12 @@ EVT_BEGIN(aji_17_init_evt)
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_kill_party, 0)
     ELSE
+        // As Mario, the fortress music and ambience play; as Peach, her partner is removed.
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
     END_IF
+    // After the final battle the room's machine runs again and the keyboard can be used to talk to TEC
+    // (tec_talk).
     IF_INT_GREATER(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kurai"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kikai"), MAPOBJ_FLAG_HIDE)
@@ -3716,6 +3811,7 @@ static s32 evt_fuki_btn_set_batu(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Suffix added to a pose name to get the matching pose of the mirrored hologram. */
 static const char horogram_pose_suffix[] = "R";
 /**
  * Script function: sets the pose args[0] on the hologram NPC

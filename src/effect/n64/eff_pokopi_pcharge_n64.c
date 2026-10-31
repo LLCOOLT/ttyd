@@ -10,9 +10,14 @@
 #include <stdlib.h>
 #include "libc_decls.h"
 
+/**
+ * Number of charge streaks in the ring for each type.
+ * vx_data: speed of the streaks along their rays for each type.
+ */
 u8 n_data[13] = {11, 11, 11, 11, 17, 11, 11, 21, 21, 21, 21, 21, 21};
 static u8 vx_data[13] = {20, 5, 20, 20, 10, 20, 20, 8, 8, 8, 1, 1, 1};
 
+/** Short streak quads for types 0-2, each type showing its own band of the streak texture. */
 static effN64Vtx size10x10_tex32x32_vtx[] = {
     {0, -5, 0, 0, 0, 0, 0, 0, 255},
     {10, -5, 0, 1024, 0, 0, 0, 0, 255},
@@ -32,6 +37,10 @@ static effN64Vtx size10x10_tex32x32_vtx[] = {
     {0, 5, 0, 0, 4096, 0, 0, 0, 255},
 };
 
+/**
+ * The same short streak quads flipped horizontally for types 3-5;
+ * the third band is also used by types 9 and 12.
+ */
 static effN64Vtx size10x10_tex32x32_2_vtx[] = {
     {0, -5, 0, 1024, 0, 0, 0, 0, 255},
     {10, -5, 0, 0, 0, 0, 0, 0, 255},
@@ -51,6 +60,7 @@ static effN64Vtx size10x10_tex32x32_2_vtx[] = {
     {0, 5, 0, 1024, 4096, 0, 0, 0, 255},
 };
 
+/** Long 128-unit streak quad for types 6-8 and 11. */
 static effN64Vtx size128x10_tex32x32_vtx[] = {
     {0, -5, 0, 0, 0, 0, 0, 0, 255},
     {128, -5, 0, 1024, 0, 0, 0, 0, 255},
@@ -70,6 +80,7 @@ static effN64Vtx size128x10_tex32x32_vtx[] = {
     {0, 5, 0, 0, 4096, 0, 0, 0, 255},
 };
 
+/** The long streak quad flipped horizontally, drawn for type 10. */
 static effN64Vtx size128x10_tex32x32_2_vtx[] = {
     {0, -5, 0, 1024, 0, 0, 0, 0, 255},
     {128, -5, 0, 0, 0, 0, 0, 0, 255},

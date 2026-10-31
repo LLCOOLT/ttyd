@@ -1,6 +1,6 @@
 // Battle menu drawing: the action, weapon-select and operation menus and the pieces they are built from.
 #pragma optimize_for_size on
-// inlining off for SelectedItemCoordinateColorUpDate, BattleMenuKeyOKInACT, battleMenuDispInit and 48 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 11 functions change length, e.g. DrawChangePartyWin 98 -> 259 instructions
 #pragma dont_inline on
 #include "version.h"
 #include "battle/battle_menu_disp.h"
@@ -55,6 +55,10 @@ static void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* curs
 #include "icon_ids.h"
 static void GetRingCenter(Vec* out);
 static void GetRingOffset(f32 angle, f32* x, f32* y);
+/**
+ * Angles in degrees of the command icons around the battle menu's ring, one row each for 3, 4 and 5 commands
+ * (indexed by the icon's slot); used to place and turn the icons when the ring spins.
+ */
 f32 kakutable[3][5] = {{240.0f, 120.0f, 0.0f, 0.0f, 0.0f}, {270.0f, 180.0f, 90.0f, 0.0f, 0.0f}, {270.0f, 203.0f, 157.0f, 90.0f, 0.0f}};
 
 //.sdata
@@ -777,8 +781,10 @@ static void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 i
 /**
  * Draws the switch-places button between Mario and his partner
  * when BattleCommandCheckChangePositionEnable allows it.
- * While an audience item throw is pending, flips in a different button (with a caution sound) instead,
- * above Mario if he has no partner. Guess: texture 5 is the warning that an item is about to be thrown.
+ * While an audience item throw is pending (BattleAudience_GetItemOn), flips in texture 5 instead,
+ * the throw warning:
+ * between the two with the SFX_BTL_SYS_CAUTION_THROW1 sound as it starts,
+ * or above Mario without a sound if he has no partner.
  */
 static void DrawMenuPartyChangeButton(void) {
     Vec p;

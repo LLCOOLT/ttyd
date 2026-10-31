@@ -83,6 +83,7 @@ EVT_BEGIN(sound_evt2)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/** Tuning values of Mario's paper boat: water drag and slowing, drift rates, the whirlpool push limit (2.0). */
 f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
 #endif
 const char* paper_ship[4] = {"p_hune", "p_hune_g", "p_hune_y", "p_hune_v"};
@@ -94,21 +95,19 @@ const char* paper_ship[4] = {"p_hune", "p_hune_g", "p_hune_y", "p_hune_v"};
 static inline s32 harborKind(HitEntry* hit) {
     s32 k = 0;
     s32 attr = hitGetAttr(hit);
-    if (attr & 0x4000) {
+    if (attr & HIT_ATTR_DOCK_NEG_Z) {
         k = 1;
-    } else if (attr & 0x8000) {
+    } else if (attr & HIT_ATTR_DOCK_POS_Z) {
         k = 2;
-    } else if (attr & 0x10000) {
+    } else if (attr & HIT_ATTR_DOCK_NEG_X) {
         k = 3;
-    } else if (attr & 0x20000) {
+    } else if (attr & HIT_ATTR_DOCK_POS_X) {
         k = 4;
     }
     return k;
 }
 
 static BOOL checkHarbor(Vec* out);
-
-double __fabs(double);
 
 #define SHIP_DIR (marioGetPtr()->motShip->flags & 1)
 
@@ -192,7 +191,7 @@ void marioShipSetDispDir(void) {
 
 /** TRUE when hit is a boat panel (any of the dock attributes 0x3C000); mario_motion.c uses it to offer Boat Mode. */
 BOOL marioChkShipPlace(HitEntry* hit) {
-    return (hitGetAttr(hit) & 0x3C000) != 0;
+    return (hitGetAttr(hit) & (HIT_ATTR_DOCK_NEG_Z | HIT_ATTR_DOCK_POS_Z | HIT_ATTR_DOCK_NEG_X | HIT_ATTR_DOCK_POS_X)) != 0;
 }
 
 /**
@@ -223,7 +222,7 @@ void marioReInit_ship(void) {
     p = __memAlloc(HEAP_DEFAULT, 0x48);
     marioGetPtr()->motStruct = p;
     memset(marioGetPtr()->motStruct, 0, 0x48);
-    mario->currMotionId = 0x19;
+    mario->currMotionId = MARIO_MOTION_SHIP;
     mario->dispOfs.y = -15.0f;
     mario->currSubMotionId = 0x32;
     mario->wPlayerCollisionBox.x = 40.0f;
@@ -335,8 +334,8 @@ static inline void shipEff(f32 s) {
     EFFP()->position.x = mario->position.x;
     EFFP()->position.y = mario->position.y + zz;
     EFFP()->position.z = mario->position.z;
-    EFFP()->f10 = s;
-    EFFP()->f14 = mario->displayDirection;
+    EFFP()->speed = s;
+    EFFP()->yaw = mario->displayDirection;
 }
 
 // FAKE: case-0 block as an inline helper so hit/attr/r are inline temps numbered
@@ -351,17 +350,17 @@ static inline void shipDecideDir(MarioWork* m, Vec* pp1, Vec* pp2) {
         m2 = marioGetPtr();
         attr = hitGetAttr(hit);
         r = 0;
-        if (attr & 0x4000) {
+        if (attr & HIT_ATTR_DOCK_NEG_Z) {
             hitObjGetPos(hitGetName(m2->hitobjJumpFrom), pp1);
             ff = revise360(angleABf(m2->position.x, m2->position.z, pp1->x, pp1->z) - m2->targetYaw);
             r = (ff >= 180.0f) ? 2 : 1;
-        } else if (attr & 0x8000) {
+        } else if (attr & HIT_ATTR_DOCK_POS_Z) {
             hitObjGetPos(hitGetName(m2->hitobjJumpFrom), pp2);
             ff = revise360(angleABf(m2->position.x, m2->position.z, pp2->x, pp2->z) - m2->targetYaw);
             r = (ff >= 180.0f) ? 2 : 1;
-        } else if (attr & 0x10000) {
+        } else if (attr & HIT_ATTR_DOCK_NEG_X) {
             r = 2;
-        } else if (attr & 0x20000) {
+        } else if (attr & HIT_ATTR_DOCK_POS_X) {
             r = 1;
         }
         marioGetPtr()->motShip->flags = r;
@@ -1176,9 +1175,11 @@ static void shipMove(void) {
     m->moveDist = len;
 }
 /**
- * Unknown: not called anywhere; writes five float constants (15, 50, 30.30303, 180, pi) that mot_ship also uses,
+ * Stand-in for a stripped function (in no version's symbols, never called):
+ * writes five float constants (15, 50, 30.30303, 180, pi) that mot_ship also uses,
  * so it only fixes their order in the constant pool.
  */
+// FAKE: uncalled stand-in for a stripped function; orders 15, 50, 30.30303, 180 and pi in .sdata2
 void shipStrippedPool(f32* p) {
     p[0] = 15.0f;
     p[1] = 50.0f;

@@ -22,6 +22,7 @@ typedef struct EffExplosionN64Work {
     f32 rotVel;   // 0x28
 } EffExplosionN64Work;
 
+/** Camera-facing 32x32 explosion sprite. */
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
     {16, -16, 0, -1024, 0, 0, 0, 0, 255},

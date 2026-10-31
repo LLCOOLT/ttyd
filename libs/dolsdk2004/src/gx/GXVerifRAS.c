@@ -6,6 +6,10 @@
 
 #include "__gx.h"
 
+/**
+ * Debug names of the raster stage outputs, printed by the graphics verifier: the multisample mode and the
+ * TEV registers.
+ */
 static char __data_0[] = "RGB multisample";
 static char _305[] = "GX_TEVPREV(color)";
 static char _306[] = "GX_TEVPREV(alpha)";
@@ -16,6 +20,7 @@ static char _310[] = "GX_TEVREG1(alpha)";
 static char _311[] = "GX_TEVREG2(color)";
 static char _312[] = "GX_TEVREG2(alpha)";
 
+/** Names of the TEV registers, filled in at run time for the verifier's messages. */
 static char* TevRegNames[8] = {0};
 
 #define SOME_GET_REG_MACRO(reg, size, shift) ((u32)((reg) << (shift)) & ((1 << (size)) - 2))

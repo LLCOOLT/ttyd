@@ -161,7 +161,7 @@ void cloud_move(PartyEntry* party) {
  * sets her collision size (38 tall, 36 wide in the demo, 24 in later versions) and clears her gust state.
  */
 void cloud_init(PartyEntry* party) {
-    party->memberKind = 5;
+    party->memberKind = PARTY_MEMBER_FLURRIE;
     party->moveKind = 1;
     party->height = 38.0f;
     party->width = 36.0f;
@@ -889,7 +889,7 @@ void cloud_move(PartyEntry* party) {
  * sets her collision size (38 tall, 24 wide) and clears her gust and cutscene-lock state.
  */
 void cloud_init(PartyEntry* party) {
-    party->memberKind = 5;
+    party->memberKind = PARTY_MEMBER_FLURRIE;
     party->moveKind = 1;
     party->height = 38.0f;
     party->width = 24.0f;
@@ -917,7 +917,7 @@ void cloud_use(PartyEntry* party) {
     u8* m;
 
     N__cloud_use(party);
-    if (mario->currMotionId == MARIO_MOTION_CLOUD || mario->currMotionId <= 1 || mario->currMotionId == MARIO_MOTION_DASH) {
+    if (mario->currMotionId == MARIO_MOTION_CLOUD || mario->currMotionId <= MARIO_MOTION_WALK || mario->currMotionId == MARIO_MOTION_DASH) {
         return;
     }
     party->flags &= ~PARTY_FLAG_IS_BEING_USED;

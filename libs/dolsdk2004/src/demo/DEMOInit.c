@@ -10,8 +10,10 @@ extern u8 DemoStatEnable;
 
 static GXRenderModeObj rmodeobj;
 
+/** Set until the first DEMOSwapBuffers, which then turns off the black screen. */
 static u8 DemoFirstFrame = 1;
 
+/** The graphics FIFO buffer and FIFO object GXInit was started with. */
 static void* DefaultFifo = NULL;
 static GXFifoObj* DefaultFifoObj = NULL;
 static GXRenderModeObj* rmode;

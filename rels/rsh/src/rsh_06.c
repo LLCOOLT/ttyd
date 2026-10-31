@@ -242,6 +242,10 @@ extern EvtWord moamoa_debug[];
 extern EvtWord rsh_06_init_evt[];
 extern EvtWord rsh_06_init_evt_nidome[];
 
+/**
+ * Animation table of the swarm of small Smorgs (c_n_moa_a) that merge into the giant Smorg:
+ * the figure, its animation set and a start offset for each.
+ */
 static MoamoaData ext_moamoa_data[] = {
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 0.0f},
     {((char*)"c_n_moa_a"), ((char*)"S_1"), 2.0f},
@@ -316,7 +320,7 @@ static MoamoaData ext_moamoa_data[] = {
     {0},
 };
 
-// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
+// FAKE: dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 /**
  * Builds the swarm's animation table (wp->defs) from ext_moamoa_data:
@@ -525,7 +529,8 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
 /**
  * Script helper: args[0] turns the per-kind model on or off (MOAMOA_FLAG_KIND_MODEL),
  * args[1] applies it to every Moamoa or only to those of kind 1; each sprite then refreshes its pose.
- * Used to dress the merged Smorg in the models of the people it swallowed.
+ * rsh_06 uses it as the Smorg merges; kinds 2-9 are passenger models (c_kinodebu, c_powan, c_rose, c_papab ...).
+ * Guess: the swarm is meant to show the passengers it has swallowed.
  */
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
@@ -792,7 +797,7 @@ static void ext_shadow_disp(CameraId camera, void* param) {
     }
 }
 
-// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
+// FAKE: dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
 /**
  * Starts a hop for one Moamoa toward (x, y, z) with the given horizontal speed and gravity:
@@ -833,7 +838,7 @@ static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround
     pose->flags &= ~4;
 }
 #pragma dont_inline reset
-// Built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
+// FAKE: built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -950,7 +955,7 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
 }
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
-// Built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
+// FAKE: built with copy propagation and lifetime analysis off: the plain build allocates registers differently (checked by
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -1534,6 +1539,7 @@ static void moamoa_joint_position(Moamoa* moa, Vec* out) {
     PSVECAdd(out, &tmp, out);
 }
 
+/** Wheels of the train: each wheel map object (sha_N_M) with how it turns and its speed. */
 static SharinData sharinDt[] = {
     {((char*)"sha_1_1"), 0, 0, FLOAT(1.0f)},
     {((char*)"sha_1_2"), 0, 0, FLOAT(1.0f)},
@@ -1624,6 +1630,7 @@ static EVT_BEGIN(evt_sharin)
     RETURN
 EVT_END()
 
+/** Connecting rods (bou_N) of the train, each moved in a circle together with its wheel. */
 static ClankData clankDt[] = {
     {((char*)"bou_1"), 0, 0, FLOAT(20.0f), FLOAT(1.0f)},
     {((char*)"bou_2"), 1, 1, FLOAT(16.5f), FLOAT(1.0f)},
@@ -1815,6 +1822,7 @@ EVT_END()
  * plays the engine sounds and ramps the wheel speeds GW(0) and GW(1) up to -15 (leftward).
  */
 static EVT_BEGIN(hom_10_evt_resha_start)
+    // The train starts moving: the station flags are cleared and the bell rings.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
@@ -1828,6 +1836,7 @@ static EVT_BEGIN(hom_10_evt_resha_start)
         CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
     END_IF
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
+        // The engine sounds start and the wheel speeds ramp up to the left (outbound).
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_54_WELCOME_BACK)
             CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_2"), 0)
         ELSE
@@ -1917,6 +1926,7 @@ EVT_END()
  * but ramps the speeds up to +15 (rightward).
  */
 static EVT_BEGIN(hom_10_evt_resha_start2)
+    // The train starts moving on the return trip: the station flags are cleared.
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
@@ -1983,6 +1993,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+        // The wheel speeds ramp up to the right.
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
         LOOP(0)
             SET_FLOAT_VALUE(GW(1), GW(0))
@@ -2147,12 +2158,17 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
+/**
+ * Map object groups of the train (pika_*) that hom_10_evt_resha_sub hooks to the TEV callback resha_tev,
+ * which adds environment effect 7 (an env.tpl reflection or shine texture) to them; NULL ends the list.
+ */
 static const char* pika_tbl[] = {
     "pika_1_1", "pika_1_2", "pika_1_3", "pika_1_4", "pika_2",
     "pika_3", "pika_4", "pika_5", "pika_6", "pika_1_1_c",
     "pika_1_2_c", "pika_1_3_c", "pika_1_4_c", "pika_6_c", NULL,
 };
 
+/** The shorter list used instead on the map rsh_06_a: the same groups without the *_c ones. */
 static const char* pika_tbl_rsh_06[] = {
     "pika_1_1", "pika_1_2", "pika_1_3", "pika_1_4", "pika_2",
     "pika_3", "pika_4", "pika_5", "pika_6", NULL,
@@ -2293,6 +2309,7 @@ EVT_BEGIN(evt_resha_init)
     RETURN
 EVT_END()
 
+/** Doors and exits of rsh_06 variant a: w_bero to rsh_05_a. */
 static BeroEntry bero_data_a[] = {
     {
         ((char*)"w_bero"), // hitName
@@ -2316,7 +2333,7 @@ static BeroEntry bero_data_a[] = {
 
 /**
  * Sets up the roof boss: registers the Smorg and passenger NPC models, the giant Smorg model (base),
- * the swarm effect for 700 sprites and the voice sound, turns the swarm on and runs the Great Moamoa cutscene.
+ * the swarm effect for 700 sprites and the voice sound, turns the swarm on and runs the giant Smorg cutscene.
  */
 static EVT_BEGIN(evt_moamoa_init)
     CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
@@ -2365,7 +2382,7 @@ static EVT_BEGIN(evt_moamoa_init)
 EVT_END()
 
 /**
- * Cutscene and boss fight with the Great Moamoa (giant Smorg) on the roof of the train:
+ * Cutscene and boss fight with the giant Smorg (moamoa) on the roof of the train:
  * the swarm gathers and merges (evt_moamoa_fusion) into a giant body with the passengers' faces (kinds),
  * the camera sweeps over it, Mario and the partner react (stg6_rsh_244 to 246),
  * the battle starts with the "base" NPC and, after the fight, the Smorg falls apart (evt_moamoa_blow),
@@ -2376,6 +2393,7 @@ EVT_BEGIN(evt_great_moamoa)
     CALL(evt_mario_normalize)
     CALL(evt_moamoa_flag_onoff, 1, 8)
     CALL(evt_moamoa_flag_onoff, 1, 4)
+    // The swarm gathers and merges into the giant Smorg.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_244"), 0, 0)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group339"), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group340"), 1)
@@ -2457,6 +2475,7 @@ EVT_BEGIN(evt_great_moamoa)
     WAIT_MS(500)
     CALL(evt_party_stop, 0)
     WAIT_MS(300)
+    // Mario and his partner react.
     CALL(evt_msg_print_party, STRING("stg6_rsh_245"))
     WAIT_MS(300)
     CALL(evt_party_run, 0)
@@ -2483,6 +2502,7 @@ EVT_BEGIN(evt_great_moamoa)
     WAIT_MS(2000)
     CALL(evt_snd_sfxoff, GW(2))
     CALL(evt_npc_set_battle_info, STRING("base"), 1)
+    // The battle with the giant Smorg starts.
     CALL(evt_npc_battle_start, STRING("base"))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_cam3d_evt_set, -50, 355, 534, -50, 260, -8, 0, 11)
@@ -2525,6 +2545,7 @@ EVT_BEGIN(evt_great_moamoa)
     CALL(evt_npc_set_anim, STRING("konari"), STRING("Z_1"))
     CALL(evt_npc_set_anim, STRING("powan"), STRING("Z_1"))
     CALL(evt_moamoa_kind_onoff, 0, 0)
+    // After the fight the Smorg falls apart.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_247"), 0, STRING("base"))
     WAIT_MS(500)
     CALL(evt_npc_get_position, STRING("base"), LW(0), LW(1), LW(2))
@@ -2546,11 +2567,13 @@ EVT_BEGIN(evt_great_moamoa)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(2000)
+    // The story advances and the map changes to rsh_01_a.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_48_SMORG_MIASMA)
     CALL(evt_bero_mapchange, STRING("rsh_01_a"), STRING("w_bero"))
     RETURN
 EVT_END()
 
+/** Animation names the Smorg debug leftover cycles through when a button is pressed. */
 const char* pose_name[] = {
     "Z_1", "H_1", "S_1", "U_1", "H_2", "S_2", "P_1",
     "S_3",
@@ -2658,7 +2681,7 @@ EVT_END()
 /**
  * Init script of rsh_06_a (first trip): places Mario at (-500, 250, 0) on the roof,
  * sets the door back to rsh_05, runs the shared init and, before STORY_STG6_48_SMORG_MIASMA,
- * sets up the swarm and the Great Moamoa scenes (or the debug scene when map events are skipped).
+ * sets up the swarm and the giant Smorg scenes (or the debug scene when map events are skipped).
  */
 EVT_BEGIN(rsh_06_a_init_evt)
     CALL(evt_mario_set_pos, -500, 250, 0)
@@ -2726,13 +2749,16 @@ static s32 ramp_r(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 /**
- * Guess: TEV callback of the train map objects (installed with evt_map_set_tevcallback);
- * adds the environment TEV stage number 7 (envAddTev).
+ * Map TEV callback 1, installed by the map init with evt_map_set_tevcallback: adds environment effect type 7
+ * (envAddTev) to the material of each map object that uses that callback slot.
  */
 static void resha_tev(MapTevCallbackInfo* info) {
     envAddTev(7, info);
 }
-/** Script helper: blocks until the base NPC's (the Great Moamoa model) current animation has played through once. */
+/**
+ * Script helper: blocks until the current animation of the base NPC (the giant Smorg model)
+ * has played through once.
+ */
 static s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall) {
     NpcEntry* npc = npcNameToPtr((char*)"base");
 

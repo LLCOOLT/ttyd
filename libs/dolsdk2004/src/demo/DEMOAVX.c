@@ -14,9 +14,14 @@ static u32 __AVX_curr_frame;
 static u16* __AVX_buffer;
 static s16* __AVX_left_buffer;
 static s16* __AVX_right_buffer;
+/**
+ * Write position and size, in samples per channel,
+ * of the left and right output buffers the captured audio is copied into.
+ */
 static u32 __AVX_write_ptr = 0;
 static u32 __AVX_buffer_size = 0;
 
+/** Set once the capture ring has passed its fifth frame; until then no audio is copied out. */
 static BOOL flag = FALSE;
 
 /**

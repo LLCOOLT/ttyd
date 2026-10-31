@@ -91,12 +91,16 @@ static inline f32 orbit_update(f32 x) {
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
 #if VERSION == VERSION_EU
-/** Declaration of the PAL-only helper in evt_sub.c that writes gp->framerate (50 or 60) to its script argument. */
+/**
+ * Declaration of the PAL-only helper in evt_sub.c that writes gp->framerate (50 or 60) to its script
+ * argument.
+ */
 USER_FUNC(evt_sub_get_framerate); // evt_sub.c (PAL only): writes gp->framerate (50 or 60) to arg 0
 #endif
 static USER_FUNC(scale_func);
 #if VERSION >= VERSION_US
-// Declaration of the US-and-later helper in evt_sub.c that forces the status gauge (HP/FP/SP display) to refresh.
+// Declaration of the US-and-later helper in evt_sub.c that forces the status gauge (HP/FP/SP display) to
+// refresh.
 USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
 static void tobikakari_seq00(NanNPC* npc);
@@ -213,7 +217,10 @@ static void alpha_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
-/** Script helper: allocates the one-byte water alpha value (_ap) from map memory and starts it fully opaque (255). */
+/**
+ * Script helper: allocates the one-byte water alpha value (_ap) from map memory and starts it fully opaque
+ * (255).
+ */
 static USER_FUNC(alpha_init_func) {
     _ap = _mapAlloc(1);
     *_ap = 255;
@@ -411,7 +418,7 @@ static USER_FUNC(mario_main_init_func) {
 
 /**
  * Script helper: records the distance and angle from the ship centre (args[0], args[1]) of Mario,
- * his partner and the six NPCs on the ship (Marco, Cortez, Mony, Garawaru, Peton, Odoodo),
+ * his partner and the six NPCs on the ship (Flavio, Cortez, Mony, Garawaru, Peton, Odoodo),
  * so mario_main_func can swing them around as the pirate ship turns.
  */
 static USER_FUNC(mario_main_setup_func) {
@@ -759,6 +766,10 @@ static USER_FUNC(cam_test_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Mass-NPC figure table of the beach crowd: model, animation set and start offset of each sailor (c_boro_k),
+ * X-Naut (c_zako_n) and c_elmos figure.
+ */
 static ExtTexInfo ext_entry_data[] = {
     {"c_boro_k", "S_1", 0.0f},
     {"c_boro_k", "S_1", 3.0f},
@@ -821,6 +832,7 @@ static ExtTexInfo ext_entry_data[] = {
     {0},
 };
 
+/** Frame sequence of the walking and standing sailors of the beach crowd, ended by -1. */
 static s16 suifu_animtbl[] = {
     0, 0, 0, 1, 1, 1, 2, 2,
     2, 3, 3, 3, 4, 4, 4, 5,
@@ -834,6 +846,7 @@ static s16 suifu_animtbl[] = {
 #endif
 };
 
+/** Frame sequence of the running sailors of the crowd (the panic and the jumping fight), ended by -1. */
 s16 suifu_animtbl_run[] = {
     14, 14, 15, 15, 16, 16, 17, 17,
     18, 18, 19, 19, 20, 20, 21, 21,
@@ -844,6 +857,7 @@ s16 suifu_animtbl_run[] = {
 #endif
 };
 
+/** Frame sequence of the c_elmos crowd on the pirate ship, ended by -1. */
 static s16 elmos_animtbl[] = {
     24, 24, 25, 25, 26, 26, 27, 27,
     28, 28, 29, 29, 30, 30, 31, 31,
@@ -854,6 +868,7 @@ static s16 elmos_animtbl[] = {
 #endif
 };
 
+/** Frame sequence of the X-Naut ship's crowd (mass NPCs 205 to 304), ended by -1. */
 static s16 dai3_animtbl[] = {
     34, 34, 34, 35, 35, 35, 36, 36,
     36, 37, 37, 37, 38, 38, 38, 39,
@@ -867,6 +882,7 @@ static s16 dai3_animtbl[] = {
 #endif
 };
 
+/** Running frame sequence of the X-Naut ship's crowd, ended by -1. */
 s16 dai3_animtbl_run[] = {
     48, 48, 49, 49, 50, 50, 51, 51,
     52, 52, 53, 53, 54, 54, 55, 55,
@@ -969,7 +985,9 @@ EVT_BEGIN(suifu_dark)
     RETURN
 EVT_END()
 
-/** Fades the sailor crowd (mass NPCs 10 to 104) back from black to normal colour, the opposite of suifu_dark. */
+/**
+ * Fades the sailor crowd (mass NPCs 10 to 104) back from black to normal colour, the opposite of suifu_dark.
+ */
 EVT_BEGIN(nannpc_light)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, LW(10))
     LOOP(0)
@@ -988,9 +1006,9 @@ EVT_BEGIN(nannpc_light)
 EVT_END()
 
 /**
- * Guess: init event of the rude sailor (Garawaru):
- * between STORY_STG5_40_TRUE_IDENTITY and STORY_STG5_41_RETURN_TO_THE_GROTTO he is placed on the beach;
- * otherwise he is left alone.
+ * Init event of the rough sailor (NPC ガラの悪い水夫, "bad-mannered sailor"):
+ * between STORY_STG5_40_TRUE_IDENTITY and STORY_STG5_41_RETURN_TO_THE_GROTTO he is placed on the beach at
+ * (1386, 35, 0); otherwise he is left where his setup puts him.
  */
 static EVT_BEGIN(garawaru_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1006,19 +1024,20 @@ static EVT_BEGIN(garawaru_talk)
     RETURN
 EVT_END()
 
-/** Init event of Marco (nothing to set up on this map). */
+/** Init event of Flavio (nothing to set up on this map). */
 static EVT_BEGIN(marco_init)
     RETURN
 EVT_END()
 
-/** Talk event of Marco (empty on this map). */
+/** Talk event of Flavio (empty on this map). */
 static EVT_BEGIN(marco_talk)
     RETURN
 EVT_END()
 
 /**
- * Guess: init event of the timid sailor (Odoodo):
- * placed on the beach between STORY_STG5_40_TRUE_IDENTITY and STORY_STG5_41_RETURN_TO_THE_GROTTO.
+ * Init event of the timid sailor (NPC オドオド水夫, "nervous sailor"):
+ * placed on the beach at (1400, 35, -100) between STORY_STG5_40_TRUE_IDENTITY
+ * and STORY_STG5_41_RETURN_TO_THE_GROTTO.
  */
 static EVT_BEGIN(odoodo_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1133,8 +1152,8 @@ static EVT_BEGIN(suifu_e_talk)
 EVT_END()
 
 /**
- * Guess: init event of Cortez on the beach: from STORY_STG5_49_BOWSER_TWILIGHT_TOWN_2 on he is set up as the
- * ferryman (placed by the pier).
+ * Init event of Cortez on the beach: from STORY_STG5_49_BOWSER_TWILIGHT_TOWN_2 on he only turns to face right
+ * (ry 90).
  */
 static EVT_BEGIN(korutesu_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1404,6 +1423,10 @@ static EVT_BEGIN(kiza_entry)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the beach: the rough sailor, Flavio, the bespectacled sailor, Lord Crump's officer disguise, the
+ * nervous sailor, sailors A, bomb, C, D and E, Cortez, Mony, Peeton and the Whacka.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "ガラの悪い水夫", // name
@@ -1573,6 +1596,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Doors and exits of muj_00: e_bero to muj_01; n_bero to muj_10; n_bero_02 to dou_11 (Pirate's Grotto). */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -1709,6 +1733,7 @@ EVT_BEGIN(mujinto_hyochaku)
     RETURN
 EVT_END()
 
+/** Standing spots (x, y, z, facing) of the 95 sailors of the beach crowd, placed by suifu_random_sub. */
 s32 suifu_random_setup[] = {
     1289, 35, -419, 270, 1214, 35, -335, 90,
     1264, 35, -358, 270, 1306, 35, -462, 90,
@@ -1851,10 +1876,11 @@ EVT_END()
 /**
  * The X-Naut ship's arrival (STORY_STG5_36_HOLE_IN_THE_WALL):
  * when Mario steps onto the pier the X-Naut ship rushes in,
- * Marco and the sailors panic (stg5_muj_95, 96 and on),
+ * Flavio and the sailors panic (stg5_muj_95, 96 and on),
  * Mario and his partner are positioned for the scene and kaizoku_vs_dai3 begins.
  */
 EVT_BEGIN(dai3_shurai_sub)
+    // Mario loses control and waits for his partner; the sailors are moved onto the pier.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     LOOP(0)
@@ -1873,6 +1899,8 @@ EVT_BEGIN(dai3_shurai_sub)
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("めがね水夫"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    // Flavio, the rough sailor and the nervous sailor run onto the pier
+    // while Mario and his partner turn to meet them.
     CALL(evt_cam3d_evt_set, 1335, 145, 312, 1335, 75, -82, 1000, 11)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_move_position, STRING("マルコ"), 1370, -50, 0, FLOAT(100.0f), 0)
@@ -1892,6 +1920,7 @@ EVT_BEGIN(dai3_shurai_sub)
     CALL(evt_mario_mov_pos2, 1285, -80, FLOAT(120.0f))
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(1000)
+    // Flavio welcomes Mario back and asks about the treasure; Mario answers with a shrug.
     CALL(evt_msg_print, 0, STRING("stg5_muj_95"), 0, STRING("マルコ"))
     CALL(evt_mario_dispflag_onoff, 1, 2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1901,6 +1930,7 @@ EVT_BEGIN(dai3_shurai_sub)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     WAIT_MS(500)
     CALL(evt_mario_dispflag_onoff, 0, 2)
+    // The rough sailor learns that Cortez guarded the treasure and that Mario left it behind.
     CALL(evt_msg_print, 0, STRING("stg5_muj_96"), 0, STRING("ガラの悪い水夫"))
     CALL(evt_set_dir_to_target, STRING("オドオド水夫"), STRING("水夫E"))
     CALL(evt_npc_get_position, STRING("オドオド水夫"), LW(0), LW(1), LW(2))
@@ -1912,6 +1942,7 @@ EVT_BEGIN(dai3_shurai_sub)
     CALL(evt_npc_move_position, STRING("オドオド水夫"), 1325, -150, 0, FLOAT(180.0f), 0)
     WAIT_MS(500)
     CALL(evt_set_dir_to_target, STRING("水夫E"), STRING("オドオド水夫"))
+    // The nervous sailor recognizes his brother (sailor E) and the two talk.
     CALL(evt_msg_print, 0, STRING("stg5_muj_99"), 0, STRING("オドオド水夫"))
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("水夫E"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
@@ -1931,6 +1962,7 @@ EVT_BEGIN(dai3_shurai_sub)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫D"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫E"), NPC_FLAG_TALK_ANIM)
     BEGIN_INLINE_EVENT
+        // The sailors fall silent together; then a cannon fires and the crowd starts to mill about nervously.
         CALL(evt_msg_print, 0, STRING("stg5_muj_103"), 0, STRING("マルコ"))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
@@ -1981,6 +2013,7 @@ EVT_BEGIN(dai3_shurai_sub)
     SET_VALUE(LW(0), STRING("マルコ"))
     SPAWN_EVENT(npc_kyorokyoro)
     WAIT_MS(3000)
+    // The nervous sailor cries out as cannonballs start landing around the beach.
     CALL(evt_msg_print, 0, STRING("stg5_muj_104"), 0, STRING("オドオド水夫"))
     WAIT_MS(1000)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -2024,6 +2057,7 @@ EVT_BEGIN(dai3_shurai_sub)
     CALL(evt_npc_set_ry, STRING("めがね水夫"), 90)
     CALL(evt_npc_set_position, STRING("第三勢力幹部"), 0, -100, 0)
     CALL(evt_npc_set_ry, STRING("第三勢力幹部"), 90)
+    // The bespectacled sailor, Four-Eyes, appears on the X-Naut ship and jumps over to the pier.
     CALL(evt_msg_print, 0, STRING("stg5_muj_105"), 0, STRING("めがね水夫"))
     WAIT_MS(1000)
     CALL(evt_npc_jump_position_nohit, STRING("めがね水夫"), -802, 162, 0, 500, 120)
@@ -2075,10 +2109,12 @@ EVT_BEGIN(dai3_shurai_sub)
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     WAIT_MS(500)
+    // He spins around and reveals himself as the great Lord Crump.
     CALL(evt_msg_print, 0, STRING("stg5_muj_110"), 0, STRING("第三勢力幹部"))
     CALL(evt_npc_set_ry, STRING("マルコ"), 180)
     CALL(evt_cam3d_evt_set, 1195, 50, 405, 200, 180, -43, 500, 11)
     WAIT_MS(1000)
+    // Lord Crump demands the Crystal Star.
     CALL(evt_msg_print, 0, STRING("stg5_muj_111"), 0, STRING("第三勢力幹部"))
     SET_VALUE(LW(0), 991)
     SET_VALUE(LW(1), -60)
@@ -2105,6 +2141,7 @@ EVT_BEGIN(dai3_shurai_sub)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("stg5_muj_112"), 0, STRING("第三勢力幹部"))
     SPAWN_EVENT_GET_ID(PTR(dai3_shurai_after), GW(8))
+    // The sailors cry out in shock at the revelation.
     CALL(evt_msg_print, 0, STRING("stg5_muj_113"), 0, STRING("マルコ"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_114"), 0, STRING("ガラの悪い水夫"))
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("マルコ"), 0, 0, 0, 0, 0, 0, 0, 60)
@@ -2130,6 +2167,7 @@ EVT_BEGIN(dai3_shurai_sub)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫D"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫E"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    // The scene ends: control returns to the player and the story advances.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_40_TRUE_IDENTITY)
     CALL(evt_mario_adjust_dir)
     CALL(evt_mario_dispflag_onoff, 0, 4)
@@ -2165,8 +2203,8 @@ EVT_BEGIN(dai3_shurai)
 EVT_END()
 
 /**
- * Guess: loop that keeps the ship battle lively after the X-Naut ship has arrived:
- * at random 3 to 5 second intervals it fires a cannonball splash (tama_shoot) at one of two spots.
+ * Loop spawned (event id in GW(8)) once the X-Naut officer has made his entrance line (stg5_muj_112):
+ * every 0.5 to 3 seconds it runs tama_shoot with one of three random parameter sets in LW(0) to LW(3).
  */
 static EVT_BEGIN(dai3_shurai_after)
     LOOP(0)
@@ -2198,6 +2236,10 @@ static EVT_BEGIN(dai3_shurai_after)
     RETURN
 EVT_END()
 
+/**
+ * Positions (x, y, z, facing) of the 95 sailors on the pirate ship during the pirates versus X-Nauts fight,
+ * relative to the ship.
+ */
 s32 kaizoku_vs_dai3_suifupos[] = {
     -88, 115, -6, 270, -87, 115, 15, 270,
     -92, 115, 34, 270, -104, 115, 76, 270,
@@ -2249,6 +2291,10 @@ s32 kaizoku_vs_dai3_suifupos[] = {
     -61, 40, 65, 270,
 };
 
+/**
+ * Positions (x, y, z, facing) of the 100 c_elmos figures on the pirate ship during the fight, relative to the
+ * ship.
+ */
 s32 kaizoku_vs_dai3_elmospos[] = {
     51, 165, 25, 270, 34, 112, -63, 270,
     37, 158, 67, 270, 24, 191, 69, 270,
@@ -2376,6 +2422,10 @@ EVT_BEGIN(dai3_kurukuru)
     RETURN
 EVT_END()
 
+/**
+ * Positions (x, y, z) of the X-Naut ship's crowd (mass NPCs 205 to 304) around the ship centre, used by
+ * dai3_butai_setup.
+ */
 s32 kaizoku_vs_dai3_dai3pos[] = {
     107, 159, -120, 10, 245, -57, 8, 152,
     40, 100, 164, -87, 3, 121, -28, -13,
@@ -2588,7 +2638,10 @@ EVT_BEGIN(mario_main)
     RETURN
 EVT_END()
 
-/** Variant of mario_main used in the later scene (dai3_beat_back) where the pirate ship pivots about GW(5), GW(6). */
+/**
+ * Variant of mario_main used in the later scene (dai3_beat_back) where the pirate ship pivots about GW(5),
+ * GW(6).
+ */
 EVT_BEGIN(mario_main2)
     CALL(evt_mario_set_pos, 20, 40, 10)
     CALL(evt_party_set_pos, 0, 10, 40, -25)
@@ -2642,6 +2695,7 @@ EVT_BEGIN(dai3_move_every)
     RETURN
 EVT_END()
 
+/** Spline points (x, y, z) of the X-Naut ship's approach path, followed by dai3_move_trace. */
 f32 dai3_spline_dt[] = {
     -1200.0f, 0.0f, -0.0f, -1100.5623f, 0.0f, -8.453464f, -293.84833f, 0.0f,
     399.23074f, 34.78095f, 0.0f, 432.56693f, 421.29593f, 0.0f, 248.42857f, 461.67648f,
@@ -2649,6 +2703,9 @@ f32 dai3_spline_dt[] = {
     -362.64764f, 0.0f, -332.12228f,
 };
 
+/**
+ * Spline points (x, y, z) of the pirate ship's sailing path toward the shore, followed by kaizoku_move_trace.
+ */
 f32 kaizoku_spline_dt[] = {
     -35.35443f, 0.0f, -1842.3301f, -144.56525f, 0.0f, -833.1615f, -259.41003f, 0.0f,
     -703.04047f, -643.16766f, 0.0f, -279.92737f, -441.1687f, 0.0f, 463.3269f, 122.979614f,
@@ -2797,8 +2854,9 @@ EVT_BEGIN(dai3_move_trace)
 EVT_END()
 
 /**
- * Guess: one puff of cannon smoke: after a random delay places a smoke effect near the ships at a random spot
- * (offset by up to 300, 150, 50), used by tobikakari_kemuri.
+ * One puff of smoke with the SFX_STG0_3RD_ATTACK3 sound at a random spot (x -400 to -100, y 150 to 300,
+ * z -300 to -250, scale 0.5 to 1.5); tobikakari_kemuri spawns two at a time during the brawl
+ * after Cortez's line.
  */
 static EVT_BEGIN(_kemuri_sub)
     CALL(evt_sub_random, 300, LW(0))
@@ -2815,7 +2873,10 @@ static EVT_BEGIN(_kemuri_sub)
     RETURN
 EVT_END()
 
-/** Spawns the smoke puffs kicked up where the jumping sailors land (two _kemuri_sub events with random delays). */
+/**
+ * Spawns the smoke puffs kicked up where the jumping sailors land (two _kemuri_sub events with random
+ * delays).
+ */
 EVT_BEGIN(tobikakari_kemuri)
     LOOP(0)
         SPAWN_EVENT(_kemuri_sub)
@@ -2856,6 +2917,7 @@ EVT_END()
  * Afterwards the story becomes STORY_STG5_42_PIRATES_VS_X_NAUTS and dai3_beat_back runs.
  */
 EVT_BEGIN(kaizoku_vs_dai3)
+    // The fight begins: Mario loses control and the crowds on both ships are set up.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -2884,6 +2946,7 @@ EVT_BEGIN(kaizoku_vs_dai3)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hai"), MAPOBJ_FLAG_HIDE)
     CALL(evt_cam3d_evt_set, -847, 334, 977, -847, 78, -475, 0, 11)
     CALL(evt_seq_wait, 2)
+    // Lord Crump gloats that he has ammunition to spare as the X-Naut ship starts to fire.
     CALL(evt_msg_print, 0, STRING("stg5_muj_118"), 0, STRING("第三勢力幹部"))
     DELETE_EVENT(GW(8))
     CALL(evt_cam3d_evt_set, 0, 470, -91, 0, 400, -383, 500, 11)
@@ -2902,6 +2965,7 @@ EVT_BEGIN(kaizoku_vs_dai3)
     CALL(evt_npc_flag_onoff, 1, STRING("コルテス"), NPC_FLAG_NO_BILLBOARD)
     CALL(evt_npc_pera_onoff, STRING("コルテス"), 0)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    // Cortez's ghost ship appears and he scolds the X-Nauts for firing without his permission.
     CALL(evt_msg_print, 0, STRING("stg5_muj_119"), 0, STRING("コルテス"))
     CALL(evt_msg_continue)
     SET_VALUE(GF(0), 1)
@@ -2924,6 +2988,7 @@ EVT_BEGIN(kaizoku_vs_dai3)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(4000)
+        // Lord Crump is startled as the ghost ship arrives and the boss music starts.
         CALL(evt_msg_print, 0, STRING("stg5_muj_120"), 0, STRING("第三勢力幹部"))
         CALL(evt_msg_continue)
     END_INLINE_EVENT
@@ -2973,6 +3038,7 @@ EVT_BEGIN(kaizoku_vs_dai3)
     DELETE_EVENT(LW(13))
     DELETE_EVENT(LW(14))
     DELETE_EVENT(LW(15))
+    // Lord Crump swears to sink the ghost ship; Cortez calls on his spirits to take the X-Naut ship.
     CALL(evt_msg_print, 0, STRING("stg5_muj_121"), 0, STRING("第三勢力幹部"))
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
@@ -2992,6 +3058,7 @@ EVT_BEGIN(kaizoku_vs_dai3)
     CALL(evt_npc_flag_onoff, 1, STRING("コルテス"), NPC_FLAG_HIDDEN)
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(500)
+    // Flavio tells Mario to cross over and duel Lord Crump.
     CALL(evt_msg_print, 0, STRING("stg5_muj_123"), 0, STRING("マルコ"))
     CALL(evt_cam3d_evt_set, -436, 595, 725, -226, 120, -460, 0, 11)
     CALL(evt_npc_flag_onoff, 0, STRING("コルテス"), NPC_FLAG_HIDDEN)
@@ -3021,10 +3088,12 @@ EVT_BEGIN(kaizoku_vs_dai3)
 #endif
     CALL(evt_npc_release_filednpc, 1)
     CALL(evt_npc_set_battle_info, STRING("第三勢力幹部"), 5)
+    // The battle with Lord Crump starts.
     CALL(evt_npc_battle_start, STRING("第三勢力幹部"))
     CALL(evt_npc_wait_battle_end)
     DELETE_EVENT(LW(15))
     CALL(tobikakaru_end)
+    // After the battle the story advances and the X-Naut ship is beaten back.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_42_PIRATES_VS_X_NAUTS)
     SET_VALUE(LW(0), 0)
     CALL_CHILD(dai3_beat_back)
@@ -3032,8 +3101,10 @@ EVT_BEGIN(kaizoku_vs_dai3)
 EVT_END()
 
 /**
- * Guess: the crew's narration after the fight, stg5_muj_127 to 132,
- * spoken without a speaker while the camera follows the sailors.
+ * The crew's cheers after the X-Nauts are driven off ("YAHOOOOOOO!", "WE DID IT!" and so on,
+ * stg5_muj_127 to 132):
+ * small speakerless balloons pop up in turn around the pirate ship's position (GW(5), GW(6)), repeating until
+ * the event is deleted. Spawned just before the story becomes STORY_STG5_43_X_NAUTS_RETREAT.
  */
 EVT_BEGIN(senin_kansei)
     LOOP(0)
@@ -3079,11 +3150,13 @@ EVT_BEGIN(senin_kansei)
     RETURN
 EVT_END()
 
+/** Spline points of the short first leg of the X-Naut ship's retreat. */
 f32 dai3_taisan_spline_dt00[] = {
     -416.0f, 0.0f, -334.0f, -413.67612f, 0.0f, -365.46518f, -411.63168f, 0.0f,
     -404.80673f,
 };
 
+/** Spline points of the X-Naut ship's sail away (taisan, retreat) after the fight. */
 f32 dai3_taisan_spline_dt01[] = {
     -416.0f, 0.0f, -334.0f, -839.007f, 0.0f, -339.86542f, -1018.9882f, 0.0f,
     -346.33777f,
@@ -3118,8 +3191,8 @@ EVT_BEGIN(nameraka_rotate)
 EVT_END()
 
 /**
- * Guess: sails the X-Naut ship along the short spline dai3_taisan_spline_dt00 as it begins to retreat (taisan,
- * withdrawal).
+ * Unreferenced (nothing spawns it): would back the X-Naut ship stern first (ship_rotate_rev) about 70 units
+ * along the short spline dai3_taisan_spline_dt00, updating its centre GW(2), GW(3).
  */
 EVT_BEGIN(dai3_taisan_move_trace00)
     SET_FLOAT_VALUE(LW(5), GW(2))
@@ -3148,7 +3221,10 @@ EVT_BEGIN(dai3_taisan_move_trace00)
     RETURN
 EVT_END()
 
-/** Guess: sails the X-Naut ship along dai3_taisan_spline_dt01, the long retreat out to sea. */
+/**
+ * Sails the X-Naut ship away (taisan, retreat) about 600 units along dai3_taisan_spline_dt01,
+ * spawned right after the officer's sore-loser line (stg5_muj_125).
+ */
 EVT_BEGIN(dai3_taisan_move_trace01)
     SET_FLOAT_VALUE(LW(5), GW(2))
     SET_FLOAT_VALUE(LW(6), GW(3))
@@ -3259,6 +3335,7 @@ EVT_BEGIN(dai3_beat_back)
     RETURN
 EVT_END()
 
+/** Positions (x, y, z, facing) of the 95 sailors aboard the ship when the crew leaves Keelhaul Key. */
 s32 leave_island_suifupos[] = {
     565, 77, -606, 90, 574, 77, -612, 90,
     590, 77, -618, 90, 590, 77, -605, 90,
@@ -3310,7 +3387,10 @@ s32 leave_island_suifupos[] = {
     896, 115, -592, 270,
 };
 
-/** Guess: the pirate ship's engine sound while it leaves Keelhaul Key (leave_island). */
+/**
+ * Plays the pirate ship's move sound (SFX_STG5_SHIP_KOL_MOVE1) at ship S_b every 2 s, 5 times, as it leaves
+ * (leave_island).
+ */
 EVT_BEGIN(move_ship_se00)
     LOOP(5)
         WAIT_MS(2000)
@@ -3320,7 +3400,10 @@ EVT_BEGIN(move_ship_se00)
     RETURN
 EVT_END()
 
-/** Guess: the second sound loop for the departing pirate ship, spawned together with move_ship_se00. */
+/**
+ * Plays the ship's mast sound (SFX_STG5_SHIP_KOL_MAST1) at ship S_b every 1.4 s, 7 times; spawned with
+ * move_ship_se00.
+ */
 EVT_BEGIN(move_ship_se01)
     LOOP(7)
         WAIT_MS(1400)
@@ -3393,7 +3476,7 @@ EVT_BEGIN(option_ship_korutesu)
 EVT_END()
 
 /**
- * Moves Marco along with the departing ship by the ship's per-frame displacement (GW(0), GW(1)),
+ * Moves Flavio along with the departing ship by the ship's per-frame displacement (GW(0), GW(1)),
  * so he rides the deck.
  */
 EVT_BEGIN(option_ship_marco)
@@ -3461,10 +3544,11 @@ EVT_END()
 
 /**
  * The pirate ship leaves Keelhaul Key with Mario aboard (STORY_STG5_64_02_F_AND_F_SAIL_OFF):
- * Cortez, Marco, Mony, Peton and the sailors talk (stg5_muj_133 to 143),
+ * Cortez, Flavio, Mony, Peton and the sailors talk (stg5_muj_133 to 143),
  * Mario and his partner jump aboard and the ship sails away.
  */
 EVT_BEGIN(leave_island)
+    // The crew gathers aboard the ship on the beach; the music stops.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -3536,6 +3620,7 @@ EVT_BEGIN(leave_island)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 660, 267, -170, 660, 190, -603, 0, 11)
     WAIT_MS(1000)
+    // Cortez thanks Mario and the sailors talk about going home.
     CALL(evt_msg_print, 0, STRING("stg5_muj_133"), 0, STRING("コルテス"))
     CALL(evt_cam3d_evt_set, 775, 133, -36, 775, 45, -550, 0, 11)
     WAIT_MS(500)
@@ -3554,6 +3639,7 @@ EVT_BEGIN(leave_island)
     CALL(evt_npc_jump_position_nohit, STRING("マルコ"), 745, 40, -555, 500, 30)
     CALL(evt_npc_set_ry, STRING("マルコ"), 90)
     SPAWN_EVENT(option_ship_marco)
+    // Mony, Peeton and the rough sailor say they will stay on the island.
     CALL(evt_msg_print, 0, STRING("stg5_muj_138"), 0, STRING("モニー"))
     BEGIN_INLINE_EVENT
         CALL(evt_party_set_dir, 0, 90, 200)
@@ -3571,6 +3657,7 @@ EVT_BEGIN(leave_island)
     CALL(evt_cam3d_evt_set, 820, 133, -36, 820, 45, -550, 500, 11)
     CALL(evt_party_set_dir, 0, 270, 200)
     WAIT_MS(200)
+    // Mario's partner speaks; Mario nods and jumps aboard.
     CALL(evt_msg_print_party, STRING("stg5_muj_142"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -3593,6 +3680,7 @@ EVT_BEGIN(leave_island)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 640, 270, -110, 640, 185, -603, 500, 11)
     WAIT_MS(1000)
+    // Cortez gives the order to cast off and the ship sails out to sea.
     CALL(evt_msg_print, 0, STRING("stg5_muj_143"), 0, STRING("コルテス"))
     CALL(evt_npc_set_ry, STRING("コルテス"), 270)
     SET_VALUE(LW(0), 10)
@@ -3648,8 +3736,10 @@ EVT_BEGIN(leave_island)
     SPAWN_EVENT(back_dark)
     CALL_CHILD(suifu_dark)
     CALL(evt_msg_toge, 1, 0, 0, 0)
+    // The light fades to dusk and the voyage is written into the diary.
     CALL(evt_msg_print, 0, STRING("stg5_muj_144"), 0, 0)
     WAIT_MS(2000)
+    // The story advances and the ship sails to Rogueport (gor_00).
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_58_FAIR_WINDS)
     CALL(evt_bero_mapchange, STRING("gor_00"), STRING(""))
     RETURN
@@ -3673,9 +3763,11 @@ EVT_BEGIN(muj_gor_ship_sub)
 EVT_END()
 
 /**
- * Guess: sets up the ship's departure for Rogueport:
- * initialises the water alpha callback on the ship water S_mizu_06 at 0,
- * puts the ship at x = 685 and starts muj_gor_ship_sub moving it.
+ * Map-init setup of Cortez's docked ship (run from STORY_STG5_58_FAIR_WINDS on):
+ * places Cortez at the pier facing
+ * right, puts the water S_mizu_06 under the alpha TEV callback at alpha 0,
+ * sets the ship to x 685 with heading 0,
+ * starts muj_gor_ship_sub to keep S_b there and the bobbing loop muj_ship_puka (event id in GW(10)).
  */
 static EVT_BEGIN(muj_gor_ship)
     CALL(evt_npc_set_position, STRING("コルテス"), 655, 40, -542)
@@ -3696,9 +3788,10 @@ static EVT_BEGIN(muj_gor_ship)
 EVT_END()
 
 /**
- * Guess: page-turn transition used when the ship leaves:
- * captures the pirate ship S_b into an off-screen image,
- * plays the paper animation Z_1 then A_1 and removes the capture, so the ship appears to fold away.
+ * Paper turn-around of the ship as it leaves for Rogueport (muj_gor_ship_start):
+ * captures the pirate ship S_b into an off-screen image on the OFF_d_kaiten paper,
+ * hides the real ship while the paper animation (Z_1, then A_1) spins it with SFX_OFF_SHIP_REVERSE1,
+ * then shows the ship again turned to heading 180 (GW(2)) and frees the capture.
  */
 static EVT_BEGIN(ship_pera)
     CALL(evt_img_entry, STRING("capture_img"))
@@ -3969,6 +4062,10 @@ EVT_BEGIN(mony_peton_boarding)
     RETURN
 EVT_END()
 
+/**
+ * Return points of the hazard-water floors of the beach: the hit area and where Mario is put back after the
+ * water bites him.
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"A_yuka01", {1083.0f, 35.0f, -738.0f}},
     {"A_yuka06", {582.0f, 35.0f, -1173.0f}},
@@ -3987,6 +4084,7 @@ static HitDamageReturn hitDmgRetPoints[] = {
  */
 EVT_BEGIN(muj_00_init_evt)
     BEGIN_INLINE_EVENT
+        // The point lights follow the pirate ship (S_b).
         CALL(evt_light_bind_mapobj, STRING("pointLight1"), STRING("S_b"), 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
@@ -3998,6 +4096,7 @@ EVT_BEGIN(muj_00_init_evt)
     BEGIN_INLINE_EVENT
         CALL(evt_light_bind_mapobj, STRING("pointLight4"), STRING("S_b"), 0)
     END_INLINE_EVENT
+    // Pick the background music for the current part of the story.
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_58_FAIR_WINDS)
         IF_INT_EQUAL(GSWF(GSWF_GOR00_SAIL_TO_KEELHAUL), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST_SHIP1"))
@@ -4015,6 +4114,7 @@ EVT_BEGIN(muj_00_init_evt)
             END_IF
         END_IF
     END_IF
+    // Start the island's ambient sound and register the exits and NPCs.
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ2"))
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -4030,12 +4130,16 @@ EVT_BEGIN(muj_00_init_evt)
     CALL(evt_npc_entry, STRING("船ダミー"), STRING("c_suifu_b"))
     CALL(evt_npc_flag_onoff, 1, STRING("船ダミー"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_HIDDEN | NPC_FLAG_INTANGIBLE)
     CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    // Place the spinning floor with its Star Piece and the paper-mode bush and turntable,
+    // and start the water and ship animations.
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 1375, 35, -430, STRING("S_ground"), 125, GSWF(GSWF_MUJ00_STAR_PIECE_PANEL))
     CALL(evt_paper_entry, STRING("OFF_d_yabu"))
     CALL(evt_paper_entry, STRING("OFF_d_kaiten"))
     CALL(evt_map_playanim, STRING("S_mizu"), 1, 0)
     CALL(evt_map_playanim, STRING("fune_c_01"), 1, 0)
     CALL(evt_map_playanim, STRING("fune_c_02"), 1, 0)
+    // Hide both ships, the bridge, the extra water and the rock and cave variants;
+    // each story stage below shows the ones it needs.
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_b"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_b"), 1, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_c"), MAPOBJ_FLAG_HIDE)
@@ -4066,11 +4170,14 @@ EVT_BEGIN(muj_00_init_evt)
             SPAWN_EVENT_GET_ID(PTR(dai3_shurai_after), GW(8))
         END_IF
     END_IF
+    // Register the hazard-water return points and the biting Gazigazi.
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     CALL_CHILD(evt_gazigazi_entry)
+    // Start the scene that belongs to the current story stage.
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_10_HAUNTED)
         SPAWN_EVENT(mujinto_hyochaku)
+        // The X-Naut ship is about to arrive (dai3_shurai).
         CASE_EQUAL(STORY_STG5_36_HOLE_IN_THE_WALL)
         CALL_CHILD(nannpc_mode_setup)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_c"), MAPOBJ_FLAG_HIDE)
@@ -4081,6 +4188,7 @@ EVT_BEGIN(muj_00_init_evt)
         CASE_EQUAL(STORY_STG5_40_TRUE_IDENTITY)
         CALL_CHILD(nannpc_mode_setup)
         SPAWN_EVENT(suifu_random_sub)
+        // Both ships are shown and the pirates versus X-Nauts fight starts.
         CASE_EQUAL(STORY_STG5_41_01_ALL_ABOARD)
         CALL_CHILD(nannpc_mode_setup)
         CALL_CHILD(mario_main_init)
@@ -4091,6 +4199,7 @@ EVT_BEGIN(muj_00_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_c"), 1, 1)
         CALL(evt_hit_bind_mapobj, STRING("A_c"), STRING("S_c"))
         SPAWN_EVENT(kaizoku_vs_dai3)
+        // Both ships are shown and the X-Nauts are beaten back (dai3_beat_back).
         CASE_EQUAL(STORY_STG5_42_PIRATES_VS_X_NAUTS)
         CALL_CHILD(nannpc_mode_setup)
         CALL_CHILD(mario_main_init)
@@ -4102,6 +4211,7 @@ EVT_BEGIN(muj_00_init_evt)
         CALL(evt_hit_bind_mapobj, STRING("A_c"), STRING("S_c"))
         SET_VALUE(LW(0), 1)
         SPAWN_EVENT(dai3_beat_back)
+        // Mario and his partner are restored before the departure scene.
         CASE_EQUAL(STORY_STG5_49_BOWSER_TWILIGHT_TOWN_2)
         CALL(evt_mario_get_party, LW(15))
         IF_INT_EQUAL(LW(15), 0)
@@ -4127,6 +4237,7 @@ EVT_BEGIN(muj_00_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mizu_00"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_hasi1"), 1, 1)
         SPAWN_EVENT(leave_island)
+        // After the departure: the ferry to Rogueport and the sailors who stayed behind.
         CASE_GREATER_OR_EQUAL(STORY_STG5_58_FAIR_WINDS)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_b"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_b"), 1, 1)

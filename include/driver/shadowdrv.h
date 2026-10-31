@@ -6,8 +6,12 @@
 #include "memory.h"
 #include "version.h"
 
+// flags of DepthShadowWork, ProjShadowWork and CharShadowWork
+#define SHADOW_WORK_DRAWN 0x1     // the shadow texture was rendered this frame
+#define SHADOW_WORK_ALLOC_TEX 0x2 // the texture buffer is allocated afresh each frame (set by the init)
+#define SHADOW_WORK_HALF_SIZE 0x4 // projected shadow: copied at half size
 typedef struct DepthShadowWork {
-    s32 flags;             // 0x0, bit0 = drawn this frame
+    s32 flags;             // 0x0, SHADOW_WORK_*
     s32 drawCount;         // 0x4
     s32 configIdx;         // 0x8, index into shadowConfig
     Mtx view;              // 0xC
@@ -20,7 +24,7 @@ typedef struct DepthShadowWork {
 } DepthShadowWork;
 
 typedef struct ProjShadowWork {
-    s32 flags;             // 0x0, bit0 = drawn this frame
+    s32 flags;             // 0x0, SHADOW_WORK_*
     s32 drawCount;         // 0x4
     s32 configIdx;         // 0x8, index into shadowConfig
     Mtx view;              // 0xC
@@ -32,6 +36,10 @@ typedef struct ProjShadowWork {
     GXColor color;         // 0x100
 } ProjShadowWork;
 
+// ShadowEntry.flags (shadowFlagOn)
+#define SHADOW_FLAG_COLLISION 0x1 // placed on the floor below by a ray (shadowSetCollision; default from defaultEnabled)
+#define SHADOW_FLAG_PLACED 0x2    // matrix computed this frame: drawn
+#define SHADOW_FLAG_NO_DECAY 0x4  // cylinder shadow drawn with color_tbl_nodecay
 typedef struct ShadowEntry {
     u16 flags;       // 0x0
     u8 mode;         // 0x2
@@ -54,7 +62,7 @@ typedef struct ShadowEntry {
 } ShadowEntry;
 
 typedef struct CharShadowWork {
-    s32 flags;             // 0x0, bit0 = drawn this frame
+    s32 flags;             // 0x0, SHADOW_WORK_*
     s32 drawCount;         // 0x4
     s32 configIdx;         // 0x8, index into shadowConfig
     Mtx view;              // 0xC

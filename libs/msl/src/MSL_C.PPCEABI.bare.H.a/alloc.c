@@ -50,6 +50,7 @@ typedef struct __mem_pool_obj {
     FixStart fix_start[num_fix_pools];
 } __mem_pool_obj;
 
+/** Block sizes of the allocator's fixed-size pools; each request is rounded up to one of these. */
 static const mem_size fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
 
 #define max_fix_pool_size 68

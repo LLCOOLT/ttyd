@@ -31,6 +31,10 @@ typedef struct PGLv2Work {
 #define AC_DISP(ac) (&(ac)->disp)
 #define AC_WORK(ac) ((PGLv2Work*)(ac)->work)
 
+/**
+ * Lip Lock gauge speed by difficulty: how fast holding A fills the gauge (300 at the easiest down to 40),
+ * and how fast holding during a wrong window drains it (100 rising to 130).
+ */
 static s32 _power_table[] = {300, 200, 150, 100, 80, 60, 40};
 s32 _power_table2[] = {100, 100, 100, 100, 110, 120, 130};
 
@@ -86,7 +90,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->setupFlags & 1) && ((u32)ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+            if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && ((u32)ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
                 if (irand(100) >= 0) {
                     ac->setupParam = 30;
                     ac->outputParams[0] = 0;
@@ -177,7 +181,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
         case 1002:
             ac->acState = 1003;
         case 1003:
-            ac->doneFlags |= 1;
+            ac->doneFlags |= AC_DONE_FLAG_FINISHED;
             BattleAcGaugeSeDelete();
             g->endTimer = 60;
             ac->acState = 1004;
@@ -238,7 +242,7 @@ void battleAcDisp_PowerGaugeLv2(CameraId cameraId, void* param) {
 
 /** Called by btlevtcmd_StopAC: unless the command already finished, stops the gauge sound and starts the end wait. */
 void battleAcDelete_PowerGaugeLv2(BattleWork* work) {
-    if (!(work->actionCommands.doneFlags & 1)) {
+    if (!(work->actionCommands.doneFlags & AC_DONE_FLAG_FINISHED)) {
         work->actionCommands.acState = 1003;
     }
 }

@@ -129,13 +129,13 @@ void InsertData(u16 id, void* data, u8 dataType, u32 remove) {
 #if 1
       dataAddSampleReference(id, &gsCurrent->aramInfo);
 #else
-      // TODO
+      // unused branch: upstream placeholder, never compiled
 #endif
     } else {
 #if 1
       dataRemoveSampleReference(id, &gsCurrent->aramInfo);
 #else
-      // TODO
+      // unused branch: upstream placeholder, never compiled
 #endif
     }
     break;

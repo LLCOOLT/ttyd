@@ -63,6 +63,15 @@ typedef struct LoadWork {
 #endif
 } LoadWork;
 
+// LoadWork.flags bits.
+enum LoadWorkFlags {
+    LOAD_FLAG_OPTION_MENU = 0x1,     // the sound or rumble option menu is open (its overlay fades in)
+    LOAD_FLAG_NO_DELETE = 0x10,      // every slot is blank (none saved or broken): Delete is greyed out and refused
+    LOAD_FLAG_NO_COPY = 0x20,        // no slot holds a good save: Copy is greyed out and refused
+    LOAD_FLAG_EVENT_RUNNING = 0x40,  // a memory card script runs: the cursor is not drawn
+    LOAD_FLAG_RESTORE_WINDOW = 0x80, // JP and later: hand savedWinId back to the next memory card check
+};
+
 typedef struct WinDt {
     f32 x;      // 0x0
     f32 y;      // 0x4
@@ -94,6 +103,7 @@ static void loadDraw(CameraId camera, void* param);
 static void continueGame(void);
 
 #if VERSION <= VERSION_DEMO_US
+/** Icons of the seven Crystal Stars, drawn on a save file's panel for each star that file has collected. */
 s32 stone_id[7] = {ICON_197, ICON_198, ICON_19A, ICON_19C, ICON_19D, ICON_199, ICON_19B};
 
 /** Demo: a 150 ms rumble on controller 0, as feedback when rumble is switched on in the file select options. */
@@ -105,6 +115,10 @@ static EVT_BEGIN(evt_shake)
 EVT_END()
 #endif
 
+/**
+ * Panels of the file select menu: the four save files, then the copy, delete and back buttons and the sound
+ * and rumble buttons; each with its position, offsets and the panel the cursor moves to up, down, left, right.
+ */
 WinDt win_dt[9] = {
     {-140.0f, 75.0f, -120.0f, 60.0f, 13, 0, {7, 2, 1, 1}},
     {140.0f, 75.0f, -120.0f, 60.0f, 12, 0, {8, 3, 0, 0}},
@@ -117,6 +131,7 @@ WinDt win_dt[9] = {
     {130.0f, -190.0f, -100.0f, 0.0f, 20, 31, {5, 1, 7, 7}},
 };
 
+/** Cursor layout while choosing a file to delete or copy from: the four files and the bottom buttons. */
 WinDt win_dt2[7] = {
     {-140.0f, 75.0f, -120.0f, 60.0f, 13, 0, {6, 2, 1, 1}},
     {140.0f, 75.0f, -120.0f, 60.0f, 12, 0, {6, 3, 0, 0}},
@@ -127,6 +142,7 @@ WinDt win_dt2[7] = {
     {200.0f, -150.0f, -80.0f, 0.0f, 18, 30, {3, 1, 6, 6}},
 };
 
+/** Cursor layout while choosing the file to copy to: only the four save files. */
 WinDt win_dt3[4] = {
     {-140.0f, 75.0f, -120.0f, 60.0f, 13, 0, {2, 2, 1, 1}},
     {140.0f, 75.0f, -120.0f, 60.0f, 12, 0, {3, 3, 0, 0}},
@@ -135,6 +151,7 @@ WinDt win_dt3[4] = {
 };
 
 static LoadWork work;
+/** Points at the file-select (load) sequence's work. */
 static LoadWork* wp = &work;
 #if VERSION >= VERSION_US
 __declspec(section ".sdata2") const u32 seq_logo_zero_color[2];
@@ -184,8 +201,8 @@ void seq_loadMain(SequenceWork* seq) {
         case 1:
             wp->evt = evtEntryType(evt_memcard_check, 0, 0, 0);
 #if VERSION >= VERSION_JP
-            if (wp->flags & 0x80) {
-                wp->flags &= ~0x80;
+            if (wp->flags & LOAD_FLAG_RESTORE_WINDOW) {
+                wp->flags &= ~LOAD_FLAG_RESTORE_WINDOW;
                 wp->evt->lwData[10] = 1;
                 wp->evt->printWindowId = wp->savedWinId;
             }
@@ -215,7 +232,7 @@ void seq_loadMain(SequenceWork* seq) {
 #else
                     wp->state = 0;
                     wp->cardCode = cardGetCode();
-                    wp->flags &= ~0x40;
+                    wp->flags &= ~LOAD_FLAG_EVENT_RUNNING;
                     if (OSGetSoundMode() == 0) {
                         SoundSetOutputMode(0);
                         gp->soundMode = 0;
@@ -318,24 +335,24 @@ static void loadMain(SequenceWork* seq) {
     wp->cardCode = code;
     for (i = 0; i < 4; i++) {
         flags = SLOTFLAGS(i);
-        if (!(flags & 1) || (flags & 2)) {
+        if (!(flags & CARD_SAVE_FLAG_EMPTY) || (flags & CARD_SAVE_FLAG_CORRUPT)) {
             break;
         }
     }
     if (i < 4) {
-        wp->flags &= ~0x10;
+        wp->flags &= ~LOAD_FLAG_NO_DELETE;
     } else {
-        wp->flags |= 0x10;
+        wp->flags |= LOAD_FLAG_NO_DELETE;
     }
-    wp->flags &= ~0x20;
+    wp->flags &= ~LOAD_FLAG_NO_COPY;
     for (i = 0; i < 4; i++) {
         flags = SLOTFLAGS(i);
-        if (!(flags & 1) && !(flags & 2)) {
+        if (!(flags & CARD_SAVE_FLAG_EMPTY) && !(flags & CARD_SAVE_FLAG_CORRUPT)) {
             break;
         }
     }
     if (i >= 4) {
-        wp->flags |= 0x20;
+        wp->flags |= LOAD_FLAG_NO_COPY;
     }
 
     switch (wp->state) {
@@ -359,9 +376,9 @@ static void loadMain(SequenceWork* seq) {
                     case 1:
                     case 2:
                     case 3:
-                        if (flags & 2) {
+                        if (flags & CARD_SAVE_FLAG_CORRUPT) {
                             SFX(0x13);
-                        } else if (flags & 1) {
+                        } else if (flags & CARD_SAVE_FLAG_EMPTY) {
                             wp->state = 0x1e;
                             SFX(0x12);
                         } else {
@@ -370,10 +387,10 @@ static void loadMain(SequenceWork* seq) {
                         }
                         break;
                     case 4:
-                        if (!(wp->flags & 0x10)) {
+                        if (!(wp->flags & LOAD_FLAG_NO_DELETE)) {
                             for (i = 0; i < 4; i++) {
                                 flags = SLOTFLAGS(i);
-                                if (!(flags & 1) || (flags & 2)) {
+                                if (!(flags & CARD_SAVE_FLAG_EMPTY) || (flags & CARD_SAVE_FLAG_CORRUPT)) {
                                     break;
                                 }
                             }
@@ -387,10 +404,10 @@ static void loadMain(SequenceWork* seq) {
                         }
                         break;
                     case 5:
-                        if (!(wp->flags & 0x20)) {
+                        if (!(wp->flags & LOAD_FLAG_NO_COPY)) {
                             for (i = 0; i < 4; i++) {
                                 flags = SLOTFLAGS(i);
-                                if (!(flags & 2) && !(flags & 1)) {
+                                if (!(flags & CARD_SAVE_FLAG_CORRUPT) && !(flags & CARD_SAVE_FLAG_EMPTY)) {
                                     break;
                                 }
                             }
@@ -443,14 +460,14 @@ static void loadMain(SequenceWork* seq) {
             }
             break;
         case 0x14:
-            wp->flags |= 0x40;
+            wp->flags |= LOAD_FLAG_EVENT_RUNNING;
             wp->evt = evtEntryType(evt_memcard_start, 0, 0, 0);
             wp->evt->lwData[0] = wp->slot;
             wp->state++;
             break;
         case 0x15:
             if (!evtCheckID(wp->evt->eventId)) {
-                wp->flags &= ~0x40;
+                wp->flags &= ~LOAD_FLAG_EVENT_RUNNING;
                 if (evtGetValue(NULL, (s32)0xFD050F80) == 1) {
                     wp->state++;
                 } else {
@@ -469,14 +486,14 @@ static void loadMain(SequenceWork* seq) {
             break;
         case 0x17:
             if (fadeIsFinish()) {
-                wp->flags |= 0x40;
+                wp->flags |= LOAD_FLAG_EVENT_RUNNING;
                 wp->evt = evtEntryType(evt_continue, 0, 0, 0);
                 wp->state++;
             }
             break;
         case 0x18:
             if (!evtCheckID(wp->evt->eventId)) {
-                wp->flags &= ~0x40;
+                wp->flags &= ~LOAD_FLAG_EVENT_RUNNING;
                 continueGame();
             }
             break;
@@ -565,7 +582,7 @@ static void loadMain(SequenceWork* seq) {
             } else if (trg & PAD_BUTTON_A) {
                 if (prev < 4) {
                     flags = SLOTFLAGS(wp->slot);
-                    if ((flags & 2) || !(flags & 1)) {
+                    if ((flags & CARD_SAVE_FLAG_CORRUPT) || !(flags & CARD_SAVE_FLAG_EMPTY)) {
                         SFX(0x12);
                         wp->state++;
                     } else {
@@ -588,7 +605,7 @@ static void loadMain(SequenceWork* seq) {
             wp->ty = win_dt2[wp->slot].y + win_dt2[wp->slot].ofsY;
             break;
         case 0x29:
-            wp->flags |= 0x40;
+            wp->flags |= LOAD_FLAG_EVENT_RUNNING;
             wp->evt = evtEntryType(evt_memcard_delete, 0, 0, 0);
             wp->evt->lwData[0] = wp->slot;
             wp->state++;
@@ -596,16 +613,16 @@ static void loadMain(SequenceWork* seq) {
         case 0x2a:
             if (!evtCheckID(wp->evt->eventId)) {
 #if VERSION <= VERSION_DEMO_US
-                wp->flags &= ~0x40;
+                wp->flags &= ~LOAD_FLAG_EVENT_RUNNING;
                 wp->slot = 4;
                 wp->state = 1;
 #else
                 if (evtGetValue(NULL, (s32)0xFAA2B580) == 0) {
-                    wp->flags &= ~0x40;
+                    wp->flags &= ~LOAD_FLAG_EVENT_RUNNING;
                     wp->slot = 4;
                     wp->state = 1;
                 } else {
-                    wp->flags |= 0x80;
+                    wp->flags |= LOAD_FLAG_RESTORE_WINDOW;
                     seq->state = 1;
                     return;
                 }
@@ -626,7 +643,7 @@ static void loadMain(SequenceWork* seq) {
             } else if (trg & PAD_BUTTON_A) {
                 if (prev < 4) {
                     flags = SLOTFLAGS(wp->slot);
-                    if (!(flags & 2) && !(flags & 1)) {
+                    if (!(flags & CARD_SAVE_FLAG_CORRUPT) && !(flags & CARD_SAVE_FLAG_EMPTY)) {
                         wp->state = 0x33;
                         wp->copySrc = wp->slot;
                         wp->copyDst = (wp->copySrc + 1) % 4;
@@ -685,7 +702,7 @@ static void loadMain(SequenceWork* seq) {
             wp->ty = win_dt2[wp->slot].y + win_dt2[wp->slot].ofsY;
             break;
         case 0x34:
-            wp->flags |= 0x40;
+            wp->flags |= LOAD_FLAG_EVENT_RUNNING;
             wp->evt = evtEntryType(evt_memcard_copy, 0, 0, 0);
             wp->evt->lwData[0] = wp->copySrc;
             wp->evt->lwData[1] = wp->copyDst;
@@ -694,16 +711,16 @@ static void loadMain(SequenceWork* seq) {
         case 0x35:
             if (!evtCheckID(wp->evt->eventId)) {
 #if VERSION <= VERSION_DEMO_US
-                wp->flags &= ~0x40;
+                wp->flags &= ~LOAD_FLAG_EVENT_RUNNING;
                 wp->slot = 5;
                 wp->state = 1;
 #else
                 if (evtGetValue(NULL, (s32)0xFAA2B580) == 0) {
-                    wp->flags &= ~0x40;
+                    wp->flags &= ~LOAD_FLAG_EVENT_RUNNING;
                     wp->slot = 5;
                     wp->state = 1;
                 } else {
-                    wp->flags |= 0x80;
+                    wp->flags |= LOAD_FLAG_RESTORE_WINDOW;
                     seq->state = 1;
                     return;
                 }
@@ -712,7 +729,7 @@ static void loadMain(SequenceWork* seq) {
             break;
         case 0x64:
 #if VERSION <= VERSION_DEMO_US
-            wp->flags |= 1;
+            wp->flags |= LOAD_FLAG_OPTION_MENU;
             if (dir & DEMO_STICK_UP) {
                 wp->soundCursor--;
                 SFX(5);
@@ -739,12 +756,12 @@ static void loadMain(SequenceWork* seq) {
                 }
                 SFX(0x12);
                 wp->soundSetting = wp->soundCursor;
-                wp->flags &= ~1;
+                wp->flags &= ~LOAD_FLAG_OPTION_MENU;
                 wp->state = 1;
             } else if (trg & PAD_BUTTON_B) {
                 SFX(0x13);
                 wp->soundCursor = wp->soundSetting;
-                wp->flags &= ~1;
+                wp->flags &= ~LOAD_FLAG_OPTION_MENU;
                 wp->state = 1;
             }
             if (wp->soundCursor >= 3) {
@@ -757,7 +774,7 @@ static void loadMain(SequenceWork* seq) {
             wp->ty = 4.0f + (50.0f - 50.0f * wp->soundCursor);
             break;
 #else
-            wp->flags |= 1;
+            wp->flags |= LOAD_FLAG_OPTION_MENU;
             sound = wp->soundCursor;
             if (dir & DEMO_STICK_UP) {
                 wp->soundCursor = wp->soundCursor - 1;
@@ -789,7 +806,7 @@ static void loadMain(SequenceWork* seq) {
                 psndBGMOn(PSND_FADE_RESUME | PSND_FADE_UNDIP, NULL);
                 psndENVOff(PSND_FADE_OUT);
                 wp->soundSetting = wp->soundCursor;
-                wp->flags &= ~1;
+                wp->flags &= ~LOAD_FLAG_OPTION_MENU;
                 wp->state = 1;
                 break;
             } else if (trg & PAD_BUTTON_B) {
@@ -802,7 +819,7 @@ static void loadMain(SequenceWork* seq) {
                 } else {
                     SoundSetOutputMode(1);
                 }
-                wp->flags &= ~1;
+                wp->flags &= ~LOAD_FLAG_OPTION_MENU;
                 wp->state = 1;
                 break;
             }
@@ -831,7 +848,7 @@ static void loadMain(SequenceWork* seq) {
             break;
 #endif
         case 0xc8:
-            wp->flags |= 1;
+            wp->flags |= LOAD_FLAG_OPTION_MENU;
             if (dir & DEMO_STICK_UP) {
                 wp->rumbleCursor--;
                 SFX(5);
@@ -842,7 +859,7 @@ static void loadMain(SequenceWork* seq) {
                 gp->rumbleEnabled = wp->rumbleCursor == 0;
                 SFX(0x12);
                 wp->rumbleSetting = wp->rumbleCursor;
-                wp->flags &= ~1;
+                wp->flags &= ~LOAD_FLAG_OPTION_MENU;
                 wp->state = 1;
                 if (gp->rumbleEnabled) {
                     evtEntryType(evt_shake, 0, 0, 0);
@@ -850,7 +867,7 @@ static void loadMain(SequenceWork* seq) {
             } else if (trg & PAD_BUTTON_B) {
                 SFX(0x13);
                 wp->rumbleCursor = wp->rumbleSetting;
-                wp->flags &= ~1;
+                wp->flags &= ~LOAD_FLAG_OPTION_MENU;
                 wp->state = 1;
             }
             if (wp->rumbleCursor >= 2) {
@@ -984,10 +1001,10 @@ static void loadDraw(CameraId camera, void* param) {
 #endif
             col = white;
         }
-        if (i == 4 && (wp->flags & 0x10)) {
+        if (i == 4 && (wp->flags & LOAD_FLAG_NO_DELETE)) {
             col = dark;
         }
-        if (i == 5 && (wp->flags & 0x20)) {
+        if (i == 5 && (wp->flags & LOAD_FLAG_NO_COPY)) {
             col = dark;
         }
         switch (win1[i].tex) {
@@ -1086,7 +1103,7 @@ static void loadDraw(CameraId camera, void* param) {
         if (i == wp->slot) {
             FontDrawColor((GXColor){0, 0, 0, 255});
         }
-        if (flags & 2) {
+        if (flags & CARD_SAVE_FLAG_CORRUPT) {
 #if VERSION >= VERSION_US
             if ((u32)gp->language == 0) {
                 str = "こわれています";
@@ -1102,7 +1119,7 @@ static void loadDraw(CameraId camera, void* param) {
             str = "こわれています";
             FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
 #endif
-        } else if (flags & 1) {
+        } else if (flags & CARD_SAVE_FLAG_EMPTY) {
 #if VERSION >= VERSION_US
             if ((u32)gp->language == 0) {
                 str = "ニューゲーム";
@@ -1233,7 +1250,7 @@ static void loadDraw(CameraId camera, void* param) {
         }
     }
 
-    if (wp->flags & 1) {
+    if (wp->flags & LOAD_FLAG_OPTION_MENU) {
         wp->alpha += 0.05f;
     } else {
         wp->alpha -= 0.05f;
@@ -1312,7 +1329,7 @@ static void loadDraw(CameraId camera, void* param) {
         winTexSetRot(0x1d, (Vec){cx, cy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, angle[wp->copySrc][wp->copyDst]);
     }
 
-    if (!(wp->flags & 0x40)) {
+    if (!(wp->flags & LOAD_FLAG_EVENT_RUNNING)) {
         winTexInit(*wp->file->data);
         winTexSet(0, (Vec){2.0f + wp->x, wp->y - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 128});
         winTexSet(0, (Vec){wp->x, wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -1326,6 +1343,7 @@ static void loadDraw(CameraId camera, void* param) {
 }
 
 #if VERSION >= VERSION_JP
+/** Icons of the seven Crystal Stars, drawn on a save file's panel for each star that file has collected. */
 s32 stone_id[7] = {ICON_197, ICON_198, ICON_19A, ICON_19C, ICON_19D, ICON_199, ICON_19B};
 
 /** A 150 ms rumble on controller 0, as feedback when rumble is switched on in the file select options. */

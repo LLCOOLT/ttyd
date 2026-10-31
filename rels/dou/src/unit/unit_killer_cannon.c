@@ -47,6 +47,7 @@ static USER_FUNC(killer_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/** Unit data of the Bill Blaster: 5 HP, level 22; the battle starts it from init_event. */
 BattleUnitKind unit_killer_cannon = {
     90,
     "btl_un_killer_cannon",
@@ -118,22 +119,42 @@ BattleUnitKind unit_killer_cannon = {
     data_table,
 };
 
+/** Defence of the Bill Blaster: 2 against every element. */
 static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
+/** Elemental reactions of the Bill Blaster: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Bill Blaster (percent, 100 is normal) in the demo builds: immune to sleep,
+ * stop, dizzy, poison, confusion and fright; resists most statuses (15-95%); is extra vulnerable to electric
+ * (150%).
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 50, 100, 50, 100, 50, 100, 50, 50, 0, 15, 100, 50, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Bill Blaster (percent, 100 is normal) in the retail builds: immune to sleep,
+ * stop, dizzy, poison, confusion and fright; resists most statuses (15-95%); is extra vulnerable to electric
+ * (150%).
+ */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 100, 100, 90, 100, 90, 100, 95, 50, 0, 15, 100, 50, 100, 100, 95};
 #endif
 
+/**
+ * Parts of the Bill Blaster: part 1 is the cannon with its front barrel, and parts 2 and 3 are the pieces
+ * shown in its place while the barrel is raised for an upper launch.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_killer_cannon", "c_killtai", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 35, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
     {2, "btl_un_killer_cannon", "c_killtai", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, 0x10000, 0, pose_table},
     {3, "btl_un_killer_cannon", "c_killtai", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0, 255, &defence, &defence_attr, 0x10000, 0, pose_table},
 };
 
+/**
+ * Setup for the Bullet Bill the Bill Blaster fires; it starts hidden below the stage and is moved to the
+ * barrel.
+ */
 static BattleUnitSetup entry_killer = {
     &unit_killer, // unitKindParams
     1, // alliance
@@ -145,6 +166,9 @@ static BattleUnitSetup entry_killer = {
     NULL, // itemDropTable
 };
 
+/**
+ * Pose table of the Bill Blaster: the animation each battle pose (idle, hurt, walk, attack and so on) plays.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "KTA_N_1"},
     {2, "KTA_Y_1"},
@@ -164,14 +188,16 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "KTA_S_1"},
 };
 
+/** Event table of the Bill Blaster: empty, it has no special reactions. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
 /**
- * Init event of the Bombshell Bill Blaster: installs its wait, attack, damage and confusion events,
+ * Init event of the Bill Blaster: installs its wait, attack, damage and confusion events,
  * shifts it 20 units right, sets the poses of the two upper barrel parts (KTA_Z_3 and KTA_Z_2)
- * and sets attributes 0x1000000 and 0x2000000 on them (Guess: hidden and untargetable while retracted).
+ * and makes them hidden and shadowless (PART_ATTR_HIDDEN, PART_ATTR_NO_SHADOW); the attack scripts show them
+ * only while it fires.
  */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -183,14 +209,14 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_AddHomePos, BTL_UNIT_SELF, 20, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KTA_Z_3"))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KTA_Z_2"))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_NO_SHADOW)
     RETURN
 EVT_END()
 
-/** Guess: damage event of a sword: runs the default damage reaction. */
+/** Damage event of the Bill Blaster: runs the default damage reaction (btldefaultevt_Damage) for itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -199,20 +225,22 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Attack event of the Bombshell Bill Blaster: it never attacks directly,
- * it fires a Bombshell Bill into free space beside it.
+ * Attack event of the Bill Blaster: it never attacks directly,
+ * it fires a Bullet Bill into free space beside it.
  * It can use an item; otherwise it draws a number and picks one of the weighted launches:
  * from the front barrel (friend_event), or from the upper barrel (friend_event_sky) after raising it;
  * LW(12) = 1 selects the charged shot with extra charging flashes.
  * If no free space is found on either side nothing is launched.
  */
 static EVT_BEGIN(attack_event)
+    // It uses an item instead if one is ready.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // A random number picks one of the weighted ways to launch a Bullet Bill.
     SET_VALUE(LW(0), 15)
     ADD(LW(0), 0)
     ADD(LW(0), 10)
@@ -222,6 +250,8 @@ static EVT_BEGIN(attack_event)
     SUBTRACT(LW(0), 1)
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 15)
+    // Front-barrel launch: it looks for free space beside itself (trying up to three spots) and fires a
+    // Bullet Bill there.
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
@@ -250,6 +280,7 @@ static EVT_BEGIN(attack_event)
         END_LOOP
         GOTO(99)
     END_IF
+    // Charged front-barrel launch (extra charging flashes); it adds no weight, so it is never drawn.
     ADD(LW(0), 0)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(15), 0)
@@ -279,6 +310,7 @@ static EVT_BEGIN(attack_event)
         END_LOOP
         GOTO(99)
     END_IF
+    // A second front-barrel launch with its own weight.
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(15), 0)
@@ -307,14 +339,16 @@ static EVT_BEGIN(attack_event)
         END_LOOP
         GOTO(99)
     END_IF
+    // Upper-barrel launch: the barrel is raised, a Bullet Bill is fired into free space and the barrel is
+    // lowered again.
     ADD(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -337,9 +371,9 @@ static EVT_BEGIN(attack_event)
                         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
                         WAIT_FRAMES(1)
                     END_LOOP
-                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
                     GOTO(99)
                 END_IF
             END_IF
@@ -352,14 +386,15 @@ static EVT_BEGIN(attack_event)
         END_LOOP
         GOTO(99)
     END_IF
+    // Charged upper-barrel launch; it adds no weight, so it is never drawn.
     ADD(LW(0), 0)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -382,9 +417,9 @@ static EVT_BEGIN(attack_event)
                         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
                         WAIT_FRAMES(1)
                     END_LOOP
-                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
                     GOTO(99)
                 END_IF
             END_IF
@@ -397,14 +432,15 @@ static EVT_BEGIN(attack_event)
         END_LOOP
         GOTO(99)
     END_IF
+    // A second upper-barrel launch with its own weight.
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, 0)
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -436,23 +472,24 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 2, 0, 0, LW(11))
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
         GOTO(99)
     END_IF
     LABEL(99)
+    // If no free space was found nothing is launched, and it goes back to waiting.
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
- * Launches a Bombshell Bill (entry_killer) from the front barrel:
- * the barrel animation and cannon sound play, a smoke puff appears at the muzzle (its size depends on statuses
- * 10 and 11, Guess: the size statuses), the camera shakes,
+ * Launches a Bullet Bill (entry_killer) from the front barrel:
+ * the barrel animation and cannon sound play, a smoke puff appears at the muzzle (larger when Huge, status 10,
+ * smaller when Tiny, status 11), the camera shakes,
  * the new unit copies the cannon's status (killer_copy_status),
  * flies to the free spot found by the caller and takes that as its home.
- * With LW(12) = 1 it charges first and sets status 16 on the new Bill.
+ * With LW(12) = 1 it charges first and gives the new Bill Charge (status 16).
  */
 static EVT_BEGIN(friend_event)
     IF_INT_EQUAL(LW(12), 1)
@@ -473,7 +510,7 @@ static EVT_BEGIN(friend_event)
     ELSE
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 70)
@@ -481,7 +518,7 @@ static EVT_BEGIN(friend_event)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 50, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 28)
@@ -511,7 +548,7 @@ static EVT_BEGIN(friend_event)
 EVT_END()
 
 /**
- * Launches a Bombshell Bill (entry_killer) from the raised upper barrel (part 2):
+ * Launches a Bullet Bill (entry_killer) from the raised upper barrel (part 2):
  * the barrel turns to aim at the free spot (killer_get_angle),
  * then it fires like friend_event with a slightly different smoke and sound,
  * and the new Bill flies with the barrel's angle at height 40 and gets attributes 0x400000
@@ -551,7 +588,7 @@ static EVT_BEGIN(friend_event_sky)
     ELSE
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 60)
@@ -559,7 +596,7 @@ static EVT_BEGIN(friend_event_sky)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 18, LW(7), 75, LW(9), FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
         GOTO(10)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(5))
     IF_INT_NOT_EQUAL(LW(5), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(7), 28)
@@ -587,8 +624,8 @@ static EVT_BEGIN(friend_event_sky)
     IF_INT_EQUAL(LW(12), 1)
         CALL(btlevtcmd_OnOffStatus, LW(3), 16, 1, 1, 1)
     END_IF
-    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 4194304)
-    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 2097152)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
     RETURN
 EVT_END()
 
@@ -611,7 +648,7 @@ static USER_FUNC(killer_get_angle) {
     return EVT_RETURN_DONE;
 }
 
-/** Guess: wait (idle) event of Cortez: sets the idle pose from the current mode's pose table. */
+/** Wait (idle) event of the Bill Blaster: sets its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

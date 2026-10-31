@@ -17,6 +17,7 @@
 #include "manager/evtmgr_cmd.h"
 #include "eff/eff_fukidashi.h"
 #include "version.h"
+#include "evt/evt_msg.h"
 // FAKE: party_chuchu.c calls effFukidashiEntry through this prototype (the types it was compiled with) instead of the one in eff/eff_fukidashi.h; same registers, behaviour-identical.
 typedef void* (*EffFukidashiEntryRetVoidptrS32Fn)(s32, s32, s32, f32, f32, f32, f32, f32, s32);
 
@@ -70,11 +71,7 @@ typedef struct ChuchuTreasure {
     s32 z;
 } ChuchuTreasure;
 
-#if VERSION <= VERSION_DEMO_US
-extern s32 mobjCheckKururingFloorItem(MapObjectEntry* mobj);
-#endif
-extern USER_FUNC(evt_msg_print);
-
+/** Map objects Ms. Mowz can sniff out: blocks, and from JP on the treasure chests and the Kururin floor. */
 char* mobj_list[] = {
 #if VERSION >= VERSION_JP
     "MOBJ_TreasureBox",
@@ -95,6 +92,7 @@ char* mobj_list[] = {
     NULL,
 };
 
+/** Zero vector that starts the position of a nearby item when Ms. Mowz searches for treasure. */
 static const Vec vecA = {0.0f, 0.0f, 0.0f};
 
 static USER_FUNC(set_msg);
@@ -117,6 +115,10 @@ EVT_BEGIN(msg_evt)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Items hidden in the scenery that Ms. Mowz's sniffing can point at (in bushes, trees and the like): map,
+ * the flag set once the item is taken, and the spot's position.
+ */
 ChuchuTreasure chuchu_treasure_tbl[] = {
     {"hei_00", 0xF840715E, -468, 139, -127},
     {"hei_00", 0xF8406272, -408, 139, -127},
@@ -159,6 +161,7 @@ ChuchuTreasure chuchu_treasure_tbl[] = {
     {"rsh_04_c", 0xF8407194, -265, 0, -250},
     {"tou_05", 0xF8407179, 100, 0, -28},};
 
+/** Zero vector that starts the position of a hidden scenery item during Ms. Mowz's treasure search. */
 static const Vec vecB = {0.0f, 0.0f, 0.0f};
 #endif
 
@@ -249,7 +252,8 @@ static USER_FUNC(set_msg) {
 /**
  * Finds the nearest entry of chuchu_treasure_tbl on the current map whose flag is still 0
  * and within range of Mario; returns 1 and its position if there is one.
- * Guess: the table lists hidden floor items such as buried Star Pieces.
+ * The table lists items hidden in the scenery, keyed by their taken flags: for example the coins and Mystery
+ * in hei_01's bushes (GSWF_HEI01_BUSH_COIN_A_TAKEN) and hei_00's tree items (GSWF_HEI00_TREE_MUSHROOM_TAKEN).
  */
 static inline int chuchu_findTreasure2(ChuchuParty* cpp, f32 range, Vec* bestPos) {
     u32 i;
@@ -480,7 +484,7 @@ BOOL chuchu_searchObject(void) {
 void chuchu_init(PartyEntry* party) {
     ChuchuParty* cp = (ChuchuParty*)party;
 
-    cp->memberKind = 7;
+    cp->memberKind = PARTY_MEMBER_MS_MOWZ;
     cp->moveKind = 0;
     cp->height = 20.0f;
     cp->width = 24.0f;
@@ -586,7 +590,7 @@ void chuchu_use(PartyEntry* party) {
 
     switch (cp->state) {
         case 80:
-            cp->flags &= ~0x100;
+            cp->flags &= ~PARTY_FLAG_IS_BEING_USED;
             partyChgRunMode(party, 2);
             cp->moveMode = 0;
             marioChgMot(MARIO_MOTION_STAY);

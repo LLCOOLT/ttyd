@@ -204,22 +204,22 @@ s32 winRootMain(WindowWork* w) {
                 case 1:
                     winPartyInit2(w);
                     w->active = 12;
-                    w->flags |= 0x4000;
+                    w->flags |= WIN_FLAG_SUBMENU;
                     break;
                 case 2:
                     winItemInit2(w);
                     w->active = 13;
-                    w->flags |= 0x4000;
+                    w->flags |= WIN_FLAG_SUBMENU;
                     break;
                 case 3:
                     winBadgeInit2(w);
                     w->active = 14;
-                    w->flags |= 0x4000;
+                    w->flags |= WIN_FLAG_SUBMENU;
                     break;
                 case 4:
                     winLogInit2(w);
                     w->active = 15;
-                    w->flags |= 0x4000;
+                    w->flags |= WIN_FLAG_SUBMENU;
                     break;
             }
             if (gp->flags & GLOBAL_FLAG_KIOSK) {
@@ -342,10 +342,10 @@ s32 winRootMain(WindowWork* w) {
                 w->helpTgtY = 185.0f;
                 w->active = 10;
                 winMsgEntry(w, 0, w->tab[w->tabSel].msg, 0);
-                w->flags &= ~0x4000;
+                w->flags &= ~WIN_FLAG_SUBMENU;
             } else if (ret == -2) {
                 w->active = 20;
-                w->flags &= ~0x4000;
+                w->flags &= ~WIN_FLAG_SUBMENU;
             }
             break;
         case 20:
@@ -401,7 +401,7 @@ s32 winRootMain(WindowWork* w) {
     winSortMain(w);
 
     if (w->active < 20) {
-        if (w->flags & 0x4000) {
+        if (w->flags & WIN_FLAG_SUBMENU) {
             w->helpX += (w->helpTgtX - w->helpX) / FPS_EASE(4.0f);
             w->helpY += (w->helpTgtY - w->helpY) / FPS_EASE(4.0f);
         } else {
@@ -487,7 +487,7 @@ void winRootDisp(s32 camId, WindowWork* wp) {
         winMsgDisp(wp, wp->msgOfsX, wp->msgOfsY);
         winSortGX(wp);
 #if VERSION >= VERSION_JP
-        if (!(wp->flags & 0x8000))
+        if (!(wp->flags & WIN_FLAG_BOOK_OPEN))
 #endif
         {
             winTexInit((TEXPalette*)*wp->res->data);
@@ -1596,34 +1596,40 @@ void winWazaGX(WindowWork* wp, s32 a, f32 x, f32 y, f32 w, f32 h) {
     winWazaQuad(wp, 0x9D, x + (w - 16.0f), y - (h - 16.0f), 16.0f, 16.0f);
 }
 
+/** Sort options (Z) of the Items list: by name or by type. */
 WinSortData sort_1[] = {
     {"msg_menu_sort_aiueo", sort_1_1_func},
     {"msg_menu_sort_kind", sort_1_2_func},
     {NULL, NULL},
 };
+/** Sort options of the Important Items list: by name or by type. */
 WinSortData sort_2[] = {
     {"msg_menu_sort_aiueo", sort_2_1_func},
     {"msg_menu_sort_kind", sort_2_2_func},
     {NULL, NULL},
 };
+/** Sort options of the full badge list: by name, by type or by BP cost. */
 WinSortData sort_3[] = {
     {"msg_menu_sort_aiueo", sort_3_1_func},
     {"msg_menu_sort_kind", sort_3_2_func},
     {"msg_menu_sort_bp", sort_3_3_func},
     {NULL, NULL},
 };
+/** Sort options of the equipped badge list: by name, by type or by BP cost. */
 WinSortData sort_4[] = {
     {"msg_menu_sort_aiueo", sort_4_1_func},
     {"msg_menu_sort_kind", sort_4_2_func},
     {"msg_menu_sort_bp", sort_4_3_func},
     {NULL, NULL},
 };
+/** Sort options of the Journal's badge log: by name, by type or by BP cost. */
 WinSortData sort_5[] = {
     {"msg_menu_sort_aiueo", sort_5_1_func},
     {"msg_menu_sort_kind", sort_5_2_func},
     {"msg_menu_sort_bp", sort_5_3_func},
     {NULL, NULL},
 };
+/** Sort options of the Journal's recipe log: by name or by type. */
 WinSortData sort_6[] = {
     {"msg_menu_sort_aiueo", sort_6_1_func},
     {"msg_menu_sort_kind", sort_6_2_func},
@@ -1632,6 +1638,7 @@ WinSortData sort_6[] = {
 // The demo still gives every listed enemy its own number; retail later merged
 // variants that share an entry.
 #if VERSION <= VERSION_DEMO_US
+/** Demo: the Tattle Log number of each enemy, by tattle entry; the Journal shows and sorts by it. */
 u8 enemy_monoshiri_sort_table[] = {
     0x00, 0x01, 0x02, 0x03, 0x2F, 0x30, 0x94, 0x2A, 0x62, 0x95, 0x96, 0x12, 0x24, 0x97, 0x0A, 0x0B,
     0x32, 0x14, 0x4D, 0x54, 0x33, 0x98, 0x15, 0x63, 0x43, 0x38, 0x4F, 0x3E, 0x6B, 0x6E, 0x6F, 0x79,
@@ -1650,6 +1657,10 @@ u8 enemy_monoshiri_sort_table[] = {
     0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6,
 };
 #else
+/**
+ * The Tattle Log number of each enemy, by tattle entry; variants that share a log entry share its number.
+ * The Journal's Tattle Log shows it before each name and sorts by it.
+ */
 u8 enemy_monoshiri_sort_table[] = {
     0x00, 0x01, 0x02, 0x03, 0x2F, 0x30, 0x94, 0x2A, 0x62, 0x95, 0x96, 0x12, 0x24, 0x24, 0x0A, 0x0B,
     0x32, 0x14, 0x4D, 0x54, 0x33, 0x32, 0x15, 0x63, 0x43, 0x38, 0x4F, 0x3E, 0x6B, 0x6E, 0x6F, 0x79,
@@ -2391,12 +2402,14 @@ static inline u32 getMonosiriPlace(const char* place) {
     return i;
 }
 
+/** Sort options of the Tattle Log: by number, by where the enemy appears most, or by name. */
 WinSortData sort_7[] = {
     {"msg_menu_sort_number", sort_7_1_func},
     {"msg_menu_sort_place", sort_7_2_func},
     {"msg_menu_sort_aiueo", sort_7_3_func},
     {NULL, NULL},
 };
+/** Sort options of the mail list: by name or by number. */
 WinSortData sort_8[] = {
     {"msg_menu_sort_aiueo", sort_8_1_func},
     {"msg_menu_sort_number", sort_8_2_func},
@@ -2951,11 +2964,11 @@ static void winMailDisp(WindowWork* wp) {
                 mail = mailGetPtr(id);
                 {
                     GXColor black = {0x00, 0x00, 0x00, 0xFF};
-                    if (mail->flags & 1) {
+                    if (mail->flags & MAIL_FLAG_PEACH) {
                         col = (GXColor){0xD7, 0xAC, 0xBC, 0xFF};
-                    } else if (mail->flags & 2) {
+                    } else if (mail->flags & MAIL_FLAG_TROUBLE) {
                         col = (GXColor){0xD3, 0xD7, 0xAC, 0xFF};
-                    } else if (mail->flags & 4) {
+                    } else if (mail->flags & MAIL_FLAG_NEWS) {
                         col = (GXColor){0xAC, 0xC2, 0xD7, 0xFF};
                     } else {
                         col = (GXColor){0xE1, 0xE1, 0xE1, 0xFF};
@@ -2982,11 +2995,11 @@ static void winMailDisp(WindowWork* wp) {
             GXColor col;
 
             mail = mailGetPtr(wp->item.mail[wp->item.mailSel].id);
-            if (mail->flags & 1) {
+            if (mail->flags & MAIL_FLAG_PEACH) {
                 col = (GXColor){0xD7, 0xAC, 0xBC, 0xFF};
-            } else if (mail->flags & 2) {
+            } else if (mail->flags & MAIL_FLAG_TROUBLE) {
                 col = (GXColor){0xD3, 0xD7, 0xAC, 0xFF};
-            } else if (mail->flags & 4) {
+            } else if (mail->flags & MAIL_FLAG_NEWS) {
                 col = (GXColor){0xAC, 0xC2, 0xD7, 0xFF};
             } else {
                 col = (GXColor){0xE1, 0xE1, 0xE1, 0xFF};
@@ -3015,7 +3028,7 @@ static void winMailDisp(WindowWork* wp) {
 #else
             winFontSetLabel((Vec){80.0f + wp->item.mailX, (wp->item.mailY - 80.0f) + (f32)(wp->item.mailLine * 21), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, (GXColor){0x00, 0x00, 0x00, 0xFF}, mail->body);
 #endif
-            if (mail->flags & 0x1000) {
+            if (mail->flags & MAIL_FLAG_PICTURE) {
                 winTexInit((TEXPalette*)*wp->mailRes->data);
 #if VERSION <= VERSION_DEMO_US
                 winTexSet(mail->icon, (Vec){210.0f + wp->item.mailX, (wp->item.mailY - (f32)((wp->item.mailLines - 3) * 21)) + (f32)(wp->item.mailLine * 21), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});

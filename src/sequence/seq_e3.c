@@ -51,6 +51,10 @@ static seq_e3_work work;
 //.sdata
 static seq_e3_work* wp = &work;
 #if VERSION >= VERSION_US
+/**
+ * The four scenarios of the trade-show menu: the story progress each one starts at and where its box sits
+ * on screen, one box in each corner.
+ */
 seq_e3_entry e3_tbl[4] = {
     { 3, -140.0f, 100.0f },
     { 23, 140.0f, 100.0f },
@@ -58,6 +62,10 @@ seq_e3_entry e3_tbl[4] = {
     { 96, 140.0f, -100.0f },
 };
 #else
+/**
+ * The three scenarios of the demo's trade-show menu: the story progress each one starts at and where its box
+ * sits on screen, two at the top and one at the bottom centre.
+ */
 seq_e3_entry e3_tbl[3] = {
     { 23, -140.0f, 100.0f },
     { 35, 140.0f, 100.0f },

@@ -18,6 +18,10 @@
 static BeroEntry bero_entry_data[5];
 static KusaAccess ueki_access_data[7];
 
+/**
+ * Exits of mri_19: pipe dokan1 to mri_05 (dokan4); pipe dokan2 to mri_06 (dokan1); dokan3 (scripted pipe);
+ * dokan4 (scripted pipe).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan1", // hitName
@@ -88,6 +92,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Plants Mario can search in mri_19: A_ueki01, A_ueki02, A_ueki03, A_ueki04, A_ueki05, A_ueki08. */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki01", "S_ueki01", NULL},
     {1, "A_ueki02", "S_ueki02", NULL},

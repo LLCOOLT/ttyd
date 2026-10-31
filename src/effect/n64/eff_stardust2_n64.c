@@ -25,16 +25,22 @@ typedef struct EffStardust2N64Work {
 static void effStardust2Main(EffectEntry* effect);
 static void effStardust2Disp(CameraId cameraId, EffectEntry* effect);
 
+/** RGB colours the sparkles cycle through (pinks, purples and blues), three bytes per step. */
 static u8 color_rotation_data[] = {
     0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
     0xB4, 0xB4, 0xFE, 0xB4, 0xDD, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5,
     0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
 };
 
+/** Distance out along its direction, in percent, over a sparkle's 14-frame burst. */
 static u8 speed_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67};
 
+/** Size in percent over a sparkle's 14-frame burst or pulse: it swells, then wobbles slightly. */
 static u8 scale_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67};
 
+/**
+ * Eight 16x16 quads, one per 22x22 cell of the sparkle strip, that each sparkle steps through as it twinkles.
+ */
 static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 0xFF},
     {8, -8, 0, 704, 0, 0, 0, 0, 0xFF},
@@ -168,7 +174,7 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
     return effect;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 /**
  * Types 0/1: each sparkle bursts out along its direction (speed_data, scale_data) for 14 frames,

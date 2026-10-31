@@ -491,6 +491,12 @@ EVT_BEGIN(e5_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Exits of this room: the west door to aji_00, the east door to aji_02, the west door to aji_03, the east
+ * door to aji_04, the north door to aji_06, the north door to aji_07, the north door to aji_08, the north
+ * door to aji_09, the west door to aji_05, the east door to aji_10, the west door to aji_12, the east door
+ * to aji_18, the west door to aji_16 and the east door to aji_17.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
@@ -747,6 +753,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Replacement for the east door exit, swapped in with evt_bero_overwrite during Peach's scene so it leads on
+ * to aji_17 (w_bero).
+ */
 BeroEntry e_bero_5_peach[] = {
     {
         "e_bero_5", // hitName
@@ -765,6 +775,9 @@ BeroEntry e_bero_5_peach[] = {
     {0},
 };
 
+/**
+ * Key item the player can choose in the item menu to unlock the first card-key elevator: the Elevator Key.
+ */
 s32 elv_key1[] = {
     ITEM_ELEVATOR_KEY_0x1B, -1,
 };
@@ -813,6 +826,7 @@ EVT_BEGIN(elv_unlock1)
     RETURN
 EVT_END()
 
+/** Key item the player can choose to unlock the second elevator: the second Elevator Key. */
 s32 elv_key2[] = {
     ITEM_ELEVATOR_KEY_0x1C, -1,
 };
@@ -972,6 +986,7 @@ EVT_END()
  * GW(0) remembers the floor the cabin is on.
  */
 EVT_BEGIN(ele_1)
+    // Mario stops and waits for his partner to finish what it is doing.
     SET_VALUE(LW(5), LW(0))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -995,6 +1010,7 @@ EVT_BEGIN(ele_1)
                 WAIT_FRAMES(1)
             END_LOOP
         END_SWITCH
+        // Mario and the partner walk up to the elevator doors while the camera swings to the shaft.
         CALL(evt_party_stop, 0)
         CALL(evt_party_move_pos2, 0, -530, 0, FLOAT(80.0f))
         CALL(evt_party_set_dir, 0, 270, 300)
@@ -1010,6 +1026,7 @@ EVT_BEGIN(ele_1)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, -560, 0, FLOAT(80.0f))
     CALL(evt_mario_set_dir, 90, 200, 0)
+    // If the cabin is waiting on another floor, it first rides to the floor that was called.
     IF_INT_NOT_EQUAL(GW(0), LW(5))
         SWITCH(GW(0))
             CASE_EQUAL(0)
@@ -1048,6 +1065,7 @@ EVT_BEGIN(ele_1)
         END_IF
         CALL(evt_hit_bind_update, STRING("A_ere1_m"))
     END_IF
+    // The doors open and Mario and the partner step into the cabin.
     SET_VALUE(LW(0), LW(5))
     CALL_CHILD(ele1_door_open)
     CALL(evt_mario_mov_pos2, -560, -120, FLOAT(120.0f))
@@ -1064,6 +1082,7 @@ EVT_BEGIN(ele_1)
     CALL(evt_party_jump_pos, 0, LW(0), LW(1), LW(2), 400, 0, -1000)
     CALL(evt_mario_set_dir, 90, 200, 0)
     CALL(evt_party_set_dir, 0, 270, 300)
+    // A voice announces the elevator and the player picks a floor; backing out walks them out again.
     CALL(evt_msg_print, 0, STRING("stg7_aji_66"), 0, 0)
     SWITCH(LW(5))
         CASE_EQUAL(0)
@@ -1117,6 +1136,7 @@ EVT_BEGIN(ele_1)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+    // The doors close and the cabin rides to the chosen floor.
     SET_VALUE(LW(0), LW(5))
     CALL_CHILD(ele1_door_close)
     SWITCH(LW(5))
@@ -1166,6 +1186,7 @@ EVT_BEGIN(ele_1)
     CALL(evt_snd_sfxoff, LW(9))
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
+    // The doors open on the new floor and Mario and the partner step out.
     SET_VALUE(LW(0), LW(8))
     CALL_CHILD(ele1_door_open)
     CALL(evt_mario_mov_pos2, -560, 0, FLOAT(120.0f))
@@ -1292,12 +1313,14 @@ EVT_END()
  */
 EVT_BEGIN(ele_2)
     SET_VALUE(LW(5), LW(0))
+    // Without the second Elevator Key the elevator only asks for it.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_14_ELEVATOR_KEY_B)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_msg_print, 0, STRING("stg7_aji_65"), 0, 0)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+    // Mario stops and waits for his partner to finish what it is doing.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     BEGIN_INLINE_EVENT_GET_ID(LW(10))
@@ -1320,6 +1343,7 @@ EVT_BEGIN(ele_2)
                 WAIT_FRAMES(1)
             END_LOOP
         END_SWITCH
+        // Mario and the partner walk up to the elevator doors while the camera swings to the shaft.
         CALL(evt_party_stop, 0)
         CALL(evt_party_move_pos2, 0, 565, 0, FLOAT(80.0f))
         CALL(evt_party_set_dir, 0, 270, 300)
@@ -1335,6 +1359,7 @@ EVT_BEGIN(ele_2)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, 535, 0, FLOAT(80.0f))
     CALL(evt_mario_set_dir, 90, 200, 0)
+    // If the cabin is waiting on another floor, it first rides to the floor that was called.
     IF_INT_NOT_EQUAL(GW(1), LW(5))
         SWITCH(GW(1))
             CASE_EQUAL(2)
@@ -1376,6 +1401,7 @@ EVT_BEGIN(ele_2)
         CALL(evt_hit_bind_update, STRING("A_ere2_m"))
     END_IF
     SET_VALUE(LW(0), LW(5))
+    // The doors open and Mario and the partner step into the cabin.
     CALL_CHILD(ele2_door_open)
     CALL(evt_mario_mov_pos2, 535, -120, FLOAT(120.0f))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1391,6 +1417,7 @@ EVT_BEGIN(ele_2)
     CALL(evt_party_jump_pos, 0, LW(0), LW(1), LW(2), 400, 0, -1000)
     CALL(evt_mario_set_dir, 90, 200, 0)
     CALL(evt_party_set_dir, 0, 270, 300)
+    // A voice announces the elevator and the player picks a floor; backing out walks them out again.
     CALL(evt_msg_print, 0, STRING("stg7_aji_66"), 0, 0)
     SWITCH(LW(5))
         CASE_EQUAL(2)
@@ -1445,6 +1472,7 @@ EVT_BEGIN(ele_2)
         RETURN
     END_IF
     SET_VALUE(LW(0), LW(5))
+    // The doors close and the cabin rides to the chosen floor.
     CALL_CHILD(ele2_door_close)
     SWITCH(LW(5))
         CASE_EQUAL(2)
@@ -1494,6 +1522,7 @@ EVT_BEGIN(ele_2)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
     SET_VALUE(LW(0), LW(8))
+    // The doors open on the new floor and Mario and the partner step out.
     CALL_CHILD(ele2_door_open)
     CALL(evt_mario_mov_pos2, 535, 0, FLOAT(120.0f))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1930,13 +1959,21 @@ static EVT_BEGIN(peach_evt_door_stop)
 EVT_END()
 
 /**
- * Guess: Peach's use of elevator 2 during her errands (STORY_STG3_33_01_PEACH_TECS_REQUEST and
- * STORY_STG5_44_PEACH_TECS_REQUEST_2): the cabin ere2_m takes her to the other floor with the doors opening
- * and closing, with her remarks peach_aji_128 to 131 and 218. GW(1) tracks the floor.
+ * Peach's ride in elevator 2 (LW(0) = her floor, LW(1) = 1 to walk her in from the key panel).
+ * It only runs at STORY_STG3_33_01_PEACH_TECS_REQUEST and STORY_STG5_44_PEACH_TECS_REQUEST_2;
+ * otherwise she says it doesn't work (peach_aji_40).
+ * The cabin ere2_m first comes to her floor if it is elsewhere (floors 2, 3, 4 at heights 2000, 1000, 0),
+ * then carries her to floor 2 with the doors opening and closing. In the chapter 3 errand TEC asks her to wait
+ * because soldiers are near (peach_aji_128), Peach reacts (129) while an X-Naut walks past outside,
+ * then TEC points her to the room with the green lamp (131);
+ * in chapter 5 TEC sends her away from Grodus's room to the green-lamp room (218).
+ * GW(1) records the cabin's floor.
  */
 EVT_BEGIN(peach_evt_ele_2)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(9), LW(1))
+    // Peach is locked out of control; she says the elevator doesn't work until the story reaches the right
+    // point (peach_aji_40).
     CALL(evt_mario_key_onoff, 0)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_01_PEACH_TECS_REQUEST)
@@ -1948,6 +1985,7 @@ EVT_BEGIN(peach_evt_ele_2)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_SWITCH
+    // If the cabin is on another floor it first comes to Peach's floor.
     IF_INT_NOT_EQUAL(GW(1), LW(5))
         SWITCH(GW(1))
             CASE_EQUAL(2)
@@ -1988,6 +2026,7 @@ EVT_BEGIN(peach_evt_ele_2)
     END_IF
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
         SET_VALUE(LW(0), LW(5))
+        // The doors open and Peach steps into the cabin.
         CALL_CHILD(ele2_door_open)
     END_IF
     IF_INT_EQUAL(LW(9), 1)
@@ -2005,6 +2044,7 @@ EVT_BEGIN(peach_evt_ele_2)
         CALL(evt_cam3d_evt_off, 1000, 11)
     END_INLINE_EVENT
     SET_VALUE(LW(0), LW(5))
+    // The doors close and the cabin carries her to floor 2.
     CALL_CHILD(ele2_door_close)
     SWITCH(LW(5))
         CASE_EQUAL(2)
@@ -2051,6 +2091,7 @@ EVT_BEGIN(peach_evt_ele_2)
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_mapobj_get_position, STRING("ere2_m"), LW(3), LW(4), LW(6))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_ELEVATOR_APPEAR1"), LW(3), LW(4), LW(6), 0)
+    // TEC's chapter 3 errand: TEC asks her to wait because soldiers are near, and an X-Naut walks past outside.
     CALL(evt_mario_cont_onoff, 1)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
         CALL(evt_msg_print, 0, STRING("peach_aji_128"), 0, 0)
@@ -2065,10 +2106,12 @@ EVT_BEGIN(peach_evt_ele_2)
         WAIT_MS(2000)
         CALL(evt_msg_print, 0, STRING("peach_aji_131"), 0, 0)
     END_IF
+    // In chapter 5 TEC sends Peach away from Grodus's room.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
         CALL(evt_msg_print, 0, STRING("peach_aji_218"), 0, 0)
     END_IF
     SET_VALUE(LW(0), LW(8))
+    // The doors open, Peach steps out and the elevator lamps are reset.
     CALL_CHILD(ele2_door_open)
     CALL(evt_mario_mov_pos2, 550, 0, FLOAT(120.0f))
     SET_VALUE(LW(0), LW(8))
@@ -2206,6 +2249,8 @@ EVT_END()
  */
 EVT_BEGIN(peach_evt_init)
     SET_VALUE(LW(15), 0)
+    // Peach's visit to the central hall: the game switches to Peach and, if she is in disguise, puts the
+    // X-Naut uniform back on.
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 1)
         RETURN
@@ -2214,6 +2259,7 @@ EVT_BEGIN(peach_evt_init)
     IF_INT_EQUAL(GSWF(GSWF_AJI09_PEACH3_DISGUISED), 1)
         CALL(evt_peach_transform_gundan_on)
     END_IF
+    // The underlings are set up; entering through the peach_evt_stg1 entrance starts Peach's first scene.
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("peach_evt_stg1"))
@@ -2223,14 +2269,17 @@ EVT_BEGIN(peach_evt_init)
         SET_VALUE(LW(15), 1)
         RETURN
     END_IF
+    // Peach's music plays and the elevator and key-lock scripts start.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
     CALL(evt_snd_envoff, PSND_FADE_OUT)
     SPAWN_EVENT(peach_evt_ele_init)
     SPAWN_EVENT(peach_evt_key_init)
+    // Chapter 1: Peach finds an open door.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_18_01_PEACH_AN_OPEN_DOOR)
         SPAWN_EVENT(peach_evt_stg1_1)
         SPAWN_EVENT(peach_evt_stg1_2)
     END_IF
+    // Chapter 3: Peach is sent on her errand for TEC; the doors she may not use are locked off.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("e_bero_5"))
@@ -2259,9 +2308,11 @@ EVT_BEGIN(peach_evt_init)
             END_INLINE_EVENT
         END_IF
     END_IF
+    // TEC's request: Peach waits at the elevator while soldiers pass (peach_evt_stg3_1).
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
         SPAWN_EVENT(peach_evt_stg3_1)
     END_IF
+    // Peach travels incognito: only the doors she may use stay open.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
         BEGIN_INLINE_EVENT
             CALL(evt_seq_wait, 2)
@@ -2271,6 +2322,7 @@ EVT_BEGIN(peach_evt_init)
             CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_3"), 0, PTR(peach_evt_door_stop), 0)
         END_INLINE_EVENT
     END_IF
+    // Chapter 5: a guard stands watch while Peach works on the invisibility potion and the data disk.
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
             CALL(evt_npc_entry, STRING("見張り"), STRING("c_zako_n"))
@@ -2296,6 +2348,7 @@ EVT_BEGIN(peach_evt_init)
             END_INLINE_EVENT
         END_IF
     END_IF
+    // TEC sends Peach away from Grodus's room to the room with the green lamp.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_44_PEACH_TECS_REQUEST_2)
         SPAWN_EVENT(peach_evt_stg5)
         BEGIN_INLINE_EVENT
@@ -2312,6 +2365,7 @@ EVT_BEGIN(peach_evt_init)
             CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero_5"), 0, PTR(peach_evt_door_stop), 0)
         END_INLINE_EVENT
     END_IF
+    // Potion puzzle and disk search: Peach is made invisible for these parts.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
         CALL(peach_evt_toumei)
         SPAWN_EVENT(peach_evt_stg5_1)
@@ -2323,8 +2377,9 @@ EVT_BEGIN(peach_evt_init)
 EVT_END()
 
 /**
- * Init of the first X-Naut underling: in STORY_STG3_33_02_PEACH_INCOGNITO it is moved to (100, 1000, -50)
- * (Guess: y=1000 is the height of the Peach-controlled floor) and left as is;
+ * Init of the first X-Naut underling: in STORY_STG3_33_02_PEACH_INCOGNITO it is moved to (100, 1000, -50),
+ * on floor 2, where elevator 2 lets Peach out (peach_evt_ele_2 walks this underling along y = 1000 there),
+ * and left as is;
  * at every other story point it is hidden and intangible.
  * It never starts a battle by contact (HAS_BATTLE_INFO off).
  */
@@ -2441,6 +2496,7 @@ EVT_BEGIN(teshita3_regl)
     RETURN
 EVT_END()
 
+/** The three X-Naut underlings (teshita) in the central hall, each with its own setup and talk scripts. */
 static NpcSetupInfo npcEnt[] = {
     {
         "手下１", // name

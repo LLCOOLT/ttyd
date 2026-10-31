@@ -16,8 +16,11 @@ static void effPeachFukidashiMain(EffectEntry* effect);
 
 #define fabsf(x) __fabsf(x)
 
+// EffPeachFukidashiWork.flags: the low two bits pick the icon; this bit adds the red cross.
+#define PEACH_FUKI_FLAG_CROSS 0x80 // effSetPeachFukiBatu: draw a red cross over the icon
+
 typedef struct EffPeachFukidashiWork {
-    u32 flags;     // 0x0, bits 0-1: icon, 0x80: show a cross
+    u32 flags;     // 0x0, bits 0-1: icon, PEACH_FUKI_FLAG_CROSS: show a cross
     Vec position;  // 0x4
     f32 angle;     // 0x10
     f32 size;      // 0x14
@@ -140,7 +143,7 @@ static void effPeachFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
     }
 
     // red cross over the icon
-    if (work->flags & 0x80) {
+    if (work->flags & PEACH_FUKI_FLAG_CROSS) {
 #if VERSION >= VERSION_US
         char text[32] = "\xD7"; // US: Latin-1 multiplication sign
 #else
@@ -165,5 +168,5 @@ static void effPeachFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
 
 /** Sets the name of the cross (batu) mark; rels/aji/src/aji_17.c calls it from an event script. */
 void effSetPeachFukiBatu(const char* name) {
-    ((EffPeachFukidashiWork*)effNameToPtr(name)->userdata)->flags |= 0x80;
+    ((EffPeachFukidashiWork*)effNameToPtr(name)->userdata)->flags |= PEACH_FUKI_FLAG_CROSS;
 }

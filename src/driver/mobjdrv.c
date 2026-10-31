@@ -47,8 +47,10 @@ typedef struct CubeJoint {
 } CubeJoint;
 
 #if VERSION >= VERSION_JP // small data in retail; in the demo's .data each sits before its joint
+/** Draw mode of the built-in collision cube (culling flag set), shared by the cube, head and front hit joints. */
 CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
 
+/** Draw mode of the second part of a two-part object's collision (the MOBJ~ part). */
 CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
 #endif
 
@@ -62,6 +64,7 @@ typedef struct CubeVtxData18 {
     s32 count;
     Vec v[18];
 } CubeVtxData18;
+/** Corners of the built-in unit collision cube (1 wide and deep, 1 tall, base at the origin). */
 CubeVtxData34 cubeDVP = {
     8,
     {
@@ -76,6 +79,7 @@ CubeVtxData34 cubeDVP = {
     },
 };
 
+/** Face normals of the built-in collision cube: front, top, back, bottom, right, left. */
 CubeVtxData18 cubeDVN = {
     6,
     {
@@ -88,6 +92,7 @@ CubeVtxData18 cubeDVN = {
     },
 };
 
+/** Vertex data table of the collision cube (positions and normals); its meshes point here. */
 void* cubeDDT[26] = {
     &cubeDVP, &cubeDVN, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
     (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
@@ -253,35 +258,45 @@ u32 cubeDN[1230] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
 };
 
+/** Mesh of the full collision cube: all six faces. */
 CubeMesh cubeDP = {0, {0}, 0, 6, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820], &cubeDN[1025]}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Draw mode of the built-in collision cube (culling flag set), shared by the cube, head and front hit joints. */
 CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
 #endif
+/** Joint of the solid cube collision (type 0) that mobjHitEntry copies into a block's hit object. */
 CubeJoint cubeDJ = {
     { NULL, NULL, NULL, NULL, NULL, NULL, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { -0.5f, 0.0f, -0.5f }, { 0.5f, 1.0f, 0.5f }, { 0 }, &cubeMSJ.mode, 1 },
     { NULL, (MapFileMesh*)&cubeDP },
 };
 
+/** Mesh of the head-hit collision: only the cube's bottom face, struck from below. */
 CubeMesh headDP = {0, {0}, 0, 1, 0, cubeDDT, {&cubeDN[410]}};
 
+/** Joint of the head-hit collision (type 1), a flat square at the object's base, copied in by mobjHitEntry. */
 CubeJoint headDJ = {
     { NULL, NULL, NULL, NULL, NULL, NULL, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { -0.5f, 0.0f, -0.5f }, { 0.5f, 0.0f, 0.5f }, { 0 }, &cubeMSJ.mode, 1 },
     { NULL, (MapFileMesh*)&headDP },
 };
 
+/** Mesh of the front hit part: only the cube's front face. */
 CubeMesh frontDP = {0, {0}, 0, 1, 0, cubeDDT, {&cubeDN[1025]}};
 
+/** Joint of a two-part object's front hit part (type 2), copied in by mobjHitEntry. */
 CubeJoint frontDJ = {
     { NULL, NULL, NULL, NULL, NULL, NULL, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { -0.5f, 0.0f, -0.5f }, { 0.5f, 1.0f, 0.5f }, { 0 }, &cubeMSJ.mode, 1 },
     { NULL, (MapFileMesh*)&frontDP },
 };
 
 #if VERSION <= VERSION_DEMO_US
+/** Draw mode of the second part of a two-part object's collision (the MOBJ~ part). */
 CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
 #endif
+/** Mesh of a two-part object's second hit part: the five faces other than the front one. */
 CubeMesh front2DP = {0, {0}, 0, 5, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820]}};
 
+/** Joint of a two-part object's second hit part (type 2), copied in by mobjHitEntry. */
 CubeJoint front2DJ = {
     { NULL, NULL, NULL, NULL, NULL, NULL, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { -0.5f, 0.0f, -0.5f }, { 0.5f, 1.0f, 0.5f }, { 0 }, &front2MSJ.mode, 1 },
     { NULL, (MapFileMesh*)&front2DP },
@@ -883,7 +898,7 @@ void mobjMain(void) {
 #if VERSION >= VERSION_JP
             {
                 MarioMotion motion = marioGetPtr()->currMotionId;
-                if (motion == 0x1f || motion == 0x20) {
+                if (motion == MARIO_MOTION_DAMAGE || motion == MARIO_MOTION_DAMAGE_TOGE) {
                     entry->flags &= ~MOBJ_FLAG_HIT;
                 }
             }
@@ -902,8 +917,8 @@ void mobjMain(void) {
             s32 shadowId;
             mapGetBlend(&blend1);
             mapGetBlend2(&blend2);
-            if ((mw->entries[0].flags & 2) && !(animPoseGetMaterialFlag(entry->poseId) & 0x800) && blend1.a != 0xff) {
-            } else if ((mw->entries[0].flags & 4) && !(animPoseGetMaterialFlag(entry->poseId) & 0x1000) &&
+            if ((mw->entries[0].flags & MAPENT_FLAG_BLEND) && !(animPoseGetMaterialFlag(entry->poseId) & ANIM_MATERIAL_FLAG_NO_BLEND) && blend1.a != 0xff) {
+            } else if ((mw->entries[0].flags & MAPENT_FLAG_BLEND2) && !(animPoseGetMaterialFlag(entry->poseId) & ANIM_MATERIAL_FLAG_NO_BLEND2) &&
                        blend2.a != 0xff) {
             } else {
                 shadowId = shadowEntry(entry->position.x, entry->position.y, entry->position.z,
@@ -930,7 +945,7 @@ void mobjMain(void) {
             continue;
         }
         if (entry->offscreenId == -1) {
-            if ((animPoseGetMaterialFlag(entry->poseId) & 0x40) && evt.a != 0xff) {
+            if ((animPoseGetMaterialFlag(entry->poseId) & ANIM_MATERIAL_FLAG_EVT_COLOR) && evt.a != 0xff) {
                 dispEntry(entry->camId, dispCalcZ(&entry->position), 2, mobjDispXLU, entry);
             } else {
                 dispEntry(entry->camId, dispCalcZ(&entry->position), 0, mobjDisp, entry);
@@ -938,7 +953,7 @@ void mobjMain(void) {
                 dispEntry(entry->camId, dispCalcZ(&entry->position), 2, mobjDisp, entry);
             }
         } else {
-            if ((animPoseGetMaterialFlag(entry->poseId) & 0x40) && evt.a != 0xff) {
+            if ((animPoseGetMaterialFlag(entry->poseId) & ANIM_MATERIAL_FLAG_EVT_COLOR) && evt.a != 0xff) {
                 dispEntry(CAMERA_OFFSCREEN2, dispCalcZ(&entry->position), 2, mobjDisp_OffscreenXLU, entry);
             } else {
                 dispEntry(CAMERA_OFFSCREEN2, dispCalcZ(&entry->position), 0, mobjDisp_OffscreenXLU, entry);
@@ -1013,7 +1028,7 @@ MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
  * or NULL if it is not map-object collision (attribute bit 31). The demo searches the table instead.
  */
 MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
-    if (hitObj->attributes & (1 << 31)) {
+    if (hitObj->attributes & HIT_ATTR_MOBJ) {
         return hitObj->mobj;
     }
 
@@ -1275,6 +1290,7 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
     return ret;
 }
 
+/** Name of the flipping floor panels that hide Star Pieces, checked to treat their hidden item specially. */
 const char kururinName[] = "MOBJ_KururinFloor";
 
 #if VERSION <= VERSION_DEMO_US

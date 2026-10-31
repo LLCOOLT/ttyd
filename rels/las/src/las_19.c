@@ -104,6 +104,10 @@ static EVT_BEGIN(e2_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Exits of las_19: west door w_bero to las_09 (e_bero); east door e_bero_1 to las_21 (w_bero); east door
+ * e_bero_2 to las_21 (w_bero); north road n_bero to las_20 (s_bero_1).
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -178,6 +182,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** The staircase pieces S_kai_NN of the tower, raised in waves by change_map_evt. */
 const char* mapgrp_name_1[] = {
     "S_kai_02",
     "S_kai_03",
@@ -199,6 +204,7 @@ const char* mapgrp_name_1[] = {
     "S_kai_25",
 };
 
+/** The last five staircase pieces, raised after those in mapgrp_name_1. */
 const char* mapgrp_name_2[] = {
     "S_kai_20",
     "S_kai_21",
@@ -220,6 +226,7 @@ EVT_END()
  * and the map changes back to las_10 (ret_chgmap_evt).
  */
 EVT_BEGIN(change_map_evt)
+    // Mario and his partner are hidden under the floor and the camera starts at the staircase.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -257,6 +264,7 @@ EVT_BEGIN(change_map_evt)
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
+        // The camera pans along the staircase pieces S_kai_xx.
         CALL(evt_cam3d_evt_set, -575, 143, 531, -575, 67, -13, 4000, 0)
         WAIT_MS(4500)
         SET_VALUE(GF(0), 1)
@@ -269,6 +277,8 @@ EVT_BEGIN(change_map_evt)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_yuka"), MAPOBJ_FLAG_HIDE)
+    // The camera drops to the foot of the tower and follows the pieces as they are pushed up in waves, with a
+    // rumble and shaking.
     CALL(evt_cam3d_evt_set, -5, -547, 531, -5, -623, -13, 9200, 0)
     WAIT_MS(300)
     SET_VALUE(GF(0), 0)
@@ -304,6 +314,7 @@ EVT_BEGIN(change_map_evt)
     END_INLINE_EVENT
     WAIT_MS(7600)
     SET_VALUE(GF(0), 1)
+    // Back to the Riddle Tower hub (las_10) with the tower risen.
     CALL(evt_bero_mapchange, STRING("las_10"), STRING("ret_chgmap_evt"))
     RETURN
 EVT_END()

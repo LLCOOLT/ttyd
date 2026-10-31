@@ -24,6 +24,22 @@
 #include "driver/mapdrv.h"
 #include "moo.h"
 
+// Unit work slots of the Yux family (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BARRIERN_Z_SATELLITE_COUNT = 0, // Mini-Yux it should have (battle setup), updated when it splits
+    UW_BARRIERN_Z_GROUP_ATTACK = 1,    // 1 during the group ring attack, 0 during the single ring attack
+    UW_BARRIERN_Z_RINGS_LANDED = 2,    // rings of the group attack that have landed
+    UW_BARRIERN_Z_BARRIER_EFFECT = 3,  // barrier effect (EffectEntry*) while a Mini-Yux lives; C only
+    UW_BARRIERN_Z_MINI_YUX_0 = 4,      // unit id of the first Mini-Yux, -1 when the slot is empty
+    UW_BARRIERN_Z_MINI_YUX_1 = 5,      // unit id of the second Mini-Yux, or -1
+    UW_BARRIERN_Z_MINI_YUX_2 = 6,      // unit id of the third Mini-Yux, or -1
+    UW_BARRIERN_Z_MINI_YUX_3 = 7,      // unit id of the fourth Mini-Yux, or -1
+    UW_BARRIERN_Z_SPLINE_0 = 10,       // orbit spline work of the first Mini-Yux (SatelliteSpline*); C only
+    UW_BARRIERN_Z_SPLINE_1 = 11,       // orbit spline work of the second Mini-Yux; C only
+    UW_BARRIERN_Z_SPLINE_2 = 12,       // orbit spline work of the third Mini-Yux; C only
+    UW_BARRIERN_Z_SPLINE_3 = 13        // orbit spline work of the fourth Mini-Yux; C only
+};
+
 static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table);
 static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n);
 
@@ -89,6 +105,10 @@ static EvtWord wawawa_attack_event_sub_no_last[10];
 static EvtWord wawawa_attack_event_sub_last[93];
 static EvtWord wait_event[116];
 
+/**
+ * Unit data of the Z-Yux: 7 HP, 50x50 units in size; ties together its sounds, parts, status vulnerability,
+ * init event and event table.
+ */
 BattleUnitKind unit_barriern_z = {
     115,
     "btl_un_barriern_z",
@@ -155,10 +175,13 @@ BattleUnitKind unit_barriern_z = {
     data_table,
 };
 
+/** Defence of the Z-Yux: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of the Z-Yux: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Parts of the Z-Yux: 11 parts (model c_baria_z). */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_barriern_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 12.0f, 0.0f, 0.0f, 22.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
     {2, "btl_un_barriern_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
@@ -174,11 +197,25 @@ static BattleUnitKindPart parts[] = {
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Z-Yux (percent chance each status takes hold): immune to poison,
+ * freeze, fright, Gale Force; resists sleep (10%), dizzy (70%), confusion (70%), Tiny (70%),
+ * Attack Down (70%), Defense Down (70%), allergic (70%), Slow (70%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {10, 80, 70, 0, 70, 100, 100, 0, 100, 70, 100, 70, 100, 70, 70, 0, 0, 100, 70, 100, 100, 95};
 #else
+/**
+ * Retail builds: Status vulnerability of the Z-Yux (percent chance each status takes hold):
+ * immune to poison, freeze, fright; resists sleep (20%), stop (70%), confusion (60%), allergic (60%),
+ * Slow (60%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {20, 70, 95, 0, 60, 100, 100, 0, 100, 85, 100, 85, 100, 90, 60, 0, 80, 100, 60, 100, 100, 95};
 #endif
 
+/**
+ * Weapon of the Z-Yux (ring attack): targets one unit for 4 damage, ignores Defense;
+ * used by wakka_attack_event.
+ */
 static BattleWeapon weapon_wakka_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -197,7 +234,7 @@ static BattleWeapon weapon_wakka_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -215,6 +252,11 @@ static BattleWeapon weapon_wakka_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of the Z-Yux (combined ring attack: five rings, from it and its four Mini-Z-Yux):
+ * targets every unit for 2 damage, ignores Defense;
+ * used by wawawa_attack_event.
+ */
 static BattleWeapon weapon_wawawa_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -233,7 +275,7 @@ static BattleWeapon weapon_wawawa_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -251,6 +293,10 @@ static BattleWeapon weapon_wawawa_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Spawn setup for the Mini-Z-Yux (unit_barriern_z_satellite): enemy side, placed off-screen at first;
+ * used by init_event.
+ */
 static BattleUnitSetup entry_barriern_satellite = {
     &unit_barriern_z_satellite, // unitKindParams
     1, // alliance
@@ -262,6 +308,7 @@ static BattleUnitSetup entry_barriern_satellite = {
     NULL, // itemDropTable
 };
 
+/** Pose table of the Z-Yux: maps its battle poses to its animations. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -283,11 +330,13 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Event table of the Z-Yux: barriern_dmg_first_attack_pos (tag 48). */
 static BattleDataEntry data_table[] = {
     {48, barriern_dmg_first_attack_pos},
     {0, NULL},
 };
 
+/** Mini-Z-Yux 1 of 1 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn1_1[] = {
     {25.0f, 0.0f, 0.0f},
     {20.0f, -30.0f, -1.0f},
@@ -296,6 +345,7 @@ static Vec splineTableIn1_1[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 1 of 2 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn2_1[] = {
     {25.0f, 0.0f, 0.0f},
     {20.0f, -30.0f, -1.0f},
@@ -304,6 +354,7 @@ static Vec splineTableIn2_1[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 2 of 2 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn2_2[] = {
     {-25.0f, 0.0f, 0.0f},
     {-20.0f, 30.0f, -1.0f},
@@ -312,6 +363,7 @@ static Vec splineTableIn2_2[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 1 of 3 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn3_1[] = {
     {0.0f, 25.0f, 0.0f},
     {0.0f, 45.0f, -1.0f},
@@ -320,6 +372,7 @@ static Vec splineTableIn3_1[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 2 of 3 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn3_2[] = {
     {25.0f, -25.0f, 0.0f},
     {40.0f, -40.0f, -1.0f},
@@ -328,6 +381,7 @@ static Vec splineTableIn3_2[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 3 of 3 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn3_3[] = {
     {-25.0f, -25.0f, 0.0f},
     {-40.0f, -40.0f, -1.0f},
@@ -336,6 +390,7 @@ static Vec splineTableIn3_3[] = {
     {-0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 1 of 4 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn4_1[] = {
     {25.0f, 25.0f, 0.0f},
     {30.0f, 35.0f, -1.0f},
@@ -344,6 +399,7 @@ static Vec splineTableIn4_1[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 2 of 4 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn4_2[] = {
     {-25.0f, 25.0f, 0.0f},
     {-30.0f, 35.0f, -1.0f},
@@ -352,6 +408,7 @@ static Vec splineTableIn4_2[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 3 of 4 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn4_3[] = {
     {25.0f, -25.0f, 0.0f},
     {30.0f, -35.0f, -1.0f},
@@ -360,6 +417,7 @@ static Vec splineTableIn4_3[] = {
     {0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 4 of 4 flies back into its Z-Yux along this five-point path. */
 static Vec splineTableIn4_4[] = {
     {-25.0f, -25.0f, 0.0f},
     {-30.0f, -35.0f, -1.0f},
@@ -368,6 +426,7 @@ static Vec splineTableIn4_4[] = {
     {-0.0f, 0.0f, -1.0f},
 };
 
+/** Mini-Z-Yux 1 of 1 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut1_1[] = {
     {0.0f, 0.0f, -1.0f},
     {-35.0f, -35.0f, -1.0f},
@@ -376,6 +435,7 @@ static Vec splineTableOut1_1[] = {
     {25.0f, 0.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 1 of 2 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut2_1[] = {
     {0.0f, 0.0f, -1.0f},
     {5.0f, 30.0f, -1.0f},
@@ -384,6 +444,7 @@ static Vec splineTableOut2_1[] = {
     {25.0f, 0.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 2 of 2 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut2_2[] = {
     {0.0f, 0.0f, -1.0f},
     {-5.0f, -30.0f, -1.0f},
@@ -392,6 +453,7 @@ static Vec splineTableOut2_2[] = {
     {-25.0f, 0.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 1 of 3 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut3_1[] = {
     {0.0f, 0.0f, -1.0f},
     {0.0f, 25.0f, -1.0f},
@@ -400,6 +462,7 @@ static Vec splineTableOut3_1[] = {
     {0.0f, 25.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 2 of 3 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut3_2[] = {
     {0.0f, 0.0f, -1.0f},
     {25.0f, -20.0f, -1.0f},
@@ -408,6 +471,7 @@ static Vec splineTableOut3_2[] = {
     {25.0f, -25.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 3 of 3 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut3_3[] = {
     {0.0f, 0.0f, -1.0f},
     {-25.0f, -20.0f, -1.0f},
@@ -416,6 +480,7 @@ static Vec splineTableOut3_3[] = {
     {-25.0f, -25.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 1 of 4 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut4_1[] = {
     {0.0f, 0.0f, -1.0f},
     {25.0f, 20.0f, -1.0f},
@@ -424,6 +489,7 @@ static Vec splineTableOut4_1[] = {
     {25.0f, 25.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 2 of 4 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut4_2[] = {
     {0.0f, 0.0f, -1.0f},
     {-25.0f, 20.0f, -1.0f},
@@ -432,6 +498,7 @@ static Vec splineTableOut4_2[] = {
     {-25.0f, 25.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 3 of 4 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut4_3[] = {
     {0.0f, 0.0f, -1.0f},
     {25.0f, -20.0f, -1.0f},
@@ -440,6 +507,7 @@ static Vec splineTableOut4_3[] = {
     {25.0f, -25.0f, 0.0f},
 };
 
+/** Mini-Z-Yux 4 of 4 flies out of its Z-Yux to its ring position along this five-point path. */
 static Vec splineTableOut4_4[] = {
     {0.0f, 0.0f, -1.0f},
     {-25.0f, -20.0f, -1.0f},
@@ -450,8 +518,8 @@ static Vec splineTableOut4_4[] = {
 
 /**
  * Init event of the Z-Yux: installs its wait, unison phase, attack, damage and confusion events,
- * clears its satellite slots (unit work 4 to 7)
- * and spawns as many Mini Z-Yux satellites as unit work 0 says (entry_barriern_satellite),
+ * clears its satellite slots (UW_BARRIERN_Z_MINI_YUX_0 to _3)
+ * and spawns as many Mini Z-Yux satellites as UW_BARRIERN_Z_SATELLITE_COUNT says (entry_barriern_satellite),
  * placing them around it with battleGetBarriernSatelliteInitPos.
  * Finally it sets the spline tables that the satellites use to fly out (outSplineTableSet).
  */
@@ -462,19 +530,19 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetPartsScale, BTL_UNIT_SELF, 1, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 3145728)
-    SET_VALUE(LW(0), 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT | UNIT_FLAG_FLOAT_ACTIVE)
+    SET_VALUE(LW(0), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(4)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), -1)
         ADD(LW(0), 1)
     END_LOOP
     SET_VALUE(LW(6), 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(7))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_SATELLITE_COUNT, LW(7))
     LABEL(0)
     IF_INT_LESS(LW(6), LW(7))
         CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(5))
         SET_VALUE(LW(8), LW(6))
-        ADD(LW(8), 4)
+        ADD(LW(8), UW_BARRIERN_Z_MINI_YUX_0)
         CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_barriern_satellite), 0)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(8), LW(3))
         CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(5))
@@ -504,7 +572,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-/** Event script: after a hit, puts the Z-Yux back at height 20 and waits for the current attack to end. */
+/**
+ * Data-table event 48, run when the battle opens with Mario's or his partner's First Strike on the Z-Yux:
+ * raises it to y = 20 and waits for the attack to end.
+ */
 static EVT_BEGIN(barriern_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 20)
@@ -515,16 +586,16 @@ EVT_END()
 
 /**
  * Event script: turns on the blur trail (attribute 0x4000000 and a white blur with alpha 100) on the body part
- * of every satellite the Z-Yux still has (unit work 4 to 7), used while the satellites fly in and out.
+ * of every satellite the Z-Yux still has (UW_BARRIERN_Z_MINI_YUX_0 to _3), used while the satellites fly in and out.
  */
 static EVT_BEGIN(satellite_blur_on)
-    SET_VALUE(LW(2), 4)
+    SET_VALUE(LW(2), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(2), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
             CALL(btlevtcmd_SetPartsBlur, LW(3), LW(4), 255, 255, 255, 255, 255, 255, 255, 100, 0)
-            CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 67108864)
+            CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), PART_ATTR_BLUR)
         END_IF
         ADD(LW(2), 1)
     END_LOOP
@@ -533,12 +604,12 @@ EVT_END()
 
 /** Event script: turns the blur trail off on every satellite part of the Z-Yux. */
 static EVT_BEGIN(satellite_blur_off)
-    SET_VALUE(LW(2), 4)
+    SET_VALUE(LW(2), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(2), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-            CALL(btlevtcmd_OffPartsAttribute, LW(3), LW(4), 67108864)
+            CALL(btlevtcmd_OffPartsAttribute, LW(3), LW(4), PART_ATTR_BLUR)
         END_IF
         ADD(LW(2), 1)
     END_LOOP
@@ -694,7 +765,7 @@ static USER_FUNC(barriern_satellite_zanzou) {
     BattleUnit* sat;
     f32 scales[5] = {1.7f, 2.4f, 3.1f, 3.8f, 4.5f};
 
-    sat = BattleGetUnitPtr(wp, unit->work[4 + n]);
+    sat = BattleGetUnitPtr(wp, unit->work[UW_BARRIERN_Z_MINI_YUX_0 + n]);
     return barriern_satellite_zanzou_sub(isFirstCall, sat, scales, n, 0);
 }
 
@@ -711,7 +782,7 @@ static USER_FUNC(barriern_satellite_zanzou2) {
     BattleUnit* sat;
     f32 scales[5] = {1.7f, 2.4f, 3.1f, 3.8f, 4.5f};
 
-    sat = BattleGetUnitPtr(wp, unit->work[4 + n]);
+    sat = BattleGetUnitPtr(wp, unit->work[UW_BARRIERN_Z_MINI_YUX_0 + n]);
     return barriern_satellite_zanzou_sub(isFirstCall, sat, scales, n, 1);
 }
 
@@ -826,7 +897,7 @@ static EVT_BEGIN(unison_phase_event)
     CALL(evt_sub_random, 10, LW(0))
     WAIT_FRAMES(LW(0))
     SET_VALUE(LW(0), 0)
-    SET_VALUE(LW(1), 4)
+    SET_VALUE(LW(1), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
@@ -840,14 +911,14 @@ static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BARRI_ATTACK9"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(barriern_zanzou3, BTL_UNIT_SELF)
     CALL_CHILD(satellite_blur_on)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_SATELLITE_COUNT, LW(1))
     IF_INT_GREATER_OR_EQUAL(LW(1), 1)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BARRI_SPLIT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
     CALL(barriernSatelliteToInside, BTL_UNIT_SELF, LW(1))
     CALL_CHILD(satellite_blur_off)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(4))
-    SET_VALUE(LW(1), 4)
+    SET_VALUE(LW(1), UW_BARRIERN_Z_MINI_YUX_0)
     SET_VALUE(LW(5), 0)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(2))
@@ -870,7 +941,7 @@ static EVT_BEGIN(unison_phase_event)
     CALL(barriernSatelliteToOutside, BTL_UNIT_SELF, LW(0))
     WAIT_FRAMES(60)
     CALL_CHILD(satellite_blur_off)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_SATELLITE_COUNT, LW(0))
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -897,13 +968,13 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(_check_satellite)
     SET_VALUE(LW(0), 0)
-    SET_VALUE(LW(1), 4)
+    SET_VALUE(LW(1), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_CheckActStatus, LW(3), LW(2))
             IF_INT_NOT_EQUAL(LW(2), 0)
-                CALL(btlevtcmd_CheckStatus, LW(3), 5, LW(2))
+                CALL(btlevtcmd_CheckStatus, LW(3), STATUS_CONFUSE, LW(2))
                 IF_INT_EQUAL(LW(2), 0)
                     ADD(LW(0), 1)
                 END_IF
@@ -972,21 +1043,24 @@ EVT_END()
  * no damage is dealt.
  */
 static EVT_BEGIN(wakka_attack_common_event_no_hit)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(6))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_GROUP_ATTACK, LW(6))
+    // The ring appears at its shooter (the Z-Yux itself or one of its Mini-Z-Yux), with a blur that depends
+    // on which one fired.
     IF_INT_EQUAL(LW(6), 0)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 67108864)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_BLUR)
     ELSE
         CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, LW(15), 255, 255, 255, 255, 255, 255, 255, 100, 0)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 67108864)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_BLUR)
     END_IF
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("Z_3"))
     CALL(btlevtcmd_GetPos, LW(12), LW(6), LW(7), LW(8))
     ADD(LW(8), 1)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(6), LW(7), LW(8))
-    CALL(btlevtcmd_CheckPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216, LW(0))
+    CALL(btlevtcmd_CheckPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
     END_IF
+    // The Z-Yux plays A_5 as the ring is launched, and the target starts to dodge as the ring passes it.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_5"))
     BEGIN_SIBLING_EVENT
         LOOP(0)
@@ -1009,7 +1083,9 @@ static EVT_BEGIN(wakka_attack_common_event_no_hit)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(6))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_GROUP_ATTACK, LW(6))
+    // The ring pulses in size as it flies past the target in two hops (slow for the Z-Yux, quick for a
+    // Mini-Z-Yux) and is then hidden off screen.
     IF_INT_EQUAL(LW(6), 0)
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
         CALL(btlevtcmd_GetStageSize, LW(6), EVT_NULLPTR, EVT_NULLPTR)
@@ -1064,23 +1140,23 @@ EVT_END()
  * The ring part LW(15) flies at the target and stops, ready for the damage check by the caller.
  */
 static EVT_BEGIN(wakka_attack_common_event_hit)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(6))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_GROUP_ATTACK, LW(6))
     IF_INT_EQUAL(LW(6), 0)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 67108864)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_BLUR)
     ELSE
         CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, LW(15), 255, 255, 255, 255, 255, 255, 255, 100, 0)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 67108864)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_BLUR)
     END_IF
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("Z_3"))
     CALL(btlevtcmd_GetPos, LW(12), LW(6), LW(7), LW(8))
     ADD(LW(8), 1)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), LW(6), LW(7), LW(8))
-    CALL(btlevtcmd_CheckPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216, LW(0))
+    CALL(btlevtcmd_CheckPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
     END_IF
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_5"))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(6))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_GROUP_ATTACK, LW(6))
     IF_INT_EQUAL(LW(6), 0)
         CALL(btlevtcmd_SetPartsScale, BTL_UNIT_SELF, LW(15), 1, 0, 1)
         BEGIN_SIBLING_EVENT
@@ -1189,14 +1265,14 @@ static EVT_BEGIN(wakka_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_wakka_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_wakka_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_GROUP_ATTACK, 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 0, LW(3))
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 5, LW(4))
     SET_VALUE(LW(9), PTR(&weapon_wakka_attack))
@@ -1268,19 +1344,22 @@ EVT_END()
  * each with a dodge or defence check.
  */
 static EVT_BEGIN(wawawa_attack_event)
+    // The Z-Yux picks five random targets for its combined ring attack, and a confused one with no target is
+    // flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_wawawa_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_wawawa_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_GROUP_ATTACK, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_RINGS_LANDED, 0)
+    // The five chosen targets are stored for the rings that follow.
     CALL(barriern_wawawa_set_target, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 0, LW(0))
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 1, LW(2))
@@ -1297,6 +1376,7 @@ static EVT_BEGIN(wawawa_attack_event)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 12, 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 13, 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 14, 0)
+    // The camera zooms out to show the Z-Yux and its Mini-Z-Yux; the attack is declared against everyone.
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_zoom, 0, 250)
@@ -1309,6 +1389,7 @@ static EVT_BEGIN(wawawa_attack_event)
     CALL(btlevtcmd_GetPartsWork, BTL_UNIT_SELF, 1, 5, LW(4))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // The Mini-Z-Yux light up and leave afterimages as they gather around the Z-Yux.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BARRI_ATTACK5"), EVT_NULLPTR, 0, EVT_NULLPTR)
     SET_VALUE(LW(0), 0)
     LOOP(4)
@@ -1320,9 +1401,10 @@ static EVT_BEGIN(wawawa_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BARRI_ATTACK10"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(barriern_zanzou2, BTL_UNIT_SELF)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BARRI_ATTACK6"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // The Z-Yux and its Mini-Z-Yux glow (F_1, F_2).
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("F_1"))
     WAIT_FRAMES(20)
-    SET_VALUE(LW(11), 4)
+    SET_VALUE(LW(11), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(0)
         IF_INT_GREATER_OR_EQUAL(LW(11), 8)
             BREAK_LOOP
@@ -1334,7 +1416,7 @@ static EVT_BEGIN(wawawa_attack_event)
     END_LOOP
     WAIT_FRAMES(20)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    SET_VALUE(LW(11), 4)
+    SET_VALUE(LW(11), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(0)
         IF_INT_GREATER_OR_EQUAL(LW(11), 8)
             BREAK_LOOP
@@ -1343,13 +1425,14 @@ static EVT_BEGIN(wawawa_attack_event)
         CALL(btlevtcmd_SetRotate, LW(12), 0, 0, 0)
         ADD(LW(11), 1)
     END_LOOP
+    // They all spin around together for 10 frames.
     SET_VALUE(LW(0), 6)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(14))
     MULTIPLY(LW(0), LW(14))
     LOOP(10)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(0), 0)
-        SET_VALUE(LW(11), 4)
+        SET_VALUE(LW(11), UW_BARRIERN_Z_MINI_YUX_0)
         LOOP(0)
             IF_INT_GREATER_OR_EQUAL(LW(11), 8)
                 BREAK_LOOP
@@ -1359,7 +1442,7 @@ static EVT_BEGIN(wawawa_attack_event)
             ADD(LW(11), 1)
         END_LOOP
     END_LOOP
-    SET_VALUE(LW(11), 4)
+    SET_VALUE(LW(11), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(0)
         IF_INT_GREATER_OR_EQUAL(LW(11), 8)
             BREAK_LOOP
@@ -1369,6 +1452,7 @@ static EVT_BEGIN(wawawa_attack_event)
         CALL(btlevtcmd_AnimeChangePose, LW(12), LW(13), STRING("S_2"))
         ADD(LW(11), 1)
     END_LOOP
+    // The Z-Yux plays its attack poses A_1 to A_4 before the ring is launched.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BARRI_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1"))
     WAIT_FRAMES(30)
@@ -1382,9 +1466,11 @@ static EVT_BEGIN(wawawa_attack_event)
     SET_VALUE(LW(13), 0)
     SET_VALUE(LW(14), 5)
     SET_VALUE(LW(15), 7)
+    // The Z-Yux fires its ring first, then each Mini-Z-Yux fires its own in turn, 20 frames apart, each at
+    // its own target.
     SPAWN_EVENT(wawawa_attack_event_sub)
     WAIT_FRAMES(30)
-    SET_VALUE(LW(11), 4)
+    SET_VALUE(LW(11), UW_BARRIERN_Z_MINI_YUX_0)
     ADD(LW(13), 1)
     ADD(LW(14), 1)
     ADD(LW(15), 1)
@@ -1400,14 +1486,16 @@ static EVT_BEGIN(wawawa_attack_event)
         ADD(LW(14), 1)
         ADD(LW(15), 1)
     END_LOOP
+    // It waits until every ring has been resolved (UW_BARRIERN_Z_RINGS_LANDED reaches 5).
     LOOP(0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_RINGS_LANDED, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 5)
             BREAK_LOOP
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_FRAMES(10)
+    // Then they all spin back the other way and settle down.
     CALL(_check_satellite)
     SET_VALUE(LW(0), -6)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(14))
@@ -1415,7 +1503,7 @@ static EVT_BEGIN(wawawa_attack_event)
     LOOP(10)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(0), 0)
-        SET_VALUE(LW(11), 4)
+        SET_VALUE(LW(11), UW_BARRIERN_Z_MINI_YUX_0)
         LOOP(0)
             IF_INT_GREATER_OR_EQUAL(LW(11), 8)
                 BREAK_LOOP
@@ -1425,6 +1513,7 @@ static EVT_BEGIN(wawawa_attack_event)
             ADD(LW(11), 1)
         END_LOOP
     END_LOOP
+    // The Z-Yux faces forward again and returns to idling.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -1459,7 +1548,7 @@ static EVT_BEGIN(wawawa_attack_event_sub)
             END_IF
         END_IF
     END_LOOP
-    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 2, 1)
+    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_BARRIERN_Z_RINGS_LANDED, 1)
     CALL(btlevtcmd_GetPartsWork, BTL_UNIT_SELF, LW(15), 15, LW(0))
     CALL(evt_snd_sfxoff, LW(0))
     RETURN
@@ -1502,8 +1591,8 @@ static EVT_BEGIN(wawawa_attack_event_sub_last)
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_wawawa_attack), 256, LW(5))
         CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), 0, -1000, 0)
         WAIT_FRAMES(20)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), 67108864)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_BLUR)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, LW(15), PART_ATTR_HIDDEN)
     ELSE
         SET_VALUE(LW(9), PTR(&weapon_wawawa_attack))
         SET_VALUE(LW(10), 1)
@@ -1520,7 +1609,7 @@ EVT_END()
 static EVT_BEGIN(wait_event)
     CALL(_check_satellite)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
-    SET_VALUE(LW(11), 4)
+    SET_VALUE(LW(11), UW_BARRIERN_Z_MINI_YUX_0)
     LOOP(0)
         IF_INT_GREATER_OR_EQUAL(LW(11), 8)
             BREAK_LOOP
@@ -1547,9 +1636,9 @@ static EVT_BEGIN(wait_event)
     WAIT_FRAMES(LW(0))
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 3, LW(1))
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 4, LW(2))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_DIZZY, LW(1))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_POISON, LW(2))
         OR(LW(0), LW(1))
         OR(LW(0), LW(2))
         IF_INT_EQUAL(LW(0), 0)
@@ -1570,16 +1659,16 @@ EVT_END()
 static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
     SatelliteSpline* sp;
 
-    if (unit->work[4 + n] == -1) {
+    if (unit->work[UW_BARRIERN_Z_MINI_YUX_0 + n] == -1) {
         return FALSE;
     }
     sp = BTL_ALLOC(sizeof(SatelliteSpline));
-    unit->work[10 + n] = (EvtWord)sp;
+    unit->work[UW_BARRIERN_Z_SPLINE_0 + n] = (EvtWord)sp;
     sp->numPoints = 5;
     sp->points = table;
     sp->frame = 0;
     spline_maketable(5, sp->points, sp->knots, sp->curvature);
-    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (EvtWord)table;
+    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0 + n]), 1)->work[2] = (EvtWord)table;
     return TRUE;
 }
 
@@ -1594,22 +1683,22 @@ static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n) {
     Vec upos;
     Vec pos;
 
-    if (unit->work[4 + n] == -1) {
+    if (unit->work[UW_BARRIERN_Z_MINI_YUX_0 + n] == -1) {
         return FALSE;
     }
-    sp = (SatelliteSpline*)unit->work[10 + n];
+    sp = (SatelliteSpline*)unit->work[UW_BARRIERN_Z_SPLINE_0 + n];
     if (sp == NULL) {
         return FALSE;
     }
     if (sp->frame >= 60) {
         if (sp != NULL) {
             BTL_FREE(sp);
-            unit->work[10 + n] = 0;
+            unit->work[UW_BARRIERN_Z_SPLINE_0 + n] = 0;
         }
         return FALSE;
     }
     spline_getvalue(&pos, intplGetValue(4, 0.0f, 1.0f, sp->frame, 60), sp->numPoints, sp->points, sp->knots, sp->curvature);
-    sat = BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]);
+    sat = BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0 + n]);
     if (sat == NULL) {
         return FALSE;
     }
@@ -1636,8 +1725,8 @@ static USER_FUNC(barriernSatelliteToInside) {
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     if (isFirstCall) {
         for (i = 0; i < 4; i++) {
-            if (unit->work[4 + i] != -1) {
-                EvtWord table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + i]), 1)->work[2];
+            if (unit->work[UW_BARRIERN_Z_MINI_YUX_0 + i] != -1) {
+                EvtWord table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0 + i]), 1)->work[2];
 
                 if (table == (EvtWord)splineTableOut1_1) {
                     barriernSatelliteTo_Init(unit, i, splineTableIn1_1);
@@ -1800,31 +1889,31 @@ static USER_FUNC(outSplineTableSet) {
 
     switch (evtGetValue(event, args[1])) {
         case 1:
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0]), 1);
             part->work[2] = (EvtWord)splineTableOut1_1;
             break;
         case 2:
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0]), 1);
             part->work[2] = (EvtWord)splineTableOut2_1;
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[5]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_1]), 1);
             part->work[2] = (EvtWord)splineTableOut2_2;
             break;
         case 3:
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0]), 1);
             part->work[2] = (EvtWord)splineTableOut3_1;
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[5]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_1]), 1);
             part->work[2] = (EvtWord)splineTableOut3_2;
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[6]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_2]), 1);
             part->work[2] = (EvtWord)splineTableOut3_3;
             break;
         case 4:
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0]), 1);
             part->work[2] = (EvtWord)splineTableOut4_1;
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[5]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_1]), 1);
             part->work[2] = (EvtWord)splineTableOut4_2;
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[6]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_2]), 1);
             part->work[2] = (EvtWord)splineTableOut4_3;
-            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[7]), 1);
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_3]), 1);
             part->work[2] = (EvtWord)splineTableOut4_4;
             break;
     }
@@ -1833,7 +1922,7 @@ static USER_FUNC(outSplineTableSet) {
 
 /** Stores the spline table in the part work 2 of the body part of satellite n of the Z-Yux. */
 static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, Vec* table) {
-    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (EvtWord)table;
+    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BARRIERN_Z_MINI_YUX_0 + n]), 1)->work[2] = (EvtWord)table;
 }
 
 /**
@@ -1929,8 +2018,8 @@ static USER_FUNC(_check_satellite) {
     if (!alive) {
         part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
         if (part->attributes & PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS) {
-            effDelete((EffectEntry*)unit->work[3]);
-            unit->work[3] = 0;
+            effDelete((EffectEntry*)unit->work[UW_BARRIERN_Z_BARRIER_EFFECT]);
+            unit->work[UW_BARRIERN_Z_BARRIER_EFFECT] = 0;
             BtlUnit_snd_se(unit, "SFX_ENM_BARRI_BARRIER_BREAK1", 0xF1194D80, 0);
             BtlUnit_GetPos(unit, &x, &y, &z);
             for (j = 0; j < 20; j++) {
@@ -1953,12 +2042,12 @@ static USER_FUNC(_check_satellite) {
 
             BtlUnit_snd_se(unit, "SFX_ENM_BARRI_BARRIER1", 0xF1194D80, 0);
             BtlUnit_GetPos(unit, &px, &py, &pz);
-            unit->work[3] = (EvtWord)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
+            unit->work[UW_BARRIERN_Z_BARRIER_EFFECT] = (EvtWord)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
         }
         part->attributes |= PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS;
         evtSetValue(event, args[0], 1);
-        if (unit->work[3] != 0) {
-            f32* ud = ((EffectEntry*)unit->work[3])->userdata;
+        if (unit->work[UW_BARRIERN_Z_BARRIER_EFFECT] != 0) {
+            f32* ud = ((EffectEntry*)unit->work[UW_BARRIERN_Z_BARRIER_EFFECT])->userdata;
 
             BtlUnit_GetPos(unit, &x, &y, &z);
             ud[1] = x;

@@ -137,7 +137,7 @@ cancel:
 
 /** Party table init for Vivian: 24 wide by 35 tall, flying follower, base shadow size 10, tail shown and no ripple. */
 void vivian_init(PartyEntry* party) {
-    party->memberKind = 6;
+    party->memberKind = PARTY_MEMBER_VIVIAN;
     party->moveKind = 1;
     party->height = 35.0f;
     party->width = 24.0f;
@@ -395,7 +395,7 @@ void vivian_use(PartyEntry* party) {
             break;
         case 10:
             hit = marioSearchGround(&gx, &gy, &gz, 100.0f, -100.0f);
-            if (hit && !(hitGetAttr(hit) & 0xA00)) {
+            if (hit && !(hitGetAttr(hit) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_SPIKES))) {
                 if (m->floorMove.y || m->floorMove.x) {
                     if ((f32)m->screenY > 480.0f || (f32)m->screenY < 50.0f) {
                         camFollowYOn();
@@ -561,7 +561,7 @@ static inline void vivianFollow(PartyEntry* party) {
 
     marioGetScreenPos(mario->position, &sx, &sy, &sz);
     hit = marioSearchGround(&gx, &gy, &gz, 37.0f, -37.0f);
-    if (hit && !(hitGetAttr(hit) & 0xA00)) {
+    if (hit && !(hitGetAttr(hit) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_SPIKES))) {
         mario->hitobjStandOn = hit;
         mario->position.y = gx;
         if (mario->floorMove.y < 0.0f) {
@@ -607,8 +607,6 @@ static inline void vivianFollow(PartyEntry* party) {
 #endif
     }
 }
-
-#pragma defer_codegen off
 /**
  * Retail Veil: Vivian slides behind Mario and both sink into the floor shadow (ripple effect, sounds),
  * then stay hidden, following the ground under Mario while he moves,

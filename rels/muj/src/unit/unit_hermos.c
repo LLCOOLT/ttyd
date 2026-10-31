@@ -73,6 +73,10 @@ static USER_FUNC(bubble_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit data of the Ember: 8 HP, 26x36 units in size; ties together its sounds, parts, status vulnerability,
+ * init event and event table.
+ */
 BattleUnitKind unit_hermos = {
     84,
     "btl_un_hermos",
@@ -131,7 +135,7 @@ BattleUnitKind unit_hermos = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     2,
     parts,
@@ -139,16 +143,33 @@ BattleUnitKind unit_hermos = {
     data_table,
 };
 
+/** Defence of the Ember: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Defence attributes of the Ember: fire hits heal it; ice hits do one extra damage;
+ * explosion hits do one extra damage.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 3, 1, 1, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Ember (percent chance each status takes hold): immune to burn;
+ * resists sleep (50%), dizzy (75%), poison (25%), confusion (75%), freeze (50%), Tiny (75%),
+ * Attack Down (75%), Defense Down (75%), allergic (75%), fright (50%), Slow (75%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {50, 90, 75, 25, 75, 100, 0, 50, 100, 75, 100, 75, 100, 75, 75, 50, 90, 100, 75, 100, 100, 95};
 #else
+/**
+ * Retail builds: Status vulnerability of the Ember (percent chance each status takes hold): immune to burn;
+ * resists sleep (50%), confusion (75%), freeze (50%), allergic (75%), fright (50%), Slow (75%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {50, 90, 105, 100, 75, 100, 0, 50, 100, 90, 100, 90, 100, 95, 75, 50, 90, 100, 75, 100, 100, 95};
 #endif
 
+/** Pose table of the Ember: maps its battle poses to its animations. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -170,6 +191,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Event table of the Ember: damage_fire_explosion_event (tag 11), avoid_fire_event (tag 40). */
 static BattleDataEntry data_table[] = {
     {11, damage_fire_explosion_event},
     {40, avoid_fire_event},
@@ -177,11 +199,13 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of the Ember: 1 part (model c_elmos). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_hermos", "c_elmos", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x109, 0x10, pose_table},
-    {2, NULL, "c_elmos", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_hermos", "c_elmos", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_WEAK_TO_ICE_POWER, COUNTER_ATTR_FIERY, pose_table},
+    {2, NULL, "c_elmos", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Weapon of the Ember (attack): targets one unit for 3 damage, fire element; used by attack_event. */
 static BattleWeapon weapon_bubble_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -200,7 +224,7 @@ static BattleWeapon weapon_bubble_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -224,6 +248,10 @@ static BattleWeapon weapon_bubble_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of the Ember (fire attack): targets one unit for 2 damage, fire element, ignores Defense,
+ * may inflict Burn (75%, 3 turns); used by attack_event.
+ */
 static BattleWeapon weapon_bubble_fire_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -242,7 +270,7 @@ static BattleWeapon weapon_bubble_fire_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -267,6 +295,10 @@ static BattleWeapon weapon_bubble_fire_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of the Ember (all fire attack): targets every unit for 2 damage, fire element, ignores Defense,
+ * may inflict Burn (75%, 3 turns); used by attack_event.
+ */
 static BattleWeapon weapon_bubble_all_fire_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -289,7 +321,7 @@ static BattleWeapon weapon_bubble_all_fire_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -314,6 +346,10 @@ static BattleWeapon weapon_bubble_all_fire_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Spawn setup for the Ember (unit_hermos): enemy side, placed off-screen at first;
+ * used by friend_event.
+ */
 static BattleUnitSetup entry_bubble = {
     &unit_hermos, // unitKindParams
     1, // alliance
@@ -325,7 +361,10 @@ static BattleUnitSetup entry_bubble = {
     NULL, // itemDropTable
 };
 
-/** Guess: init event of the Ember: sets its work values and pose tables. */
+/**
+ * Init event of the Ember: installs its wait, attack,
+ * damage and confusion (the attack event) events and puts it, and its home, 10 units above the ground.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -338,7 +377,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
-/** Guess: damage event of the Ember: runs the default damage flow. */
+/** Damage event of the Ember: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -346,7 +385,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-/** Event run when the Ember is hit by fire: plays its fire sound and the A_2B pose. */
+/**
+ * Data event (tag 40, the fiery-counter hit event) run
+ * when an attacker is burned by touching the Ember's fiery body: plays its fire sound and the A_2B pose.
+ */
 static EVT_BEGIN(avoid_fire_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -354,7 +396,11 @@ static EVT_BEGIN(avoid_fire_event)
     RETURN
 EVT_END()
 
-/** Guess: explosion damage event of the Ember: plays the A_2B pose and flings it back, checking the space behind it. */
+/**
+ * Data event (tag 11) run when the Ember takes a fire hit:
+ * it takes the A_2B pose and splits (friend_event) into the first free spot behind it (out to x = 170),
+ * or else in front of it (down to x = 10); with no room nothing more happens.
+ */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -425,7 +471,11 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
-/** Guess: attack event of the Ember: chooses between its normal attack and its fire attacks. */
+/**
+ * Attack event (also its confusion event) of the Ember: may use an item;
+ * otherwise picks by weights 50 its body-slam (normal_attack_event),
+ * 30 a fireball (fire_attack_event) and 20 the wall of fire (all_fire_attack_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -458,9 +508,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-/** Guess: normal attack of the Ember: it flies at one target and hits it for the weapon damage. */
+/**
+ * Normal attack of the Ember: it swoops onto one target (the first-strike target on a first strike)
+ * and flickers against it for a 3-damage fire hit (weapon_bubble_attack), then floats back home.
+ */
 static EVT_BEGIN(normal_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -469,7 +522,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -482,6 +535,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // The camera pulls in as the Ember drifts toward its target with a floating sound.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -490,6 +544,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_FRAMES(120)
     END_SIBLING_EVENT
+    // It swoops down in front of its target in two dives, ending right next to it.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 13)
@@ -531,6 +586,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is blocked: it still breathes its flame (A_1B), but the target avoids it.
     LABEL(90)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LOOP(4)
@@ -538,6 +594,8 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(10)
     END_LOOP
     GOTO(98)
+    // The attack hits: the camera shakes and pulls back, the flame burns the target and the Action Command
+    // defence result is applied.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -552,6 +610,7 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(10)
     END_LOOP
     GOTO(98)
+    // The Ember floats back up and away in three dives to its starting spot, then settles into its idle pose.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -614,9 +673,12 @@ static USER_FUNC(eff_fire) {
     return EVT_RETURN_BLOCK;
 }
 
-/** Guess: fire attack of the Ember: it spits fire at one target (eff_fire) for the weapon damage. */
+/**
+ * Fireball attack of the Ember: it sends its second part, wrapped in a growing flame (eff_fire),
+ * at one target for 2 fire damage with a 75% chance of Burn for 3 turns (weapon_bubble_fire_attack).
+ */
 static EVT_BEGIN(fire_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -625,7 +687,7 @@ static EVT_BEGIN(fire_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -640,12 +702,14 @@ static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 0)
     BEGIN_SIBLING_EVENT
+        // The Ember tilts back (T_1) for a moment while it conjures a fireball.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("T_1"))
         WAIT_FRAMES(30)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     END_SIBLING_EVENT
+    // The fireball (part 2) appears at the Ember with a fire effect trailing behind it.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 5)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
@@ -661,6 +725,7 @@ static EVT_BEGIN(fire_attack_event)
     MULTIPLY_FLOAT(LW(12), FLOAT(0.5996094f))
     ADD_FLOAT(LW(0), LW(10))
     ADD_FLOAT(LW(2), LW(12))
+    // The fireball flies toward the target in three arcing dives that get shorter as it closes in.
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 5)
@@ -675,8 +740,9 @@ static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 30, 0, 1, 0, -1)
+    // The fireball reaches the target and disappears.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -701,12 +767,15 @@ static EVT_BEGIN(fire_attack_event)
     END_SWITCH
     LABEL(90)
     GOTO(98)
+    // The fireball hits: a puff of smoke bursts, the Action Command defence result is applied and damage is
+    // dealt.
     LABEL(91)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 16, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     GOTO(98)
+    // The camera resets and the Ember pauses a moment.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(400)
@@ -743,7 +812,7 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
-/** Guess: sub-event of the fire wall attack: lights one fire (eff_all_fire) in the row. */
+/** Sub-event of the wall-of-fire attack: keeps flame LW(0) of the row (eff_all_fire) going for 120 frames. */
 static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, BTL_UNIT_SELF, LW(0))
@@ -753,11 +822,12 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
 EVT_END()
 
 /**
- * Guess: fire wall attack of the Ember: lights a row of ten growing fires in front of itself that burn everyone
- * on the other side.
+ * Wall-of-fire attack of the Ember: it moves to the front (x = -40), quivers,
+ * and lights a row of ten flames in front of itself that hit every selected target for 2 fire damage with a 75%
+ * chance of Burn for 3 turns (weapon_bubble_all_fire_attack), then returns home.
  */
 static EVT_BEGIN(all_fire_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -766,7 +836,7 @@ static EVT_BEGIN(all_fire_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -777,6 +847,7 @@ static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // The camera zooms out to take in every target while the Ember floats back (A_1A) to its firing spot.
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -791,6 +862,7 @@ static EVT_BEGIN(all_fire_attack_event)
 #endif
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It charges up (A_2A), trembling from side to side for about 80 frames.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     LOOP(20)
@@ -802,16 +874,20 @@ static EVT_BEGIN(all_fire_attack_event)
     BEGIN_SIBLING_EVENT
         SET_VALUE(LW(0), 0)
         LOOP(10)
+            // Ten fireballs shoot out one after another across the stage.
             SPAWN_EVENT(all_fire_attackEvent_sub)
             WAIT_FRAMES(2)
             ADD(LW(0), 1)
         END_LOOP
     END_SIBLING_EVENT
+    // It breathes the fire out (A_2B) and the camera follows the flames.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
+    // Each target is checked in turn: a miss, or a hit that applies damage (the defence result counts for the
+    // first target only).
     LABEL(0)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
@@ -849,6 +925,7 @@ static EVT_BEGIN(all_fire_attack_event)
         ADD(LW(10), 1)
         GOTO(0)
     END_IF
+    // After a long pause (180 frames) it floats back to its starting spot.
     LABEL(98)
     WAIT_FRAMES(180)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
@@ -862,7 +939,7 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
-/** Guess: wait (idle) event of the Ember: sets the idle pose. */
+/** Wait (idle) event of the Ember: sets the idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

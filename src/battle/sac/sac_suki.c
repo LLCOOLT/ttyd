@@ -92,6 +92,10 @@ static void main_base(void);
 static void main_button(s32 idx);
 void N__disp_2D(s32 side, s32 idx);
 
+/**
+ * Showstopper's weapon template (2 SP): picks the targets, and set_weapon copies it with the
+ * instant-KO chance the stars earned (the template's own chance, 100%, is 0 in the demos).
+ */
 static BattleWeapon weapon = {
     "btl_wn_sac_sukkari_sukkiri", // name
     ICON_199, // icon
@@ -113,7 +117,7 @@ static BattleWeapon weapon = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_sac_7", // acHelpMsg
@@ -297,7 +301,7 @@ static void main_base(void) {
                     w->timer = 0;
                     w->round++;
                     w->starState = 5;
-                    e = evtEntry(nice_event, 0, 0x20);
+                    e = evtEntry(nice_event, 0, EVENT_START_NOW);
                     n = w->round + 1;
                     e->lwData[0] = n < 6 ? n : 6;
                     if (num >= 1 && num <= 49) {
@@ -332,7 +336,7 @@ static void main_base(void) {
     }
 }
 
-// inlining off for main_button, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it main_button is inlined into main_suki (93 -> 147 instructions)
 #pragma dont_inline on
 /** Deals button idx of a new round: places it in the row and picks A, B, X or Y at random. */
 static void main_button(s32 idx) {
@@ -755,7 +759,7 @@ static void disp_3D(CameraId cam, void* param) {
 static void disp_3D_alpha(CameraId cam, void* param) {
 }
 
-// inlining off for get_ptr, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it get_ptr is inlined into its callers (16 shrink, e.g. star_stone_appear 11 -> 5 instructions)
 #pragma dont_inline on
 /** Returns the Showstopper work, which lives in the battle's action command work area. */
 static SukiWork* get_ptr(void) {
@@ -832,6 +836,7 @@ typedef struct OhkoRateTbl {
     u8 rate[6];
 } OhkoRateTbl;
 
+/** Showstopper's instant-KO chance (%) for 1 to 6 stars earned, read by set_weapon. */
 const OhkoRateTbl N_ohko_rate_tbl = {{50, 60, 70, 80, 90, 100}};
 
 /**
@@ -940,9 +945,10 @@ static void set_tev(MapTevCallbackInfo* info) {
  * the stage flashes and every enemy not evasive is checked against the instant-KO chance the stars bought.
  */
 EVT_BEGIN(marioAttackEvent_Suki)
+    // A knocked-out partner is left out; with no enemy to target the move ends at once.
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(14))
     CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
-    CALL(btlevtcmd_CheckStatus, LW(14), 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, LW(14), STATUS_INSTANT_KILL, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(14), -1)
     END_IF
@@ -951,6 +957,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
+    // Mario declares the attack, pays the Star Power and Showstopper's work starts.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
@@ -960,6 +967,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
     BEGIN_SIBLING_EVENT
         CALL(main_suki, LW(14))
     END_SIBLING_EVENT
+    // Crystal Star opening: Mario holds up the star item and the Crystal Star appears in stardust.
     CALL_CHILD(sac_start_camera_evt)
     WAIT_MS(500)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -974,11 +982,13 @@ EVT_BEGIN(marioAttackEvent_Suki)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_snd_sfxoff, LW(11))
     WAIT_FRAMES(40)
+    // Mario puts the item away, returns home and waits for the star to rise.
     CALL_CHILD(sac_mario_item_on_end_evt)
     CALL_CHILD(sac_mario_back_home)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
     CALL(wait_star_stone_up_end)
     WAIT_MS(100)
+    // The button game runs with the help shown and the crowd cheering; the stars earned set the KO chance.
     BEGIN_SIBLING_EVENT
         CALL(sac_cheer, 0)
     END_SIBLING_EVENT
@@ -989,9 +999,11 @@ EVT_BEGIN(marioAttackEvent_Suki)
     CALL(sac_cheer_end)
     CALL(set_weapon, LW(0), LW(9))
     WAIT_MS(500)
+    // The camera pulls back to show the whole stage.
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     WAIT_MS(1000)
+    // Each star earned flies out with a paper flourish, a crystal shine and a screen shake.
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), LW(0))
     CALL(evt_paper_entry, STRING("OFF_d_yabu_small"))
@@ -1017,6 +1029,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
         CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_SUKKIRI4"), 0)
         CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_SUKKIRI4_2"), 0)
         IF_INT_EQUAL(LW(10), 0)
+            // With the first star, every enemy that can be hurt flinches.
             CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(1))
             CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(1), PTR(&weapon))
             CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
@@ -1027,7 +1040,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
             END_IF
             CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS, LW(1))
             IF_INT_EQUAL(LW(1), 0)
-                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 39)
+                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_DAMAGE)
             END_IF
             CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
             GOTO(5)
@@ -1037,6 +1050,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
         CALL(wait_star_stone_attack_end)
         ADD(LW(10), 1)
     END_LOOP
+    // The paper flourishes are cleared away.
     CALL(evt_paper_delete, STRING("OFF_d_yabu_small"))
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), LW(0))
@@ -1045,6 +1059,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
         CALL(evt_img_release, LW(13))
         ADD(LW(10), 1)
     END_LOOP
+    // The stage flashes white four times.
     CALL_CHILD(flash_evt)
     SET_VALUE(LW(10), 3)
     LOOP(4)
@@ -1063,6 +1078,7 @@ EVT_BEGIN(marioAttackEvent_Suki)
         END_LOOP
     END_LOOP
     CALL_CHILD(flash_cancel_evt)
+    // Every enemy that is not evasive is checked against the instant-KO chance.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon), LW(3), LW(4))
@@ -1073,11 +1089,12 @@ EVT_BEGIN(marioAttackEvent_Suki)
     END_IF
     CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), PART_ATTR_EVASIVE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     GOTO(10)
     LABEL(20)
+    // The camera resets and the move's work is freed.
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(end_suki)

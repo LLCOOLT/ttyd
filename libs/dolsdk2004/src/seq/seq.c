@@ -1,6 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/seq.h>
 
+/** Number of data bytes after each MIDI status byte 0x80-0xFF. */
 static u8 __SEQMidiEventLength[128] = {
     0x02, 0x02, 0x02, 0x02,
     0x02, 0x02, 0x02, 0x02,

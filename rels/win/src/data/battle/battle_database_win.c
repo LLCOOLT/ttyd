@@ -77,6 +77,10 @@ NpcBattleSelect btlgrpsel_win_btlno_win_03_01_off[2];
 NpcSetupBattleInfo btlsetup_win_tbl[9];
 NpcTerritoryInfo btl_win_setup_no_tbl[9];
 
+/**
+ * Stage objects of the Boggly Woods battle stage stg_02_0: the A1 backdrop piece, flower (S_hana) and grass
+ * (S_kusa) props, and the B and C background sets.
+ */
 BattleStageObjectData win_btlobject_data[] = {
     {"A1", 2, 0, {92.0f, 0.0f, -46.0f}, 0, 60, {0}},
     {"S_hana", 2, 1, {2.0f, 0.0f, -46.0f}, 0, 60, {0}},
@@ -85,6 +89,10 @@ BattleStageObjectData win_btlobject_data[] = {
     {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
+/**
+ * The one battle stage used by every win.rel fight: bti_01 shared data with the stg_02_0 scenery and the
+ * objects above.
+ */
 BattleStageData win_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -98,6 +106,7 @@ BattleStageData win_btlstage_data[] = {
     },
 };
 
+/** Enemy lineup for the first win_00 encounter, default set (flag clear), variant 1: Dark Puff x2. */
 BattleUnitSetup btlparty_win_win_00_01_off_1[] = {
     {
         &unit_monochrome_kurokumorn, // unitKindParams
@@ -121,6 +130,10 @@ BattleUnitSetup btlparty_win_win_00_01_off_1[] = {
     },
 };
 
+/**
+ * Battle group for the first win_00 encounter, default set (flag clear), variant 1: Dark Puff x2, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_01_off_1 = {
     2, // numEnemies
     btlparty_win_win_00_01_off_1, // enemyData
@@ -132,6 +145,10 @@ BattleGroupSetup btlgrp_win_win_00_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the first win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 1: Dark Puff x2.
+ */
 BattleUnitSetup btlparty_win_win_00_01_on_1[] = {
     {
         &unit_monochrome_kurokumorn, // unitKindParams
@@ -155,6 +172,10 @@ BattleUnitSetup btlparty_win_win_00_01_on_1[] = {
     },
 };
 
+/**
+ * Battle group for the first win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 1: Dark Puff x2, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_01_on_1 = {
     2, // numEnemies
     btlparty_win_win_00_01_on_1, // enemyData
@@ -166,6 +187,10 @@ BattleGroupSetup btlgrp_win_win_00_01_on_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the first win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 2: Dark Puff x3.
+ */
 BattleUnitSetup btlparty_win_win_00_01_on_2[] = {
     {
         &unit_monochrome_kurokumorn, // unitKindParams
@@ -199,6 +224,10 @@ BattleUnitSetup btlparty_win_win_00_01_on_2[] = {
     },
 };
 
+/**
+ * Battle group for the first win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 2: Dark Puff x3, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_01_on_2 = {
     3, // numEnemies
     btlparty_win_win_00_01_on_2, // enemyData
@@ -210,6 +239,10 @@ BattleGroupSetup btlgrp_win_win_00_01_on_2 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the first win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 3: Dark Puff x4.
+ */
 BattleUnitSetup btlparty_win_win_00_01_on_3[] = {
     {
         &unit_monochrome_kurokumorn, // unitKindParams
@@ -253,6 +286,10 @@ BattleUnitSetup btlparty_win_win_00_01_on_3[] = {
     },
 };
 
+/**
+ * Battle group for the first win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 3: Dark Puff x4, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_01_on_3 = {
     4, // numEnemies
     btlparty_win_win_00_01_on_3, // enemyData
@@ -264,6 +301,7 @@ BattleGroupSetup btlgrp_win_win_00_01_on_3 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup for the second win_00 encounter, default set (flag clear), variant 1: Cleft, Dark Puff. */
 BattleUnitSetup btlparty_win_win_00_02_off_1[] = {
     {
         &unit_monochrome_sinemon, // unitKindParams
@@ -287,6 +325,10 @@ BattleUnitSetup btlparty_win_win_00_02_off_1[] = {
     },
 };
 
+/**
+ * Battle group for the second win_00 encounter, default set (flag clear), variant 1: Cleft, Dark Puff, with
+ * its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_02_off_1 = {
     2, // numEnemies
     btlparty_win_win_00_02_off_1, // enemyData
@@ -298,6 +340,10 @@ BattleGroupSetup btlgrp_win_win_00_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the second win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 1: Cleft, Dark Puff.
+ */
 BattleUnitSetup btlparty_win_win_00_02_on_1[] = {
     {
         &unit_monochrome_sinemon, // unitKindParams
@@ -321,6 +367,10 @@ BattleUnitSetup btlparty_win_win_00_02_on_1[] = {
     },
 };
 
+/**
+ * Battle group for the second win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 1: Cleft, Dark Puff, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_02_on_1 = {
     2, // numEnemies
     btlparty_win_win_00_02_on_1, // enemyData
@@ -332,6 +382,10 @@ BattleGroupSetup btlgrp_win_win_00_02_on_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the second win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 2: Cleft, Dark Puff x2.
+ */
 BattleUnitSetup btlparty_win_win_00_02_on_2[] = {
     {
         &unit_monochrome_sinemon, // unitKindParams
@@ -365,6 +419,10 @@ BattleUnitSetup btlparty_win_win_00_02_on_2[] = {
     },
 };
 
+/**
+ * Battle group for the second win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 2: Cleft, Dark Puff x2, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_02_on_2 = {
     3, // numEnemies
     btlparty_win_win_00_02_on_2, // enemyData
@@ -376,6 +434,7 @@ BattleGroupSetup btlgrp_win_win_00_02_on_2 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup for the third win_00 encounter, default set (flag clear), variant 1: Dark Puff x2, Cleft. */
 BattleUnitSetup btlparty_win_win_00_03_off_1[] = {
     {
         &unit_monochrome_kurokumorn, // unitKindParams
@@ -409,6 +468,10 @@ BattleUnitSetup btlparty_win_win_00_03_off_1[] = {
     },
 };
 
+/**
+ * Battle group for the third win_00 encounter, default set (flag clear), variant 1: Dark Puff x2, Cleft,
+ * with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_03_off_1 = {
     3, // numEnemies
     btlparty_win_win_00_03_off_1, // enemyData
@@ -420,6 +483,10 @@ BattleGroupSetup btlgrp_win_win_00_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the third win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 1: Dark Puff x2.
+ */
 BattleUnitSetup btlparty_win_win_00_03_on_1[] = {
     {
         &unit_monochrome_kurokumorn, // unitKindParams
@@ -443,6 +510,10 @@ BattleUnitSetup btlparty_win_win_00_03_on_1[] = {
     },
 };
 
+/**
+ * Battle group for the third win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 1: Dark Puff x2, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_03_on_1 = {
     2, // numEnemies
     btlparty_win_win_00_03_on_1, // enemyData
@@ -454,6 +525,10 @@ BattleGroupSetup btlgrp_win_win_00_03_on_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the third win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 2: Dark Puff, Cleft.
+ */
 BattleUnitSetup btlparty_win_win_00_03_on_2[] = {
     {
         &unit_monochrome_kurokumorn, // unitKindParams
@@ -477,6 +552,10 @@ BattleUnitSetup btlparty_win_win_00_03_on_2[] = {
     },
 };
 
+/**
+ * Battle group for the third win_00 encounter, alternate set (used once the Flurrie-joined story flag is
+ * set), variant 2: Dark Puff, Cleft, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_03_on_2 = {
     2, // numEnemies
     btlparty_win_win_00_03_on_2, // enemyData
@@ -488,6 +567,7 @@ BattleGroupSetup btlgrp_win_win_00_03_on_2 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup for the Vivian boss fight in win_00, default set (flag clear), variant 1: Vivian. */
 BattleUnitSetup btlparty_win_win_00_04_off_1[] = {
     {
         &unit_boss_vivian, // unitKindParams
@@ -501,6 +581,10 @@ BattleUnitSetup btlparty_win_win_00_04_off_1[] = {
     },
 };
 
+/**
+ * Battle group for the Vivian boss fight in win_00, default set (flag clear), variant 1: Vivian, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_00_04_off_1 = {
     1, // numEnemies
     btlparty_win_win_00_04_off_1, // enemyData
@@ -511,6 +595,7 @@ BattleGroupSetup btlgrp_win_win_00_04_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup for the first win_02 encounter, default set (flag clear), variant 1: Cleft, Pale Piranha. */
 BattleUnitSetup btlparty_win_win_02_01_off_1[] = {
     {
         &unit_monochrome_sinemon, // unitKindParams
@@ -534,6 +619,10 @@ BattleUnitSetup btlparty_win_win_02_01_off_1[] = {
     },
 };
 
+/**
+ * Battle group for the first win_02 encounter, default set (flag clear), variant 1: Cleft, Pale Piranha,
+ * with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_01_off_1 = {
     2, // numEnemies
     btlparty_win_win_02_01_off_1, // enemyData
@@ -545,6 +634,10 @@ BattleGroupSetup btlgrp_win_win_02_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the first win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 1: Cleft, Pale Piranha.
+ */
 BattleUnitSetup btlparty_win_win_02_01_on_1[] = {
     {
         &unit_monochrome_sinemon, // unitKindParams
@@ -568,6 +661,11 @@ BattleUnitSetup btlparty_win_win_02_01_on_1[] = {
     },
 };
 
+/**
+ * Battle group for the first win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 1: Cleft, Pale Piranha, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_01_on_1 = {
     2, // numEnemies
     btlparty_win_win_02_01_on_1, // enemyData
@@ -579,6 +677,10 @@ BattleGroupSetup btlgrp_win_win_02_01_on_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the first win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 2: Cleft, Pale Piranha x2.
+ */
 BattleUnitSetup btlparty_win_win_02_01_on_2[] = {
     {
         &unit_monochrome_sinemon, // unitKindParams
@@ -612,6 +714,11 @@ BattleUnitSetup btlparty_win_win_02_01_on_2[] = {
     },
 };
 
+/**
+ * Battle group for the first win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 2: Cleft, Pale Piranha x2, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_01_on_2 = {
     3, // numEnemies
     btlparty_win_win_02_01_on_2, // enemyData
@@ -623,6 +730,10 @@ BattleGroupSetup btlgrp_win_win_02_01_on_2 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the first win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 3: Cleft x2, Pale Piranha.
+ */
 BattleUnitSetup btlparty_win_win_02_01_on_3[] = {
     {
         &unit_monochrome_sinemon, // unitKindParams
@@ -656,6 +767,11 @@ BattleUnitSetup btlparty_win_win_02_01_on_3[] = {
     },
 };
 
+/**
+ * Battle group for the first win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 3: Cleft x2, Pale Piranha, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_01_on_3 = {
     3, // numEnemies
     btlparty_win_win_02_01_on_3, // enemyData
@@ -667,6 +783,7 @@ BattleGroupSetup btlgrp_win_win_02_01_on_3 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup for the second win_02 encounter, default set (flag clear), variant 1: Pale Piranha, Cleft. */
 BattleUnitSetup btlparty_win_win_02_02_off_1[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -690,6 +807,10 @@ BattleUnitSetup btlparty_win_win_02_02_off_1[] = {
     },
 };
 
+/**
+ * Battle group for the second win_02 encounter, default set (flag clear), variant 1: Pale Piranha, Cleft,
+ * with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_02_off_1 = {
     2, // numEnemies
     btlparty_win_win_02_02_off_1, // enemyData
@@ -701,6 +822,10 @@ BattleGroupSetup btlgrp_win_win_02_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the second win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 1: Pale Piranha, Cleft.
+ */
 BattleUnitSetup btlparty_win_win_02_02_on_1[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -724,6 +849,11 @@ BattleUnitSetup btlparty_win_win_02_02_on_1[] = {
     },
 };
 
+/**
+ * Battle group for the second win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 1: Pale Piranha, Cleft, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_02_on_1 = {
     2, // numEnemies
     btlparty_win_win_02_02_on_1, // enemyData
@@ -735,6 +865,10 @@ BattleGroupSetup btlgrp_win_win_02_02_on_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the second win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 2: Pale Piranha x2, Cleft.
+ */
 BattleUnitSetup btlparty_win_win_02_02_on_2[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -768,6 +902,11 @@ BattleUnitSetup btlparty_win_win_02_02_on_2[] = {
     },
 };
 
+/**
+ * Battle group for the second win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 2: Pale Piranha x2, Cleft, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_02_on_2 = {
     3, // numEnemies
     btlparty_win_win_02_02_on_2, // enemyData
@@ -779,6 +918,10 @@ BattleGroupSetup btlgrp_win_win_02_02_on_2 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the second win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 3: Pale Piranha, Cleft x2.
+ */
 BattleUnitSetup btlparty_win_win_02_02_on_3[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -812,6 +955,11 @@ BattleUnitSetup btlparty_win_win_02_02_on_3[] = {
     },
 };
 
+/**
+ * Battle group for the second win_02 encounter, alternate set (used once GSWF_WIN02_ALT_BATTLES (which
+ * nothing sets, so this set is never used) is set), variant 3: Pale Piranha, Cleft x2, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_02_02_on_3 = {
     3, // numEnemies
     btlparty_win_win_02_02_on_3, // enemyData
@@ -823,6 +971,7 @@ BattleGroupSetup btlgrp_win_win_02_02_on_3 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup for the win_03 encounter, default set (flag clear), variant 1: Pale Piranha x4. */
 BattleUnitSetup btlparty_win_win_03_01_off_1[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -866,6 +1015,10 @@ BattleUnitSetup btlparty_win_win_03_01_off_1[] = {
     },
 };
 
+/**
+ * Battle group for the win_03 encounter, default set (flag clear), variant 1: Pale Piranha x4, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_03_01_off_1 = {
     4, // numEnemies
     btlparty_win_win_03_01_off_1, // enemyData
@@ -877,6 +1030,10 @@ BattleGroupSetup btlgrp_win_win_03_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 1: Pale Piranha x2.
+ */
 BattleUnitSetup btlparty_win_win_03_01_on_1[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -900,6 +1057,10 @@ BattleUnitSetup btlparty_win_win_03_01_on_1[] = {
     },
 };
 
+/**
+ * Battle group for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 1: Pale Piranha x2, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_03_01_on_1 = {
     2, // numEnemies
     btlparty_win_win_03_01_on_1, // enemyData
@@ -911,6 +1072,10 @@ BattleGroupSetup btlgrp_win_win_03_01_on_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 2: Pale Piranha x3.
+ */
 BattleUnitSetup btlparty_win_win_03_01_on_2[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -944,6 +1109,10 @@ BattleUnitSetup btlparty_win_win_03_01_on_2[] = {
     },
 };
 
+/**
+ * Battle group for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 2: Pale Piranha x3, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_03_01_on_2 = {
     3, // numEnemies
     btlparty_win_win_03_01_on_2, // enemyData
@@ -955,6 +1124,10 @@ BattleGroupSetup btlgrp_win_win_03_01_on_2 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 3: Pale Piranha, Dark Puff, Cleft.
+ */
 BattleUnitSetup btlparty_win_win_03_01_on_3[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -988,6 +1161,11 @@ BattleUnitSetup btlparty_win_win_03_01_on_3[] = {
     },
 };
 
+/**
+ * Battle group for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 3: Pale Piranha, Dark Puff, Cleft, with its item drop odds and heart and flower drop
+ * tables.
+ */
 BattleGroupSetup btlgrp_win_win_03_01_on_3 = {
     3, // numEnemies
     btlparty_win_win_03_01_on_3, // enemyData
@@ -999,6 +1177,10 @@ BattleGroupSetup btlgrp_win_win_03_01_on_3 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 4: Pale Piranha x4.
+ */
 BattleUnitSetup btlparty_win_win_03_01_on_4[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -1042,6 +1224,10 @@ BattleUnitSetup btlparty_win_win_03_01_on_4[] = {
     },
 };
 
+/**
+ * Battle group for the win_03 encounter, alternate set (used once the Flurrie-request-heard story flag is
+ * set), variant 4: Pale Piranha x4, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_win_win_03_01_on_4 = {
     4, // numEnemies
     btlparty_win_win_03_01_on_4, // enemyData
@@ -1053,11 +1239,19 @@ BattleGroupSetup btlgrp_win_win_03_01_on_4 = {
     5, // reserved_1C
 };
 
+/**
+ * Debug battle choice BTLNO_WIN_TEST1: the win_00 Dark Puff pair (btlgrp_win_win_00_01_off_1) on the Boggly
+ * Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_test1_off[] = {
     {50, &btlgrp_win_win_00_01_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_00_01 as the alternate set (used once the Flurrie-joined story flag is set): 3
+ * groups with weights 20, 20, 10, all on the Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_00_01_on[] = {
     {20, &btlgrp_win_win_00_01_on_1, win_btlstage_data},
     {20, &btlgrp_win_win_00_01_on_2, win_btlstage_data},
@@ -1065,38 +1259,67 @@ NpcBattleSelect btlgrpsel_win_btlno_win_00_01_on[] = {
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_00_01 as the default set (flag clear): 1 group with weight 10, all on the
+ * Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_00_01_off[] = {
     {10, &btlgrp_win_win_00_01_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_00_02 as the alternate set (used once the Flurrie-joined story flag is set): 2
+ * groups with weights 20, 20, all on the Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_00_02_on[] = {
     {20, &btlgrp_win_win_00_02_on_1, win_btlstage_data},
     {20, &btlgrp_win_win_00_02_on_2, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_00_02 as the default set (flag clear): 1 group with weight 10, all on the
+ * Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_00_02_off[] = {
     {10, &btlgrp_win_win_00_02_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_00_03 as the alternate set (used once the Flurrie-joined story flag is set): 2
+ * groups with weights 20, 20, all on the Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_00_03_on[] = {
     {20, &btlgrp_win_win_00_03_on_1, win_btlstage_data},
     {20, &btlgrp_win_win_00_03_on_2, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_00_03 as the default set (flag clear): 1 group with weight 10, all on the
+ * Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_00_03_off[] = {
     {10, &btlgrp_win_win_00_03_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_00_04 as the default set (flag clear): 1 group with weight 50, all on the
+ * Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_00_04_off[] = {
     {50, &btlgrp_win_win_00_04_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_02_01 as the alternate set (used once GSWF_WIN02_ALT_BATTLES (which nothing
+ * sets, so this set is never used) is set): 3 groups with weights 20, 20, 10, all on the Boggly Woods
+ * stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_02_01_on[] = {
     {20, &btlgrp_win_win_02_01_on_1, win_btlstage_data},
     {20, &btlgrp_win_win_02_01_on_2, win_btlstage_data},
@@ -1104,11 +1327,20 @@ NpcBattleSelect btlgrpsel_win_btlno_win_02_01_on[] = {
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_02_01 as the default set (flag clear): 1 group with weight 10, all on the
+ * Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_02_01_off[] = {
     {10, &btlgrp_win_win_02_01_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_02_02 as the alternate set (used once GSWF_WIN02_ALT_BATTLES (which nothing
+ * sets, so this set is never used) is set): 3 groups with weights 20, 20, 10, all on the Boggly Woods
+ * stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_02_02_on[] = {
     {20, &btlgrp_win_win_02_02_on_1, win_btlstage_data},
     {20, &btlgrp_win_win_02_02_on_2, win_btlstage_data},
@@ -1116,11 +1348,19 @@ NpcBattleSelect btlgrpsel_win_btlno_win_02_02_on[] = {
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_02_02 as the default set (flag clear): 1 group with weight 10, all on the
+ * Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_02_02_off[] = {
     {10, &btlgrp_win_win_02_02_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_03_01 as the alternate set (used once the Flurrie-request-heard story flag is
+ * set): 4 groups with weights 10, 10, 10, 10, all on the Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_03_01_on[] = {
     {10, &btlgrp_win_win_03_01_on_1, win_btlstage_data},
     {10, &btlgrp_win_win_03_01_on_2, win_btlstage_data},
@@ -1129,11 +1369,21 @@ NpcBattleSelect btlgrpsel_win_btlno_win_03_01_on[] = {
     {0},
 };
 
+/**
+ * Group choice for BTLNO_WIN_03_01 as the default set (flag clear): 1 group with weight 10, all on the
+ * Boggly Woods stage.
+ */
 NpcBattleSelect btlgrpsel_win_btlno_win_03_01_off[] = {
     {10, &btlgrp_win_win_03_01_off_1, win_btlstage_data},
     {0},
 };
 
+/**
+ * Encounter table of win.rel, indexed by BTLNO_WIN_*: a debug entry, then the win_00 Dark Puff and Cleft
+ * fights, the Vivian boss fight, the win_02 and win_03 fights. Each entry gives the group choices, the
+ * switch flag that picks the alternate set, the battle music and the random placement ranges. Registered
+ * with relSetBtlAddr in win.c.
+ */
 NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
         "マップstg_02_0", // name
@@ -1220,6 +1470,10 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {0},
 };
 
+/**
+ * Maps the BTLNO_WIN_* battle ids to their index in btlsetup_win_tbl; registered with relSetBtlAddr in
+ * win.c.
+ */
 NpcTerritoryInfo btl_win_setup_no_tbl[] = {
     {"BTLNO_WIN_TEST1", 0},
     {"BTLNO_WIN_00_01", 1},

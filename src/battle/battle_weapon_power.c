@@ -103,8 +103,9 @@ s32 weaponGetPowerFromPartyAttackLv(BattleUnit* attacker, BattleWeapon* weapon, 
 }
 
 /**
- * Partner-rank damage without an action command: hpDamageWork[rank] (capped at slot 5).
- * No weapon in the tree uses it.
+ * Partner-rank damage without an action command: hpDamageWork[rank] (capped at slot 5), with the rank of the
+ * real partner the attacker's kind maps to. Used by the moves of Doopliss's partner copies (the gullible
+ * partner units in jin and Doopliss's partner forms in unit_boss_rampell_las.c).
  */
 s32 weaponGetPowerFromGulliblePartyAttackLv(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target,
                                             BattleUnitPart* part) {

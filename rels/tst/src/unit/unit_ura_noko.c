@@ -15,6 +15,13 @@
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 
+// Unit work slots of the Shady Koopa (btlevtcmd_SetUnitWork / GetUnitWork, unit->work)
+enum {
+    UW_URA_NOKO_SPIN_DONE = 0,   // set to 1 to stop the shell-spin loop of the attack (it then resets its rotation)
+    UW_URA_NOKO_SPIN_SPEED = 1,  // degrees per frame the spinning shell turns by
+    UW_URA_NOKO_AURA_EFFECT = 2, // dark aura effect (effUranoko EffectEntry*)
+};
+
 static USER_FUNC(eff_aura);
 
 BattleUnitKind unit_ura_noko;
@@ -39,6 +46,10 @@ static EvtWord attack_event[548];
 static EvtWord ura_attack_event[560];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the Shady Koopa: 8 HP and level 17, with its sizes, damage sounds, status vulnerability,
+ * parts and init script.
+ */
 BattleUnitKind unit_ura_noko = {
     47,
     "btl_un_ura_noko",
@@ -97,7 +108,7 @@ BattleUnitKind unit_ura_noko = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -105,6 +116,10 @@ BattleUnitKind unit_ura_noko = {
     data_table,
 };
 
+/**
+ * Pose table of the Shady Koopa: maps each battle pose (waiting, hurt, running...) to one of its NKT_*
+ * animations.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "NKT_N_1"},
     {2, "NKT_Y_1"},
@@ -112,20 +127,24 @@ static PoseTableEntry pose_table[] = {
     {5, "NKT_K_1"},
     {4, "NKT_X_1"},
     {3, "NKT_X_1"},
-    {28, "NKT_S_1"},
+    {BTL_POSE_NORMAL, "NKT_S_1"},
     {29, "NKT_Q_1"},
     {30, "NKT_Q_1"},
     {31, "NKT_S_1"},
-    {39, "NKT_D_1"},
+    {BTL_POSE_DAMAGE, "NKT_D_1"},
     {50, "NKT_A_1"},
-    {42, "NKT_R_1"},
-    {40, "NKT_W_1"},
-    {56, "NKT_X_1"},
-    {57, "NKT_X_1"},
+    {BTL_POSE_RUN, "NKT_R_1"},
+    {BTL_POSE_WALK, "NKT_W_1"},
+    {BTL_POSE_DANGER, "NKT_X_1"},
+    {BTL_POSE_PERIL, "NKT_X_1"},
     {BTL_POSE_TALK, "NKT_T_1"},
     {BTL_POSE_STAY_DEFAULT, "NKT_S_1"},
 };
 
+/**
+ * Pose table of the Shady Koopa while it is flipped on its back:
+ * maps each battle pose (waiting, hurt, running...) to one of its NKT_* animations.
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "NKT_N_2"},
     {2, "NKT_B_1"},
@@ -133,43 +152,54 @@ static PoseTableEntry pose_table_turn[] = {
     {5, "NKT_K_2"},
     {4, "NKT_K_2"},
     {3, "NKT_K_2"},
-    {28, "NKT_S_2"},
+    {BTL_POSE_NORMAL, "NKT_S_2"},
     {29, "NKT_Q_1"},
     {30, "NKT_Q_1"},
     {31, "NKT_D_1"},
-    {39, "NKT_D_1"},
+    {BTL_POSE_DAMAGE, "NKT_D_1"},
 #if VERSION >= VERSION_JP
-    {42, "NKT_R_1"},
-    {40, "NKT_W_1"},
+    {BTL_POSE_RUN, "NKT_R_1"},
+    {BTL_POSE_WALK, "NKT_W_1"},
 #endif
-    {56, "NKT_K_2"},
-    {57, "NKT_K_2"},
+    {BTL_POSE_DANGER, "NKT_K_2"},
+    {BTL_POSE_PERIL, "NKT_K_2"},
     {BTL_POSE_TALK, "NKT_S_2"},
     {BTL_POSE_STAY_DEFAULT, "NKT_S_2"},
 };
 
+/**
+ * Data table of the Shady Koopa: reaction scripts for being flipped over;
+ * a First Strike on it triggers nothing special.
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/** Defence of the Shady Koopa: 1 against every kind of hit. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element modifiers of the Shady Koopa: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Defence of the Shady Koopa while it is flipped on its back: none, every hit does its full damage. */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Shady Koopa in the demo builds: resists most statuses. */
 static StatusVulnerability regist = {85, 90, 85, 100, 85, 100, 100, 85, 100, 85, 100, 85, 100, 85, 85, 90, 80, 100, 85, 100, 100, 95};
 #else
+/** Status vulnerability of the Shady Koopa in the retail builds: resists most statuses. */
 static StatusVulnerability regist = {85, 90, 80, 100, 80, 100, 100, 80, 100, 90, 100, 90, 100, 90, 80, 85, 80, 100, 80, 100, 100, 95};
 #endif
 
+/** Body part of the Shady Koopa: a single part using the c_uranoko model. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_ura_noko", "c_uranoko", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x1009, 0, pose_table},
+    {1, "btl_un_ura_noko", "c_uranoko", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_SHELLED, 0, pose_table},
 };
 
+/** Attack data of the Shady Koopa's shell charge: 3 damage. */
 static BattleWeapon weapon_nokonoko_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -188,7 +218,7 @@ static BattleWeapon weapon_nokonoko_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -211,6 +241,7 @@ static BattleWeapon weapon_nokonoko_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data of the Shady Koopa's attack from its back: 6 damage; hits every target. */
 static BattleWeapon weapon_ura_noko_ura_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -229,7 +260,7 @@ static BattleWeapon weapon_ura_noko_ura_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -289,7 +320,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("NKT_D_1"))
     WAIT_FRAMES(2)
@@ -319,7 +350,7 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("NKT_S_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -354,24 +385,24 @@ static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("NKT_A_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 0)
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 20)
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 40)
     WAIT_MS(100)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -379,8 +410,8 @@ static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_nokonoko_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), 256, LW(5))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 10)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
@@ -391,9 +422,9 @@ static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -414,14 +445,17 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+        // If the Shady Koopa is on its back it spends the turn getting up instead of attacking.
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // First-strike battle: the target is already fixed; otherwise one is picked from the opposing party.
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
         WAIT_FRAMES(30)
     ELSE
+        // If the Shady Koopa holds an item, it uses that instead of attacking.
         CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(LW(0))
@@ -432,19 +466,22 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_nokonoko_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_nokonoko_attack), LW(3), LW(4))
     END_IF
+    // No target to attack: a confused Shady Koopa just flusters about, otherwise it skips its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera frames the Shady Koopa and its target.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_nokonoko_attack))
+    // The Shady Koopa declares its shell charge.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_nokonoko_attack))
@@ -458,25 +495,27 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("NKT_A_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 0)
+    // It curls into its shell and starts to spin, faster in two steps.
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 20)
     WAIT_MS(100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 40)
     WAIT_MS(100)
+    // A trail of smoke kicks up behind it while it rolls at the target.
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -490,7 +529,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 1)
     DELETE_EVENT(LW(13))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), 256, LW(5))
+    // Check whether the attack will connect; a miss sends the target into its dodge.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -512,27 +552,29 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A miss: it rolls past the target, then jumps and turns back.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 100)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0, 1)
     WAIT_MS(250)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 10)
     WAIT_MS(250)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, 1)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 40)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     GOTO(98)
+    // A hit: the target takes the damage and the Shady Koopa bounces off it twice.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_nokonoko_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), 256, LW(5))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 10)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_nokonoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
@@ -543,14 +585,16 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, 1)
     GOTO(98)
+    // The charge is over: it walks back to its place.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    // Turn finished: the Shady Koopa goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -566,16 +610,19 @@ EVT_END()
  */
 static EVT_BEGIN(ura_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // A target is picked from the opposing party.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_ura_noko_ura_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_ura_noko_ura_attack), LW(3), LW(4))
+    // No target to attack: a confused Shady Koopa just flusters about, otherwise it skips its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera frames the Shady Koopa and its target.
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -599,22 +646,23 @@ static EVT_BEGIN(ura_attack_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("NKT_A_2"))
     END_SIBLING_EVENT
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+    // Lying on its back, it spins round once.
     LOOP(36)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 10, 0)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 5)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 5)
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
@@ -623,17 +671,20 @@ static EVT_BEGIN(ura_attack_event)
         WAIT_MS(200)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(2), 10)
+        // A dark aura gathers around it while it spins faster and faster (three speed-ups).
         CALL(eff_aura, BTL_UNIT_SELF)
     END_SIBLING_EVENT
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_URANOKO_MOVE1"), EVT_NULLPTR, 0, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 10)
     WAIT_MS(400)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 20)
     WAIT_MS(400)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_SPEED, 40)
     WAIT_MS(400)
+    // It slides through every target in the row, one after another.
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     CALL(evt_btl_camera_set_mode, 0, 0)
+    // A smoke trail follows it as it starts to slide.
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -653,7 +704,8 @@ static EVT_BEGIN(ura_attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_ura_noko_ura_attack), 256, LW(5))
+    // Check whether the attack will connect; a miss sends the target into its dodge.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_ura_noko_ura_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -675,10 +727,12 @@ static EVT_BEGIN(ura_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A miss: that target dodges as it slides past.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 100)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 1)
     GOTO(97)
+    // A hit: the target takes the damage (the action-command result is read on the first one only).
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -687,8 +741,9 @@ static EVT_BEGIN(ura_attack_event)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_ura_noko_ura_attack))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_ura_noko_ura_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_ura_noko_ura_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
+    // On to the next target in the row.
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -699,7 +754,9 @@ static EVT_BEGIN(ura_attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 1)
     WAIT_MS(500)
+    // It shoots off the right side of the screen.
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 250, LW(1), LW(2))
+    // It slides back in to its place, still on its back, and bounces to a stop.
     LABEL(98)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_URANOKO_MOVE3"), EVT_NULLPTR, 0, LW(15))
@@ -712,8 +769,9 @@ static EVT_BEGIN(ura_attack_event)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_URA_NOKO_SPIN_DONE, 1)
     WAIT_FRAMES(3)
+    // Turn finished: the Shady Koopa goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -733,10 +791,10 @@ static USER_FUNC(eff_aura) {
     f32 x, y, z;
 
     if (isFirstCall) {
-        unit->work[2] = (EvtWord)effUranokoEntry(0, 120, 0.0f, -1000.0f, 0.0f);
+        unit->work[UW_URA_NOKO_AURA_EFFECT] = (EvtWord)effUranokoEntry(0, 120, 0.0f, -1000.0f, 0.0f);
     }
     BtlUnit_GetPos(unit, &x, &y, &z);
-    eff = (EffectEntry*)unit->work[2];
+    eff = (EffectEntry*)unit->work[UW_URA_NOKO_AURA_EFFECT];
     if (!(eff->flags & 1)) {
         return EVT_RETURN_DONE;
     }

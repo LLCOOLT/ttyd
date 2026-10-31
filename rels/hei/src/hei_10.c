@@ -32,8 +32,6 @@
 #include "data_tables.h"
 #include "version.h"
 #include "evt/evt_story.h"
-void PSMTXIdentity(Mtx m);
-f32 PSVECDistance(const Vec* a, const Vec* b);
 #if VERSION <= VERSION_JP
 void* _mapAlloc(u32 size);
 #else
@@ -42,7 +40,6 @@ void* _mapAlloc(u32 size);
 #include "driver/extdrv.h"
 #include "libc_decls.h"
 #include "driver/mapdrv.h"
-void* memset(void* dest, int ch, size_t count);
 
 typedef struct Chorobon {
     s16 flags;
@@ -225,6 +222,10 @@ static void ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/**
+ * Doors of this room: the west exit (w_bero) to hei_09, the east exit (e_bero) to hei_11 and the pipe
+ * (dokan) to hei_07.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         ("w_bero"), // hitName
@@ -278,6 +279,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Start frames (0 to 38 in steps of 2) of the Fuzzy swarm's walking animation (c_chorobon, CBN_W_1), one per
+ * Fuzzy of the room's effect.
+ */
 static ExtTexInfo ext_data[] = {
     {("c_chorobon"), ("CBN_W_1"), 0.0f},
     {("c_chorobon"), ("CBN_W_1"), 2.0f},
@@ -346,7 +351,7 @@ static inline void jump(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y,
 static inline void escape(ExtdrvPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) {
     chb_jump(pose, chb, next, x, y, z, 2.0f * (rs * (smax - smin) + smin), rg * (gmax - gmin) + gmin);
 }
-// Lifetime analysis and dead-assignment removal off for jump_r, escape_r and ext_main (removal tested).
+// FAKE: lifetime analysis and dead-assignment removal off for jump_r, escape_r and ext_main (removal tested).
 #pragma push
 #pragma opt_lifetimes off
 #pragma opt_dead_assignments off
@@ -510,7 +515,7 @@ static inline s32 npc_jump_get_time(EventEntry* event, EvtWord* args) {
     return evtGetValue(event, args[6]);
 }
 
-// Copy propagation and lifetime analysis off for npc_jump, as in the other ext-pose swarm code (removal tested).
+// FAKE: copy propagation and lifetime analysis off for npc_jump, as in the other ext-pose swarm code (removal tested).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 /**

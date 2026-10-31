@@ -14,6 +14,8 @@ enum MsgCharFlags {
     MSG_CHAR_OPTION_0 = 0x100, // <select> lists: the letter belongs to option n (MSG_CHAR_OPTION_0 << n)
     MSG_CHAR_OPTIONS = 0xFF00,
     MSG_CHAR_SCALE_X = 0x10000, // US <scaleX>: the letter is stretched on x only
+    MSG_CHAR_TALK = 0x8,        // a letter other than the full-width space or 0x8151: voice SE and the talk animation
+    MSG_CHAR_DOT = 0x10,        // the middle dot (0x8145): voice SE only
 };
 
 // MsgChar.glyph values above the font's glyphs: control entries made from the message tags

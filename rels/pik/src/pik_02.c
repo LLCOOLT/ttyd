@@ -116,9 +116,9 @@ static NpcSetupInfo npc_data[7];
 extern EvtWord evt_kaiga[];
 
 /**
- * Guess: Enter-event of the dokan (pipe) entrance:
- * turns the scenery hit objects of the back room (a_E_yuka, h_bero, h_dokan) on again
- * and removes the painting's case event (GW(10)). Returns 0 in LW(0) (no override).
+ * Switches the hidden back room on for Mario's trip down the pipe (run by evt_go, the dokan exit event):
+ * turns the hit objects a_E_yuka, h_bero and h_dokan on and removes the painting's case event (GW(10)).
+ * Returns 0 in LW(0) (no override).
  */
 EVT_BEGIN(haikei_on)
     CALL(evt_hitobj_onoff, STRING("a_E_yuka"), 1, 1)
@@ -130,9 +130,10 @@ EVT_BEGIN(haikei_on)
 EVT_END()
 
 /**
- * Guess: Reverse of haikei_on: switches the back-room hit objects (a_E_yuka, h_bero, h_dokan) off
+ * Reverse of haikei_on: switches the back-room hit objects (a_E_yuka, h_bero, h_dokan) off
  * and re-registers the case event that shows the painting message (evt_kaiga) when Mario faces a_kaiga.
- * Run when Mario enters the sanctum through s_bero.
+ * Run as the enter event of s_bero (both door versions), by evt_return when Mario comes back up the pipe,
+ * and by the map init before the theft scene.
  */
 EVT_BEGIN(haikei_off)
     CALL(evt_hitobj_onoff, STRING("a_E_yuka"), 1, 0)
@@ -184,8 +185,8 @@ EVT_BEGIN(evt_return_sub)
 EVT_END()
 
 /**
- * Guess: Enter-event of the pipe: if the real Garnet Star has just been found, spawns evt_return_sub,
- * and then always switches the back room off (haikei_off).
+ * Enter event of the dokan pipe (Mario coming back up from h_dokan): at STORY_STG6_53_THE_REAL_GARNET_STAR it
+ * spawns evt_return_sub, and then always switches the back room off (haikei_off).
  */
 EVT_BEGIN(evt_return)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_53_THE_REAL_GARNET_STAR)
@@ -197,8 +198,8 @@ EVT_BEGIN(evt_return)
 EVT_END()
 
 /**
- * Guess: Exit event of the pipe: switches the back room on (haikei_on) so the hidden room is solid
- * when Mario arrives.
+ * Exit event of the dokan pipe, whose destination is h_dokan on this same map: switches the back room on
+ * (haikei_on) so the hidden room is solid when Mario arrives.
  */
 EVT_BEGIN(evt_go)
     CALL_CHILD(haikei_on)
@@ -227,6 +228,7 @@ static EVT_BEGIN(s_door_close)
     RETURN
 EVT_END()
 
+/** Doors and exits of pik_02: s_bero to pik_01; dokan; h_dokan; h_bero to pik_03. */
 static BeroEntry bero_data[] = {
     {
         "s_bero", // hitName
@@ -312,6 +314,7 @@ EVT_BEGIN(out_room)
     RETURN
 EVT_END()
 
+/** Doors and exits of pik_02: s_bero to aji_10 (X-Naut Fortress). */
 BeroEntry s_bero_peach[] = {
     {
         "s_bero", // hitName
@@ -417,12 +420,13 @@ EVT_BEGIN(patakuri_init)
     RETURN
 EVT_END()
 
-/** Init event of Baba (ババ): sets NPC status bit 2 on himself. */
+/** Init event of Kammy Koopa (ババ): sets NPC_STATUS_FACE_MOVE_DIR (2): she turns the way she moves. */
 static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** NPCs of the sanctum: Detective Pennington, Beldam, Marilyn, Doopliss, the Paragoomba and Kammy. */
 static NpcSetupInfo npc_data[] = {
     {
         "ポワン探偵", // name
@@ -529,7 +533,7 @@ static USER_FUNC(hoshi_r) {
     return EVT_RETURN_DONE;
 }
 
-// Built with copy propagation and lifetime analysis off (the plain build reorders the loads); t, vy and speed
+// FAKE: built with copy propagation and lifetime analysis off (the plain build reorders the loads); t, vy and speed
 // are kept in the event's userdata words as raw float bits between frames.
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -671,11 +675,11 @@ static USER_FUNC(reset_stone_cam) {
 }
 
 /**
- * Guess: cutscene on Mario's first entry into the sanctum (story before STORY_STG6_51):
- * the doors swing shut, Mario and Pennington see Beldam (マジョリン), Marilyn and Doopliss at the altar;
- * the Garnet Star effect hops over to Beldam, the sirens' models are switched off in a burst of star dust,
- * Doopliss hops away, and after the partner and Pennington comment the story becomes
- * STORY_STG6_51_3_SURPRISE_GUESTS.
+ * Cutscene on Mario's first entry into the sanctum (story before STORY_STG6_51_3): the doors swing shut,
+ * Mario and Pennington see Beldam (マジョリン), Marilyn (マリリン) and Doopliss (ランペル) at the altar;
+ * the Garnet Star hops over to Beldam, who gloats that they have the Crystal Star (stg6_pik_13),
+ * Beldam and Marilyn vanish in a burst of star dust, Doopliss cries not to be left behind (stg6_pik_14) and hops
+ * away, and after the partner and Pennington comment the story becomes STORY_STG6_51_3_SURPRISE_GUESTS.
  */
 EVT_BEGIN(evt_garnet)
     CALL(evt_mario_key_onoff, 0)
@@ -696,6 +700,7 @@ EVT_BEGIN(evt_garnet)
     CALL(evt_npc_status_onoff, 1, STRING("ポワン探偵"), 2)
     CALL(evt_npc_move_position, STRING("ポワン探偵"), -30, 600, 1000, 0, 1)
     SET_VALUE(LW(1), 0)
+    // The doors swing shut behind Mario.
     SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 70, 0, 500)
     LABEL(1)
@@ -735,8 +740,10 @@ EVT_BEGIN(evt_garnet)
     ADD(LW(1), 50)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_STARATONE_LIGHT1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff64, 0, STRING("stardust_n64"), 0, LW(0), LW(1), LW(2), FLOAT(20.0f), 0, 0, 0, 0, 0, 0, 0)
+    // Mario and Pennington see Beldam, Marilyn and Doopliss at the altar.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_WITCH1"))
     CALL(evt_snd_envoff, PSND_FADE_HOLD)
+    // The Garnet Star hops to Beldam, who gloats that they have the Crystal Star.
     CALL(evt_msg_print, 0, STRING("stg6_pik_13"), 0, STRING("マジョリン"))
     BEGIN_INLINE_EVENT
         CALL(evt_npc_majo_disp_off, STRING("マジョリン"))
@@ -751,6 +758,7 @@ EVT_BEGIN(evt_garnet)
         CALL(evt_npc_reverse_ry, STRING("ランペル"))
         WAIT_MS(400)
     END_LOOP
+    // Beldam and Marilyn vanish; Doopliss cries not to be left behind and hops away.
     CALL(evt_msg_print, 0, STRING("stg6_pik_14"), 0, STRING("ランペル"))
     CALL(evt_cam3d_evt_set, 0, 54, -568, -230, 30, -930, 2900, 11)
     CALL(evt_npc_status_onoff, 1, STRING("ランペル"), 2)
@@ -796,6 +804,7 @@ EVT_BEGIN(evt_garnet)
     END_SWITCH
     WAIT_MS(500)
     CALL(evt_party_run, 0)
+    // Mario's partner and Pennington comment on what happened.
     CALL(evt_msg_print, 0, STRING("stg6_pik_16"), 0, STRING("ポワン探偵"))
     WAIT_MS(500)
     CALL(evt_party_set_dir, 0, 270, 200)
@@ -814,6 +823,7 @@ EVT_BEGIN(evt_garnet)
     CALL(evt_msg_print, 0, STRING("stg6_pik_18"), 0, STRING("ポワン探偵"))
     WAIT_MS(500)
     CALL(evt_cam3d_evt_off, 500, 11)
+    // The story advances.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_51_3_SURPRISE_GUESTS)
 #if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
@@ -823,10 +833,10 @@ EVT_BEGIN(evt_garnet)
 EVT_END()
 
 /**
- * Guess: cutscene of the curtain switch: the camera moves to the curtain,
+ * Hit event of the blue switch sw: the camera moves to the curtain,
  * the curtain object ka_ten rises 150 units over 1.5 s with the curtain sound while its hit area follows,
- * story progress becomes STORY_STG6_52_THE_HIDDEN_PIPE, the door- switch event bero_case_switch_on runs,
- * the success jingle plays and the camera returns to Mario.
+ * story progress becomes STORY_STG6_52_THE_HIDDEN_PIPE, the pipe entrance (bero 1, dokan) is registered again
+ * (bero_case_switch_on), the success jingle plays and the camera returns to Mario.
  */
 static EVT_BEGIN(evt_sw)
     CALL(evt_mario_key_onoff, 0)
@@ -866,9 +876,9 @@ EVT_BEGIN(evt_kaiga)
 EVT_END()
 
 /**
- * Guess: examine script of the altar: locks the controls,
- * and for the story stretch from STORY_STG6_70 to STORY_STG7_25 prints stg7_pik_clear_09_2,
- * otherwise stg6_pik_25.
+ * Examine script of the altar (case event on dai_a): locks the controls and, from STORY_STG6_70 to
+ * STORY_STG7_25_00 (while the fake Crystal Star sits there), says it shines with a suspicious light
+ * (stg7_pik_clear_09_2); otherwise says the Crystal Star is no longer on the pedestal (stg6_pik_25).
  */
 static EVT_BEGIN(evt_daiza)
     CALL(evt_mario_key_onoff, 0)
@@ -883,12 +893,15 @@ static EVT_BEGIN(evt_daiza)
 EVT_END()
 
 /**
- * Guess: Bowser interlude in the sanctum (STORY_STG7_25_00_BOWSER_POSHLEY_HEIGHTS):
- * Bowser and Kammy walk in, Bowser takes the fake Garnet Star from the altar (the star effect "nise" follows his
- * hand), Pennington catches them and Bowser answers him in one of three ways chosen from a menu,
- * then Patakuri the Paragoomba joins in.
- * The game is saved and the story becomes STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM
- * before the scene goes on to aji_18.
+ * Bowser interlude in the sanctum (STORY_STG7_25_00_BOWSER_POSHLEY_HEIGHTS), with the player as Bowser:
+ * Bowser and Kammy (ババ) walk in, Bowser takes the fake Garnet Star from the altar (the star effect "nise"
+ * follows
+ * his hand), Pennington accuses them of theft and Bowser names himself in one of three ways picked from a menu
+ * (kpa_stg7_018); Pennington reveals the star is a fake, it falls and breaks,
+ * and he says he gave the real one to
+ * "Luigi"; a Paragoomba (パタクリ) crashes in to report that Mario has the seven Crystal Stars and is heading for
+ * the Thousand-Year Door. The story becomes STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM, the game is saved and the
+ * map changes to aji_18.
  */
 EVT_BEGIN(pik_02_koopa_evt)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -904,6 +917,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     CALL(evt_cam3d_evt_set, 0, 360, -338, 0, 250, -1130, 0, 11)
     CALL(evt_seq_wait, 2)
 #if VERSION >= VERSION_JP
+    // The Bowser interlude: Bowser and Kammy walk into the sanctum.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
     CALL(evt_snd_bgm_scope, 0, 1)
 #endif
@@ -938,6 +952,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     CALL(reset_stone_cam)
     CALL(evt_mario_init_camid)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_6"), STRING("KPA_T_6"))
+    // Bowser takes the Garnet Star from the altar.
     CALL(evt_msg_print, 0, STRING("kpa_stg7_014"), 0, STRING("mario"))
     WAIT_MS(500)
     CALL(evt_npc_set_autotalkpose, STRING("ババ"), STRING("U_1"), STRING("T_5"))
@@ -961,6 +976,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -65, 60, -563, -65, 40, -762, 800, 11)
     WAIT_MS(800)
+    // Pennington accuses them of theft.
     CALL(evt_msg_print, 0, STRING("kpa_stg7_016"), 0, STRING("ポワン探偵"))
     CALL(evt_npc_set_autotalkpose, STRING("ババ"), STRING("S_1"), STRING("T_1"))
     CALL(evt_npc_set_stay_anim, STRING("ババ"))
@@ -991,6 +1007,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     SET_VALUE(GF(0), 1)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_1"), STRING("KPA_T_1"))
     CALL(evt_msg_print, 0, STRING("kpa_stg7_017"), 0, STRING("mario"))
+    // Bowser names himself, picking one of three names from a menu.
     CALL(evt_msg_select, 0, STRING("kpa_stg7_018"))
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -1065,6 +1082,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("kpa_stg7_026"), 0, STRING("ババ"))
     WAIT_MS(500)
+    // Pennington reveals that the star is a fake; it falls and breaks.
     CALL(evt_msg_print, 0, STRING("kpa_stg7_027"), 0, STRING("ポワン探偵"))
     CALL(evt_npc_set_ry, STRING("ババ"), 90)
     WAIT_MS(300)
@@ -1120,6 +1138,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     CALL(evt_mario_set_dir, 270, 300, 0)
     CALL(evt_npc_set_ry, STRING("ババ"), 270)
     WAIT_MS(300)
+    // A Paragoomba crashes in to report that Mario has the seven Crystal Stars.
     CALL(evt_msg_print, 0, STRING("kpa_stg7_030"), 0, STRING("パタクリ"))
     CALL(evt_npc_set_position, STRING("パタクリ"), -200, 80, -800)
     CALL(evt_npc_set_ry, STRING("パタクリ"), 90)
@@ -1197,6 +1216,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     CALL(evt_cam3d_evt_set, -65, 60, -563, -65, 40, -762, 800, 11)
     WAIT_MS(800)
     CALL(evt_msg_print, 0, STRING("kpa_stg7_036"), 0, STRING("ポワン探偵"))
+    // The story advances and the game is saved.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     CALL(evt_fade_entry, FADE_OUT_SPOT_3D, 300, 0, 0, 0)
@@ -1213,6 +1233,7 @@ EVT_BEGIN(pik_02_koopa_evt)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_BOWSER_A1, 0, FADE_STORY_BOWSER_A3, 0)
+    // The scene continues in aji_18.
     CALL(evt_bero_mapchange, STRING("aji_18"), STRING("e_bero"))
     RETURN
 EVT_END()

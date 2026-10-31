@@ -164,16 +164,6 @@ static void ext_fan_dispent(void);
 s32 move_pos[26];
 ExtTexInfo ext_fan_data[28];
 
-void C_VECReflect(const Vec* src, const Vec* normal, Vec* dst);
-void PSMTXIdentity(Mtx m);
-void PSVECAdd(const Vec* a, const Vec* b, Vec* ab);
-f32 PSVECDistance(const Vec* a, const Vec* b);
-f32 PSVECMag(const Vec* v);
-void PSVECNormalize(const Vec* src, Vec* dst);
-void PSVECScale(const Vec* src, Vec* dst, f32 scale);
-f32 PSVECSquareDistance(const Vec* a, const Vec* b);
-void PSVECSubtract(const Vec* a, const Vec* b, Vec* a_b);
-int __cvt_ull_flt();
 /**
  * Builds the fan crowd's animation table (FanAnim) from ext_fan_data:
  * groups the per-frame texture entries by model name and animation,
@@ -384,6 +374,10 @@ EVT_BEGIN(n_4_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Doors of the lobby: the front door out to the plaza (tou_01), the two arena doors to tou_03
+ * (ground floor and upper floor) and the two doors to the main corridor (tou_04).
+ */
 static BeroEntry bero_data[] = {
     {
         ("s_bero"), // hitName
@@ -869,15 +863,21 @@ EVT_BEGIN(init_kino5)
 EVT_END()
 
 /**
- * Guess: talk script of the fifth Toad: story-dependent lines;
- * one of them mentions the current partner (Yoshi has its own variant).
+ * Talk script of the fifth Toad (キノピオ５), a parent who brought their son to the Glitz Pit: before Gonzales
+ * debuts the son is a fan of Prince Mush (stg3_npc_02_06_01);
+ * until the title match the line follows Mario's rank
+ * (02 to 05), then congratulations (06) and, after the chapter, a farewell (07) or, when Mario re-entered the
+ * league, the stg3_npc_re_031/032 lines. With Yoshi as the partner the _yos variants address him by the Yoshi's
+ * name (LW(10)).
  */
 EVT_BEGIN(talk_kino5)
     CALL(evt_pouch_get_yoshiname, LW(10))
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
+        // Before Gonzales debuts the son is a fan of Prince Mush.
         CALL(evt_msg_print, 0, STRING("stg3_npc_02_06_01"), 0, 0)
         CASE_LESS(STORY_STG3_32_BOSS_BATTLE)
+        // Up to the title match the line follows Mario's rank, naming the Yoshi when he is the partner.
         CALL(evt_tou_get_ranking, LW(0))
         SWITCH(LW(0))
             CASE_GREATER(15)
@@ -921,6 +921,7 @@ EVT_BEGIN(talk_kino5)
             END_IF
         END_SWITCH
         CASE_DEFAULT
+        // After chapter 3: a farewell, or comments on Mario's return to the league.
         IF_INT_EQUAL(GSWF(GSWF_TOU_REENTERED_LEAGUE), 0)
             CALL(evt_mario_get_party, LW(0))
             IF_INT_EQUAL(LW(0), 4)
@@ -1130,6 +1131,7 @@ static EVT_BEGIN(init_champ)
     RETURN
 EVT_END()
 
+/** Thirteen (x, z) points around the lobby that move_champ steps through; it does not use the values. */
 s32 move_pos[] = {
     0, 0, -100, -70, -225, 50, -230, 135,
     -105, 110, 10, -10, 135, 135, 220, 40,
@@ -1138,8 +1140,9 @@ s32 move_pos[] = {
 };
 
 /**
- * Guess: scene where the champion walks along the points in move_pos
- * while talking (stg3_tou_182 to 189) in the lobby.
+ * Move event the lobby crowd scene gives the champion (チャンピョン) while the fans mob him (GF(10) clear): every
+ * 2 to 7 s a fan's cry (stg3_tou_182 to 189 and 186_01, in turn) pops up with its tail at a random spot near
+ * him; it ends once fewer than 10 fans are left. It steps through move_pos but discards the values it reads.
  */
 EVT_BEGIN(move_champ)
     SET_VALUE(LW(10), 0)
@@ -1211,8 +1214,8 @@ EVT_BEGIN(talk_champ)
 EVT_END()
 
 /**
- * Guess: NPC init for the "Shikowa" NPC: in the late Chapter 3 scene (STORY_STG3_33_06_BOWSER_PUNI_ELDER) he is
- * placed at (-25, 0, 75) unless Mario left as champion.
+ * NPC init for Jolene (キノシコワ): at STORY_STG3_33_06_BOWSER_PUNI_ELDER (after the Bowser interlude, before
+ * Mario leaves Glitzville) she is placed at (-25, 0, 75) unless Mario left as champion.
  */
 EVT_BEGIN(init_shikowa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1229,7 +1232,7 @@ EVT_BEGIN(init_shikowa)
     RETURN
 EVT_END()
 
-/** Guess: talk script for the NPC above in the late Chapter 3 scene (stg3_tou_479_01). */
+/** Talk script of Jolene: at STORY_STG3_33_06_BOWSER_PUNI_ELDER she says stg3_tou_479_01; otherwise nothing. */
 EVT_BEGIN(talk_shikowa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1271,8 +1274,8 @@ static EVT_BEGIN(talk_uranoko)
 EVT_END()
 
 /**
- * Guess: NPC init for the first of two big "iron" NPCs, scaled 1.5x,
- * placed at (-30, 0, -50) in the late Chapter 3 scene.
+ * NPC init for the first Iron Cleft (アイアンＡ): scaled 1.5 in x and y, and at
+ * STORY_STG3_33_06_BOWSER_PUNI_ELDER placed at (-30, 0, -50) unless Mario left as champion.
  */
 EVT_BEGIN(init_ironA)
     CALL(evt_npc_set_scale, STRING("me"), FLOAT(1.5f), FLOAT(1.5f), FLOAT((1.0f)))
@@ -1290,7 +1293,7 @@ EVT_BEGIN(init_ironA)
     RETURN
 EVT_END()
 
-/** Guess: talk script of the first iron NPC (stg3_tou_479_04). */
+/** Talk script of the first Iron Cleft: stg3_tou_479_04 at STORY_STG3_33_06_BOWSER_PUNI_ELDER, otherwise nothing. */
 EVT_BEGIN(talk_ironA)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1299,7 +1302,10 @@ EVT_BEGIN(talk_ironA)
     RETURN
 EVT_END()
 
-/** Guess: NPC init for the second iron NPC, scaled 1.5x, placed at (-60, 0, -25) in the late Chapter 3 scene. */
+/**
+ * NPC init for the second Iron Cleft (アイアンＢ): scaled 1.5 in x and y, and at
+ * STORY_STG3_33_06_BOWSER_PUNI_ELDER placed at (-60, 0, -25) unless Mario left as champion.
+ */
 EVT_BEGIN(init_ironB)
     CALL(evt_npc_set_scale, STRING("me"), FLOAT(1.5f), FLOAT(1.5f), FLOAT((1.0f)))
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1316,7 +1322,7 @@ EVT_BEGIN(init_ironB)
     RETURN
 EVT_END()
 
-/** Guess: talk script of the second iron NPC (stg3_tou_479_05). */
+/** Talk script of the second Iron Cleft: stg3_tou_479_05 at STORY_STG3_33_06_BOWSER_PUNI_ELDER, otherwise nothing. */
 EVT_BEGIN(talk_ironB)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1350,6 +1356,10 @@ EVT_BEGIN(talk_borodo)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the lobby: the two door guards, the madam, a reporter and two cameramen, two Toads, Toadette,
+ * the badge seller, Rawk Hawk, Jolene, the Shady Koopa, the two Iron Clefts and the Bandit.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "ガードマン１", // name
@@ -1547,10 +1557,14 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 /**
- * Guess: arrival cutscene for the lobby when Mario first enters from the plaza:
- * Mario and the partner walk in, the camera pans and the story is set to STORY_STG3_01_ARENA_INTRO.
+ * Lobby scene after the arena intro in tou_03 (which sets GSWF_TOU_ARENA_INTRO_TO_LOBBY): Mario and the partner
+ * come in through door n_bero_1, or n_bero_2 on the upper floor, the partner asks how to get the Crystal Star
+ * (stg3_tou_33) with the choice to steal it or battle to the top (stg3_tou_33_yn); Goombella, Koops or Flurrie
+ * answer the choice (stg3_tou_34_* or 35_*), Mario nods, the partner speaks again (stg3_tou_36), the flag is
+ * cleared and the story is set to STORY_STG3_01_ARENA_INTRO.
  */
 EVT_BEGIN(evt_tougi2)
+    // Mario and the partner wait behind the arena door they came out of (the upper one for n_bero_2).
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     SET_VALUE(LF(0), 0)
@@ -1572,6 +1586,7 @@ EVT_BEGIN(evt_tougi2)
     ELSE
         CALL(evt_cam3d_evt_set, 0, 90, 190, 0, 38, -158, 0, 11)
     END_IF
+    // The door opens and they step into the lobby.
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(1), 2)
     SPAWN_EVENT(bero_open_door_play_se)
@@ -1612,6 +1627,7 @@ EVT_BEGIN(evt_tougi2)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // The partner asks how to get the Crystal Star, steal it or fight to the top, and answers Mario's choice.
     CALL(evt_msg_print_party, STRING("stg3_tou_33"))
     CALL(evt_msg_select, 0, STRING("stg3_tou_33_yn"))
     IF_INT_EQUAL(LW(0), 0)
@@ -1635,6 +1651,7 @@ EVT_BEGIN(evt_tougi2)
             CALL(evt_msg_print_add, 0, STRING("stg3_tou_35_win"))
         END_SWITCH
     END_IF
+    // Mario nods, the partner sums up and the story moves on.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NOD1_4"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
@@ -1653,6 +1670,10 @@ EVT_BEGIN(evt_tougi2)
     RETURN
 EVT_END()
 
+/**
+ * Texture frames of the lobby fan crowd sprites: the Toad, Toadette and Lakitu walk cycles,
+ * grouped into animations by pose_init and registered with evt_ext_entry.
+ */
 ExtTexInfo ext_fan_data[] = {
     {("c_kinopio"), ("KNP_W_1"), 2.0f},
     {("c_kinopio"), ("KNP_W_1"), 6.0f},
@@ -1685,8 +1706,9 @@ ExtTexInfo ext_fan_data[] = {
 };
 
 /**
- * Guess: initializes the lobby's cheering fan crowd (extdrv sprites):
- * allocates the work area, builds the animation table and places the fans.
+ * Init callback of the lobby fan crowd (extdrv sprites): allocates FanWork and one Fan per pose, gives each fan
+ * a random facing, a random Toad, Toadette or Lakitu walk animation and a random spot within 100 of the centre,
+ * and starts the crowd noise SFX_STG3_AUDIENCE_FAN1, keeping its full volume.
  */
 static void ext_fan_init(void) {
     s32 i;
@@ -1750,14 +1772,16 @@ static void fan_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
-// Optimisation pragmas: without them the function's code differs from the original (checked by removing them).
+// FAKE: optimisation pragmas: without them the function's code differs from the original (checked by removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static Vec fan_zero;
 /**
- * Guess: per-frame update of the fan crowd: moves the fans, reacts to Mario's hammer,
- * and handles the fans leaving the lobby; the crowd's sound volume follows the number remaining.
- * Different versions use different update logic.
+ * Per-frame callback of the fan crowd: the fans press toward the target (Mario when GF(10) is set, otherwise the
+ * champion, with Mario also in the crowd), push each other apart and bounce off walls; a fan that Mario's hammer
+ * hits (check_hammer 1) flies off in an arc, one caught in Flurrie's gust (2) drifts away, and both then vanish;
+ * the crowd noise follows the target and its volume the share of fans left (count).
+ * The demos and the releases have different bodies.
  */
 static void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
@@ -2182,8 +2206,9 @@ static __declspec(section ".rodata") Vec fan_zero = {0.0f, 0.0f, 0.0f};
 #pragma opt_lifetimes reset
 
 /**
- * Guess: loop that, every 2 to 6 seconds, pops a message at a random spot near Mario
- * while the fans crowd him (stg3_tou_236 to 240).
+ * Loop spawned while the fans mob Mario (GF(10) set): every 2 to 7 s a fan's cry for Gonzales (stg3_tou_236 to
+ * 240 and 240_01, in turn) pops up with its tail at a random spot (near Mario in the demos, within -50 to 150 of
+ * the lobby centre in the releases); it ends once fewer than 10 fans are left.
  */
 EVT_BEGIN(mario_momikucha_msg)
     SET_VALUE(LW(10), 0)
@@ -2238,9 +2263,11 @@ EVT_BEGIN(mario_momikucha_msg)
 EVT_END()
 
 /**
- * Guess: the lobby crowd scene: after the first match the fans mob Mario until they are shoved away,
- * with the "Lobby poster" story step set at the end (STORY_STG3_20_14_LOBBY_POSTER).
- * Spawns the ext_fan entry with its init/main/display callbacks.
+ * The lobby crowd scene, played once after the first match (GSWF_TOU02_LOBBY_CROWD_SEEN: the fans mob the
+ * champion, who gets move_champ) and once when Mario is champion,
+ * rank 0 (GSWF_TOU02_LOBBY_CROWD_CHAMP_SEEN: they
+ * mob Mario, with mario_momikucha_msg). Registers the fan NPC models, then spawns the ext_fan entry with its
+ * init/main/display callbacks.
  */
 EVT_BEGIN(evt_momikucha)
     SET_VALUE(LF(0), 0)
@@ -2355,12 +2382,15 @@ static void ext_fan_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, fan_disp, NULL);
 }
 
-// Optimisation pragmas: without them the function's code differs from the original (checked by removing them).
+// FAKE: optimisation pragmas: without them the function's code differs from the original (checked by removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 /**
- * Guess: checks whether Mario's (or the partner's) hammer swing hits a given fan:
- * within range and angle in front of the attacker, below the hit height.
+ * Checks whether a fan is knocked away, only while Mario is on the ground: returns 1 when his hammer swing (more
+ * than 10 frames in) lands within 35 of the fan 35 in front of him,
+ * or his spin hammer (submotion 0x14) is within 65;
+ * 2 when Flurrie's gust reaches within 30 of it; 0 otherwise. In JP and later, the fan standing in for Mario or
+ * the champion (flags bit 1) is never hit.
  */
 static s32 check_hammer(Fan* fan) {
     MarioWork* mario = marioGetPtr();
@@ -2494,7 +2524,7 @@ EVT_END()
 /**
  * Lobby scene spawned right after the Champ's Belt is taken away and the party healed (the Peach interlude):
  * Mario and the partner appear in the lobby with the doors hidden,
- * the Toad guide (キノシコワ) speaks (stg3_tou_479_00_01 to 05) with the champion and the Shady Koopa answering,
+ * Jolene (キノシコワ) speaks (stg3_tou_479_00_01 to 05) with the champion and the Shady Koopa answering,
  * Mario nods and cheers, then they walk out and the map changes to tou_01 (bero a_door_mon).
  */
 static EVT_BEGIN(evt_after_peach)
@@ -2548,6 +2578,7 @@ EVT_END()
  * and the first-visit scenes (evt_tougi2, evt_momikucha, doors to tou_01, tou_03 and tou_04).
  */
 EVT_BEGIN(tou_02_init_evt)
+    // Music: the lobby theme early in the chapter and after it, the main Glitz Pit theme in between.
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
@@ -2562,6 +2593,7 @@ EVT_BEGIN(tou_02_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
     END_SWITCH
+    // Entrances; coming back from the arena intro plays evt_tougi2.
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     IF_INT_EQUAL(GSWF(GSWF_TOU_ARENA_INTRO_TO_LOBBY), 1)
@@ -2570,10 +2602,12 @@ EVT_BEGIN(tou_02_init_evt)
     ELSE
         CALL_CHILD(evt_bero_info_run)
     END_IF
+    // NPCs and the Star Piece panel.
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL_CHILD(init_kinopio_f)
     CALL(evt_npc_change_interrupt, STRING("キノピオ女"), 6, PTR(talk_kinopio_f))
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), -260, 0, -120, STRING("sita"), 125, GSWF(GSWF_TOU02_STAR_PIECE_PANEL))
+    // The guards keep the corridor doors shut until they step aside.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_02_THE_GUARD_BACKS_OFF)
         SET_VALUE(LW(0), 3)
         CALL_CHILD(bero_case_switch_off)
@@ -2588,6 +2622,7 @@ EVT_BEGIN(tou_02_init_evt)
             CALL_CHILD(bero_case_switch_off)
         END_IF
     END_IF
+    // After the Peach interlude: the party is healed, the Champ's Belt is taken and Jolene's scene plays.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_06_BOWSER_PUNI_ELDER)
         IF_INT_EQUAL(GSWF(GSWF_TOU_LEFT_AS_CHAMPION), 0)
             CALL(evt_npc_set_position, STRING("キノピオ女"), 0, -1000, 0)
@@ -2617,6 +2652,7 @@ EVT_BEGIN(tou_02_init_evt)
         SET_VALUE(GSWF(GSWF_TOU02_LOBBY_CROWD_SEEN), 1)
         SET_VALUE(GSWF(GSWF_TOU02_LOBBY_CROWD_CHAMP_SEEN), 1)
     END_IF
+    // The big screen's animation and its sounds.
     CALL(evt_map_playanim, STRING("anm_paneru"), 1, 0)
     BEGIN_INLINE_EVENT
         LOOP(0)
@@ -2649,7 +2685,10 @@ EVT_BEGIN(tou_02_init_evt)
             END_LOOP
         END_LOOP
     END_INLINE_EVENT
+    // The fan crowd scene.
     CALL_CHILD(evt_momikucha)
+    // Wall posters by Mario's rank (none in the minors, one in the majors, eight more in the top two),
+    // each blown away by Flurrie once.
 #if VERSION <= VERSION_JP
     CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
@@ -2894,6 +2933,7 @@ EVT_BEGIN(tou_02_init_evt)
         END_SWITCH
     END_IF
 #endif
+    // If poster 8 was blown away at this stage, the Storage Key lies where it fell.
     IF_INT_EQUAL(GSWF(GSWF_TOU02_POSTER_8_SEEN), 1)
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_13_MAJORS_1ST_PL)
             CALL(evt_item_entry, STRING("key"), ITEM_STORAGE_KEY_0x13, -110, 200, -180, ITEM_ENTRY_FIXED, -1, PTR(evt_key))

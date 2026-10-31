@@ -14,6 +14,11 @@
 #include "data_tables.h"
 #include "battle/battle_sub.h"
 
+// Unit work slots of the Hyper Paragoomba.
+enum {
+    UW_HYPER_PATAKURI_CHARGED = 0, // set to 1 when it charges up; cleared by init_event; nothing in this file reads it
+};
+
 static USER_FUNC(krb_get_dir);
 
 BattleUnitKind unit_hyper_patakuri;
@@ -44,8 +49,12 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[638];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the Hyper Paragoomba: 8 HP, level 15, 1 part, with its sounds, init script and data
+ * table.
+ */
 BattleUnitKind unit_hyper_patakuri = {
-    67,
+    UNIT_HYPER_PARAGOOMBA,
     "btl_un_hyper_patakuri",
     8,
     0,
@@ -102,7 +111,7 @@ BattleUnitKind unit_hyper_patakuri = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40004,
+    UNIT_ATTR_FLOATING | UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist_patakuri,
     1,
     parts_patakuri,
@@ -110,16 +119,32 @@ BattleUnitKind unit_hyper_patakuri = {
     data_table_patakuri,
 };
 
+/**
+ * Defence of the Hyper Paragoomba for its winged form: none, so it takes full damage from every kind of
+ * attack.
+ */
 static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage-type modifiers of the Hyper Paragoomba for its winged form: none, no special weakness or immunity.
+ */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Hyper Paragoomba for its winged form (100% is the normal chance): resists Sleep
+ * 80%, Confusion 80%, Freeze 80%, Tiny 80%, Attack Down 80%, Defense Down 80%, Allergic 80%, Slow 80% and
+ * instant KO 95%; weak to Gale Force 130%.
+ */
 static StatusVulnerability regist_patakuri = {80, 100, 100, 100, 80, 100, 100, 80, 100, 80, 100, 80, 100, 80, 80, 100, 130, 100, 80, 100, 100, 95};
 #else
 static StatusVulnerability regist_patakuri = {80, 90, 100, 100, 80, 100, 100, 80, 100, 90, 100, 90, 100, 95, 80, 90, 90, 100, 80, 100, 100, 95};
 #endif
 
+/**
+ * Attack data of the Hyper Paragoomba's dive attack: hits one opposing unit for 2 damage; flips shelled
+ * enemies over; knocks flying enemies out of the air.
+ */
 static BattleWeapon weapon_patakuri_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -138,7 +163,7 @@ static BattleWeapon weapon_patakuri_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -156,6 +181,7 @@ static BattleWeapon weapon_patakuri_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data of the Hyper Paragoomba's charge-up: powers up its next attack by 6. */
 BattleWeapon weapon_patakuri_charge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -173,7 +199,7 @@ BattleWeapon weapon_patakuri_charge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -191,38 +217,54 @@ BattleWeapon weapon_patakuri_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Body of the Hyper Paragoomba for its winged form: one targetable part, the model `c_kuribo_h`, with its hit
+ * box, defence tables and pose table.
+ */
 static BattleUnitKindPart parts_patakuri[] = {
-    {1, "btl_un_hyper_patakuri", "c_kuribo_h", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_patakuri, &defence_patakuri_attr, 0x600809, 0, pose_table_patakuri},
+    {1, "btl_un_hyper_patakuri", "c_kuribo_h", 0.0f, 0.0f, 0.0f, 0.0f, 22.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_patakuri, &defence_patakuri_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_WINGED | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table_patakuri},
 };
 
+/**
+ * Pose table of the Hyper Paragoomba for its winged form: its 19 battle poses (status, hurt and action) and
+ * the animation each one plays; the idle animation is `PTK_S_1`.
+ */
 static PoseTableEntry pose_table_patakuri[] = {
-    {1, "PTK_N_1"},
-    {2, "PTK_Y_1"},
-    {9, "PTK_Y_1"},
-    {5, "PTK_K_1"},
-    {4, "PTK_I_1"},
-    {3, "PTK_I_1"},
-    {28, "PTK_S_1"},
+    {STATUS_SLEEP, "PTK_N_1"},
+    {STATUS_STOP, "PTK_Y_1"},
+    {STATUS_FREEZE, "PTK_Y_1"},
+    {STATUS_CONFUSE, "PTK_K_1"},
+    {STATUS_POISON, "PTK_I_1"},
+    {STATUS_DIZZY, "PTK_I_1"},
+    {BTL_POSE_NORMAL, "PTK_S_1"},
     {29, "PTK_Q_1"},
     {30, "PTK_Q_1"},
     {31, "PTK_S_1"},
-    {39, "PTK_D_1"},
+    {BTL_POSE_DAMAGE, "PTK_D_1"},
     {50, "PTK_A_1"},
-    {42, "PTK_R_1"},
+    {BTL_POSE_RUN, "PTK_R_1"},
     {41, "PTK_R_2"},
-    {40, "PTK_W_1"},
-    {56, "PTK_I_1"},
-    {57, "PTK_I_1"},
+    {BTL_POSE_WALK, "PTK_W_1"},
+    {BTL_POSE_DANGER, "PTK_I_1"},
+    {BTL_POSE_PERIL, "PTK_I_1"},
     {BTL_POSE_TALK, "PTK_T_1"},
     {BTL_POSE_STAY_DEFAULT, "PTK_S_1"},
 };
 
+/**
+ * Data table of the Hyper Paragoomba for its winged form: event 14 runs dmg_fall_event for being knocked out
+ * of the air; event 48 runs patakuri_dmg_first_attack_pos for the First Strike that opens the battle.
+ */
 static BattleDataEntry data_table_patakuri[] = {
     {14, dmg_fall_event},
     {48, patakuri_dmg_first_attack_pos},
     {0, NULL},
 };
 
+/**
+ * Sound cues of the Hyper Paragoomba: ties the animations `PTK_S_1`, `PTK_W_1` and `PTK_R_1` and 3 more to
+ * the sound effect (`SFX_ENM_PATAKURI_MOVE1` and `SFX_ENM_PATAKURI_WAIT1`) that plays along with them.
+ */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"PTK_S_1", 0.01f, NULL, "SFX_ENM_PATAKURI_WAIT1", 0, 1},
     {"PTK_W_1", 0.01f, NULL, "SFX_ENM_PATAKURI_MOVE1", 0, 1},
@@ -249,24 +291,25 @@ static EVT_BEGIN(init_event_patakuri)
 EVT_END()
 
 /**
- * Guess: Called when the winged Hyper Paragoomba is hit down:
- * clears its flying state and winged part attribute, switches to the ground tables and parts,
- * falls to the ground with the fall sound, changes its kind to the wingless version (kind 66)
- * and runs init_event.
+ * Data-table event 14, run by subsetevt_damage when a hit knocks the Hyper Paragoomba's wings off (damage flag
+ * 0x400000, grounded): it clears the floating unit attribute and the winged part attribute,
+ * holds the hurt pose in LW(14) for a second, switches to the Hyper Goomba's pose table, data table and part,
+ * sets the kind-changed unit flag, falls to the ground with the fall sound and makes that its home,
+ * then changes kind to the Hyper Goomba (kind 66) and runs its init_event.
  */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_OffAttribute, LW(10), 4)
-    CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 2048)
+    CALL(btlevtcmd_OffAttribute, LW(10), UNIT_ATTR_FLOATING)
+    CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), PART_ATTR_WINGED)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     WAIT_MS(1000)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table))
     CALL(btlevtcmd_ReplaceParts, LW(10), LW(11), PTR(parts), 1)
-    CALL(btlevtcmd_OnUnitFlag, LW(10), 4)
+    CALL(btlevtcmd_OnUnitFlag, LW(10), UNIT_FLAG_KIND_CHANGED)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)
@@ -278,13 +321,14 @@ static EVT_BEGIN(dmg_fall_event)
     CALL(btlevtcmd_ChangeKind, LW(10), 66)
     CALL_CHILD(init_event)
     WAIT_FRAMES(1)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     RETURN
 EVT_END()
 
 /**
- * Positioning script that runs before the unit's first attack in a battle:
- * puts it at height 10 and waits for the attack to end.
+ * Data-table event 48, which the default damage script runs (damage code 0x39)
+ * when the battle opens with Mario's or his partner's First Strike on this unit:
+ * it sets the unit's height to 10 and waits for the strike to end.
  */
 static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -295,29 +339,38 @@ static EVT_BEGIN(patakuri_dmg_first_attack_pos)
 EVT_END()
 
 /**
- * Guess: Attack script of the winged Hyper Paragoomba:
- * after the item-use check it may charge up first (charge sound, crystal effect and a self-applied buff),
- * then flies at the target (dive with the wing sounds), pauses,
- * and swoops in to hit it with weapon_patakuri_attack, shaking the camera on a hit. A miss makes it fly past.
- * It then returns home.
+ * Attack script of the winged Hyper Paragoomba:
+ * unless it is already charged, after the item-use check it draws lots (charge weight 75 on turn 1, else 25,
+ * against 25 for attacking); charging pays weapon_patakuri_charge, zooms in,
+ * plays the charge sound and the crystal effect, hops and applies the charge (strength 6) to itself,
+ * which ends its turn.
+ * The attack flies to a point 50 units in front of and 40 above the sampled target, pauses,
+ * then swoops down at it (weapon_patakuri_attack, with the wing sounds);
+ * a miss carries it on past the target, a hit shakes the camera and applies the guard result and the damage.
+ * It then flies home.
  */
 static EVT_BEGIN(attack_event_patakuri)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
+    // If it is already charged it skips straight to the attack.
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CHARGE, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(10)
     END_IF
+    // Uses a held item if it has one to use.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // Draws lots on charging up instead of attacking (more likely on the first turn).
     CALL(btlevtcmd_get_turn, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
         CALL(btlevtcmd_DrawLots, LW(0), 2, 25, 75)
     ELSE
         CALL(btlevtcmd_DrawLots, LW(0), 2, 25, 25)
     END_IF
+    // Charge-up: the camera pulls back and a crystal-like glow gathers around the Paragoomba with the charge sound;
+    // the next attack is stronger.
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_patakuri_charge))
         CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -340,21 +393,23 @@ static EVT_BEGIN(attack_event_patakuri)
             WAIT_MS(500)
             CALL(evt_btl_camera_set_mode, 0, 0)
         END_INLINE_EVENT
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
     LABEL(10)
+    // Picks a random opposing unit as the target; with none it does nothing (or is flustered when confused).
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_patakuri_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_patakuri_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Declares the attack and pays its cost while the camera zooms in on the target.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -363,7 +418,8 @@ static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_patakuri_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // Wind-up: it flies up above and just beyond the target, then turns to face it.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 50)
     ADD(LW(1), 40)
@@ -374,6 +430,7 @@ static EVT_BEGIN(attack_event_patakuri)
     WAIT_MS(100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It dives down at the target with a swoop.
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
@@ -381,7 +438,9 @@ static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PATAKURI_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 5, 4, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patakuri_attack), 256, LW(5))
+    // Checks the outcome of the hit: a miss, dodge or guard goes to the no-damage branch; a connecting hit applies
+    // the Action Command defence result and deals the damage.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patakuri_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -403,6 +462,7 @@ static EVT_BEGIN(attack_event_patakuri)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss branch: it sweeps past the target to the other side and hovers there.
     LABEL(90)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PATAKURI_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
@@ -413,6 +473,8 @@ static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     GOTO(98)
+    // Hit branch: the Paragoomba dives into the target; the camera shakes and pulls in, the defence result is read
+    // and the damage is applied.
     LABEL(91)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PATAKURI_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
@@ -423,12 +485,13 @@ static EVT_BEGIN(attack_event_patakuri)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_patakuri_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patakuri_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_patakuri_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
+    // Flies back to its home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_PATAKURI_MOVE1"), STRING("SFX_ENM_PATAKURI_MOVE1"), 0, 15, 15, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -10, 0, 0, -2)
@@ -450,44 +513,65 @@ static EVT_BEGIN(wait_event_patakuri)
     RETURN
 EVT_END()
 
+/**
+ * Pose table of the Hyper Paragoomba for its wingless form: its 20 battle poses (status, hurt and action) and
+ * the animation each one plays; the idle animation is `KUR_S_1`.
+ */
 static PoseTableEntry pose_table[] = {
-    {1, "KUR_N_1"},
-    {2, "KUR_Y_1"},
-    {9, "KUR_Y_1"},
-    {5, "KUR_K_1"},
-    {4, "KUR_I_1"},
-    {3, "KUR_I_1"},
-    {28, "KUR_S_1"},
+    {STATUS_SLEEP, "KUR_N_1"},
+    {STATUS_STOP, "KUR_Y_1"},
+    {STATUS_FREEZE, "KUR_Y_1"},
+    {STATUS_CONFUSE, "KUR_K_1"},
+    {STATUS_POISON, "KUR_I_1"},
+    {STATUS_DIZZY, "KUR_I_1"},
+    {BTL_POSE_NORMAL, "KUR_S_1"},
     {29, "KUR_Q_1"},
     {30, "KUR_Q_1"},
     {31, "KUR_S_1"},
-    {39, "KUR_D_1"},
+    {BTL_POSE_DAMAGE, "KUR_D_1"},
     {50, "KUR_A_1"},
     {51, "KUR_A_2"},
-    {42, "KUR_R_1"},
+    {BTL_POSE_RUN, "KUR_R_1"},
     {41, "KUR_R_2"},
-    {40, "KUR_W_1"},
-    {56, "KUR_I_1"},
-    {57, "KUR_I_1"},
+    {BTL_POSE_WALK, "KUR_W_1"},
+    {BTL_POSE_DANGER, "KUR_I_1"},
+    {BTL_POSE_PERIL, "KUR_I_1"},
     {BTL_POSE_TALK, "KUR_T_1"},
     {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
+/** Data table of the Hyper Paragoomba for its wingless form: event 48 does nothing (btldefaultevt_Dummy). */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0},
 };
 
+/**
+ * Defence of the Hyper Paragoomba for its wingless form: none, so it takes full damage from every kind of
+ * attack.
+ */
 static BattleUnitDefense defence = {0};
 
+/**
+ * Damage-type modifiers of the Hyper Paragoomba for its wingless form: none, no special weakness or immunity.
+ */
 static BattleUnitDefenseAttr defence_attr = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Hyper Paragoomba for its wingless form (100% is the normal chance): resists
+ * Sleep 80%, Dizzy 80%, Confusion 80%, Freeze 80%, Tiny 80%, Attack Down 80%, Defense Down 80%, Allergic 80%,
+ * Slow 80% and instant KO 95%.
+ */
 static StatusVulnerability regist = {80, 100, 80, 100, 80, 100, 100, 80, 100, 80, 100, 80, 100, 80, 80, 100, 100, 100, 80, 100, 100, 95};
 #else
 static StatusVulnerability regist = {80, 90, 80, 100, 80, 100, 100, 80, 100, 95, 100, 95, 100, 95, 80, 90, 80, 100, 80, 100, 100, 95};
 #endif
 
+/**
+ * Body of the Hyper Paragoomba for its wingless form: one targetable part, the model `c_kuribo_h`, with its
+ * hit box, defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
     {
         1, // partNum
@@ -507,6 +591,10 @@ static BattleUnitKindPart parts[] = {
     },
 };
 
+/**
+ * Attack data of the Hyper Paragoomba's headbutt: hits one opposing unit for 2 damage; flips shelled enemies
+ * over; knocks flying enemies out of the air (the form it takes once its wings are gone).
+ */
 static BattleWeapon weapon_kuriboo_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -525,7 +613,7 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -543,6 +631,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack data of the Hyper Paragoomba's charge-up: powers up its next attack by 6 (the form it takes once its
+ * wings are gone).
+ */
 static BattleWeapon weapon_kuriboo_charge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -560,7 +652,7 @@ static BattleWeapon weapon_kuriboo_charge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -591,7 +683,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 6, 6)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 6, 6)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_JUMP1"), STRING("SFX_ENM_KURI_LANDING1"))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_PATAKURI_CHARGED, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -613,13 +705,21 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 /**
- * Guess: Attack script of the Hyper Goomba: after the item-use check it may first charge up (unit work 0 = 1:
- * charge sound, a crystal effect and a self-applied buff).
- * It then rolls at its target (walking pose, turning with krb_get_dir over 32 steps), jumps at it,
- * and applies the damage with the guard-timing check (weapon_kuriboo_attack);
- * a miss lets it bounce past and a hit shakes the camera. It then hops back toward its home position.
+ * Attack script of the Hyper Goomba (the Hyper Paragoomba after losing its wings):
+ * the target is the First Strike target in a battle-flag-2 battle, else a sampled enemy.
+ * Unless it is already charged, after the item-use check it draws lots (charge weight 75 on turn 1, else 25,
+ * against 25 for attacking): charging pays weapon_kuriboo_charge, sets unit work 0 to 1, zooms in,
+ * plays the charge sound and the crystal effect, hops in place and applies the charge (strength 6) to itself,
+ * which ends its turn.
+ * The attack walks to 100 units in front of the target,
+ * then leaps onto it in a 32-frame arc while tilting along the flight path (krb_get_dir)
+ * and applies the guard result and the damage (weapon_kuriboo_attack);
+ * a miss carries it on with two small hops, a hit shakes the camera and it bounces back in three hops.
+ * It then walks home.
  */
 static EVT_BEGIN(attack_event)
+    // Picks the target: the preset first-attack target when battle flag 2 is set, otherwise a random opposing unit;
+    // with no target it does nothing (or is flustered when confused).
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -630,33 +730,38 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_kuriboo_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
+    // If it is already charged it skips straight to the attack.
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CHARGE, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(10)
     END_IF
+    // Uses a held item if it has one to use.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // Draws lots on charging up instead of attacking (more likely on the first turn).
     CALL(btlevtcmd_get_turn, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
         CALL(btlevtcmd_DrawLots, LW(0), 2, 25, 75)
     ELSE
         CALL(btlevtcmd_DrawLots, LW(0), 2, 25, 25)
     END_IF
+    // Charge-up: the camera pulls back, a crystal-like glow gathers around the unit with the charge sound, and it
+    // hops once; its next attack is stronger.
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_kuriboo_charge))
         CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_PATAKURI_CHARGED, 1)
         CALL(evt_btl_camera_set_mode, 0, 7)
         CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -676,9 +781,10 @@ static EVT_BEGIN(attack_event)
             WAIT_MS(500)
             CALL(evt_btl_camera_set_mode, 0, 0)
         END_INLINE_EVENT
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
+    // Declares the attack and pays its cost while the camera zooms in on the target.
     LABEL(10)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.5996094f))
     CALL(evt_btl_camera_set_mode, 0, 8)
@@ -689,19 +795,21 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_kuriboo_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // Wind-up: it runs past the target and out the far side, then turns around to face it.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(170)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
+    // It curls up and spins as it leaps in a 32-frame jump at the target.
     BEGIN_INLINE_EVENT
         CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
         SET_VALUE(LW(8), 0)
@@ -723,7 +831,9 @@ static EVT_BEGIN(attack_event)
     END_INLINE_EVENT
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 32, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
+    // Checks the outcome of the hit: a miss, dodge or guard goes to the no-damage branch; a connecting hit applies
+    // the Action Command defence result and deals the damage.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -745,6 +855,7 @@ static EVT_BEGIN(attack_event)
         GOTO(91)
         CASE_END
     END_SWITCH
+    // Miss branch: the jump is cut short and it hops back away from the target.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -757,13 +868,15 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
     WAIT_MS(500)
     GOTO(95)
+    // Hit branch: the camera shakes and pulls in, the headbutt lands and the damage is applied, and the unit bounces
+    // back in three hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_kuriboo_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(15), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, LW(15))
@@ -776,6 +889,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 6, -1)
     GOTO(95)
+    // Walks back to its home position.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 3, 3, 0, 0)

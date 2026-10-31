@@ -21,6 +21,7 @@ static const char* yellow_light_anim[5];
 static const char* red_light_anim[5];
 static const char* orange_light_anim[5];
 
+/** Animation names of Grodus's power lamp (green light): its five lit and dim states. */
 static const char* green_light_anim[] = {
     "L_1C",
     "L_1B",
@@ -29,6 +30,7 @@ static const char* green_light_anim[] = {
     "L_1E",
 };
 
+/** Animation names of Grodus's third head lamp (yellow light): its five lit and dim states. */
 static const char* yellow_light_anim[] = {
     "L_2C",
     "L_2B",
@@ -37,6 +39,7 @@ static const char* yellow_light_anim[] = {
     "L_2E",
 };
 
+/** Animation names of Grodus's second head lamp and staff lamp (red light): its five lit and dim states. */
 static const char* red_light_anim[] = {
     "L_3C",
     "L_3B",
@@ -45,6 +48,7 @@ static const char* red_light_anim[] = {
     "L_3E",
 };
 
+/** Animation names of Grodus's first head lamp (orange light): its five lit and dim states. */
 static const char* orange_light_anim[] = {
     "L_4C",
     "L_4B",

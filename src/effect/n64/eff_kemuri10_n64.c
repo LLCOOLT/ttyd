@@ -12,6 +12,7 @@
 #include <math.h>
 #include "version.h"
 
+/** Smoke cloud mesh (192 vertices) of the puff left beside a moving NPC. */
 static effN64Vtx stg_houki_kemuri_v[] = {
     {0, -50, 20, 0, 512, 255, 255, 255, 255},
     {35, -35, 20, 256, 512, 255, 255, 255, 255},

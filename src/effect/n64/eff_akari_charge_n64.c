@@ -13,6 +13,7 @@
 #include "libc_decls.h"
 #include <math.h>
 
+/** Spark quad of the charge glow (an 8x16 texture window), stretched along each spark's last step into a streak. */
 static effN64Vtx size2x8_tex8x16_vtx[] = {
     {-4, -4, 0, 0, 0, 255, 255, 255, 255},
     {4, -4, 0, 512, 0, 0, 0, 0, 255},

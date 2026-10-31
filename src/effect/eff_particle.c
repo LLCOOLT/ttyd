@@ -11,8 +11,6 @@
 #include "libc_decls.h"
 #include <math.h>
 
-double log(double);
-
 typedef struct ParticleItem {
     s32 next; // 0x0
     Vec pos;  // 0x4
@@ -49,6 +47,10 @@ typedef struct ParticleWork {
     f32 speed;            // 0xAC
 } ParticleWork;
 
+/**
+ * Spark (hibana) colour by remaining life, indexed by life / 8:
+ * a particle fades from white through yellow to a dark, transparent orange as it dies.
+ */
 GXColor hibana_col[32] = {
     {0x5F, 0x28, 0x00, 0x00},
     {0x69, 0x35, 0x00, 0x08},
@@ -84,6 +86,7 @@ GXColor hibana_col[32] = {
     {0xFF, 0xFF, 0xFF, 0xFF}
 };
 
+/** Random seed of the particle generator, advanced by pt_frand for every random draw in this file. */
 s32 seed = 1;
 
 /** Pseudo-random f32 in [0, 1) from a linear congruential generator on the global seed. */
@@ -122,6 +125,7 @@ static inline f32 pt_gauss(void) {
 }
 
 /** Stand-in for a function the original linker dead-stripped; its signed int->float constant is last in .rodata. */
+// FAKE: uncalled stand-in for a stripped function; creates the int-to-float double in .rodata
 void particleStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }

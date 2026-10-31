@@ -56,6 +56,7 @@ static USER_FUNC(evt_mario_check_menu) {
     return EVT_RETURN_DONE;
 }
 
+/** Exits (beros) of this room: e_bero to dou_03. */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -446,6 +447,9 @@ EVT_BEGIN(lift_event)
     RETURN
 EVT_END()
 
+/**
+ * Hazard-water floors of this room (map hit names) and the point each puts Mario back at after he is bitten.
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_01", {120.0f, 10.0f, 0.0f}},
     {"mod_02", {-90.0f, 10.0f, -110.0f}},
@@ -474,14 +478,19 @@ EVT_END()
  * Other partners and other times give a generic line.
  */
 EVT_BEGIN(kuribo_talk)
+    // Only while the Couples Cake request is active does he have anything to say.
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 21)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
+            // First talk: he thanks Mario for taking the request and says he feels lonely on the island.
             CALL(evt_msg_print, 0, STRING("irai_21_001"), 0, 0)
             SET_VALUE(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
         ELSE
+            // Later talks: if Goombella is the partner, she is the cute girl he has been waiting for.
             CALL(evt_mario_get_party, LW(0))
             IF_INT_EQUAL(LW(0), 1)
                 CALL(evt_party_stop, 0)
+                // Mario and Goombella walk up to him, and he asks whether they found a cute girl, then notices
+                // Goombella.
                 CALL(evt_npc_set_ry, STRING("me"), 90)
                 CALL(evt_party_set_dir_npc, 0, STRING("クリチェロ"))
                 WAIT_MS(300)
@@ -499,6 +508,7 @@ EVT_BEGIN(kuribo_talk)
                     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 0)
                     SET_VALUE(GF(0), 0)
                 END_INLINE_EVENT
+                // The Goomba walks over to Goombella, nervously confesses his love and asks her out.
                 CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INTANGIBLE)
                 CALL(evt_npc_move_position, STRING("me"), -175, 86, 0, 40, 0)
                 WAIT_WHILE(GF(0))
@@ -510,6 +520,7 @@ EVT_BEGIN(kuribo_talk)
                 CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
                 ADD(LW(0), 5)
                 CALL(evt_npc_move_position, STRING("me"), LW(0), LW(2), 0, 30, 0)
+                // Goombella is startled and Mario and she jump back in surprise.
                 BEGIN_INLINE_EVENT
                     WAIT_MS(250)
                     CALL(evt_mario_dispflag_onoff, 1, 2)
@@ -524,13 +535,16 @@ EVT_BEGIN(kuribo_talk)
                     CALL(evt_party_jump_pos, 0, LW(0), LW(1), LW(2), 200, 1, 5)
                     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 0)
                 END_INLINE_EVENT
+                // He says he loves her and asks her to go out with him.
                 CALL(evt_msg_print, 0, STRING("irai_21_005"), 0, STRING("me"))
                 CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
                 ADD(LW(0), 10)
                 ADD(LW(1), 15)
                 ADD(LW(2), 5)
+                // A Couples Cake appears next to him for Goombella.
                 CALL(evt_item_entry, STRING("ff"), ITEM_COUPLES_CAKE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, GSWF(GSWF_DOU04_TROUBLE21_COUPLES_CAKE_TAKEN), 0)
                 WAIT_MS(800)
+                // Goombella is flustered and says she is already going out with Mario; Mario and she react.
                 CALL(evt_msg_print, 0, STRING("irai_21_006"), 0, STRING("party"))
                 WAIT_MS(500)
                 CALL(evt_eff_fukidashi, 3, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 30)
@@ -567,6 +581,7 @@ EVT_BEGIN(kuribo_talk)
                     END_LOOP
                 END_INLINE_EVENT
                 WAIT_MS(800)
+                // Heartbroken, the Goomba says he has had enough, shouts "Peace!" and runs off the screen.
                 CALL(evt_msg_print, 0, STRING("irai_21_008"), 0, STRING("me"))
                 CALL(evt_npc_move_position, STRING("me"), -140, -76, 0, 60, 0)
                 WAIT_MS(1000)
@@ -586,6 +601,7 @@ EVT_BEGIN(kuribo_talk)
                 END_INLINE_EVENT
                 CALL(evt_npc_move_position, STRING("me"), 140, -76, 0, 150, 0)
                 CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
+                // Goombella feels bad about it, picks up the Couples Cake and gives it to Mario as a reward.
                 CALL(evt_msg_print, 0, STRING("irai_21_010"), 0, STRING("party"))
                 CALL(evt_item_get_position, STRING("ff"), LW(0), LW(1), LW(2))
                 SUBTRACT(LW(2), 10)
@@ -601,6 +617,8 @@ EVT_BEGIN(kuribo_talk)
                 CALL(evt_msg_print, 0, STRING("irai_21_011"), 0, STRING("party"))
                 CALL(evt_mario_set_dir, 270, 300, 0)
                 WAIT_MS(300)
+                // If the inventory has room (10 slots, or 20 with the Strange Sack) Mario receives the cake;
+                // otherwise it is left on the ground.
                 CALL(evt_pouch_get_haveitemcnt, LW(0))
                 CALL(evt_pouch_check_item, ITEM_STRANGE_SACK, LW(1))
                 IF_INT_EQUAL(LW(1), 0)
@@ -621,11 +639,14 @@ EVT_BEGIN(kuribo_talk)
                     WAIT_MS(300)
                     CALL(evt_party_set_dir, 0, 90, 300)
                 END_IF
+                // The request is finished: Trouble Center job 21 is solved.
                 CALL(evt_msg_print, 0, STRING("irai_21_013"), 0, STRING("party"))
                 CALL(evt_party_run, 0)
                 SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
                 SET_VALUE(GSWF(GSWF_TROUBLE_21_SOLVED), 1)
                 CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
+                // Any other partner: the Goomba turns them down with a line specific to that partner (Koops,
+                // Flurrie, Yoshi, Vivian, Bobbery, Ms. Mowz) and the partner replies.
             ELSE
                 LOOP(0)
                     CALL(evt_mario_party_use_check, LW(1))
@@ -687,6 +708,7 @@ EVT_BEGIN(kuribo_talk)
     RETURN
 EVT_END()
 
+/** NPC setup of dou_04: the Goomba Kurichero, who talks to Mario about the Couples Cake request. */
 static NpcSetupInfo npcEnt[] = {
     {
         "クリチェロ", // name

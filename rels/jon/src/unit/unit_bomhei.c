@@ -12,6 +12,11 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 
+// Unit work slots of the Bob-omb (btlevtcmd_Get/SetUnitWork).
+enum {
+    UW_BOMHEI_FUSE_SFX = 0, // handle of the looping fuse sound, -1 when none is playing
+};
+
 BattleUnitKind unit_bomhei;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -36,6 +41,7 @@ static EvtWord attack_event_spark[288];
 #endif
 static EvtWord wait_event_spark[27];
 
+/** Unit data of the Bob-omb: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_bomhei = {
     43,
     "btl_un_bomhei",
@@ -102,10 +108,13 @@ BattleUnitKind unit_bomhei = {
     data_table,
 };
 
+/** Damage reduction of the Bob-omb: defence 1 against every attack type. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element response of the Bob-omb: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Pose table of the Bob-omb: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "BOM_N_1"},
     {2, "BOM_Y_1"},
@@ -113,20 +122,21 @@ static PoseTableEntry pose_table[] = {
     {5, "BOM_K_1"},
     {4, "BOM_X_1"},
     {3, "BOM_X_1"},
-    {28, "BOM_S_1"},
+    {BTL_POSE_NORMAL, "BOM_S_1"},
     {29, "BOM_Q_1"},
     {30, "BOM_Q_1"},
     {31, "BOM_S_1"},
-    {39, "BOM_D_1"},
+    {BTL_POSE_DAMAGE, "BOM_D_1"},
     {50, "BOM_A_1"},
-    {42, "BOM_R_1"},
-    {40, "BOM_W_1"},
-    {56, "BOM_X_1"},
-    {57, "BOM_X_1"},
+    {BTL_POSE_RUN, "BOM_R_1"},
+    {BTL_POSE_WALK, "BOM_W_1"},
+    {BTL_POSE_DANGER, "BOM_X_1"},
+    {BTL_POSE_PERIL, "BOM_X_1"},
     {BTL_POSE_TALK, "BOM_T_1"},
     {BTL_POSE_STAY_DEFAULT, "BOM_S_1"},
 };
 
+/** Pose table of the Bob-omb, fuse lit: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_spark[] = {
     {1, "BOM_N_2"},
     {2, "BOM_Y_2"},
@@ -138,40 +148,46 @@ static PoseTableEntry pose_table_spark[] = {
 #else
     {3, "BOM_X_2"},
 #endif
-    {28, "BOM_S_2"},
+    {BTL_POSE_NORMAL, "BOM_S_2"},
     {29, "BOM_Q_2"},
     {30, "BOM_Q_2"},
     {31, "BOM_S_2"},
-    {39, "BOM_D_2"},
+    {BTL_POSE_DAMAGE, "BOM_D_2"},
     {50, "BOM_A_2"},
-    {42, "BOM_R_2"},
-    {40, "BOM_W_2"},
-    {56, "BOM_X_2"},
-    {57, "BOM_X_2"},
+    {BTL_POSE_RUN, "BOM_R_2"},
+    {BTL_POSE_WALK, "BOM_W_2"},
+    {BTL_POSE_DANGER, "BOM_X_2"},
+    {BTL_POSE_PERIL, "BOM_X_2"},
     {BTL_POSE_TALK, "BOM_T_2"},
     {BTL_POSE_STAY_DEFAULT, "BOM_S_2"},
 };
 
+/** Data table of the Bob-omb: event handlers keyed by tag. */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/** Data table of the Bob-omb, fuse lit: event handlers keyed by tag. */
 static BattleDataEntry data_table_spark[] = {
     {48, btldefaultevt_Dummy},
     {0},
 };
 
+/** Body part of the Bob-omb: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_bomhei", "c_bomhey", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1000, pose_table},
+    {1, "btl_un_bomhei", "c_bomhey", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_EXPLOSIVE, pose_table},
 };
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Bob-omb (percent, 0 is immune): immune to poison. Demo values. */
 static StatusVulnerability regist = {80, 80, 70, 0, 80, 150, 100, 70, 100, 80, 100, 80, 100, 80, 80, 90, 80, 100, 80, 100, 100, 95};
 #else
+/** Status vulnerability of the Bob-omb (percent, 0 is immune): immune to poison. Released game values. */
 static StatusVulnerability regist = {70, 100, 70, 0, 70, 150, 100, 100, 100, 90, 100, 90, 100, 95, 80, 90, 80, 100, 80, 100, 100, 95};
 #endif
 
+/** Attack data for the Bob-omb's body bump: 2 damage. */
 static BattleWeapon weapon_bomhei_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -190,7 +206,7 @@ static BattleWeapon weapon_bomhei_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -208,6 +224,7 @@ static BattleWeapon weapon_bomhei_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Bob-omb's blast once its fuse is lit: 5 damage. */
 static BattleWeapon weapon_bomhei_bomb = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -226,7 +243,7 @@ static BattleWeapon weapon_bomhei_bomb = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -252,13 +269,13 @@ static BattleWeapon weapon_bomhei_bomb = {
  */
 static EVT_BEGIN(bomb_event)
     CALL(evt_btl_camera_shake_w, 0, 5, 0, 15, 0)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 33554432)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NO_SHADOW)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOMHEI_FUSE_SFX, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
         CALL(evt_snd_sfxoff, LW(0))
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMHEI_FUSE_SFX, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_ENM_BOMB_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -289,7 +306,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMHEI_FUSE_SFX, -1)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_BOMB_MOVE2"), STRING("SFX_ENM_BOMB_MOVE2"), 0, 4, 4)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_BOMB_MOVE2"), STRING("SFX_ENM_BOMB_MOVE2"), 0, 10, 10)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -298,15 +315,15 @@ EVT_END()
 
 /**
  * Damage script of the Bob-omb.
- * A damaging hit (damage code 256) of kind 24, 25 or 27 sets it off at once (bomb_event;
- * Guess: these are the fire and explosion kinds).
- * Otherwise it takes the default damage and, if it is still able to act and not in status 27,
+ * A damaging hit (damage code 256) of kind 24, 25 or 27 (a fire, explosion or electric hit) sets it off at once
+ * (bomb_event).
+ * Otherwise it takes the default damage and, if it is still able to act and not in status 27 (KO),
  * lights its fuse (change_spark_event).
  */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
         SWITCH(LW(0))
@@ -320,7 +337,7 @@ static EVT_BEGIN(damage_event)
         END_SWITCH
     END_IF
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_INSTANT_KILL, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
@@ -336,8 +353,8 @@ EVT_END()
  * and sets counter attribute 8192 on part 1.
  */
 static EVT_BEGIN(change_spark_event)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 256, LW(0))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
@@ -349,8 +366,8 @@ static EVT_BEGIN(change_spark_event)
         CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event_spark))
         CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event_spark))
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_spark))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
-        CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 8192)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
+        CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_VOLATILE_EXPLOSIVE)
         CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_spark))
     END_IF
     LABEL(99)
@@ -364,6 +381,8 @@ EVT_END()
  * When confused with no target it is flustered. The demo builds use longer waits and a slower walk home.
  */
 static EVT_BEGIN(attack_event)
+    // Use an item if it has one; otherwise pick a target (a confused Bob-omb with nobody to bump gets
+    // flustered).
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -374,7 +393,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_bomhei_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_bomhei_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -390,11 +409,13 @@ static EVT_BEGIN(attack_event)
 #endif
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_bomhei_attack))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_bomhei_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It hops twice on the spot, then runs up to the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOMB_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -403,13 +424,14 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 10)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_attack), 256, LW(5))
+    // Find out whether the bump connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -431,8 +453,9 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: it circles around the target and stands there for a moment.
     LABEL(90)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
@@ -452,9 +475,10 @@ static EVT_BEGIN(attack_event)
     WAIT_MS(500)
 #endif
     GOTO(98)
+    // Hit: the damage is dealt and the Bob-omb is knocked back in two hops.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_bomhei_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(2.0f), FLOAT(0.5f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
@@ -466,9 +490,10 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOMB_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // Walk back home.
     LABEL(98)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_BOMB_MOVE4"), STRING("SFX_ENM_BOMB_MOVE4"), 0, 10, 10, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
 #if VERSION <= VERSION_DEMO_US
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
 #else
@@ -495,7 +520,7 @@ EVT_END()
 static EVT_BEGIN(damage_event_spark)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(15), 1)
         CALL_CHILD(bomb_event)
@@ -511,6 +536,8 @@ EVT_END()
  * dealing the bomb weapon's damage to the target when it connects.
  */
 static EVT_BEGIN(attack_event_spark)
+    // Use an item if it has one; otherwise pick a target (a confused Bob-omb with nobody to hit gets
+    // flustered).
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -521,7 +548,7 @@ static EVT_BEGIN(attack_event_spark)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_bomhei_bomb))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_bomhei_bomb), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -537,6 +564,7 @@ static EVT_BEGIN(attack_event_spark)
 #endif
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_bomhei_bomb))
+    // Declare the attack; the lit Bob-omb hops twice and runs at the target like the normal bump.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_bomhei_bomb))
@@ -550,7 +578,7 @@ static EVT_BEGIN(attack_event_spark)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 10)
@@ -558,7 +586,8 @@ static EVT_BEGIN(attack_event_spark)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_btl_camera_set_mode, 0, 0)
 #endif
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_bomb), 256, LW(5))
+    // Find out whether the blast will reach the target.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_bomb), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -580,6 +609,7 @@ static EVT_BEGIN(attack_event_spark)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: it runs past the target and blows up anyway.
     LABEL(90)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 500)
@@ -589,14 +619,16 @@ static EVT_BEGIN(attack_event_spark)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(1000)
     RETURN
+    // Hit: the blast damages the target, then the Bob-omb explodes.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_bomhei_bomb))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_bomb), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_bomhei_bomb), DAMAGE_FLAG_LAST_HIT, LW(5))
     SET_VALUE(LW(15), 0)
     CALL_CHILD(bomb_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(1000)
     RETURN
+    // Wait for the blast to settle.
     LABEL(98)
     WAIT_MS(1000)
     LABEL(99)
@@ -609,10 +641,10 @@ EVT_END()
  */
 static EVT_BEGIN(wait_event_spark)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOMHEI_FUSE_SFX, LW(15))
     IF_INT_EQUAL(LW(15), -1)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOMB_WAIT1"), EVT_NULLPTR, 0, LW(15))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(15))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMHEI_FUSE_SFX, LW(15))
     END_IF
     RETURN
 EVT_END()

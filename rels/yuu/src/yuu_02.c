@@ -74,6 +74,11 @@ BOOL yuuminigame3_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
 
 Vec fukkipoint[15];
 
+/**
+ * Checkpoints along the Tube Mode course, in order from the start around the loop to the goal.
+ * yuuminigame3_gamerule tracks which one Mario has passed and drops him back onto the last one
+ * after he falls off the course.
+ */
 Vec fukkipoint[] = {
     {300.0f, 0.0f, 300.0f},
     {750.0f, 0.0f, 300.0f},
@@ -107,6 +112,10 @@ EVT_BEGIN(yuu_02_icon_monte_entry_evt)
 EVT_END()
 #endif
 
+/**
+ * Where fall_rtn places the Tube Mode coins: ten areas of the course (x range, z range, coin count)
+ * with the coins set on the floor below; coins of type 2 start hidden. A zero type ends the table.
+ */
 static MonteZoneTable montetable[] = {
     {1500.0f, 990.0f, -200.0f, -300.0f, 1, 1},
     {1500.0f, 990.0f, -300.0f, -400.0f, 1, 2},
@@ -166,7 +175,9 @@ USER_FUNC(yuu_02_icon_monte_onoff) {
 /**
  * 2D draw callback for the arrow icon (ICON_163):
  * flips it to face the direction of travel depending on which side (z sign) of the course Mario is on,
- * and nudges it back and forth in a short blink cycle. Guess: it warns that the player is rolling the wrong way.
+ * and nudges it 5 units for 9 of every 32 frames.
+ * The course tick shows it when Mario crosses a checkpoint backwards
+ * and hides it when he passes the next one forwards, so it marks that he is rolling the wrong way.
  */
 void yuu_02_icon_monte_disp(CameraId camera, void* param) {
     Monte* monte = param;

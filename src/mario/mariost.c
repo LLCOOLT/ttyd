@@ -82,6 +82,7 @@ BOOL DvdCheckTreadOn;
 //.data
 #if VERSION == VERSION_EU
 // PAL: the plain modes are 50Hz PAL interlaced, the _prog / Prog ones EURGB60 interlaced
+/** Video mode of the boot logo screens (448 lines, 50Hz): seq_logo sets it on a cold start or restart. */
 GXRenderModeObj sRMObjHReso = {
     VI_TVMODE_PAL_INT, //viTVmode
     0x260, //fbWidth
@@ -101,6 +102,7 @@ GXRenderModeObj sRMObjHReso = {
     8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 
+/** Video mode of the boot logo screens in 60Hz mode (EURGB60), set by seq_logo after a hot reset. */
 GXRenderModeObj sRMObjHReso_prog = {
     VI_TVMODE_EURGB60_INT, //viTVmode
     0x260, //fbWidth
@@ -120,6 +122,7 @@ GXRenderModeObj sRMObjHReso_prog = {
     8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 
+/** The game's main video mode (50Hz PAL, interlaced): marioStInit starts the game with it. */
 GXRenderModeObj GXNtsc480IntDfMarioSt = {
     VI_TVMODE_PAL_INT, //viTVmode
     0x260, //fbWidth
@@ -139,6 +142,7 @@ GXRenderModeObj GXNtsc480IntDfMarioSt = {
     8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 
+/** The game's main video mode in 60Hz (EURGB60), used by marioStInit after a hot reset. */
 GXRenderModeObj GXNtsc480ProgMarioSt = {
     VI_TVMODE_EURGB60_INT, //viTVmode
     0x260, //fbWidth
@@ -158,6 +162,7 @@ GXRenderModeObj GXNtsc480ProgMarioSt = {
     8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 #else
+/** Video mode of the boot logo screens (448 lines, interlaced): seq_logo sets it on a cold start or restart. */
 GXRenderModeObj sRMObjHReso = {
     VI_TVMODE_NTSC_INT, //viTVmode
     0x260, //fbWidth
@@ -177,6 +182,7 @@ GXRenderModeObj sRMObjHReso = {
     8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 
+/** Video mode of the boot logo screens in progressive scan, set by seq_logo after a hot reset. */
 GXRenderModeObj sRMObjHReso_prog = {
     VI_TVMODE_NTSC_PROG, //viTVmode
     0x260, //fbWidth
@@ -196,6 +202,7 @@ GXRenderModeObj sRMObjHReso_prog = {
     8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 
+/** The game's main video mode (480 lines, interlaced): marioStInit starts the game with it. */
 GXRenderModeObj GXNtsc480IntDfMarioSt = {
     VI_TVMODE_NTSC_INT, //viTVmode
     0x260, //fbWidth
@@ -215,6 +222,7 @@ GXRenderModeObj GXNtsc480IntDfMarioSt = {
     8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 
+/** The game's main video mode in progressive scan, used by marioStInit after a hot reset. */
 GXRenderModeObj GXNtsc480ProgMarioSt = {
     VI_TVMODE_NTSC_PROG, //viTVmode
     0x260, //fbWidth

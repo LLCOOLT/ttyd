@@ -66,6 +66,7 @@ static USER_FUNC(chk_luigi_color) {
     return EVT_RETURN_DONE;
 }
 
+/** Return points of the hazard floors (the mod_NN hit areas) of the town square. */
 static HitDamageReturn dmgReturnPt[] = {
     {"mod_00", {0.0f, -1000.0f, 0.0f}},
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
@@ -100,6 +101,7 @@ static EVT_BEGIN(n_door_close)
     RETURN
 EVT_END()
 
+/** Doors and exits of pik_01: nw_bero to pik_04; n_bero to pik_02; dokan_1 to tik_17 (Rogueport Sewers). */
 static BeroEntry bero_data[] = {
     {
         "nw_bero", // hitName
@@ -155,6 +157,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/** Map objects of the arrow signs (yajirusi_N) that evt_pik_yajirushi animates. */
 static const char* name_tbl[] = {
     "yajirusi_1",
     "yajirusi_2",
@@ -169,6 +172,7 @@ static const char* name_tbl[] = {
 EVT_BEGIN(evt_powan)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+    // Detective Pennington hops in and greets Mario.
     CALL(evt_msg_print, 0, STRING("stg6_pik_06"), 0, 0)
     WAIT_MS(300)
     CALL(evt_npc_flag_onoff, 1, STRING("ポワン探偵"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
@@ -183,6 +187,7 @@ EVT_BEGIN(evt_powan)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
+        // Mario's partner comments.
         CALL(evt_msg_print, 0, STRING("stg6_pik_07_0"), 0, STRING("party"))
         CASE_EQUAL(2)
         CALL(evt_msg_print, 0, STRING("stg6_pik_07_1"), 0, STRING("party"))
@@ -200,12 +205,14 @@ EVT_BEGIN(evt_powan)
     WAIT_MS(500)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_set_dir_to_target, STRING("ポワン探偵"), STRING("mario"))
+    // Pennington speaks about the sanctum.
     CALL(evt_msg_print, 0, STRING("stg6_pik_08"), 0, STRING("ポワン探偵"))
     CALL(evt_mario_set_dir, 270, 200, 0)
     CALL(evt_party_set_dir, 0, 270, 200)
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+        // Pennington's theme starts and he leads Mario to the sanctum gate.
         CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_POWAN1"))
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -350, 120, 40, -55, 50, -236, 500, 11)
@@ -226,6 +233,7 @@ EVT_BEGIN(evt_powan)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
+        // Mario's partner comments again.
         CALL(evt_msg_print, 0, STRING("stg6_pik_09_0"), 0, STRING("party"))
         CASE_EQUAL(2)
         CALL(evt_msg_print, 0, STRING("stg6_pik_09_1"), 0, STRING("party"))
@@ -241,6 +249,7 @@ EVT_BEGIN(evt_powan)
         CALL(evt_msg_print, 0, STRING("stg6_pik_09_6"), 0, STRING("party"))
     END_SWITCH
     WAIT_MS(500)
+    // Pennington unlocks the padlocked gate.
     CALL(evt_msg_print, 0, STRING("stg6_pik_10"), 0, STRING("ポワン探偵"))
     CALL(evt_mario_set_pose, STRING("M_N_5B"))
     WAIT_MS(1000)
@@ -252,6 +261,7 @@ EVT_BEGIN(evt_powan)
     WAIT_MS(1000)
     CALL(evt_npc_move_position, STRING("ポワン探偵"), 180, -220, 0, FLOAT(50.0f), 1)
     CALL(evt_set_dir_to_target, STRING("ポワン探偵"), STRING("mario"))
+    // The story advances and the gate's exit is switched on.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_50_THE_SANCTUM_MANAGER)
     SET_VALUE(LW(0), 1)
     CALL_CHILD(bero_case_switch_on)
@@ -266,8 +276,8 @@ EVT_BEGIN(evt_powan)
 EVT_END()
 
 /**
- * Guess: init for Pennington (ポワン探偵, powan): during the sanctum manager story point (STORY_STG6_50) he stands at
- * (165, 20, -190) and may jump and land on floors; at other times he stays where the map put him.
+ * Init for Detective Pennington (ポワン探偵, powan): during the sanctum manager story point (STORY_STG6_50) he stands
+ * at (165, 20, -190) with the jumping and land-on-floor flags on; at other times he stays where the map put him.
  */
 static EVT_BEGIN(init_powan)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -295,9 +305,11 @@ EVT_END()
  */
 EVT_BEGIN(miyageya_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 27)
+        // Once Mario looks like Luigi, a longer scene plays.
         CALL(chk_luigi_color, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
+                // Trouble Center request 27: the shop owner asks for help.
                 CALL(evt_msg_print, 0, STRING("irai_27_001"), 0, 0)
                 CALL(evt_mario_set_pose, STRING("M_N_5B"))
                 WAIT_MS(300)
@@ -352,6 +364,7 @@ EVT_BEGIN(miyageya_talk)
                 SET_VALUE(LW(4), 20)
             END_IF
             IF_INT_LESS(LW(3), LW(4))
+                // The owner rewards Mario with a Choco Cake.
                 CALL(evt_msg_print, 0, STRING("irai_27_006"), 0, 0)
                 CALL(evt_item_entry, STRING("sc"), ITEM_CHOCO_CAKE, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                 CALL(evt_item_get_item, STRING("sc"))
@@ -372,6 +385,7 @@ EVT_BEGIN(miyageya_talk)
             CALL(evt_npc_set_position, STRING("ルイージ"), -386, 0, 214)
             CALL(evt_npc_flag_onoff, 1, STRING("ルイージ"), NPC_FLAG_JUMPING | NPC_FLAG_INTANGIBLE | NPC_FLAG_LAND_ON_FLOOR)
             CALL(evt_npc_move_position, STRING("ルイージ"), -330, 272, 0, 60, 0)
+            // The real Luigi turns up.
             CALL(evt_msg_print, 0, STRING("irai_27_008"), 0, STRING("ルイージ"))
             CALL(evt_mario_set_pose, STRING("M_S_1"))
             CALL(evt_mario_set_dir_npc, STRING("ルイージ"))
@@ -404,12 +418,14 @@ EVT_BEGIN(miyageya_talk)
             WAIT_MS(800)
             SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
             SET_VALUE(GSWF(GSWF_TROUBLE_27_SOLVED), 1)
+            // The request is recorded as solved.
             CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
             CALL(evt_party_run, 0)
         END_IF
         RETURN
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
+        // Without a request, the owner's chatter follows the story.
         CASE_LESS(STORY_STG6_71_01)
         CALL(evt_msg_print, 0, STRING("stg7_pik_clear_02"), 0, STRING("me"))
         CASE_BETWEEN(STORY_STG7_20_LORD_CRUMP_DEFEATED, STORY_STG7_25_THE_LAST_MAIL)
@@ -417,6 +433,7 @@ EVT_BEGIN(miyageya_talk)
             CALL(evt_npc_set_force_regl_anim, STRING("me"), STRING("KNF_S_2"))
             CALL(evt_npc_set_anim, STRING("me"), STRING("KNF_S_1"))
             CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("KNF_S_2"), STRING("KNF_T_2"))
+            // During the Bowser interlude he reacts to Bowser.
             CALL(evt_msg_print, 0, STRING("kpa_stg7_004"), 0, STRING("me"))
             CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_TALK_ANIM)
             SET_VALUE(LSWF(1), 1)
@@ -459,14 +476,17 @@ EVT_BEGIN(miyageya_init)
     RETURN
 EVT_END()
 
+/** Items for request 29 when Little Narikin asks for a Shroom Cake: the Shroom Cake only, ended by -1. */
 s32 iri_29_item_tbl1[] = {
     ITEM_SHROOM_CAKE, -1,
 };
 
+/** Items for request 29 when Little Narikin asks for a Keelhaul Mango: the Keel Mango only, ended by -1. */
 s32 iri_29_item_tbl2[] = {
     ITEM_KEEL_MANGO, -1,
 };
 
+/** Items for request 29 when Little Narikin asks for a Fright Mask: the Fright Mask only, ended by -1. */
 s32 iri_29_item_tbl3[] = {
     ITEM_FRIGHT_MASK, -1,
 };
@@ -483,6 +503,7 @@ EVT_BEGIN(konarikin_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 29)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
+                // Trouble Center request 29: Little Narikin asks for a gift.
                 CALL(evt_msg_print, 0, STRING("irai_29_00"), 0, 0)
                 CALL(evt_msg_select, 0, STRING("irai_29_00_s"))
                 IF_INT_GREATER_OR_EQUAL(LW(0), 3)
@@ -500,6 +521,8 @@ EVT_BEGIN(konarikin_talk)
                 END_IF
                 SWITCH(GSW(GSW_TROUBLE_WORK_FIRST))
                     CASE_EQUAL(0)
+                    // He may ask for a Shroom Cake, a Keelhaul Mango or a Fright Mask, depending on Mario's
+                    // first answer.
                     CALL(evt_pouch_check_item, ITEM_SHROOM_CAKE, LW(0))
                     IF_INT_GREATER(LW(0), 0)
                         CALL(evt_msg_print, 0, STRING("irai_29_05"), 0, 0)
@@ -559,6 +582,7 @@ EVT_BEGIN(konarikin_talk)
                 END_SWITCH
             END_IF
         ELSE
+            // On the second visit Mario is paid 3 coins.
             CALL(evt_msg_print, 0, STRING("irai_29_12"), 0, 0)
             CALL(evt_mario_set_pose, STRING("M_N_2"))
             WAIT_MS(500)
@@ -579,10 +603,12 @@ EVT_BEGIN(konarikin_talk)
             CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
             SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
             SET_VALUE(GSWF(GSWF_TROUBLE_29_SOLVED), 1)
+            // The request is recorded as solved.
             CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
         END_IF
         RETURN
     END_IF
+    // During the Bowser interlude he reacts to Bowser.
     CALL(evt_msg_print, 0, STRING("kpa_stg7_005"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("kpa_stg7_005_1"))
     CALL(evt_msg_continue)
@@ -695,13 +721,16 @@ EVT_BEGIN(madam_init)
     RETURN
 EVT_END()
 
-/** Guess: talk script for the NPC ババ (baba): kpa_stg7_003_1. */
+/**
+ * Talk script for Kammy Koopa (ババ) during the Bowser interlude: kpa_stg7_003_1, where she admires the town and
+ * tells Bowser the sanctum and its Crystal Star lie ahead.
+ */
 static EVT_BEGIN(baba_talk)
     CALL(evt_msg_print, 0, STRING("kpa_stg7_003_1"), 0, STRING("me"))
     RETURN
 EVT_END()
 
-/** Guess: init for the NPC ババ: runs the standard NPC init, then sets NPC status bit 2 on her. */
+/** Init for Kammy Koopa (ババ): standard NPC init, then NPC_STATUS_FACE_MOVE_DIR (she turns the way she moves). */
 static EVT_BEGIN(baba_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -794,6 +823,7 @@ EVT_BEGIN(takun6_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the town square: Detective Pennington and the souvenir shop owner. */
 static NpcSetupInfo npc_data[] = {
     {
         "ポワン探偵", // name
@@ -1226,8 +1256,10 @@ static void test_tev2(MapTevCallbackInfo* info) {
 }
 
 /**
- * Guess: stops the regular scripts of the three NPCs ターくん４, ５ and ６:
- * finds each one's running script, removes its regular- script hook and deletes the script.
+ * Stops the regular scripts of the three NPCs ターくん４, ５ and ６ before the chapter 8 cutscenes:
+ * for each one it fetches the running regular script,
+ * clears its move event (evt_npc_change_interrupt type 1) and
+ * deletes the script.
  */
 static EVT_BEGIN(delete_npc_regl_evt)
     CALL(evt_npc_get_reglid, STRING("ターくん４"), LW(0))
@@ -1251,11 +1283,12 @@ static EVT_BEGIN(sekai_yami_shake)
 EVT_END()
 
 /**
- * Guess: cutscene of the world going dark (chapter 8):
- * the controls are locked, Mario and the partner are hidden,
- * the square and Pennington are set to the dark look (envSetYami) with the camera at yami_view -800
- * while the ground shakes (sekai_yami_shake) with the quake sound,
- * Pennington looks around and says stg8_dark_07, then the map changes to bom_02 (entrance sekai_yami2).
+ * Cutscene of the world going dark during the Grodus story point (STORY_STG8_15), played when the map is entered
+ * from sekai_yami2: the controls are locked, Mario and the partner are moved off screen,
+ * the square, Pennington and ターくん５ are given the dark look (envSetYami) with yami_view -800
+ * while the camera shakes (sekai_yami_shake) to the quake sound,
+ * Pennington turns about and wonders whether this is the end of the world (stg8_dark_07),
+ * then the map changes to bom_02 (entrance sekai_yami2).
  */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
@@ -1304,10 +1337,11 @@ static EVT_BEGIN(sekai_yami_evt)
 EVT_END()
 
 /**
- * Guess: cutscene of "everyone's voices" in the chapter 8 finale:
- * Pennington, the madam and the Goldbob family are placed in the dark square,
- * the camera moves and they speak the stg8_las_148 lines in turn,
- * and then the game changes to bom_02 (entrance minnnanokoe).
+ * Cutscene of "everyone's voices" (minna no koe) in the chapter 8 finale, played when the map is entered from
+ * minnnanokoe during STORY_STG8_15: Pennington, the madam and the Goldbob family are placed in the dark square
+ * around a floating, spinning crystal (starstone); the madam and the Goldbobs worry and then cheer for Mario
+ * and "Gonzales" (stg8_las_148_53 to _61), Pennington is puzzled that they are not cheering for "Luigi" (_62),
+ * and the map changes to bom_02 (entrance minnnanokoe).
  */
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_mario_key_onoff, 0)
@@ -1384,6 +1418,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_seq_wait, 2)
     WAIT_MS(500)
     CALL(evt_npc_flag_onoff, 0, STRING("マダム"), NPC_FLAG_INSTANT_TURN)
+    // Everyone's voices: the madam and the Goldbob family worry and then cheer for Mario.
     CALL(evt_msg_print, 0, STRING("stg8_las_148_53"), 0, STRING("マダム"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_54"), 0, STRING("ポワン探偵"))
@@ -1409,6 +1444,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     WAIT_MS(500)
     CALL(evt_npc_reverse_ry, STRING("ポワン探偵"))
     WAIT_MS(500)
+    // Pennington is puzzled that they are not cheering for Luigi.
     CALL(evt_msg_print, 0, STRING("stg8_las_148_62"), 0, STRING("ポワン探偵"))
     BEGIN_INLINE_EVENT
         LOOP(0)
@@ -1418,6 +1454,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     END_INLINE_EVENT
     WAIT_MS(2000)
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
+    // The scene moves on to bom_02.
     CALL(evt_bero_mapchange, STRING("bom_02"), STRING("minnnanokoe"))
     RETURN
 EVT_END()
@@ -1456,6 +1493,7 @@ EVT_END()
  */
 EVT_BEGIN(pik_01_init_evt)
     SET_VALUE(LF(0), 0)
+    // Set up the Bowser interlude state when the story is between Lord Crump's defeat and the sanctum.
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
             CALL(evt_mario_set_mode, 2)
@@ -1465,6 +1503,7 @@ EVT_BEGIN(pik_01_init_evt)
     CALL_CHILD(evt_switch_init)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
+    // Register the exits and the Shine Sprite block.
     CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_powerupblk, STRING("pblk01"), 400, 95, 125, 0, GSWF(GSWF_PIK01_SHINE_SPRITE), 0)
     IF_INT_EQUAL(LF(0), 1)
@@ -1484,6 +1523,7 @@ EVT_BEGIN(pik_01_init_evt)
                 SET_VALUE(LF(1), 1)
             END_IF
             IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
+                // Pick the music, including the dark chapter 8 finale tracks.
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG8_VOICE1"))
                 CALL(evt_snd_envoff, PSND_FADE_OUT)
                 SET_VALUE(LF(1), 1)
@@ -1540,6 +1580,7 @@ EVT_BEGIN(pik_01_init_evt)
     CALL(evt_npc_setup, PTR(npc_data))
     IF_INT_EQUAL(LF(1), 0)
         IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 27)
+            // Place the NPCs: Luigi for request 27 and the epilogue ghosts.
             CALL_CHILD(iri_27_npc_entry)
         END_IF
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_27_SOLVED), 1)
@@ -1556,6 +1597,7 @@ EVT_BEGIN(pik_01_init_evt)
     CALL(evt_npc_change_interrupt, STRING("ターくん５"), 6, PTR(takun5_talk))
     CALL_CHILD(takun6_init)
     CALL(evt_npc_change_interrupt, STRING("ターくん６"), 6, PTR(takun6_talk))
+    // Lock or unlock the sanctum gate, with the case events that open it for Mario or Bowser.
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_50_THE_SANCTUM_MANAGER)
         CALL(evt_mobj_entry, STRING("lock"), STRING("MOBJ_Lock"))
         CALL(evt_mobj_set_position, STRING("lock"), 226, 30, -216)
@@ -1581,6 +1623,7 @@ EVT_BEGIN(pik_01_init_evt)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_mario_kill_party, 0)
+        // Start the Bowser interlude.
         SPAWN_EVENT(pik_01_koopa_evt)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_BOWSER_POSHLEY_HEIGHTS)
@@ -1593,6 +1636,7 @@ EVT_BEGIN(pik_01_init_evt)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("sekai_yami2"))
             CALL_CHILD(delete_npc_regl_evt)
+            // Start the chapter 8 finale scenes.
             SPAWN_EVENT(sekai_yami_evt)
         END_IF
         IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))

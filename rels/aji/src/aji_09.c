@@ -79,6 +79,7 @@ static EVT_BEGIN(s_door_close)
     RETURN
 EVT_END()
 
+/** Exit of this room: the south door to aji_01. */
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName
@@ -118,6 +119,10 @@ EVT_BEGIN(peach_evt_bero_out1)
     RETURN
 EVT_END()
 
+/**
+ * Replacement for the south door exit, swapped in with evt_bero_overwrite during Peach's scene so it leads
+ * on to aji_01 (n_bero_4).
+ */
 BeroEntry bero_data_peach1[] = {
     {
         "s_bero", // hitName
@@ -157,6 +162,10 @@ EVT_BEGIN(peach_evt_bero_out2)
     RETURN
 EVT_END()
 
+/**
+ * Replacement for the south door exit, swapped in with evt_bero_overwrite during Peach's scene so it leads
+ * on to aji_17 (w_bero).
+ */
 BeroEntry bero_data_peach2[] = {
     {
         "s_bero", // hitName
@@ -283,6 +292,7 @@ EVT_BEGIN(evt_kou2)
     RETURN
 EVT_END()
 
+/** Names of the locker parts (door and hit areas) that the room sets up; read until the terminator. */
 const char* rokka_data[] = {
     "R_door_1",
     "a_door_1",
@@ -856,6 +866,7 @@ EVT_END()
  */
 EVT_BEGIN(aji_09_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
+    // The exits are set up and the changing-room clothes and hit areas start hidden.
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
     CALL(evt_hitobj_onoff, STRING("A_R_fuku_g"), 1, 0)
@@ -863,6 +874,7 @@ EVT_BEGIN(aji_09_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_fuku1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_fuku2"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LF(0), 0)
+    // During Peach's disguise scenes (chapter 3) she takes over and her scene starts.
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_01_PEACH_TECS_REQUEST)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_03_PEACH_GRODUS)
             SET_VALUE(LF(0), 1)
@@ -874,6 +886,7 @@ EVT_BEGIN(aji_09_init_evt)
         SPAWN_EVENT(peach_evt_stg3)
     ELSE
         SET_VALUE(GF(0), 0)
+        // Otherwise the two changing booths get their curtain scripts and the lockers are set up.
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kou1_ka_omo"), 0, PTR(evt_kou1), 0)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kou1_ka_ura"), 0, PTR(evt_kou1), 0)
         SET_VALUE(GF(1), 0)
@@ -884,6 +897,7 @@ EVT_BEGIN(aji_09_init_evt)
     END_IF
     CALL_CHILD(evt_rokka_init)
     CALL(evt_bero_get_entername, LW(0))
+    // Entering from the ceiling (tenjo): Mario and his partner drop into the room and land.
     IF_STR_EQUAL(LW(0), STRING("tenjo"))
         CALL(evt_cam_letter_box_disable, 1)
         CALL(evt_mario_key_onoff, 0)
@@ -922,6 +936,7 @@ EVT_BEGIN(aji_09_init_evt)
         CALL(evt_item_entry, STRING("item_00"), ITEM_REPEL_CAPE, -180, 12, -135, ITEM_ENTRY_FIXED, GSWF(GSWF_AJI09_REPEL_CAPE_TAKEN), 0)
     END_IF
 #endif
+    // The alarm starts; Mario can read the wall notes.
     SPAWN_EVENT(evt_emergency)
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -930,6 +945,7 @@ EVT_BEGIN(aji_09_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
     ELSE
+        // As Peach: the notes are hidden and her music plays.
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_memo"), MAPOBJ_FLAG_HIDE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
         CALL(evt_snd_envoff, PSND_FADE_OUT)

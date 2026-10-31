@@ -5,18 +5,26 @@
 
 static void (*FatalFunc)();
 
+/**
+ * Japanese text of the fatal DVD error screen: an error has occurred, turn the power off and follow the
+ * console manual.
+ */
 const char* Japanese =
     "\n\n\nエラーが発生しました。\n\n"
     "本体のパワーボタンを押して電源をOFFにし、\n"
     "本体の取扱説明書の指示に従ってください。";
 
+/**
+ * English text of the fatal DVD error screen: an error has occurred, turn the power off and see the GameCube
+ * instruction booklet.
+ */
 const char* English = 
     "\n\n\nAn error has occurred.\n"
     "Turn the power off and refer to the\n"
     "Nintendo GameCube Instruction Booklet\n"
     "for further instructions.";
 
-// TODO: need solution to compile special characters in a cleaner way
+// Accented characters are written as hex escapes, with the string split where a hex digit follows one.
 const char* const Europe[6] = {
     {
         "\n\n\nAn error has occurred.\n"

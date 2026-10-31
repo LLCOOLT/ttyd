@@ -16,16 +16,21 @@
 #include "memory.h"
 #include "version.h"
 #include "battle/battle_status_effect.h"
+#include "unit/unit_koura.h"
+#include "unit/party/unit_party_vivian.h"
+#include "battle/battle_actrecord.h"
 // FAKE: battle_unit.c calls BtlUnit_snd_se_pos through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
 typedef s32 (*BtlUnit_snd_se_posS32PitchFn)(BattleUnit*, const char*, s32, s32, Vec*);
 
 double pow(double, double);
-// FAKE: local prototype: BtlActRec_AddPoint takes the points as u8 (battle_actrecord.h: s32); this file was compiled with it and the header prototype changes the code.
-void BtlActRec_AddPoint(u8* rec, u8 points);
 void BtlActRec_AddCount(u8* rec);
 
 #define PART_POSE_SOUND(part) (&(part)->poseSound)
 
+/**
+ * Items an enemy can use in battle (attack, status and healing items; 0 ends the list). Besides badges, only
+ * these pass BtlUnit_EnemyItemCanUseCheck, which decides whether an enemy may be given an item.
+ */
 s32 _enemy_can_use_item_table[] = {
     ITEM_THUNDER_BOLT, ITEM_FIRE_FLOWER, ITEM_POW_BLOCK, ITEM_THUNDER_RAGE, ITEM_SHOOTING_STAR, ITEM_ICE_STORM,
     ITEM_EARTH_QUAKE, ITEM_HP_DRAIN_ITEM, ITEM_SLEEPY_SHEEP, ITEM_STOPWATCH, ITEM_DIZZY_DIAL, ITEM_MINI_MR_MINI,
@@ -218,10 +223,10 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     unit->countersetWeapon = NULL;
     unit->deleteFunc = NULL;
     switch (unit->currentKind) {
-        case 0xD0:
+        case UNIT_UNUSED_UFO:
             unit->countersetWeapon = BattleAlloc(0x44);
             break;
-        case 0xDE:
+        case UNIT_MARIO:
             break;
     }
     BtlUnit_SetParamFromPouch(unit);
@@ -2036,10 +2041,10 @@ void BtlUnit_PayWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
 
     BtlUnit_SetFp(unit, fp - cost);
     if (unit->currentKind == UNIT_MARIO) {
-        BtlActRec_AddPoint(&wp->actRecord.marioFpSpent, cost);
+        BtlActRec_AddPoint(&wp->actRecord.marioFpSpent, (u8)cost);
         BtlActRec_AddCount(&wp->actRecord.marioFpMoves);
     } else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
-        BtlActRec_AddPoint(&wp->actRecord.partnerFpSpent, cost);
+        BtlActRec_AddPoint(&wp->actRecord.partnerFpSpent, (u8)cost);
         BtlActRec_AddCount(&wp->actRecord.partnerFpMoves);
     }
     pouchAddAP(-weapon->baseSpCost * 100);
@@ -2054,7 +2059,7 @@ BattleUnit* BtlUnit_GetGuardKouraPtr(BattleUnit* unit) {
 
     for (; i < BATTLE_UNIT_MAX; i++) {
         other = BattleGetUnitPtr(wp, i);
-        if (other && other->currentKind == UNIT_SHELL_SHIELD && other->work[0] == id) {
+        if (other && other->currentKind == UNIT_SHELL_SHIELD && other->work[UW_KOURA_SHIELDED_UNIT] == id) {
             break;
         }
     }
@@ -2412,13 +2417,13 @@ BOOL BtlUnit_EnemyItemCanUseCheck(s32 item) {
 
 /**
  * Whether the unit is hidden in the shadows and cannot be hit:
- * a veiled unit (Vivian's Veil) or Vivian while her work[4] counter is running.
+ * a veiled unit (Vivian's Veil) or Vivian while her UW_VIVIAN_VEIL_TURNS counter is running.
  */
 BOOL BtlUnit_CheckShadowGuard(BattleUnit* unit) {
     if (unit->attributeFlags & UNIT_ATTR_VEILED) {
         return TRUE;
     }
-    if (unit->currentKind == UNIT_VIVIAN && unit->work[4] > 0) {
+    if (unit->currentKind == UNIT_VIVIAN && unit->work[UW_VIVIAN_VEIL_TURNS] > 0) {
         return TRUE;
     }
     return FALSE;

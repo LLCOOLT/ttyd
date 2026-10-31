@@ -11,6 +11,13 @@ struct ExtdrvPose;
 struct HitEntry;
 struct TobiWork;
 
+// NanNPC.flags bits (evt_nannpc_flag_onoff).
+enum NanNPCFlags {
+    NANNPC_FLAG_HIDDEN = 0x2, // the pose is moved 1000 units below the map
+    NANNPC_FLAG_WALK = 0x4,   // walks toward its target, pushed apart from the other walking NPCs
+    NANNPC_FLAG_NO_HIT = 0x8, // nanNPCHitMove moves it without the map collision
+};
+
 // One crowd NPC of the evt_nannpc system. The map rels (gor_00, muj_00, muj_10, muj_20) drive their NPCs through the
 // func callback and keep their own state in the slots evt_nannpc leaves to the user; those slots are
 // unions with the per-user names.

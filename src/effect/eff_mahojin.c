@@ -15,11 +15,21 @@ static void effMahojinDisp(CameraId cameraId, EffectEntry* effect);
 
 s32 mahojin_rate;
 
+/**
+ * Animation names for the seven star pieces around the magic circle, three per piece:
+ * appear (A_2), shown (S_2) and already placed (S_3).
+ * A new piece plays its appear animation and then S_2;
+ * pieces already placed when the effect starts show S_3 at once, or S_2 for types 7 and 8.
+ */
 static const char* name_tbl[] = {
     "A_2_1", "S_2_1", "S_3_1", "A_2_2", "S_2_2", "S_3_2", "A_2_3", "S_2_3", "S_3_3", "A_2_4", "S_2_4",
     "S_3_4", "A_2_5", "S_2_5", "S_3_5", "A_2_6", "S_2_6", "S_3_6", "A_2_7", "S_2_7", "S_3_7",
 };
 
+/**
+ * Positions of the seven star pieces around the magic circle, evenly spaced on a ring of radius about 14
+ * starting at the back; effMahojinDisp uses them to sort the pieces by depth before drawing.
+ */
 Vec pos_tbl[7] = {
     { 0.0f, 0.0f, -14.321f },
     { 10.7071f, 0.0f, -9.1648f },

@@ -77,6 +77,7 @@ static BeroEntry bero_data_b_return[3];
 static BeroEntry bero_data_c_return[3];
 extern EvtWord rsh_04_init_evt_nidome[];
 
+/** Doors and exits of rsh_04 variant a: w_bero to rsh_05_a; e_bero to rsh_03_a. */
 static BeroEntry bero_data_a[] = {
     {
         "w_bero", // hitName
@@ -117,6 +118,7 @@ static BeroEntry bero_data_a[] = {
     {0},
 };
 
+/** Doors and exits of rsh_04 variant b: w_bero to rsh_05_a; e_bero to rsh_03_b. */
 static BeroEntry bero_data_b[] = {
     {
         "w_bero", // hitName
@@ -157,6 +159,7 @@ static BeroEntry bero_data_b[] = {
     {0},
 };
 
+/** Doors and exits of rsh_04 variant c: w_bero to rsh_05_a; e_bero to rsh_03_c. */
 static BeroEntry bero_data_c[] = {
     {
         "w_bero", // hitName
@@ -197,6 +200,10 @@ static BeroEntry bero_data_c[] = {
     {0},
 };
 
+/**
+ * Map objects of cabin 3 for evt_rsh_door_entry: the room, backdrop, door, door hit areas and open and close
+ * animations.
+ */
 static const char* door_3[] = {
     "heya_3",
     "haikei_3",
@@ -207,6 +214,10 @@ static const char* door_3[] = {
     "3_door_close",
 };
 
+/**
+ * Map objects of cabin 4 for evt_rsh_door_entry: the room, backdrop, door, door hit areas and open and close
+ * animations.
+ */
 static const char* door_4[] = {
     "heya_4",
     "haikei_4",
@@ -217,6 +228,10 @@ static const char* door_4[] = {
     "4_door_close",
 };
 
+/**
+ * Map objects of cabin 5 for evt_rsh_door_entry: the room, backdrop, door, door hit areas and open and close
+ * animations.
+ */
 static const char* door_5[] = {
     "heya_5",
     "haikei_5",
@@ -332,6 +347,7 @@ EVT_END()
  * the screen blurs as the mystery deepens and the story advances to STORY_STG6_22_DOCUMENT.
  */
 EVT_BEGIN(evt_shorui_funshitu)
+    // The lost documents scene: Pennington's theme plays and he questions the salaryman.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_POWAN1"))
     CALL(evt_cam3d_evt_set, 220, 130, 250, 220, 55, -180, 500, 11)
     BEGIN_INLINE_EVENT
@@ -360,6 +376,7 @@ EVT_BEGIN(evt_shorui_funshitu)
     CALL(evt_set_dir_to_target, STRING("me"), STRING("サラリーマン"))
     WAIT_MS(500)
     CALL(evt_mario_set_dir_npc, STRING("サラリーマン"))
+    // The salaryman answers while Pennington presses him.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_168"), 0, STRING("サラリーマン"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_168_01"), 0, STRING("ポワン探偵"))
@@ -373,6 +390,7 @@ EVT_BEGIN(evt_shorui_funshitu)
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
         CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_TALK_ANIM)
+        // The salaryman paces and mumbles.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_169_00"), 0, 0)
         CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_TALK_ANIM)
         SET_VALUE(GF(0), 1)
@@ -429,6 +447,7 @@ EVT_BEGIN(evt_shorui_funshitu)
     CALL(evt_cam3d_evt_set, 225, 93, 115, 225, 40, -180, 500, 11)
     CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
     WAIT_MS(500)
+    // The screen blurs as the mystery deepens.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_169_04"), 0, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
     DELETE_EVENT(LW(10))
@@ -436,10 +455,12 @@ EVT_BEGIN(evt_shorui_funshitu)
     CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), -2147483648)
     CALL(evt_npc_flag_onoff, 0, STRING("サラリーマン"), -2147483648)
+    // The story advances.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_22_DOCUMENT)
     RETURN
 EVT_END()
 
+/** Items the player may hand over: the Vital Paper only, ended by -1. */
 static s32 item_tbl[] = {
     ITEM_VITAL_PAPER, -1,
 };
@@ -530,8 +551,10 @@ EVT_BEGIN(evt_syasyou_auto_talk)
 EVT_END()
 
 /**
- * Guess: init event of the conductor in rsh_04;
- * places or hides him depending on the story stage and trip direction.
+ * Init event of the conductor (車掌) in rsh_04: at (-395, 0, -145) from STORY_STG6_16_THE_BAGGAGE_CAR to
+ * STORY_STG6_17_GHOST_DIARY, off the map during day 3 (STORY_STG6_45 to 48), otherwise at (-400, 0, -100) on the
+ * outward trip and off the map on the return trip (GSWF_TRAIN_RETURN_TRIP). When parked below y 0 his jumping
+ * flag is turned off.
  */
 static EVT_BEGIN(init_syashou)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -553,6 +576,7 @@ static EVT_BEGIN(init_syashou)
     RETURN
 EVT_END()
 
+/** Items the player may hand to the conductor: the Blanket only, ended by -1. */
 static s32 item_tbl2[] = {
     ITEM_BLANKET, -1,
 };
@@ -571,6 +595,7 @@ static EVT_BEGIN(talk_syashou)
     END_SWITCH
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_01_THE_CONDUCTOR)
+        // His first greeting.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_06"), 0, 0)
         WAIT_MS(300)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -584,6 +609,7 @@ static EVT_BEGIN(talk_syashou)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_01_THE_CONDUCTOR)
         CASE_LESS(STORY_STG6_06_PENNINGTONS_ASSISTANT)
         IF_INT_EQUAL(LSWF(9), 0)
+            // Ticket and autograph hints.
             CALL(evt_msg_print, 0, STRING("stg6_rsh_07"), 0, 0)
             SET_VALUE(LSWF(9), 1)
         ELSE
@@ -604,6 +630,7 @@ static EVT_BEGIN(talk_syashou)
         CASE_LESS(STORY_STG6_13_TALK_TO_THE_CONDUCTOR)
         IF_INT_EQUAL(GSWF(GSWF_RSH04_CONDUCTOR_NIGHT_FIRST_TALK), 0)
             SET_VALUE(GSWF(GSWF_RSH04_CONDUCTOR_NIGHT_FIRST_TALK), 1)
+            // The night talk: he asks Mario to help.
             CALL(evt_msg_print, 0, STRING("stg6_rsh_111"), 0, 0)
         ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_114"), 0, 0)
@@ -616,6 +643,7 @@ static EVT_BEGIN(talk_syashou)
             CALL(evt_msg_print_add, 0, STRING("stg6_rsh_113"))
         END_IF
         CASE_LESS(STORY_STG6_15_GHOST_REQUEST)
+        // Hints for the ghost and the baggage car.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_115"), 0, 0)
         CASE_LESS(STORY_STG6_16_THE_BAGGAGE_CAR)
         CALL_CHILD(evt_allow_kamotsu)
@@ -624,6 +652,7 @@ static EVT_BEGIN(talk_syashou)
         CASE_LESS(STORY_STG6_18_BLANKET_EXCHANGE)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_129"), 0, 0)
         CASE_LESS(STORY_STG6_19_GIVE_BLANKET)
+        // The Blanket exchange: he takes the Blanket and gives a Mushroom.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_142"), 0, 0)
 #if VERSION <= VERSION_DEMO_US
         CALL(evt_win_item_select, PTR(item_tbl2), LW(1))
@@ -651,6 +680,7 @@ static EVT_BEGIN(talk_syashou)
             CALL(evt_item_entry, STRING("orei"), ITEM_MUSHROOM, 0, 0, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_item_get_item, STRING("orei"))
             CALL(evt_item_get_item_end_wait, STRING("orei"))
+            // Lines for day 2, day 3 and the return trip.
             CALL(evt_msg_print, 0, STRING("stg6_rsh_145"), 0, 0)
             SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_19_GIVE_BLANKET)
             CALL(evt_pouch_remove_item, ITEM_BLANKET, LW(0))
@@ -722,8 +752,11 @@ EVT_BEGIN(talk_sarary_repeat)
 EVT_END()
 
 /**
- * Guess: init event of the salaryman in rsh_04;
- * places him in his cabin on days 1 and 2 and parks him elsewhere at other stages.
+ * Init event of the salaryman (サラリーマン) in rsh_04: off the map from STORY_STG6_01 to STORY_STG6_04, at
+ * (190, 0, -150) from STORY_STG6_21_DAY_2 to STORY_STG6_26, off the map during day 3 (STORY_STG6_45 to 48) and
+ * from STORY_STG6_49_POSHLEY_HEIGHTS on; otherwise he keeps his setup position.
+ * When parked below y 0 his jumping
+ * flag is turned off.
  */
 static EVT_BEGIN(init_sarary)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -843,8 +876,9 @@ EVT_BEGIN(talk_papa_repeat)
 EVT_END()
 
 /**
- * Guess: init event of Papa Narikin; sets his position by story stage (hidden during the Riverside,
- * day 3 and Poshley stages).
+ * Init event of Papa Narikin (ナリキンパパ): parks him off the map from STORY_STG6_27_RIVERSIDE_STATION to
+ * STORY_STG6_42_DRAWBRIDGE_DOWN, during day 3 (STORY_STG6_45 to 48) and from STORY_STG6_49_POSHLEY_HEIGHTS on,
+ * turning his jumping flag off; otherwise he keeps his setup position.
  */
 static EVT_BEGIN(init_papa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -900,7 +934,10 @@ EVT_BEGIN(talk_mama_repeat)
     RETURN
 EVT_END()
 
-/** Guess: init event of Mama Narikin; sets her position by story stage (hidden during day 3 and the Poshley stage). */
+/**
+ * Init event of Mama Narikin (ナリキンママ): parks her off the map during day 3 (STORY_STG6_45 to 48) and from
+ * STORY_STG6_49_POSHLEY_HEIGHTS on, turning her jumping flag off; otherwise she keeps her setup position.
+ */
 static EVT_BEGIN(init_mama)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_45_DAY_3_STARTS, STORY_STG6_48_SMORG_MIASMA)
@@ -937,8 +974,9 @@ static EVT_BEGIN(talk_mama)
 EVT_END()
 
 /**
- * Guess: init event of the Narikin child (konari);
- * sets its position by story stage (hidden during Riverside, day 3 and the Poshley stage).
+ * Init event of the Narikin child (コナリキン): parks it off the map from STORY_STG6_27_RIVERSIDE_STATION to
+ * STORY_STG6_42_DRAWBRIDGE_DOWN, during day 3 (STORY_STG6_45 to 48) and from STORY_STG6_49_POSHLEY_HEIGHTS on,
+ * turning its jumping flag off; otherwise it keeps its setup position.
  */
 static EVT_BEGIN(init_konari)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -956,6 +994,7 @@ static EVT_BEGIN(init_konari)
     RETURN
 EVT_END()
 
+/** Items the player may hand over for the autograph: the Autograph only, ended by -1. */
 s32 item_tbl3[] = {
     ITEM_AUTOGRAPH, -1,
 };
@@ -969,6 +1008,7 @@ s32 item_tbl3[] = {
 static EVT_BEGIN(talk_konari)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_06_PENNINGTONS_ASSISTANT)
+        // Early on, Little Narikin's lines follow the story.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_17"), 0, 0)
         CASE_LESS(STORY_STG6_07_SYLVIA)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_90"), 0, 0)
@@ -976,6 +1016,7 @@ static EVT_BEGIN(talk_konari)
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_08_BUB)
             SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_08_BUB)
+            // He asks Mario for an autograph.
             CALL(evt_msg_print, 0, STRING("stg6_rsh_91"), 0, 0)
         ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_94"), 0, 0)
@@ -989,6 +1030,7 @@ static EVT_BEGIN(talk_konari)
         END_IF
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
         CASE_LESS(STORY_STG6_12_GIVE_AUTOGRAPH)
+        // With the Autograph, Mario can hand it over.
         CALL(evt_pouch_check_item, ITEM_AUTOGRAPH, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 0)
             IF_INT_EQUAL(GSWF(GSWF_RSH04_BUB_NO_AUTOGRAPH_FIRST), 0)
@@ -1033,6 +1075,7 @@ static EVT_BEGIN(talk_konari)
                     CALL(evt_item_delete, STRING("sign"))
 #endif
                     CALL(evt_msg_print, 0, STRING("stg6_rsh_97"), 0, 0)
+                    // He pays Mario with a Shine Sprite.
                     CALL(evt_item_entry, STRING("orei"), ITEM_SHINE_SPRITE, 0, 0, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                     CALL(evt_item_get_item, STRING("orei"))
                     CALL(evt_item_get_item_end_wait, STRING("orei"))
@@ -1044,6 +1087,7 @@ static EVT_BEGIN(talk_konari)
             END_IF
         END_IF
         CASE_LESS(STORY_STG6_19_GIVE_BLANKET)
+        // Later lines follow the story stage.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_102"), 0, 0)
         CASE_LESS(STORY_STG6_20_END_OF_DAY_1)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_147_11"), 0, 0)
@@ -1075,8 +1119,10 @@ EVT_BEGIN(talk_powan_repeat)
 EVT_END()
 
 /**
- * Guess: init event of Pennington in rsh_04; places him in cabin 3 at the stages where he is there
- * and parks him elsewhere.
+ * Init event of Pennington (ポワン探偵) in rsh_04: off the map from STORY_STG6_01 to STORY_STG6_04, at
+ * (230, 0, -180) from STORY_STG6_21_DAY_2 to STORY_STG6_26, off the map from STORY_STG6_27 to STORY_STG6_42,
+ * during day 3 (STORY_STG6_45 to 48) and from STORY_STG6_49_POSHLEY_HEIGHTS on; otherwise he keeps his setup
+ * position. When parked below y 0 his jumping flag is turned off.
  */
 static EVT_BEGIN(init_powan)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1160,6 +1206,7 @@ static EVT_BEGIN(talk_powan)
     RETURN
 EVT_END()
 
+/** NPCs of the car: the conductor, the salaryman, Goldbob and his wife, Little Narikin and Pennington. */
 static NpcSetupInfo npc_data[] = {
     {
         "車掌", // name
@@ -1263,6 +1310,7 @@ EVT_BEGIN(evt_tana_5)
     RETURN
 EVT_END()
 
+/** Luggage shelves of the car: each shelf hit area with the message it shows and the script a shelf runs. */
 static ShelfAccessTbl3 access_tbl = {
     {
 #if VERSION <= VERSION_DEMO_US
@@ -1590,6 +1638,7 @@ EVT_BEGIN(rsh_04_b_init_evt)
     RETURN
 EVT_END()
 
+/** Map objects of the scenery that passes by the windows. */
 static const char* window_tbl[] = {
     "mado_uturi_1",
     "mado_uturi_2",
@@ -1631,6 +1680,7 @@ EVT_BEGIN(rsh_04_c_init_evt)
     RETURN
 EVT_END()
 
+/** Doors and exits of rsh_04 variant a (return trip): w_bero to rsh_07_a; e_bero to rsh_03_a. */
 static BeroEntry bero_data_a_return[] = {
     {
         "w_bero", // hitName
@@ -1671,6 +1721,7 @@ static BeroEntry bero_data_a_return[] = {
     {0},
 };
 
+/** Doors and exits of rsh_04 variant b (return trip): w_bero to rsh_07_b; e_bero to rsh_03_b. */
 static BeroEntry bero_data_b_return[] = {
     {
         "w_bero", // hitName
@@ -1711,6 +1762,7 @@ static BeroEntry bero_data_b_return[] = {
     {0},
 };
 
+/** Doors and exits of rsh_04 variant c (return trip): w_bero to rsh_07_c; e_bero to rsh_03_c. */
 static BeroEntry bero_data_c_return[] = {
     {
         "w_bero", // hitName

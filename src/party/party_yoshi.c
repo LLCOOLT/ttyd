@@ -395,7 +395,7 @@ void yoshi_animTimeMain(PartyEntry* party) {
 
 /** Yoshi's init handler (party_data): sets his member kind and size (26 tall; 28 wide in the demo, 20 later). */
 void yoshi_init(PartyEntry* party) {
-    party->memberKind = 4;
+    party->memberKind = PARTY_MEMBER_YOSHI;
     party->moveKind = 0;
     party->height = 26.0f;
 #if VERSION <= VERSION_DEMO_US
@@ -829,11 +829,11 @@ void yoshi_use(PartyEntry* party) {
                 party->position.y = mario->mot.yoshi.baseY + mario->mot.yoshi.bobOfs;
             } else {
                 attr = hitGetAttr(hit);
-                if (attr & 0x200) {
+                if (attr & HIT_ATTR_DEEP_WATER) {
                     if (party->position.y <= party->groundY) {
                         party->useMotionId = 70;
                     }
-                } else if (attr & 0xC00) {
+                } else if (attr & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES)) {
                     if (party->position.y <= party->groundY) {
                         yoshi_damageToge(party);
                         return;
@@ -1345,7 +1345,7 @@ static void searchGround(PartyEntry* party) {
             psndSFXOff(party->yoshiPsndSFXId);
             party->yoshiPsndSFXId = -1;
         }
-        if (attr & 0x200) {
+        if (attr & HIT_ATTR_DEEP_WATER) {
             pos = party->position;
             marioSetSplash(0, &pos);
             L_sweatEntry(party, NULL);
@@ -1368,11 +1368,11 @@ static void searchGround(PartyEntry* party) {
             party->useMotionId = 70;
             return;
         }
-        if (attr & 0x800) {
+        if (attr & HIT_ATTR_SPIKES) {
             yoshi_damageToge(party);
             return;
         }
-        if (hit && (hitGetAttr(hit) & 0x40000000)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_DAMAGE_RETURN)) {
             mario->damageHit = hit;
         }
         if (!(party->flags & (PARTY_FLAG_IS_JUMPING | PARTY_FLAG_IS_FALLING))) {
@@ -1442,7 +1442,7 @@ static void searchGround(PartyEntry* party) {
             psndSFXOff(party->yoshiPsndSFXId);
             party->yoshiPsndSFXId = -1;
         }
-        if (attr & 0x200) {
+        if (attr & HIT_ATTR_DEEP_WATER) {
             if (!L_chgMotion(party, 70)) {
                 return;
             }
@@ -1467,7 +1467,7 @@ static void searchGround(PartyEntry* party) {
             marioChgMot(MARIO_MOTION_DAMAGE);
             return;
         }
-        if (attr & 0xC00) {
+        if (attr & (HIT_ATTR_DAMAGE_LIQUID | HIT_ATTR_SPIKES)) {
             yoshi_damageToge(party);
             partyChgRunMode(party, 0xd);
             {
@@ -1478,7 +1478,7 @@ static void searchGround(PartyEntry* party) {
             }
             return;
         }
-        if (hit && (hitGetAttr(hit) & 0x40000000)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_DAMAGE_RETURN)) {
             mario->damageHit = hit;
         }
         if (!(party->flags & (PARTY_FLAG_IS_JUMPING | PARTY_FLAG_IS_FALLING))) {
@@ -1540,7 +1540,7 @@ static void searchGround2(PartyEntry* party) {
         party->yoshiPsndSFXId = -1;
     }
     attr = hitGetAttr(hit);
-    if (attr & 0x200) {
+    if (attr & HIT_ATTR_DEEP_WATER) {
         pos = party->position;
         marioSetSplash(0, &pos);
         L_sweatEntry(party, NULL);
@@ -1558,7 +1558,7 @@ static void searchGround2(PartyEntry* party) {
         party->useMotionId = 70;
         return;
     }
-    if (attr & 0x800) {
+    if (attr & HIT_ATTR_SPIKES) {
         yoshi_damageToge(party);
     }
     party->flags |= PARTY_FLAG_IS_GROUNDED;
@@ -1585,7 +1585,7 @@ static void searchGround2(PartyEntry* party) {
         return;
     }
     attr = hitGetAttr(hit);
-    if (attr & 0x200) {
+    if (attr & HIT_ATTR_DEEP_WATER) {
         Vec pos = party->position;
         marioSetSplash(0, &pos);
         L_sweatEntry(party, NULL);
@@ -1603,7 +1603,7 @@ static void searchGround2(PartyEntry* party) {
         party->useMotionId = 70;
         return;
     }
-    if (attr & 0x800) {
+    if (attr & HIT_ATTR_SPIKES) {
         yoshi_damageToge(party);
     }
     party->flags |= PARTY_FLAG_IS_GROUNDED;
@@ -1653,11 +1653,11 @@ static void checkWall(PartyEntry* party, f32 spd, f32 dir) {
                 mario->hitobjWall = NULL;
             }
         }
-        if (hitGetAttr(hit) & 0x800) {
+        if (hitGetAttr(hit) & HIT_ATTR_SPIKES) {
             yoshi_damageToge(party);
         }
         attr = hitGetAttr(hit);
-        if ((attr & 0x800004) && !(attr & 0x80080)) {
+        if ((attr & (HIT_ATTR_PASS_THROUGH | HIT_ATTR_PARTY_PASS)) && !(attr & (HIT_ATTR_ALWAYS_SOLID | HIT_ATTR_TUBE_PASS))) {
             movePos(&party->position.x, &party->position.z, spd, dir);
             return;
         }
@@ -1692,7 +1692,7 @@ static void checkWall(PartyEntry* party, f32 spd, f32 dir) {
             }
         }
         hit = dou10_yoko_yari2(&work1);
-        if (hit && (hitGetAttr(hit) & 0x800)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
             yoshi_damageToge(party);
         }
 #if VERSION <= VERSION_DEMO_US
@@ -1700,7 +1700,7 @@ static void checkWall(PartyEntry* party, f32 spd, f32 dir) {
 #endif
     } else {
         hit = dou10_yoko_yari2(&work2);
-        if (hit && (hitGetAttr(hit) & 0x800)) {
+        if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
             yoshi_damageToge(party);
         }
     }
@@ -1764,7 +1764,7 @@ void L_getStick(PartyEntry* party, f32* angle, f32* speed) {
             dist = 1.5f * (mario->baseWalkSpeed * ((f32 (*)(void))marioGetMoveRate)()); // FAKE: as above
         }
 #endif
-        if (hitGetAttr(mario->hitobjStandOn) & 0x100) {
+        if (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_SHALLOW_WATER) {
             mario->flags |= MARIO_FLAG_IN_SHALLOW_WATER;
             dist *= 0.75f;
         } else {

@@ -34,6 +34,7 @@ typedef struct EffKemuri9N64Work {
 } EffKemuri9N64Work;
 
 #if VERSION <= VERSION_DEMO_US
+/** 16-wide smoke puff, used by type 1 (the Hooktail family's leg smoke). */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, -1024, 0, 0, 0, 0, 255},
@@ -41,6 +42,7 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 1024, 0, 0, 0, 255},
 };
 
+/** 32-wide smoke puff, used by every type except 1. */
 static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, -16, 0, 0, 0, 0, 0, 0, 255},
     {16, -16, 0, -1024, 0, 0, 0, 0, 255},

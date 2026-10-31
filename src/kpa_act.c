@@ -150,7 +150,7 @@ static inline void kpaSetScoreStr(s32 score, Vec* pos) {
 
 /**
  * Same as kpaAddCoin, and also shows the points scored as a popup above pos.
- * Nothing in the decompiled code calls it.
+ * kpa.rel's kpa_add_coin calls it for each stage coin Bowser picks up (kpa_coin_evt).
  */
 void kpaAddCoinPos(s32 coins, Vec* pos) {
     s32 score;

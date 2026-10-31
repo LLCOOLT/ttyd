@@ -38,6 +38,7 @@ extern EvtWord yuka_shake2[];
 extern EvtWord yuka_event[];
 static KusaAccess ueki_access_data[7];
 
+/** Exit of mri_13: east road e_bero to mri_14. */
 BeroEntry bero_dai3_kanbu[] = {
     {
         "e_bero", // hitName
@@ -57,6 +58,7 @@ BeroEntry bero_dai3_kanbu[] = {
     },
 };
 
+/** Exits of mri_13: east road e_bero to mri_14 (w_bero); pipe dokan to mri_16 (dokan7). */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -392,6 +394,12 @@ EVT_BEGIN(yuka_event)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_sub_area_check, 1, -50, 60, 60, LW(0), LW(2), LW(14))
+        // Wait until the Puni Orb is on the pedestal, every Puni is on the platform and Mario and his partner
+        // stand on it too.
+        // Wait until the Puni Orb is on the pedestal, every Puni is on the platform and Mario and his partner
+        // stand on it too.
+        // Wait until the Puni Orb is on the pedestal, every Puni is on the platform and Mario and his partner
+        // stand on it too.
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_sub_area_check, 1, -50, 60, 60, LW(0), LW(2), LW(15))
         IF_INT_EQUAL(GSWF(GSWF_MRI13_ORB_ON_PEDESTAL), 1)
@@ -407,6 +415,7 @@ EVT_BEGIN(yuka_event)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Mario stops and the Punies freeze; the floor starts to quake.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_puni_winddisable_onoff, 1)
@@ -432,6 +441,7 @@ EVT_BEGIN(yuka_event)
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_INERT)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
+    // Punio comments on the shaking floor while the camera drops to the shaft.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e21_00"), 0, STRING("ガイドsp"))
     CALL(evt_puni_flag_onoff, 1, 1, 262144)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_INERT)
@@ -445,6 +455,7 @@ EVT_BEGIN(yuka_event)
     CALL(evt_hit_bind_mapobj, STRING("A_sui_l1"), STRING("S_sui_l"))
     CALL(evt_hit_bind_mapobj, STRING("A_dai"), STRING("S_dai"))
     CALL(evt_hit_bind_mapobj, STRING("A_dai_02"), STRING("S_dai"))
+    // The platform, the Puni Orb and the light move down 309 units over ten seconds.
     CALL(evt_snd_sfxon, STRING("SFX_STG2_FLOOR_MOVE1"), GW(2))
     CALL(evt_item_get_position, STRING("punipuni"), LW(3), LW(4), LW(5))
     BEGIN_INLINE_EVENT
@@ -480,6 +491,7 @@ EVT_BEGIN(yuka_event)
     END_LOOP
     CALL(evt_snd_sfxoff, GW(2))
     CALL(evt_snd_sfxoff, GW(3))
+    // The platform stops; the Punies are released and the story advances.
     CALL(evt_snd_sfxon, STRING("SFX_STG2_FLOOR_STOP1"), 0)
     WAIT_MS(1000)
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
@@ -525,6 +537,10 @@ static EVT_BEGIN(evt_f1_ueki_01)
     RETURN
 EVT_END()
 
+/**
+ * Plants Mario can search in mri_13: A_f2_ueki02, A_f2_ueki03, A_f2_ueki04, A_f1_ueki01
+ * (runs evt_f1_ueki_01 when searched), A_f1_ueki02, A_f1_ueki03.
+ */
 static KusaAccess ueki_access_data[] = {
     {1, "A_f2_ueki02", "S_f2_ueki02", NULL},
     {1, "A_f2_ueki03", "S_f2_ueki03", NULL},

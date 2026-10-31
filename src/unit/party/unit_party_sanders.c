@@ -24,6 +24,13 @@
 #include "evt/evt_cmd.h"
 #include "version.h"
 
+// Unit work slots of Bobbery (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_SANDERS_UNUSED_0 = 0, // set to -1 by init_event; nothing reads it
+    UW_SANDERS_UNUSED_1 = 1, // set to -1 by init_event; nothing reads it
+    UW_SANDERS_UNUSED_2 = 2, // set to -1 by init_event; nothing reads it
+};
+
 static USER_FUNC(_get_bomb_hit_position);
 static USER_FUNC(_judge_on_stage);
 static USER_FUNC(_sanders_make_extra_work_area);
@@ -64,12 +71,20 @@ static EvtWord attack_event[2];
 BattleUnitSetup entry_bomzou;
 static EvtWord party_win_reaction[9];
 
+/** Bobbery's defence: 0 against every element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Bobbery's defence attributes: normal (0) against every element, no weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Bobbery's status chances: 100 for every status (badges lower them in battle). */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Bobbery's normal pose table: animations for each status (stop, dizzy, poison, confusion, sleep, freeze,
+ * instant KO), the hurt poses, walking and running, low HP, the failed Run Away tumble, talking, item use,
+ * the command menu wait, the Appeal, zero gravity, the Defend stance and plain standing.
+ */
 PoseTableEntry pose_table_sanders_stay[] = {
     {9, "D_4"},
     {2, "D_4"},
@@ -78,49 +93,58 @@ PoseTableEntry pose_table_sanders_stay[] = {
     {5, "X_1"},
     {1, "N_1"},
     {27, "D_3"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {37, "G_2"},
     {31, "G_1"},
-    {39, "D_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {57, "D_2"},
-    {56, "D_2"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_PERIL, "D_2"},
+    {BTL_POSE_DANGER, "D_2"},
     {BTL_POSE_ESCAPE_FAIL, "D_4"},
     {BTL_POSE_ESCAPE_FAIL_END, "D_2"},
     {BTL_POSE_TALK, "T_1"},
-    {52, "I_1"},
+    {BTL_POSE_ITEM_USE, "I_1"},
     {BTL_POSE_COMMAND_WAIT, "C_1"},
     {BTL_POSE_APPEAL, "O_1"},
     {BTL_POSE_ZERO_GRAVITY, "R_3"},
     {49, "J_1A"},
-    {45, "G_1"},
+    {BTL_POSE_DEFEND, "G_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Bobbery's pose table while Hold Fast is active (wait_event swaps it in):
+ * the same poses, but he stands and idles with his fuse lit (A_3).
+ */
 PoseTableEntry pose_table_counter_sanders[] = {
     {1, "N_2"},
     {27, "D_3"},
-    {28, "A_3"},
+    {BTL_POSE_NORMAL, "A_3"},
     {37, "G_2"},
     {31, "G_1"},
-    {39, "D_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {57, "D_2"},
-    {56, "D_2"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_PERIL, "D_2"},
+    {BTL_POSE_DANGER, "D_2"},
     {BTL_POSE_ESCAPE_FAIL, "D_4"},
     {BTL_POSE_ESCAPE_FAIL_END, "D_2"},
     {BTL_POSE_TALK, "T_1"},
-    {52, "I_1"},
+    {BTL_POSE_ITEM_USE, "I_1"},
     {BTL_POSE_COMMAND_WAIT, "C_1"},
     {BTL_POSE_APPEAL, "O_1"},
     {BTL_POSE_ZERO_GRAVITY, "R_3"},
     {49, "J_1A"},
-    {45, "G_1"},
+    {BTL_POSE_DEFEND, "G_1"},
     {BTL_POSE_STAY_DEFAULT, "A_3"},
 };
 
+/**
+ * Bobbery's data events: Appeal, the audience attack reaction, his move list (tag 1, __makeTechMenuFunc),
+ * First Strike (nothing), the victory pose, an empty step run after a move's cost is paid (7), the battle-end
+ * Hold Fast reset (retail only) and the spin when he superguards an attack (47).
+ */
 static BattleDataEntry data_table[] = {
     {5, sanders_appeal_event},
     {6, attack_audience_event},
@@ -135,10 +159,15 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Bobbery's single battle part: his targetable body (model c_bomt_n) with the normal pose table. */
 BattleUnitKindPart unitpartsdata_Party_Sanders[] = {
     {1, "btl_un_sanders", "c_bomt_n", 0.0f, 0.0f, 0.0f, 16.0f, 24.0f, 5.0f, 0.0f, 24.0f, 0.0f, 20, 24, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table_sanders_stay},
 };
 
+/**
+ * Bobbery's battle unit (UNIT_BOBBERY), listed in battle_party.c's partner table:
+ * one part, the partner hit sounds, no enemy HP gauge.
+ */
 BattleUnitKind unitdata_Party_Sanders = {
     229,
     "btl_un_sanders",
@@ -214,7 +243,7 @@ static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     WAIT_FRAMES(40)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_SUBMOVE1L"), STRING("SFX_PARTY_BATTLE_SUBMOVE1R"), 0, 9, 9, 0, 0)
@@ -225,7 +254,7 @@ EVT_END()
 
 /**
  * Init for Bobbery: registers his wait, attack, damage, confusion and entry scripts and his walk,
- * run and jump sounds, sets unit work 0-2 to -1 (not read anywhere in this file)
+ * run and jump sounds, sets UW_SANDERS_UNUSED_0-2 to -1 (not read anywhere)
  * and allocates Hold Fast's spare weapon.
  */
 static EVT_BEGIN(init_event)
@@ -236,9 +265,9 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 0, 18, 18)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 0, 9, 9)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), STRING("SFX_PARTY_BATTLE_LANDING1"))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, -1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, -1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_SANDERS_UNUSED_0, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_SANDERS_UNUSED_1, -1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_SANDERS_UNUSED_2, -1)
     CALL(_sanders_make_extra_work_area)
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(battle_entry_event))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -259,7 +288,7 @@ EVT_END()
  * and plays its stay pose.
  */
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 22, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HOLD_FAST, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_counter_sanders))
     ELSE
@@ -269,6 +298,11 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Weapon of Bobbery's First Strike, when he starts the battle by hitting an enemy in the field:
+ * an explosion on the front ground-bound enemy dealing 4, 5 or 6 damage at Normal, Super or Ultra rank,
+ * with no action command; it cannot be guarded.
+ */
 BattleWeapon partyWeapon_SandersFirstAttack = {
     NULL, // name
 #if VERSION >= VERSION_US
@@ -291,7 +325,7 @@ BattleWeapon partyWeapon_SandersFirstAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -310,6 +344,10 @@ BattleWeapon partyWeapon_SandersFirstAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Bomb (0 FP): Bobbery explodes on the front ground-bound enemy (explosive, cannot be guarded).
+ * Damage by rank: 1, 2 or 3 on a failed action command, 4, 5 or 6 on success. Usable while confused.
+ */
 BattleWeapon partyWeapon_SandersNormalAttack = {
     "btl_wn_pbm_normal", // name
 #if VERSION >= VERSION_US
@@ -333,7 +371,7 @@ BattleWeapon partyWeapon_SandersNormalAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -352,6 +390,10 @@ BattleWeapon partyWeapon_SandersNormalAttack = {
     {0, 10, 10, 100, 10, 10, 10, 5, 10, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Bomb Squad (3 FP): Bobbery throws up to three time bombs that explode a turn later.
+ * The weapon itself does no damage; the thrown bombs (unit_bomzou) do.
+ */
 BattleWeapon partyWeapon_SandersTimeBombSet = {
     "btl_wn_pbm_lv1", // name
 #if VERSION >= VERSION_US
@@ -376,7 +418,7 @@ BattleWeapon partyWeapon_SandersTimeBombSet = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_ac_jigen_bakudan", // acHelpMsg
@@ -394,6 +436,11 @@ BattleWeapon partyWeapon_SandersTimeBombSet = {
     {0}, // stageEffectRates
 };
 
+/**
+ * Hold Fast (4 FP): Bobbery targets himself and gains the Hold Fast status, which damages enemies
+ * that attack him directly. The 1-turn duration here is replaced per use by the action command result plus one
+ * (_make_counterset_weapon copies this weapon into his spare slot).
+ */
 BattleWeapon partyWeapon_SandersCounterSet = {
     "btl_wn_pbm_lv2", // name
 #if VERSION >= VERSION_US
@@ -418,7 +465,7 @@ BattleWeapon partyWeapon_SandersCounterSet = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_ac_bom_counter", // acHelpMsg
@@ -440,6 +487,10 @@ BattleWeapon partyWeapon_SandersCounterSet = {
 #endif
 };
 
+/**
+ * Bob-ombast (9 FP): a massive explosion that hits every enemy (explosive, cannot be guarded).
+ * The damage is the action command's gauge result (weaponGetACOutputParam on output 2).
+ */
 BattleWeapon partyWeapon_SandersSuperBombAttack = {
     "btl_wn_pbm_lv3", // name
 #if VERSION >= VERSION_US
@@ -468,7 +519,7 @@ BattleWeapon partyWeapon_SandersSuperBombAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -535,7 +586,7 @@ EVT_BEGIN(partySandersAttack_FirstAttack)
 #endif
     CALL(btlevtcmd_StageDispellFog)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131328, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
@@ -565,7 +616,7 @@ EVT_BEGIN(partySandersAttack_FirstAttack)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)
@@ -580,6 +631,7 @@ EVT_END()
  * damaging the target, then walks back home.
  */
 EVT_BEGIN(partySandersAttack_NormalAttack)
+    // Pick the target, pay the cost and aim the camera at Bobbery and the enemy.
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -597,6 +649,7 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Action command (hold A, release when the light comes on): the timing window shrinks at higher difficulty.
     CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_AcGetDifficulty, LW(0))
@@ -642,6 +695,7 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
     END_SIBLING_EVENT
     CALL(btlevtcmd_StartAC, 1)
     CALL(btlevtcmd_WaitEventEnd, LW(15))
+    // The command went wrong: his fuse fizzles, he topples over and the move ends without an explosion.
     CALL(btlevtcmd_AcGetOutputParam, 0, LW(1))
     IF_INT_EQUAL(LW(1), 2)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -662,7 +716,8 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
         CALL(btlevtcmd_InviteApInfoReport)
         GOTO(95)
     END_IF
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+    // A pre-emptive spiky enemy: he walks into its spikes first and is hurt.
+    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_2"))
         CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(5))
@@ -672,8 +727,9 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_BTL_THUNDERS_ATTACK1"), 0, 0, -1, -1, 0, 0)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 60, -2, 1)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
+    // He walks up to the enemy with his fuse sizzling while the camera zooms in, then glows for a second.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_2"))
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
     MULTIPLY_FLOAT(LW(6), 20)
@@ -698,6 +754,7 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
         CASE_DEFAULT
         WAIT_MS(1000)
     END_SWITCH
+    // He explodes (a bigger blast for a successful command in retail), the camera shakes and stage fog clears.
     CALL(btlevtcmd_ResultAC)
     CALL(evt_snd_sfxoff, LW(14))
     CALL(evt_snd_sfxon, STRING("SFX_BTL_THUNDERS_ATTACK3"), 0)
@@ -718,6 +775,7 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
     CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
 #endif
     CALL(btlevtcmd_StageDispellFog)
+    // A miss: the enemy plays its dodge reaction.
     IF_INT_NOT_EQUAL(LW(5), 1)
         IF_INT_EQUAL(LW(5), 3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -730,17 +788,19 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
         END_IF
         GOTO(90)
     END_IF
+    // The hit: a successful command adds the rating effect (Nice, Good...) and the higher damage.
     CALL(btlevtcmd_GetResultAC, LW(6))
     IF_BITS_SET(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
         CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
     ELSE
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
     END_IF
+    // The blast throws him off the top of the screen and he falls back down to his home spot.
     LABEL(90)
     CALL(btlevtcmd_StopAC)
     LABEL(92)
@@ -770,6 +830,7 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 16, -1)
     END_SIBLING_EVENT
+    // Stylish: pressing A as he lands makes him stretch and squash for the audience; otherwise he lands in a heap.
     CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 15, 15, 15)
     CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
     CALL(btlevtcmd_WaitEventEnd, LW(15))
@@ -831,13 +892,14 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_THUNDERS_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_FRAMES(40)
     END_IF
+    // The audience refills Star Power, then he walks back home.
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)
@@ -852,6 +914,7 @@ EVT_END()
  * then returns home.
  */
 EVT_BEGIN(partySandersAttack_SuperBombAttack)
+    // Target every enemy, pay the cost and aim the camera at Bobbery.
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
@@ -867,6 +930,7 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Action command (tap A to fill the gauge): its length and fill rate depend on the difficulty.
     CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_AcGetDifficulty, LW(0))
@@ -907,7 +971,8 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 6, 1, 0)
     WAIT_FRAMES(22)
     CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+    // A pre-emptive spiky enemy in front: he walks into its spikes and the move ends there.
+    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_2"))
         CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
@@ -918,9 +983,10 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
         CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_BTL_THUNDERS_ATTACK1"), 0, 0, -1, -1, 0, 0)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 60, -2, 1)
         CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
         RETURN
     END_IF
+    // While the command runs: sparks burst around him, the fuse hiss rises in pitch and he swells with the gauge.
     BEGIN_SIBLING_EVENT
         SUBTRACT(LW(0), 85)
         WAIT_FRAMES(LW(0))
@@ -962,6 +1028,7 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // He walks up to the front enemy; when the command ends he blows up in a huge blast that shakes the screen.
     SET_VALUE(LW(13), LW(0))
     SUBTRACT(LW(13), 85)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_2"))
@@ -1004,9 +1071,11 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     CALL(evt_btl_camera_shake_h, 0, 10, 0, 20, 13)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+    // Each enemy in turn: a miss plays its dodge reaction; a hit deals the gauge damage and a full enough gauge
+    // earns a rating (Nice, Good...).
     SET_VALUE(LW(10), 0)
     LABEL(10)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(6))
+    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(6))
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -1042,28 +1111,30 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
             SET_VALUE(LW(0), 2)
         END_SWITCH
         IF_INT_GREATER_OR_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
+            CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_AC_SUCCESS, LW(5))
             CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(6))
             CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
             CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
             CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
         ELSE
-            CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+            CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
             CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
             CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
         END_IF
     ELSE
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
     END_IF
+    // Move on to the next enemy until every one has been hit.
     LABEL(50)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
         ADD(LW(10), 1)
         GOTO(10)
     END_IF
+    // The blast throws him off the top of the screen and he falls back down to his home spot.
     LABEL(90)
     CALL(btlevtcmd_StopAC)
     LABEL(92)
@@ -1094,6 +1165,7 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 16, -1)
     END_SIBLING_EVENT
+    // Stylish: pressing A as he lands makes him stretch and squash for the audience; otherwise he lands in a heap.
     CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 15, 15, 15)
     CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
     CALL(btlevtcmd_WaitEventEnd, LW(15))
@@ -1155,13 +1227,14 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_THUNDERS_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_FRAMES(40)
     END_IF
+    // The audience refills Star Power, then he walks back home.
     LABEL(95)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)
@@ -1245,7 +1318,7 @@ EVT_BEGIN(partySandersAttack_CounterSet)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
 #endif
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(80)
     LABEL(99)
     CALL(evt_audience_ap_recovery)
@@ -1259,6 +1332,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Setup for each time bomb that Bomb Squad spawns (unit_bomzou): on Bobbery's side,
+ * acting before the player's turn, placed off stage until the throw moves it.
+ */
 BattleUnitSetup entry_bomzou = {
     &unit_bomzou, // unitKindParams
     2, // alliance
@@ -1275,6 +1352,7 @@ BattleUnitSetup entry_bomzou = {
  * along the aimed arc (_shot_bomb_event); bombs that land off the stage are removed, the rest explode next turn.
  */
 EVT_BEGIN(partySandersAttack_TimeBombSet)
+    // Pay the cost and spawn three hidden bombs at Bobbery's position.
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_bomzou), 0)
     CALL(btlevtcmd_OnAttribute, LW(3), UNIT_ATTR_HIDDEN)
@@ -1291,6 +1369,7 @@ EVT_BEGIN(partySandersAttack_TimeBombSet)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     SET_VALUE(LW(12), LW(3))
+    // Action command (press A with good timing to throw): the aiming speed depends on the difficulty.
     CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_AcGetDifficulty, LW(0))
@@ -1323,6 +1402,8 @@ EVT_BEGIN(partySandersAttack_TimeBombSet)
     CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 7, 1, 0)
     CALL(btlevtcmd_AcSetFlag, 1)
     WAIT_FRAMES(20)
+    // Each successful press shows the next bomb and throws it along the aimed arc; after the third throw comes
+    // the stylish chance (retail only) and the throwing stops.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_4A"))
     CALL(btlevtcmd_StartAC, 1)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
@@ -1377,6 +1458,7 @@ EVT_BEGIN(partySandersAttack_TimeBombSet)
         DEBUG_PUT_MSG(STRING("イベント終了"))
 #endif
     END_SIBLING_EVENT
+    // Wait for the command and the throws to finish, refill Star Power (retail only) and end the turn.
     CALL(btlevtcmd_ResultAC)
     WAIT_FRAMES(60)
     CALL(btlevtcmd_StopAC)
@@ -1484,6 +1566,7 @@ EVT_END()
  * then is blown up off the screen and falls back home.
  */
 static EVT_BEGIN(attack_audience_event)
+    // Bobbery runs off the side of the stage.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(4))
@@ -1491,9 +1574,10 @@ static EVT_BEGIN(attack_audience_event)
     MULTIPLY(LW(8), LW(4))
     MULTIPLY(LW(8), -1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(8), LW(1), LW(2), 0, -1, 0)
     WAIT_FRAMES(20)
+    // He reappears at the edge of the audience; the camera homes in on the chosen audience member and he walks up.
     CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageAudienceAreaSize, LW(4), EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
@@ -1508,6 +1592,7 @@ static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // His fuse sizzles for a second, then he explodes on the audience member and the camera shakes.
     CALL(evt_snd_sfxon, STRING("SFX_BTL_THUNDERS_ATTACK2"), LW(14))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
     WAIT_MS(1000)
@@ -1538,6 +1623,7 @@ static EVT_BEGIN(attack_audience_event)
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_MS(500)
     END_SIBLING_EVENT
+    // The blast throws him off the top of the screen and he falls back down to his home spot.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1A"))
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(30)
@@ -1573,7 +1659,7 @@ EVT_END()
  */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(sanders_battle_end_event)
-    CALL(btlevtcmd_OnOffStatus, BTL_UNIT_SELF, 22, 0, 0, 0)
+    CALL(btlevtcmd_OnOffStatus, BTL_UNIT_SELF, STATUS_HOLD_FAST, 0, 0, 0)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_sanders_stay))
     RETURN
 EVT_END()

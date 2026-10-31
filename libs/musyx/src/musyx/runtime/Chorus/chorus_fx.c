@@ -3,6 +3,7 @@
 #include "musyx/sal.h"
 #include "musyx/assert.h"
 
+/** Resampling filter taps for the 12 kHz chorus delay line. */
 static float rsmpTab12khz[512] = {
     0.097503662109f,  0.802215576172f,  0.101593017578f,  -0.000976562500f, 0.093505859375f,
     0.802032470703f,  0.105804443359f,  -0.001037597656f, 0.089599609375f,  0.801696777344f,
@@ -109,6 +110,7 @@ static float rsmpTab12khz[512] = {
     0.802215576172f,  0.097503662109f,
 };
 
+/** Constant for fast integer-to-float conversion. */
 const double i2fMagic = 4.503601774854144E15;
 
 #ifdef __MWERKS__
@@ -292,7 +294,7 @@ lbl_803B6E10:
 /* clang-format on */
 #else
 static void do_src1(_SND_CHORUS_SRCINFO* src) {
-  // TODO: Reimplement in C
+  // No C version: the original MusyX asm above stays asm (project rule).
 }
 #endif
 
@@ -530,10 +532,10 @@ lbl_803B6FF4:
 #undef smpBasePtr
 }
 #else
-/** Guess: assembly resampler for one chorus channel, reading the delayed history through the 4-tap interpolation table
- * rsmpTab12khz at a pitch of one sample plus a fractional offset (the case pitchHi == 1 in sndAuxCallbackChorus). */
+/** Empty non-Metrowerks placeholder for the assembly do_src2 above, which writes 160 samples, each a 4-tap filter of the
+ * history with rsmpTab12khz weights, stepping one sample plus a fraction (sndAuxCallbackChorus's pitchHi == 1 case). */
 static void do_src2(register _SND_CHORUS_SRCINFO* src) {
-  // TODO: Reimplement in C
+  // No C version: the original MusyX asm above stays asm (project rule).
 }
 #endif
 

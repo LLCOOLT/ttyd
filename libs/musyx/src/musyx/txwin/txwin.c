@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-/* TODO: TEMPORARY HACKS */
+/* DEMO library functions, declared here instead of through the DEMO headers. */
 extern GXRenderModeObj* DEMOGetRenderModeObj();
 extern void DEMOPrintf(s16, s16, s16, char*, ...);
 
@@ -17,9 +17,13 @@ static void __win_delete_node(sWIN* handle);
 
 static unsigned short __X_Res = 0;
 static unsigned short __Y_Res = 0;
+/** Render mode of the display, fetched from the DEMO library in winInit. */
 GXRenderModeObj* __rmp = NULL;
+/** The text window most recently made current; set when the first window is added, cleared by winInit. */
 sWIN* __CurrNode = NULL;
+/** Last window of the linked list of text windows; new windows are appended after it. */
 sWIN* __LastNode = NULL;  // size: 0x4
+/** First window of the linked list of text windows; winRefresh walks the list from here. */
 sWIN* __FirstNode = NULL; // size: 0x4
 
 /** Initializes the text window system (a debug overlay drawn with the DEMO library): empties the window list, sets the

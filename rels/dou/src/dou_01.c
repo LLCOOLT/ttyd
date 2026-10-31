@@ -14,6 +14,7 @@
 
 static BeroEntry bero_entry_data[3];
 
+/** Exits (beros) of this room: w_bero to dou_00 and e_bero to dou_02. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName

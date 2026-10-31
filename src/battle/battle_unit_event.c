@@ -63,7 +63,7 @@ s32 BattleRunHitEventDirect(BattleUnit* unit, s32 damageCode, void* code) {
     }
 
     if (code) {
-        evt = evtEntry(code, 0xA, 0x20);
+        evt = evtEntry(code, 0xA, EVENT_START_NOW);
         evt->unitId = unit->unitId;
         unit->damageCode = damageCode;
         newId = evt->eventId;
@@ -111,12 +111,12 @@ s32 BattleRunPhaseEvent(BattleUnit* unit, BOOL isUnison) {
     if (isUnison) {
         code = unit->unisonPhaseEventCode;
         if (code) {
-            evt = evtEntry(code, 0xA, 0x20);
+            evt = evtEntry(code, 0xA, EVENT_START_NOW);
         }
     } else {
         code = unit->phaseEventCode;
         if (code) {
-            evt = evtEntry(code, 0xA, 0x20);
+            evt = evtEntry(code, 0xA, EVENT_START_NOW);
         }
     }
     if (evt) {

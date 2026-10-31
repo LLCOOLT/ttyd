@@ -77,16 +77,21 @@ static USER_FUNC(alpha_set_func) {
 }
 
 /**
- * Script helper: sets a camera-road parameter (work->f_19c[10]) to 1.7;
- * Guess: widens or shifts the camera displacement for this room.
+ * Script helper: sets the camera road's position weight (work->tuning[10], default 1.0) to 1.7: cam_road.c
+ * scales the distance the camera position moves by it when timing a blend between camera settings (20 to 90
+ * frames), so blends that move the camera take up to 1.7 times as long in this room.
  */
 static USER_FUNC(cam_displacement) {
     CamRoadWork* work = camRoadGetWorkPtr();
 
-    work->f_19c[10] = 1.7f;
+    work->tuning[10] = 1.7f;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Exits (beros) of this room: w_bero_1 to dou_03, w_bero_2 to dou_03, w_bero_3 to dou_03 and e_bero to
+ * dou_06.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
@@ -157,6 +162,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Items offered in the item menu at the Grotto Key door: only the Grotto Key. */
 static s32 key_tbl[] = {
     ITEM_GROTTO_KEY, -1,
 };
@@ -265,6 +271,9 @@ EVT_BEGIN(bigdoor_event)
     RETURN
 EVT_END()
 
+/**
+ * Hazard-water floors of this room (map hit names) and the point each puts Mario back at after he is bitten.
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_01", {0.0f, -1000.0f, 0.0f}},
     {"mod_02", {0.0f, -1000.0f, 0.0f}},

@@ -33,7 +33,7 @@ typedef struct ShotTargetWork {
 
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-// inlining off for battleAcMain_ShotTarget, _ac_rumble_param_set, battleAcResult_ShotTarget and 4 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 2 functions change length, e.g. battleAcDisp_ShotTarget 60 -> 372 instructions
 #pragma dont_inline on
 
 static void _ac_disp_init(BattleWork* work);
@@ -142,7 +142,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
                     cw->inRange = 0;
                 }
                 cw->frame--;
-                if ((ac->setupFlags & 1) && ((u32)ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+                if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && ((u32)ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
                     if (irand(100) >= 0) {
                         ac->result = 0;
                     } else {

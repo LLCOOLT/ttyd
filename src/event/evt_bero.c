@@ -61,10 +61,15 @@ EVT_BEGIN(default_outevt)
 EVT_END()
 #endif
 
+/**
+ * Stand-in entrance for an arrival with no entrance name: no hit object, normal type,
+ * direction and start point worked out automatically. The entrance lookup falls back to it
+ * when gp->beroEnterName is empty.
+ */
 BeroEntry bero_null[] = {
     {
         NULL, // hitName
-        3840, // type
+        BERO_TYPE_NONE, // type
         0, // sfxId
         BERO_DIR_AUTO, // directionId
         BERO_POS_AUTO, // centerPosition
@@ -308,16 +313,16 @@ USER_FUNC(evt_bero_get_info_length) {
         evtSetFloat(event, args[1], (f32)len);
         return EVT_RETURN_DONE;
     }
-    switch (bero->type & 0xFFF) {
-        case 0:
-        case 3:
-        case 0xF00:
+    switch (bero->type & BERO_TYPE_MASK) {
+        case BERO_TYPE_ROAD:
+        case BERO_TYPE_GATE:
+        case BERO_TYPE_NONE:
             defaultLength = 30.0f;
             break;
-        case 1:
+        case BERO_TYPE_DOOR:
             defaultLength = 60.0f;
             break;
-        case 2:
+        case BERO_TYPE_PIPE:
             defaultLength = 60.0f;
             break;
         default:
@@ -425,9 +430,9 @@ static inline s32 bero_get_kind(BeroEntry* bero, s32 walk) {
             if (kind == BERO_DIR_NONE) {
                 kind = BERO_DIR_NONE;
             } else {
-                switch (bero->type & 0xFFF) {
-                    case 0:
-                    case 1:
+                switch (bero->type & BERO_TYPE_MASK) {
+                    case BERO_TYPE_ROAD:
+                    case BERO_TYPE_DOOR:
                         if (walk) {
                             for (i = 0, p = dirs; i < 8; i++, p++) {
                                 if (!strncmp(*p, bero->hitName, strlen(*p))) {
@@ -556,20 +561,20 @@ USER_FUNC(evt_bero_get_info_num) {
     event->lwData[9] = BeroSW[id];
     event->lwData[10] = bero->caseType;
     if (bero->caseType == -1) {
-        switch (bero->type & 0xFFF) {
-            case 0xF00:
+        switch (bero->type & BERO_TYPE_MASK) {
+            case BERO_TYPE_NONE:
                 event->lwData[10] = 0;
                 break;
-            case 0:
+            case BERO_TYPE_ROAD:
                 event->lwData[10] = 10;
                 break;
-            case 1:
+            case BERO_TYPE_DOOR:
                 event->lwData[10] = 9;
                 break;
-            case 2:
+            case BERO_TYPE_PIPE:
                 event->lwData[10] = 4;
                 break;
-            case 3:
+            case BERO_TYPE_GATE:
                 event->lwData[10] = 7;
                 break;
         }
@@ -1043,7 +1048,7 @@ static USER_FUNC(bero_set_disp_position_pipe) {
     switch (event->lwData[5]) {
         case BERO_DIR_E:
         case BERO_DIR_W:
-            if (!(event->lwData[4] & 0x1000)) {
+            if (!(event->lwData[4] & BERO_TYPE_FLAG_BG)) {
                 marioGetPtr()->dispOfs.y += 3.0f;
                 marioGetPtr()->dispOfs.z -= 15.0f;
             }
@@ -1053,7 +1058,7 @@ static USER_FUNC(bero_set_disp_position_pipe) {
             break;
         case BERO_DIR_UP:
         case BERO_DIR_DOWN:
-            if (!(event->lwData[4] & 0x1000)) {
+            if (!(event->lwData[4] & BERO_TYPE_FLAG_BG)) {
                 marioGetPtr()->dispOfs.z -= 13.0f;
             } else {
                 marioGetPtr()->dispOfs.z -= 20.0f;
@@ -1327,7 +1332,8 @@ USER_FUNC(evt_bero_mario_go_wait) {
 
 /**
  * args[0] = 1 when the destination map (LW(13)) is sys_01, else 0; the exits then wait a second.
- * Guess: the pause before the system map that ends the demo or a chapter.
+ * sys_01 is the chapter title card ("Prologue", "Chapter 1" ...),
+ * so this is the pause before a chapter starts.
  */
 static USER_FUNC(evt_bero_1stcheck) {
     EvtWord* args = event->args;
@@ -1355,18 +1361,18 @@ EVT_BEGIN(bero_case_init_check)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
     SET_VALUE(LW(0), LW(4))
-    AND_RAW(LW(0), 4095)
+    AND_RAW(LW(0), BERO_TYPE_MASK)
     SWITCH(LW(0))
-        CASE_OR_EQUAL(0)
-        CASE_OR_EQUAL(1)
+        CASE_OR_EQUAL(BERO_TYPE_ROAD)
+        CASE_OR_EQUAL(BERO_TYPE_DOOR)
         CALL(evt_bero_get_info_length, LW(1), LW(0))
         CALL(bero_get_position_normal, 0, LW(0))
         CASE_END
-        CASE_OR_EQUAL(3840)
-        CASE_OR_EQUAL(3)
+        CASE_OR_EQUAL(BERO_TYPE_NONE)
+        CASE_OR_EQUAL(BERO_TYPE_GATE)
         CALL(bero_get_position_normal, 0, FLOAT(0.0f))
         CASE_END
-        CASE_EQUAL(2)
+        CASE_EQUAL(BERO_TYPE_PIPE)
         CALL(evt_bero_get_info_length, LW(1), LW(0))
         CALL(bero_get_position_pipe_pure, 0, LW(0))
     END_SWITCH
@@ -1539,13 +1545,15 @@ static USER_FUNC(evt_camera_change_event_from_road) {
  * switching background mode when the two pipes differ; the exit is re-registered.
  */
 EVT_BEGIN(bero_case_exec_pipe_sub)
+    // The camera leaves road mode. Alongside, unless Mario goes from a normal pipe into a background pipe,
+    // the camera waits until he is inside and then glides over to the destination pipe.
     BEGIN_INLINE_EVENT
         CALL(evt_camera_change_event_from_road)
     END_INLINE_EVENT
     IF_INT_EQUAL(LW(13), 0)
         BEGIN_INLINE_EVENT
             SET_VALUE(LW(0), LW(4))
-            AND_RAW(LW(0), 4096)
+            AND_RAW(LW(0), BERO_TYPE_FLAG_BG)
             IF_INT_EQUAL(LW(0), 0)
                 SET_VALUE(LF(0), 0)
             ELSE
@@ -1555,7 +1563,7 @@ EVT_BEGIN(bero_case_exec_pipe_sub)
             CALL(evt_bero_set_now_number, LW(1))
             CALL(evt_bero_get_info_num, LW(1))
             SET_VALUE(LW(0), LW(4))
-            AND_RAW(LW(0), 4096)
+            AND_RAW(LW(0), BERO_TYPE_FLAG_BG)
             IF_INT_EQUAL(LW(0), 0)
                 SET_VALUE(LF(1), 0)
             ELSE
@@ -1582,6 +1590,7 @@ EVT_BEGIN(bero_case_exec_pipe_sub)
             END_IF
         END_INLINE_EVENT
     END_IF
+    // Mario sinks into the pipe with the pipe sound, posed for the pipe's direction.
     CALL(evt_bero_disppos_save)
     CALL(evt_bero_get_info_length, LW(1), LW(10))
     CALL(bero_get_position_pipe_pure, 0, LW(10))
@@ -1602,10 +1611,12 @@ EVT_BEGIN(bero_case_exec_pipe_sub)
         CALL(evt_mario_paper_pose_dokan, 3)
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
     END_SWITCH
+    // He is inside: let the camera move.
     POKE_INT(1, PTR(&BeroCAM))
+    // After a moment the destination pipe's own entry script runs, and Mario is moved under that pipe.
     IF_INT_EQUAL(LW(13), 0)
         SET_VALUE(LW(0), LW(4))
-        AND_RAW(LW(0), 4096)
+        AND_RAW(LW(0), BERO_TYPE_FLAG_BG)
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LF(0), 0)
         ELSE
@@ -1616,7 +1627,7 @@ EVT_BEGIN(bero_case_exec_pipe_sub)
         CALL(evt_bero_get_info_num, LW(1))
         CALL_CHILD(LW(7))
         SET_VALUE(LW(0), LW(4))
-        AND_RAW(LW(0), 4096)
+        AND_RAW(LW(0), BERO_TYPE_FLAG_BG)
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LF(1), 0)
         ELSE
@@ -1632,6 +1643,8 @@ EVT_BEGIN(bero_case_exec_pipe_sub)
         CALL(evt_bero_get_info_length, LW(1), LW(10))
         CALL(bero_get_position_pipe_pure, 1, LW(10))
         CALL(bero_set_disp_position_pipe)
+        // He pops out of the destination pipe in its layer (background or normal) with the pipe sound,
+        // gets control back, and the pipe he left re-arms once he steps off.
         WAIT_MS(500)
         IF_INT_NOT_EQUAL(LF(1), 0)
             CALL(evt_mario_bgmode_on)
@@ -1655,17 +1668,19 @@ EVT_BEGIN(bero_case_exec_pipe_sub)
         SPAWN_EVENT(evt_bero_nonride_check)
         CALL(evt_bero_cam_shift_init)
         CALL(evt_cam3d_evt_off, 500, 11)
+        // With a destination map (the pipe exit never spawns this case) he just takes the entrance's layer.
     ELSE
         CALL(evt_bero_disppos_load)
         CALL(evt_mario_paper_pose_off)
         SET_VALUE(LW(0), LW(4))
-        AND_RAW(LW(0), 4096)
+        AND_RAW(LW(0), BERO_TYPE_FLAG_BG)
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(evt_mario_bgmode_on)
         ELSE
             CALL(evt_mario_bgmode_off)
         END_IF
     END_IF
+    // Field enemies resume and the exits are live again.
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_npc_start_for_event)
     CALL(evt_bero_exec_onoff, 0, 65536)
@@ -1717,7 +1732,7 @@ EVT_BEGIN(bero_case_exec_pipe)
         CALL(evt_mario_paper_pose_dokan, 3)
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
     END_SWITCH
-    IF_BITS_CLEAR(LW(4), 8192)
+    IF_BITS_CLEAR(LW(4), BERO_TYPE_FLAG_NO_FADE)
         SWITCH(LW(5))
             CASE_EQUAL(BERO_DIR_W)
             CALL(evt_fade_set_mapchange_type, 1, FADE_PIPE_LEFT_A1, 0, -1, -1)
@@ -1779,18 +1794,18 @@ EVT_BEGIN(bero_case_entry)
         CALL(evt_bero_get_info_num, LW(1))
         IF_INT_EQUAL(LW(9), -1)
             SET_VALUE(LW(0), LW(4))
-            AND_RAW(LW(0), 4095)
+            AND_RAW(LW(0), BERO_TYPE_MASK)
             SWITCH(LW(0))
-                CASE_EQUAL(3840)
+                CASE_EQUAL(BERO_TYPE_NONE)
                 CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_none), LW(15))
-                CASE_EQUAL(0)
+                CASE_EQUAL(BERO_TYPE_ROAD)
                 CALL(evt_hitobj_attr_onoff, 0, 1, LW(3), 8388608)
                 CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_road), LW(15))
-                CASE_EQUAL(1)
+                CASE_EQUAL(BERO_TYPE_DOOR)
                 CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_door), LW(15))
-                CASE_EQUAL(2)
+                CASE_EQUAL(BERO_TYPE_PIPE)
                 CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_pipe), LW(15))
-                CASE_EQUAL(3)
+                CASE_EQUAL(BERO_TYPE_GATE)
                 CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_gate), LW(15))
             END_SWITCH
             CALL(evt_bero_case_id_save, LW(1), LW(15))
@@ -1809,18 +1824,18 @@ EVT_END()
 /** Registers the exit trigger for the single entrance loaded in LW(1)-LW(15) and saves its case ID. */
 EVT_BEGIN(bero_case_entry_sub)
     SET_VALUE(LW(0), LW(4))
-    AND_RAW(LW(0), 4095)
+    AND_RAW(LW(0), BERO_TYPE_MASK)
     SWITCH(LW(0))
-        CASE_EQUAL(3840)
+        CASE_EQUAL(BERO_TYPE_NONE)
         CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_none), LW(15))
-        CASE_EQUAL(0)
+        CASE_EQUAL(BERO_TYPE_ROAD)
         CALL(evt_hitobj_attr_onoff, 0, 1, LW(3), 8388608)
         CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_road), LW(15))
-        CASE_EQUAL(1)
+        CASE_EQUAL(BERO_TYPE_DOOR)
         CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_door), LW(15))
-        CASE_EQUAL(2)
+        CASE_EQUAL(BERO_TYPE_PIPE)
         CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_pipe), LW(15))
-        CASE_EQUAL(3)
+        CASE_EQUAL(BERO_TYPE_GATE)
         CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_gate), LW(15))
     END_SWITCH
     CALL(evt_bero_case_id_save, LW(1), LW(15))
@@ -1997,10 +2012,12 @@ EVT_END()
  * sets the pipe fade and spawns the walk-in.
  */
 EVT_BEGIN(evt_bero_info_run)
+    // Find the entrance Mario arrived by and whether he is in paper form.
     CALL(evt_bero_get_into_info)
     CALL(evt_bero_set_now_number, LW(1))
     CALL(evt_bero_read_mario_pera)
     CALL(evt_sub_get_system_flag, LW(0))
+    // Loading a save: no walk-in; only arm the exits and start the NPCs.
     IF_BITS_SET(LW(0), GLOBAL_FLAG_LOADED)
 #if VERSION >= VERSION_JP
         DEBUG_PUT_MSG(STRING("セーブブロックからのロード時の処理"))
@@ -2023,6 +2040,8 @@ EVT_BEGIN(evt_bero_info_run)
         CALL_CHILD(bero_case_entry)
         RETURN
     END_IF
+    // Normal arrival: lock the controls. A background entrance hides the partners;
+    // otherwise they follow Mario in, out of the pipe for a pipe entrance.
     CALL(evt_bero_exec_get, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
@@ -2030,7 +2049,7 @@ EVT_BEGIN(evt_bero_info_run)
     CALL(evt_bero_exec_onoff, 0, 1)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(LW(0), LW(4))
-    AND_RAW(LW(0), 4096)
+    AND_RAW(LW(0), BERO_TYPE_FLAG_BG)
     IF_INT_NOT_EQUAL(LW(0), 0)
         DEBUG_PUT_MSG(STRING("背景に入るときのマリオの初期処理"))
         CALL(evt_mario_bgmode_on)
@@ -2041,8 +2060,8 @@ EVT_BEGIN(evt_bero_info_run)
         DEBUG_PUT_MSG(STRING("普通に入るときのマリオの初期処理"))
         CALL(evt_mario_bgmode_off)
         SET_VALUE(LW(0), LW(4))
-        AND_RAW(LW(0), 4095)
-        IF_INT_EQUAL(LW(0), 2)
+        AND_RAW(LW(0), BERO_TYPE_MASK)
+        IF_INT_EQUAL(LW(0), BERO_TYPE_PIPE)
             CALL(evt_mario_set_prev_party_dokan, 0)
             CALL(evt_mario_set_prev_party_dokan, 1)
         ELSE
@@ -2050,9 +2069,10 @@ EVT_BEGIN(evt_bero_info_run)
             CALL(evt_mario_set_prev_party, 1)
         END_IF
     END_IF
+    // Pipe entrance: Mario starts tucked inside the pipe, facing out along its direction.
     SET_VALUE(LW(0), LW(4))
-    AND_RAW(LW(0), 4095)
-    IF_INT_EQUAL(LW(0), 2)
+    AND_RAW(LW(0), BERO_TYPE_MASK)
+    IF_INT_EQUAL(LW(0), BERO_TYPE_PIPE)
         SWITCH(LW(5))
             CASE_EQUAL(BERO_DIR_W)
             CALL(evt_mario_dokan_prepare, 4)
@@ -2064,11 +2084,13 @@ EVT_BEGIN(evt_bero_info_run)
             CALL(evt_mario_dokan_prepare, 0)
         END_SWITCH
     END_IF
+    // Place Mario and the partners at the entrance, choose the pipe fade-in for its direction
+    // and start the walk-in.
     CALL_CHILD(evt_bero_initial_pos)
-    IF_BITS_CLEAR(LW(4), 8192)
+    IF_BITS_CLEAR(LW(4), BERO_TYPE_FLAG_NO_FADE)
         SET_VALUE(LW(0), LW(4))
-        AND_RAW(LW(0), 4095)
-        IF_INT_EQUAL(LW(0), 2)
+        AND_RAW(LW(0), BERO_TYPE_MASK)
+        IF_INT_EQUAL(LW(0), BERO_TYPE_PIPE)
             SWITCH(LW(5))
                 CASE_EQUAL(BERO_DIR_W)
                 CALL(evt_fade_set_mapchange_type, 1, -1, -1, FADE_PIPE_LEFT_A2, 0)
@@ -2094,10 +2116,10 @@ EVT_END()
 EVT_BEGIN(evt_bero_initial_pos)
     CALL(evt_bero_get_into_info)
     SET_VALUE(LW(0), LW(4))
-    AND_RAW(LW(0), 4095)
+    AND_RAW(LW(0), BERO_TYPE_MASK)
     SWITCH(LW(0))
-        CASE_EQUAL(3840)
-        CASE_EQUAL(3)
+        CASE_EQUAL(BERO_TYPE_NONE)
+        CASE_EQUAL(BERO_TYPE_GATE)
         CALL(bero_get_position_normal, 0, FLOAT(0.0f))
         PEEK_FLOAT(LW(10), PTR(&BeroSX))
         PEEK_FLOAT(LW(11), PTR(&BeroSY))
@@ -2106,7 +2128,7 @@ EVT_BEGIN(evt_bero_initial_pos)
         CALL(evt_party_set_pos, 0, LW(10), LW(11), LW(12))
         CALL(evt_party_set_pos, 1, LW(10), LW(11), LW(12))
         CASE_END
-        CASE_EQUAL(0)
+        CASE_EQUAL(BERO_TYPE_ROAD)
         CALL(evt_bero_get_info_length, LW(1), LW(10))
         CALL(bero_get_position_normal, 1, LW(10))
         PEEK_FLOAT(LW(10), PTR(&BeroSX))
@@ -2115,7 +2137,7 @@ EVT_BEGIN(evt_bero_initial_pos)
         CALL(evt_mario_set_pos, LW(10), LW(11), LW(12))
         CALL(evt_party_set_pos, 0, LW(10), LW(11), LW(12))
         CALL(evt_party_set_pos, 1, LW(10), LW(11), LW(12))
-        CASE_EQUAL(1)
+        CASE_EQUAL(BERO_TYPE_DOOR)
         CALL(evt_bero_get_info_length, LW(1), LW(10))
         CALL(bero_get_position_normal, 1, LW(10))
         PEEK_FLOAT(LW(10), PTR(&BeroSX))
@@ -2124,7 +2146,7 @@ EVT_BEGIN(evt_bero_initial_pos)
         CALL(evt_mario_set_pos, LW(10), LW(11), LW(12))
         CALL(evt_party_set_pos, 0, LW(10), LW(11), LW(12))
         CALL(evt_party_set_pos, 1, LW(10), LW(11), LW(12))
-        CASE_EQUAL(2)
+        CASE_EQUAL(BERO_TYPE_PIPE)
         CALL(evt_bero_get_info_length, LW(1), LW(10))
         CALL(bero_get_position_pipe_pure, 1, LW(10))
         PEEK_FLOAT(LW(10), PTR(&BeroSX))
@@ -2157,17 +2179,17 @@ EVT_BEGIN(evt_bero_mario_enter)
     END_IF
     CALL(evt_bero_get_into_info)
     SET_VALUE(LW(0), LW(4))
-    AND_RAW(LW(0), 4095)
+    AND_RAW(LW(0), BERO_TYPE_MASK)
     SWITCH(LW(0))
-        CASE_EQUAL(3840)
+        CASE_EQUAL(BERO_TYPE_NONE)
         CALL_CHILD(evt_bero_info_run_none)
-        CASE_EQUAL(0)
+        CASE_EQUAL(BERO_TYPE_ROAD)
         CALL_CHILD(evt_bero_info_run_road)
-        CASE_EQUAL(1)
+        CASE_EQUAL(BERO_TYPE_DOOR)
         CALL_CHILD(evt_bero_info_run_door)
-        CASE_EQUAL(2)
+        CASE_EQUAL(BERO_TYPE_PIPE)
         CALL_CHILD(evt_bero_info_run_pipe)
-        CASE_EQUAL(3)
+        CASE_EQUAL(BERO_TYPE_GATE)
         CALL_CHILD(evt_bero_info_run_gate)
         CASE_DEFAULT
         CALL(evt_mario_key_onoff, 1)

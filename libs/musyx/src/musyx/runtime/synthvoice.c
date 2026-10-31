@@ -16,8 +16,13 @@ SYNTH_VOICELIST voiceList[64];
 SYNTH_ROOTLIST voicePrioSortRootList[256];
 u8 voicePrioSortVoicesRoot[256];
 SYNTH_VOICELIST voicePrioSortVoices[64];
+/** Heads of the list of free voice ids and the list of voice ids in use. */
 static VID_LIST* vidFree = NULL;
 static VID_LIST* vidRoot = NULL;
+/**
+ * State of the voice allocator: the next voice id, the head of the priority list, and counters of music and
+ * effect voices.
+ */
 static u32 vidCurrentId = 0;
 u16 voicePrioSortRootListRoot = 0;
 u8 voiceMusicRunning = 0;

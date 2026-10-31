@@ -1,7 +1,6 @@
-#pragma once
-
 // Magnum Battender (Magnus von Grapple) and Magnum Battender mkII: types shared between the mri and
 // aji units.
+#pragma once
 
 #include "driver/effdrv.h"
 #include <dolphin/mtx.h>

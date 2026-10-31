@@ -16,6 +16,7 @@
 #define DOL_ADDR_LIMIT          0x80700000
 
 u16 Pad3Button AT_ADDRESS(PAD3_BUTTON_ADDR);
+/** Set when the boot debug flag asks for the debugger over the Broadband Adapter. */
 static u8 Debug_BBA = 0;
 
 extern void InitMetroTRK();

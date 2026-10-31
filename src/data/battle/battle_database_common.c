@@ -139,6 +139,7 @@ ItemDropData battle_item_suitooru[1];
 ItemDropData battle_item_sinabita_kinoko[1];
 #endif
 
+/** X-Naut: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_gundan_zako[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -152,6 +153,7 @@ ItemDropData battle_item_gundan_zako[] = {
     {0},
 };
 
+/** X-Naut PhD: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_gundan_zako_magician[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -165,6 +167,7 @@ ItemDropData battle_item_gundan_zako_magician[] = {
     {0},
 };
 
+/** Elite X-Naut: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_gundan_zako_elite[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -178,6 +181,7 @@ ItemDropData battle_item_gundan_zako_elite[] = {
     {0},
 };
 
+/** Spinia: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hinnya[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -191,6 +195,7 @@ ItemDropData battle_item_hinnya[] = {
     {0},
 };
 
+/** Spania: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hannya[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -204,6 +209,7 @@ ItemDropData battle_item_hannya[] = {
     {0},
 };
 
+/** Spunia: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hennya[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -217,6 +223,7 @@ ItemDropData battle_item_hennya[] = {
     {0},
 };
 
+/** Goomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_kuriboo[] = {
     {0, 200, 300},
     {ITEM_DRIED_SHROOM, 10, 10},
@@ -230,6 +237,7 @@ ItemDropData battle_item_kuriboo[] = {
     {0},
 };
 
+/** Spiky Goomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_togekuri[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -243,6 +251,7 @@ ItemDropData battle_item_togekuri[] = {
     {0},
 };
 
+/** Paragoomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_patakuri[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -256,6 +265,7 @@ ItemDropData battle_item_patakuri[] = {
     {0},
 };
 
+/** Hyper Goomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hyper_kuriboo[] = {
     {0, 200, 300},
     {ITEM_LIFE_SHROOM, 5, 5},
@@ -269,6 +279,7 @@ ItemDropData battle_item_hyper_kuriboo[] = {
     {0},
 };
 
+/** H. S. Goomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hyper_togekuri[] = {
     {0, 200, 300},
     {ITEM_LIFE_SHROOM, 5, 5},
@@ -282,6 +293,7 @@ ItemDropData battle_item_hyper_togekuri[] = {
     {0},
 };
 
+/** H. Paragoomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hyper_patakuri[] = {
     {0, 200, 300},
     {ITEM_LIFE_SHROOM, 5, 5},
@@ -295,6 +307,7 @@ ItemDropData battle_item_hyper_patakuri[] = {
     {0},
 };
 
+/** Gloomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_yami_kuriboo[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -308,6 +321,7 @@ ItemDropData battle_item_yami_kuriboo[] = {
     {0},
 };
 
+/** Spiky Gloomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_yami_togekuri[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -321,6 +335,7 @@ ItemDropData battle_item_yami_togekuri[] = {
     {0},
 };
 
+/** Paragloomba: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_yami_patakuri[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -334,6 +349,7 @@ ItemDropData battle_item_yami_patakuri[] = {
     {0},
 };
 
+/** Koopa Troopa: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_nokonoko[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -347,6 +363,7 @@ ItemDropData battle_item_nokonoko[] = {
     {0},
 };
 
+/** Paratroopa: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_patapata[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -360,6 +377,7 @@ ItemDropData battle_item_patapata[] = {
     {0},
 };
 
+/** Dark Koopa: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_yami_noko[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -373,6 +391,7 @@ ItemDropData battle_item_yami_noko[] = {
     {0},
 };
 
+/** Shady Koopa: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_ura_noko[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -386,6 +405,7 @@ ItemDropData battle_item_ura_noko[] = {
     {0},
 };
 
+/** S. Paratroopa: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_ura_pata[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -399,6 +419,7 @@ ItemDropData battle_item_ura_pata[] = {
     {0},
 };
 
+/** Koopatrol: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_togenoko[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -412,6 +433,7 @@ ItemDropData battle_item_togenoko[] = {
     {0},
 };
 
+/** D. Koopatrol: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_togenoko_ace[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -425,6 +447,7 @@ ItemDropData battle_item_togenoko_ace[] = {
     {0},
 };
 
+/** Hammer Bro: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hammer_bros[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -438,6 +461,7 @@ ItemDropData battle_item_hammer_bros[] = {
     {0},
 };
 
+/** Buzzy Beetle: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_met[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 10, 10},
@@ -455,6 +479,7 @@ ItemDropData battle_item_met[] = {
     {0},
 };
 
+/** Spike Top: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_togemet[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 10, 10},
@@ -472,6 +497,7 @@ ItemDropData battle_item_togemet[] = {
     {0},
 };
 
+/** Parabuzzy: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_patamet[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 10, 10},
@@ -485,6 +511,7 @@ ItemDropData battle_item_patamet[] = {
     {0},
 };
 
+/** S. Parabuzzy: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_patatogemet[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 10, 10},
@@ -498,6 +525,7 @@ ItemDropData battle_item_patatogemet[] = {
     {0},
 };
 
+/** Red Spike Top (Glitz Pit): held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hyper_togemet[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 10, 10},
@@ -508,6 +536,7 @@ ItemDropData battle_item_hyper_togemet[] = {
     {0},
 };
 
+/** Lakitu: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_jyugem[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -521,6 +550,7 @@ ItemDropData battle_item_jyugem[] = {
     {0},
 };
 
+/** Dark Lakitu: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hyper_jyugem[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -534,6 +564,7 @@ ItemDropData battle_item_hyper_jyugem[] = {
     {0},
 };
 
+/** Spiny: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_togezo[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -545,6 +576,7 @@ ItemDropData battle_item_togezo[] = {
     {0},
 };
 
+/** Magikoopa: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_kamec[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -558,6 +590,7 @@ ItemDropData battle_item_kamec[] = {
     {0},
 };
 
+/** Fuzzy: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_chorobon[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -570,6 +603,7 @@ ItemDropData battle_item_chorobon[] = {
     {0},
 };
 
+/** Green Fuzzy: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_green_chorobon[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 5, 5},
@@ -582,6 +616,7 @@ ItemDropData battle_item_green_chorobon[] = {
     {0},
 };
 
+/** Flower Fuzzy: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_flower_chorobon[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 5, 5},
@@ -594,6 +629,7 @@ ItemDropData battle_item_flower_chorobon[] = {
     {0},
 };
 
+/** Dull Bones: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_honenoko[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -606,6 +642,7 @@ ItemDropData battle_item_honenoko[] = {
     {0},
 };
 
+/** Dry Bones: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_karon[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -618,6 +655,7 @@ ItemDropData battle_item_karon[] = {
     {0},
 };
 
+/** Dark Puff: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_monochrome_kurokumorn[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -630,6 +668,7 @@ ItemDropData battle_item_monochrome_kurokumorn[] = {
     {0},
 };
 
+/** Ruff Puff: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_kurokumorn[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -642,6 +681,7 @@ ItemDropData battle_item_kurokumorn[] = {
     {0},
 };
 
+/** Ice Puff: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_bllizard[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -654,6 +694,7 @@ ItemDropData battle_item_bllizard[] = {
     {0},
 };
 
+/** Poison Puff: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_dokugassun[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -666,6 +707,7 @@ ItemDropData battle_item_dokugassun[] = {
     {0},
 };
 
+/** Piranha Plant: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_pakkun_flower[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 5},
@@ -676,30 +718,37 @@ ItemDropData battle_item_pakkun_flower[] = {
     {0},
 };
 
+/** Empty drop table for units that never hold or drop an item. */
 ItemDropData battle_item_NONE[] = {
     {0},
 };
 
+/** KP Koopa: holds and drops no items. */
 ItemDropData battle_item_nokonoko_fighter[] = {
     {0},
 };
 
+/** KP Paratroopa: holds and drops no items. */
 ItemDropData battle_item_patapata_fighter[] = {
     {0},
 };
 
+/** Boomerang Bro: holds and drops no items. */
 ItemDropData battle_item_boomerang_bros[] = {
     {0},
 };
 
+/** Fire Bro: holds and drops no items. */
 ItemDropData battle_item_fire_bros[] = {
     {0},
 };
 
+/** Red Bones: holds and drops no items. */
 ItemDropData battle_item_red_honenoko[] = {
     {0},
 };
 
+/** Putrid Piranha: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_poison_pakkun[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 5},
@@ -708,6 +757,7 @@ ItemDropData battle_item_poison_pakkun[] = {
     {0},
 };
 
+/** Frost Piranha: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_ice_pakkun[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 5},
@@ -716,6 +766,7 @@ ItemDropData battle_item_ice_pakkun[] = {
     {0},
 };
 
+/** Pale Piranha: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_monochrome__pakkun[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 0, 5},
@@ -724,6 +775,7 @@ ItemDropData battle_item_monochrome__pakkun[] = {
     {0},
 };
 
+/** Pider: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_piders[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 0, 10},
@@ -731,6 +783,7 @@ ItemDropData battle_item_piders[] = {
     {0},
 };
 
+/** Arantula: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_churantalar[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 0, 10},
@@ -740,38 +793,47 @@ ItemDropData battle_item_churantalar[] = {
     {0},
 };
 
+/** Yux: holds and drops no items. */
 ItemDropData battle_item_barriern[] = {
     {0},
 };
 
+/** Z-Yux: holds and drops no items. */
 ItemDropData battle_item_barriern_z[] = {
     {0},
 };
 
+/** X-Yux: holds and drops no items. */
 ItemDropData battle_item_barriern_custom[] = {
     {0},
 };
 
+/** Iron Cleft: holds and drops no items. */
 ItemDropData battle_item_iron_sinemon[] = {
     {0},
 };
 
+/** Iron Cleft: holds and drops no items. */
 ItemDropData battle_item_iron_sinemon2[] = {
     {0},
 };
 
+/** Atomic Boo: holds and drops no items. */
 ItemDropData battle_item_atmic_teresa[] = {
     {0},
 };
 
+/** Bullet Bill: holds and drops no items. */
 ItemDropData battle_item_killer[] = {
     {0},
 };
 
+/** Bombshell Bill: holds and drops no items. */
 ItemDropData battle_item_super_killer[] = {
     {0},
 };
 
+/** Cleft: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_monochrome_sinemon[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -783,6 +845,7 @@ ItemDropData battle_item_monochrome_sinemon[] = {
     {0},
 };
 
+/** Moon Cleft: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_sinemon[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -794,6 +857,7 @@ ItemDropData battle_item_sinemon[] = {
     {0},
 };
 
+/** H. Bald Cleft: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hyper_sinnosuke[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -804,6 +868,7 @@ ItemDropData battle_item_hyper_sinnosuke[] = {
     {0},
 };
 
+/** Hyper Cleft: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hyper_sinemon[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -816,6 +881,7 @@ ItemDropData battle_item_hyper_sinemon[] = {
     {0},
 };
 
+/** Swooper: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_basabasa[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 5, 5},
@@ -829,6 +895,7 @@ ItemDropData battle_item_basabasa[] = {
     {0},
 };
 
+/** Swoopula: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_basabasa_chururu[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -842,6 +909,7 @@ ItemDropData battle_item_basabasa_chururu[] = {
     {0},
 };
 
+/** Swampire: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_basabasa_green[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -855,6 +923,7 @@ ItemDropData battle_item_basabasa_green[] = {
     {0},
 };
 
+/** Boo: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_teresa[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 10, 10},
@@ -868,6 +937,7 @@ ItemDropData battle_item_teresa[] = {
     {0},
 };
 
+/** Dark Boo: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_purple_teresa[] = {
     {0, 200, 300},
     {ITEM_SLOW_SHROOM, 10, 10},
@@ -881,6 +951,7 @@ ItemDropData battle_item_purple_teresa[] = {
     {0},
 };
 
+/** Pokey: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_sambo[] = {
     {0, 200, 300},
     {ITEM_LIFE_SHROOM, 5, 5},
@@ -891,6 +962,7 @@ ItemDropData battle_item_sambo[] = {
     {0},
 };
 
+/** Poison Pokey: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_sambo_mummy[] = {
     {0, 200, 300},
     {ITEM_LIFE_SHROOM, 5, 5},
@@ -902,6 +974,7 @@ ItemDropData battle_item_sambo_mummy[] = {
     {0},
 };
 
+/** Bill Blaster: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_killer_cannon[] = {
     {0, 200, 300},
     {ITEM_MUSHROOM, 0, 5},
@@ -910,6 +983,7 @@ ItemDropData battle_item_killer_cannon[] = {
     {0},
 };
 
+/** B. Bill Blaster: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_super_killer_cannon[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 5},
@@ -918,26 +992,32 @@ ItemDropData battle_item_super_killer_cannon[] = {
     {0},
 };
 
+/** Big Bandit: holds and drops no items. */
 ItemDropData battle_item_borodo_king[] = {
     {0},
 };
 
+/** Gus: holds and drops no items. */
 ItemDropData battle_item_monban[] = {
     {0},
 };
 
+/** Gold Fuzzy: holds and drops no items. */
 ItemDropData battle_item_gold_chorobon[] = {
     {0},
 };
 
+/** Bald Cleft: holds and drops no items. */
 ItemDropData battle_item_sinnosuke[] = {
     {0},
 };
 
+/** Bristle: holds and drops no items. */
 ItemDropData battle_item_togedaruma[] = {
     {0},
 };
 
+/** Bob-omb: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_bomhei[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -951,6 +1031,7 @@ ItemDropData battle_item_bomhei[] = {
     {0},
 };
 
+/** Bulky Bob-omb: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_heavy_bom[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 5},
@@ -963,6 +1044,7 @@ ItemDropData battle_item_heavy_bom[] = {
     {0},
 };
 
+/** Bob-ulk: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_giant_bomb[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 5},
@@ -975,6 +1057,7 @@ ItemDropData battle_item_giant_bomb[] = {
     {0},
 };
 
+/** Bandit: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_borodo[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -988,6 +1071,7 @@ ItemDropData battle_item_borodo[] = {
     {0},
 };
 
+/** Badge Bandit: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_badge_borodo[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -1001,6 +1085,7 @@ ItemDropData battle_item_badge_borodo[] = {
     {0},
 };
 
+/** Wizzerd: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_mahorn[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -1013,6 +1098,7 @@ ItemDropData battle_item_mahorn[] = {
     {0},
 };
 
+/** Dark Wizzerd: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_super_mahorn[] = {
     {0, 200, 300},
     {ITEM_LIFE_SHROOM, 10, 10},
@@ -1025,6 +1111,7 @@ ItemDropData battle_item_super_mahorn[] = {
     {0},
 };
 
+/** Elite Wizzerd: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_mahorn_custom[] = {
     {0, 200, 300},
     {ITEM_ULTRA_SHROOM, 10, 10},
@@ -1037,6 +1124,7 @@ ItemDropData battle_item_mahorn_custom[] = {
     {0},
 };
 
+/** Chain-Chomp: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_wanwan[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 10},
@@ -1047,6 +1135,7 @@ ItemDropData battle_item_wanwan[] = {
     {0},
 };
 
+/** Red Chomp: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_burst_wanwan[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 10},
@@ -1057,6 +1146,7 @@ ItemDropData battle_item_burst_wanwan[] = {
     {0},
 };
 
+/** Lava Bubble: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_bubble[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -1068,6 +1158,7 @@ ItemDropData battle_item_bubble[] = {
     {0},
 };
 
+/** Ember: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_hermos[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -1079,6 +1170,7 @@ ItemDropData battle_item_hermos[] = {
     {0},
 };
 
+/** Phantom Ember: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_phantom[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 5, 5},
@@ -1090,6 +1182,7 @@ ItemDropData battle_item_phantom[] = {
     {0},
 };
 
+/** Crazee Dayzee: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_pansy[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 10, 10},
@@ -1103,6 +1196,7 @@ ItemDropData battle_item_pansy[] = {
     {0},
 };
 
+/** Amazy Dayzee: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_twinkling_pansy[] = {
     {0, 200, 300},
     {ITEM_ULTRA_SHROOM, 10, 10},
@@ -1116,6 +1210,7 @@ ItemDropData battle_item_twinkling_pansy[] = {
     {0},
 };
 
+/** Dark Craw: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_dark_keeper[] = {
     {0, 200, 300},
     {ITEM_LIFE_SHROOM, 10, 10},
@@ -1129,6 +1224,7 @@ ItemDropData battle_item_dark_keeper[] = {
     {0},
 };
 
+/** Dark Bristle: held items and drops by weight, after a first row of no item. */
 ItemDropData battle_item_yamitogedaruma[] = {
     {0, 200, 300},
     {ITEM_SUPER_SHROOM, 0, 10},
@@ -1137,62 +1233,81 @@ ItemDropData battle_item_yamitogedaruma[] = {
     {0},
 };
 
+/** Vivian: holds and drops no items. */
 ItemDropData battle_item_vivian1[] = {
     {0},
 };
 
+/** Blooper: holds and drops no items. */
 ItemDropData battle_item_gesso[] = {
     {0},
 };
 
+/** Hooktail: holds and drops no items. */
 ItemDropData battle_item_gonbaba[] = {
     {0},
 };
 
+/** Smorg: holds and drops no items. */
 ItemDropData battle_item_moamoa[] = {
     {0},
 };
 
+/** Doopliss: holds and drops no items. */
 ItemDropData battle_item_rampell[] = {
     {0},
 };
 
+/** Doopliss's fake Mario: holds and drops no items. */
 ItemDropData battle_item_faker_mario[] = {
     {0},
 };
 
+/** Cortez: holds and drops no items. */
 ItemDropData battle_item_cortez[] = {
     {0},
 };
 
+/** Goomba Bros.: holds and drops no items. */
 ItemDropData battle_item_kurikuri[] = {
     {0},
 };
 
+/** Magnus: holds and drops no items. */
 ItemDropData battle_item_magnum_battender[] = {
     {0},
 };
 
+/** Macho Grubba: holds and drops no items. */
 ItemDropData battle_item_macho_gance[] = {
     {0},
 };
 
+/** Rawk Hawk: holds and drops no items. */
 ItemDropData battle_item_champion[] = {
     {0},
 };
 
+/** Lord Crump: holds and drops no items. */
 ItemDropData battle_item_kanbu1[] = {
     {0},
 };
 
+/** Bonetail: holds and drops no items. */
 ItemDropData battle_item_zonbaba[] = {
     {0},
 };
 
+/** Empty default drop table, used by a few units in bom, moo, aji and las battles: no held items or drops. */
 ItemDropData battle_item_default_param_list[] = {
     {0},
 };
 
+/**
+ * Hearts after a won battle, by Mario's HP (rows up to 20/30/50/80/100%): overall chance, then 2 rolls.
+ * The lookup stops at the first row that fits, so rows after the first 100% one are never read;
+ * the same holds for the other heart and flower tables.
+ */
 PointDropData battle_heart_drop_param_default[] = {
     {20, 70, 2, 50},
     {30, 60, 2, 50},
@@ -1246,6 +1361,7 @@ PointDropData battle_heart_drop_param_default[] = {
     {100, 30, 6, 40},
 };
 
+/** Hearts after a won battle, by Mario's HP (rows up to 20/30/50/80/100%): overall chance, then 3 rolls. */
 PointDropData battle_heart_drop_param_default2[] = {
     {20, 70, 3, 50},
     {30, 60, 3, 50},
@@ -1294,6 +1410,7 @@ PointDropData battle_heart_drop_param_default2[] = {
     {100, 30, 6, 40},
 };
 
+/** Hearts after a won battle, by Mario's HP (rows up to 20/30/50/80/100%): overall chance, then 4 rolls. */
 PointDropData battle_heart_drop_param_default3[] = {
     {20, 70, 4, 50},
     {30, 60, 4, 50},
@@ -1337,6 +1454,7 @@ PointDropData battle_heart_drop_param_default3[] = {
     {100, 30, 6, 40},
 };
 
+/** Hearts after a won battle, by Mario's HP (rows up to 20/30/50/80/100%): overall chance, then 5 rolls. */
 PointDropData battle_heart_drop_param_default4[] = {
     {20, 70, 5, 50},
     {30, 60, 5, 50},
@@ -1375,6 +1493,7 @@ PointDropData battle_heart_drop_param_default4[] = {
     {100, 30, 6, 40},
 };
 
+/** Hearts after a won battle, by Mario's HP (rows up to 20/30/50/80/100%): overall chance, then 6 rolls. */
 PointDropData battle_heart_drop_param_default5[] = {
     {20, 70, 6, 50},
     {30, 60, 6, 50},
@@ -1408,6 +1527,7 @@ PointDropData battle_heart_drop_param_default5[] = {
     {100, 30, 6, 40},
 };
 
+/** Flowers after a won battle, by Mario's FP (rows up to 20/30/50/80/100%): overall chance, then 2 rolls. */
 PointDropData battle_flower_drop_param_default[] = {
     {20, 40, 2, 40},
     {30, 40, 2, 40},
@@ -1436,6 +1556,7 @@ PointDropData battle_flower_drop_param_default[] = {
     {100, 30, 6, 40},
 };
 
+/** Flowers after a won battle, by Mario's FP (rows up to 20/30/50/80/100%): overall chance, then 3 rolls. */
 PointDropData battle_flower_drop_param_default2[] = {
     {20, 40, 3, 40},
     {30, 40, 3, 40},
@@ -1459,6 +1580,7 @@ PointDropData battle_flower_drop_param_default2[] = {
     {100, 30, 6, 40},
 };
 
+/** Flowers after a won battle, by Mario's FP (rows up to 20/30/50/80/100%): overall chance, then 4 rolls. */
 PointDropData battle_flower_drop_param_default3[] = {
     {20, 40, 4, 40},
     {30, 40, 4, 40},
@@ -1477,6 +1599,7 @@ PointDropData battle_flower_drop_param_default3[] = {
     {100, 30, 6, 40},
 };
 
+/** Flowers after a won battle, by Mario's FP (rows up to 20/30/50/80/100%): overall chance, then 5 rolls. */
 PointDropData battle_flower_drop_param_default4[] = {
     {20, 40, 5, 40},
     {30, 40, 5, 40},
@@ -1490,6 +1613,7 @@ PointDropData battle_flower_drop_param_default4[] = {
     {100, 30, 6, 40},
 };
 
+/** Flowers after a won battle, by Mario's FP (rows up to 20/30/50/80/100%): overall chance, then 6 rolls. */
 PointDropData battle_flower_drop_param_default5[] = {
     {20, 40, 6, 40},
     {30, 40, 6, 40},
@@ -1504,38 +1628,47 @@ ItemDropData battle_item_kinoko[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_funyafunya_kun[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_pow_block[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_dekadeka_drink[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_kirakira_otoshi[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_koorino_ibuki[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_fire_flower[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_yurayura_jishin[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_suitooru[] = {
     {0},
 };
 
+/** Empty drop table of a tst.rel test battle (PAL and the demos only). */
 ItemDropData battle_item_sinabita_kinoko[] = {
     {0},
 };

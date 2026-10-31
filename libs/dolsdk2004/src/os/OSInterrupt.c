@@ -4,6 +4,7 @@
 #include "__os.h"
 
 #if DEBUG
+/** Debug count of interrupts that arrived with no source bit set. */
 u64 __OSSpuriousInterrupts = 0;
 #endif
 static __OSInterruptHandler* InterruptHandlerTable;
@@ -12,6 +13,9 @@ volatile OSTime __OSLastInterruptTime;
 volatile __OSInterrupt __OSLastInterrupt;
 volatile u32 __OSLastInterruptSrr0;
 
+/**
+ * Interrupt masks in the order the dispatcher checks them: the first group with a pending interrupt is handled.
+ */
 static OSInterruptMask InterruptPrioTable[] = {
     OS_INTERRUPTMASK_PI_ERROR,
     OS_INTERRUPTMASK_PI_DEBUG,
@@ -28,6 +32,7 @@ static OSInterruptMask InterruptPrioTable[] = {
 };
 
 #if DEBUG
+/** Interrupt names printed by debug builds. */
 char* __OSInterruptNames[33] = {
     "MEM_0",
     "MEM_1",
@@ -64,6 +69,7 @@ char* __OSInterruptNames[33] = {
     "unknown"
 };
 
+/** Processor-interface error messages, printed with the PI error register as index. */
 char* __OSPIErrors[8] = {
     "No Error",
     "Misaligned address for CPU request",

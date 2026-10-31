@@ -19,6 +19,7 @@ static void envGlare(EnvironmentGlare* glare);
 
 //.data
 
+/** Glare filter type 0: the screen copy added back 16 times, up to 7 pixels off in a cross: a star glow. */
 EnvironmentGlare envGlare0 = {
     GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)0, 5.25f, 16, {
                                                                                             { -1.0f, 0.0f },
@@ -40,6 +41,7 @@ EnvironmentGlare envGlare0 = {
                                                                                         }
 };
 
+/** Glare filter type 1: the screen copy added back 8 times in a small ring around each pixel, a soft glow. */
 EnvironmentGlare envGlare1 = {
     GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)4, 3.5f, 8, {
                                                                                           { -1.41419994831f, -1.41419994831f },
@@ -53,6 +55,7 @@ EnvironmentGlare envGlare1 = {
                                                                                       }
 };
 
+/** Glare filter type 2: the screen copy added back 52 times over a filled diamond: a strong bloom. */
 EnvironmentGlare envGlare2 = {
     GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)6, 3.5f, 52, {
                                                                                            { 0.0f, -5.0f },
@@ -110,6 +113,7 @@ EnvironmentGlare envGlare2 = {
                                                                                        }
 };
 
+/** Glare filter type 3: the screen copy added back 16 times on a diamond ring 3 to 4 pixels out, a halo. */
 EnvironmentGlare envGlare3 = {
     GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)4, 3.5f, 16, {
                                                                                            { 0.0f, -4.0f },
@@ -135,7 +139,9 @@ EnvironmentGlare envGlare3 = {
 static EnvironmentWork work[2];
 
 //.sbss
+/** The environment textures (env.tpl: reflection maps, water ripples, darkness pattern), loaded at boot. */
 TEXPalette* env_tpl = NULL;
+/** Set once env.tpl has finished loading and is unpacked; cleared by envInit. */
 s32 tpl_ok = 0;
 
 // local prototypes
@@ -221,7 +227,7 @@ static void envCapture(CameraId camId, void* param) { // 1:1
     var1 = gp->efbHeight;
     var2 = (u16)(((u32)var0 & 0xFFFF) / 2);
     var3 = (u16)(((u32)var1 & 0xFFFF) / 2);
-    if (wp->flags & 1) {
+    if (wp->flags & ENV_FLAG_CAPTURE_COLOR) {
         GXSetTexCopySrc(0, 0, gp->fbWidth, gp->efbHeight);
         GXSetTexCopyDst(var2, var3, GX_TF_RGBA8, GX_TRUE);
         size = GXGetTexBufferSize(var2, var3, GX_TF_RGBA8, GX_FALSE, 0);
@@ -231,7 +237,7 @@ static void envCapture(CameraId camId, void* param) { // 1:1
         GXInitTexObj(&wp->captureObj, wp->capture->address, var2, var3, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&wp->captureObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     }
-    if (wp->flags & 2) {
+    if (wp->flags & ENV_FLAG_CAPTURE_DEPTH) {
         GXSetTexCopySrc(0, 0, var0, var1);
         GXSetTexCopyDst(var2, var3, GX_CTF_Z8M, GX_TRUE);
         size = GXGetTexBufferSize(var2, var3, GX_CTF_Z8M, GX_FALSE, 0);
@@ -253,7 +259,7 @@ static void envCapture2(CameraId camId, void* param) { // 1:1
 
     var0 = (u16)(((u32)gp->fbWidth & 0xFFFF) / 2);
     var1 = (u16)(((u32)gp->efbHeight & 0xFFFF) / 2);
-    if (wp->flags & 4) {
+    if (wp->flags & ENV_FLAG_BLUR_CAPTURE) {
         GXSetTexCopySrc(0, 0, gp->fbWidth, gp->efbHeight);
         GXSetTexCopyDst(var0, var1, GX_TF_RGB565, GX_TRUE);
         GXCopyTex(wp->envBlur, GX_FALSE);
@@ -261,11 +267,11 @@ static void envCapture2(CameraId camId, void* param) { // 1:1
         GXInitTexObj(&wp->envBlurObj, wp->envBlur, var0, var1, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD(&wp->envBlurObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     }
-    if (wp->flags & 0x40000000) {
-        if ((wp->blurWork & 1) && (wp->flags & 8)) {
-            wp->flags &= ~4;
+    if (wp->flags & ENV_FLAG_BLUR) {
+        if ((wp->blurWork & 1) && (wp->flags & ENV_FLAG_BLUR_READY)) {
+            wp->flags &= ~ENV_FLAG_BLUR_CAPTURE;
         }
-        wp->flags |= 8;
+        wp->flags |= ENV_FLAG_BLUR_READY;
     }
 }
 
@@ -301,7 +307,7 @@ static void envDisp2(CameraId camId, void* param) { // almost 1:1, needs extra a
     GXGetProjectionv(pm);
     wp = envGetWork();
     filter = &wp->filter; // CodeWarrior is very good compiler, yesyes
-    if (wp->flags & 0x20000000) {
+    if (wp->flags & ENV_FLAG_GLARE) {
         switch (filter->type) {
             case 0:
                 break;
@@ -333,6 +339,7 @@ void envMain(void) {
 
 #define PI 3.141592653589793f
 #define TWO_PI 6.283185307179586f
+/** Texture matrix slots (GX_TEXMTX0 to 9) by index, for the environment textures and depth of field. */
 static const s32 texmtx_tbl[] = {30, 33, 36, 39, 42, 45, 48, 51, 54, 57};
 
 static inline f32
@@ -426,6 +433,7 @@ static inline f32 dofDiv(f32 a, f32 b) {
     GXPosition3f32(-(s32)(g)->fbWidth / (half), -(s32)(g)->efbHeight / (half), 0.0f);  \
     GXTexCoord2f32(0.0f, 1.0f)
 
+/** Opaque white, the TEV colour of the depth-of-field pass (envDisp_DepthOfField). */
 static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 
 // FAKE: turns off copy propagation so the temporaries and registers match the target; removing it changes the code
@@ -469,7 +477,7 @@ static void envDisp_DepthOfField(void) {
     tbl[0] = texmtx_tbl;
     mg[0] = 0x43300000;
     dof = &wp->dof;
-    if (wp->flags & 0x80000000) {
+    if (wp->flags & ENV_FLAG_DOF) {
         /* FAKE: cam is a one-element array so it becomes an @ temp numbered between mg and tbl2 */
         cam[0] = camGetPtr(CAMERA_2D);
         // FAKE: dead guard (gz is 0) gives cam a second def, so it stays a named web instead of the call-result temp
@@ -497,7 +505,7 @@ static void envDisp_DepthOfField(void) {
         for (k = 0; k < 1; k++) {
             GXSetCullMode(GX_CULL_NONE);
         }
-        if ((dof->flags & 1) && dof->radius1) {
+        if ((dof->flags & ENV_DOF_PASS1) && dof->radius1) {
             tbl[0] = texmtx_tbl;
             coord = 0;
             stage = 0;
@@ -538,7 +546,7 @@ static void envDisp_DepthOfField(void) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             DOF_QUAD(gp, 2.0f);
         }
-        if ((dof->flags & 2) && dof->radius2) {
+        if ((dof->flags & ENV_DOF_PASS2) && dof->radius2) {
             /* FAKE: dead read of i2 with a different type. It stops the first front end pass from scalarizing i2;
                the read is then deleted and the second pass scalarizes it, so its @ temp is created after the
                CSE temps and numbers below them. */
@@ -623,7 +631,7 @@ static void envDisp_Blur(void) {
     u8 alpha;
     GXColor c;
 
-    if ((wp->flags & 0x40000000) && (wp->flags & 8)) {
+    if ((wp->flags & ENV_FLAG_BLUR) && (wp->flags & ENV_FLAG_BLUR_READY)) {
         cam = camGetPtr(CAMERA_2D);
         GXSetProjection(camGetPtr(CAMERA_2D)->projection, cam->projType);
         GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
@@ -680,9 +688,9 @@ void envBlurOn(s32 type, s32 msec) {
     EnvironmentWork* wp = envGetWork();
     EnvBlurWork* blur = (EnvBlurWork*)&wp->blurWork;
 
-    wp->flags |= 0x40000000;
-    wp->flags |= 4;
-    wp->flags &= ~8;
+    wp->flags |= ENV_FLAG_BLUR;
+    wp->flags |= ENV_FLAG_BLUR_CAPTURE;
+    wp->flags &= ~ENV_FLAG_BLUR_READY;
     memset(blur, 0, sizeof(EnvBlurWork));
     blur->time = gp->renderTime;
     blur->msec = msec;
@@ -697,8 +705,8 @@ void envBlurOn(s32 type, s32 msec) {
 void envBlurOff(void) {
     EnvironmentWork* wp = envGetWork();
 
-    wp->flags &= ~4;
-    wp->flags &= ~0x40000000;
+    wp->flags &= ~ENV_FLAG_BLUR_CAPTURE;
+    wp->flags &= ~ENV_FLAG_BLUR;
     _mapFree(wp->envBlur);
 }
 
@@ -789,7 +797,7 @@ static void envGlare(EnvironmentGlare* glare) {
         }
     }
 
-    if (glareFilter->flags & 1) {
+    if (glareFilter->flags & ENV_GLARE_FLAG_DEPTH) {
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     } else {
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
@@ -821,7 +829,7 @@ static void envGlare(EnvironmentGlare* glare) {
         batchCount = 0;
         texMtxId = 0x1E;
         while ((batchCount < 8) && (doneCount < glareCount)) {
-            MTXTrans(texMtx, (glare->coordScale * glareCur->coords[0].x) / (f32)gp->fbWidth, (glare->coordScale * glareCur->coords[0].y) / (f32)gp->efbHeight, 0.0f); // temp_r4, temp_r5_3, as 2 3 and temp_f4 as last
+            MTXTrans(texMtx, (glare->coordScale * glareCur->coords[0].x) / (f32)gp->fbWidth, (glare->coordScale * glareCur->coords[0].y) / (f32)gp->efbHeight, 0.0f);
             GXLoadTexMtxImm(texMtx, texMtxId, 1);
             texMtxId += 3;
             batchCount += 1;
@@ -859,7 +867,7 @@ void envGlareFilter(s32 type, s32 y0, s32 x0, s32 y1, s32 x1) {
         f->y1 = 0;
         f->x0 = 0;
         f->y0 = 0;
-        wp->flags &= ~0x20000000;
+        wp->flags &= ~ENV_FLAG_GLARE;
         return;
     }
     sx0 = x0 - (x0 & 1);
@@ -884,8 +892,8 @@ void envGlareFilter(s32 type, s32 y0, s32 x0, s32 y1, s32 x1) {
     f->y1 = sy1;
     f->x1 = sx1;
     f->zscale = 0.0f;
-    f->flags &= ~1;
-    wp->flags |= 0x20000000;
+    f->flags &= ~ENV_GLARE_FLAG_DEPTH;
+    wp->flags |= ENV_FLAG_GLARE;
 }
 
 /** Sets the depth scale of the glare filter and makes it depth-dependent. No caller in this tree. */
@@ -894,7 +902,7 @@ void envGlareFilterZ(f32 zscale) {
     EnvironmentGlareFilter* f = &wp->filter;
 
     f->zscale = zscale;
-    f->flags |= 1;
+    f->flags |= ENV_GLARE_FLAG_DEPTH;
 }
 
 // FAKE: #pragma opt_propagation off and opt_lifetimes off for envDisp_FF: no copy propagation or lifetime splitting, which gives the target temporaries and registers; without them envDisp_FF is 375 instructions instead of 368
@@ -913,7 +921,7 @@ static void envDisp_FF(void) {
     f32 ofs;
     s32 i;
 
-    if (wp->flags & 0x10000000) {
+    if (wp->flags & ENV_FLAG_FF_LINES) {
         GXSetNumChans(0);
         GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         GXSetNumTexGens(1);
@@ -962,8 +970,6 @@ typedef struct EnvTexMtxWork {
     f32 rotX;     // 0x84
 } EnvTexMtxWork;
 #define tw ((EnvTexMtxWork*)wp->texMtxWork)
-
-double acos(double);
 
 /**
  * Builds and loads the texture matrix for environment TEV type type (reflection maps from the surface normals as
@@ -1161,7 +1167,8 @@ envLoadTex(u32 id, s32 map) {
  * Map TEV callback: adds the TEV stages and texture generation for environment effect type (reflection and shine
  * textures from env.tpl, 1..10) to a map object's material, advancing the stage,
  * texture coordinate and map counters in info.
- * No direct caller in this tree; Guess: the map driver reaches it through a material callback.
+ * Map RELs call it from their own TEV callbacks installed with evt_map_set_tevcallback
+ * (the trains in gor_04 and pik_00 with type 7, pik_01 with 4 and 7, hom_10 with 7).
  */
 void envAddTev(s32 type, MapTevCallbackInfo* info) {
     s32 stage;
@@ -1338,7 +1345,7 @@ static inline MapObject* envWaterParent(MapObject* o) {
  * Map TEV callback for refracting water: copies the screen area behind the water object (from the previous
  * frame's screen rectangle, at half size), builds a wavy indirect texture whose strength grows as the camera
  * gets closer, and warps the copy through it onto the surface. Skips the first frame an object is seen.
- * No direct caller in this tree; Guess: reached through the map driver's material callbacks like envAddTev.
+ * Called from map TEV callbacks installed with evt_map_set_tevcallback (dou_00, hei_09).
  */
 void envSetWater(MapTevCallbackInfo* info) {
     MapObject* obj;
@@ -1371,11 +1378,11 @@ void envSetWater(MapTevCallbackInfo* info) {
     map = info->texCoord;
     coord = info->texMap;
     ind = info->indStage;
-    if (obj->flags & 0x20) {
+    if (obj->flags & MAPOBJ_FLAG_IN_GROUP) {
         while ((obj = envWaterParent(obj)) != NULL) {
-            if (obj->flags & 0x10) {
-                if (!(obj->flags & 0x20000000)) {
-                    obj->flags |= 0x20000000;
+            if (obj->flags & MAPOBJ_FLAG_GROUP) {
+                if (!(obj->flags & MAPOBJ_FLAG_BBOX)) {
+                    obj->flags |= MAPOBJ_FLAG_BBOX;
                     return;
                 }
                 x0 = obj->screenRect[0];
@@ -1386,8 +1393,8 @@ void envSetWater(MapTevCallbackInfo* info) {
             }
         }
     } else {
-        if (!(obj->flags & 0x20000000)) {
-            obj->flags |= 0x20000000;
+        if (!(obj->flags & MAPOBJ_FLAG_BBOX)) {
+            obj->flags |= MAPOBJ_FLAG_BBOX;
             return;
         }
         x0 = obj->screenRect[0];
@@ -1502,7 +1509,8 @@ void envSetYamiView(Mtx view) {
  * Map TEV callback for the darkness (yami) effect:
  * projects two env.tpl patterns (9 and 10) scrolling in opposite directions over the surface
  * and multiplies them into the material's colour.
- * No direct caller in this tree; Guess: used for the dark, shadowy surfaces such as the Palace of Shadow.
+ * Installed with evt_map_set_tevcallback in the chapter 8 world-darkening scenes (sekai_yami) of Rogueport,
+ * Petalburg, the Great Tree, Fahr Outpost and others, after the map sets the pattern view with envSetYamiView.
  */
 void envSetYami(MapTevCallbackInfo* info) {
     static f32 u1 = 0.0f;

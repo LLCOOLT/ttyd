@@ -58,6 +58,7 @@ extern EvtWord evt_treeb_01[];
 static TreeAccess tree_tbl[7];
 static KusaAccess kusa_tbl[7];
 
+/** Doors and exits of muj_02: w_bero to muj_01; e_bero to muj_03; dokan_1 to tik_17 (Rogueport Sewers). */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -183,6 +184,7 @@ EVT_BEGIN(lost_wedding_ring)
     DELETE_EVENT(LW(0))
     CALL(evt_npc_get_reglid, STRING("ピートン"), LW(0))
     DELETE_EVENT(LW(0))
+    // Mony and Peeton are placed; Mario and his partner approach them.
     CALL_CHILD(mony_peton_setup)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -193,6 +195,7 @@ EVT_BEGIN(lost_wedding_ring)
     CALL(evt_set_dir_to_target, STRING("ピートン"), STRING("mario"))
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // Peeton and Mony learn that the boss is sick.
     CALL(evt_msg_print, 0, STRING("stg5_muj_171"), 0, STRING("ピートン"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_172"), 0, STRING("モニー"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -205,6 +208,7 @@ EVT_BEGIN(lost_wedding_ring)
     DIVIDE(LW(0), 2)
     CALL(evt_cam3d_evt_set, LW(0), 118, 343, LW(0), 54, -18, 500, 11)
     WAIT_MS(500)
+    // Mony explains that she dropped the wedding ring and Peeton tries to calm her.
     CALL(evt_msg_print, 0, STRING("stg5_muj_173"), 0, STRING("モニー"))
     CALL(evt_set_dir_to_target, STRING("ピートン"), STRING("モニー"))
     WAIT_MS(500)
@@ -213,6 +217,7 @@ EVT_BEGIN(lost_wedding_ring)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg5_muj_175"), 0, STRING("モニー"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_176"), 0, STRING("ピートン"))
+    // Mony makes Peeton promise to say he loves her 100 times.
     CALL(evt_msg_print, 0, STRING("stg5_muj_177"), 0, STRING("モニー"))
     CALL(evt_npc_get_position, STRING("ピートン"), LW(0), LW(1), LW(2))
     CALL(evt_npc_jump_position_nohit, STRING("ピートン"), LW(0), LW(1), LW(2), 225, 30)
@@ -229,6 +234,7 @@ EVT_BEGIN(lost_wedding_ring)
     SET_VALUE(GW(0), 10)
     SPAWN_EVENT_GET_ID(PTR(lost_wedding_ring_sub), LW(0))
     LOOP(90)
+        // Peeton says it again and again, tiring himself out.
         CALL(evt_msg_print_add, 0, STRING("stg5_muj_182_01"))
         ADD(GW(0), 1)
     END_LOOP
@@ -237,6 +243,7 @@ EVT_BEGIN(lost_wedding_ring)
     CALL(evt_msg_print_add, 0, STRING("stg5_muj_182_03"))
     CALL(evt_set_dir_to_target, STRING("モニー"), STRING("ピートン"))
     WAIT_MS(500)
+    // Mony forgives him.
     CALL(evt_msg_print, 0, STRING("stg5_muj_183"), 0, STRING("モニー"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_184"), 0, STRING("ピートン"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -245,6 +252,7 @@ EVT_BEGIN(lost_wedding_ring)
     DIVIDE(LW(0), 2)
     CALL(evt_cam3d_evt_set, LW(0), 118, 343, LW(0), 54, -18, 500, 11)
     WAIT_MS(500)
+    // Mario's partner comments on the ring and the scene wraps up.
     CALL(evt_pouch_check_item, ITEM_WEDDING_RING, LW(10))
     IF_INT_EQUAL(LW(10), 0)
         CALL(evt_msg_print_party, STRING("stg5_muj_185"))
@@ -273,6 +281,7 @@ EVT_BEGIN(lost_wedding_ring)
     RETURN
 EVT_END()
 
+/** Items the player may hand over in the wedding-ring scene: the Wedding Ring only, ended by -1. */
 static s32 itemsel_table00[] = {
     ITEM_WEDDING_RING, -1,
 };
@@ -362,7 +371,7 @@ EVT_BEGIN(find_wedding_ring)
 EVT_END()
 
 /**
- * Init event of Mony in the jungle: she cannot be pushed around (status bit 2)
+ * Init event of Mony in the jungle: sets status bit 2 (she turns to face the way she moves)
  * and between STORY_STG5_63_KEELHAUL_ANYTIME and STORY_STG5_64_LOST_WEDDING_RING she is placed at (500, 0, -40).
  */
 static EVT_BEGIN(mony_init)
@@ -445,7 +454,7 @@ static EVT_BEGIN(mony_talk)
 EVT_END()
 
 /**
- * Init event of Peton in the jungle: status bit 2 set,
+ * Init event of Peton in the jungle: NPC_STATUS_FACE_MOVE_DIR set (he turns to face the way he moves),
  * and between STORY_STG5_63_KEELHAUL_ANYTIME and STORY_STG5_64_LOST_WEDDING_RING he is placed beside Mony.
  */
 static EVT_BEGIN(peton_init)
@@ -491,6 +500,7 @@ static EVT_BEGIN(peton_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the jungle clearing: Mony and Peeton, the couple looking for their lost wedding ring. */
 static NpcSetupInfo npcEnt[] = {
     {
         "モニー", // name
@@ -519,14 +529,15 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Return point of the hazard-water floor A_yuka_01 of this room. */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"A_yuka_01", {0}},
     {0},
 };
 
 /**
- * Guess: shows the sewer pipe (S_dakan, A_dokan) only once GSWF_TIK17_PIPE_MUJ_OPEN is set,
- * which the pipe in Rogueport sets from the other end.
+ * Until GSWF_TIK17_PIPE_MUJ_OPEN is set (by the tornado switch in the Rogueport sewers room tik_17),
+ * hides the warp pipe's model group S_dakan and turns off its hit A_dokan.
  */
 static EVT_BEGIN(evt_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_MUJ_OPEN), 0)
@@ -573,6 +584,7 @@ static EVT_BEGIN(evt_kusa_6)
 EVT_END()
 
 #if VERSION >= VERSION_US
+/** Trees of muj_02 that Mario can shake with his hammer (6 in all). */
 static TreeAccess tree_tbl[] = {
     {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
     {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
@@ -583,6 +595,7 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/** Trees of muj_02 that Mario can shake with his hammer (6 in all); A_treeB_01 runs evt_treeb_01. */
 TreeAccess tree_tbl_treeb_evt[] = {
     {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
     {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
@@ -593,6 +606,7 @@ TreeAccess tree_tbl_treeb_evt[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 #else
+/** Trees of muj_02 that Mario can shake with his hammer (6 in all); A_treeB_01 runs evt_treeb_01. */
 static TreeAccess tree_tbl[] = {
     {5, "A_treeA_01", "treeA_01_m", "treeA_01_ha", 0, NULL},
     {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
@@ -604,6 +618,10 @@ static TreeAccess tree_tbl[] = {
 };
 #endif
 
+/**
+ * Bushes of muj_02 that Mario can check for hidden things (6 in all); A_kuwa_move_02 runs evt_kusa_2,
+ * A_kuwa_move_06 runs evt_kusa_6.
+ */
 static KusaAccess kusa_tbl[] = {
     {1, "A_kuwa_move_01", "S_kuwa_move_01", NULL},
     {1, "A_kuwa_move_02", "S_kuwa_move_02", evt_kusa_2},

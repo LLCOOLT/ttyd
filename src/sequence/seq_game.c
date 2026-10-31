@@ -20,7 +20,7 @@ EVT_END()
 /** Enters the field sequence: records the time (none_key, otherwise unused here) and clears system level flag 0x10. */
 void seq_gameInit(SequenceWork* wp) {
     none_key = OSGetTime();
-    gp->systemLevelFlags &= ~0x10;
+    gp->systemLevelFlags &= ~SYSTEM_LEVEL_FLAG_NO_BATTLE;
 }
 
 /**

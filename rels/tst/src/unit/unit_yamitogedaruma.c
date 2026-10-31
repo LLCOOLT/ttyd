@@ -29,6 +29,11 @@ static EvtWord dmg_turn_event[131];
 static EvtWord attack_event[358];
 static EvtWord wait_event[102];
 
+/**
+ * Unit data of the test-area Dark Bristle (kind 165): a spiked rock creature with 8 HP and high Defense.
+ * Jumping on it or hammering its front hurts the attacker; it charges at its target,
+ * and a flip leaves it helpless on its back for a turn.
+ */
 BattleUnitKind unit_yamitogedaruma = {
     165,
     "btl_un_yamitogedaruma",
@@ -103,18 +108,32 @@ BattleUnitKind unit_yamitogedaruma = {
     data_table,
 };
 
+/** Damage reduction of the Dark Bristle while upright: 4 against every kind of hit. */
 static BattleUnitDefense defence = {{4, 4, 4, 4, 4}};
 
+/** The Dark Bristle has no elemental defence. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Damage reduction while flipped on its back: none, so it takes full damage. */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerabilities of the Dark Bristle (percent chance per status;
+ * the newer releases tweak a few values).
+ */
 static StatusVulnerability regist = {20, 70, 30, 100, 30, 100, 100, 50, 100, 50, 100, 50, 100, 50, 50, 30, 55, 100, 50, 100, 100, 30};
 #else
+/**
+ * Status vulnerabilities of the Dark Bristle (percent chance per status;
+ * the newer releases tweak a few values).
+ */
 static StatusVulnerability regist = {20, 80, 20, 100, 20, 100, 100, 40, 100, 50, 100, 50, 100, 100, 40, 30, 20, 100, 40, 100, 100, 30};
 #endif
 
+/**
+ * Poses of the upright Dark Bristle (TGD_*): rolled-up standing frames, hurt, charge and talking poses.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "TGD_N_1"},
     {2, "TGD_I_1"},
@@ -136,6 +155,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "TGD_S_4"},
 };
 
+/**
+ * Poses of the flipped Dark Bristle: the on-its-back frames (TGD_*_2 and similar) it uses until it rights
+ * itself.
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "TGD_N_2"},
     {2, "TGD_I_2"},
@@ -154,6 +177,11 @@ static PoseTableEntry pose_table_turn[] = {
     {BTL_POSE_STAY_DEFAULT, "TGD_S_5"},
 };
 
+/**
+ * Data table of the Dark Bristle: event 13 flips it over, events 37 (spikes on top),
+ * 38 and 39 (spikes in front) run when the attacker is hurt by its spikes,
+ * and event 48 (First Strike) does nothing.
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
@@ -163,10 +191,18 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * The Dark Bristle's single part: the dark Bristle model (c_togedaruma_b), the main target;
+ * it carries counter attributes that mark its top and front spikes.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_yamitogedaruma", "c_togedaruma_b", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0x7, pose_table},
+    {1, "btl_un_yamitogedaruma", "c_togedaruma_b", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_BOMB_FLIPPABLE, COUNTER_ATTR_TOP_SPIKY | COUNTER_ATTR_PREEMPTIVE_FRONT_SPIKY | COUNTER_ATTR_FRONT_SPIKY, pose_table},
 };
 
+/**
+ * The Dark Bristle's charge: 8 damage (7 in the demos) to the front-most opposing target,
+ * a hammer-like blow that is guardable and superguardable; the spikes make it hurt whoever touches it.
+ */
 static BattleWeapon weapon_togedaruma_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -189,7 +225,7 @@ static BattleWeapon weapon_togedaruma_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -228,12 +264,12 @@ EVT_END()
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 58)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 32)
         GOTO(90)
@@ -255,7 +291,7 @@ EVT_END()
 static EVT_BEGIN(dmg_avoid_counter_thorn_front_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 17, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_FLIPPED, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_3"))
             WAIT_FRAMES(60)
@@ -268,13 +304,13 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_front_event)
     END_SIBLING_EVENT
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 53)
         ADD(LW(1), 26)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 33)
         ADD(LW(1), 16)
@@ -309,7 +345,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_GetOverTurnCount, LW(10), LW(12))
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
@@ -358,7 +394,7 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     SET_VALUE(LW(12), 0)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 10, 0)
@@ -394,11 +430,14 @@ EVT_END()
  * a hit shakes the camera and damages the target (8 damage, 7 in the demos). It then hops home.
  */
 static EVT_BEGIN(attack_event)
+    // While it is lying on its back it only counts down and rights itself instead of attacking.
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // After a First Strike it attacks the unit that was struck;
+    // otherwise it may use an item or picks the front-most target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -415,18 +454,20 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_togedaruma_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the camera follows the target.
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_togedaruma_attack))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_togedaruma_attack))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // It rears up, then curls into a ball and charges at the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_1"))
     WAIT_FRAMES(10)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE2"), EVT_NULLPTR, 0, LW(15))
@@ -439,7 +480,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togedaruma_attack), 256, LW(5))
+    // It rolls up to the target and the game decides whether the charge connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togedaruma_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -461,6 +503,8 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Dodged, blocked or missed: it rolls past onto the target's spot, sits there for a second and a half,
+    // then rears up.
     LABEL(90)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_A_1"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -475,15 +519,17 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGD_J_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE5"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // Hit: the camera shakes and zooms out and the damage lands.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_togedaruma_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togedaruma_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togedaruma_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(evt_snd_sfxoff, LW(15))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // It hops back to its home position, uncurls and returns to idle.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -507,34 +553,34 @@ static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
     SET_VALUE(LW(15), 0)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_SLEEP, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_STOP, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 3, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_DIZZY, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_POISON, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 9, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_FREEZE, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         ADD(LW(15), 1)
     END_IF
     IF_INT_NOT_EQUAL(LW(15), 0)
-        CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 2)
+        CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_PREEMPTIVE_FRONT_SPIKY)
     ELSE
-        CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 2)
+        CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_PREEMPTIVE_FRONT_SPIKY)
     END_IF
     WAIT_FRAMES(1)
     GOTO(0)

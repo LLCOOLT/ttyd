@@ -70,6 +70,10 @@ static USER_FUNC(bubble_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit data of the Phantom Ember: 10 HP, 26x36 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_phantom = {
     124,
     "btl_un_phantom",
@@ -128,7 +132,7 @@ BattleUnitKind unit_phantom = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     2,
     parts,
@@ -136,16 +140,33 @@ BattleUnitKind unit_phantom = {
     data_table,
 };
 
+/** Defence of the Phantom Ember: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Defence attributes of the Phantom Ember: fire hits heal it; ice hits do one extra damage;
+ * explosion hits do one extra damage.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 3, 1, 1, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of the Phantom Ember (percent chance each status takes hold):
+ * immune to burn; resists sleep (40%), dizzy (65%), poison (25%), confusion (65%), freeze (40%),
+ * Tiny (65%), Attack Down (65%), Defense Down (65%), allergic (65%), fright (40%), Slow (65%);
+ * the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {40, 80, 65, 25, 65, 100, 0, 40, 100, 65, 100, 65, 100, 65, 65, 40, 80, 100, 65, 100, 100, 90};
 #else
+/**
+ * Retail builds: Status vulnerability of the Phantom Ember (percent chance each status takes hold):
+ * immune to burn; resists sleep (40%), confusion (65%), freeze (40%), allergic (65%), fright (40%),
+ * Slow (65%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {40, 80, 100, 100, 65, 100, 0, 40, 100, 80, 100, 80, 100, 90, 65, 40, 80, 100, 65, 100, 100, 90};
 #endif
 
+/** Pose table of the Phantom Ember: maps its battle poses to its animations. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -153,20 +174,21 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_2B"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Event table of the Phantom Ember: damage_fire_explosion_event (tag 11), avoid_fire_event (tag 40). */
 static BattleDataEntry data_table[] = {
     {11, damage_fire_explosion_event},
     {40, avoid_fire_event},
@@ -174,11 +196,15 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of the Phantom Ember: 1 part (model c_phantom). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_phantom", "c_phantom", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x109, 0x10, pose_table},
-    {2, NULL, "c_phantom", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_phantom", "c_phantom", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 35.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_WEAK_TO_ICE_POWER, COUNTER_ATTR_FIERY, pose_table},
+    {2, NULL, "c_phantom", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/**
+ * Weapon of the Phantom Ember (attack): targets one unit for 5 damage, fire element; used by attack_event.
+ */
 static BattleWeapon weapon_bubble_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -197,7 +223,7 @@ static BattleWeapon weapon_bubble_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -221,6 +247,10 @@ static BattleWeapon weapon_bubble_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of the Phantom Ember (fire attack): targets one unit for 5 damage, fire element, ignores Defense,
+ * may inflict Burn (75%, 3 turns); used by attack_event.
+ */
 static BattleWeapon weapon_bubble_fire_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -239,7 +269,7 @@ static BattleWeapon weapon_bubble_fire_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -264,6 +294,10 @@ static BattleWeapon weapon_bubble_fire_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Spawn setup for the Phantom Ember (unit_phantom): enemy side, placed off-screen at first;
+ * used by friend_event.
+ */
 static BattleUnitSetup entry_bubble = {
     &unit_phantom, // unitKindParams
     1, // alliance
@@ -311,9 +345,9 @@ static EVT_BEGIN(avoid_fire_event)
 EVT_END()
 
 /**
- * Guess: event (data table entry 11) run when the Phantom Ember is hit by an explosion or fire and splits:
- * it waits, then looks for free space beside it on either side (btlevtcmd_CheckSpace)
- * and calls friend_event there.
+ * Run when a fire hit lands on the Phantom Ember (data table entry 11, damage code 0x18), which makes it split:
+ * it takes pose A_2B, waits as many frames as its x position, then looks for free space beside it, first behind
+ * and then in front (btlevtcmd_CheckSpace), and calls friend_event there to spawn a new Phantom Ember.
  */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -354,7 +388,8 @@ static EVT_BEGIN(damage_fire_explosion_event)
 EVT_END()
 
 /**
- * Splitting move of the Phantom Ember: a new Ember (entry_bubble, a normal Ember) is spawned at its position,
+ * Splitting move of the Phantom Ember: a new Phantom Ember (entry_bubble, which uses this unit kind) is spawned
+ * at its position,
  * copies its status (bubble_copy_status), spins and jumps to the free spot found by the caller.
  */
 static EVT_BEGIN(friend_event)
@@ -430,7 +465,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -443,6 +478,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // The camera pulls in as the Phantom Ember drifts toward its target with a floating sound.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -451,6 +487,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_FRAMES(120)
     END_SIBLING_EVENT
+    // It swoops down in front of its target in two dives, ending right next to it.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 13)
@@ -492,6 +529,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is blocked: it still breathes its flame (A_1B), but the target avoids it.
     LABEL(90)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     LOOP(4)
@@ -499,6 +537,8 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(10)
     END_LOOP
     GOTO(98)
+    // The attack hits: the camera shakes and pulls back, the flame burns the target and the Action Command
+    // defence result is applied.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -506,13 +546,15 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(10)
     LOOP(3)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
         WAIT_FRAMES(10)
     END_LOOP
     GOTO(98)
+    // The Phantom Ember floats back up and away in three dives to its starting spot, then settles into its
+    // idle pose.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -591,7 +633,7 @@ static EVT_BEGIN(fire_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -606,12 +648,14 @@ static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 0)
     BEGIN_SIBLING_EVENT
+        // The Phantom Ember tilts back (T_1) for a moment while it conjures a fireball.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("T_1"))
         WAIT_FRAMES(30)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     END_SIBLING_EVENT
+    // The fireball (part 2) appears at the Phantom Ember with a fire effect trailing behind it.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 5)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
@@ -627,6 +671,7 @@ static EVT_BEGIN(fire_attack_event)
     MULTIPLY_FLOAT(LW(12), FLOAT(0.5996094f))
     ADD_FLOAT(LW(0), LW(10))
     ADD_FLOAT(LW(2), LW(12))
+    // The fireball flies toward the target in three arcing dives that get shorter as it closes in.
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 5)
@@ -641,8 +686,9 @@ static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 30, 0, 1, 0, -1)
+    // The fireball reaches the target and disappears.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -667,12 +713,15 @@ static EVT_BEGIN(fire_attack_event)
     END_SWITCH
     LABEL(90)
     GOTO(98)
+    // The fireball hits: a puff of smoke bursts, the Action Command defence result is applied and damage is
+    // dealt.
     LABEL(91)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 16, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
+    // The camera resets and the Phantom Ember pauses a moment.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(400)
@@ -723,7 +772,7 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
 EVT_END()
 
 /**
- * Attack of the Phantom Ember on every target (Guess: unused, nothing calls it):
+ * Attack of the Phantom Ember on every target; unused, as nothing in the file calls it:
  * it shakes while charging, then fire rains on the whole opposing side (ten eff_all_fire showers),
  * and each target gets its dodge or hit check in turn. It then returns to its home position.
  */
@@ -737,7 +786,7 @@ static EVT_BEGIN(all_fire_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -748,6 +797,8 @@ static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // The camera zooms out to take in every target while the Phantom Ember floats back (A_1A) to its firing
+    // spot.
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -762,6 +813,7 @@ static EVT_BEGIN(all_fire_attack_event)
 #endif
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // It charges up (A_2A), trembling from side to side for about 80 frames.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     LOOP(20)
@@ -773,16 +825,20 @@ static EVT_BEGIN(all_fire_attack_event)
     BEGIN_SIBLING_EVENT
         SET_VALUE(LW(0), 0)
         LOOP(10)
+            // Ten fireballs shoot out one after another across the stage.
             SPAWN_EVENT(all_fire_attackEvent_sub)
             WAIT_FRAMES(2)
             ADD(LW(0), 1)
         END_LOOP
     END_SIBLING_EVENT
+    // It breathes the fire out (A_2B) and the camera follows the flames.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
+    // Each target is checked in turn: a miss, or a hit that applies damage (the defence result counts for the
+    // first target only).
     LABEL(0)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
@@ -812,7 +868,7 @@ static EVT_BEGIN(all_fire_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -820,6 +876,7 @@ static EVT_BEGIN(all_fire_attack_event)
         ADD(LW(10), 1)
         GOTO(0)
     END_IF
+    // After a long pause (180 frames) it floats back to its starting spot.
     LABEL(98)
     WAIT_FRAMES(180)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))

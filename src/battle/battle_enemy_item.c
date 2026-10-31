@@ -1,6 +1,6 @@
 // Enemy item use: decides which healing, support or attack item an enemy unit should use.
 #pragma optimize_for_size on
-// inlining off for BattleEnemyUseItemCheck, _check_hp_recover_item, _check_fp_recover_item and 4 more, as in the original (the object differs without it)
+// FAKE: inlining off for the whole file (FAKES.md); without it 1 function changes length, e.g. BattleEnemyUseItemCheck 82 -> 426 instructions
 #pragma dont_inline on
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
@@ -144,7 +144,7 @@ static void* _check_attack_item(BattleUnit* self) {
     if (targets->numTargets <= 0) {
         return NULL;
     }
-    if (itemId == 0x8B || itemId == 0x85) {
+    if (itemId == ITEM_POW_BLOCK || itemId == ITEM_EARTH_QUAKE) {
         for (i = 0; i < targets->numTargets; i++) {
             GETUNIT();
             if (unit->currentKind == UNIT_KOOPS && !NOFLAG && !BtlUnit_CanActStatus(unit)) {

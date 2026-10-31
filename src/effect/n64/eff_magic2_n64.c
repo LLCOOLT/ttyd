@@ -33,6 +33,7 @@ typedef struct EffMagic2N64Work {
     f32 f5c;
 } EffMagic2N64Work;
 
+/** Colours the magic burst cycles through, eight RGB entries. */
 static u8 color_rotation_data[24] = {0xFF, 0xC5, 0x9C, 0xFF, 0x9C, 0xFF, 0xFF, 0x73, 0xD6, 0xFF, 0x9C, 0xFF,
                                      0xFF, 0xC5, 0x7B, 0xFF, 0xB4, 0xFF, 0xDE, 0x73, 0xFF, 0xFF, 0x94, 0x9C};
 
@@ -41,6 +42,7 @@ static void effMagic2Disp(CameraId cameraId, EffectEntry* effect);
 static void magic2_2_line_dl(void);
 static void magic2_4_dl(void);
 
+/** Type 0 mesh: a 12-sided tube of long streaks reaching 2000 units deep. */
 effN64Vtx stg_magic2_2_line_v[] = {
     {-87, 50, 0, 5461, 2048, 255, 255, 255, 0},
     {-87, 50, -2000, 5461, 0, 255, 255, 255, 255},
@@ -70,6 +72,7 @@ effN64Vtx stg_magic2_2_line_v[] = {
     {87, 50, -2000, 2731, 0, 255, 255, 255, 255},
 };
 
+/** Type 1 mesh: a 12-sided short ring, 50 units deep. */
 effN64Vtx stg_magic2_1_v[] = {
     {-87, 50, 0, 5461, 512, 255, 255, 255, 255},
     {-87, 50, -50, 5461, 0, 255, 255, 255, 255},
@@ -143,7 +146,7 @@ EffectEntry* effMagic2N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scal
     return effect;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_common_subs off
 /**
  * Fades the burst in over 10 frames and out over the last 6, eases its scale with a sine pulse,

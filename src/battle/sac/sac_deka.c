@@ -177,7 +177,8 @@ static USER_FUNC(main_deka) {
 }
 
 /**
- * Sets up the rippling floor: flags the stage floor object stg_b_yuka (Guess: hides it), measures its bounds,
+ * Sets up the rippling floor: flags the stage floor object stg_b_yuka 0x400001 (hidden from the normal draw,
+ * drawn by test_kururing_mapdisp for the capture), measures its bounds,
  * allocates a texture of its size (at most 608x480) and a 2 x 129 vertex strip across its width,
  * and queues yuka_capture to photograph the floor into that texture.
  */
@@ -372,7 +373,7 @@ static void main_base(void) {
                     w->result++;
                     w->starState = 6;
                     psndSFXOff(w->sfx);
-                    ev = evtEntry(nice_event, 0, 0x20);
+                    ev = evtEntry(nice_event, 0, EVENT_START_NOW);
                     v = w->result + 1;
                     ev->lwData[0] = v < 6 ? v : 6;
                     if (w->round > 5) {
@@ -524,7 +525,7 @@ static void main_gauge(void) {
     }
 }
 
-// inlining off for main_timing, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it main_timing is inlined into main_deka (76 -> 111 instructions)
 #pragma dont_inline on
 /**
  * Per-marker upkeep: clears the type of an unused marker, keeps a waiting one fully opaque,
@@ -742,7 +743,7 @@ static void main_star(void) {
     }
 }
 
-// inlining off for main_enemy, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it main_enemy is inlined into main_deka (76 -> 104 instructions)
 #pragma dont_inline on
 /** Moves every enemy-side unit with the floor ripple (main_enemy_sub) and records their ids, -1 for unused slots. */
 static void main_enemy(void) {
@@ -1026,6 +1027,7 @@ static void yuka_capture(CameraId cam, void* param) {
  * While Vivian (kind 228) rides, her unit work 0-3 follows her position.
  */
 EVT_BEGIN(marioAttackEvent_Deka)
+    // The partner joins only if it can act; with no enemy to target the move ends at once.
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(14))
     CALL(btlevtcmd_GetBodyId, LW(14), LW(15))
     CALL(btlevtcmd_CheckActStatus, LW(14), LW(0))
@@ -1036,6 +1038,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
+    // Mario declares the attack, pays the Star Power and Earth Tremor's work starts.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
@@ -1045,6 +1048,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
     BEGIN_SIBLING_EVENT
         CALL(main_deka, LW(14))
     END_SIBLING_EVENT
+    // Crystal Star opening: Mario holds up the star item and the Crystal Star appears in stardust.
     CALL_CHILD(sac_start_camera_evt)
     WAIT_MS(500)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1060,10 +1064,12 @@ EVT_BEGIN(marioAttackEvent_Deka)
     CALL(evt_snd_sfxoff, LW(11))
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(40)
+    // Mario puts the item away and returns home while the Crystal Star settles.
     CALL_CHILD(sac_mario_item_on_end_evt)
     CALL(btlevtcmd_SacBgsetMove, 0)
     CALL_CHILD(sac_mario_back_home)
     CALL(wait_star_stone_take_on)
+    // Mario and the partner jump onto the Crystal Star (Vivian's position is kept in her unit work).
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 44)
         CALL(get_ride_pos, 0, LW(0), LW(1), LW(2))
@@ -1074,7 +1080,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
     BEGIN_SIBLING_EVENT
         IF_INT_NOT_EQUAL(LW(14), -1)
             CALL(btlevtcmd_GetUnitKind, BTL_UNIT_PARTNER, LW(0))
-            IF_INT_EQUAL(LW(0), 228)
+            IF_INT_EQUAL(LW(0), UNIT_VIVIAN)
                 LOOP(0)
                     CALL(btlevtcmd_SetUnitWork, LW(14), 3, 1)
                     CALL(btlevtcmd_GetPos, LW(14), LW(0), LW(1), LW(2))
@@ -1092,10 +1098,11 @@ EVT_BEGIN(marioAttackEvent_Deka)
             CALL(get_ride_pos, 1, LW(0), LW(1), LW(2))
             CALL(btlevtcmd_JumpSetting, LW(14), 30, 0, FLOAT(0.39941406f))
             CALL(btlevtcmd_JumpPosition, LW(14), LW(0), LW(1), LW(2), 30, -1)
-            CALL(btlevtcmd_AnimeChangePoseType, LW(14), LW(15), 43)
+            CALL(btlevtcmd_AnimeChangePoseType, LW(14), LW(15), BTL_POSE_STAY)
         END_IF
     END_SIBLING_EVENT
     WAIT_FRAMES(30)
+    // They stay on top of the star wherever it moves.
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         LOOP(0)
             WAIT_FRAMES(1)
@@ -1108,6 +1115,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
             END_IF
         END_LOOP
     END_SIBLING_EVENT
+    // The timing game runs with the Action Command help shown and the crowd cheering.
     BEGIN_SIBLING_EVENT
         CALL(sac_cheer, 0)
     END_SIBLING_EVENT
@@ -1116,6 +1124,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
     CALL(wait_game_end)
     CALL(sac_ac_help_off)
     CALL(sac_cheer_end)
+    // The Crystal Star pounds the floor and the enemies take damage a second later.
     WAIT_MS(1000)
     CALL(star_stone_attack)
     LABEL(90)
@@ -1125,12 +1134,13 @@ EVT_BEGIN(marioAttackEvent_Deka)
         CALL_CHILD(dmg_evt)
     END_INLINE_EVENT
     WAIT_MS(500)
+    // Mario and the partner jump back to their home positions.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 44)
         CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 30, 0, FLOAT(0.39941406f))
         CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     END_SIBLING_EVENT
     BEGIN_SIBLING_EVENT
         IF_INT_NOT_EQUAL(LW(14), -1)
@@ -1142,6 +1152,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
         END_IF
     END_SIBLING_EVENT
     WAIT_FRAMES(30)
+    // The camera resets and the background and rippling floor are cleaned up.
     CALL(evt_btl_camera_set_mode, 0, 0)
 #if VERSION <= VERSION_DEMO_US
     CALL(yuka_end)
@@ -1150,9 +1161,10 @@ EVT_BEGIN(marioAttackEvent_Deka)
 #else
     CALL(btlevtcmd_SacBgsetMove, 1)
 #endif
+    // Vivian stops tracking her position.
     IF_INT_NOT_EQUAL(LW(14), -1)
         CALL(btlevtcmd_GetUnitKind, BTL_UNIT_PARTNER, LW(0))
-        IF_INT_EQUAL(LW(0), 228)
+        IF_INT_EQUAL(LW(0), UNIT_VIVIAN)
             CALL(btlevtcmd_SetUnitWork, LW(14), 3, 0)
         END_IF
     END_IF
@@ -1202,7 +1214,7 @@ EVT_BEGIN(dmg_evt)
     LABEL(20)
     CALL(btlevtcmd_CheckPartsAttribute, LW(3), LW(4), PART_ATTR_EVASIVE, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), 256, LW(5))
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_MARIO, LW(3), LW(4), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     LABEL(30)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -1280,7 +1292,7 @@ static void yuka_disp(CameraId cam, void* param) {
     }
 }
 
-// inlining off for get_ptr, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it get_ptr is inlined into its callers (16 shrink, e.g. main_timing 46 -> 36 instructions)
 #pragma dont_inline on
 /** Earth Tremor's work area (DekaWork), kept in the battle's shared action-command work buffer. */
 static DekaWork* get_ptr(void) {

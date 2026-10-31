@@ -73,6 +73,7 @@ static USER_FUNC(kanbu_get_id) {
     return EVT_RETURN_DONE;
 }
 
+/** Unit data of the X-Naut PhD: 9 HP, level 27; the battle starts it from init_event. */
 BattleUnitKind unit_gundan_zako_magician = {
     119,
     "btl_un_gundan_zako_magician",
@@ -139,16 +140,29 @@ BattleUnitKind unit_gundan_zako_magician = {
     data_table,
 };
 
+/** Defence of the X-Naut PhD: none against any element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Elemental reactions of the X-Naut PhD: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the X-Naut PhD (percent, 100 is normal) in the demo builds: resists most statuses
+ * (70-95%).
+ */
 static StatusVulnerability regist = {70, 80, 70, 100, 80, 100, 100, 70, 100, 75, 100, 75, 100, 70, 70, 90, 80, 100, 70, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the X-Naut PhD (percent, 100 is normal) in the retail builds: resists most statuses
+ * (70-95%).
+ */
 static StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 70, 100, 90, 100, 90, 100, 90, 70, 90, 70, 100, 70, 100, 100, 95};
 #endif
 
+/**
+ * Pose table of the X-Naut PhD: the animation each battle pose (idle, hurt, walk, attack and so on) plays.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -157,30 +171,36 @@ static PoseTableEntry pose_table[] = {
     {4, "X_1"},
     {3, "X_1"},
     {27, "Z_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "D_1"},
     {30, "D_1"},
     {31, "S_1"},
-    {39, "D_1"},
-    {42, "R_1"},
-    {40, "W_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Event table of the X-Naut PhD: empty, it has no special reactions. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of the X-Naut PhD: part 1 is his body (the target) and part 2 is the bottle he throws. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 #if VERSION <= VERSION_DEMO_US
-    {2, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {2, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 #else
-    {2, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13018000, 0, pose_table},
+    {2, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NO_TRANSLUCENT_POSE | PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 #endif
 };
 
+/**
+ * Weapon data for the X-Naut PhD's fire bottle: 4 damage, fire element, a jump-type hit, one target, may
+ * inflict burn (75%).
+ */
 static BattleWeapon weapon_gundan_zako_magician_fire_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -199,7 +219,7 @@ static BattleWeapon weapon_gundan_zako_magician_fire_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -224,6 +244,10 @@ static BattleWeapon weapon_gundan_zako_magician_fire_bottle = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon data for the X-Naut PhD's Defense-down bottle: 4 damage, a jump-type hit, one target, may inflict
+ * defense change (75%).
+ */
 static BattleWeapon weapon_gundan_zako_magician_hunyahunya_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -242,7 +266,7 @@ static BattleWeapon weapon_gundan_zako_magician_hunyahunya_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -268,6 +292,7 @@ static BattleWeapon weapon_gundan_zako_magician_hunyahunya_bottle = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the X-Naut PhD's Dodgy bottle: no damage, one target, may inflict Dodgy (100%). */
 static BattleWeapon weapon_gundan_zako_magician_yokeyoke_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -285,7 +310,7 @@ static BattleWeapon weapon_gundan_zako_magician_yokeyoke_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -304,6 +329,7 @@ static BattleWeapon weapon_gundan_zako_magician_yokeyoke_bottle = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the X-Naut PhD's shrink bottle: 3 damage, every target, may inflict size change (75%). */
 static BattleWeapon weapon_gundan_zako_magician_minimini_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -326,7 +352,7 @@ static BattleWeapon weapon_gundan_zako_magician_minimini_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -351,6 +377,7 @@ static BattleWeapon weapon_gundan_zako_magician_minimini_bottle = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the X-Naut PhD's heal-one bottle: no damage, one target. */
 static BattleWeapon weapon_gundan_zako_magician_one_recover = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -368,7 +395,7 @@ static BattleWeapon weapon_gundan_zako_magician_one_recover = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, // acHelpMsg..special
@@ -385,6 +412,7 @@ static BattleWeapon weapon_gundan_zako_magician_one_recover = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the X-Naut PhD's heal-all bottle: no damage, every target. */
 static BattleWeapon weapon_gundan_zako_magician_all_recover = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -402,7 +430,7 @@ static BattleWeapon weapon_gundan_zako_magician_all_recover = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, 0, // acHelpMsg..special
@@ -418,6 +446,7 @@ static BattleWeapon weapon_gundan_zako_magician_all_recover = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon data for the X-Naut PhD's regen bottle: no damage, one target. */
 static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -435,7 +464,7 @@ static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -485,17 +514,20 @@ EVT_END()
  * officer the dodgy bottle or the regen bottle.
  */
 static EVT_BEGIN(attack_event)
+    // After a First Strike it always throws the fire bottle.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(fire_bottle_event)
         GOTO(99)
     END_IF
+    // It uses an item instead of a bottle when one is ready.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // Look for an X-Naut officer in the battle: with one present it picks from a different mix of bottles.
     CALL(kanbu_get_id, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(10)
@@ -511,6 +543,8 @@ static EVT_BEGIN(attack_event)
     ADD(LW(0), 10)
     ADD(LW(0), 5)
     SUBTRACT(LW(0), 1)
+    // No officer: a random number picks a bottle by weight (fire, Defense-down, Dodgy, shrink, heal one ally,
+    // heal all).
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
@@ -524,7 +558,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 7, LW(2))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_DODGY, LW(2))
         IF_INT_EQUAL(LW(2), 0)
             CALL_CHILD(yokeyoke_bottle_event)
             GOTO(99)
@@ -552,6 +586,8 @@ static EVT_BEGIN(attack_event)
     ADD(LW(0), 20)
     ADD(LW(0), 20)
     SUBTRACT(LW(0), 1)
+    // With an officer: a random number picks the fire bottle, the Dodgy bottle for the officer or the regen
+    // bottle.
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 60)
     IF_INT_LESS(LW(1), LW(0))
@@ -561,7 +597,7 @@ static EVT_BEGIN(attack_event)
     ADD(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
         CALL(kanbu_get_id, LW(3), LW(4))
-        CALL(btlevtcmd_CheckStatus, LW(3), 7, LW(2))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_DODGY, LW(2))
         IF_INT_EQUAL(LW(2), 0)
             CALL_CHILD(yokeyoke_bottle_event_with_kanbu)
             GOTO(99)
@@ -570,7 +606,7 @@ static EVT_BEGIN(attack_event)
     ADD(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
         CALL(kanbu_get_id, LW(3), LW(4))
-        CALL(btlevtcmd_CheckStatus, LW(3), 23, LW(2))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_HP_REGEN, LW(2))
         IF_INT_EQUAL(LW(2), 0)
             CALL_CHILD(ziwaziwa_bottle_event)
             GOTO(99)
@@ -642,12 +678,14 @@ EVT_END()
  * ends by resetting the camera and facing.
  */
 static EVT_BEGIN(attack_common_event2)
+    // Pick the bottle's pose for the bottle being thrown (fire or Defense-down).
     IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_1A"))
     END_IF
     IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_hunyahunya_bottle))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_1B"))
     END_IF
+    // The bottle (part 2) appears in its hand as it winds up.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 10)
     ADD(LW(1), 20)
@@ -660,16 +698,18 @@ static EVT_BEGIN(attack_common_event2)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     END_IF
     WAIT_FRAMES(24)
+    // It hurls the bottle in a high arc toward the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD2_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(24)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     END_SIBLING_EVENT
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 2, 0, FLOAT(6.0f), FLOAT(0.2998047f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 0, -1)
+    // Hit check: a miss or dodge shatters the bottle, a hit goes on to the damage and status.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -692,6 +732,7 @@ static EVT_BEGIN(attack_common_event2)
         GOTO(98)
         CASE_END
         LABEL(90)
+        // Miss: the bottle smashes on the ground beside the target in a shower of glass.
         CALL(btlevtcmd_JumpPartsContinue, BTL_UNIT_SELF, 2)
         CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
         LOOP(12)
@@ -700,8 +741,8 @@ static EVT_BEGIN(attack_common_event2)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD2_CRASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_2"))
         WAIT_FRAMES(8)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
         GOTO(98)
         LABEL(91)
         IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
@@ -712,15 +753,17 @@ static EVT_BEGIN(attack_common_event2)
         LOOP(12)
             CALL(evt_eff64, STRING(""), STRING("glass_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 30, 0, 0, 0, 0, 0, 0)
         END_LOOP
+        // Hit: the bottle smashes on the target and the damage and status effect are applied.
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD2_CRASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_2"))
         WAIT_FRAMES(8)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
         GOTO(98)
         LABEL(98)
+        // The camera and facing return to normal.
         WAIT_FRAMES(10)
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_FRAMES(30)
@@ -757,8 +800,8 @@ static EVT_BEGIN(attack_common_event3)
         WAIT_FRAMES(24)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     END_SIBLING_EVENT
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 2, 0, FLOAT(1.0f), FLOAT(0.5f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), 0, LW(2), 0, -1)
@@ -791,14 +834,14 @@ static EVT_BEGIN(attack_common_event3)
         GOTO(98)
         LABEL(91)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         GOTO(98)
         LABEL(98)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD2_CRASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_2"))
         WAIT_FRAMES(8)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
         WAIT_FRAMES(10)
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_FRAMES(30)
@@ -822,7 +865,7 @@ static EVT_BEGIN(fire_bottle_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -842,7 +885,7 @@ static EVT_BEGIN(hunyahunya_bottle_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -879,7 +922,7 @@ static EVT_BEGIN(yokeyoke_bottle_event)
         CALL(evt_btl_camera_set_mode, 0, 0)
     END_INLINE_EVENT
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 
@@ -889,23 +932,27 @@ EVT_END()
  */
 static EVT_BEGIN(minimini_bottle_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_minimini_bottle))
+    // It samples a target, but the bottle reaches every opposing unit.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    // No valid target: a confused PhD is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Wind-up: it steps up to its throwing spot (attack_common_event1).
     CALL_CHILD(attack_common_event1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_1E"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 10)
     ADD(LW(1), 20)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
+    // It lifts the bottle (part 2) and throws it high over the opposing side.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD2_ATTACK3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3C"))
     WAIT_FRAMES(24)
@@ -914,8 +961,8 @@ static EVT_BEGIN(minimini_bottle_event)
         WAIT_FRAMES(24)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     END_SIBLING_EVENT
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(10))
     IF_INT_EQUAL(LW(10), 0)
         SET_VALUE(LW(10), 125)
@@ -929,16 +976,19 @@ static EVT_BEGIN(minimini_bottle_event)
     LOOP(12)
         CALL(evt_eff64, STRING(""), STRING("glass_n64"), 0, LW(10), 0, 0, FLOAT(1.0f), 30, 0, 0, 0, 0, 0, 0)
     END_LOOP
+    // The bottle bursts over the opposing side in a shower of shrinking mist.
     BEGIN_INLINE_EVENT
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_3RD2_CRASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_2"))
         WAIT_FRAMES(8)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     END_INLINE_EVENT
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LABEL(0)
+    // Each target in turn gets the hit check and then the shrink effect; the action-command result is read
+    // once.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -966,7 +1016,7 @@ static EVT_BEGIN(minimini_bottle_event)
         IF_INT_EQUAL(LW(10), 0)
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         END_IF
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         GOTO(97)
         LABEL(97)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -975,6 +1025,7 @@ static EVT_BEGIN(minimini_bottle_event)
             GOTO(0)
         END_IF
         LABEL(98)
+        // The camera returns to normal.
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_FRAMES(60)
         LABEL(99)
@@ -992,7 +1043,7 @@ static EVT_BEGIN(one_recover_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1034,7 +1085,7 @@ static EVT_BEGIN(all_recover_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN

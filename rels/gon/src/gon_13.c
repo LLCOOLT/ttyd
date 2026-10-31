@@ -17,6 +17,7 @@
 static BeroEntry bero_entry_data[2];
 extern EvtWord item_get03[];
 
+/** Exits (beros) of this room: w_bero to gon_07. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName

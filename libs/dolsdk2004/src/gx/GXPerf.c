@@ -185,7 +185,7 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1) {
 
     __GXData->bpSentNot = 0;
 }
-
+// The scheduling off/reset pairs in this file are the original SDK's (dolsdk2001 has the same ones); not fakes.
 #pragma scheduling off
 /**
  * Reads the four CP counters (registers 32 to 39) and converts them according to the selected metrics:

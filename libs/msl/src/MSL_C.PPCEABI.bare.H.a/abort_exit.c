@@ -12,9 +12,11 @@ extern void (*_dtors[])(void);
 
 #define atexit_funcs_access 0
 
+/** Set once abort() has started, so a second abort does not run the exit handlers again. */
 int __aborting = 0;
 
 static void (*__atexit_funcs[max_funcs])(void);
+/** Number of handlers registered with atexit() so far. */
 int __atexit_curr_func = 0;
 
 void (*__stdio_exit)(void) = 0;

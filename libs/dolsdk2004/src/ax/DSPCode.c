@@ -1,6 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 
+/** Size in bytes of the AX DSP program below. */
 u16 axDspSlaveLength = (AX_DSP_SLAVE_LENGTH * 2);
 
 u16 axDspSlave[AX_DSP_SLAVE_LENGTH] ATTRIBUTE_ALIGN(32) = {

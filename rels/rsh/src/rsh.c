@@ -286,6 +286,7 @@ EVT_BEGIN(evt_rsh_door_open)
 #if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 1)
 #endif
+    // Mario walks into the cabin as the door slides open and the page turns to reveal it.
     CALL(evt_mario_key_onoff, 0)
     CALL(img_wait)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
@@ -346,6 +347,7 @@ EVT_BEGIN(evt_rsh_door_open)
 #endif
         CALL(evt_img_onoff, STRING("capture_img"), 0)
     END_INLINE_EVENT
+    // Control returns once Mario is inside.
     CALL(evt_mario_key_onoff, 1)
 #if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 0)
@@ -364,6 +366,8 @@ EVT_BEGIN(evt_rsh_door_open)
         SET_VALUE(LF(0), 1)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
+        // Entering cabin 5 at the blanket stage makes Mario's partner remark that they should leave
+        // everything to the conductor.
         IF_STR_EQUAL(LW(1), STRING("heya_5"))
             SWITCH(GSW(GSW_STORY_PROGRESS))
                 CASE_EQUAL(STORY_STG6_19_GIVE_BLANKET)
@@ -390,8 +394,10 @@ EVT_BEGIN(evt_rsh_door_open)
                 END_SWITCH
                 CALL(evt_party_run, 0)
                 CALL(evt_mario_key_onoff, 1)
+                // During the vital clue stage the background music dips for the ghost scenes.
                 CASE_BETWEEN(STORY_STG6_24_A_VITAL_CLUE, STORY_STG6_24_02_ANOTHER_CLUE)
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
+                // When the conductor appears, the partner comments on entering cabin 5.
                 CASE_EQUAL(STORY_STG6_43_CONDUCTOR_APPEARS)
                 CALL(evt_mario_key_onoff, 0)
                 CALL(evt_img_wait_animend, STRING("capture_img"))
@@ -422,6 +428,7 @@ EVT_BEGIN(evt_rsh_door_open)
                 CALL(evt_mario_key_onoff, 1)
             END_SWITCH
 #if VERSION == VERSION_EU
+            // Once Zip Toad has appeared, entering the cabins makes him touchable.
             IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_25_ZIP_TOAD_APPEARS)
                 CALL(evt_npc_check, STRING("トロン"), LW(10))
                 IF_INT_EQUAL(LW(10), 1)
@@ -474,6 +481,7 @@ EVT_BEGIN(evt_rsh_door_open)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
         IF_STR_EQUAL(LW(1), STRING("heya_5"))
+            // Remember which cabin Mario is now inside.
             SET_VALUE(GSWF(GSWF_RSH04_INSIDE_CABIN5), 1)
         END_IF
         IF_STR_EQUAL(LW(1), STRING("heya_3"))
@@ -506,6 +514,7 @@ EVT_BEGIN(evt_rsh_door_close)
     CALL(evt_hitobj_attr_onoff, 0, 1, LW(6), 8388608)
     CALL(img_wait)
     BEGIN_INLINE_EVENT
+        // Leaving a cabin at certain stages starts a scripted map change to rsh_04.
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_06_PENNINGTONS_ASSISTANT)
             CALL(evt_sub_get_mapname, LW(0))
             IF_STR_EQUAL(LW(0), STRING("rsh_04_a"))
@@ -525,6 +534,7 @@ EVT_BEGIN(evt_rsh_door_close)
             END_IF
         END_IF
     END_INLINE_EVENT
+    // In rsh_02_c the ghost's voice is heard once as Mario leaves.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_15_GHOST_REQUEST)
         CALL(evt_sub_get_mapname, LW(10))
         IF_STR_EQUAL(LW(10), STRING("rsh_02_c"))
@@ -569,6 +579,7 @@ EVT_BEGIN(evt_rsh_door_close)
             END_IF
         END_IF
     END_INLINE_EVENT
+    // Remember that Mario is no longer inside a cabin.
     SET_VALUE(GSWF(GSWF_RSH04_INSIDE_CABIN5), 0)
     SET_VALUE(GSWF(GSWF_RSH04_INSIDE_CABIN3), 0)
     SET_VALUE(GSWF(GSWF_RSH02_INSIDE_CABIN4), 0)
@@ -585,6 +596,7 @@ EVT_BEGIN(evt_rsh_door_close)
 #endif
     CALL(evt_mapobj_set_offscreen, 1, STRING("rouka"), STRING("offscreen"))
     CALL(evt_img_onoff, STRING("capture_img"), 0)
+    // The cabin is captured and the page turns back as Mario walks out into the corridor.
     CALL_CHILD(kami_offscreen_check)
     CALL_CHILD(simi_offscreen_check)
     CALL(evt_npc_check, STRING("車掌"), LW(0))
@@ -685,6 +697,10 @@ static const s32 texmtx_tbl[] = {
     GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4, GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9,
 };
 
+/**
+ * Candidate passengers for random slot 1 of the car rsh_01: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_01_rnd_npc_1[] = {
     {"c_kinopiko_v", "キノピオ女紫", evt_rsh_rnd_npc_2_1_talk},
     {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_2_2_talk},
@@ -693,17 +709,29 @@ RshRndNpc rsh_01_rnd_npc_1[] = {
     {"c_kuribo_n", "NPCクリボー", evt_rsh_rnd_npc_2_5_talk},
 };
 
+/**
+ * Candidate passengers for random slot 2 of the car rsh_01: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_01_rnd_npc_2[] = {
     {"c_kinopiko_p", "キノピオ女桃", evt_rsh_rnd_npc_2_6_talk},
     {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_2_8_talk},
     {"c_kinopiko", "キノピオ女", evt_rsh_rnd_npc_2_9_talk},
 };
 
+/**
+ * Candidate passengers for random slot 3 of the car rsh_01: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_01_rnd_npc_3[] = {
     {"c_kokinopio_y", "キノピオ子黄緑", evt_rsh_rnd_npc_2_7_talk},
     {"c_kokinopio_b", "キノピオ子青", evt_rsh_rnd_npc_2_10_talk},
 };
 
+/**
+ * Candidate passengers for random slot 1 of the car rsh_03: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_03_rnd_npc_1[] = {
     {"c_kinopio", "キノピオ", evt_rsh_rnd_npc_3_1_talk},
     {"c_kinopiko_p", "キノピオ女桃", evt_rsh_rnd_npc_3_2_talk},
@@ -720,6 +748,10 @@ RshRndNpc rsh_03_rnd_npc_1[] = {
     {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_4_5_talk},
 };
 
+/**
+ * Candidate passengers for random slot 2 of the car rsh_03: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_03_rnd_npc_2[] = {
     {"c_kokinopio_g", "キノピオ子緑", evt_rsh_rnd_npc_3_6_talk},
     {"c_kokinopio_y", "キノピオ子黄緑", evt_rsh_rnd_npc_3_10_talk},
@@ -730,21 +762,37 @@ RshRndNpc rsh_03_rnd_npc_2[] = {
     {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_4_10_talk},
 };
 
+/**
+ * Candidate passengers for random slot 1 of the car rsh_04: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_04_rnd_npc_1[] = {
     {"c_kinopio_g", "キノピオ緑", evt_rsh_rnd_npc_5_2_talk},
     {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_5_10_talk},
 };
 
+/**
+ * Candidate passengers for random slot 2 of the car rsh_04: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_04_rnd_npc_2[] = {
     {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_5_8_talk},
     {"c_kinopio", "キノピオ", evt_rsh_rnd_npc_5_9_talk},
 };
 
+/**
+ * Candidate passengers for random slot 3 of the car rsh_04: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_04_rnd_npc_3[] = {
     {"c_kokinopio_g", "キノピオ子緑", evt_rsh_rnd_npc_5_5_talk},
     {"c_kokinopio", "キノピオ子", evt_rsh_rnd_npc_5_6_talk},
 };
 
+/**
+ * Candidate passengers for random slot 4 of the car rsh_04: the model, NPC name and talk event of each, one
+ * of which is rolled for a new game.
+ */
 RshRndNpc rsh_04_rnd_npc_4[] = {
     {"c_kokinopio_b", "キノピオ子青", evt_rsh_rnd_npc_5_1_talk},
     {"c_kokinopio_y", "キノピオ子黄緑", evt_rsh_rnd_npc_5_3_talk},
@@ -1154,6 +1202,10 @@ EVT_BEGIN(evt_rsh_rnd_npc_5_10_talk)
     RETURN
 EVT_END()
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_01_rnd_npc_1; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_01_rnd_npc_1_list[] = {
     /*"２−１"*/"\x82\x51\x81\x7C\x82\x50",
     /*"２−２"*/"\x82\x51\x81\x7C\x82\x51",
@@ -1162,17 +1214,29 @@ const char* rsh_01_rnd_npc_1_list[] = {
     /*"２−５"*/"\x82\x51\x81\x7C\x82\x54",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_01_rnd_npc_2; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_01_rnd_npc_2_list[] = {
     /*"２−６"*/"\x82\x51\x81\x7C\x82\x55",
     /*"２−８"*/"\x82\x51\x81\x7C\x82\x57",
     /*"２−９"*/"\x82\x51\x81\x7C\x82\x58",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_01_rnd_npc_3; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_01_rnd_npc_3_list[] = {
     /*"２−７"*/"\x82\x51\x81\x7C\x82\x56",
     /*"２−１０"*/"\x82\x51\x81\x7C\x82\x50\x82\x4F",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_03_rnd_npc_1; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_03_rnd_npc_1_list[] = {
     /*"３−１"*/"\x82\x52\x81\x7C\x82\x50",
     /*"３−２"*/"\x82\x52\x81\x7C\x82\x51",
@@ -1189,6 +1253,10 @@ const char* rsh_03_rnd_npc_1_list[] = {
     /*"４−５"*/"\x82\x53\x81\x7C\x82\x54",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_03_rnd_npc_2; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_03_rnd_npc_2_list[] = {
     /*"３−６"*/"\x82\x52\x81\x7C\x82\x55",
     /*"３−１０"*/"\x82\x52\x81\x7C\x82\x50\x82\x4F",
@@ -1199,21 +1267,37 @@ const char* rsh_03_rnd_npc_2_list[] = {
     /*"４−１０"*/"\x82\x53\x81\x7C\x82\x50\x82\x4F",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_04_rnd_npc_1; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_04_rnd_npc_1_list[] = {
     /*"５−２"*/"\x82\x54\x81\x7C\x82\x51",
     /*"５−１０"*/"\x82\x54\x81\x7C\x82\x50\x82\x4F",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_04_rnd_npc_2; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_04_rnd_npc_2_list[] = {
     /*"５−８"*/"\x82\x54\x81\x7C\x82\x57",
     /*"５−９"*/"\x82\x54\x81\x7C\x82\x58",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_04_rnd_npc_3; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_04_rnd_npc_3_list[] = {
     /*"５−５"*/"\x82\x54\x81\x7C\x82\x54",
     /*"５−６"*/"\x82\x54\x81\x7C\x82\x55",
 };
 
+/**
+ * Shift-JIS labels (car-passenger numbers) of the candidates in rsh_04_rnd_npc_4; only the leftover debug
+ * print uses them.
+ */
 const char* rsh_04_rnd_npc_4_list[] = {
     /*"５−１"*/"\x82\x54\x81\x7C\x82\x50",
     /*"５−３"*/"\x82\x54\x81\x7C\x82\x52",
@@ -1253,6 +1337,7 @@ typedef struct RshDebugStr {
     char str[256];
 } RshDebugStr;
 
+/** Zeroed 256-byte template for the debug line buffer of the leftover debug print. */
 static const RshDebugStr rsh_debug_str_init = {0};
 
 /**
@@ -1322,6 +1407,10 @@ EVT_BEGIN(evt_rsh_01_rnd_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Setup of passenger 2 of the dining car when it is a wandering passenger: territory and the npc_urouro move
+ * and return events.
+ */
 NpcSetupInfo rsh_03_rnd_npc_2_ent[] = {
     {
         "乗客２", // name
@@ -1368,6 +1457,10 @@ EVT_BEGIN(evt_rsh_03_rnd_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Setup of passenger 3 of car rsh_04 when it is a wandering passenger: territory and the npc_urouro move and
+ * return events.
+ */
 NpcSetupInfo rsh_04_rnd_npc_3_ent[] = {
     {
         "乗客３", // name

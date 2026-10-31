@@ -1,7 +1,6 @@
-#pragma once
-
 // Camera that circles a target ("kaiten", rotation): the cam_kaiten_* functions that gor_00, tik_05 and
 // win_06 each carry.
+#pragma once
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>

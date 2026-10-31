@@ -47,6 +47,7 @@ static HitDamageReturn hitDmgRetPoints[4];
 static TreeAccess tree_tbl[3];
 static KusaAccess kusa_tbl[5];
 
+/** NPCs of the rope bridge: the nervous sailor, the bespectacled sailor and the two Embers. */
 static NpcSetupInfo npcEnt[] = {
     {
         "サンダース", // name
@@ -101,8 +102,9 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 /**
- * Guess: entrance event: waits for the map change to finish,
- * then switches the camera to follow Mario's height again (haikei_in).
+ * Enter event of the pipe A_dokan: in the background it waits
+ * until the entrance has finished (BeroEXEC bit 0x10000) and 10 more frames,
+ * then makes the camera follow Mario's height again; returns LW(0) = 0.
  */
 static EVT_BEGIN(evt_haikei_in)
     BEGIN_INLINE_EVENT
@@ -115,6 +117,7 @@ static EVT_BEGIN(evt_haikei_in)
     RETURN
 EVT_END()
 
+/** Doors and exits of muj_04: w_bero to muj_03; e_bero to muj_05; dokan_1; A_dokan. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -183,6 +186,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Hit areas of the 17 planks of the rope bridge, in order; mapanim holds the matching map animations. */
 const char* hitname[] = {
     "A_hasi01",
     "A_hasi02",
@@ -203,6 +207,10 @@ const char* hitname[] = {
     "A_hasi017",
 };
 
+/**
+ * Map animations (S_hasiNN) of the 17 bridge planks, played when Mario steps onto the plank with the same
+ * index in hitname.
+ */
 const char* mapanim[] = {
     "S_hasi01",
     "S_hasi02",
@@ -347,10 +355,12 @@ EVT_BEGIN(sanders_funto)
     CALL(evt_npc_flag_onoff, 1, STRING("エルモスB"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_position, STRING("エルモスA"), -60, 125, 0)
     CALL(evt_npc_set_position, STRING("エルモスB"), 60, 125, 0)
+    // Mario arrives at the bridge: control is taken and the exit is waited out.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
+    // Bobbery, holding the bridge against the ghosts, curses them and spots Mario.
     CALL(evt_msg_print, 0, STRING("stg5_muj_23"), 0, STRING("サンダース"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -380,6 +390,7 @@ EVT_BEGIN(sanders_funto)
     CALL(evt_set_dir_to_target, STRING("オドオド水夫"), STRING("サンダース"))
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // The nervous sailor worries about the admiral; Bobbery tells them to leave the ghosts to him.
     CALL(evt_msg_print, 0, STRING("stg5_muj_25"), 0, STRING("オドオド水夫"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_26"), 0, STRING("サンダース"))
     BEGIN_INLINE_EVENT
@@ -398,6 +409,7 @@ EVT_BEGIN(sanders_funto)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_flag_onoff, 0, STRING("めがね水夫"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
         CALL(evt_npc_get_position, STRING("めがね水夫"), LW(0), LW(1), LW(2))
+        // Bobbery throws a bomb at the Embers.
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_THUNDERS_THROW1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_npc_set_ry, STRING("めがね水夫"), 270)
@@ -410,6 +422,7 @@ EVT_BEGIN(sanders_funto)
         CALL(evt_npc_jump_position_nohit, STRING("オドオド水夫"), -105, 116, 0, 500, 70)
         CALL(evt_npc_set_anim, STRING("オドオド水夫"), STRING("F_1"))
         CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
+        // The nervous sailor screams.
         CALL(evt_msg_print, 0, STRING("stg5_muj_27"), 0, STRING("オドオド水夫"))
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
@@ -421,6 +434,7 @@ EVT_BEGIN(sanders_funto)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -110, 260, 532, -110, 165, -10, 500, 11)
     WAIT_MS(500)
+    // The Embers charge and Bobbery fights back.
     SPAWN_EVENT(erumos00_attack)
     SPAWN_EVENT(erumos01_attack)
     SPAWN_EVENT(sanders_attack)
@@ -429,6 +443,8 @@ EVT_BEGIN(sanders_funto)
     CALL(evt_npc_flag_onoff, 1, STRING("めがね水夫"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     WAIT_FRAMES(1)
+    // The bespectacled sailor says Bobbery thinks this is the right thing to do, and the group leaves the
+    // bridge.
     CALL(evt_msg_print, 0, STRING("stg5_muj_28"), 0, STRING("めがね水夫"))
     WAIT_MS(1000)
     CALL(evt_mario_cam_keep_off)
@@ -449,6 +465,7 @@ EVT_BEGIN(sanders_funto)
         CALL(evt_party_move_pos2, 0, -300, -20, FLOAT(180.0f))
     END_INLINE_EVENT
     WAIT_MS(2000)
+    // The story advances and Mario crosses to muj_03.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_13_BOBBERY_AND_THE_BRIDGE)
     CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     CALL(evt_bero_mapchange, STRING("muj_03"), STRING("e_bero"))
@@ -538,6 +555,10 @@ EVT_BEGIN(yashi_yure)
     RETURN
 EVT_END()
 
+/**
+ * Return points of the hazard areas around the rope bridge: its two ends (S_l_dai_03 and A_r_dai) and the
+ * pipe (dokan_1).
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"S_l_dai_03", {-432.0f, 150.0f, 0.0f}},
     {"A_r_dai", {411.0f, 150.0f, 0.0f}},
@@ -545,12 +566,14 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/** Trees of muj_04 that Mario can shake with his hammer (2 in all). */
 static TreeAccess tree_tbl[] = {
     {5, "A_treeA_02", "treeA_02_m", "treeA_02_ha", 0, NULL},
     {5, "A_treeA_04", "treeA_04_m", "treeA_04_ha", 0, NULL},
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/** Bushes of muj_04 that Mario can check for hidden things (4 in all). */
 static KusaAccess kusa_tbl[] = {
     {1, "A_kuwa_move_01", "S_kuwa_move_01", NULL},
     {1, "A_kuwa_move_02", "S_kuwa_move_02", NULL},

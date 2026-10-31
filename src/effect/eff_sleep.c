@@ -101,9 +101,9 @@ static void effSleepMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSleepDisp, effect);
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma push
-// propagation optimisation off for sleepPos, effSleepDisp: the original register allocation and scheduling need it
+// FAKE: propagation optimisation off for sleepPos, effSleepDisp: the original register allocation and scheduling need it
 #pragma opt_propagation off
 
 // FAKE: same values as the plain form, written so the code generator sees the target's shapes:

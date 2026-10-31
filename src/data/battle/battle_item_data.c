@@ -29,7 +29,7 @@
 #include "statuswindow.h"
 
 #include "battle/battle_detect.h"
-EffectEntry* effNanigaEntry(s32 type, s32* table, s32 item, f32 x, f32 y, f32 z);
+#include "eff/eff_naniga.h"
 static void _nancy_disp(CameraId cameraId, void* param);
 static void _disp_item_icon(CameraId cameraId, void* param);
 
@@ -438,6 +438,10 @@ EVT_BEGIN(ItemEvent_Support_RefreshEffect)
     RETURN
 EVT_END()
 
+/**
+ * Stand-in battle data for cooking items that have none of their own (battle_seq_command puts it in the menu):
+ * heals one ally via ItemEvent_Recovery.
+ */
 BattleWeapon ItemWeaponData_CookingItem = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -450,7 +454,7 @@ BattleWeapon ItemWeaponData_CookingItem = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -468,6 +472,7 @@ BattleWeapon ItemWeaponData_CookingItem = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Mushroom: restores 5 HP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -486,7 +491,7 @@ BattleWeapon ItemWeaponData_Kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -504,6 +509,7 @@ BattleWeapon ItemWeaponData_Kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Life Shroom: restores 10 HP; also revives Mario or his partner when he falls (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -522,7 +528,7 @@ BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -540,6 +546,7 @@ BattleWeapon ItemWeaponData_Kinkyuu_Kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Super Shroom: restores 10 HP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Super_Kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -558,7 +565,7 @@ BattleWeapon ItemWeaponData_Super_Kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -576,6 +583,7 @@ BattleWeapon ItemWeaponData_Super_Kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Ultra Shroom: restores 50 HP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -594,7 +602,7 @@ BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -612,6 +620,7 @@ BattleWeapon ItemWeaponData_Ultra_Kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Dried Shroom: restores 1 HP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -630,7 +639,7 @@ BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -648,6 +657,7 @@ BattleWeapon ItemWeaponData_Sinabita_Kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Honey Syrup: restores 5 FP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Honey_Syrup = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -666,7 +676,7 @@ BattleWeapon ItemWeaponData_Honey_Syrup = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -684,6 +694,7 @@ BattleWeapon ItemWeaponData_Honey_Syrup = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Maple Syrup: restores 10 FP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Maple_Syrup = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -702,7 +713,7 @@ BattleWeapon ItemWeaponData_Maple_Syrup = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -720,6 +731,7 @@ BattleWeapon ItemWeaponData_Maple_Syrup = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Jammin' Jelly: restores 50 FP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Royal_Jelly = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -738,7 +750,7 @@ BattleWeapon ItemWeaponData_Royal_Jelly = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -756,6 +768,7 @@ BattleWeapon ItemWeaponData_Royal_Jelly = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Whacka Bump: restores 25 HP and 25 FP to one ally (ItemEvent_Recovery). */
 BattleWeapon ItemWeaponData_Tankobu = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -774,7 +787,7 @@ BattleWeapon ItemWeaponData_Tankobu = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -794,6 +807,7 @@ BattleWeapon ItemWeaponData_Tankobu = {
 
 /** POW Block: a POW Block appears above Mario, he hits it and every enemy takes 2 damage as the stage shakes. */
 EVT_BEGIN(ItemEvent_Pow_Block)
+    // The camera closes in on the user; on the player's side they first walk forward.
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -807,11 +821,13 @@ EVT_BEGIN(ItemEvent_Pow_Block)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
+    // The user holds up the POW Block, which is used up.
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
+    // The POW Block appears above the user's head in a puff of smoke.
     CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -838,6 +854,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
         WAIT_MS(2050)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
+    // The camera pulls back and the user walks under the block.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
     WAIT_FRAMES(5)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -849,6 +866,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 43)
     WAIT_FRAMES(30)
+    // The user jumps, hits the block from below and walks home after landing.
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.7998047f))
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 44)
@@ -862,6 +880,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 43)
     END_SIBLING_EVENT
+    // The block bounces and the stage shakes; sleeping audience members wake up.
     BEGIN_INLINE_EVENT
         WAIT_FRAMES(5)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -874,6 +893,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
     END_INLINE_EVENT
     CALL(evt_audience_reflesh_natural_all, 100)
     WAIT_FRAMES(7)
+    // Every enemy takes the damage unless it dodges (a miss, a lucky dodge or Dodgy).
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&ItemWeaponData_Pow_Block))
     CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
@@ -895,6 +915,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
     GOTO(10)
     LABEL(90)
+    // The user returns home.
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&ItemWeaponData_Pow_Block))
     WAIT_FRAMES(150)
@@ -903,6 +924,7 @@ EVT_BEGIN(ItemEvent_Pow_Block)
     RETURN
 EVT_END()
 
+/** POW Block: damages every enemy on the ground (ItemEvent_Pow_Block). */
 BattleWeapon ItemWeaponData_Pow_Block = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -921,7 +943,7 @@ BattleWeapon ItemWeaponData_Pow_Block = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1014,6 +1036,7 @@ EVT_BEGIN(ItemEvent_Fire_Flower)
     RETURN
 EVT_END()
 
+/** Fire Flower: fireballs on every enemy, with a chance to burn (ItemEvent_Fire_Flower). */
 BattleWeapon ItemWeaponData_Fire_Flower = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1032,7 +1055,7 @@ BattleWeapon ItemWeaponData_Fire_Flower = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -1154,6 +1177,7 @@ EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
     RETURN
 EVT_END()
 
+/** Thunder Rage: lightning on every enemy (ItemEvent_Kaminari_Dokkan). */
 BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1172,7 +1196,7 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    4, // element
+    ELEMENT_ELECTRIC, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -1198,6 +1222,7 @@ EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
     RETURN
 EVT_END()
 
+/** Thunder Bolt: lightning on one enemy (ItemEvent_Kaminari_Gorogoro). */
 BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1216,7 +1241,7 @@ BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    4, // element
+    ELEMENT_ELECTRIC, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -1240,6 +1265,7 @@ BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
  * then every enemy takes 6 damage.
  */
 EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
+    // The camera pulls back and the targets are chosen (a random one if the player did not pick it).
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
@@ -1267,6 +1293,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
+    // Single target: one star streaks from above the user down onto the target.
     CALL(evt_snd_sfxon, STRING("SFX_ITEM_KIRAKIRA_FALL1"), 0)
     IF_INT_EQUAL(LW(15), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1276,6 +1303,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
         CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_KIRAKIRA_FALL1"), LW(0), LW(1), LW(2), 0)
         WAIT_FRAMES(50)
     ELSE
+        // All enemies: the camera shakes five times while sparks hit random enemies.
         BEGIN_SIBLING_EVENT
             WAIT_MS(500)
             LOOP(5)
@@ -1303,6 +1331,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
                 WAIT_MS(500)
             END_LOOP
         END_SIBLING_EVENT
+        // Sixty stars rain down at random spots over the enemies' side of the stage.
         LOOP(60)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             CALL(btlevtcmd_GetStageSize, EVT_NULLPTR, LW(1), EVT_NULLPTR)
@@ -1334,6 +1363,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
             CALL(evt_eff64, STRING(""), STRING("sstar_n64"), 2, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), FLOAT(8.0f), 0, 0, 0, 0)
             WAIT_FRAMES(3)
         END_LOOP
+        // After the shower the enemies are picked again for the damage.
         WAIT_FRAMES(50)
         CALL(btlevtcmd_WaitEventEnd, LW(15))
         CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
@@ -1347,6 +1377,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
             CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
         END_IF
     END_IF
+    // Each target takes the damage unless it dodges; the single-target version stops after one.
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
@@ -1371,6 +1402,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
     WAIT_MS(80)
     GOTO(10)
     LABEL(90)
+    // The user returns home.
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(_return_home_event)
@@ -1391,6 +1423,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi)
     RETURN
 EVT_END()
 
+/** Shooting Star: falling stars on every enemy (ItemEvent_Kirakira_Otoshi). */
 BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1409,7 +1442,7 @@ BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1429,6 +1462,7 @@ BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
 
 /** Ice Storm: an icy wind blows over the enemies for 3 ice damage each, with a chance to freeze them for two turns. */
 EVT_BEGIN(ItemEvent_Koorino_Ibuki)
+    // The camera closes in on the user; on the player's side they first walk forward.
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Koorino_Ibuki))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1443,6 +1477,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
+    // The user holds up the Ice Storm, which is used up, and the camera pulls back.
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
@@ -1452,6 +1487,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
+    // The targets are chosen (a random one for a single target when the user is not Mario or a partner).
     CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
@@ -1472,6 +1508,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
+    // The icy wind blows from the user towards the enemies and clears any fog from the stage.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_ICE_WIND1"), LW(0), LW(1), LW(2), LW(15))
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
@@ -1487,6 +1524,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     CALL(btlevtcmd_StageDispellFog)
     WAIT_MS(2000)
     CALL(evt_snd_sfxoff, LW(15))
+    // Each target takes the damage unless it dodges (a miss, a lucky dodge or Dodgy).
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
@@ -1510,6 +1548,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     END_IF
     GOTO(10)
     LABEL(90)
+    // The user returns home.
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(_return_home_event)
@@ -1517,6 +1556,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     RETURN
 EVT_END()
 
+/** Ice Storm: a cold wind on every enemy, with a chance to freeze (ItemEvent_Koorino_Ibuki). */
 BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1535,7 +1575,7 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    2, // element
+    ELEMENT_ICE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -1563,6 +1603,7 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
 
 /** Earthquake: the stage shakes and dust falls, and every enemy that is not floating takes 5 damage. */
 EVT_BEGIN(ItemEvent_Yurayura_Jishin)
+    // The camera closes in on the user; on the player's side they first walk forward.
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Yurayura_Jishin))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1577,6 +1618,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
+    // The user holds up the Earthquake, which is used up, and the camera pulls back.
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
@@ -1586,6 +1628,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
+    // Dust falls from above while the stage shakes harder and harder.
     BEGIN_SIBLING_EVENT
         CALL(evt_eff64, 0, STRING("hokori_n64"), 0, 0, 300, 0, 150, 0, 0, 0, 0, 0, 0, 0)
         WAIT_MS(600)
@@ -1603,6 +1646,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     CALL(evt_btl_camera_shake_h, 0, 5, 0, 30, 13)
     WAIT_MS(333)
     CALL(evt_snd_sfxoff, LW(10))
+    // The targets are chosen (a random one for a single target when the user is not Mario or a partner).
     CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
@@ -1623,6 +1667,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
+    // Each target takes the damage unless it dodges (a miss, a lucky dodge or Dodgy).
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
@@ -1646,6 +1691,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     END_IF
     GOTO(10)
     LABEL(90)
+    // The user returns home.
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
     CALL_CHILD(_return_home_event)
@@ -1653,6 +1699,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     RETURN
 EVT_END()
 
+/** Earth Quake: damages every enemy on the ground (ItemEvent_Yurayura_Jishin). */
 BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1671,7 +1718,7 @@ BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_NO_FLOATING_2 | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1764,6 +1811,7 @@ EVT_BEGIN(ItemEvent_Teresano_Fuku)
     RETURN
 EVT_END()
 
+/** Boo's Sheet: makes one ally invisible (ItemEvent_Teresano_Fuku). */
 BattleWeapon ItemWeaponData_Teresano_Fuku = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1782,7 +1830,7 @@ BattleWeapon ItemWeaponData_Teresano_Fuku = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1822,6 +1870,7 @@ EVT_BEGIN(ItemEvent_Biribiri_Kinoko)
     RETURN
 EVT_END()
 
+/** Volt Shroom: electrifies one ally so direct attackers get hurt (ItemEvent_Biribiri_Kinoko). */
 BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1840,7 +1889,7 @@ BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1881,6 +1930,7 @@ EVT_BEGIN(ItemEvent_Teki_Yokeeru)
     RETURN
 EVT_END()
 
+/** Repel Cape: makes one ally dodgy, harder to hit (ItemEvent_Teki_Yokeeru). */
 BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1899,7 +1949,7 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1926,6 +1976,7 @@ EVT_BEGIN(ItemEvent_Madowaseno_Kona)
     RETURN
 EVT_END()
 
+/** Ruin Powder: confuses every enemy (ItemEvent_Madowaseno_Kona). */
 BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1944,7 +1995,7 @@ BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1996,6 +2047,7 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     RETURN
 EVT_END()
 
+/** Sleepy Sheep: puts every enemy to sleep (ItemEvent_Nemure_Yoikoyo). */
 BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2014,7 +2066,7 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2110,6 +2162,7 @@ EVT_BEGIN(ItemEvent_Stop_Watch)
     RETURN
 EVT_END()
 
+/** Stopwatch: stops every enemy (ItemEvent_Stop_Watch). */
 BattleWeapon ItemWeaponData_Stop_Watch = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2128,7 +2181,7 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2172,6 +2225,7 @@ EVT_BEGIN(ItemEvent_Guruguru_Memawashi)
     RETURN
 EVT_END()
 
+/** Dizzy Dial: makes every enemy dizzy (ItemEvent_Guruguru_Memawashi). */
 BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2190,7 +2244,7 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2217,6 +2271,7 @@ EVT_BEGIN(ItemEvent_Dekadeka_Drink)
     RETURN
 EVT_END()
 
+/** Power Punch: makes one ally huge, raising its attack (ItemEvent_Dekadeka_Drink). */
 BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2235,7 +2290,7 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2263,6 +2318,7 @@ EVT_BEGIN(ItemEvent_Katikati_Koura)
     RETURN
 EVT_END()
 
+/** Courage Shell: raises one ally's defence (ItemEvent_Katikati_Koura). */
 BattleWeapon ItemWeaponData_Katikati_Koura = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2281,7 +2337,7 @@ BattleWeapon ItemWeaponData_Katikati_Koura = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2387,6 +2443,7 @@ EVT_BEGIN(ItemEvent_Suitooru)
     RETURN
 EVT_END()
 
+/** HP Drain: damages one enemy and heals the user by the damage dealt (ItemEvent_Suitooru). */
 BattleWeapon ItemWeaponData_Suitooru = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2405,7 +2462,7 @@ BattleWeapon ItemWeaponData_Suitooru = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2493,6 +2550,7 @@ EVT_BEGIN(ItemEvent_Teki_Kyouka)
     RETURN
 EVT_END()
 
+/** Trade Off: raises the enemies' level so they are worth more Star Points (ItemEvent_Teki_Kyouka). */
 BattleWeapon ItemWeaponData_Teki_Kyouka = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2511,7 +2569,7 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2536,6 +2594,7 @@ EVT_BEGIN(ItemEvent_Minimini_Kun)
     RETURN
 EVT_END()
 
+/** Mini Mr. Mini: shrinks every enemy, lowering its attack (ItemEvent_Minimini_Kun). */
 BattleWeapon ItemWeaponData_Minimini_Kun = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2554,7 +2613,7 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2582,6 +2641,7 @@ EVT_BEGIN(ItemEvent_Funyafunya_Kun)
     RETURN
 EVT_END()
 
+/** Mr. Softener: lowers every enemy's defence (ItemEvent_Funyafunya_Kun). */
 BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2600,7 +2660,7 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2629,6 +2689,7 @@ EVT_BEGIN(ItemEvent_Sukkiri_Drink)
     RETURN
 EVT_END()
 
+/** Tasty Tonic: cures one ally's poison and other ailments (ItemEvent_Sukkiri_Drink). */
 BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2647,7 +2708,7 @@ BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2702,6 +2763,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko)
     RETURN
 EVT_END()
 
+/** Slow Shroom: one ally regains HP each turn for a while (ItemEvent_Jiwajiwa_Kinoko). */
 BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2720,7 +2782,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2761,6 +2823,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup)
     RETURN
 EVT_END()
 
+/** Gradual Syrup: one ally regains FP each turn for a while (ItemEvent_Jiwajiwa_Syrup). */
 BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2779,7 +2842,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2849,6 +2912,7 @@ EVT_BEGIN(ItemEvent_Irekaeeru)
     RETURN
 EVT_END()
 
+/** Point Swap: swaps the target's HP and FP (ItemEvent_Irekaeeru). */
 BattleWeapon ItemWeaponData_Irekaeeru = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2867,7 +2931,7 @@ BattleWeapon ItemWeaponData_Irekaeeru = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     27, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -2938,6 +3002,7 @@ EVT_BEGIN(ItemEvent_Attiike_Shisshi)
     RETURN
 EVT_END()
 
+/** Fright Mask: scares the enemies, which can make some flee (ItemEvent_Attiike_Shisshi). */
 BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2956,7 +3021,7 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2981,12 +3046,14 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
  * one of the recovery, status or attack item scripts on a fitting target.
  */
 EVT_BEGIN(ItemEvent_Naniga_Okorukana)
+    // Mystery is announced, then the roulette spins and lands on an item.
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Naniga_Okorukana))
     CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
     CALL(_naniga_okorukana_check, BTL_UNIT_SELF, LW(13))
     SWITCH(LW(13))
         CASE_EQUAL(148)
+        // Mushroom, Ultra Shroom, Dried Shroom, Honey Syrup or Jammin' Jelly: it heals an automatic target.
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Kinoko))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(ItemEvent_Automatic_Target)
@@ -3017,6 +3084,7 @@ EVT_BEGIN(ItemEvent_Naniga_Okorukana)
         SET_VALUE(LW(9), 156)
         CALL_CHILD(ItemEvent_Recovery_Core)
         CASE_EQUAL(135)
+        // Volt Shroom, Repel Cape, Slow Shroom or Gradual Syrup: its effect on an automatic target.
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Biribiri_Kinoko))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(ItemEvent_Automatic_Target)
@@ -3037,6 +3105,7 @@ EVT_BEGIN(ItemEvent_Naniga_Okorukana)
         CALL_CHILD(ItemEvent_Automatic_Target)
         CALL_CHILD(ItemEvent_Jiwajiwa_Syrup_Core)
         CASE_EQUAL(128)
+        // Thunder Bolt, Thunder Rage, Fire Flower, Shooting Star or Stopwatch: its attack on the enemies.
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
         SET_VALUE(LW(8), LW(12))
         CALL_CHILD(ItemEvent_Automatic_Target)
@@ -3062,6 +3131,7 @@ EVT_BEGIN(ItemEvent_Naniga_Okorukana)
         CALL_CHILD(ItemEvent_Automatic_Target)
         CALL_CHILD(ItemEvent_Stop_Watch_Core)
         CASE_DEFAULT
+        // Any other result: nothing happens.
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_SWITCH
@@ -3069,6 +3139,7 @@ EVT_BEGIN(ItemEvent_Naniga_Okorukana)
     RETURN
 EVT_END()
 
+/** Mystery: turns into a random item effect when used (ItemEvent_Naniga_Okorukana). */
 BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3087,7 +3158,7 @@ BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3120,6 +3191,7 @@ EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
     RETURN
 EVT_END()
 
+/** Spite Pouch: gives one ally payback against direct attacks (ItemEvent_Shikaeshino_Kona). */
 BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3138,7 +3210,7 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3164,6 +3236,7 @@ EVT_BEGIN(ItemEvent_Kameno_Noroi)
     RETURN
 EVT_END()
 
+/** Koopa Curse: slows one enemy (ItemEvent_Kameno_Noroi). */
 BattleWeapon ItemWeaponData_Kameno_Noroi = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3182,7 +3255,7 @@ BattleWeapon ItemWeaponData_Kameno_Noroi = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3289,6 +3362,7 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
     RETURN
 EVT_END()
 
+/** Space Food (Zess T. cooking): restores 5 HP (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_SpaceFood = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3307,7 +3381,7 @@ BattleWeapon ItemWeaponData_SpaceFood = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3327,6 +3401,7 @@ BattleWeapon ItemWeaponData_SpaceFood = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Icicle Pop (Zess T. cooking): restores 10 HP (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_IceCandy = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3345,7 +3420,7 @@ BattleWeapon ItemWeaponData_IceCandy = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3366,6 +3441,7 @@ BattleWeapon ItemWeaponData_IceCandy = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Zess Frappe (Zess T. cooking): restores 20 HP (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_NancyFrappe = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3384,7 +3460,7 @@ BattleWeapon ItemWeaponData_NancyFrappe = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3405,6 +3481,7 @@ BattleWeapon ItemWeaponData_NancyFrappe = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Snow Bunny (Zess T. cooking): restores 15 HP but freezes the eater (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_SnowRabbit = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3423,7 +3500,7 @@ BattleWeapon ItemWeaponData_SnowRabbit = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3444,6 +3521,7 @@ BattleWeapon ItemWeaponData_SnowRabbit = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Shroom Broth (Zess T. cooking): restores HP gradually (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_TeaKinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3462,7 +3540,7 @@ BattleWeapon ItemWeaponData_TeaKinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3486,6 +3564,7 @@ BattleWeapon ItemWeaponData_TeaKinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Love Pudding (Zess T. cooking), electrified outcome: ItemEvent_RecoveryAndStatus picks it 40% of the time. */
 BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3504,7 +3583,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3525,6 +3604,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingBiribiri = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Love Pudding, invisible outcome: ItemEvent_RecoveryAndStatus picks it 40% of the time. */
 BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3543,7 +3623,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3563,6 +3643,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingTrans = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Love Pudding, sleepy outcome: ItemEvent_RecoveryAndStatus picks it 20% of the time. */
 BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3581,7 +3662,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3601,6 +3682,7 @@ BattleWeapon ItemWeaponData_FirstLovePuddingSleep = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Meteor Meal (Zess T. cooking): restores 7 HP, then more over time (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_StarryDinner = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3619,7 +3701,7 @@ BattleWeapon ItemWeaponData_StarryDinner = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3640,6 +3722,7 @@ BattleWeapon ItemWeaponData_StarryDinner = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Spicy Pasta (Zess T. cooking): restores 10 HP and 10 FP (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_KararinaPasta = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3658,7 +3741,7 @@ BattleWeapon ItemWeaponData_KararinaPasta = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3677,6 +3760,7 @@ BattleWeapon ItemWeaponData_KararinaPasta = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Heartful Cake (Zess T. cooking): restores 20 FP but softens the eater (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_MeromeroCake = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3695,7 +3779,7 @@ BattleWeapon ItemWeaponData_MeromeroCake = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3717,6 +3801,7 @@ BattleWeapon ItemWeaponData_MeromeroCake = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Peach Tart (Zess T. cooking), electrified outcome: ItemEvent_RecoveryAndStatus picks it 40% of the time. */
 BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3735,7 +3820,7 @@ BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3756,6 +3841,7 @@ BattleWeapon ItemWeaponData_PeachTaltBiribiri = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Peach Tart, dodgy outcome: ItemEvent_RecoveryAndStatus picks it 40% of the time. */
 BattleWeapon ItemWeaponData_PeachTaltDodge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3774,7 +3860,7 @@ BattleWeapon ItemWeaponData_PeachTaltDodge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3794,6 +3880,7 @@ BattleWeapon ItemWeaponData_PeachTaltDodge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Peach Tart, sleepy outcome: ItemEvent_RecoveryAndStatus picks it 20% of the time. */
 BattleWeapon ItemWeaponData_PeachTaltSleep = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3812,7 +3899,7 @@ BattleWeapon ItemWeaponData_PeachTaltSleep = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3832,6 +3919,7 @@ BattleWeapon ItemWeaponData_PeachTaltSleep = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Electro Pop (Zess T. cooking): restores 15 FP (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_BiribiriCandy = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3850,7 +3938,7 @@ BattleWeapon ItemWeaponData_BiribiriCandy = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3871,6 +3959,7 @@ BattleWeapon ItemWeaponData_BiribiriCandy = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Healthy Salad (Zess T. cooking): restores 15 FP and cures poison (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_HealthySalad = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3889,7 +3978,7 @@ BattleWeapon ItemWeaponData_HealthySalad = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3924,6 +4013,7 @@ BattleWeapon ItemWeaponData_HealthySalad = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Fresh Juice (Zess T. cooking): restores 5 FP and cures poison (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_FreshJuice = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3942,7 +4032,7 @@ BattleWeapon ItemWeaponData_FreshJuice = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3977,6 +4067,7 @@ BattleWeapon ItemWeaponData_FreshJuice = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Hot Sauce (Zess T. cooking): battle data run by ItemEvent_RecoveryAndStatus. */
 BattleWeapon ItemWeaponData_RedKararing = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3995,7 +4086,7 @@ BattleWeapon ItemWeaponData_RedKararing = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -4014,6 +4105,7 @@ BattleWeapon ItemWeaponData_RedKararing = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Couple's Cake (Zess T. cooking): restores HP slowly (ItemEvent_RecoveryAndStatus). */
 BattleWeapon ItemWeaponData_FutarideForever = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -4032,7 +4124,7 @@ BattleWeapon ItemWeaponData_FutarideForever = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -4073,7 +4165,7 @@ BattleWeapon ItemWeaponData_FireCandy = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    1, 0, // element..damagePattern
+    ELEMENT_FIRE, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -4098,6 +4190,7 @@ BattleWeapon ItemWeaponData_FireCandy = {
  * Zess Dynamite also shows fire pillars and the cook's ghostly image, the bombs explode.
  */
 EVT_BEGIN(ItemEvent_ThrowAttack)
+    // The camera closes in on the user; on the player's side they first walk forward.
     CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -4112,6 +4205,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
     END_IF
+    // The user holds up the dish, which is used up, and the camera pulls back.
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), 52)
     CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
@@ -4125,6 +4219,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // The targets are chosen (a random one for a single target when the user is not Mario or a partner).
     CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
@@ -4145,6 +4240,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
             CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(10), LW(11))
         END_IF
     END_IF
+    // If the user is Mario, he takes a throwing pose.
     CALL(btlevtcmd_GetUnitKind, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 222)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_C_1"))
@@ -4153,6 +4249,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
             CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
         END_SIBLING_EVENT
     END_IF
+    // The dish flies in an arc at the target, or at the middle of the enemies' side for an all-enemy dish.
     CALL(btlevtcmd_CheckWeaponPluralTarget, LW(12), LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(5), LW(6), LW(7))
@@ -4169,6 +4266,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     END_IF
     CALL(_get_throw_first_pos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(_throw_item_icon, LW(9), LW(0), LW(1), LW(2), LW(5), LW(6), LW(7))
+    // Zess Dynamite raises fire pillars and the cook's ghostly image; Coconut Bomb and Egg Bomb explode.
     SWITCH(LW(9))
         CASE_EQUAL(196)
         CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_THUNDERS_ATTACK4"), LW(5), LW(6), LW(7), 0)
@@ -4190,6 +4288,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
         CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_THUNDERS_ATTACK3"), LW(5), LW(6), LW(7), 0)
         CASE_END
     END_SWITCH
+    // Each target takes the damage unless it dodges (a miss, a lucky dodge or Dodgy).
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
@@ -4213,6 +4312,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     END_IF
     GOTO(10)
     LABEL(90)
+    // The user returns home.
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(30)
     CALL_CHILD(_return_home_event)
@@ -4220,6 +4320,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     RETURN
 EVT_END()
 
+/** Zess Dynamite (Zess T. cooking): thrown at every enemy (ItemEvent_ThrowAttack). */
 BattleWeapon ItemWeaponData_NancyDynamite = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -4238,7 +4339,7 @@ BattleWeapon ItemWeaponData_NancyDynamite = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -4257,6 +4358,7 @@ BattleWeapon ItemWeaponData_NancyDynamite = {
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+/** Coconut Bomb (Zess T. cooking): thrown at one enemy (ItemEvent_ThrowAttack). */
 BattleWeapon ItemWeaponData_CoconutsBomb = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -4275,7 +4377,7 @@ BattleWeapon ItemWeaponData_CoconutsBomb = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -4294,6 +4396,7 @@ BattleWeapon ItemWeaponData_CoconutsBomb = {
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+/** Courage Meal (Zess T. cooking): thrown at one enemy (ItemEvent_ThrowAttack). */
 BattleWeapon ItemWeaponData_KachikachiDish = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -4312,7 +4415,7 @@ BattleWeapon ItemWeaponData_KachikachiDish = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -4330,6 +4433,7 @@ BattleWeapon ItemWeaponData_KachikachiDish = {
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+/** Egg Bomb (Zess T. cooking): thrown at one enemy (ItemEvent_ThrowAttack). */
 BattleWeapon ItemWeaponData_BomberEgg = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -4348,7 +4452,7 @@ BattleWeapon ItemWeaponData_BomberEgg = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -4397,6 +4501,7 @@ EVT_BEGIN(ItemEvent_Poison_Kinoko)
     RETURN
 EVT_END()
 
+/** Poison Shroom (Zess T. cooking): poisons the eater (ItemEvent_Poison_Kinoko). */
 BattleWeapon ItemWeaponData_PoisonKinoko = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -4415,7 +4520,7 @@ BattleWeapon ItemWeaponData_PoisonKinoko = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -4596,7 +4701,7 @@ static USER_FUNC(_naniga_okorukana_check) {
         for (i = 0; _item_table[i] != 0; i++) {
         }
         item = _item_table[irand(i)];
-        event->userdata[0] = (EvtWord)effNanigaEntry(0, _item_table, item, pos.x, pos.y, pos.z);
+        event->userdata[0] = (EvtWord)effNanigaEntry(0, pos.x, pos.y, pos.z, _item_table, item);
         effSetName((EffectEntry*)event->userdata[0], "effNaniga");
         evtSetValue(event, out, item);
 #if VERSION >= VERSION_JP
@@ -4857,6 +4962,7 @@ EVT_BEGIN(ItemEvent_LastDinner)
     RETURN
 EVT_END()
 
+/** Trial Stew (Zess T. cooking): a drastic effect on the eater (ItemEvent_LastDinner). */
 BattleWeapon ItemWeaponData_LastDinner = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -4875,7 +4981,7 @@ BattleWeapon ItemWeaponData_LastDinner = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg

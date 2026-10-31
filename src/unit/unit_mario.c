@@ -22,6 +22,11 @@
 #include "version.h"
 #include "evt/evt_story.h"
 
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_MARIO_PINCH_VOICE = 8, // counts the pinch-pose relief voices; bit 0 picks the clip
+};
+
 static USER_FUNC(_get_local_frame);
 static USER_FUNC(_mario_makkuro_set);
 static USER_FUNC(_mario_super_emblem_anim_set);
@@ -55,12 +60,21 @@ static EvtWord attack_event[2];
 static EvtWord wait_event[6];
 extern EvtWord mario_win_reaction[];
 
+/** Mario's base defence: 0 against every element (badges and statuses add to it in battle). */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Mario's defence attributes: normal (0) against every element, no weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Mario's status chances: 100 for every status (badges such as Feeling Fine lower them in battle). */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Mario's pose table: animations for each status (sleep, stop, dizzy, poison, confusion, freeze, instant KO),
+ * the hurt poses, walking and running, item use, the low-HP pants, the Happy Heart / Happy Flower
+ * cheer, the kiss reactions (retail only), the failed Run Away tumble, the command menu wait, the Appeal,
+ * zero gravity, the Defend stance and plain standing.
+ */
 PoseTableEntry pose_table_mario_stay[] = {
     {4, "M_S_3"},
     {1, "M_N_5"},
@@ -69,21 +83,21 @@ PoseTableEntry pose_table_mario_stay[] = {
     {5, "M_X_1"},
     {3, "M_X_1"},
     {27, "M_Z_11"},
-    {28, "M_S_1"},
+    {BTL_POSE_NORMAL, "M_S_1"},
     {35, "M_V_2"},
     {37, "M_B_2"},
     {36, "M_D_6"},
     {31, "M_B_1"},
     {32, "M_V_1"},
     {38, "M_N_7"},
-    {39, "M_D_1"},
-    {43, "M_S_1"},
-    {40, "M_W_1"},
-    {42, "M_R_1"},
+    {BTL_POSE_DAMAGE, "M_D_1"},
+    {BTL_POSE_STAY, "M_S_1"},
+    {BTL_POSE_WALK, "M_W_1"},
+    {BTL_POSE_RUN, "M_R_1"},
     {44, "M_J_1B"},
-    {52, "M_I_1"},
-    {57, "M_S_3"},
-    {56, "M_S_3"},
+    {BTL_POSE_ITEM_USE, "M_I_1"},
+    {BTL_POSE_PERIL, "M_S_3"},
+    {BTL_POSE_DANGER, "M_S_3"},
     {BTL_POSE_HAPPY_HEART, "M_V_2"},
     {BTL_POSE_HAPPY_FLOWER, "M_V_2"},
 #if VERSION >= VERSION_JP
@@ -96,16 +110,22 @@ PoseTableEntry pose_table_mario_stay[] = {
     {BTL_POSE_APPEAL, "M_N_8"},
     {BTL_POSE_ZERO_GRAVITY, "M_I_O"},
     {49, "M_J_1B"},
-    {45, "M_B_2"},
+    {BTL_POSE_DEFEND, "M_B_2"},
     {BTL_POSE_STAY_DEFAULT, "M_S_1"},
 };
 
+/** Pose table for Mario's two hidden helper parts (2 and 3): the hidden KRN_H_1 animation for every pose. */
 PoseTableEntry pose_table_object[] = {
-    {28, "KRN_H_1"},
-    {39, "KRN_H_1"},
+    {BTL_POSE_NORMAL, "KRN_H_1"},
+    {BTL_POSE_DAMAGE, "KRN_H_1"},
     {BTL_POSE_STAY_DEFAULT, "KRN_H_1"},
 };
 
+/**
+ * Mario's data events: Appeal, the audience attack reaction, First Strike (nothing), Life Shroom revival,
+ * death, the victory pose, the readied jump attack, the Yoshi-riding battle entry
+ * and the counter after a dodge.
+ */
 BattleDataEntry data_table_mario[] = {
     {5, mario_appeal_event},
     {6, attack_audience_event},
@@ -119,12 +139,20 @@ BattleDataEntry data_table_mario[] = {
     {0, NULL},
 };
 
+/**
+ * Mario's battle parts: part 1 is his visible, targetable body; parts 2 and 3 are hidden,
+ * untargetable world-position parts on the same model.
+ */
 BattleUnitKindPart unitpartsdata_Mario[] = {
     {1, "btl_un_mario", "b_mario", 0.0f, 0.0f, 0.0f, 16.0f, 36.0f, 5.0f, 0.0f, 40.0f, 0.0f, 20, 36, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table_mario_stay},
     {2, "btl_un_mario", "b_mario", 0.0f, 0.0f, 0.0f, 16.0f, 36.0f, 5.0f, 0.0f, 40.0f, 0.0f, 20, 36, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table_object},
     {3, "btl_un_mario", "b_mario", 0.0f, 0.0f, 0.0f, 16.0f, 36.0f, 5.0f, 0.0f, 40.0f, 0.0f, 20, 36, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table_object},
 };
 
+/**
+ * Mario's battle unit (UNIT_MARIO), entered at the start of every battle by entryunit_mario in battle.c:
+ * three parts, Mario's hit sounds, required for clearing the battle and shown without an enemy HP gauge.
+ */
 BattleUnitKind unitdata_Mario = {
     222,
     "btl_un_mario",
@@ -202,7 +230,7 @@ static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_map_replayanim, 0, STRING("dontyo"))
     WAIT_FRAMES(40)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 61, -1, 0)
     LABEL(0)
@@ -225,7 +253,8 @@ EVT_END()
  * when he entered the battle in field motion 0x1A:
  * he runs from offstage to the partner's spot, hops from there to his home position,
  * then waits for the stand pose loop.
- * Guess: motion 0x1A is riding Yoshi, so Mario arrives on his partner and jumps off.
+ * Motion 0x1A is MARIO_MOTION_YOSHI (battle_seq.c picks this event then), so Mario arrives riding Yoshi
+ * and jumps off.
  */
 EVT_BEGIN(mario_ride_btl_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -233,7 +262,7 @@ EVT_BEGIN(mario_ride_btl_entry_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_map_replayanim, 0, STRING("dontyo"))
     WAIT_FRAMES(60)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_PARTNER, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 50, -1, 0)
@@ -241,7 +270,7 @@ EVT_BEGIN(mario_ride_btl_entry_event)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 60)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 24, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1, 0)
     LABEL(0)
@@ -259,6 +288,10 @@ EVT_BEGIN(mario_ride_btl_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Pose sounds for Mario: on the low-HP pant pose M_S_3, at a quarter of the loop,
+ * mario_pinch_pose_sound_callback plays one of his relief voice clips.
+ */
 static PoseSoundTiming pose_sound_timing_table[] = {
     {"M_S_3", 0.25f, mario_pinch_pose_sound_callback, NULL, 0, 1},
     {NULL, 0.0f, NULL, NULL, 0, 1},
@@ -279,7 +312,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_MARIO_BATTLE_MOVE1L"), STRING("SFX_MARIO_BATTLE_MOVE1R"), 0, 20, 20)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_MARIO_BATTLE_MOVE1L"), STRING("SFX_MARIO_BATTLE_MOVE1R"), 0, 10, 10)
     CALL(btlevtcmd_AnimeSetPoseSoundTable, BTL_UNIT_SELF, 1, PTR(pose_sound_timing_table))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_MARIO_PINCH_VOICE, 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 3, 0, 0)
     CALL(_mario_super_emblem_anim_set, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(battle_entry_event))
@@ -334,12 +367,12 @@ static USER_FUNC(_get_local_frame) {
 static s32 mario_pinch_pose_sound_callback(BattleUnit* unit) {
     s32 ret;
 
-    if (unit->work[8] & 1) {
+    if (unit->work[UW_MARIO_PINCH_VOICE] & 1) {
         ret = BtlUnit_snd_se(unit, "SFX_VOICE_MARIO_RELIEF2", -250000000, 0);
     } else {
         ret = BtlUnit_snd_se(unit, "SFX_VOICE_MARIO_RELIEF1", -250000000, 0);
     }
-    unit->work[8]++;
+    unit->work[UW_MARIO_PINCH_VOICE]++;
     return ret;
 }
 
@@ -524,7 +557,7 @@ EVT_BEGIN(mario_emergency_revival_event)
         CALL(btlevtcmd_DispItemIcon, LW(0), LW(1), LW(2), ITEM_LIFE_SHROOM, 120)
     END_SIBLING_EVENT
     WAIT_FRAMES(120)
-    CALL(btlevtcmd_OnOffStatus, LW(10), 27, 0, 0, 0)
+    CALL(btlevtcmd_OnOffStatus, LW(10), STATUS_INSTANT_KILL, 0, 0, 0)
     CALL(btlevtcmd_SetHp, LW(10), 0)
     CALL(btlevtcmd_RecoverHp, LW(10), LW(11), 10)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -616,7 +649,7 @@ EVT_BEGIN(btlataudevtMarioJump)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 6, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         WAIT_MS(500)
         CALL(evt_btl_camera_set_mode, 0, 0)
@@ -646,6 +679,7 @@ EVT_END()
  * The US and later releases add a follow-through pose and walk him back through the audience area.
  */
 EVT_BEGIN(btlataudevtMarioHammer)
+    // Mario runs off the side of the stage.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(4))
@@ -653,9 +687,10 @@ EVT_BEGIN(btlataudevtMarioHammer)
     MULTIPLY(LW(8), LW(4))
     MULTIPLY(LW(8), -1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(8), LW(1), LW(2), 0, -1, 0)
     WAIT_FRAMES(20)
+    // He reappears at the edge of the audience area; the camera homes in on the chosen audience member and he walks up.
     CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageAudienceAreaSize, LW(4), EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
@@ -670,6 +705,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Wind-up: picks the swing poses for his hammer upgrade level and raises the hammer with its hold sound.
     CALL(_get_mario_hammer_lv, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(2)
@@ -704,6 +740,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SWITCH
     WAIT_MS(500)
+    // He swings, with the swing sound of his hammer level.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(1))
     WAIT_FRAMES(1)
     CALL(_get_mario_hammer_lv, LW(0))
@@ -715,6 +752,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CASE_DEFAULT
         CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
     END_SWITCH
+    // The hammer lands: ground-thump sound, the audience member is struck and the camera shakes.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
     WAIT_FRAMES(7)
     CALL(_get_mario_hammer_lv, LW(0))
@@ -729,23 +767,26 @@ EVT_BEGIN(btlataudevtMarioHammer)
     CALL(_attack_aud, LW(3), 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+    // The camera returns to the stage view after a pause while Mario heads back.
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         WAIT_MS(1500)
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_MS(1000)
     END_SIBLING_EVENT
 #if VERSION <= VERSION_DEMO_US
+    // He reappears at the stage edge and walks home.
     WAIT_MS(30)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(8), LW(1), LW(2))
     CALL(btlevtcmd_WaitEventEnd, LW(15))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
 #else
+    // Follow-through pose, then he runs back through the audience area, reappears at the stage edge and walks home.
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_H_16"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     SET_VALUE(LW(0), 0)

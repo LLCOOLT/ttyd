@@ -18,6 +18,7 @@ static TreeAccess ki_data[5];
 extern EvtWord evt_kusa_8[];
 static KusaAccess kusa_data[10];
 
+/** Doors of this room: the west exit (w_bero) to hei_05 and the east exit (e_bero) to hei_07. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -54,6 +55,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Trees of this field that Mario can hit (a_ki_1 to a_ki_4). */
 static TreeAccess ki_data[] = {
     {0, "a_ki_1", "miki__1", "ha_temae_1", "ha_usiro_1", NULL},
     {0, "a_ki_2", "miki__2", "ha_temae_2", "ha_usiro_2", NULL},
@@ -71,6 +73,7 @@ EVT_BEGIN(evt_kusa_8)
     RETURN
 EVT_END()
 
+/** Grass patches Mario can hit on this field (a_kusa_2 to a_kusa_14); a_kusa_8 runs evt_kusa_8 when cut. */
 static KusaAccess kusa_data[] = {
     {0, "a_kusa_2", "kusa_2", NULL},
     {0, "a_kusa_3", "kusa_3", NULL},

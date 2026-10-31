@@ -1,4 +1,4 @@
-// Palace of Shadow battle unit: the Kammy Koopa (fought with Bowser) (`boss_kamec_obaba`): parts, stats, poses and AI scripts.
+// Palace of Shadow battle unit: Kammy Koopa (fought with Bowser) (`boss_kamec_obaba`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "eff/n64/eff_magic1_n64.h"
@@ -19,6 +19,15 @@
 #include "evt/evt_msg.h"
 #include "eff/eff_stardust.h"
 #include "eff/n64/eff_thunderflare_n64.h"
+
+// Unit work slots of Kammy Koopa (btlevtcmd_SetUnitWork / GetUnitWork / AddUnitWork; eff_* use 3 and 4).
+enum {
+    UW_BOSS_KAMEC_OBABA_FLYING = 0,         // 1 while she is on her broom
+    UW_BOSS_KAMEC_OBABA_FLYING_DAMAGE = 1,  // damage taken on the broom; above 1 she falls off
+    UW_BOSS_KAMEC_OBABA_GROUNDED_TURNS = 2, // turns on the ground; at 3 she gets back on her broom
+    UW_BOSS_KAMEC_OBABA_STAFF_EFFECT = 3,   // EffectEntry of the Thunder Flare charge on her staff (eff_staff)
+    UW_BOSS_KAMEC_OBABA_MAGIC_EFFECT = 4,   // EffectEntry of her magic bolt (eff_magic)
+};
 
 // The callers of effThunderflareN64Entry pass a sixth argument (scale) that the five-parameter definition in
 // eff_thunderflare_n64.h does not take (header request P13 4).
@@ -59,6 +68,7 @@ static EvtWord trans_magic_event[4];
 static EvtWord recover_magic_event[90];
 static EvtWord wait_event[6];
 
+/** Weapon of Kammy Koopa's magic blast: damage 5. */
 BattleWeapon weapon_kamec_obaba_attack_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -77,7 +87,7 @@ BattleWeapon weapon_kamec_obaba_attack_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -95,6 +105,7 @@ BattleWeapon weapon_kamec_obaba_attack_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Kammy Koopa's spell that makes a unit huge: inflicts a size change. */
 BattleWeapon weapon_kamec_obaba_dekadeka_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -112,7 +123,7 @@ BattleWeapon weapon_kamec_obaba_dekadeka_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -133,6 +144,7 @@ BattleWeapon weapon_kamec_obaba_dekadeka_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Kammy Koopa's spell that electrifies a unit: inflicts Electrified. */
 BattleWeapon weapon_kamec_obaba_biribiri_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -150,7 +162,7 @@ BattleWeapon weapon_kamec_obaba_biribiri_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -171,6 +183,7 @@ BattleWeapon weapon_kamec_obaba_biribiri_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Kammy Koopa's spell that raises Defense: inflicts a defense change. */
 BattleWeapon weapon_kamec_obaba_katikati_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -188,7 +201,7 @@ BattleWeapon weapon_kamec_obaba_katikati_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -210,6 +223,7 @@ BattleWeapon weapon_kamec_obaba_katikati_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Kammy Koopa's spell that turns a unit invisible: inflicts Invisible. */
 BattleWeapon weapon_kamec_obaba_trans_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -227,7 +241,7 @@ BattleWeapon weapon_kamec_obaba_trans_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -247,6 +261,7 @@ BattleWeapon weapon_kamec_obaba_trans_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Kammy Koopa's healing spell. */
 BattleWeapon weapon_kamec_obaba_recover_magic = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -264,7 +279,7 @@ BattleWeapon weapon_kamec_obaba_recover_magic = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -282,6 +297,10 @@ BattleWeapon weapon_kamec_obaba_recover_magic = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Unit data of Kammy Koopa in the Palace of Shadow: 50 HP, level 48;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_boss_kamec_obaba = {
     145,
     "btl_un_kamec_obaba",
@@ -340,7 +359,7 @@ BattleUnitKind unit_boss_kamec_obaba = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     2,
     parts,
@@ -348,16 +367,36 @@ BattleUnitKind unit_boss_kamec_obaba = {
     data_table,
 };
 
+/**
+ * Defence of Kammy Koopa against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of Kammy Koopa per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Kammy Koopa:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Stop, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic,
+ * Slow, Instant KO.
+ */
 static StatusVulnerability regist = {40, 40, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Kammy Koopa:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Stop, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist = {40, 40, 60, 100, 40, 100, 100, 40, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/** Pose table of Kammy Koopa: animation names for each pose type (idle, walk, hurt, attack and so on). */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -365,19 +404,23 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "D_1"},
-    {39, "D_1"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Pose table of Kammy Koopa while in the air: animation names for each pose type (idle, walk, hurt, attack
+ * and so on).
+ */
 static PoseTableEntry pose_table_sky[] = {
     {1, "N_2"},
     {2, "Y_2"},
@@ -385,33 +428,42 @@ static PoseTableEntry pose_table_sky[] = {
     {5, "K_2"},
     {4, "X_2"},
     {3, "X_2"},
-    {28, "S_2"},
+    {BTL_POSE_NORMAL, "S_2"},
     {29, "Q_2"},
     {30, "Q_2"},
     {31, "D_2"},
-    {39, "D_2"},
-    {42, "R_2"},
-    {40, "W_2"},
-    {56, "X_2"},
-    {57, "X_2"},
+    {BTL_POSE_DAMAGE, "D_2"},
+    {BTL_POSE_RUN, "R_2"},
+    {BTL_POSE_WALK, "W_2"},
+    {BTL_POSE_DANGER, "X_2"},
+    {BTL_POSE_PERIL, "X_2"},
     {BTL_POSE_TALK, "T_2"},
     {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
+/**
+ * Pose table of Kammy Koopa once defeated: animation names for each pose type (idle, walk, hurt, attack and
+ * so on).
+ */
 static PoseTableEntry pose_table_dead[] = {
-    {28, "D_3"},
-    {39, "D_3"},
+    {BTL_POSE_NORMAL, "D_3"},
+    {BTL_POSE_DAMAGE, "D_3"},
     {BTL_POSE_STAY_DEFAULT, "D_3"},
 };
 
+/**
+ * Data table of Kammy Koopa: event scripts and values the battle looks up by tag (damage reactions, dodge,
+ * first strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/** Parts of Kammy Koopa: 2 parts with their hit boxes, defence tables and pose tables. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_kamec_obaba", "c_kamek_bb", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table_sky},
-    {2, "btl_un_kamec_obaba", "c_kamek_bb", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_kamec_obaba", "c_kamek_bb", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table_sky},
+    {2, "btl_un_kamec_obaba", "c_kamek_bb", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
 /**
@@ -419,7 +471,7 @@ static BattleUnitKindPart parts[] = {
  * the view is higher when her unit work 0 is 1 (she is flying on her broom).
  */
 static EVT_BEGIN(kamec_obaba_zoom)
-    CALL(btlevtcmd_GetUnitWork, GW(9), 0, LW(1))
+    CALL(btlevtcmd_GetUnitWork, GW(9), UW_BOSS_KAMEC_OBABA_FLYING, LW(1))
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_EQUAL(LW(1), 1)
         CALL(evt_btl_camera_set_moveto, 0, 135, 106, 296, 135, 55, -402, 30, 11)
@@ -440,9 +492,9 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING_DAMAGE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_GROUNDED_TURNS, 0)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_BOSS_KAMEBABA_MOVE1L"), STRING("SFX_BOSS_KAMEBABA_MOVE1R"), 0, 15, 15)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_BOSS_KAMEBABA_MOVE1L"), STRING("SFX_BOSS_KAMEBABA_MOVE1R"), 0, 8, 8)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -458,20 +510,20 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_INSTANT_KILL, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, LW(10), UW_BOSS_KAMEC_OBABA_FLYING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_GetTotalDamage, LW(10), LW(1))
-        CALL(btlevtcmd_GetUnitWork, LW(10), 1, LW(0))
+        CALL(btlevtcmd_GetUnitWork, LW(10), UW_BOSS_KAMEC_OBABA_FLYING_DAMAGE, LW(0))
         ADD(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, LW(10), 1, LW(0))
+        CALL(btlevtcmd_SetUnitWork, LW(10), UW_BOSS_KAMEC_OBABA_FLYING_DAMAGE, LW(0))
         IF_INT_GREATER(LW(0), 1)
             CALL(btlevtcmd_WaitAttackEnd)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
@@ -491,21 +543,21 @@ EVT_END()
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 4)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_FLOATING)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_2"))
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
     BEGIN_INLINE_EVENT
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("H_1"))
         CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, 255)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
         WAIT_FRAMES(80)
         CALL(evt_sub_intpl_init, 0, 255, 0, 30)
         LOOP(30)
@@ -513,7 +565,7 @@ static EVT_BEGIN(dmg_fall_event)
             CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 2, LW(1))
             WAIT_FRAMES(1)
         END_LOOP
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
     END_INLINE_EVENT
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -522,7 +574,7 @@ static EVT_BEGIN(dmg_fall_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KAMEBABA_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     WAIT_MS(500)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING, 0)
     RETURN
 EVT_END()
 
@@ -537,7 +589,7 @@ static EVT_BEGIN(dead_event)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_WaitAttackEnd)
     DEBUG_PUT_MSG(STRING("カメックオババ　死亡イベント開始"))
-    CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, LW(10), UW_BOSS_KAMEC_OBABA_FLYING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(dmg_fall_event)
     END_IF
@@ -601,7 +653,7 @@ static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_INSTANT_KILL, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
@@ -609,12 +661,12 @@ static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 2, 1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_GROUNDED_TURNS, 1)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_GROUNDED_TURNS, LW(0))
     IF_INT_LESS(LW(0), 3)
         GOTO(99)
     END_IF
@@ -623,15 +675,15 @@ static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, 300, LW(1), LW(2), 0, -1, 0)
     WAIT_FRAMES(60)
-    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 4)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 2097152)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, UNIT_ATTR_FLOATING)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_sky))
     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         LOOP(0)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KAMEBABA_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -647,9 +699,9 @@ static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     DELETE_EVENT(LW(15))
     WAIT_MS(500)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING_DAMAGE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_GROUNDED_TURNS, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     LABEL(99)
     RETURN
@@ -664,6 +716,7 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // Kammy uses an enemy item if she has one.
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -708,22 +761,24 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_dekadeka_magic))
+    // She looks for a support spell to cast on herself.
     CALL_CHILD(magic_select_pri_obaba)
     IF_INT_NOT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckStatus, LW(3), 6, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_ELECTRIC, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LW(8), 10)
         END_IF
-        CALL(btlevtcmd_CheckStatus, LW(3), 18, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_INVISIBLE, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LW(10), 10)
         END_IF
     END_IF
     SET_VALUE(LW(13), LW(3))
     SET_VALUE(LW(14), LW(4))
+    // Or she looks for one to cast on Bowser.
     CALL_CHILD(magic_select_pri_koopa)
     IF_INT_NOT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckStatus, LW(3), 14, LW(0))
+        CALL(btlevtcmd_CheckStatus, LW(3), STATUS_DEFENSE_UP, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(LW(7), 10)
         END_IF
@@ -747,7 +802,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
         IF_INT_EQUAL(LW(3), -1)
-            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+            CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
                 CALL_CHILD(subsetevt_confuse_flustered)
                 RETURN
@@ -759,6 +814,7 @@ static EVT_BEGIN(attack_event)
         IF_INT_EQUAL(LW(0), LW(1))
             GOTO(10)
         END_IF
+        // She casts the chosen spell (heal, Defense up, electric charge, invisibility or growth).
         CALL_CHILD(recover_magic_event)
         GOTO(99)
     END_IF
@@ -791,6 +847,7 @@ static EVT_BEGIN(attack_event)
         GOTO(99)
     ELSE
         SET_VALUE(LW(9), PTR(&weapon_kamec_obaba_attack_magic))
+        // Otherwise she casts the magic attack at the party.
         CALL_CHILD(attack_magic_event)
         GOTO(99)
     END_IF
@@ -894,7 +951,7 @@ EVT_END()
  * runs the ground or the air animation depending on whether she is flying (unit work 0).
  */
 static EVT_BEGIN(magic_common_event1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(13))
         IF_INT_NOT_EQUAL(LW(3), LW(13))
@@ -913,7 +970,7 @@ EVT_END()
  * runs the ground or air second half depending on whether she is flying.
  */
 static EVT_BEGIN(magic_common_event2)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_KAMEC_OBABA_FLYING, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL_CHILD(ground_magic_common_event2)
     ELSE
@@ -946,10 +1003,11 @@ EVT_END()
  */
 static EVT_BEGIN(attack_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -957,15 +1015,18 @@ static EVT_BEGIN(attack_magic_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // She conjures a magic blast and sends it at one party member.
     CALL_CHILD(magic_common_event1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KAMEBABA_MAGIC3_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -983,6 +1044,7 @@ static EVT_BEGIN(attack_magic_event)
         CASE_DEFAULT
         GOTO(98)
         CASE_END
+        // The attack misses or is dodged.
         LABEL(90)
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(1)
@@ -992,6 +1054,7 @@ static EVT_BEGIN(attack_magic_event)
                     CALL(eff_magic_get_posX, BTL_UNIT_SELF, LW(0))
                     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(6), LW(7), LW(8))
                     IF_INT_LESS_OR_EQUAL(LW(0), LW(6))
+                        // The party member can dodge it as it passes.
                         CALL_CHILD(start_avoid)
                         BREAK_LOOP
                     END_IF
@@ -1017,6 +1080,7 @@ static EVT_BEGIN(attack_magic_event)
         CALL(eff_magic, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 60)
         WAIT_FRAMES(60)
         GOTO(98)
+        // The attack connects.
         LABEL(91)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(0), -57)
@@ -1024,12 +1088,15 @@ static EVT_BEGIN(attack_magic_event)
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
         CALL(eff_magic, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 45)
         WAIT_FRAMES(45)
+        // Deal the damage, reduced by the action command defence.
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         GOTO(98)
+        // Wrap up the attack.
         LABEL(98)
         WAIT_FRAMES(30)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
+        // The attack is over; back to waiting.
         LABEL(99)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
         RETURN
@@ -1094,12 +1161,11 @@ EVT_END()
 
 /**
  * Dekadeka spell of Kammy Koopa (weapon_kamec_obaba_dekadeka_magic):
- * she casts it on one target, Bowser or herself (Guess: it makes the target grow,
- * as for the Elite Wizzerd's spell of the same name).
+ * she casts it on one ally, Bowser or herself: Huge (size +2) for 3 turns.
  */
 static EVT_BEGIN(dekadeka_magic_event)
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -1116,7 +1182,7 @@ static EVT_BEGIN(dekadeka_magic_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(30)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -1125,7 +1191,7 @@ EVT_END()
 
 /**
  * Katikati spell of Kammy Koopa: uses the same casting script as dekadeka_magic_event with
- * weapon_kamec_obaba_katikati_magic (Guess: a defence boost).
+ * weapon_kamec_obaba_katikati_magic: Defense +3 for 3 turns on one ally.
  */
 static EVT_BEGIN(katikati_magic_event)
     CALL_CHILD(dekadeka_magic_event)
@@ -1134,7 +1200,7 @@ EVT_END()
 
 /**
  * Biribiri spell of Kammy Koopa: uses the same casting script as dekadeka_magic_event with
- * weapon_kamec_obaba_biribiri_magic (Guess: an electric charge, from the name "biribiri").
+ * weapon_kamec_obaba_biribiri_magic: Electrified for 3 turns on one ally.
  */
 static EVT_BEGIN(biribiri_magic_event)
     CALL_CHILD(dekadeka_magic_event)
@@ -1143,7 +1209,7 @@ EVT_END()
 
 /**
  * Trans spell of Kammy Koopa: uses the same casting script as dekadeka_magic_event with
- * weapon_kamec_obaba_trans_magic (Guess: makes the target transparent).
+ * weapon_kamec_obaba_trans_magic: Invisible for 3 turns on one ally.
  */
 static EVT_BEGIN(trans_magic_event)
     CALL_CHILD(dekadeka_magic_event)
@@ -1214,20 +1280,20 @@ static USER_FUNC(eff_magic_support) {
 
 /**
  * Script helper: returns in args[1] the current X offset of the magic effect stored in the unit args[0]
- * (unit->work[4]), so the script can wait for the spell to reach a position.
+ * (unit->work[UW_BOSS_KAMEC_OBABA_MAGIC_EFFECT]), so the script can wait for the spell to reach a position.
  */
 static USER_FUNC(eff_magic_get_posX) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
-    evtSetFloat(event, args[1], ((EffMagic1N64Work*)((EffectEntry*)unit->work[4])->userdata)->offset.x);
+    evtSetFloat(event, args[1], ((EffMagic1N64Work*)((EffectEntry*)unit->work[UW_BOSS_KAMEC_OBABA_MAGIC_EFFECT])->userdata)->offset.x);
     return EVT_RETURN_DONE;
 }
 
 /**
- * Script helper: starts Kammy's magic bolt (N64 magic effect of kind args[4]) from the tip of her wand towards
- * the point (args[1], args[2], args[3]) and stores it in unit->work[4].
+ * Script helper: fires Kammy's magic bolt (effMagic1N64, type 0) from the tip of her wand towards
+ * the point (args[1], args[2], args[3]), lasting args[4] frames, and stores it in unit->work[UW_BOSS_KAMEC_OBABA_MAGIC_EFFECT].
  */
 static USER_FUNC(eff_magic) {
     EvtWord* args = event->args;
@@ -1248,7 +1314,7 @@ static USER_FUNC(eff_magic) {
     y += 20.0f * unit->sizeMultiplier;
     z += 5.0f;
     eff = effMagic1N64Entry(0, type, x, y, z, a, b, c);
-    unit->work[4] = (EvtWord)eff;
+    unit->work[UW_BOSS_KAMEC_OBABA_MAGIC_EFFECT] = (EvtWord)eff;
     ((EffMagic1N64Work*)eff->userdata)->scale = unit->sizeMultiplier;
     return EVT_RETURN_DONE;
 }
@@ -1267,12 +1333,12 @@ static USER_FUNC(eff_staff) {
     f32* wk;
 
     if (isFirstCall) {
-        unit->work[3] = (EvtWord)effThunderflareN64Entry(0, 60, 0.0f, -1000.0f, 0.0f, 1.0f);
+        unit->work[UW_BOSS_KAMEC_OBABA_STAFF_EFFECT] = (EvtWord)effThunderflareN64Entry(0, 60, 0.0f, -1000.0f, 0.0f, 1.0f);
     }
-    if (!(((EffectEntry*)unit->work[3])->flags & 1)) {
+    if (!(((EffectEntry*)unit->work[UW_BOSS_KAMEC_OBABA_STAFF_EFFECT])->flags & EFFECT_FLAG_IN_USE)) {
         return EVT_RETURN_DONE;
     }
-    wk = ((EffectEntry*)unit->work[3])->userdata;
+    wk = ((EffectEntry*)unit->work[UW_BOSS_KAMEC_OBABA_STAFF_EFFECT])->userdata;
     wk[10] = unit->sizeMultiplier;
     BtlUnit_GetPos(unit, &x, &y, &z);
     wk[2] = x + 30.0f * unit->sizeMultiplier * unit->faceDirection;

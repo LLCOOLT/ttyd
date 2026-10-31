@@ -1,6 +1,7 @@
 #include <dolphin/gd.h>
 #include <dolphin/os.h>
 
+/** The display list being written by the GD functions, and the callback run when it runs out of room. */
 GDLObj* __GDCurrentDL = NULL;
 static GDOverflowCb overflowcb = NULL;
 

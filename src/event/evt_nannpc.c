@@ -97,7 +97,7 @@ static inline void nanNPCHitMove(NanNPC* r, f32 mag) {
     v60 = r->pos;
     v60.y += 1.0f;
     PSVECNormalize(&r->move, &v6c);
-    if (r->flags & 8) {
+    if (r->flags & NANNPC_FLAG_NO_HIT) {
         PSVECAdd(&r->pos, &r->move, &r->pos);
         PSVECScale(&r->move, &r->move, 0.6f);
     } else {
@@ -165,9 +165,9 @@ void nanNPCOption(void) {
 
     w = nanNPCWork;
     for (p = ((NanNPCWork*)w)->npc; p < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; p++) {
-        if (p->flags & 4) {
+        if (p->flags & NANNPC_FLAG_WALK) {
             for (q = ((NanNPCWork*)w)->npc; q < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; q++) {
-                if (p != q && (q->flags & 4)) {
+                if (p != q && (q->flags & NANNPC_FLAG_WALK)) {
                     dist = PSVECDistance(&p->pos, &q->pos);
                     PSVECSubtract(&p->pos, &q->pos, &diff);
                     if (dist <= p->sizeY) {
@@ -187,7 +187,7 @@ void nanNPCOption(void) {
     }
     // FAKE: r (loop 3 start) assigned in loop 2's exit test, as the target loads it there (no mr copy); w->npc is not changed by loop 2
     for (p = ((NanNPCWork*)w)->npc; p < (r = ((NanNPCWork*)w)->npc) + ((NanNPCWork*)w)->num; p++) {
-        if (p->flags & 4) {
+        if (p->flags & NANNPC_FLAG_WALK) {
             PSVECSubtract(&p->target, &p->pos, &diff);
             mag = PSVECMag(&diff);
             if (mag > 0.8f * p->sizeY) {
@@ -199,7 +199,7 @@ void nanNPCOption(void) {
         }
     }
     for (; r < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; r++) {
-        if (r->flags & 4) {
+        if (r->flags & NANNPC_FLAG_WALK) {
             mag = PSVECMag(&r->move);
             if (mag) {
                 if (mag > 10.0f) {
@@ -335,7 +335,7 @@ void nannpc_ext_main_sub_fast(void) {
             }
             p->pose->texId = p->anim;
             p->pose->dir = -p->dir;
-            if (p->flags & 2) {
+            if (p->flags & NANNPC_FLAG_HIDDEN) {
                 (*p->pose->mtx)[0][3] = 0.0f;
                 (*p->pose->mtx)[1][3] = -1000.0f;
                 (*p->pose->mtx)[2][3] = 0.0f;
@@ -368,11 +368,11 @@ static void nannpc_ext_main(void) {
  */
 static void nannpc_ext_dispent(void) {
     if (!(nanNPCWork->flags & 1)) {
-        dispEntry(4, 0.0f, 1, nannpc_ext_disp, 0);
-        dispEntry(4, 0.0f, 2, nannpc_ext_shadow_disp, 0);
+        dispEntry(CAMERA_3D, 0.0f, 1, nannpc_ext_disp, 0);
+        dispEntry(CAMERA_3D, 0.0f, 2, nannpc_ext_shadow_disp, 0);
     } else {
-        dispEntry(4, 0.0f, 2, nannpc_ext_disp, 0);
-        dispEntry(4, 0.0f, 2, nannpc_ext_shadow_disp, 0);
+        dispEntry(CAMERA_3D, 0.0f, 2, nannpc_ext_disp, 0);
+        dispEntry(CAMERA_3D, 0.0f, 2, nannpc_ext_shadow_disp, 0);
     }
 }
 

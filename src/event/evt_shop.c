@@ -85,6 +85,10 @@ static USER_FUNC(shop_point_item);
 static USER_FUNC(shopper_name);
 static USER_FUNC(unkeep_pouchcheck_func);
 
+/**
+ * Text colours of the shop windows: white for the item name, price, point count, list title and the list's
+ * "Pts." and "Prizes" headings; in the Shop Prizes list, prizes already earned are red and the rest black.
+ */
 static const GXColor shop_name_color = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor shop_price_color = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor shop_point_num_color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -113,18 +117,32 @@ extern EvtWord unkeep_evt[];
 extern EvtWord point_evt[];
 extern EvtWord evt_shoplist[];
 
+/**
+ * Windows shown while browsing a shop shelf: the item name and price,
+ * the item description and the shop point count.
+ */
 static WinMgrDesc window_desc[] = {
     {0, 0, 8, -150, 120, 300, 50, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, name_disp},
     {0, 0, 8, -240, -130, 500, 80, {0xF0, 0xF0, 0xF0, 0xFF}, help_main, help_disp},
     {2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, point_disp},
 };
 
+/**
+ * Shop point prizes: 10 Mushroom, 20 Ice Storm, 30 Super Shroom, 50 Thunder Rage, 70 Shooting Star,
+ * 100 Gold Bar, 150 Life Shroom, 200 Ultra Shroom, 250 Jammin' Jelly
+ * and 300 Gold Bar x3 (the point count then resets). Ends with -1.
+ * Read by the prize checks and the Shop Prizes list.
+ */
 ShopPoint shopPointList[] = {
     10, 148, 20, 131, 30, 149, 50, 129,
     70, 130, 100, 126, 150, 151, 200, 150,
     250, 156, 300, 127, -1, -1,
 };
 
+/**
+ * Windows of the Shop Prizes list ("Just checking points..."): the title,
+ * the prize list and the shop point count.
+ */
 WinMgrDesc list_desc[] = {
     {0, 0, 8, -280, 160, 210, 80, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, title_disp},
     {0, 3, 8, -60, 160, 340, 300, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, list_disp},
@@ -149,6 +167,8 @@ EVT_END()
  * then runs the shop's own buy_evt with LW(0) = the item id.
  */
 static EVT_BEGIN(buy_evt)
+    // Mario stops and the item's highlight goes away;
+    // a first-time shopper hears the shopping explanation instead.
     CALL(evt_mario_normalize)
     SET_VALUE(LW(10), LW(0))
     CALL(disp_off, LW(10))
@@ -157,6 +177,7 @@ static EVT_BEGIN(buy_evt)
         CALL_CHILD(first_shopping_evt)
         RETURN
     END_IF
+    // The shopkeeper turns to Mario, the coin and point windows open, and he names the item and its price.
     CALL(shopper_name, LW(9))
     CALL(evt_set_dir_to_target, LW(9), STRING("mario"))
     CALL(evt_win_coin_on, 0, LW(8))
@@ -180,6 +201,7 @@ static EVT_BEGIN(buy_evt)
         CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(11), LW(13))
     END_IF
 #endif
+    // Mario decides: "no", too few coins or a full item bag each end the purchase with the shopkeeper's line.
     CALL(get_msg, LW(10), 24, LW(14))
     CALL(evt_msg_select, 0, LW(14))
     IF_INT_EQUAL(LW(0), 1)
@@ -205,6 +227,7 @@ static EVT_BEGIN(buy_evt)
         CALL(point_disp_onoff, 0)
         RETURN
     END_IF
+    // Bought: a shop point is added (two during a timed double-points sale) and the coins are paid.
     CALL(set_buy_item_id, LW(12))
     CALL(evt_sub_load_progresstime, GSW(GSW_MRI07_DOUBLE_POINTS_TIME), LW(0))
     CALL(evt_sub_load_progresstime, GSW(GSW_USU01_DOUBLE_POINTS_TIME), LW(1))
@@ -223,6 +246,7 @@ static EVT_BEGIN(buy_evt)
 #else
     CALL(evt_msg_continue)
 #endif
+    // The first item ever bought brings up the item tutorial, except on kiosk units.
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_CLEAR(LW(0), GLOBAL_FLAG_KIOSK)
         IF_INT_EQUAL(GSWF(GSWF_ITEM_TUTORIAL_SEEN), 0)
@@ -230,6 +254,8 @@ static EVT_BEGIN(buy_evt)
             CALL(evt_msg_print, 0, STRING("item_first_hit"), 0, 0)
         END_IF
     END_IF
+    // Hand out every shop point prize now reached; at 300 points the shopkeeper announces the maximum and the
+    // count resets.
     LOOP(0)
         CALL(chk_shop_point, LW(0), LW(1), LW(2))
         IF_INT_EQUAL(LW(0), -1)
@@ -266,6 +292,7 @@ static EVT_BEGIN(buy_evt)
             CALL(point_disp_onoff, 0)
             SET_VALUE(LF(0), 1)
         END_IF
+        // With a full item bag the prize is kept for later (the 300-point prize is remembered by a flag).
         CALL(evt_pouch_add_item, LW(1), LW(0))
         IF_INT_EQUAL(LW(0), -1)
             CALL(get_msg, LW(10), 27, LW(14))
@@ -278,6 +305,7 @@ static EVT_BEGIN(buy_evt)
         END_IF
         CALL(exchange_shop_point)
     END_LOOP
+    // Finally the shop's own after-purchase script runs, if it has one.
     LABEL(123)
     CALL(get_buy_evt, LW(1))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -297,6 +325,7 @@ EVT_END()
  */
 EVT_BEGIN(shopper_talk_evt)
     CALL(evt_mario_key_onoff, 0)
+    // The shop's hook script runs first and may end the talk or keep its message box open.
     CALL(get_ptr, LW(10))
     SET_VALUE(LF(10), 0)
     CALL(get_fook_evt, LW(0))
@@ -310,6 +339,7 @@ EVT_BEGIN(shopper_talk_evt)
             SET_VALUE(LF(10), 1)
         END_IF
     END_IF
+    // A first-time shopper hears the shopping explanation.
     IF_INT_EQUAL(GSWF(GSWF_SHOP_FIRST_VISIT), 0)
         SET_VALUE(GSWF(GSWF_SHOP_FIRST_VISIT), 1)
         CALL_CHILD(first_shopping_evt)
@@ -317,6 +347,7 @@ EVT_BEGIN(shopper_talk_evt)
         RETURN
     END_IF
     SET_VALUE(LF(0), 0)
+    // Hand out shop point prizes Mario earned but could not carry, one at a time.
     LOOP(0)
         CALL(chk_shop_point, LW(0), LW(1), LW(2))
         IF_INT_EQUAL(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 1)
@@ -328,6 +359,8 @@ EVT_BEGIN(shopper_talk_evt)
                 CALL(evt_mario_key_onoff, 1)
                 RETURN
             END_IF
+            // Nothing (left) to hand out: greet Mario, with the double-points greeting during a timed sale at
+            // the Great Tree, Twilight Town or the Excess Express shop.
             SET_VALUE(LF(11), 0)
             CALL(evt_sub_get_mapname, LW(0))
             IF_STR_EQUAL(LW(0), STRING("mri_07"))
@@ -381,6 +414,7 @@ EVT_BEGIN(shopper_talk_evt)
             END_IF
             BREAK_LOOP
         END_IF
+        // A prize that still does not fit is kept for later.
         CALL(evt_pouch_add_item, LW(1), LW(0))
         IF_INT_EQUAL(LW(0), -1)
             CALL(get_msg, LW(10), 29, LW(14))
@@ -393,6 +427,7 @@ EVT_BEGIN(shopper_talk_evt)
             END_IF
             BREAK_LOOP
         END_IF
+        // "Here's your prize": the prize is marked as given.
         CALL(get_msg, LW(10), 28, LW(14))
         IF_INT_EQUAL(LF(10), 0)
 #if VERSION >= VERSION_US
@@ -439,10 +474,11 @@ EVT_BEGIN(shopper_talk_evt)
             SET_VALUE(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 0)
         END_IF
     END_LOOP
-    CALL(shop_flag_onoff, 1, 16384)
+    // The counter menu: shop, sell, store, withdraw or check shop points.
+    CALL(shop_flag_onoff, 1, SHOP_FLAG_TALKING)
     CALL(get_msg, LW(10), 23, LW(14))
     CALL(evt_msg_select, 0, LW(14))
-    CALL(shop_flag_onoff, 0, 16384)
+    CALL(shop_flag_onoff, 0, SHOP_FLAG_TALKING)
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(get_msg, LW(10), 5, LW(14))
@@ -992,7 +1028,7 @@ static void name_disp(WinMgrEntry* entry) {
         FontDrawEdgeOff();
     }
     for (i = 0; i < wp->count; i++) {
-        if (wp->itemFlags[i] & 1) {
+        if (wp->itemFlags[i] & SHOP_ITEM_FLAG_SOLD_OUT) {
             continue;
         }
         mapObjGetPos(wp->objs[i].mobj, &pos);
@@ -1048,7 +1084,7 @@ static void point_disp(WinMgrEntry* entry) {
 #if VERSION >= VERSION_US
     PSMTXScale(s, gp->language != 0U ? 0.8f : 1.1f, 1.1f, 1.1f);
     PSMTXConcat(m, s, m);
-    iconDispGx2(m, 0x10, point_disp_icons[gp->language]);
+    iconDispGx2(m, ICON_DISP_2D, point_disp_icons[gp->language]);
 #else
     if (gp->language == 0U) {
         PSMTXScale(s, 1.1f, 1.1f, 1.1f);
@@ -1326,33 +1362,29 @@ USER_FUNC(evt_shop_setup) {
     wp->count = 6;
     for (i = 0; i < wp->count; i++) {
         mapObjGetPos(wp->objs[i].mobj, &pos);
-        mapObjFlagOn(wp->objs[i].mobj, 0x4000);
+        mapObjFlagOn(wp->objs[i].mobj, MAPOBJ_FLAG_DISABLE);
         sprintf(buf, "shp%d", i);
         iconEntry(buf, itemDataTable[wp->items[i].id].icon_id);
         iconSetPos(buf, pos.x, pos.y + 6.0f, pos.z);
-#if VERSION <= VERSION_DEMO_US
-        iconFlagOn(buf, 0x80); // the demo icon driver numbers this flag 0x80
-#else
-        iconFlagOn(buf, 0x40);
-#endif
+        iconFlagOn(buf, ICON_FLAG_NO_MAP_BLEND);
         wp->itemFlags[i] = 0;
-        if (wp->items[i].id == 0x33 && pouchCheckItem(ITEM_CONTACT_LENS)) {
-            wp->itemFlags[i] |= 1;
+        if (wp->items[i].id == ITEM_CONTACT_LENS && pouchCheckItem(ITEM_CONTACT_LENS)) {
+            wp->itemFlags[i] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->items[i].id == 0x37 && pouchCheckItem(ITEM_SUPER_LUIGI1)) {
-            wp->itemFlags[i] |= 1;
+        if (wp->items[i].id == ITEM_SUPER_LUIGI1 && pouchCheckItem(ITEM_SUPER_LUIGI1)) {
+            wp->itemFlags[i] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->items[i].id == 0x38 && pouchCheckItem(ITEM_SUPER_LUIGI2)) {
-            wp->itemFlags[i] |= 1;
+        if (wp->items[i].id == ITEM_SUPER_LUIGI2 && pouchCheckItem(ITEM_SUPER_LUIGI2)) {
+            wp->itemFlags[i] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->items[i].id == 0x39 && pouchCheckItem(ITEM_SUPER_LUIGI3)) {
-            wp->itemFlags[i] |= 1;
+        if (wp->items[i].id == ITEM_SUPER_LUIGI3 && pouchCheckItem(ITEM_SUPER_LUIGI3)) {
+            wp->itemFlags[i] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->items[i].id == 0x3A && pouchCheckItem(ITEM_SUPER_LUIGI4)) {
-            wp->itemFlags[i] |= 1;
+        if (wp->items[i].id == ITEM_SUPER_LUIGI4 && pouchCheckItem(ITEM_SUPER_LUIGI4)) {
+            wp->itemFlags[i] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->items[i].id == 0x3B && pouchCheckItem(ITEM_SUPER_LUIGI5)) {
-            wp->itemFlags[i] |= 1;
+        if (wp->items[i].id == ITEM_SUPER_LUIGI5 && pouchCheckItem(ITEM_SUPER_LUIGI5)) {
+            wp->itemFlags[i] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
     }
     {
@@ -1403,7 +1435,7 @@ static USER_FUNC(point_wait) {
 #endif
 }
 
-/** Sets or clears ShopWork flag bits; args: on/off, mask. The talk script sets 0x4000 while the counter menu is up. */
+/** Sets or clears ShopWork flag bits; args: on/off, mask. The talk script sets SHOP_FLAG_TALKING while the counter menu is up. */
 static USER_FUNC(shop_flag_onoff) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -1541,10 +1573,10 @@ static USER_FUNC(shopper_name) {
     return EVT_RETURN_DONE;
 }
 
-/** Clears the shop's "item selected" flag (bit 0) on the ShopWork in args[0], hiding the name and price display. */
+/** Clears SHOP_FLAG_ITEM_SELECTED on the ShopWork in args[0], hiding the name and price display. */
 static USER_FUNC(disp_off) {
     ShopWork* wp = (ShopWork*)evtGetValue(event, event->args[0]);
-    wp->flags &= ~1;
+    wp->flags &= ~SHOP_FLAG_ITEM_SELECTED;
     return EVT_RETURN_DONE;
 }
 
@@ -1675,7 +1707,7 @@ static USER_FUNC(evt_shop_main_func) {
     mario = marioGetPtr();
     party = partyGetPtr(0);
     hit = mario->hitobjStandOn;
-    wp->flags &= ~1;
+    wp->flags &= ~SHOP_FLAG_ITEM_SELECTED;
     trg = keyGetButtonTrg(0);
     if ((marioChkCtrl() ? FALSE : TRUE) || (marioChkKey() ? FALSE : TRUE)) {
         trg = 0;
@@ -1705,14 +1737,14 @@ static USER_FUNC(evt_shop_main_func) {
         }
         return EVT_RETURN_BLOCK;
     }
-    if (!(wp->flags & 2)) {
+    if (!(wp->flags & SHOP_FLAG_BUYING)) {
         if (hit) {
             for (i = 0; i < wp->count; i++) {
                 if (!strcmp(wp->objs[i].hit, hitGetName(hit))) {
                     break;
                 }
             }
-            if (!(wp->itemFlags[i] & 1) && i < wp->count) {
+            if (!(wp->itemFlags[i] & SHOP_ITEM_FLAG_SOLD_OUT) && i < wp->count) {
                 if (wp->sel != i) {
                     if (wp->sel == -1) {
                         winMgrOpen(wp->win[0]);
@@ -1731,12 +1763,12 @@ static USER_FUNC(evt_shop_main_func) {
             winMgrClose(wp->win[1]);
         }
         if (wp->sel != -1) {
-            wp->flags |= 1;
+            wp->flags |= SHOP_FLAG_ITEM_SELECTED;
             if (trg & PAD_BUTTON_A) {
                 marioKeyOff();
                 wp->buyEvt = evtEntry(buy_evt, 0, 0);
                 wp->buyEvt->lwData[0] = (EvtWord)wp;
-                wp->flags |= 2;
+                wp->flags |= SHOP_FLAG_BUYING;
                 winMgrClose(wp->win[0]);
                 winMgrClose(wp->win[1]);
                 wp->sel = -1;
@@ -1744,37 +1776,37 @@ static USER_FUNC(evt_shop_main_func) {
             }
         }
     } else if (!evtCheckID(wp->buyEvt->eventId)) {
-        wp->flags &= ~2;
+        wp->flags &= ~SHOP_FLAG_BUYING;
         marioKeyOn();
-        if (wp->buyItem == 0x33) {
-            wp->itemFlags[wp->cur] |= 1;
+        if (wp->buyItem == ITEM_CONTACT_LENS) {
+            wp->itemFlags[wp->cur] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->buyItem == 0x37) {
-            wp->itemFlags[wp->cur] |= 1;
+        if (wp->buyItem == ITEM_SUPER_LUIGI1) {
+            wp->itemFlags[wp->cur] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->buyItem == 0x38) {
-            wp->itemFlags[wp->cur] |= 1;
+        if (wp->buyItem == ITEM_SUPER_LUIGI2) {
+            wp->itemFlags[wp->cur] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->buyItem == 0x39) {
-            wp->itemFlags[wp->cur] |= 1;
+        if (wp->buyItem == ITEM_SUPER_LUIGI3) {
+            wp->itemFlags[wp->cur] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->buyItem == 0x3A) {
-            wp->itemFlags[wp->cur] |= 1;
+        if (wp->buyItem == ITEM_SUPER_LUIGI4) {
+            wp->itemFlags[wp->cur] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
-        if (wp->buyItem == 0x3B) {
-            wp->itemFlags[wp->cur] |= 1;
+        if (wp->buyItem == ITEM_SUPER_LUIGI5) {
+            wp->itemFlags[wp->cur] |= SHOP_ITEM_FLAG_SOLD_OUT;
         }
     }
     for (i = 0; i < wp->count; i++) {
         mobj = mapGetMapObj(wp->objs[i].mobj);
         if (mobj) {
             sprintf(buf, "shp%d", i);
-            if (wp->itemFlags[i] & 1) {
-                iconFlagOn(buf, 2);
-            } else if (mobj->flags & 1) {
-                iconFlagOn(buf, 2);
+            if (wp->itemFlags[i] & SHOP_ITEM_FLAG_SOLD_OUT) {
+                iconFlagOn(buf, ICON_FLAG_HIDDEN);
+            } else if (mobj->flags & MAPOBJ_FLAG_HIDE) {
+                iconFlagOn(buf, ICON_FLAG_HIDDEN);
             } else {
-                iconFlagOff(buf, 2);
+                iconFlagOff(buf, ICON_FLAG_HIDDEN);
             }
         }
     }

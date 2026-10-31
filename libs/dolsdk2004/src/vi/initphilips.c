@@ -2,8 +2,10 @@
 
 #include "__vi.h"
 
+/** Setup bytes for the video encoder chip in NTSC mode: two ranges of 4 and 38 bytes. */
 static u8 ntscRange0[4] = { 0x00, 0x00, 0x19, 0x1D };
 
+/** Second block of video encoder setup bytes for NTSC mode (38 bytes). */
 static u8 ntscRange1[38] = {
     0x2D, 0x76, 0xA5, 0x2A,
     0x2E, 0x2E, 0x00, 0x15,
@@ -17,8 +19,10 @@ static u8 ntscRange1[38] = {
     0x00, 0x00
 };
 
+/** Setup bytes for the video encoder chip in PAL mode: two ranges of 4 and 38 bytes. */
 static u8 palRange0[4] = { 0x00, 0x00, 0x21, 0x1D };
 
+/** Second block of video encoder setup bytes for PAL mode (38 bytes). */
 static u8 palRange1[38] = {
     0x0C, 0x7D, 0xAF, 0x23,
     0x35, 0x35, 0x00, 0x06,
@@ -32,6 +36,7 @@ static u8 palRange1[38] = {
     0x00, 0x00
 };
 
+/** Value written to encoder register 0x3A. */
 static u8 value3a = 19;
 
 /**

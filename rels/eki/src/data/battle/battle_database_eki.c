@@ -62,6 +62,10 @@ NpcBattleSelect btlgrpsel_eki_btlno_eki_04_05_off[2];
 NpcSetupBattleInfo btlsetup_eki_tbl[20];
 NpcTerritoryInfo btl_eki_setup_no_tbl[20];
 
+/**
+ * Props of the Riverside Station battle stage: each entry names a model of the backdrop and where it stands,
+ * the last entries being the background layers.
+ */
 BattleStageObjectData eki_btlobject_data[] = {
     {"lamp_01", 2, 0, {-116.0f, 0.0f, -59.0f}, 0, 60, {0}},
     {"lamp_02", 2, 0, {116.0f, 0.0f, -59.0f}, 10, 50, {0}},
@@ -89,6 +93,10 @@ BattleStageObjectData eki_btlobject_data[] = {
     {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
+/**
+ * Battle stage of Riverside Station: the stage model directories, the props above, the backdrop weapons and
+ * the background event that runs during the fight.
+ */
 BattleStageData eki_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -138,6 +146,10 @@ BattleStageData eki_btlstage_data[] = {
     },
 };
 
+/**
+ * Enemy party of battle eki_06_01 in Riverside Station: 3 x Goomba (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_eki_eki_06_01_off_1[] = {
     {
         &unit_kuriboo, // unitKindParams
@@ -171,6 +183,10 @@ BattleUnitSetup btlparty_eki_eki_06_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_06_01 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_06_01_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_06_01_off_1, // enemyData
@@ -182,6 +198,10 @@ BattleGroupSetup btlgrp_eki_eki_06_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_02_01 in Riverside Station: 2 x Ruff Puff (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_eki_eki_02_01_off_1[] = {
     {
         &unit_kurokumorn, // unitKindParams
@@ -205,6 +225,10 @@ BattleUnitSetup btlparty_eki_eki_02_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_02_01 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_02_01_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_02_01_off_1, // enemyData
@@ -216,6 +240,10 @@ BattleGroupSetup btlgrp_eki_eki_02_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_02_02 in Riverside Station: 3 x Ruff Puff (start positions and item drop tables
+ * included).
+ */
 BattleUnitSetup btlparty_eki_eki_02_02_off_1[] = {
     {
         &unit_kurokumorn, // unitKindParams
@@ -249,6 +277,10 @@ BattleUnitSetup btlparty_eki_eki_02_02_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_02_02 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_02_02_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_02_02_off_1, // enemyData
@@ -260,6 +292,10 @@ BattleGroupSetup btlgrp_eki_eki_02_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_02_03 in Riverside Station: 2 x S. Parabuzzy (start positions and item drop
+ * tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_02_03_off_1[] = {
     {
         &unit_patatogemet, // unitKindParams
@@ -283,6 +319,10 @@ BattleUnitSetup btlparty_eki_eki_02_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_02_03 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_02_03_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_02_03_off_1, // enemyData
@@ -294,6 +334,10 @@ BattleGroupSetup btlgrp_eki_eki_02_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_03_01 in Riverside Station: 2 x Poison Pokey (start positions and item drop
+ * tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_03_01_off_1[] = {
     {
         &unit_sambo_mummy, // unitKindParams
@@ -317,6 +361,10 @@ BattleUnitSetup btlparty_eki_eki_03_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_03_01 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_03_01_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_03_01_off_1, // enemyData
@@ -328,6 +376,10 @@ BattleGroupSetup btlgrp_eki_eki_03_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_03_02 in Riverside Station: 3 x Poison Pokey (start positions and item drop
+ * tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_03_02_off_1[] = {
     {
         &unit_sambo_mummy, // unitKindParams
@@ -361,6 +413,10 @@ BattleUnitSetup btlparty_eki_eki_03_02_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_03_02 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_03_02_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_03_02_off_1, // enemyData
@@ -372,6 +428,10 @@ BattleGroupSetup btlgrp_eki_eki_03_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_03_03 in Riverside Station: 2 x Poison Pokey and Ruff Puff (start positions and
+ * item drop tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_03_03_off_1[] = {
     {
         &unit_sambo_mummy, // unitKindParams
@@ -405,6 +465,10 @@ BattleUnitSetup btlparty_eki_eki_03_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_03_03 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_03_03_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_03_03_off_1, // enemyData
@@ -416,6 +480,10 @@ BattleGroupSetup btlgrp_eki_eki_03_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_03_05 in Riverside Station: Ruff Puff and Poison Pokey (start positions and item
+ * drop tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_03_05_off_1[] = {
     {
         &unit_kurokumorn, // unitKindParams
@@ -439,6 +507,10 @@ BattleUnitSetup btlparty_eki_eki_03_05_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_03_05 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_03_05_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_03_05_off_1, // enemyData
@@ -450,6 +522,10 @@ BattleGroupSetup btlgrp_eki_eki_03_05_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_03_07 in Riverside Station: 2 x Ruff Puff and 2 x Poison Pokey (start positions
+ * and item drop tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_03_07_off_1[] = {
     {
         &unit_kurokumorn, // unitKindParams
@@ -493,6 +569,10 @@ BattleUnitSetup btlparty_eki_eki_03_07_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_03_07 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_03_07_off_1 = {
     4, // numEnemies
     btlparty_eki_eki_03_07_off_1, // enemyData
@@ -504,6 +584,10 @@ BattleGroupSetup btlgrp_eki_eki_03_07_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_04_01 in Riverside Station: 3 x S. Parabuzzy (start positions and item drop
+ * tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_04_01_off_1[] = {
     {
         &unit_patatogemet, // unitKindParams
@@ -537,6 +621,10 @@ BattleUnitSetup btlparty_eki_eki_04_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_04_01 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_04_01_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_04_01_off_1, // enemyData
@@ -548,6 +636,10 @@ BattleGroupSetup btlgrp_eki_eki_04_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_04_02 in Riverside Station: 2 x S. Parabuzzy and Poison Pokey (start positions
+ * and item drop tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_04_02_off_1[] = {
     {
         &unit_patatogemet, // unitKindParams
@@ -581,6 +673,10 @@ BattleUnitSetup btlparty_eki_eki_04_02_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_04_02 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_04_02_off_1 = {
     3, // numEnemies
     btlparty_eki_eki_04_02_off_1, // enemyData
@@ -592,6 +688,10 @@ BattleGroupSetup btlgrp_eki_eki_04_02_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_04_06 in Riverside Station: 2 x S. Parabuzzy (start positions and item drop
+ * tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_04_06_off_1[] = {
     {
         &unit_patatogemet, // unitKindParams
@@ -615,6 +715,10 @@ BattleUnitSetup btlparty_eki_eki_04_06_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_04_06 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_04_06_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_04_06_off_1, // enemyData
@@ -626,6 +730,10 @@ BattleGroupSetup btlgrp_eki_eki_04_06_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_04_03 in Riverside Station: 2 x Poison Pokey (start positions and item drop
+ * tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_04_03_off_1[] = {
     {
         &unit_sambo_mummy, // unitKindParams
@@ -649,6 +757,10 @@ BattleUnitSetup btlparty_eki_eki_04_03_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_04_03 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_04_03_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_04_03_off_1, // enemyData
@@ -660,6 +772,10 @@ BattleGroupSetup btlgrp_eki_eki_04_03_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_04_04 in Riverside Station: 4 x Poison Pokey (start positions and item drop
+ * tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_04_04_off_1[] = {
     {
         &unit_sambo_mummy, // unitKindParams
@@ -703,6 +819,10 @@ BattleUnitSetup btlparty_eki_eki_04_04_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_04_04 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_04_04_off_1 = {
     4, // numEnemies
     btlparty_eki_eki_04_04_off_1, // enemyData
@@ -714,6 +834,10 @@ BattleGroupSetup btlgrp_eki_eki_04_04_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle eki_04_05 in Riverside Station: Poison Pokey and S. Parabuzzy (start positions and
+ * item drop tables included).
+ */
 BattleUnitSetup btlparty_eki_eki_04_05_off_1[] = {
     {
         &unit_sambo_mummy, // unitKindParams
@@ -737,6 +861,10 @@ BattleUnitSetup btlparty_eki_eki_04_05_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle eki_04_05 in Riverside Station: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_eki_eki_04_05_off_1 = {
     2, // numEnemies
     btlparty_eki_eki_04_05_off_1, // enemyData
@@ -748,101 +876,124 @@ BattleGroupSetup btlgrp_eki_eki_04_05_off_1 = {
     5, // reserved_1C
 };
 
+/** Developer test battle 1 in Riverside Station: always fights eki_06_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_test1_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, eki_btlstage_data},
     {0},
 };
 
+/** Developer test battle 2 in Riverside Station: always fights eki_06_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_test2_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
+/** Developer test battle 3 in Riverside Station: always fights eki_06_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_test3_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
+/** Battle 06_01 in Riverside Station always fights one group, eki_06_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_06_01_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, eki_btlstage_data},
     {0},
 };
 
+/** Battle 06_02 in Riverside Station always fights one group, eki_06_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_06_02_off[] = {
     {50, &btlgrp_eki_eki_06_01_off_1, eki_btlstage_data},
     {0},
 };
 
+/** Battle 02_01 in Riverside Station always fights one group, eki_02_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_02_01_off[] = {
     {20, &btlgrp_eki_eki_02_01_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
+/** Battle 02_02 in Riverside Station always fights one group, eki_02_02_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_02_02_off[] = {
     {20, &btlgrp_eki_eki_02_02_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
+/** Battle 02_03 in Riverside Station always fights one group, eki_02_03_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_02_03_off[] = {
     {20, &btlgrp_eki_eki_02_03_off_1, &eki_btlstage_data[3]},
     {0},
 };
 
+/** Battle 03_01 in Riverside Station always fights one group, eki_03_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_03_01_off[] = {
     {20, &btlgrp_eki_eki_03_01_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
+/** Battle 03_02 in Riverside Station always fights one group, eki_03_02_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_03_02_off[] = {
     {20, &btlgrp_eki_eki_03_02_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
+/** Battle 03_03 in Riverside Station always fights one group, eki_03_03_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_03_03_off[] = {
     {20, &btlgrp_eki_eki_03_03_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
+/** Battle 03_06 in Riverside Station always fights one group, eki_03_05_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_03_06_off[] = {
     {20, &btlgrp_eki_eki_03_05_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
+/** Battle 03_08 in Riverside Station always fights one group, eki_03_07_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_03_08_off[] = {
     {20, &btlgrp_eki_eki_03_07_off_1, &eki_btlstage_data[2]},
     {0},
 };
 
+/** Battle 04_01 in Riverside Station always fights one group, eki_04_01_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_04_01_off[] = {
     {20, &btlgrp_eki_eki_04_01_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
+/** Battle 04_02 in Riverside Station always fights one group, eki_04_02_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_04_02_off[] = {
     {20, &btlgrp_eki_eki_04_02_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
+/** Battle 04_06 in Riverside Station always fights one group, eki_04_06_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_04_06_off[] = {
     {20, &btlgrp_eki_eki_04_06_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
+/** Battle 04_03 in Riverside Station always fights one group, eki_04_03_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_04_03_off[] = {
     {20, &btlgrp_eki_eki_04_03_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
+/** Battle 04_04 in Riverside Station always fights one group, eki_04_04_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_04_04_off[] = {
     {20, &btlgrp_eki_eki_04_04_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
+/** Battle 04_05 in Riverside Station always fights one group, eki_04_05_off_1. */
 NpcBattleSelect btlgrpsel_eki_btlno_eki_04_05_off[] = {
     {20, &btlgrp_eki_eki_04_05_off_1, &eki_btlstage_data[1]},
     {0},
 };
 
+/**
+ * Field battle setups of Riverside Station: one entry per battle id in btl_eki_setup_no_tbl, giving the
+ * stage, the group selection and the battle music.
+ */
 NpcSetupBattleInfo btlsetup_eki_tbl[] = {
     {
         "マップstg_06_1", // name
@@ -1037,6 +1188,10 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
     {0},
 };
 
+/**
+ * Battle ids of Riverside Station (BTLNO_EKI_*) and their index into btlsetup_eki_tbl; handed to the battle
+ * system by relSetBtlAddr.
+ */
 NpcTerritoryInfo btl_eki_setup_no_tbl[] = {
     {"BTLNO_EKI_TEST1", 0},
     {"BTLNO_EKI_TEST2", 1},

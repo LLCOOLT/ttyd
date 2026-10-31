@@ -767,6 +767,7 @@ static void mcmdSetADSR(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Times in milliseconds for each of the 128 MIDI envelope values. */
 static s32 midi2TimeTab[128] = {
     0,      10,     20,     30,     40,     50,     60,     70,     80,     90,     100,    110,
     110,    120,    130,    140,    150,    160,    170,    190,    200,    220,    230,    250,

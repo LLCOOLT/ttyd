@@ -10,10 +10,9 @@
 #include <dolphin/os.h>
 #include <string.h>
 #include "icon_ids.h"
+#include <dolphin/si.h>
 // FAKE: ac_repeatedly.c calls BattleAcDrawGauge through this prototype (the types it was compiled with) instead of the one in battle/battle_ac.h; same registers, behaviour-identical.
 typedef void (*BattleAcDrawGaugeNoProtoFn)();
-
-u32 SIProbe(s32 chan);
 
 typedef struct RepeatDisp {
     s32 frame;         // 0x0
@@ -58,8 +57,10 @@ void battleAcDelete_Repeatedly(BattleWork* work);
 #define PadNow(m) (BattlePadCheckNow(m))
 
 #if VERSION <= VERSION_DEMO_US
+/** Gauge gain per press by difficulty in the demos (80 at the easiest down to 8); for fleeing and Rally Wink. */
 static s32 _power_table[] = {80, 60, 50, 40, 28, 16, 8};
 #else
+/** Gauge gain per press by difficulty in the releases (55 at the easiest down to 25), as above. */
 static s32 _power_table[] = {55, 50, 45, 40, 35, 30, 25};
 #endif
 
@@ -173,7 +174,7 @@ s32 battleAcMain_Repeatedly(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if (!((work->actionCommands.setupFlags & 1) &&
+            if (!((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) &&
                   (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
                 if (r->holdMask) {
                     if (!PadNow(r->holdMask)) {
@@ -348,7 +349,7 @@ void battleAcDisp_Repeatedly(CameraId cameraId, BattleWork* work) {
     }
 }
 
-// inlining off for battleAcDelete_Repeatedly, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it battleAcDelete_Repeatedly is inlined into battleAcMain_Repeatedly (328 -> 335 instructions)
 #pragma dont_inline on
 /**
  * Ends the command (also called from main when time runs out):

@@ -98,11 +98,17 @@ static inline const char* mario_status_name(s32 id) {
     return mario_status_name_table[id];
 #endif
 }
+/** What a level-up adds to Mario's HP, FP and BP: 5, 5 and 3. */
 static s32 mario_status_henka_table[] = {5, 5, 3};
 #if VERSION >= VERSION_JP
+/** The ceiling of Mario's HP, FP and BP (200, 200 and 99). */
 s32 mario_status_max_table[] = {200, 200, 99};
 #endif
 
+/**
+ * Windows of the standard selection menu (items, badges and so on):
+ * the list, the small side window and the help box.
+ */
 WinMgrDesc select_desc[] = {
     {0, 1, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp},
     {2, 0, 8, -280, 120, 240, 45, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
@@ -114,28 +120,36 @@ WinMgrDesc select_desc[] = {
 #endif
 };
 
+/** Windows of the partner selection menu: the list, the side window and the help box. */
 WinMgrDesc select_party_desc[] = {
     {0, 4, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp_party},
     {2, 0, 8, -280, 120, 240, 69, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
     {0, 0, 8, -240, -130, 500, 80, {0xFF, 0xFF, 0xFF, 0xFF}, select_main3, select_disp3_party},
 };
 
+/** Windows of the Mario status selection menu (HP, FP, BP): the list, the side window and the help box. */
 WinMgrDesc select_mario_desc[] = {
     {0, 5, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp_mario},
     {2, 0, 8, -280, 120, 240, 69, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
     {0, 0, 8, -240, -130, 500, 80, {0xFF, 0xFF, 0xFF, 0xFF}, select_main3, select_disp3_mario},
 };
 
+/** Windows of the menu type drawn by select_disp_luigi: the list and the side window (no help box). */
 WinMgrDesc select_luigi_desc[] = {
     {0, 1, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp_luigi},
     {2, 0, 8, -280, 120, 240, 45, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
 };
 
+/** Windows of the johoya_perfect menu type: the same layout as select_luigi_desc. */
 WinMgrDesc select_johoya_perfect_desc[] = {
     {0, 1, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp_luigi},
     {2, 0, 8, -280, 120, 240, 45, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
 };
 
+/**
+ * Window set (count and descriptors) of each selection menu type,
+ * indexed by the type passed to winMgrSelectEntry.
+ */
 WinMgrSelectTbl select_desc_tbl[] = {
     {3, select_desc},
     {3, select_desc},
@@ -329,12 +343,12 @@ void winMgrMain(void) {
 
     entry = wp->entries;
     for (i = 0; i < wp->numEntries; i++, entry++) {
-        if (entry->flags & 1) {
+        if (entry->flags & WINMGR_ENTRY_IN_USE) {
             winMgrSeq(entry);
             if (entry->description->main) {
                 entry->description->main(entry);
             }
-            if (entry->flags & 2) {
+            if (entry->flags & WINMGR_ENTRY_VISIBLE) {
                 dispEntry((CameraId)entry->description->camId, entry->priority + 300, 0, winMgrDisp, entry);
             }
         }
@@ -345,19 +359,20 @@ void winMgrMain(void) {
  * The open/close animation of a window over FPS_FRAMES(8) frames.
  * Type 0 spins and grows from 30 degrees and zero size, type 1 grows and fades in,
  * type 2 appears and disappears at once.
- * Flag 4 stays set while animating; closing clears flag 2 (visible) and, with auto-delete (flag 8),
+ * WINMGR_ENTRY_ANIMATING stays set while animating; closing clears WINMGR_ENTRY_VISIBLE and, with
+ * WINMGR_ENTRY_AUTO_DELETE,
  * frees the slot.
  */
 static void winMgrSeq(WinMgrEntry* entry) {
-    entry->flags |= 4;
+    entry->flags |= WINMGR_ENTRY_ANIMATING;
     switch (entry->description->type) {
         case 0:
             switch (entry->state) {
                 case 0:
-                    entry->flags &= ~4;
+                    entry->flags &= ~WINMGR_ENTRY_ANIMATING;
                     break;
                 case 1:
-                    entry->flags |= 2;
+                    entry->flags |= WINMGR_ENTRY_VISIBLE;
                     entry->rotation = intplGetValue(12, 30.0f, 0.0f, entry->timer, FPS_FRAMES(8));
                     entry->scale = intplGetValue(12, 0.0f, 1.0f, entry->timer, FPS_FRAMES(8));
                     entry->alpha = 255;
@@ -373,9 +388,9 @@ static void winMgrSeq(WinMgrEntry* entry) {
                     entry->timer++;
                     if (entry->timer > FPS_FRAMES(8)) {
                         entry->state = 0;
-                        entry->flags &= ~2;
-                        if (entry->flags & 8) {
-                            entry->flags &= ~1;
+                        entry->flags &= ~WINMGR_ENTRY_VISIBLE;
+                        if (entry->flags & WINMGR_ENTRY_AUTO_DELETE) {
+                            entry->flags &= ~WINMGR_ENTRY_IN_USE;
                         }
                     }
                     break;
@@ -384,10 +399,10 @@ static void winMgrSeq(WinMgrEntry* entry) {
         case 1:
             switch (entry->state) {
                 case 0:
-                    entry->flags &= ~4;
+                    entry->flags &= ~WINMGR_ENTRY_ANIMATING;
                     break;
                 case 1:
-                    entry->flags |= 2;
+                    entry->flags |= WINMGR_ENTRY_VISIBLE;
                     entry->rotation = 0.0f;
                     entry->scale = intplGetValue(12, 0.0f, 1.0f, entry->timer, FPS_FRAMES(8));
                     entry->alpha = intplGetValue(12, 0.0f, 255.0f, entry->timer, FPS_FRAMES(8));
@@ -403,9 +418,9 @@ static void winMgrSeq(WinMgrEntry* entry) {
                     entry->timer++;
                     if (entry->timer > FPS_FRAMES(8)) {
                         entry->state = 0;
-                        entry->flags &= ~2;
-                        if (entry->flags & 8) {
-                            entry->flags &= ~1;
+                        entry->flags &= ~WINMGR_ENTRY_VISIBLE;
+                        if (entry->flags & WINMGR_ENTRY_AUTO_DELETE) {
+                            entry->flags &= ~WINMGR_ENTRY_IN_USE;
                         }
                     }
                     break;
@@ -414,23 +429,23 @@ static void winMgrSeq(WinMgrEntry* entry) {
         case 2:
             switch (entry->state) {
                 case 0:
-                    entry->flags &= ~4;
+                    entry->flags &= ~WINMGR_ENTRY_ANIMATING;
                     break;
                 case 1:
-                    entry->flags |= 2;
+                    entry->flags |= WINMGR_ENTRY_VISIBLE;
                     entry->rotation = 0.0f;
                     entry->scale = 1.0f;
                     entry->alpha = 255;
                     entry->state = 0;
                     break;
                 case 2:
-                    entry->flags &= ~2;
+                    entry->flags &= ~WINMGR_ENTRY_VISIBLE;
                     entry->rotation = 0.0f;
                     entry->scale = 1.0f;
                     entry->alpha = 255;
                     entry->state = 0;
-                    if (entry->flags & 8) {
-                        entry->flags &= ~1;
+                    if (entry->flags & WINMGR_ENTRY_AUTO_DELETE) {
+                        entry->flags &= ~WINMGR_ENTRY_IN_USE;
                     }
                     break;
             }
@@ -448,12 +463,12 @@ s32 winMgrEntry(WinMgrDesc* desc) {
 
     entry = wp->entries;
     for (i = 0; i < wp->numEntries; i++, entry++) {
-        if (!(entry->flags & 1)) {
+        if (!(entry->flags & WINMGR_ENTRY_IN_USE)) {
             break;
         }
     }
     entry->flags = 0;
-    entry->flags |= 1;
+    entry->flags |= WINMGR_ENTRY_IN_USE;
     entry->state = 0;
     entry->timer = 0;
     entry->description = desc;
@@ -473,7 +488,7 @@ void winMgrSetParam(s32 id, void* param) {
     WinMgrEntry* entry;
 
     entry = &wp->entries[id];
-    if (entry->flags & 1) {
+    if (entry->flags & WINMGR_ENTRY_IN_USE) {
         entry->param = param;
     }
 }
@@ -483,7 +498,7 @@ void winMgrOpen(s32 id) {
     WinMgrEntry* entry;
 
     entry = &wp->entries[id];
-    if (entry->flags & 1) {
+    if (entry->flags & WINMGR_ENTRY_IN_USE) {
         entry->state = 1;
         entry->timer = 0;
         entry->scroll = 0;
@@ -497,7 +512,7 @@ void winMgrClose(s32 id) {
     WinMgrEntry* entry;
 
     entry = &wp->entries[id];
-    if (entry->flags & 1) {
+    if (entry->flags & WINMGR_ENTRY_IN_USE) {
         entry->state = 2;
         entry->timer = 0;
     }
@@ -508,19 +523,19 @@ void winMgrCloseAutoDelete(s32 id) {
     WinMgrEntry* entry;
 
     entry = &wp->entries[id];
-    if (entry->flags & 1) {
+    if (entry->flags & WINMGR_ENTRY_IN_USE) {
         entry->state = 2;
         entry->timer = 0;
-        entry->flags |= 8;
+        entry->flags |= WINMGR_ENTRY_AUTO_DELETE;
     }
 }
 
 /** Frees a window slot at once, without an animation. */
 void winMgrDelete(s32 id) {
-    wp->entries[id].flags &= ~1;
+    wp->entries[id].flags &= ~WINMGR_ENTRY_IN_USE;
 }
 
-/** TRUE while the window is still opening or closing (flag 4), so callers wait before reading input or drawing. */
+/** TRUE while the window is still opening or closing (WINMGR_ENTRY_ANIMATING), so callers wait before reading input or drawing. */
 BOOL winMgrAction(s32 id) {
     return (wp->entries[id].flags >> 2) & 1;
 }
@@ -530,7 +545,7 @@ void winMgrSetSize(s32 id, s32 x, s32 y, s32 width, s32 height) {
     WinMgrEntry* entry;
 
     entry = &wp->entries[id];
-    if (entry->flags & 1) {
+    if (entry->flags & WINMGR_ENTRY_IN_USE) {
         entry->x = x;
         entry->y = y;
         entry->width = width;
@@ -543,7 +558,7 @@ void winMgrSetPriority(s32 id, s32 priority) {
     WinMgrEntry* entry;
 
     entry = &wp->entries[id];
-    if (entry->flags & 1) {
+    if (entry->flags & WINMGR_ENTRY_IN_USE) {
         entry->priority = priority;
     }
 }
@@ -569,7 +584,7 @@ void winMgrHelpInit(WinMgrEntry* entry) {
 void winMgrHelpMain(WinMgrEntry* entry) {
     u16 lines = 0;
 
-    if (!(entry->flags & 4)) {
+    if (!(entry->flags & WINMGR_ENTRY_ANIMATING)) {
         if (entry->msg) {
             FontGetMessageWidthLine(entry->msg, &lines);
             entry->lines = lines + 1;
@@ -603,7 +618,7 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
     Mtx scale;
     char buf[0x400];
 
-    if (!(entry->flags & 4)) {
+    if (!(entry->flags & WINMGR_ENTRY_ANIMATING)) {
         GXSetScissor(0, 384, 608, 56);
         if (!strcmp(entry->msg, msgSearch("msg_lottery_number"))) {
             sprintf(buf, entry->msg, lotteryGetPtr()->number);
@@ -756,7 +771,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
                 if (id) {
 #if VERSION >= VERSION_US
                     if (sel->type == 12 && id == ((L_pouchEquipBadgeRetU16Fn)L_pouchEquipBadge)(i)) {
-                        sel->items[sel->numItems].flags |= 8;
+                        sel->items[sel->numItems].flags |= WINMGR_ITEM_EQUIPPED;
                     }
 #endif
                     sel->items[sel->numItems++].id = id;
@@ -787,11 +802,11 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
                     sel->items[sel->numItems].id = i;
                     if (!evtGetValue(NULL, GSWF(GSWF_MERLON_FIRST_UPGRADE_DONE))) {
                         if (pouch->partyData[party_id_table[i]].techLevel >= 1) {
-                            sel->items[sel->numItems].flags |= 3;
+                            sel->items[sel->numItems].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
                         }
                     } else {
                         if (pouch->partyData[party_id_table[i]].techLevel >= 2) {
-                            sel->items[sel->numItems].flags |= 3;
+                            sel->items[sel->numItems].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
                         }
                     }
                     sel->numItems++;
@@ -807,7 +822,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
                 if (partyChkJoin(party_id_table[i]) && party_id_table[i] != evtGetValue(NULL, GW(1))) {
                     sel->items[sel->numItems].id = i;
                     if (pouch->partyData[party_id_table[i]].techLevel == 0) {
-                        sel->items[sel->numItems].flags |= 3;
+                        sel->items[sel->numItems].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
                     }
                     sel->numItems++;
                 }
@@ -839,14 +854,14 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
 #if VERSION <= VERSION_DEMO_US
                 // the demo has no stat cap check
                 if (cnt == 2) {
-                    sel->items[i].flags |= 3;
+                    sel->items[i].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
                 }
 #else
                 if (cnt == 2 || over) {
                     if (over) {
-                        sel->items[i].flags |= 7;
+                        sel->items[i].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED | WINMGR_ITEM_OVER_CAP);
                     } else {
-                        sel->items[i].flags |= 3;
+                        sel->items[i].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
                     }
                 }
 #endif
@@ -864,7 +879,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
                 if (i != evtGetValue(NULL, GW(1))) {
                     sel->items[sel->numItems].id = i;
                     if (*mario_status_point_table[i] - mario_status_henka_table[i] <= 0) {
-                        sel->items[sel->numItems].flags |= 3;
+                        sel->items[sel->numItems].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
                     }
                     sel->numItems++;
                 }
@@ -899,7 +914,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
 #else
                     sel->items[sel->numItems].id = i + 240;
                     if (itemDataTable[i + 240].star_piece_price > pouchGetStarPiece()) {
-                        sel->items[sel->numItems].flags |= 3;
+                        sel->items[sel->numItems].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
                     }
                     sel->numItems++;
                 }
@@ -954,7 +969,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
             for (i = 0; i < sel->numItems; i++) {
                 sel->items[i].id = i;
                 if (johoya_get(tbl, jdt->info[i].storyId)) {
-                    sel->items[i].flags |= 1;
+                    sel->items[i].flags |= WINMGR_ITEM_GRAY;
                 }
             }
             break;
@@ -1214,7 +1229,7 @@ static void select_main(WinMgrEntry* entry) {
             sel->state++;
             break;
         case 1:
-            if ((wp->entries[sel->descriptorId[0]].flags & 4)) {
+            if ((wp->entries[sel->descriptorId[0]].flags & WINMGR_ENTRY_ANIMATING)) {
                 break;
             }
             prev = sel->cursor;
@@ -1261,7 +1276,7 @@ static void select_main(WinMgrEntry* entry) {
             }
 #endif
             if (keyGetButtonTrg(0) & PAD_BUTTON_A) {
-                if (sel->items[sel->cursor].flags & 2) {
+                if (sel->items[sel->cursor].flags & WINMGR_ITEM_DISABLED) {
                     psndSFXOn((const char*)0x20014);
                 } else {
                     psndSFXOn((const char*)0x20012);
@@ -1287,7 +1302,7 @@ static void select_main(WinMgrEntry* entry) {
             sel->state++;
             break;
         case 3:
-            if ((wp->entries[sel->descriptorId[0]].flags & 4)) {
+            if ((wp->entries[sel->descriptorId[0]].flags & WINMGR_ENTRY_ANIMATING)) {
                 break;
             }
             for (i = 0; i < sel->numDescriptors; i++) {
@@ -1330,7 +1345,7 @@ static void select_disp(WinMgrEntry* entry) {
     tmp = white;
     iconcol = tmp;
 
-    if (!(wp->entries[sel->descriptorId[0]].flags & 4)) {
+    if (!(wp->entries[sel->descriptorId[0]].flags & WINMGR_ENTRY_ANIMATING)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);
         GXSetScissor(entry->x + 304, 274 - entry->y, entry->width, entry->height - 50);
@@ -1346,8 +1361,8 @@ static void select_disp(WinMgrEntry* entry) {
                 ofs = ofs + 0.0f;
             }
 #if VERSION >= VERSION_US
-            if (sel->items[i].flags & 8) {
-                if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_EQUIPPED) {
+                if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                     winIconGrayInit();
                 } else {
                     winIconInit();
@@ -1358,7 +1373,7 @@ static void select_disp(WinMgrEntry* entry) {
 #if VERSION <= VERSION_DEMO_US
             winIconInit();
 #else
-            if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                 winIconGrayInit();
             } else {
                 winIconInit();
@@ -1368,13 +1383,13 @@ static void select_disp(WinMgrEntry* entry) {
             winFontInit();
 #if VERSION >= VERSION_US
             winFontSetWidth((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
-                            *((sel->items[i].flags & 1) ? &gray : &black), 185.0f, msgSearch(item->name));
+                            *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), 185.0f, msgSearch(item->name));
 #elif VERSION <= VERSION_DEMO_US
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        black, msgSearch(item->name));
 #else
                         winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
-                                   *((sel->items[i].flags & 1) ? &gray : &black), msgSearch(item->name));
+                                   *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), msgSearch(item->name));
 #endif
             show = FALSE;
             switch (sel->type) {
@@ -1415,7 +1430,7 @@ static void select_disp(WinMgrEntry* entry) {
             }
             winFontInit();
             winFontSetWidth((Vec){entry->x + entry->width - 10 - tw, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
-                            *((sel->items[i].flags & 1) ? &gray : &black), 30.0f, buf);
+                            *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), 30.0f, buf);
 #elif VERSION <= VERSION_DEMO_US
             tw = FontGetMessageWidth(buf);
             winFontInit();
@@ -1425,7 +1440,7 @@ static void select_disp(WinMgrEntry* entry) {
                         tw = FontGetMessageWidth(buf);
                         winFontInit();
                         winFontSet((Vec){entry->x + entry->width - 10 - tw, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
-                                   *((sel->items[i].flags & 1) ? &gray : &black), buf);
+                                   *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), buf);
 #endif
         }
         if (sel->newItem) {
@@ -1558,7 +1573,7 @@ static void select_disp_party(WinMgrEntry* entry) {
     tmp = white;
     iconcol = tmp;
 
-    if (!(wp->entries[sel->descriptorId[0]].flags & 4)) {
+    if (!(wp->entries[sel->descriptorId[0]].flags & WINMGR_ENTRY_ANIMATING)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);
         GXSetScissor(entry->x + 304, 274 - entry->y, entry->width, entry->height - 50);
@@ -1575,13 +1590,13 @@ static void select_disp_party(WinMgrEntry* entry) {
             winFontInit();
 #if VERSION <= VERSION_DEMO_US
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
-                       *((sel->items[i].flags & 1) ? &gray : &black), party_name_table_rtn(sel->items[i].id));
+                       *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), party_name_table_rtn(sel->items[i].id));
 #else
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f},
                        (Vec){FontGetMessageWidth(party_name_table_rtn(sel->items[i].id)) > 170 ? 170.0f / FontGetMessageWidth(party_name_table_rtn(sel->items[i].id)) : 1.0f, 1.0f, 1.0f},
-                       *((sel->items[i].flags & 1) ? &gray : &black), party_name_table_rtn(sel->items[i].id));
+                       *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), party_name_table_rtn(sel->items[i].id));
 #endif
-            if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                 winIconGrayInit();
             } else {
                 winIconInit();
@@ -1592,7 +1607,7 @@ static void select_disp_party(WinMgrEntry* entry) {
             for (j = 0; j < pouch->partyData[party_id_table[sel->items[i].id]].techLevel; j++) {
 #else
             for (j = 0; j < pouch->partyData[party_id_table[sel->items[i].id]].techLevel; j++) {
-                if (sel->items[i].flags & 1) {
+                if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                     winIconGrayInit();
                 } else {
                     winIconInit();
@@ -1670,7 +1685,7 @@ static void select_disp_mario(WinMgrEntry* entry) {
     tmp = white;
     iconcol = tmp;
 
-    if (!(wp->entries[sel->descriptorId[0]].flags & 4)) {
+    if (!(wp->entries[sel->descriptorId[0]].flags & WINMGR_ENTRY_ANIMATING)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);
         GXSetScissor(entry->x + 304, 274 - entry->y, entry->width, entry->height - 50);
@@ -1687,7 +1702,7 @@ static void select_disp_mario(WinMgrEntry* entry) {
             }
             winFontInit();
             col = &black;
-            if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                 col = &gray;
             }
             // (written out: the mario_status_name() call allocates registers differently in US)
@@ -1697,7 +1712,7 @@ static void select_disp_mario(WinMgrEntry* entry) {
 #else
                        mario_status_name_table[id]);
 #endif
-            if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                 winIconGrayInit();
             } else {
                 winIconInit();
@@ -1706,11 +1721,11 @@ static void select_disp_mario(WinMgrEntry* entry) {
             sprintf(buf, "%3d", *mario_status_point_table[id]);
             winFontInit();
             col = &black;
-            if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                 col = &gray;
             }
             winFontSet((Vec){entry->x + 160, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
-            if (sel->items[i].flags & 2) {
+            if (sel->items[i].flags & WINMGR_ITEM_DISABLED) {
                 continue;
             }
             switch (sel->type) {
@@ -1724,7 +1739,7 @@ static void select_disp_mario(WinMgrEntry* entry) {
             }
             winFontInit();
             col = &black;
-            if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                 col = &gray;
             }
             winFontSet((Vec){entry->x + 240, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
@@ -1799,7 +1814,7 @@ static void select_disp_luigi(WinMgrEntry* entry) {
     Mtx mtx;
     Mtx scale;
 
-    if (!(wp->entries[sel->descriptorId[0]].flags & 4)) {
+    if (!(wp->entries[sel->descriptorId[0]].flags & WINMGR_ENTRY_ANIMATING)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);
         GXSetScissor(ent->x + 304, 274 - ent->y, ent->width, ent->height - 50);
@@ -1812,7 +1827,7 @@ static void select_disp_luigi(WinMgrEntry* entry) {
             winFontInit();
             save = info->initEndPos[info->tagEndPos];
             info->initEndPos[info->tagEndPos] = 0;
-            if (sel->items[i].flags & 1) {
+            if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                 col = &gray;
             } else {
                 col = &black;
@@ -1823,11 +1838,11 @@ static void select_disp_luigi(WinMgrEntry* entry) {
             winFontSet((Vec){ent->x + 25, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, info->initEndPos);
 #endif
             info->initEndPos[info->tagEndPos] = save;
-            if (sel->type == 17 && !(sel->items[i].flags & 1)) {
+            if (sel->type == 17 && !(sel->items[i].flags & WINMGR_ITEM_GRAY)) {
                 sprintf(buf, "%3d", info->cost);
                 winFontInit();
                 col = &black;
-                if (sel->items[i].flags & 1) {
+                if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
                     col = &gray;
                 }
                 winFontSet((Vec){ent->x + 245, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
@@ -1935,7 +1950,7 @@ static void select_disp2(WinMgrEntry* entry) {
             break;
     }
 #if VERSION >= VERSION_US
-    if (!(wp->entries[sel->descriptorId[1]].flags & 4)) {
+    if (!(wp->entries[sel->descriptorId[1]].flags & WINMGR_ENTRY_ANIMATING)) {
         Mtx trans;
         Mtx scale;
         f32 tw;
@@ -1963,7 +1978,7 @@ static void select_disp2(WinMgrEntry* entry) {
             ew = entry->width;
             ex = entry->x;
             ey = d->y + h / 2;
-            if (e->flags & 1) {
+            if (e->flags & WINMGR_ENTRY_IN_USE) {
                 e->x = ex;
                 e->y = ey;
                 e->width = ew;
@@ -1972,7 +1987,7 @@ static void select_disp2(WinMgrEntry* entry) {
         }
     }
 #else
-    if (!(wp->entries[sel->descriptorId[1]].flags & 4)) {
+    if (!(wp->entries[sel->descriptorId[1]].flags & WINMGR_ENTRY_ANIMATING)) {
         w = (entry->width - FontGetMessageWidthLine(msg, &lines)) / 2;
         FontDrawStart();
         FontDrawMessage(entry->x + w, entry->y - (entry->height - (lines + 1) * 24) / 2, msg);
@@ -1989,7 +2004,7 @@ static void select_main3(WinMgrEntry* entry) {
 static void select_disp3(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
 
-    if (!(wp->entries[sel->descriptorId[2]].flags & 4)) {
+    if (!(wp->entries[sel->descriptorId[2]].flags & WINMGR_ENTRY_ANIMATING)) {
         ItemData* item = &itemDataTable[sel->items[sel->cursor].id];
         entry->msg = msgSearch(item->description);
         winMgrHelpDraw(entry);
@@ -2010,8 +2025,8 @@ static void select_disp3_party(WinMgrEntry* entry) {
     s32 id;
 
     pouch = pouchGetPtr();
-    if (!(wp->entries[sel->descriptorId[2]].flags & 4)) {
-        if (sel->items[sel->cursor].flags & 2) {
+    if (!(wp->entries[sel->descriptorId[2]].flags & WINMGR_ENTRY_ANIMATING)) {
+        if (sel->items[sel->cursor].flags & WINMGR_ITEM_DISABLED) {
             help = "helperr";
         } else {
             help = "help";
@@ -2039,12 +2054,12 @@ static void select_disp3_mario(WinMgrEntry* entry) {
     const char* help;
 
     pouchGetPtr();
-    if (!(wp->entries[sel->descriptorId[2]].flags & 4)) {
-        if (sel->items[sel->cursor].flags & 2) {
+    if (!(wp->entries[sel->descriptorId[2]].flags & WINMGR_ENTRY_ANIMATING)) {
+        if (sel->items[sel->cursor].flags & WINMGR_ITEM_DISABLED) {
 #if VERSION <= VERSION_DEMO_US
             help = "helperr";
 #else
-            if (sel->items[sel->cursor].flags & 4) {
+            if (sel->items[sel->cursor].flags & WINMGR_ITEM_OVER_CAP) {
                 help = "helperr2";
             } else {
                 help = "helperr";
@@ -2067,6 +2082,10 @@ static void select_disp3_mario(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Message labels of the partners' names
+ * (Goombella, Koops, Flurrie, Vivian, Bobbery, Ms. Mowz), looked up for the window text.
+ */
 static const char name_party0[] = "name_party0";
 static const char name_party1[] = "name_party1";
 static const char name_party4[] = "name_party4";

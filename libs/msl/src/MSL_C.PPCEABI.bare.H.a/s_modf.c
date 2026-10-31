@@ -1,5 +1,6 @@
 #include "fdlibm.h"
 
+/** The constant 1.0 for modf. */
 static const double one = 1.0;
 
 /**

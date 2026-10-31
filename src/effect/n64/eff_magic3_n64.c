@@ -25,9 +25,9 @@ typedef struct EffMagic3N64Work {
 static void effMagic3Main(EffectEntry* effect);
 static void effMagic3Disp(CameraId cameraId, EffectEntry* effect);
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-// strength reduction optimisation off for effMagic3N64Entry: the original register allocation and scheduling need it
+// FAKE: strength reduction optimisation off for effMagic3N64Entry: the original register allocation and scheduling need it
 #pragma opt_strength_reduction off
 /**
  * Spawns five sparks at (x, y, z) that shoot upward in a 100-degree fan facing the camera and
@@ -209,6 +209,7 @@ static void effMagic3Disp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Camera-facing 32x16 streak each magic spark is drawn with. */
 effN64Vtx size32x16_tex64x32_vtx[] = {
     {-16, -8, 0, 0, 0, 0, 0, 0, 255},
     {16, -8, 0, 2048, 0, 0, 0, 0, 255},

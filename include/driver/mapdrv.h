@@ -110,12 +110,18 @@ typedef struct MapFileJointPart {
     MapFileMesh* mesh;     // 0x4
 } MapFileJointPart;
 
+// MapJointDrawMode.modeFlags (from map.dat), copied into MapObject.flags by mapEntry
+#define MAP_DRAWMODE_NO_DEPTH 0x1    // MAPOBJ_FLAG_NO_DEPTH
+#define MAP_DRAWMODE_GROUP 0x2       // MAPOBJ_FLAG_GROUP, blend mode from blendType
+#define MAP_DRAWMODE_CHAR_SHADOW 0x4 // MAPOBJ_FLAG_CHAR_SHADOW
+#define MAP_DRAWMODE_NEAR_LIGHTS 0x8 // lit by the nearest map lights as well as lightMask; no prebuilt display list
+#define MAP_DRAWMODE_DEPTH_BIAS 0x10 // MAPOBJ_FLAG_DEPTH_BIAS (groups)
 typedef struct MapJointDrawMode {
     u8 blendType;          // 0x0, 0..3, selects MapObject.blendMode
     u8 cullMode;           // 0x1
-    u8 modeFlags;          // 0x2, 1 = MapObject flag 8, 2 = group (flag 0x10), 8 = use lightMask, 0x10 = flag 0x8000
+    u8 modeFlags;          // 0x2, MAP_DRAWMODE_*
     u8 pad_03;             // 0x3, never accessed
-    u32 lightMask;         // 0x4, bit i = map light i applies (with modeFlags 8)
+    u32 lightMask;         // 0x4, bit i = map light i applies
     s32 hitAttributes;     // 0x8, copied to HitEntry.attributes
     u8 pad_0C[0x10 - 0xC]; // 0xC, never accessed
 } MapJointDrawMode;
@@ -174,26 +180,34 @@ typedef struct MapHeader {
 
 // MapObject.flags (mapObjFlagOn/Off, mapGrpFlagOn/Off and evt_mapobj_flag_onoff). Bits not listed have no
 // script use and their meaning is not established from the readers.
-#define MAPOBJ_FLAG_HIDE 0x1                    // not drawn on its own camera (an offscreen copy is still drawn)
-#define MAPOBJ_FLAG_BBOX_CULL 0x2               // skipped when its bounding box is outside the view
-#define MAPOBJ_FLAG_CHAR_SHADOW 0x4             // receives Mario's projected shadow
-#define MAPOBJ_FLAG_GROUP 0x10                  // a group node (drawn with mapDispMapGrp)
-#define MAPOBJ_FLAG_IN_GROUP 0x20               // drawn as part of a parent group, not on its own
-#define MAPOBJ_FLAG_COLOR_ALPHA 0x40            // MapObject.color alpha applies (translucent below 0xFF, skipped at 0)
-#define MAPOBJ_FLAG_OFFSCREEN 0x80              // also drawn into its offscreen buffer (offscreenId)
-#define MAPOBJ_FLAG_DISPLAY_LIST 0x100          // draw from the prebuilt display lists (only sticks when one exists)
-#define MAPOBJ_FLAG_MTX_DIRTY 0x200             // world matrix is recalculated on the next mapReCalcMatrix
-#define MAPOBJ_FLAG_PROJ_TEXTURE 0x400          // adds the projected texture stage (projTexObj)
-#define MAPOBJ_FLAG_NO_BLEND 0x800              // ignores the map's blend colour (MapEntry flag 2) and colour (flag 8)
-#define MAPOBJ_FLAG_NO_BLEND2 0x1000            // ignores the map's second blend colour (MapEntry flag 4)
-#define MAPOBJ_FLAG_ANIM_MTX 0x2000             // uses animMtx instead of localMtx
-#define MAPOBJ_FLAG_DISABLE 0x4000              // not drawn at all (no bounding box, no offscreen copy)
-#define MAPOBJ_FLAG_NO_FOG 0x80000              // drawn without the map fog
-#define MAPOBJ_FLAG_TRANSFORM_MTX 0x200000      // transformMtx (mapObjRotate/Trans/Scale) applies
-#define MAPOBJ_FLAG_KURURING_PASS 0x400000      // drawn again, unculled, by test_kururing_mapdisp
-#define MAPOBJ_FLAG_TEV_CALLBACK_MASK 0xF000000 // index into MapEntry.tevCallbacks, see MAPOBJ_TEV_CALLBACK
-#define MAPOBJ_FLAG_NO_COLOR_STAGE 0x10000000   // skips the TEV stage that multiplies in the object and blend colour
-#define MAPOBJ_FLAG_BBOX 0x20000000             // its screen bounding box is measured (mapDispMapObj_bbox)
+#define MAPOBJ_FLAG_HIDE 0x1                     // not drawn on its own camera (an offscreen copy is still drawn)
+#define MAPOBJ_FLAG_BBOX_CULL 0x2                // skipped when its bounding box is outside the view
+#define MAPOBJ_FLAG_CHAR_SHADOW 0x4              // receives Mario's projected shadow
+#define MAPOBJ_FLAG_NO_DEPTH 0x8                 // no depth test or write: blend modes 3-5 instead of 0-2 (draw mode MAP_DRAWMODE_NO_DEPTH)
+#define MAPOBJ_FLAG_GROUP 0x10                   // a group node (drawn with mapDispMapGrp)
+#define MAPOBJ_FLAG_IN_GROUP 0x20                // drawn as part of a parent group, not on its own
+#define MAPOBJ_FLAG_COLOR_ALPHA 0x40             // MapObject.color alpha applies (translucent below 0xFF, skipped at 0)
+#define MAPOBJ_FLAG_OFFSCREEN 0x80               // also drawn into its offscreen buffer (offscreenId)
+#define MAPOBJ_FLAG_DISPLAY_LIST 0x100           // draw from the prebuilt display lists (only sticks when one exists)
+#define MAPOBJ_FLAG_MTX_DIRTY 0x200              // world matrix is recalculated on the next mapReCalcMatrix
+#define MAPOBJ_FLAG_PROJ_TEXTURE 0x400           // adds the projected texture stage (projTexObj)
+#define MAPOBJ_FLAG_NO_BLEND 0x800               // ignores the map's blend colour (MapEntry flag 2) and colour (flag 8)
+#define MAPOBJ_FLAG_NO_BLEND2 0x1000             // ignores the map's second blend colour (MapEntry flag 4)
+#define MAPOBJ_FLAG_ANIM_MTX 0x2000              // uses animMtx instead of localMtx
+#define MAPOBJ_FLAG_DISABLE 0x4000               // not drawn at all (no bounding box, no offscreen copy)
+#define MAPOBJ_FLAG_DEPTH_BIAS 0x8000            // group part drawn with its depth pulled 0.01 per joint index toward the camera (MAP_DRAWMODE_DEPTH_BIAS)
+#define MAPOBJ_FLAG_DEPTH_SHADOW 0x10000         // receives the depth shadow, subtracted (mapSetMaterialTev; ANIM_MATERIAL_FLAG_DEPTH_SHADOW)
+#define MAPOBJ_FLAG_PROJ_SHADOW 0x20000          // receives the projected shadow (shadowGetProjShadowTexObj)
+#define MAPOBJ_FLAG_DEPTH_SHADOW_ADD 0x40000     // as DEPTH_SHADOW, but the shadow colour is added instead of subtracted
+#define MAPOBJ_FLAG_NO_FOG 0x80000               // drawn without the map fog
+#define MAPOBJ_FLAG_HIGHLIGHT_OBJ_COLOR 0x100000 // the highlight stage uses the object colour, not the pulsing yellow
+#define MAPOBJ_FLAG_TRANSFORM_MTX 0x200000       // transformMtx (mapObjRotate/Trans/Scale) applies
+#define MAPOBJ_FLAG_KURURING_PASS 0x400000       // drawn again, unculled, by test_kururing_mapdisp
+#define MAPOBJ_FLAG_CHARGE_SHINE 0x800000        // adds the scrolling shine texture stage (ANIM_MATERIAL_FLAG_CHARGE_SHINE)
+#define MAPOBJ_FLAG_TEV_CALLBACK_MASK 0xF000000  // index into MapEntry.tevCallbacks, see MAPOBJ_TEV_CALLBACK
+#define MAPOBJ_FLAG_NO_COLOR_STAGE 0x10000000    // skips the TEV stage that multiplies in the object and blend colour
+#define MAPOBJ_FLAG_BBOX 0x20000000              // its screen bounding box is measured (mapDispMapObj_bbox)
+#define MAPOBJ_FLAG_HIGHLIGHT 0x80000000         // mapSetMaterialTev adds a pulsing yellow colour stage (ANIM_MATERIAL_FLAG_HIGHLIGHT)
 
 // MapObject.flags value that selects MapEntry.tevCallbacks[n] (1-15) for the object's extra TEV stages
 #define MAPOBJ_TEV_CALLBACK(n) ((n) << 24)
@@ -241,6 +255,17 @@ typedef struct MapAnimHeader {
     struct MapAnimList* lightColorAnims; // 0x1C
 } MapAnimHeader;
 
+// MapEntryAnimData.flags (mapPlayAnimationLv, mapMain)
+#define MAP_ANIM_FLAG_PLAYING 0x1        // started by mapPlayAnimationLv
+#define MAP_ANIM_FLAG_ENDED 0x2          // reached its end (not looping); mapMain stops advancing it
+#define MAP_ANIM_FLAG_LOOP 0x4           // mode 1: wraps around at the end
+#define MAP_ANIM_FLAG_PAUSED 0x10        // mapPauseAnimation: time stands still
+#define MAP_ANIM_FLAG_RESUME 0x20        // mapReStartAnimation: mapMain clears this and PAUSED, resuming at the stopped frame
+#define MAP_ANIM_FLAG_LV0 0x100          // level 1: timed on gp->systemLv0Time
+#define MAP_ANIM_FLAG_LV1 0x200          // level 2: gp->systemLv1Time
+#define MAP_ANIM_FLAG_LV2 0x400          // level 3: gp->systemLv2Time
+#define MAP_ANIM_FLAG_LV3 0x800          // level 4: gp->systemLv3Time
+#define MAP_ANIM_FLAG_HIT_APPLIED 0x1000 // hitMain moved the collision objects to this ended animation's last frame
 typedef struct MapEntryAnimData {
     u16 flags;              // 0x0
     u8 pad_02[0x8 - 0x2];   // 0x2
@@ -319,6 +344,12 @@ typedef struct MapMaterialNameTable {
     MapMaterialName entries[]; // 0x4
 } MapMaterialNameTable;
 
+// MapEntry.flags
+#define MAPENT_FLAG_FOG 0x1         // map fog on (fog_table enable, mapFogOn/Off)
+#define MAPENT_FLAG_BLEND 0x2       // blend colour on (mapSetBlend); objects with MAPOBJ_FLAG_NO_BLEND ignore it
+#define MAPENT_FLAG_BLEND2 0x4      // second blend colour on (mapSetBlend2); MAPOBJ_FLAG_NO_BLEND2 opts out
+#define MAPENT_FLAG_COLOR 0x8       // map colour stage on; MAPOBJ_FLAG_NO_BLEND opts out
+#define MAPENT_FLAG_VER_1_02 0x8000 // map.dat is "ver1.02": prebuilt display lists are made for it
 typedef struct MapEntry {
     union {
         s32 count;                     // 0x0, entries[0]: number of active entries

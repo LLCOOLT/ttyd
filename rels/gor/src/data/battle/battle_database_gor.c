@@ -29,6 +29,10 @@ NpcBattleSelect btlgrpsel_gor_btlno_gor_02_01_off[2];
 NpcSetupBattleInfo btlsetup_gor_tbl[7];
 NpcTerritoryInfo btl_gor_setup_no_tbl[7];
 
+/**
+ * Props of the Rogueport battle stage: each entry names a model of the backdrop and where it stands, the last
+ * entries being the background layers.
+ */
 BattleStageObjectData gor_btlobject_data[] = {
     {"A1", 2, 0, {33.0f, 0.0f, -48.0f}, 0, 60, {0}},
     {"A2", 2, 1, {0.0f, 0.0f, 71.0f}, 0, 60, {0}},
@@ -38,6 +42,10 @@ BattleStageObjectData gor_btlobject_data[] = {
     {"C", 2, 3, {0}, 0, 60, {0}},
 };
 
+/**
+ * Battle stage of Rogueport: the stage model directories, the props above, the backdrop weapons and the
+ * background event that runs during the fight.
+ */
 BattleStageData gor_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -61,6 +69,9 @@ BattleStageData gor_btlstage_data[] = {
     },
 };
 
+/**
+ * Enemy party of battle gor_00_01 in Rogueport: Lord Crump (start positions and item drop tables included).
+ */
 BattleUnitSetup btlparty_gor_gor_00_01_off_1[] = {
     {
         &unit_boss_kanbu1, // unitKindParams
@@ -74,6 +85,10 @@ BattleUnitSetup btlparty_gor_gor_00_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gor_00_01 in Rogueport: the party above with its item-drop weights and the heart and
+ * flower drop tables.
+ */
 BattleGroupSetup btlgrp_gor_gor_00_01_off_1 = {
     1, // numEnemies
     btlparty_gor_gor_00_01_off_1, // enemyData
@@ -84,6 +99,10 @@ BattleGroupSetup btlgrp_gor_gor_00_01_off_1 = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gor_02_ac_lecture in Rogueport: Goombella (action command tutorial) (start positions
+ * and item drop tables included).
+ */
 BattleUnitSetup btlparty_gor_gor_02_ac_lecture[] = {
     {
         &unit_lecture_christine, // unitKindParams
@@ -97,6 +116,10 @@ BattleUnitSetup btlparty_gor_gor_02_ac_lecture[] = {
     },
 };
 
+/**
+ * Enemy group of battle gor_02_ac_lecture in Rogueport: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gor_gor_02_ac_lecture = {
     1, // numEnemies
     btlparty_gor_gor_02_ac_lecture, // enemyData
@@ -107,6 +130,10 @@ BattleGroupSetup btlgrp_gor_gor_02_ac_lecture = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy party of battle gor_02_sac_lecture in Rogueport: Professor Frankly (special action command tutorial)
+ * (start positions and item drop tables included).
+ */
 BattleUnitSetup btlparty_gor_gor_02_sac_lecture[] = {
     {
         &unit_lecture_frankli_sac, // unitKindParams
@@ -120,6 +147,10 @@ BattleUnitSetup btlparty_gor_gor_02_sac_lecture[] = {
     },
 };
 
+/**
+ * Enemy group of battle gor_02_sac_lecture in Rogueport: the party above with its item-drop weights and the
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_gor_gor_02_sac_lecture = {
     1, // numEnemies
     btlparty_gor_gor_02_sac_lecture, // enemyData
@@ -130,6 +161,7 @@ BattleGroupSetup btlgrp_gor_gor_02_sac_lecture = {
     5, // reserved_1C
 };
 
+/** Enemy party of battle gor_02_01 in Rogueport: Gus (start positions and item drop tables included). */
 BattleUnitSetup btlparty_gor_gor_02_01_off_1[] = {
     {
         &unit_monban, // unitKindParams
@@ -143,6 +175,10 @@ BattleUnitSetup btlparty_gor_gor_02_01_off_1[] = {
     },
 };
 
+/**
+ * Enemy group of battle gor_02_01 in Rogueport: the party above with its item-drop weights and the heart and
+ * flower drop tables.
+ */
 BattleGroupSetup btlgrp_gor_gor_02_01_off_1 = {
     1, // numEnemies
     btlparty_gor_gor_02_01_off_1, // enemyData
@@ -153,36 +189,46 @@ BattleGroupSetup btlgrp_gor_gor_02_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Developer test battle 1 in Rogueport: always fights gor_02_01_off_1. */
 NpcBattleSelect btlgrpsel_gor_btlno_gor_test1_off[] = {
     {50, &btlgrp_gor_gor_02_01_off_1, gor_btlstage_data},
     {0},
 };
 
+/** Developer test battle 2 in Rogueport: always fights gor_02_01_off_1. */
 NpcBattleSelect btlgrpsel_gor_btlno_gor_test2_off[] = {
     {50, &btlgrp_gor_gor_02_01_off_1, &gor_btlstage_data[1]},
     {0},
 };
 
+/** Battle 00_01 in Rogueport always fights one group, gor_00_01_off_1. */
 NpcBattleSelect btlgrpsel_gor_btlno_gor_00_01_off[] = {
     {50, &btlgrp_gor_gor_00_01_off_1, gor_btlstage_data},
     {0},
 };
 
+/** Battle 02_aclec in Rogueport always fights one group, gor_02_ac_lecture. */
 NpcBattleSelect btlgrpsel_gor_btlno_gor_02_aclec_off[] = {
     {50, &btlgrp_gor_gor_02_ac_lecture, &gor_btlstage_data[1]},
     {0},
 };
 
+/** Battle 02_saclec in Rogueport always fights one group, gor_02_sac_lecture. */
 NpcBattleSelect btlgrpsel_gor_btlno_gor_02_saclec_off[] = {
     {50, &btlgrp_gor_gor_02_sac_lecture, &gor_btlstage_data[1]},
     {0},
 };
 
+/** Battle 02_01 in Rogueport always fights one group, gor_02_01_off_1. */
 NpcBattleSelect btlgrpsel_gor_btlno_gor_02_01_off[] = {
     {50, &btlgrp_gor_gor_02_01_off_1, &gor_btlstage_data[1]},
     {0},
 };
 
+/**
+ * Field battle setups of Rogueport: one entry per battle id in btl_gor_setup_no_tbl, giving the stage, the
+ * group selection and the battle music.
+ */
 NpcSetupBattleInfo btlsetup_gor_tbl[] = {
     {
         "マップstg_00_0", // name
@@ -253,6 +299,10 @@ NpcSetupBattleInfo btlsetup_gor_tbl[] = {
     {0},
 };
 
+/**
+ * Battle ids of Rogueport (BTLNO_GOR_*) and their index into btlsetup_gor_tbl; handed to the battle system by
+ * relSetBtlAddr.
+ */
 NpcTerritoryInfo btl_gor_setup_no_tbl[] = {
     {"BTLNO_GOR_TEST1", 0},
     {"BTLNO_GOR_TEST2", 1},

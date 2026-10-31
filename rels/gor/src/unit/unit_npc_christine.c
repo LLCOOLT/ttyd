@@ -17,6 +17,10 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[5];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of Goombella:
+ * 10 HP, level 1, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 BattleUnitKind unit_npc_christine = {
     221,
     "btl_un_christine",
@@ -75,7 +79,7 @@ BattleUnitKind unit_npc_christine = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x12000000,
+    UNIT_ATTR_NO_HP_GAUGE | UNIT_ATTR_IGNORE_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -83,25 +87,34 @@ BattleUnitKind unit_npc_christine = {
     data_table,
 };
 
+/** Defence of Goombella's body per damage type: 0 against every damage type. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Goombella's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Status vulnerability of Goombella: immune to every status. */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/**
+ * Pose table of Goombella:
+ * the animation played for each pose type (idle, hurt, walk, run, attack and so on).
+ */
 static PoseTableEntry pose_table[] = {
-    {28, "PKR_S_1"},
+    {BTL_POSE_NORMAL, "PKR_S_1"},
     {31, "PKR_S_1"},
-    {39, "PKR_S_1"},
+    {BTL_POSE_DAMAGE, "PKR_S_1"},
     {BTL_POSE_STAY_DEFAULT, "PKR_S_1"},
 };
 
+/** Event table of Goombella: empty, so it has no special reactions. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Body part of Goombella: a single part using the model "c_pkr". */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_christine", "c_pkr", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x90009, 0, pose_table},
+    {1, "btl_un_christine", "c_pkr", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_UNTATTLEABLE, 0, pose_table},
 };
 
 /** Init event of Goombella as an NPC battle unit: installs attack, damage and confusion events and forbids movement. */

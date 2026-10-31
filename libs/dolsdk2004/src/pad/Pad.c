@@ -5,8 +5,10 @@
 #include "__si.h"
 
 #if DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __PADVersion = "<< Dolphin SDK - PAD\tdebug build: Apr  5 2004 03:56:05 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __PADVersion = "<< Dolphin SDK - PAD\trelease build: Apr  5 2004 04:14:49 (0x2301) >>";
 #endif
 
@@ -28,9 +30,16 @@ const char* __PADVersion = "<< Dolphin SDK - PAD\trelease build: Apr  5 2004 04:
         0x0080             \
     )
 
+/** Port being reset (32: none). */
 static s32 ResettingChan = 0x20;
+/**
+ * Ports whose stick X origin is zeroed when it reads out of range on a standard controller;
+ * __PADDisableXPatch clears them all.
+ */
 static u32 XPatchBits = PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT;
+/** Analog mode bits sent in the controller poll command. */
 static u32 AnalogMode = 0x300;
+/** Controller spec set with PADSetSpec. */
 static u32 Spec = PAD_SPEC_5;
 
 static BOOL Initialized;
@@ -71,13 +80,16 @@ void __PADDisableXPatch(void);
 BOOL __PADDisableRumble(BOOL disable);
 
 typedef void (*SPECCallback)(s32, PADStatus*, u32*);
+/** Function that turns raw controller data into a PADStatus for the current spec. */
 static SPECCallback MakeStatus = SPEC2_MakeStatus;
 
 static u32 CmdTypeAndStatus;
+/** SI commands that read a controller's origin and recalibrate it. */
 static u32 CmdReadOrigin = 0x41000000;
 static u32 CmdCalibrate = 0x42000000;
 static u32 CmdProbeDevice[4];
 
+/** Registers OnReset (priority 127) with the OS so controllers are recalibrated before a reset. */
 static OSResetFunctionInfo ResetFunctionInfo = {
     OnReset,
     127,
@@ -953,9 +965,9 @@ BOOL __PADDisableRumble(BOOL disable) {
 }
 
 /**
- * Returns TRUE when port chan is flagged in BarrelBits,
- * which SPEC2_MakeStatus sets for a standard controller whose button word lacks bit 0x80.
- * Guess: that identifies a non-standard "barrel" style device.
+ * Returns TRUE when port chan is flagged in BarrelBits, which SPEC2_MakeStatus sets (and zeroes the sticks)
+ * for a standard controller whose button word lacks bit 0x80. Nothing in the game calls it.
+ * Guess: "barrel" is the DK Bongos (Taru Konga), which report as a standard controller without that bit.
  */
 BOOL PADIsBarrel(s32 chan) {
     if (chan < 0 || chan >= 4) {

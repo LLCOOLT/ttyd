@@ -481,6 +481,7 @@ EVT_END()
  * the lecture_friends_05 messages explain the kick and the hold. The camera and Koops are restored at the end.
  */
 EVT_BEGIN(nokotaro_party_lecture)
+    // Koops introduces himself and the camera moves in for the lesson.
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_0_1"), 0, 0)
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_1"), 0, 0)
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(100.0f), FLOAT(630.0f), FLOAT(45.0f), FLOAT(39.0f), FLOAT(-100.0f), 1000, 0)
@@ -490,6 +491,7 @@ EVT_BEGIN(nokotaro_party_lecture)
     WAIT_MS(1500)
 #endif
     CALL(evt_cam_letter_box_disable, 1)
+    // Koops kicks his shell twice.
     LOOP(2)
         CALL(evt_party_nokotaro_kick, 0)
         WAIT_MS(500)
@@ -505,6 +507,8 @@ EVT_BEGIN(nokotaro_party_lecture)
     END_INLINE_EVENT
     CALL(x_flag_wait, 0, 0)
 #endif
+    // A blue switch block is dropped for Koops to hit; the lesson runs twice, explaining the kick and then
+    // the hold.
     CALL(evt_npc_change_fbat_mode, 8)
     SET_VALUE(LW(8), 2)
     LOOP(LW(8))
@@ -568,6 +572,7 @@ EVT_BEGIN(nokotaro_party_lecture)
         END_SWITCH
         CALL(evt_party_nokotaro_hold_cancel, 0)
     END_LOOP
+    // The camera and Koops are restored and the lecture ends with a last tip.
     CALL(evt_cam_letter_box_disable, 0)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(x_flag_set, 0, 1)
@@ -610,6 +615,8 @@ EVT_END()
  * For Koops the extra kick tutorial runs inside it.
  */
 EVT_BEGIN(all_party_lecture)
+    // Mario stops and the previous partner is sent away; the new partner takes the NPC's place in the
+    // party.
     CALL(evt_mario_normalize)
     IF_INT_NOT_EQUAL(LW(9), 1)
         IF_INT_NOT_EQUAL(LW(9), 5)
@@ -627,6 +634,8 @@ EVT_BEGIN(all_party_lecture)
     ELSE
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     END_IF
+    // The partner-join jingle plays, an "itemget" backdrop appears and the lecture message for that partner
+    // plays.
     CALL(evt_party_set_camid, 0, 7)
     SPAWN_EVENT_GET_ID(PTR(all_party_lecture_otosub), LW(11))
     CALL(lect_itemget_kesan, 0, FLOAT(600.0f), LW(0), LW(1), LW(2))
@@ -657,6 +666,7 @@ EVT_BEGIN(all_party_lecture)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_IF
+    // The lecture music starts and the partner is shown in a paper cut-out frame.
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_mario_set_camid, 7)
     CALL(effitemget_open, STRING("sub_bg"))
@@ -695,6 +705,7 @@ EVT_BEGIN(all_party_lecture)
         CASE_EQUAL(2)
         CALL_CHILD(nokotaro_party_lecture_init)
     END_SWITCH
+    // Mario and the partner blink in and out while their lesson plays (for Koops the kick tutorial).
     LOOP(6)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_LECTUREN_BLINKING1"), LW(0), LW(1), LW(2), 0)
@@ -720,6 +731,7 @@ EVT_BEGIN(all_party_lecture)
         CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 0)
         WAIT_MS(100)
     END_LOOP
+    // The camera, music and ambience are restored and the paper frame folds away.
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     CALL(evt_mario_init_camid)

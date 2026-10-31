@@ -55,6 +55,7 @@ void TRKProcessInput(int bufferIdx);
 
 DSError TRKRequestSend(TRKBuffer* msgBuf, int* bufferId, u32 p1, u32 p2, int p3);
 
+/** Debug message strings for the host file-request path. */
 static const char sRequestSendStrings[] = "Calling MessageSend\n\0\0\0\0"
                                           "msg_command : 0x%02x hdr->cmdID 0x%02x\n\0"
                                           "msg_error : 0x%02x\n\0"

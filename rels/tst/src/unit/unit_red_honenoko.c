@@ -15,6 +15,13 @@
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_sub.h"
 
+// Unit work slots of the Red Bones (btlevtcmd_Get/SetUnitWork).
+enum {
+    UW_RED_HONENOKO_BONE_DONE = 0,    // set to 1 when the thrown bone lands: ends the bone's spin loop
+    UW_RED_HONENOKO_REWARD_GIVEN = 1, // 1 once its coins and experience were paid out
+    UW_RED_HONENOKO_REVIVE_TURNS = 2, // turns left while collapsed (2 or 3); at 0 it rebuilds itself
+};
+
 static USER_FUNC(honenoko_copy_status);
 extern BattleUnitKind unit_honenoko;
 
@@ -36,6 +43,10 @@ static EvtWord normal_attack_event[428];
 static EvtWord call_friend_event[311];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the Red Bones: 5 HP and level 14, with its sizes, damage sounds, status vulnerability,
+ * parts and init script.
+ */
 BattleUnitKind unit_red_honenoko = {
     22,
     "btl_un_red_honenoko",
@@ -98,7 +109,7 @@ BattleUnitKind unit_red_honenoko = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x10000,
+    UNIT_ATTR_REVIVES_AFTER_KO,
     &regist,
     4,
     parts,
@@ -106,23 +117,38 @@ BattleUnitKind unit_red_honenoko = {
     data_table,
 };
 
+/** Defence of the Red Bones: 1 against every kind of hit. */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/** Element modifiers of the Red Bones: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Red Bones in the demo builds: immune to poison and instant KO;
+ * resists sleep, stop and confusion.
+ */
 static StatusVulnerability regist = {50, 50, 100, 0, 50, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 0};
 #else
+/**
+ * Status vulnerability of the Red Bones in the retail builds: immune to sleep, poison, fright and instant KO;
+ * resists most other statuses.
+ */
 static StatusVulnerability regist = {0, 85, 40, 0, 40, 100, 90, 80, 100, 90, 100, 90, 100, 90, 80, 0, 80, 100, 80, 100, 100, 0};
 #endif
 
+/**
+ * Parts of the Red Bones: the body (part 1), the bone it throws (part 2)
+ * and the two bones (parts 3 and 4) it tosses up and reassembles when it calls a friend.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_red_honenoko", "c_karon_r_h", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
-    {2, "btl_un_red_honenoko", "c_karon_r_h", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {3, "btl_un_red_honenoko", "c_nagehone_g", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
-    {4, "btl_un_red_honenoko", "c_karon_g_h", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_red_honenoko", "c_karon_r_h", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
+    {2, "btl_un_red_honenoko", "c_karon_r_h", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {3, "btl_un_red_honenoko", "c_nagehone_g", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {4, "btl_un_red_honenoko", "c_karon_g_h", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Attack data of the Red Bones' bone throw: 3 damage. */
 static BattleWeapon weapon_honenoko_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -141,7 +167,7 @@ static BattleWeapon weapon_honenoko_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -159,6 +185,10 @@ static BattleWeapon weapon_honenoko_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Spawn setup for a Dull Bones, which the Red Bones calls into the battle:
+ * enemy side, acting in the enemy phase, placed far off-screen until the calling script moves it into position.
+ */
 static BattleUnitSetup entry_honenoko = {
     &unit_honenoko, // unitKindParams
     1, // alliance
@@ -170,6 +200,9 @@ static BattleUnitSetup entry_honenoko = {
     NULL, // itemDropTable
 };
 
+/**
+ * Pose table of the Red Bones: maps each battle pose (waiting, hurt, running...) to one of its KRN_* animations.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "KRN_N_1"},
     {2, "KRN_Y_1"},
@@ -192,6 +225,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "KRN_S_1"},
 };
 
+/**
+ * Data table of the Red Bones: reaction scripts for being defeated and falling apart (`fake_dead_event`);
+ * a First Strike on it triggers nothing special.
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {15, fake_dead_event},
@@ -208,7 +245,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REWARD_GIVEN, 0)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("0"), STRING("SFX_ENM_HONENOKO_LANDING1"))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -247,9 +284,9 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     ADD(LW(2), 10)
     CALL(evt_eff, 0, STRING("kemuri_test"), 4, LW(0), LW(1), LW(2), FLOAT(0.7998047f), 0, 0, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REWARD_GIVEN, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REWARD_GIVEN, 1)
         CALL(btlevtcmd_GetCoin, LW(10), LW(0))
         CALL(btlevtcmd_StoreCoin, LW(0))
         CALL(btlevtcmd_GetExp, LW(10), LW(0))
@@ -274,7 +311,7 @@ static EVT_BEGIN(dead_event)
         GOTO(20)
     END_IF
     CALL(btlevtcmd_GetBackItem, LW(10))
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_KillUnit, LW(10), 0)
     ELSE
@@ -293,9 +330,9 @@ static EVT_BEGIN(fake_dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(2), LW(3), LW(4), 0, -1, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REWARD_GIVEN, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REWARD_GIVEN, 1)
         SET_VALUE(LW(10), -2)
         CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -321,7 +358,7 @@ static EVT_BEGIN(fake_dead_event)
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 2)
     CALL(evt_sub_random, 2, LW(0))
     ADD(LW(0), 2)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REVIVE_TURNS, LW(0))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, -20, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -334,9 +371,9 @@ EVT_END()
  * clears the attribute flag that marked it down and restores its HP to the maximum.
  */
 static EVT_BEGIN(rebirth_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REVIVE_TURNS, LW(0))
     SUBTRACT(LW(0), 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REVIVE_TURNS, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         RETURN
     END_IF
@@ -346,7 +383,7 @@ static EVT_BEGIN(rebirth_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRN_D_4"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HONENOKO_UNITE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 131072)
+    CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, UNIT_ATTR_INACTIVE)
     CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SetHp, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
@@ -365,7 +402,7 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_REVIVE_TURNS, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(rebirth_event)
         GOTO(99)
@@ -452,6 +489,7 @@ EVT_END()
  * On a hit the bone lands, the damage is resolved and it bounces back; the bone part is hidden again at the end.
  */
 static EVT_BEGIN(normal_attack_event)
+    // First-strike battle: the target is already fixed; otherwise one is picked from the opposing party.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -461,8 +499,9 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_honenoko_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_honenoko_attack), LW(3), LW(4))
     END_IF
+    // No target to attack: a confused Red Bones just flusters about, otherwise it skips its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -476,20 +515,22 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(500)
+    // The Red Bones winds up with a bone in hand.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRN_A_1"))
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRN_A_2"))
     WAIT_MS(250)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HONENOKO_SEND_GROUP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HONENOKO_BONE_THROW1"), EVT_NULLPTR, 0, LW(15))
+    // The bone (part 2) is held up and spins, ready to fly.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("KRN_H_1"))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2))
     BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_BONE_DONE, 0)
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_BONE_DONE, LW(14))
             IF_INT_EQUAL(LW(14), 1)
                 BREAK_LOOP
             END_IF
@@ -497,7 +538,8 @@ static EVT_BEGIN(normal_attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_honenoko_attack), 256, LW(5))
+    // Check whether the attack will connect; a miss sends the target into its dodge.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_honenoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -516,6 +558,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // A miss: the bone sails past the target, which dodges as it goes by.
     LABEL(90)
     BEGIN_SIBLING_EVENT
         LOOP(0)
@@ -549,6 +592,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 0, 0)
     CALL(evt_snd_sfxoff, LW(15))
     GOTO(98)
+    // A hit: the bone lands on the target, the damage is dealt and the bone bounces away.
     LABEL(91)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
     ADD(LW(1), 14)
@@ -559,18 +603,20 @@ static EVT_BEGIN(normal_attack_event)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_honenoko_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_honenoko_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_honenoko_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), -50)
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 2, 0, FLOAT(2.0f), FLOAT(0.2998047f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 0, 0)
     GOTO(98)
+    // Either way the bone is hidden again.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 33554432)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_BONE_DONE, 1)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_NO_SHADOW)
     WAIT_FRAMES(10)
+    // Turn finished: the Red Bones goes back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -585,11 +631,13 @@ EVT_END()
  * position in LW(0) to LW(2) with this unit's status copied by honenoko_copy_status.
  */
 static EVT_BEGIN(call_friend_event)
+    // The camera zooms in on the Red Bones.
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     SET_VALUE(LW(10), 0)
+    // Six times it raises a bone and throws it into the air, piling the bones up.
     LOOP(6)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRN_A_3"))
         WAIT_FRAMES(5)
@@ -610,16 +658,16 @@ static EVT_BEGIN(call_friend_event)
             CASE_DEFAULT
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("KRN_H_2"))
         END_SWITCH
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 50331648)
+        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
         CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 1, LW(4), LW(5), LW(6))
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(4), 15)
         ADD(LW(5), 14)
         CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 3, LW(4), LW(5), LW(6))
         BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_BONE_DONE, 0)
             SET_VALUE(LW(15), 0)
             LOOP(0)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(14))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_RED_HONENOKO_BONE_DONE, LW(14))
                 IF_INT_EQUAL(LW(14), 1)
                     BREAK_LOOP
                 END_IF
@@ -636,7 +684,7 @@ static EVT_BEGIN(call_friend_event)
         SWITCH(LW(10))
             CASE_EQUAL(0)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRN_C_5"))
-            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 4, 50331648)
+            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 4, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
             CASE_EQUAL(1)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRN_C_4"))
             CASE_EQUAL(2)
@@ -648,10 +696,11 @@ static EVT_BEGIN(call_friend_event)
             CASE_DEFAULT
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRN_Z_2"))
         END_SWITCH
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 50331648)
+        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
         ADD(LW(10), 1)
     END_LOOP
     WAIT_FRAMES(15)
+    // The bones reassemble with a rattle.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 4, STRING("KRN_D_3"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HONENOKO_UNITE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(60)
@@ -659,8 +708,9 @@ static EVT_BEGIN(call_friend_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HONENOKO_UNITE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRN_S_1"))
+    // A new Dull Bones is spawned and takes over this unit status.
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_honenoko), 0)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 4, 50331648)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 4, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(honenoko_copy_status, BTL_UNIT_SELF, LW(3))

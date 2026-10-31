@@ -223,12 +223,20 @@ EVT_BEGIN(after_2hours)
     RETURN
 EVT_END()
 
+/**
+ * Eight control points (x, y, z) of the path the freed Puni Elder walks along when he leaves with Punio
+ * (elder_rescue).
+ */
 static f32 spline_dt[] = {
     132.0f, 0.0f, -153.0f, 95.267204f, 0.0f, -108.09037f, 81.30669f, 0.0f,
     -100.69795f, 79.727806f, 0.0f, -73.32686f, 117.33458f, 0.0f, -59.17779f, 162.0448f,
     0.0f, -53.076424f, 228.65108f, 0.0f, 36.325317f, 245.45486f, 0.0f, 22.319448f,
 };
 
+/**
+ * Five control points (x, y, z) of the path Punio (the guide Puni) walks along in elder_rescue after the
+ * elder leaves.
+ */
 f32 spline_dt1[] = {
     98.0f, 0.0f, -156.0f, 65.11044f, 0.0f, -80.236275f, 56.63583f, 0.0f,
     -57.388996f, -4.335236f, 0.0f, -40.86129f, -145.0f, 0.0f, -60.0f,
@@ -241,6 +249,7 @@ f32 spline_dt1[] = {
  * The Puni elder joins the Puni group and the story is set to STORY_STG2_14_PUNI_ELDER_FREED.
  */
 EVT_BEGIN(elder_rescue)
+    // Mario opens the red cell; Punio and his sister run up to the swollen Elder inside.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_cam3d_evt_set, 105, 82, 92, 105, 30, -203, 1000, 11)
@@ -304,6 +313,7 @@ EVT_BEGIN(elder_rescue)
         CALL(evt_party_jump_pos, 0, LW(0), LW(1), LW(2), 400, 1, -1000)
     END_INLINE_EVENT
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
+    // The Elder scolds Punio for coming back, and he protests that he only went to find help.
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_STG2_PUNI1"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_e14_01"), 0, STRING("プニ族長老"))
     WAIT_WHILE(GF(0))
@@ -335,6 +345,7 @@ EVT_BEGIN(elder_rescue)
     CALL(evt_npc_jump_position_nohit, STRING("プニ族長老"), LW(0), LW(1), LW(2), 200, 18)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e14_05"), 0, STRING("プニ族長老"))
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70) | PSND_CH(1))
+    // The screen fades out for "several hours later" while the Elder keeps lecturing.
     CALL(evt_fade_out, 1000)
     WAIT_MS(100)
     CALL(evt_fade_entry, FADE_OUT_BLACK_2D, 0, 0, 0, 0)
@@ -354,6 +365,12 @@ EVT_BEGIN(elder_rescue)
     CALL(evt_fade_entry, FADE_IN_BLACK_2D, 0, 0, 0, 0)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP | PSND_CH(1), 0)
     CALL(evt_fade_in, 1000)
+    // The lecture ends; Punio finally gets to say they came to rescue everyone and the Elder asks to be let
+    // out.
+    // The lecture ends; Punio finally gets to say they came to rescue everyone and the Elder asks to be let
+    // out.
+    // The lecture ends; Punio finally gets to say they came to rescue everyone and the Elder asks to be let
+    // out.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e14_07"), 0, STRING("プニ族長老"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_e14_08"), 0, STRING("ガイド"))
     CALL(evt_npc_get_position, STRING("プニ族長老"), LW(0), LW(1), LW(2))
@@ -380,6 +397,12 @@ EVT_BEGIN(elder_rescue)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 1000)
     CALL(evt_cam3d_evt_off, 1000, 11)
     CALL(evt_npc_status_onoff, 1, STRING("プニ族長老"), 2)
+    // The Elder walks out along a path, then Punio follows another; he promises his sister he will come back
+    // for her.
+    // The Elder walks out along a path, then Punio follows another; he promises his sister he will come back
+    // for her.
+    // The Elder walks out along a path, then Punio follows another; he promises his sister he will come back
+    // for her.
     CALL(evt_sub_spline_init, 0, 0, PTR(spline_dt), 8, 30, 0)
     LABEL(0)
     CALL(evt_sub_spline_get_value, LW(3), LW(4), LW(5), LW(6))
@@ -432,6 +455,7 @@ EVT_BEGIN(elder_rescue)
     SET_VALUE(GF(2), 0)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
+    // The Elder joins the Puni group, the story advances and Mario regains control.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_14_PUNI_ELDER_FREED)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
@@ -539,6 +563,7 @@ EVT_BEGIN(puni_3_talk)
     RETURN
 EVT_END()
 
+/** NPCs of the jail: the Puni Elder, the guide's sister, the guide Puni and Puni 3. */
 static NpcSetupInfo npcEnt[] = {
     {
         "プニ族長老", // name
@@ -613,6 +638,7 @@ EVT_BEGIN(bero_custom_00)
     RETURN
 EVT_END()
 
+/** Exits of mri_03: pipe dokan to mri_20 (dokan1); west road w_bero to mri_04 (e_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan", // hitName
@@ -650,6 +676,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Scattered (x, z) spots, as pairs of 16-bit values, where the Punies stand in the jail. */
 static s16 puni_rand_position[] = {
     -68, -143, -146, -199, -101, -286, -126, -253,
     -144, -149, -229, -226, -183, -191, -40, -200,
@@ -743,6 +770,7 @@ EVT_BEGIN(evt_unlock00_01)
     RETURN
 EVT_END()
 
+/** Item list for the red cell door's key window: only the Red Key (-1 ends the list). */
 s32 key_table00[] = {
     ITEM_RED_KEY, -1,
 };
@@ -824,6 +852,7 @@ static EVT_BEGIN(evt_unlock01)
     RETURN
 EVT_END()
 
+/** Item list for the blue cell door's key window: the Red Key and the Blue Key (-1 ends the list). */
 s32 key_table01[] = {
     ITEM_RED_KEY, ITEM_BLUE_KEY, -1,
 };
@@ -962,7 +991,8 @@ EVT_END()
 /**
  * Makes Mario spin around on the spot (1980 degrees, five and a half turns) over 2 seconds with his facing
  * locked, after a short wait; afterwards he faces east and the partner runs again.
- * Guess: it plays during the moment he is being carried or spun by the cell trap.
+ * Spawned with party_kirimomi_event at the start of guide_sister, when the blue cell is opened
+ * and the reunion music (BGM_EVT_NOKO_SAIKAI1) starts.
  */
 static EVT_BEGIN(mario_kirimomi_event)
     WAIT_MS(300)
@@ -1012,6 +1042,7 @@ EVT_BEGIN(party_kirimomi_event)
     RETURN
 EVT_END()
 
+/** Points (x, z pairs, 10000 ends the list) the Punies run to when they flee in the blue-cell scene. */
 s32 JailAwayTable_New[] = {
     -83, -216, -153, -195, -205, -154, -241, -95,
     -220, -25, -190, 0, -160, 40, 10000,
@@ -1177,6 +1208,7 @@ EVT_END()
  */
 EVT_BEGIN(guide_sister)
 #if VERSION <= VERSION_JP
+    // The Punies step back from the opened blue cell and Mario and his partner relax.
     CALL(evt_mario_key_onoff, 0)
 #endif
     SET_VALUE(LW(10), 14)
@@ -1204,6 +1236,7 @@ EVT_BEGIN(guide_sister)
     END_LOOP
     SPAWN_EVENT(mario_kirimomi_event)
     SPAWN_EVENT(party_kirimomi_event)
+    // The reunion music starts.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_NOKO_SAIKAI1"))
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド妹"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -1220,6 +1253,7 @@ EVT_BEGIN(guide_sister)
     SPAWN_EVENT_GET_ID(PTR(mri_puni_walk_se), LW(9))
     CALL(evt_npc_move_position, STRING("ガイド妹"), -180, 40, 0, FLOAT(180.0f), 0)
     DELETE_EVENT(LW(9))
+    // Petuni runs out of the cell and into Punio's arms.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_00"), 0, STRING("ガイド妹"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_mov_pos2, -230, -45, FLOAT(120.0f))
@@ -1280,6 +1314,7 @@ EVT_BEGIN(guide_sister)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_02"), 0, LW(11))
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_03"), 0, LW(10))
     CALL(evt_msg_togelr, 0)
+    // Petuni gives her brother a gift: his favorite mushroom, a Dried Shroom, which shrinks as he eats it.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_04"), 0, LW(11))
     CALL(evt_npc_set_ry, LW(11), 270)
     WAIT_MS(200)
@@ -1323,6 +1358,7 @@ EVT_BEGIN(guide_sister)
     WAIT_MS(1000)
     CALL(evt_msg_togelr, 0)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_10"), 0, LW(11))
+    // Punio pretends it is delicious, then hugs her tight.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_11"), 0, LW(10))
     CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
     ADD(LW(0), -20)
@@ -1340,6 +1376,7 @@ EVT_BEGIN(guide_sister)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_14"), 0, LW(11))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
+    // Petuni joins the Puni group.
     SET_VALUE(GSWF(GSWF_MRI03_PUNIO_WAITING_AT_CELL), 0)
     SET_VALUE(GSWF(GSWF_MRI_PETUNI_IN_PUNI_GROUP), 1)
     SET_VALUE(GSW(GSW_MRI_PUNI_FOLLOWERS), 98)
@@ -1368,6 +1405,7 @@ EVT_BEGIN(guide_sister)
     END_INLINE_EVENT
     CALL(evt_msg_toge, 1, 0, 0, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI_JABBI_IN_PUNI_GROUP), 0)
+        // The Punies in the jail join Mario's party and the new total is announced.
         CALL(evt_msg_print, 0, STRING("stg2_mri_e20_16"), 0, 0)
     ELSE
         CALL(evt_msg_print, 0, STRING("stg2_mri_e20_16_1"), 0, 0)
@@ -1395,6 +1433,7 @@ EVT_END()
  * Sets the story to STORY_STG2_12_02_PUNI_ELDER_IMPRISONED.
  */
 EVT_BEGIN(toraware_elder)
+    // Mario enters the prison; Punio and the Punies find the Elder locked in her cell.
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
     CALL(evt_puni_wait_systemmode, 2)
@@ -1447,6 +1486,12 @@ EVT_BEGIN(toraware_elder)
     CALL(evt_npc_move_position, LW(10), 115, -100, 0, FLOAT(60.0f), 0)
     DELETE_EVENT(LW(9))
     WAIT_WHILE(GF(0))
+    // The Elder, calm in her cell, welcomes Punio; he asks why she is not afraid and she shrugs off the
+    // rescue.
+    // The Elder, calm in her cell, welcomes Punio; he asks why she is not afraid and she shrugs off the
+    // rescue.
+    // The Elder, calm in her cell, welcomes Punio; he asks why she is not afraid and she shrugs off the
+    // rescue.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e12_26_02"), 0, LW(10))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_mov_pos2, 175, -30, FLOAT(120.0f))
@@ -1465,6 +1510,7 @@ EVT_BEGIN(toraware_elder)
     SET_VALUE(LW(10), STRING("ガイド妹"))
     CALL(evt_npc_set_ry, LW(10), 90)
     CALL(evt_npc_set_position, LW(10), -165, 0, -100)
+    // Petuni, in another cell, hears her brother's voice and cries out.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e12_26_07"), 0, LW(10))
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("ガイドsp"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
@@ -1487,6 +1533,7 @@ EVT_BEGIN(toraware_elder)
         CALL(evt_party_move_pos2, 0, -75, -30, FLOAT(120.0f))
     END_INLINE_EVENT
     WAIT_MS(250)
+    // Punio and Petuni are reunited through the bars and Punio promises to rescue them all.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e12_26_09"), 0, LW(10))
     CALL(evt_msg_print, 0, STRING("stg2_mri_e12_26_10"), 0, STRING("ガイドsp"))
     WAIT_MS(500)
@@ -1494,6 +1541,7 @@ EVT_BEGIN(toraware_elder)
     WAIT_MS(500)
     CALL(evt_npc_set_ry, STRING("ガイドsp"), 90)
     WAIT_MS(833)
+    // Punio tells Mario they need the cell key.
     CALL(evt_msg_print, 0, STRING("stg2_mri_e12_26_12"), 0, STRING("ガイドsp"))
     SET_VALUE(LW(0), STRING("ガイドsp"))
     SPAWN_EVENT_GET_ID(PTR(mri_puni_walk_se), LW(9))
@@ -1504,6 +1552,7 @@ EVT_BEGIN(toraware_elder)
     CALL(evt_puni_set_position, 1, LW(0), LW(1), LW(2))
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
+    // The story advances and Mario regains control.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_12_02_PUNI_ELDER_IMPRISONED)
     CALL(evt_npc_restart_regular_event, STRING("ガイド妹"))
     CALL(evt_party_run, 0)
@@ -1551,6 +1600,7 @@ EVT_BEGIN(guide_sister_before)
     RETURN
 EVT_END()
 
+/** Plants Mario can search in mri_03: A_ueki01, A_ueki03, A_ueki04, A_ueki05. */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki01", "S_ueki01", NULL},
     {1, "A_ueki03", "S_ueki03", NULL},

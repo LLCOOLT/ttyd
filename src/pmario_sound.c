@@ -300,6 +300,10 @@ SoundBGMEntry psbgmlist[] = {
     { "BGM_FF_MAIL_RECEPTION3", SFX_FLAG_STREAM, "sound/stream/ff_mail_chakusin3_32k", 0x46, 0x40, 0x00, 0x01 }
 };
 
+/**
+ * Every sound effect by name ("SFX_..."): its id in the sound project, label, volume, pan, reverb, priority,
+ * delay and pitch. psndSFXOn and the other effect calls look sounds up here by name or index.
+ */
 SoundEffectEntry pssfxlist[] = {
     { "", 0, "", 0, 0, 0, 0, 0, 0, 0 },
     { "", 0, "", 0, 0, 0, 0, 0, 0, 0 },
@@ -4533,6 +4537,10 @@ SoundEffectEntry pssfxlist[] = {
     { "", 0, "", 0, 0, 0, 0, 0, 0, 0 }
 };
 
+/**
+ * Environment sounds (wind, water, crowds and other map ambience): the effect each one plays, its volume and
+ * whether it loops or repeats at random intervals and positions; the id is its index in psenvlistname.
+ */
 SoundEnvList psenvlist[] = {
     { 0x1, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0.0f, 0.0f, 0.0f, 0x14, 0x32, 0x12 },
     { 0x1, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0.0f, 0.0f, 0.0f, 0x14, 0x32, 0x12 },
@@ -4867,6 +4875,7 @@ SoundEnvList psenvlist[] = {
     { 0x75, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0.0f, 0.0f, 0.0f, 0x0, 0x0, 0x0 }
 };
 
+/** Names of the environment sounds ("ENV_..."), searched by name when a map starts its ambience (psndENVOn). */
 const char* psenvlistname[] = {
     "",
     "ENV_OPN_AAA1",
@@ -4987,6 +4996,10 @@ const char* psenvlistname[] = {
     "ENV_END_AAA1"
 };
 #else
+/**
+ * Every music track by name ("BGM_..."): the sound project song or the disc stream (.stm) to play, with its
+ * volume, pan and group. psndBGMOn looks the map and battle music up here.
+ */
 SoundBGMEntry psbgmlist[] = {
     { "", 0, "", 0x00, 0x00, 0x00, 0x00 },
     { "", 0, "", 0x00, 0x00, 0x00, 0x00 },
@@ -5252,6 +5265,10 @@ SoundBGMEntry psbgmlist[] = {
     { "BGM_FF_MAIL_RECEPTION3", SFX_FLAG_STREAM, "sound/stream/ff_mail_chakusin3_32k", 0x46, 0x40, 0x00, 0x01 }
 };
 
+/**
+ * Every sound effect by name ("SFX_..."): its id in the sound project, label, volume, pan, reverb, priority,
+ * delay and pitch. psndSFXOn and the other effect calls look sounds up here by name or index.
+ */
 SoundEffectEntry pssfxlist[] = {
     { "", 0, "", 0, 0, 0, 0, 0, 0, 0 },
     { "", 0, "", 0, 0, 0, 0, 0, 0, 0 },
@@ -9497,6 +9514,10 @@ SoundEffectEntry pssfxlist[] = {
     { "", 0, "", 0, 0, 0, 0, 0, 0, 0 }
 };
 
+/**
+ * Environment sounds (wind, water, crowds and other map ambience): the effect each one plays, its volume and
+ * whether it loops or repeats at random intervals and positions; the id is its index in psenvlistname.
+ */
 SoundEnvList psenvlist[] = {
     { 0x1, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0.0f, 0.0f, 0.0f, 0x14, 0x32, 0x12 },
     { 0x1, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0.0f, 0.0f, 0.0f, 0x14, 0x32, 0x12 },
@@ -9825,6 +9846,7 @@ SoundEnvList psenvlist[] = {
     { 0x76, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0.0f, 0.0f, 0.0f, 0x0, 0x0, 0x0 }
 };
 
+/** Names of the environment sounds ("ENV_..."), searched by name when a map starts its ambience (psndENVOn). */
 const char* psenvlistname[] = {
     "",
     "ENV_OPN_AAA1",
@@ -9862,6 +9884,7 @@ const char* psenvlistname[] = {
 };
 #endif
 
+/** Paths of the sound name databases for music, environment sounds and effects; nothing in the game reads them. */
 const char psdb_bgm_txt[0x28] = "%s/sound/proj/pmario_sound_bgm_txt.db";
 const char psdb_env_txt[0x28] = "%s/sound/proj/pmario_sound_env_txt.db";
 const char psdb_sfx_txt[0x28] = "%s/sound/proj/pmario_sound_sfx_txt.db";
@@ -9897,6 +9920,7 @@ u8 _buf[0x80];
 
 //.sdata
 #if VERSION >= VERSION_JP
+/** Volume percentages of a dipped sound (10 to 100 in steps of 10), picked by the PSND_FADE_DIP bits. */
 s32 silent_tbl[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 #endif
 
@@ -10428,7 +10452,7 @@ static void psndBGMMain(void) {
         if (bgm->listId == 0xFFFFFFFF) {
             continue;
         }
-        if (SoundSSCheck(bgm->streamId) & 2) {
+        if (SoundSSCheck(bgm->streamId) & SOUND_SS_FLAG_PAUSED) {
             SoundSSMuteOff(bgm->streamId);
         }
         {
@@ -10566,7 +10590,7 @@ static inline s32 psndSSFindCh(void) {
         }
     }
     for (ch = 0; ch < 3; ch++) {
-        if (SoundSSCheck(ch) & 0x20) {
+        if (SoundSSCheck(ch) & SOUND_SS_FLAG_FADE_OUT) {
             SoundSSStopCh(ch);
         }
     }
@@ -11079,8 +11103,9 @@ BOOL psndBGMOff(u32 flags) {
 /**
  * Stops BGM channel flags & 0xF: fades it out (PSND_FADE_OUT), fades to silence keeping it (PSND_FADE_HOLD),
  * dips it to a lower level (PSND_FADE_DIP), or stops it at once.
- * Story guards keep certain BGMs (during the Great Tree time bomb,
- * and between Glitzville and chapter 4) from being stopped; US and PAL skip them when someswitch is set.
+ * Story guards refuse to stop BGM 0xA4 while the Great Tree time bomb runs (STORY_STG2_23 to before STG2_24), and,
+ * from STORY_STG3_00 to before STG4_00 while channel 0 plays BGM 0xC3, any BGM but 0x92 (JP and later then resume a
+ * held BGM before stopping 0x92). The demos apply them always; JP and later skip them when someswitch is set.
  * Returns FALSE when the channel is empty or guarded.
  */
 BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
@@ -11320,7 +11345,7 @@ static void psndSFXMain(void) {
                     }
                 }
                 for (j = 0; j < 3; j++) {
-                    if (SoundSSCheck(j) & 0x20) {
+                    if (SoundSSCheck(j) & SOUND_SS_FLAG_FADE_OUT) {
                         SoundSSStopCh(j);
                     }
                 }
@@ -12121,9 +12146,6 @@ BOOL psndENVOn(u32 flags, const char* name) {
     return psndENVOn_f_d(flags, name, 1000, 0);
 }
 
-typedef struct PairU32_ {
-    u32 a, b;
-} PairU32_;
 // number of psenvlistname entries; it also ends psenvlist
 #if VERSION <= VERSION_DEMO_US
 #define PSENV_COUNT 0x75
@@ -12233,9 +12255,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 unused) {
         e->type = list->type;
         e->intervalRand = list->intervalRand;
         e->interval = list->interval;
-        *(PairU32_*)&e->position.x = *(PairU32_*)&list->posX;
-
-        *(u32*)&e->position.z = *(u32*)&list->posZ;
+        e->position = list->pos;
         e->radiusMin = list->radiusMin;
         e->radiusRange = list->radiusRange;
         e->dist = list->dist;
@@ -12295,8 +12315,6 @@ BOOL psndENVOff(u32 flags) {
     return psndENVOff_f_d(flags, 1000, 0);
 }
 #pragma dont_inline reset
-
-#pragma dont_inline on
 /**
  * Stops environment channel flags & 0xF: fades it out, holds it silent or dips it (PaperSoundFadeFlags),
  * or stops it at once. Returns FALSE when the channel is empty.
@@ -12348,8 +12366,6 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 unused) {
     return TRUE;
 }
 
-#pragma dont_inline reset
-
 /**
  * Sets a low-pass filter frequency on environment channel id (0 = none, stored as 32000 Hz);
  * returns FALSE when the channel is empty.
@@ -12366,9 +12382,10 @@ BOOL psndENV_LPF(s32 id, u16 freq) {
 }
 
 /**
- * FAKE stand-in: keeps the int-to-float conversion constant of stripped code in its place in the literal pool;
+ * Stand-in: keeps the int-to-float conversion constant of stripped code in its place in the literal pool;
  * nothing calls it.
  */
+// FAKE: uncalled stand-in for a stripped function; puts the int-to-float double ahead of the u32 one
 void psndStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }

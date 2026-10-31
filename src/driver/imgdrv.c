@@ -120,14 +120,14 @@ static void imgDisp(CameraId camId, void* param) {
 
     for (i = 0; i < 3; i++) {
         sh = entry->shadows + i;
-        if (!(sh->flags & 4)) {
+        if (!(sh->flags & IMG_SHADOW_USED)) {
             texs[i] = NULL;
             datas[i] = NULL;
-        } else if (sh->flags & 0x10) {
+        } else if (sh->flags & IMG_SHADOW_PENDING) {
             texs[i] = NULL;
             datas[i] = NULL;
         } else {
-            if (entry->flags & 4) {
+            if (entry->flags & IMG_FLAG_OFFSCREEN_RECT) {
                 fx = sh->rect.left;
                 fy = sh->rect.top;
                 fw = sh->rect.width;
@@ -154,12 +154,12 @@ static void imgDisp(CameraId camId, void* param) {
     }
     if (first == -1) {
 #if VERSION >= VERSION_JP
-        entry->flags |= 0x10000000;
+        entry->flags |= IMG_FLAG_NOTHING_CAPTURED;
 #endif
         return;
     }
 #if VERSION >= VERSION_JP
-    entry->flags &= ~0x10000000;
+    entry->flags &= ~IMG_FLAG_NOTHING_CAPTURED;
 #endif
     animSetPaperTexMtx(mp[0], mp[1], mp[2]);
     animSetPaperTexObj(texs[0], texs[1], texs[2], datas[0], datas[1], datas[2],
@@ -171,7 +171,7 @@ static void imgDisp(CameraId camId, void* param) {
     animPoseMain(entry->poseId);
     animPoseSetMaterialLightFlagOn(entry->poseId, ANIM_MATERIAL_LIGHT_PAPER);
     entry->loopTimes = animPoseGetLoopTimes(entry->poseId);
-    if (entry->flags & 8) {
+    if (entry->flags & IMG_FLAG_NO_VIRTUAL_POINT) {
         zFill();
         scale = 1.0f;
         zoff = 0.0f;
@@ -190,7 +190,7 @@ static void imgDisp(CameraId camId, void* param) {
         zoff = d - t;
     }
     {
-        if (entry->flags & 4) {
+        if (entry->flags & IMG_FLAG_OFFSCREEN_RECT) {
             fl = entry->shadows[first].rect.left;
             ft = entry->shadows[first].rect.top;
             fr = entry->shadows[first].rect.width;
@@ -219,7 +219,7 @@ static void imgDisp(CameraId camId, void* param) {
 #else
     e2 = wp->entries;
     for (i = 0; i < wp->count; i++, e2++) {
-        if ((e2->flags & 1) && e2->poseId != -1 && !(e2->flags & 2) && strcmp(e2->name, entry->name) != 0 &&
+        if ((e2->flags & IMG_FLAG_USED) && e2->poseId != -1 && !(e2->flags & IMG_FLAG_HIDDEN) && strcmp(e2->name, entry->name) != 0 &&
             strcmp(animPoseGetAnimBaseDataPtr(e2->poseId)->fileName, animPoseGetAnimBaseDataPtr(entry->poseId)->fileName) == 0)
             break;
     }
@@ -247,12 +247,12 @@ static void imgDisp_ProjPlane(CameraId camId, void* param) {
         case 0:
             return;
         case 1:
-            flags = 0x20000;
+            flags = MAPOBJ_FLAG_PROJ_SHADOW;
             PSMTXIdentity(mtx);
             GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
             break;
         case 2:
-            flags = 0x40000;
+            flags = MAPOBJ_FLAG_DEPTH_SHADOW_ADD;
             PSMTXTrans(mtx, 0.0f, 0.0f, entry->offsetZ);
             GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
             break;
@@ -338,13 +338,13 @@ static void imgCapture_Prim(ImageEntry* entry, s32 id) {
     u32 size;
     GXTexObj* obj;
     smartEntry* buf;
-    if (!(sh->flags & 4))
+    if (!(sh->flags & IMG_SHADOW_USED))
         return;
     offId = sh->offscreenId;
-    sh->flags |= 0x10;
+    sh->flags |= IMG_SHADOW_PENDING;
     if (offId != -1) {
         if (sh->allocMode) {
-            if (sh->flags & 0x100) {
+            if (sh->flags & IMG_SHADOW_COPY_ONCE) {
                 offscreenGetTexObj(offId, &obj, &buf);
                 if (obj) {
 #if VERSION <= VERSION_DEMO_US
@@ -378,11 +378,11 @@ static void imgCapture_Prim(ImageEntry* entry, s32 id) {
                     offscreenGetBoundingBox(offId, &sh->rect.left, &sh->rect.top, &sh->rect.width, &sh->rect.height);
                     sh->rect.width -= sh->rect.left;
                     sh->rect.height -= sh->rect.top;
-                    sh->flags &= ~0x100;
+                    sh->flags &= ~IMG_SHADOW_COPY_ONCE;
                 }
             }
-            if (!(sh->flags & 0x100))
-                sh->flags &= ~0x10;
+            if (!(sh->flags & IMG_SHADOW_COPY_ONCE))
+                sh->flags &= ~IMG_SHADOW_PENDING;
         } else {
             GXTexObj* o2;
             smartEntry* b2;
@@ -393,19 +393,19 @@ static void imgCapture_Prim(ImageEntry* entry, s32 id) {
                 offscreenGetBoundingBox(offId, &sh->rect.left, &sh->rect.top, &sh->rect.width, &sh->rect.height);
                 sh->rect.width -= sh->rect.left;
                 sh->rect.height -= sh->rect.top;
-                sh->flags &= ~0x10;
+                sh->flags &= ~IMG_SHADOW_PENDING;
             }
         }
     } else if (sh->allocMode) {
-        if (sh->flags & 0x100) {
+        if (sh->flags & IMG_SHADOW_COPY_ONCE) {
             imgCaptureCopy(sh, entry);
-            sh->flags &= ~0x100;
+            sh->flags &= ~IMG_SHADOW_COPY_ONCE;
         }
-        if (!(sh->flags & 0x100))
-            sh->flags &= ~0x10;
+        if (!(sh->flags & IMG_SHADOW_COPY_ONCE))
+            sh->flags &= ~IMG_SHADOW_PENDING;
     } else {
         imgCaptureCopy(sh, entry);
-        sh->flags &= ~0x10;
+        sh->flags &= ~IMG_SHADOW_PENDING;
     }
 }
 
@@ -421,7 +421,7 @@ static void imgCapture(CameraId camId, void* param) {
     i = 0;
     count = wp->count;
     for (entry = wp->entries; i < count; i++, entry++) {
-        if (entry->flags & 1 && entry->poseId != -1) {
+        if (entry->flags & IMG_FLAG_USED && entry->poseId != -1) {
             if (entry->type == 2 || entry->type == type) {
                 if (entry->dispCamId == camId) {
                     int j;
@@ -449,7 +449,7 @@ void imgAutoRelease(s32 type) {
     i = 0;
     count = wp->count;
     for (entry = wp->entries; i < count; i++, entry++) {
-        if (entry->flags & 1 && entry->type == type) {
+        if (entry->flags & IMG_FLAG_USED && entry->type == type) {
             imgRelease(entry, type);
         }
     }
@@ -466,7 +466,7 @@ s32 imgEntry(const char* name, s32 type) {
 
     // check if already created
     for (i = 0, count = wp->count, entry = wp->entries; i < count; i++, entry++) {
-        if (entry->flags & 1 && entry->type == type) {
+        if (entry->flags & IMG_FLAG_USED && entry->type == type) {
             if (!strcmp(entry->name, name))
                 break;
         }
@@ -474,11 +474,11 @@ s32 imgEntry(const char* name, s32 type) {
 
     // find new slot
     for (i = 0, entry = wp->entries; i < count; i++, entry++) {
-        if (!(entry->flags & 1))
+        if (!(entry->flags & IMG_FLAG_USED))
             break;
     }
 
-    entry->flags = 9;
+    entry->flags = IMG_FLAG_USED | IMG_FLAG_NO_VIRTUAL_POINT;
     entry->type = type;
     strcpy(entry->name, name);
     entry->poseId = -1;
@@ -536,10 +536,10 @@ void imgMain(void) {
     i = 0;
     count = wp->count;
     for (entry = wp->entries; i < count; i++, entry++) {
-        if (entry->flags & 1 && entry->poseId != -1 && !(entry->flags & 2)) {
+        if (entry->flags & IMG_FLAG_USED && entry->poseId != -1 && !(entry->flags & IMG_FLAG_HIDDEN)) {
             if (entry->type == 2 || entry->type == type) {
                 for (shadow = 0; shadow < 3; shadow++) {
-                    if (entry->shadows[shadow].flags & 4)
+                    if (entry->shadows[shadow].flags & IMG_SHADOW_USED)
                         break;
                 }
                 if (shadow != 3) {
@@ -580,7 +580,7 @@ ImageEntry* imgNameToPtr(const char* name, s32 type) {
     i = 0;
     count = wp->count;
     for (entry = wp->entries; i < count; i++, entry++) {
-        if (entry->flags & 1 && (entry->type == 2 || entry->type == type)) {
+        if (entry->flags & IMG_FLAG_USED && (entry->type == 2 || entry->type == type)) {
             if (!strcmp(entry->name, name))
                 break;
         }
@@ -591,9 +591,9 @@ ImageEntry* imgNameToPtr(const char* name, s32 type) {
 /** Empties capture slot shadowId of an image, freeing its copied texture when the image owns one. */
 void imgFreeCapture(ImageEntry* entry, s32 shadowId) {
     ImageShadow* shadow = &entry->shadows[shadowId];
-    if (shadow->flags & 4) {
-        shadow->flags &= ~0x10;
-        if (shadow->flags & 0x100) {
+    if (shadow->flags & IMG_SHADOW_USED) {
+        shadow->flags &= ~IMG_SHADOW_PENDING;
+        if (shadow->flags & IMG_SHADOW_COPY_ONCE) {
             shadow->flags = 0;
         } else if (!shadow->allocMode) {
             shadow->flags = 0;
@@ -606,13 +606,13 @@ void imgFreeCapture(ImageEntry* entry, s32 shadowId) {
 
 /** Anchors the image at a 3D point so it is scaled by the camera distance to it instead of drawn at a fixed depth. */
 void imgSetVirtualPoint(ImageEntry* entry, const Vec* point) {
-    entry->flags &= ~8;
+    entry->flags &= ~IMG_FLAG_NO_VIRTUAL_POINT;
     entry->point = *point;
 }
 
 /** Removes the image's 3D anchor point; it is drawn at a fixed depth again. */
 void imgClearVirtualPoint(ImageEntry* entry) {
-    entry->flags |= 8;
+    entry->flags |= IMG_FLAG_NO_VIRTUAL_POINT;
 }
 
 /** Frees all three capture slots of an image and clears its entry. */
@@ -649,15 +649,15 @@ static void imgShadowDisp(CameraId camId, void* param) {
 
     for (i = 0; i < 3; i++) {
         sh = &entry->shadows[i];
-        if (!(sh->flags & 4)) {
+        if (!(sh->flags & IMG_SHADOW_USED)) {
             objs[i] = NULL;
             datas[i] = NULL;
-        } else if (sh->flags & 0x10) {
+        } else if (sh->flags & IMG_SHADOW_PENDING) {
             objs[i] = NULL;
             datas[i] = NULL;
         } else {
             ImageRect* r = &sh->rect;
-            if (entry->flags & 4) {
+            if (entry->flags & IMG_FLAG_OFFSCREEN_RECT) {
                 x0 = r->left;
                 y0 = r->top;
                 w = r->width;
@@ -685,12 +685,12 @@ static void imgShadowDisp(CameraId camId, void* param) {
     }
     if (first == -1) {
 #if VERSION >= VERSION_JP
-        entry->flags |= 0x10000000;
+        entry->flags |= IMG_FLAG_NOTHING_CAPTURED;
 #endif
         return;
     }
 #if VERSION >= VERSION_JP
-    entry->flags &= ~0x10000000;
+    entry->flags &= ~IMG_FLAG_NOTHING_CAPTURED;
 #endif
     animSetPaperTexMtx((void*)mp[0], (void*)mp[1], (void*)mp[2]);
     animSetPaperTexObj(objs[0], objs[1], objs[2], datas[0], datas[1], datas[2],
@@ -704,14 +704,14 @@ static void imgShadowDisp(CameraId camId, void* param) {
     {
         f32 left, top, width, height;
         f32 sc, z;
-        if (entry->flags & 8) { // both cases set the same values; the test is in the binary
+        if (entry->flags & IMG_FLAG_NO_VIRTUAL_POINT) { // both cases set the same values; the test is in the binary
             sc = 1.0f;
             z = 0.0f;
         } else {
             sc = 1.0f;
             z = 0.0f;
         }
-        if (entry->flags & 4) {
+        if (entry->flags & IMG_FLAG_OFFSCREEN_RECT) {
             left = entry->shadows[first].rect.left;
             top = entry->shadows[first].rect.top;
             width = entry->shadows[first].rect.width;

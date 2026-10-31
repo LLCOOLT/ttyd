@@ -839,11 +839,11 @@ static USER_FUNC(kaizoku_fune_eff) {
     ((EffFunemizuWork*)eff->userdata)->position.x = 140.0f * dir + pos.x;
     ((EffFunemizuWork*)eff->userdata)->position.y = pos.y - 160.0f;
     ((EffFunemizuWork*)eff->userdata)->position.z = 40.0f + pos.z;
-    ((EffFunemizuWork*)eff->userdata)->f10 = speed;
+    ((EffFunemizuWork*)eff->userdata)->speed = speed;
     if (angle < 180.0f) {
-        ((EffFunemizuWork*)eff->userdata)->f14 = 135.0f + angle;
+        ((EffFunemizuWork*)eff->userdata)->yaw = 135.0f + angle;
     } else {
-        ((EffFunemizuWork*)eff->userdata)->f14 = 45.0f + angle;
+        ((EffFunemizuWork*)eff->userdata)->yaw = 45.0f + angle;
     }
     return EVT_RETURN_BLOCK;
 }
@@ -869,7 +869,10 @@ EVT_BEGIN(nami_alpha)
     RETURN
 EVT_END()
 
-/** Guess: fades the moon (S_hai02 and S_hai03_moon) through the alpha callback as the mist covers the sky. */
+/**
+ * Fades the sky models S_hai02 and S_hai03_moon (the moon) from opaque to clear over 1.5 seconds through
+ * alpha_tev; moya_effect starts it together with the five mist banks.
+ */
 EVT_BEGIN(moonout_effect)
     CALL(alpha_init_func)
     CALL(evt_map_set_tevcallback, 1, PTR(alpha_tev))
@@ -965,6 +968,10 @@ EVT_BEGIN(elmos_a_shuku)
     RETURN
 EVT_END()
 
+/**
+ * Mass-NPC figure table of the Embers (c_elmos) that crowd the ship at sea, one entry per figure with its
+ * animation offset.
+ */
 static ExtTexInfo ext_entry_data[] = {
     {"c_elmos", "S_1", 0.0f},
     {"c_elmos", "S_1", 1.0f},
@@ -989,6 +996,7 @@ static ExtTexInfo ext_entry_data[] = {
     {0},
 };
 
+/** Frame sequence of the Ember crowd on the voyage, ended by -1. */
 static s16 elmos_animtbl[] = {
     0, 1, 2, 3, 4, 5, 6, 7,
     8, 9, 10, 11, 12, 13, 14, 15,
@@ -1000,8 +1008,9 @@ static s16 elmos_animtbl[] = {
 };
 
 /**
- * Guess: sets up the crowd of 1000 mass-NPC Embers (ext texture table, fast update function) for the ghost fleet
- * around the ship.
+ * Sets up the mass-NPC crowd of 1000 Embers for the Ember attack (onryo_event spawns it):
+ * each uses the c_elmos texture table with the 20-frame elmos_animtbl and the fast update function,
+ * then elmos1000tai_init scatters them around the ship.
  */
 static EVT_BEGIN(nannpc_mode_setup)
     CALL(evt_nannpc_init, PTR(ext_entry_data), 0, 0, 0, 1000)
@@ -1017,6 +1026,7 @@ static EVT_BEGIN(nannpc_mode_setup)
     RETURN
 EVT_END()
 
+/** Positions (x, y, z) of the mist clouds drifting around the ship, ended by -10000. */
 s32 mist_pos[] = {
     -400, 30, -200, -400, 30, -400, -400, 30,
     -600, -400, 30, -800, -400, 30, -1000, -400,
@@ -1115,6 +1125,7 @@ EVT_BEGIN(onryo_event)
     BEGIN_INLINE_EVENT
         CALL(evt_map_anim_rate)
     END_INLINE_EVENT
+    // The voyage begins: the ship rocks on the waves and the sailors are placed.
     SPAWN_EVENT(marco_ship_yure)
     SPAWN_EVENT(nannpc_mode_setup)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_b"), MAPOBJ_FLAG_HIDE)
@@ -1139,6 +1150,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_seq_wait, 2)
     WAIT_MS(4000)
     CALL(evt_msg_toge, 1, 0, 0, 0)
+    // The ship's log tells of the days at sea as day turns to night.
     CALL(evt_msg_print, 0, STRING("stg5_sea_00"), 0, 0)
     CALL_CHILD(hiru_yoru_event)
     WAIT_MS(3000)
@@ -1247,6 +1259,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_TALK_ANIM)
 #endif
     WAIT_MS(1500)
+    // Flavio starts a story and the sailors groan.
     CALL(evt_msg_print, 0, STRING("stg5_sea_03"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg5_sea_04"), 0, STRING("オドオド水夫"))
@@ -1266,6 +1279,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_set_nami_anim_rate, FLOAT(0.099609375f))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_fne_nami"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(500)
+    // The rough sailor sheepishly interrupts Flavio.
     CALL(evt_msg_print, 0, STRING("stg5_sea_05"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(1000)
     SET_VALUE(GW(0), 1)
@@ -1304,6 +1318,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_npc_set_rotate, STRING("ガラの悪い水夫"), 0, 180, 0)
     WAIT_MS(1000)
     CALL(evt_npc_set_position, STRING("エルモスA"), -45, 336, -73)
+    // Eerie lights and ghostly sounds appear on the ship.
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_APPEAR1_2"), -45, 336, -73, 0)
     CALL(evt_npc_set_ry, STRING("エルモスA"), 90)
     WAIT_MS(1000)
@@ -1354,6 +1369,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_npc_glide_position, STRING("エルモスA"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
     CALL(evt_npc_glide_position, STRING("エルモスA"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
     WAIT_MS(500)
+    // The rough sailor snaps at someone shoving him.
     CALL(evt_msg_print, 0, STRING("stg5_sea_09"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(1000)
     CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 270)
@@ -1402,10 +1418,12 @@ EVT_BEGIN(onryo_event)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, -10, 340, 558, -11, 131, -108, 1000, 11)
     WAIT_WHILE(GF(0))
+    // The rough sailor cries out that the ghosts are here.
     CALL(evt_msg_print, 0, STRING("stg5_sea_12"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg5_sea_13"), 0, STRING("マルコ"))
     WAIT_MS(500)
+    // Mist rolls in around the ship.
     SPAWN_EVENT(mist_setup)
     CALL(evt_npc_set_position, STRING("エルモスA"), 168, 160, -84)
     CALL(evt_npc_set_position, STRING("エルモスB"), 105, 100, -200)
@@ -1489,6 +1507,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_VOICE1"), 0)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_KORTESS_VOICE1"), 0)
     CALL(evt_msg_toge, 1, 0, 0, 0)
+    // Ghostly moaning rolls over the ship and the sailors panic.
     CALL(evt_msg_print, 0, STRING("stg5_sea_14"), 0, 0)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 0, 358, 572, -1, 145, -108, 0, 11)
@@ -1565,6 +1584,7 @@ EVT_BEGIN(onryo_event)
     END_INLINE_EVENT
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_KORTESS_VOICE1"), 0)
+    // The moaning grows louder and Flavio screams.
     CALL(evt_msg_print, 0, STRING("stg5_sea_19"), 0, 0)
     DELETE_EVENT(GW(1))
     SET_VALUE(GF(10), 1)
@@ -1616,6 +1636,7 @@ EVT_BEGIN(onryo_event)
     SPAWN_EVENT_GET_ID(PTR(urouro), GW(0))
     CALL(evt_cam3d_evt_set, 0, 358, 572, -1, 145, -108, 500, 11)
     WAIT_MS(1000)
+    // Bobbery tries to calm everyone; the ship starts to shake.
     CALL(evt_msg_print, 0, STRING("stg5_sea_22"), 0, STRING("サンダース"))
     CALL(evt_msg_print, 0, STRING("stg5_sea_23"), 0, STRING("サンダース"))
     CALL(evt_msg_print, 0, STRING("stg5_sea_24"), 0, STRING("サンダース"))
@@ -1629,6 +1650,7 @@ EVT_BEGIN(onryo_event)
     END_INLINE_EVENT
     CALL(evt_npc_jump_position_nohit, STRING("サンダース"), -20, -100, -300, 600, 100)
     CALL(evt_eff, 0, STRING("splash"), 0, -20, 30, -150, FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+    // The bespectacled sailor tries to get everyone's attention as sailors fall overboard.
     CALL(evt_msg_print, 0, STRING("stg5_sea_25"), 0, STRING("めがね水夫"))
     DELETE_EVENT(GW(3))
     SET_VALUE(LW(10), STRING("めがね水夫"))
@@ -1640,6 +1662,7 @@ EVT_BEGIN(onryo_event)
     END_INLINE_EVENT
     CALL(evt_npc_jump_position_nohit, STRING("めがね水夫"), -30, -100, 100, 600, 100)
     CALL(evt_eff, 0, STRING("splash"), 0, -30, 30, 0, FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
+    // Flavio calls to Bobbery as the ship tosses everyone about.
     CALL(evt_msg_print, 0, STRING("stg5_sea_26"), 0, STRING("マルコ"))
     BEGIN_INLINE_EVENT
         DELETE_EVENT(GW(0))
@@ -1648,6 +1671,7 @@ EVT_BEGIN(onryo_event)
     END_INLINE_EVENT
     WAIT_MS(500)
     CALL(evt_mapobj_get_position, STRING("S_a1"), LW(0), LW(1), LW(2))
+    // The ship sinks.
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_SHIP_SINK1"), LW(0), LW(1), LW(2), LW(10))
     SPAWN_EVENT(marcoship_shizumu)
     WAIT_MS(4500)
@@ -1655,6 +1679,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_fade_end_wait)
     CALL(evt_snd_sfxoff, LW(10))
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+    // The story advances and the castaways wash up on Keelhaul Key (muj_00).
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_10_HAUNTED)
     CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_BLACK, 0, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING("muj_00"), STRING(""))
@@ -1807,8 +1832,10 @@ EVT_BEGIN(gor_muj_ship)
 EVT_END()
 
 /**
- * Guess: sets up the ship's return from Keelhaul Key to Rogueport:
- * takes control, sails the ship through day and night, bobs it with muj_ship_puka and changes the map to gor_00.
+ * The voyage back from Keelhaul Key to Rogueport (GSWF_GOR00_SHIP_ARRIVAL_PENDING,
+ * set in muj_00 when Mario asks to sail): the mirror of gor_muj_ship with the ship turned 180 degrees,
+ * sailing right to left over 15 seconds through day and night, bobbed by muj_ship_puka;
+ * the map changes to gor_00 at the end or when A is pressed.
  */
 static EVT_BEGIN(muj_gor_ship)
     CALL(evt_mario_key_onoff, 0)
@@ -1979,13 +2006,13 @@ static USER_FUNC(fune_eff) {
     ((EffFunemizuWork*)eff1->userdata)->position.x = pos.x + off85;
     ((EffFunemizuWork*)eff1->userdata)->position.y = pos.y - 51.0f;
     ((EffFunemizuWork*)eff1->userdata)->position.z = 30.0f + pos.z;
-    ((EffFunemizuWork*)eff1->userdata)->f10 = speed;
-    ((EffFunemizuWork*)eff1->userdata)->f14 = 225.0f;
+    ((EffFunemizuWork*)eff1->userdata)->speed = speed;
+    ((EffFunemizuWork*)eff1->userdata)->yaw = 225.0f;
     ((EffFunemizuWork*)eff2->userdata)->position.x = pos.x - 15.0f;
     ((EffFunemizuWork*)eff2->userdata)->position.y = pos.y - 51.0f;
     ((EffFunemizuWork*)eff2->userdata)->position.z = 90.0f + pos.z;
-    ((EffFunemizuWork*)eff2->userdata)->f10 = speed;
-    ((EffFunemizuWork*)eff2->userdata)->f14 = 180.0f;
+    ((EffFunemizuWork*)eff2->userdata)->speed = speed;
+    ((EffFunemizuWork*)eff2->userdata)->yaw = 180.0f;
     if (speed > 1.0f && gp->retraceCount % 15 == 0) {
         effWaterDamageN64Entry(5, 30, pos.x - 150.0f, pos.y - 50.0f, pos.z, 2.0f);
     }
@@ -2198,14 +2225,18 @@ static void draw(CameraId camera, void* param) {
 }
 
 /**
- * Guess: the game's opening scene (map entered as "prologue"):
- * plays the opening music, shows the title logo and sails the ship across the sea under the logo.
+ * The title scene of the opening (entered as "prologue" from aaa_00 after the Mario's house prologue):
+ * plays BGM_OPENING1 (the init starts it on the US demo and earlier), starts the title logo,
+ * sails the steamship S_fune_m in over 10 seconds and waits for Press Start (GF(1)),
+ * switching to BGM_EVT_SAILING1 if nothing is pressed within 5 seconds.
+ * After the press it plays SFX_PRESS_START1, sails the ship on out and fades to white into sys_01 ("prologue").
  */
 static EVT_BEGIN(evt_prologue)
 #if VERSION <= VERSION_DEMO_US
     WAIT_MS(4000)
 #else
     WAIT_MS(500)
+    // The opening title scene: music starts and the logo appears.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_OPENING1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_OPN_MUJ1"))
     WAIT_MS(3500)
@@ -2249,6 +2280,7 @@ static EVT_BEGIN(evt_prologue)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // After Press Start the steamship sails off and the screen fades to white into the chapter card.
     CALL(evt_snd_sfxon, STRING("SFX_PRESS_START1"), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(4000)
@@ -2285,7 +2317,7 @@ static EVT_BEGIN(evt_prologue)
     RETURN
 EVT_END()
 
-/** Guess: adds Cortez (model c_korutesu3) for the epilogue on the ship. */
+/** Adds Cortez (model c_korutesu3) on the deck of the pirate ship for the epilogue (epilogue_evt). */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("コルテス"), STRING("c_korutesu3"))
     CALL(evt_npc_set_tribe, STRING("コルテス"), STRING("コルテス"))
@@ -2336,8 +2368,11 @@ EVT_BEGIN(fune_move)
 EVT_END()
 
 /**
- * Guess: the epilogue on the ship: the Keelhaul music and ending ambience start,
- * the party stops and Cortez and the crew appear as the ship sails to Keelhaul Key.
+ * Bobbery's epilogue scene on the ship (STORY_STG8_END_AFTER_THE_BATTLE):
+ * BGM_STG5_MUJ1 and the ENV_END_MUJ3 ambience start,
+ * Bobbery (サンダース) and the two sailors are placed on the pirate ship S_b
+ * and fune_move sails it left to right with them and Cortez aboard.
+ * After 10 seconds the scene fades to black and the map changes to muj_01.
  */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
@@ -2399,6 +2434,7 @@ EVT_BEGIN(muj_20_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hai_r_04"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hai_r_05"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_fune_m"), MAPOBJ_FLAG_HIDE)
+    // A Bowser interlude plays at this point of the story.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
         CALL(evt_mario_set_mode, 2)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_a1"), MAPOBJ_FLAG_HIDE)
@@ -2416,6 +2452,7 @@ EVT_BEGIN(muj_20_init_evt)
     CALL(evt_map_playanim, STRING("nami_02"), 1, 0)
     CALL(evt_map_playanim, STRING("fune_01"), 1, 0)
     CALL(evt_map_playanim, STRING("kumo"), 1, 0)
+    // Pick the music and scene for the ship's crossing to or from Rogueport.
     IF_INT_EQUAL(GSWF(GSWF_GOR00_SAIL_TO_KEELHAUL), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST_SHIP1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
@@ -2426,6 +2463,7 @@ EVT_BEGIN(muj_20_init_evt)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
         SPAWN_EVENT(muj_gor_ship)
     END_IF
+    // The voyage to Keelhaul Key begins.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_END_OFF_TO_THE_KEYS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_SAILING1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
@@ -2436,6 +2474,7 @@ EVT_BEGIN(muj_20_init_evt)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
         SPAWN_EVENT(onryo_event)
     END_IF
+    // When entered as the prologue, the ship animations start and the opening title scene runs.
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("prologue"))
 #if VERSION <= VERSION_DEMO_US
@@ -2468,6 +2507,7 @@ EVT_BEGIN(muj_20_init_evt)
         SPAWN_EVENT(anm_yure)
         SPAWN_EVENT(evt_prologue)
     END_IF
+    // At the end of the game the epilogue scene on the ship starts.
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_a1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_a1"), 1, 0)

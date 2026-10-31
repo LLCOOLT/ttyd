@@ -1,6 +1,5 @@
-#pragma once
-
 // Atmic Teresa (Atomic Boo): the swarm of small Teresa drawn as ext poses, shared by jin and its tst copy.
+#pragma once
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>

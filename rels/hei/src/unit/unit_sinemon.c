@@ -1,4 +1,4 @@
-// Shinemon (sinemon): battle unit used in Petal Meadows.
+// Moon Cleft (sinemon): battle unit used in Petal Meadows.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -28,6 +28,10 @@ static EvtWord dmg_turn_event[96];
 static EvtWord attack_event[454];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the Moon Cleft:
+ * 6 HP, level 26, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 static BattleUnitKind unit_sinemon = {
     114, // unitType
     "btl_un_sinemon", // name
@@ -73,18 +77,35 @@ static BattleUnitKind unit_sinemon = {
     (BattleDataEntry*)data_table, // dataTable
 };
 
+/**
+ * Defence of the Moon Cleft's body: 5 against normal, ice, explosion and electric hits;
+ * immune to fire (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{5, 99, 5, 5, 5}};
 
+/**
+ * Defence attributes of the Moon Cleft's body: fire (takes no damage); every other type is dealt normally.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
+/** Defence of the Moon Cleft's body per damage type while flipped over: 0 against every damage type. */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Moon Cleft in the demo, as a percent of the normal chance: immune to burn;
+ * sleep 30%, stop 70%, freeze 50%, instant kill 95% (and 9 other statuses lowered).
+ */
 static StatusVulnerability regist = {30, 70, 30, 100, 30, 100, 0, 50, 100, 50, 100, 50, 100, 60, 60, 30, 10, 100, 60, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Moon Cleft in the retail versions, as a percent of the normal chance:
+ * immune to burn; sleep 30%, stop 80%, freeze 50%, instant kill 95% (and 8 other statuses lowered).
+ */
 static StatusVulnerability regist = {30, 80, 30, 100, 30, 100, 0, 50, 100, 60, 100, 60, 100, 100, 50, 30, 20, 100, 50, 100, 100, 95};
 #endif
 
+/** Body part of the Moon Cleft: a single part using the model "c_sinemon". */
 static BattleUnitKindPart parts[] = {
     {
         1, // partNum
@@ -99,11 +120,12 @@ static BattleUnitKindPart parts[] = {
         &defence, // defense
         &defence_attr, // defenseAttr
         PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_BOMB_FLIPPABLE, // attributes
-        1, // counterAttributes
+        COUNTER_ATTR_TOP_SPIKY, // counterAttributes
         pose_table, // poseTable
     },
 };
 
+/** Moon Cleft's attack: 5 damage to a single target, a hammer-style hit. */
 static BattleWeapon weapon_sinemon_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -122,7 +144,7 @@ static BattleWeapon weapon_sinemon_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -140,6 +162,10 @@ static BattleWeapon weapon_sinemon_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Pose table of the Moon Cleft:
+ * the animation played for each pose type (idle, hurt, walk, run, attack and so on).
+ */
 static PoseTableEntry pose_table[] = {
     {1, "SIN_N_1"},
     {2, "SIN_Y_1"},
@@ -161,6 +187,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "SIN_S_1"},
 };
 
+/**
+ * Pose table of the Moon Cleft while flipped over:
+ * the animation played for each pose type (idle, hurt, walk, run, attack and so on).
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "SIN_N_2"},
     {2, "SIN_Y_2"},
@@ -179,6 +209,11 @@ static PoseTableEntry pose_table_turn[] = {
     {BTL_POSE_STAY_DEFAULT, "SIN_D_2"},
 };
 
+/**
+ * Event table of the Moon Cleft:
+ * its reaction to being flipped over, the counter for an attacker hurt by its spikes,
+ * nothing special on a First Strike.
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
@@ -187,7 +222,7 @@ static BattleDataEntry data_table[] = {
 };
 
 /**
- * Init event of the Shinemon: installs wait, attack, damage and confusion events and sets its walk,
+ * Init event of the Moon Cleft: installs wait, attack, damage and confusion events and sets its walk,
  * run and jump sounds (SFX_ENM_EMON_*).
  */
 static EVT_BEGIN(init_event)
@@ -203,20 +238,20 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Spark effect (toge_flush) shown when an attack on the Shinemon's spiked head is turned away:
+ * Spark effect (toge_flush) shown when an attack on the Moon Cleft's spiked head is turned away:
  * it waits 30 frames, then places the flash above the head at a height that depends on whether the unit has
  * status 10 or 11.
  */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
         ADD(LW(1), 45)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 7)
         ADD(LW(1), 25)
@@ -231,7 +266,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
 EVT_END()
 
 /**
- * Damage event of the Shinemon: shows the hurt pose (SIN_D_1) when damage was dealt;
+ * Damage event of the Moon Cleft: shows the hurt pose (SIN_D_1) when damage was dealt;
  * while it lies flipped over (over-turn count) it shows SIN_D_2 and hops twice.
  * Then it runs the default damage handling.
  */
@@ -254,7 +289,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Reaction when the Shinemon is flipped over: switches to the flipped defence and pose tables,
+ * Reaction when the Moon Cleft is flipped over: switches to the flipped defence and pose tables,
  * sets the over-turn count to 2 (SFX_ENM_INSIDE1), hops,
  * and rests on its back at y = 7 with the hit offset lowered and its counter attribute turned off.
  */
@@ -263,7 +298,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -276,12 +311,12 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, -10, 0)
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     RETURN
 EVT_END()
 
 /**
- * Recovery of the Shinemon at the start of its turn:
+ * Recovery of the Moon Cleft at the start of its turn:
  * counts the over-turn count down and, when it reaches 0, restores the normal defence and pose tables,
  * ground position and counter attribute with SFX_ENM_INSIDE2 and a hop;
  * while still flipped it just goes back to waiting.
@@ -297,14 +332,14 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("SIN_S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, 0, 0)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -314,16 +349,18 @@ static EVT_BEGIN(wakeup_event)
 EVT_END()
 
 /**
- * Attack event of the Shinemon: gets up first if it is flipped over;
+ * Attack event of the Moon Cleft: gets up first if it is flipped over;
  * otherwise it uses an enemy item if it has one, or dashes at one target (SFX_ENM_EMON_DASH1) and rams it.
  * The pre-damage check decides between a dodge and a hit with the action-command result, then it hops back home.
  */
 static EVT_BEGIN(attack_event)
+    // Flipped over: it gets up instead of attacking.
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // First Strike: the first-attack target is already fixed and the camera pulls in on it.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -331,6 +368,7 @@ static EVT_BEGIN(attack_event)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 3)
         WAIT_MS(800)
     ELSE
+        // It may use an enemy item instead of attacking.
         CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(LW(0))
@@ -338,11 +376,12 @@ static EVT_BEGIN(attack_event)
             RETURN
         END_IF
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+        // Target: it picks one for its attack; with none, a confused one flusters, otherwise the attack ends.
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sinemon_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sinemon_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -354,10 +393,11 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sinemon_attack))
+    // The attack is declared and it walks to a spot in front of the target.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_sinemon_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -366,6 +406,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Wind-up: it shuffles on the spot with its feet sounding, then dashes at the target.
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         LOOP(0)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -384,6 +425,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
+    // The dash carries it into the target; the pre-damage check decides between a dodge and a hit.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, -1, 0)
     DELETE_EVENT(LW(15))
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), 256, LW(5))
@@ -408,11 +450,13 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: it slides on past the target (which dodges for some kinds of miss) and stops.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 50)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_MS(500)
     GOTO(98)
+    // Hit: the ram lands for its damage and it hops back twice.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -430,9 +474,10 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // It walks back to its home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -442,7 +487,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-/** Wait (idle) event of the Shinemon: shows the idle pose from the pose table. */
+/** Wait (idle) event of the Moon Cleft: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

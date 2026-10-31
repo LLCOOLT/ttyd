@@ -14,6 +14,7 @@
 
 static BeroEntry bero_entry_data[4];
 
+/** Doors of this room: the pipes to tik_06, tik_09 and tik_14. */
 static BeroEntry bero_entry_data[] = {
     {
         "dokan_1", // hitName

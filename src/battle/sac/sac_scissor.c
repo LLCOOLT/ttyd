@@ -29,9 +29,9 @@
 #include "battle/sac/sac_scissor.h"
 #include "manager/fontmgr.h"
 #include "libc_decls.h"
+#include <dolphin/os.h>
 
 double fabs(double);
-double __fabs(double);
 /** Absolute value through the __fabs intrinsic; scissor_intersection uses it to pick each segment's major axis. */
 static inline double my_fabsf(float x) {
     return __fabs(x);
@@ -96,7 +96,6 @@ ScissorWork* GetScissorPtr(void);
 static void scissor_disp_region(CameraId camera, void* param);
 static void scissor_capture(CameraId camera, void* param);
 static void tess(Pt* buf, s32 count);
-void DCFlushRange(void*, u32);
 static void star_disp2D_sub(s32 idx, s32 alpha);
 static s32 scissor_damage_sub2(Vec pt);
 static void scissor_damage_sub(BattleUnit* unit, s32* out);
@@ -118,6 +117,10 @@ static s32 scissor_tess();
 BattleWeapon weapon_scissor;
 BattleWeapon weapon_scissor_finish;
 
+/**
+ * Art Attack's per-loop hit: scissor_damage hits each enemy inside a closed loop with it, for the power
+ * weaponGetPower_Scissor worked out (0 to 3); it always hits, pierces defense and cannot be guarded.
+ */
 BattleWeapon weapon_scissor = {
     "btl_wn_sac_scissor", // name
     ICON_19C, // icon
@@ -139,7 +142,7 @@ BattleWeapon weapon_scissor = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     "msg_sac_5", // acHelpMsg
@@ -156,6 +159,10 @@ BattleWeapon weapon_scissor = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Art Attack's finishing hit: no damage of its own, given by marioAttackEvent_Scissor to each enemy
+ * that took damage during the drawing, with damage pattern 27 for the hurt pose.
+ */
 BattleWeapon weapon_scissor_finish = {
     "btl_wn_sac_scissor", // name
     0, // icon
@@ -174,7 +181,7 @@ BattleWeapon weapon_scissor_finish = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     27, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -192,7 +199,7 @@ BattleWeapon weapon_scissor_finish = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-// inlining off for GetScissorPtr, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it GetScissorPtr is inlined into its callers (17 shrink, e.g. star_stone_appear 11 -> 5 instructions)
 #pragma dont_inline on
 /** The minigame's work area, kept in the battle's shared action-command work buffer. */
 ScissorWork* GetScissorPtr(void) {
@@ -384,7 +391,7 @@ static s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, 
     return 0;
 }
 
-// inlining off for scissor_intersection2, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it scissor_intersection2 is inlined into scissor_cross (267 -> 291 instructions)
 #pragma dont_inline on
 /** scissor_intersection, but segments that share an endpoint do not count as crossing. */
 static s32 scissor_intersection2(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
@@ -404,7 +411,7 @@ static s32 scissor_intersection2(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3,
 }
 
 #pragma dont_inline reset
-// inlining off for scissor_intersection3, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it scissor_intersection3 is inlined into scissor_cross (267 -> 298 instructions; one other caller grows)
 #pragma dont_inline on
 /**
  * scissor_intersection with the first segment stretched 1000 units both ways,
@@ -439,7 +446,7 @@ static s32 scissor_intersection3(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3,
 }
 #pragma dont_inline reset
 
-// inlining off for scissor_intersection4, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it scissor_intersection4 is inlined into scissor_cross (267 -> 299 instructions)
 #pragma dont_inline on
 /** scissor_intersection3, but a shared endpoint counts as a crossing at that point. */
 static s32 scissor_intersection4(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
@@ -778,7 +785,7 @@ static void star_disp2D(CameraId camera, void* param) {
     }
 }
 
-// inlining off for star_disp2D_sub, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it star_disp2D_sub is inlined into star_disp2D (28 -> 410 instructions)
 #pragma dont_inline on
 /**
  * Draws star idx (0 the cursor, 1-4 the trail) as the Art Attack icon at the given alpha;
@@ -1117,7 +1124,7 @@ static void scissor_damage_sub(BattleUnit* unit, s32* out) {
     }
 }
 
-// inlining off for scissor_damage_sub2, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it scissor_damage_sub2 is inlined into scissor_damage_sub (154 -> 217 instructions)
 #pragma dont_inline on
 /** Whether screen point pt is inside any triangle of the drawn loop. */
 static s32 scissor_damage_sub2(Vec pt) {
@@ -1399,10 +1406,12 @@ static s32 wait_star_standby(void) {
  * Then pays the Star Power and gives each damaged enemy a finishing hit.
  */
 EVT_BEGIN(marioAttackEvent_Scissor)
+    // Art Attack's work is set up and the star's flight starts.
     CALL(scissor_init)
     BEGIN_SIBLING_EVENT
         CALL(star_control)
     END_SIBLING_EVENT
+    // Crystal Star opening: Mario holds up the star item and the Crystal Star appears in stardust.
     CALL_CHILD(sac_start_camera_evt)
     WAIT_MS(500)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1418,6 +1427,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
     CALL(evt_snd_sfxoff, LW(11))
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(40)
+    // Mario puts the item away and returns home, and the camera pulls back to show the whole stage.
     CALL_CHILD(sac_mario_item_on_end_evt)
     CALL_CHILD(sac_mario_back_home)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
@@ -1430,6 +1440,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
         CALL(evt_btl_camera_set_moveto, 0, 75, 105, 600, 75, 55, 0, 30, 0)
 #endif
     END_SIBLING_EVENT
+    // Once the star is in place as the drawing cursor, the timer runs, the crowd cheers and help shows.
     CALL(wait_star_standby)
     BEGIN_SIBLING_EVENT
         CALL(scissor_timer_main)
@@ -1439,6 +1450,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
     END_SIBLING_EVENT
     CALL(sac_ac_help_on)
     LOOP(0)
+        // Each pass: the screen is readied for a cut-out while the player draws; time running out ends it.
         SET_VALUE(LW(10), STRING("OFF_d_bom"))
         CALL(evt_paper_entry, LW(10))
         CALL(evt_offscreen_entry, STRING("ofs"))
@@ -1456,6 +1468,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
             GOTO(90)
         END_IF
         WAIT_FRAMES(1)
+        // The drawn loop is closed and the area inside it is captured from the screen.
         CALL(scissor_tess)
         WAIT_FRAMES(1)
         CALL(scissor_offscreen)
@@ -1463,6 +1476,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
         WAIT_FRAMES(1)
         CALL(scissor_ofscreen_ok, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
+            // The loop cuts that piece out and hurts the enemies inside; hitting them all earns a rating.
             CALL(evt_snd_sfxon, STRING("SFX_BTL_SAC_KAKONDEPON2"), 0)
             CALL(evt_img_onoff, STRING("img"), 1)
             CALL(evt_img_set_shadow, STRING("img"), 2)
@@ -1474,6 +1488,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
             CALL(evt_img_clear_virtual_point, STRING("img"))
             WAIT_FRAMES(60)
         END_IF
+        // The cut-out is cleared before the next loop.
         CALL(evt_img_onoff, STRING("img"), 0)
         CALL(evt_img_set_shadow, STRING("img"), 0)
         CALL(evt_img_release, STRING("img"))
@@ -1485,6 +1500,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
         END_IF
     END_LOOP
     LABEL(90)
+    // Time's up: Mario pays the Star Power and each enemy that took damage gets the finishing hit.
     CALL(sac_ac_help_off)
     CALL(sac_cheer_end)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1503,6 +1519,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     GOTO(95)
     LABEL(97)
+    // The camera resets and the drawing work is freed.
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(1000)
     CALL(scissor_end)

@@ -43,7 +43,7 @@ void countDownInit(void) {
  */
 void countDownSaveReStart(void) {
     CountdownWork* work = wp;
-    if ((work->flags & 1) != 0) {
+    if ((work->flags & COUNTDOWN_FLAG_RUNNING) != 0) {
         u32 ticks = OS_TIMER_CLOCK / 1000;
         s64 ms = work->elapsed / ticks;
 #if VERSION >= VERSION_US
@@ -64,7 +64,7 @@ void countDownSaveReStart(void) {
             wp->sfxId = psndSFXOn("SFX_STG7_ALART_WARNING1");
         }
 #if VERSION >= VERSION_US
-        wp->flags &= ~2;
+        wp->flags &= ~COUNTDOWN_FLAG_TIME_UP;
 #endif
     }
 }
@@ -86,7 +86,7 @@ void countDownStart(u32 limit, u32 restart) {
     wp->x = 180.0f;
     wp->y = -180.0f;
     wp->flags = 0;
-    wp->flags |= 1;
+    wp->flags |= COUNTDOWN_FLAG_RUNNING;
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG7_00_START) {
         wp->sfxId = psndSFXOn("SFX_STG2_BOMB_TIMER1");
     } else {
@@ -106,7 +106,7 @@ void countDownSetRestartTime(u32 restart) {
  * JP and later releases also stop the ticking sound at time-up.
  */
 void countDownMain(void) {
-    if ((wp->flags & 1) != 0) {
+    if ((wp->flags & COUNTDOWN_FLAG_RUNNING) != 0) {
         switch (wp->state) {
             case 0:
                 if (++wp->counter < 30) {
@@ -118,7 +118,7 @@ void countDownMain(void) {
                 break;
             case 1:
 #if VERSION >= VERSION_JP
-                if ((wp->flags & 2) != 0) {
+                if ((wp->flags & COUNTDOWN_FLAG_TIME_UP) != 0) {
                     psndSFXOff(wp->sfxId);
                     wp->sfxId = -1;
                 }
@@ -130,19 +130,19 @@ void countDownMain(void) {
                 } else {
                     wp->counter = 0;
                     wp->state++;
-                    wp->flags &= ~1;
+                    wp->flags &= ~COUNTDOWN_FLAG_RUNNING;
                     psndSFXOff(wp->sfxId);
                 }
                 break;
         }
-        if ((wp->flags & 8) == 0 && marioStGetSystemLevel() == 0U) {
+        if ((wp->flags & COUNTDOWN_FLAG_FROZEN) == 0 && marioStGetSystemLevel() == 0U) {
             wp->elapsed += (s32)((u32)gp->renderTime - (u32)wp->prevTime);
         }
         wp->prevTime = gp->renderTime;
         {
             CountdownWork* work = wp;
             if (work->elapsed / (OS_TIMER_CLOCK / 1000) >= work->limit) {
-                work->flags |= 2;
+                work->flags |= COUNTDOWN_FLAG_TIME_UP;
             }
         }
         dispEntry(CAMERA_2D, 1000.0f, 0, countDownDisp, NULL);
@@ -170,11 +170,11 @@ static void countDownDisp(CameraId cameraId, void* param) {
     white2 = sWhite;
     flags = work->flags;
     remaining = work->limit - work->elapsed / (OS_TIMER_CLOCK / 1000);
-    if ((flags & 4) == 0) {
+    if ((flags & COUNTDOWN_FLAG_HIDDEN) == 0) {
         s32 sec, msec;
         s32 digits[3];
         s32 i;
-        if ((flags & 2) != 0) {
+        if ((flags & COUNTDOWN_FLAG_TIME_UP) != 0) {
             remaining = 0;
         }
         sec = remaining / 1000;
@@ -213,19 +213,19 @@ static void countDownDisp(CameraId cameraId, void* param) {
 /** Returns -1 when no countdown is running, 1 when its time is up and 0 while it is still counting. */
 s32 countDownGetStatus(void) {
     CountdownWork* work = wp;
-    return !(work->flags & 1) ? -1 : (work->flags >> 1) & 1;
+    return !(work->flags & COUNTDOWN_FLAG_RUNNING) ? -1 : (work->flags >> 1) & 1;
 }
 
 /** Slides a running countdown off screen and stops its sound (state 2 of countDownMain). */
 void countDownEnd(void) {
-    if ((wp->flags & 1) != 0) {
+    if ((wp->flags & COUNTDOWN_FLAG_RUNNING) != 0) {
         wp->state = 2;
     }
 }
 
 /** Freezes the countdown (flag 8) and stops its sound; the display stays up. */
 void countDownStop(void) {
-    wp->flags |= 8;
+    wp->flags |= COUNTDOWN_FLAG_FROZEN;
     psndSFXOff(wp->sfxId);
 }
 

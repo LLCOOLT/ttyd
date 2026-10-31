@@ -4,8 +4,14 @@
 #include "__ax.h"
 
 #ifdef DEBUG
+/**
+ * Version string of the AX (audio mixing) library in the debug build, kept in the binary as a build stamp.
+ */
 const char* __AXVersion = "<< Dolphin SDK - AX\tdebug build: Apr  5 2004 03:56:21 (0x2301) >>";
 #else
+/**
+ * Version string of the AX (audio mixing) library in the release build, kept in the binary as a build stamp.
+ */
 const char* __AXVersion = "<< Dolphin SDK - AX\trelease build: Apr  5 2004 04:15:05 (0x2301) >>";
 #endif
 

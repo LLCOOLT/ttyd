@@ -33,8 +33,17 @@ typedef struct {
     s32 id;
 } UranaiEntry;
 
+/**
+ * The fortune teller's session state: the fortune list being built from the message labels,
+ * its kind and prefix, and which Star Piece and Shine Sprite fortunes were already told.
+ * All the uranaisi functions share it.
+ */
 UranaiWork _udt = {0};
 
+/**
+ * Star Piece flag names as written in the fortune messages, with their flag ids, ending with NULL.
+ * The Star Piece fortune looks a message's flag up here to skip pieces Mario already has.
+ */
 UranaiEntry uranai_table_starpiece[] = {
     { "GSWF_STARPIECE_00", 0xF840713F },
     { "GSWF_STARPIECE_01", 0xF8407140 },
@@ -139,6 +148,10 @@ UranaiEntry uranai_table_starpiece[] = {
     { NULL, 0 }
 };
 
+/**
+ * Shine Sprite flag names as written in the fortune messages, with their flag ids, ending with NULL.
+ * The Shine Sprite fortune looks a message's flag up here to skip Shine Sprites Mario already has.
+ */
 UranaiEntry uranai_table_supercoin[] = {
     { "GSWF_SHINE_00", 0xF8407115 },
     { "GSWF_SHINE_01", 0xF8407116 },
@@ -185,6 +198,9 @@ UranaiEntry uranai_table_supercoin[] = {
     { NULL, 0 }
 };
 
+/**
+ * Fortune prices in coins by kind (the "where to go next" price is worked out from Mario's level instead).
+ */
 s32 uranaisi_ryokin_tbl[] = {5, 5, 10};
 
 s32 uranaisi_data_make_supercoin(const char* prefix, s32 type);

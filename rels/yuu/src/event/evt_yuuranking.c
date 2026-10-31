@@ -23,6 +23,7 @@
 #include "evt/evt_yuuranking.h"
 #include "evt/evt_story.h"
 
+/** An opaque white colour constant that nothing in the results screen reads. */
 const GXColor yuuranking_unused_color = {0xFF, 0xFF, 0xFF, 0xFF};
 
 #if VERSION >= VERSION_US

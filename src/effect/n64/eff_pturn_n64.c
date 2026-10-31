@@ -27,8 +27,13 @@ typedef struct PturnElem {
     s32 delay;  // 0x44
 } PturnElem;
 
+/**
+ * Size of the counter badge over its first frames: it shrinks in from five times its size
+ * and settles with a bounce.
+ */
 f32 scale_dat[9] = {5.0f, 4.5f, 4.0f, 3.0f, 2.0f, 1.0f, 0.7f, 1.2f, 1.0f};
 
+/** 48x48 quad drawn for the badge, its texture coordinates turn the texture 45 degrees. */
 effN64Vtx size48x48_tex32x32_pturn_vtx[] = {
     {-24, -24, 0, -512, 512, 255, 255, 255, 255},
     {24, -24, 0, 512, -512, 255, 255, 255, 255},
@@ -36,6 +41,7 @@ effN64Vtx size48x48_tex32x32_pturn_vtx[] = {
     {-24, 24, 0, 512, 1536, 255, 255, 255, 255},
 };
 
+/** Yellow 24x24 quad for a single-digit count over the badge. */
 effN64Vtx size24x24_tex32x32_pturn_vtx[] = {
     {-12, -12, 0, 0, 0, 250, 250, 0, 255},
     {12, -12, 0, 1024, 0, 250, 250, 0, 255},
@@ -43,6 +49,7 @@ effN64Vtx size24x24_tex32x32_pturn_vtx[] = {
     {-12, 12, 0, 0, 1024, 250, 250, 0, 255},
 };
 
+/** Yellow quad for the left-hand digit of a two-digit count. */
 effN64Vtx size16x24_tex32x32_l_pturn_vtx[] = {
     {-16, -12, 0, 0, 0, 250, 250, 0, 255},
     {4, -12, 0, 1024, 0, 250, 250, 0, 255},
@@ -50,6 +57,7 @@ effN64Vtx size16x24_tex32x32_l_pturn_vtx[] = {
     {-16, 12, 0, 0, 1024, 250, 250, 0, 255},
 };
 
+/** Yellow quad for the right-hand digit of a two-digit count. */
 effN64Vtx size16x24_tex32x32_r_pturn_vtx[] = {
     {-4, -12, 0, 0, 0, 250, 250, 0, 255},
     {16, -12, 0, 1024, 0, 250, 250, 0, 255},
@@ -63,10 +71,12 @@ static void pturn_main_dispp(CameraId cameraId, EffectEntry* effect);
 static void pturn_num_dispp(CameraId cameraId, EffectEntry* effect);
 
 /**
- * Guess: a status badge with a turn counter above (x, y, z) (effect table label: "unable to act").
+ * A bobbing badge (N64 texture 0x92) with a one- or two-digit count (texture 0x53) above (x, y, z);
+ * the effect table labels it 行動不能 ("unable to act").
  * Type 0 steps its displayed count toward lifetime, type 1 shows the badge without digits,
  * and type 10 is the short-lived badge that type 0 throws off when the count falls.
- * Via evt_eff64 "pturn_n64"; no script callers found.
+ * Reached only through evt_eff64 "pturn_n64"; no script in the tree spawns it.
+ * Guess: the immobilised-status icon with its turns left.
  */
 EffectEntry* effPturnN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     EffectEntry* effect;

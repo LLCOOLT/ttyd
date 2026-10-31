@@ -1,4 +1,4 @@
-// unit_burst_wanwan: Glitz Pit Chain Chomp variant ("burst" wanwan), battle unit.
+// unit_burst_wanwan: Red Chomp (`burst_wanwan`), the Glitz Pit's red Chain-Chomp, battle unit.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -16,6 +16,13 @@
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "libc_decls.h"
+
+// Unit work slots of the Red Chomp (btlevtcmd_SetUnitWork / GetUnitWork; chain_main reads slot 2).
+enum {
+    UW_BURST_WANWAN_IDLE = 0,        // 1 outside its attack, 0 while it attacks (not read in this file)
+    UW_BURST_WANWAN_BARK_VOLUME = 1, // landing/bark sound volume, lowered by sound_gensui_event (floor 32)
+    UW_BURST_WANWAN_CHAIN_MODE = 2,  // chain_main: 2 records the chain's shape, 1 holds it, 0 lets it sag
+};
 
 static USER_FUNC(chain_init);
 static USER_FUNC(chain_main);
@@ -46,6 +53,10 @@ static EvtWord wait_sound_event2[11];
 static EvtWord wait_sound_event2[12];
 #endif
 
+/**
+ * Unit kind of the Red Chomp (HP 6, level 24): its size, offsets, damage sounds, status vulnerability,
+ * parts and init event.
+ */
 BattleUnitKind unit_burst_wanwan = {
     59,
     "btl_un_burst_wanwan",
@@ -118,23 +129,39 @@ BattleUnitKind unit_burst_wanwan = {
 };
 
 #if VERSION <= VERSION_DEMO_US
+/** Defence of the Red Chomp: 3 damage points off every hit. */
 static BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
 #else
+/**
+ * Defence of the Red Chomp: 3 against normal, explosion and electric hits;
+ * immune to fire and ice (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{3, 99, 99, 3, 3}};
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/** Element reactions of the Red Chomp: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 #else
+/** Element reactions of the Red Chomp: fire: no damage, ice: no damage. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 2, 0, 0}};
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Red Chomp (percent chance to take each status): immune to sleep;
+ * resists most other statuses.
+ */
 static StatusVulnerability regist = {0, 65, 65, 100, 65, 100, 100, 65, 100, 65, 100, 65, 100, 65, 65, 45, 30, 100, 65, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Red Chomp (percent chance to take each status): immune to sleep and burn;
+ * resists most other statuses.
+ */
 static StatusVulnerability regist = {0, 70, 65, 100, 65, 100, 0, 70, 100, 90, 100, 90, 100, 95, 65, 45, 30, 100, 65, 100, 100, 95};
 #endif
 
+/** Pose table of the Red Chomp: maps each battle pose to the animation it plays (WAN_* animations). */
 static PoseTableEntry pose_table[] = {
     {1, "WAN_N_1"},
     {2, "WAN_Y_1"},
@@ -143,20 +170,24 @@ static PoseTableEntry pose_table[] = {
     {4, "WAN_X_1"},
     {3, "WAN_X_1"},
     {27, "WAN_Z_1"},
-    {28, "WAN_S_1A"},
+    {BTL_POSE_NORMAL, "WAN_S_1A"},
     {29, "WAN_D_1"},
     {30, "WAN_D_1"},
     {31, "WAN_A_1"},
-    {39, "WAN_D_1"},
+    {BTL_POSE_DAMAGE, "WAN_D_1"},
     {50, "WAN_A_1"},
-    {42, "WAN_R_1"},
-    {40, "WAN_W_1"},
-    {56, "WAN_X_1"},
-    {57, "WAN_X_1"},
+    {BTL_POSE_RUN, "WAN_R_1"},
+    {BTL_POSE_WALK, "WAN_W_1"},
+    {BTL_POSE_DANGER, "WAN_X_1"},
+    {BTL_POSE_PERIL, "WAN_X_1"},
     {BTL_POSE_TALK, "WAN_S_1A"},
     {BTL_POSE_STAY_DEFAULT, "WAN_S_1A"},
 };
 
+/**
+ * Data table of the Red Chomp: event handlers for the counter-hit reactions (tags 25-36),
+ * a First Strike on it (no reaction) and being defeated.
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {26, counter_damage_event},
@@ -175,18 +206,20 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of the Red Chomp (9 parts): hit positions, defences, attributes and pose tables. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x10000009, 0, pose_table},
-    {2, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
-    {3, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
-    {4, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
-    {5, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
-    {6, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
-    {7, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
-    {8, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
-    {9, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x12010000, 0, pose_table},
+    {1, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 5.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {2, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {3, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {4, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {5, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {6, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {7, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {8, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
+    {9, "btl_un_burst_wanwan", "c_wanwan_a", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Weapon of the Red Chomp's bite: 5 damage, hammer-type contact attack. */
 static BattleWeapon weapon_wanwan_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -205,7 +238,7 @@ static BattleWeapon weapon_wanwan_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -224,7 +257,7 @@ static BattleWeapon weapon_wanwan_attack = {
 };
 
 /**
- * Init event of the Glitz Pit Chain Chomp: registers its wait, attack, damage and confusion events,
+ * Init event of the Red Chomp: registers its wait, attack, damage and confusion events,
  * sets unit work 0 to 1 and the sound volume in work 1 to 127,
  * sets up its chain (chain_init) and spawns chain_event to keep it moving,
  * sets the landing sound for jumps and starts the wait event.
@@ -234,17 +267,17 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_IDLE, 1)
     CALL(chain_init, BTL_UNIT_SELF)
     SPAWN_EVENT(chain_event)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("0"), STRING("SFX_ENM_WAN_LANDING1"))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 127)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_BARK_VOLUME, 127)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
- * Runs alongside the Chain Chomp for the whole battle:
+ * Runs alongside the Red Chomp for the whole battle:
  * every frame calls chain_main to update the chain links, until the unit no longer exists.
  */
 static EVT_BEGIN(chain_event)
@@ -261,30 +294,31 @@ static EVT_BEGIN(chain_event)
 EVT_END()
 
 /**
- * Damage event of the Chain Chomp: sets unit work 0 to 1 and work 2 to 2 and,
+ * Damage event of the Red Chomp: sets unit work 0 to 1 and work 2 to 2 and,
  * with attribute 4 (UNIT_ATTR_FLOATING) set on it, runs the default damage reaction,
  * then clears the attribute and unit work 2.
  */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 2)
-    CALL(btlevtcmd_OnAttribute, LW(10), 4)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_IDLE, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_CHAIN_MODE, 2)
+    CALL(btlevtcmd_OnAttribute, LW(10), UNIT_ATTR_FLOATING)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_OffAttribute, LW(10), 4)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_OffAttribute, LW(10), UNIT_ATTR_FLOATING)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_CHAIN_MODE, 0)
     RETURN
 EVT_END()
 
 /**
- * Guess: reaction when the Chain Chomp is hurt by a counterattack:
- * plays the hurt pose and flies the body part back from the attacker;
- * versions up to the US demo also have it tumble home in two hops.
- * It returns to the wait event unless the hit knocked it out for good.
+ * Data events 25 to 36, which the standard damage reaction runs for the counter-damage codes 44 to 55:
+ * the Red Chomp takes the hurt pose (type 39) and its head (part 1) is flung 25 units back and up;
+ * up to the US demo it then drops back to the floor in two hops.
+ * After 30 frames the camera resets, and it restarts its wait event
+ * unless the damage code has 512 set without 2048.
  */
 static EVT_BEGIN(counter_damage_event)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
     CALL(btlevtcmd_SetPartsFallAccel, LW(10), 1, FLOAT(1.0f))
     CALL(btlevtcmd_GetPartsPos, LW(10), 1, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_PartsFaceDirectionSub, LW(10), 1, LW(2), 25)
@@ -302,9 +336,9 @@ static EVT_BEGIN(counter_damage_event)
 #endif
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             RETURN
         END_IF
@@ -314,7 +348,7 @@ static EVT_BEGIN(counter_damage_event)
 EVT_END()
 
 /**
- * Death of the Chain Chomp: it spins its body parts around quickly with the defeat sound, puffs smoke,
+ * Death of the Red Chomp: it spins its body parts around quickly with the defeat sound, puffs smoke,
  * pays out its coins and EXP (StoreCoin and StoreExp) and a star-point effect,
  * then spins the parts for 30 more frames and removes the unit (KillUnit mode 2,
  * or 0 when the hit has damage-code bit 1024).
@@ -368,7 +402,7 @@ static EVT_BEGIN(dead_event)
         GOTO(20)
     END_IF
     CALL(btlevtcmd_GetBackItem, LW(10))
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_KillUnit, LW(10), 0)
     ELSE
@@ -378,7 +412,7 @@ static EVT_BEGIN(dead_event)
 EVT_END()
 
 /**
- * Attack event of the Chain Chomp: uses an enemy item if one fits,
+ * Attack event of the Red Chomp: uses an enemy item if one fits,
  * otherwise picks a target (BATTLE_FLAG_FIRST_ATTACK uses the first-strike target),
  * hops twice on the spot barking, then lunges at the target on its chain
  * and bites (damage with weapon_wanwan_attack).
@@ -386,6 +420,8 @@ EVT_END()
  * A confused unit with no target runs subsetevt_confuse_flustered. It always ends back in the wait event.
  */
 static EVT_BEGIN(attack_event)
+    // Choose the target: the First Strike target if the battle opened with one,
+    // otherwise it may use an item or pick a normal target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -401,29 +437,33 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_wanwan_attack))
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_wanwan_attack), LW(3), LW(4))
     END_IF
+    // No target left: a confused Red Chomp is flustered; either way it ends its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 127)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(14))
+    // The attack is announced and the Chomp turns toward the target; its idle animation stops.
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_BARK_VOLUME, 127)
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_BARK_VOLUME, LW(14))
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_wanwan_attack))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_wanwan_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangePartsFaceDirection, BTL_UNIT_SELF, 1, LW(15))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_IDLE, 0)
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
+    // The camera frames the Chomp and its target.
     CALL(evt_btl_camera_set_mode, 0, 11)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("WAN_A_1"))
+    // The Chomp hops twice on the spot, barking.
     LOOP(2)
         CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 1, 20, 0, FLOAT(0.69921875f))
@@ -435,6 +475,7 @@ static EVT_BEGIN(attack_event)
         END_SIBLING_EVENT
         CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 1, LW(0), 0, LW(2), 20, -1)
     END_LOOP
+    // It rears back on its chain, then lunges at the target with a bark.
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(20)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("WAN_S_1A"))
@@ -453,6 +494,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 1, 0, FLOAT(16.0f), FLOAT(0.0f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 1, LW(0), LW(1), 10, 0, -1)
+    // Check how the target defends against the bite.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_wanwan_attack), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -475,6 +517,7 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The target dodged: the Chomp falls short and pulls back in.
     LABEL(90)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_WAN_WAIT1"), LW(14), 0, EVT_NULLPTR)
@@ -483,12 +526,13 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 1, 0, FLOAT(8.0f), FLOAT(0.0f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2), 0, -1)
     GOTO(98)
+    // The bite lands: the camera shakes, the damage is dealt and the Chomp pulls back in.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_wanwan_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_wanwan_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_wanwan_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(30)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_WAN_WAIT1"), LW(14), 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("WAN_S_1A"))
@@ -496,28 +540,30 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 1, 0, FLOAT(8.0f), FLOAT(0.25f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2), 0, -1)
     GOTO(98)
+    // The camera returns and the Chomp goes back to its idle animation.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
     LABEL(99)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_IDLE, 1)
     CALL(btlevtcmd_ChangePartsFaceDirection, BTL_UNIT_SELF, 1, -1)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
- * Idle behaviour of the Chain Chomp, chosen by status: asleep (status 1) it rocks slowly in "WAN_N_1";
+ * Idle behaviour of the Red Chomp, chosen by status: asleep (status 1) it rocks slowly in "WAN_N_1";
  * stopped or frozen (2, 9) it stays in "WAN_Y_1" making occasional sounds;
  * confused, poisoned or dizzy (5, 4, 3) it hops in a looping series of landings;
  * otherwise it hops in place in a similar loop with its barking poses.
  * The loops run as sibling events with the bark sounds from wait_sound_event1 and wait_sound_event2.
  */
 static EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 1, LW(15))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_CHAIN_MODE, 0)
+    // Asleep: the Red Chomp sways slowly from side to side in its sleeping pose.
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_SLEEP, LW(15))
     IF_INT_NOT_EQUAL(LW(15), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_CHAIN_MODE, 2)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("WAN_N_1"))
         CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 1, 0, 10, 0)
         BEGIN_SIBLING_EVENT
@@ -537,11 +583,12 @@ static EVT_BEGIN(wait_event)
         END_SIBLING_EVENT
         GOTO(98)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 2, LW(14))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 9, LW(15))
+    // Stopped or frozen: it stays still in its stunned pose, making an occasional sound.
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_STOP, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_FREEZE, LW(15))
     OR(LW(15), LW(14))
     IF_INT_NOT_EQUAL(LW(15), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 2)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_CHAIN_MODE, 2)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("WAN_Y_1"))
         BEGIN_SIBLING_EVENT
             LABEL(5)
@@ -552,9 +599,11 @@ static EVT_BEGIN(wait_event)
         END_SIBLING_EVENT
         GOTO(98)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(13))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 4, LW(14))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 3, LW(15))
+    // Confused, poisoned or dizzy: it keeps hopping in place in a looping series of landings,
+    // barking out of time.
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(13))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_POISON, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_DIZZY, LW(15))
     OR(LW(15), LW(13))
     OR(LW(15), LW(14))
     IF_INT_NOT_EQUAL(LW(15), 0)
@@ -592,6 +641,7 @@ static EVT_BEGIN(wait_event)
         END_SIBLING_EVENT
         GOTO(98)
     END_IF
+    // Otherwise it keeps hopping in place, alternating barking poses with each landing.
     BEGIN_SIBLING_EVENT
         LABEL(4)
         CALL_CHILD(sound_gensui_event)
@@ -636,16 +686,16 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 /**
- * Lowers the Chain Chomp's sound volume in unit work 1 to 70% of its value each call,
+ * Lowers the Red Chomp's sound volume in unit work 1 to 70% of its value each call,
  * with a floor of 32 ("gensui" is attenuation); wait_event uses it so the idle barks fade.
  */
 static EVT_BEGIN(sound_gensui_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(11))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_BARK_VOLUME, LW(11))
     MULTIPLY_FLOAT(LW(11), FLOAT(0.69921875f))
     IF_INT_LESS(LW(11), 32)
         SET_VALUE(LW(11), 32)
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(11))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BURST_WANWAN_BARK_VOLUME, LW(11))
     RETURN
 EVT_END()
 
@@ -673,10 +723,14 @@ EVT_END_PAD()
 #endif
 
 /**
- * Guess: per-frame script helper that lays the chain of the Burst Wanwan: arg0 = unit.
- * It keeps the stake (part 9) behind the chomp and, unless the chain is frozen (unit work 2),
- * hangs links 2 to 8 between the chomp and the stake with a sag;
- * it can also remember the chain's shape and keep it while the chomp is tethered.
+ * Per-frame script helper (chain_event) that lays out the Red Chomp's chain; args[0] = unit.
+ * It keeps the stake (part 9) 20 units behind the chomp.
+ * With unit work 2 at 2 it records each link's offset from the stake in the parts' work and switches to 1;
+ * at 1 the links (parts 1 to 8) keep that recorded shape.
+ * Otherwise the links hang between the head (part 1, held below y = 110 in JP and later) and the stake:
+ * link 2 sits on the head, and the links are pulled toward each other from both ends at a fixed spacing (the
+ * distance over 8, over 7 up to the US demo, at least 10),
+ * sagging by 300 / spacing squared and never below the floor.
  */
 static USER_FUNC(chain_main) {
     BattleWork* wp = _battleWorkPointer;
@@ -712,7 +766,7 @@ static USER_FUNC(chain_main) {
     BtlUnit_GetPos(unit, &x, &y, &z);
     BtlUnit_SetPartsPos(BtlUnit_GetPartsPtr(unit, 9), x - 20.0f * unit->faceDirection, y, z);
     // 2: remember the chain's shape relative to the stake
-    if (unit->work[2] == 2) {
+    if (unit->work[UW_BURST_WANWAN_CHAIN_MODE] == 2) {
         BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, 9), &x, &y, &z);
         for (i = 8; i >= 1; i--) {
             part = BtlUnit_GetPartsPtr(unit, i);
@@ -720,10 +774,10 @@ static USER_FUNC(chain_main) {
             part->work[0] = x2 - x;
             part->work[1] = y2 - y;
         }
-        unit->work[2] = 1;
+        unit->work[UW_BURST_WANWAN_CHAIN_MODE] = 1;
     }
     // 1: keep that shape
-    if (unit->work[2] == 1) {
+    if (unit->work[UW_BURST_WANWAN_CHAIN_MODE] == 1) {
         BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, 9), &x, &y, &z);
         for (i = 8; i >= 1; i--) {
             part = BtlUnit_GetPartsPtr(unit, i);
@@ -800,9 +854,9 @@ static USER_FUNC(chain_main) {
 }
 
 /**
- * Guess: script helper that starts the Burst Wanwan's chain: arg0 = unit.
- * All chain link parts (2 to 7) are put on the chomp with their chain animation,
- * and the stake parts (8 and 9) just behind it.
+ * Script helper run by init_event to set up the Red Chomp's chain;
+ * args[0] = unit: puts the chain links (parts 2 to 7) on the chomp with the WAN_S_1B animation,
+ * and part 8 and the stake (part 9, animation WAN_Z_2) 20 units behind it.
  */
 static USER_FUNC(chain_init) {
     BattleWork* wp = _battleWorkPointer;

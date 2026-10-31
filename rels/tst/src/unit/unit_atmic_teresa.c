@@ -27,6 +27,11 @@
 #include "version.h"
 #include "libc_decls.h"
 
+// Unit work slots of the Atomic Boo (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_ATMIC_TERESA_FACE_HIDDEN = 0, // 1 while it hides its face (pose_table_kaokakusi), 0 once it shows it again
+};
+
 AtmTeresa* teresa;
 #define ATMIC_TERESA_SCALE atmic_teresa_scale
 s32 teresa_count;
@@ -73,6 +78,10 @@ f32 atmic_teresa_scale;
 ExtTexInfo teresa_ext_entry_data[17];
 extern EvtWord teresa_entry[];
 
+/**
+ * Unit data of the Atomic Boo: hit points, level, size, sounds, parts, status vulnerability, init event
+ * and event data table.
+ */
 BattleUnitKind unit_atmic_teresa = {
     76,
     "btl_un_atmic_teresa",
@@ -135,7 +144,7 @@ BattleUnitKind unit_atmic_teresa = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     1,
     parts,
@@ -143,10 +152,16 @@ BattleUnitKind unit_atmic_teresa = {
     data_table,
 };
 
+/**
+ * Defense of the Atomic Boo against normal, fire, ice, explosion and electric attacks: none, so it takes
+ * full damage from every element.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type reactions of the Atomic Boo: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Pose table of the Atomic Boo: maps each battle pose (idle, hurt, attacking and so on) to its animation. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -154,19 +169,20 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_1"},
-    {39, "D_1"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/** Pose table of the Atomic Boo while it covers its face with its hands. */
 PoseTableEntry pose_table_kaokakusi[] = {
     {1, "A_1"},
     {2, "A_1"},
@@ -174,33 +190,51 @@ PoseTableEntry pose_table_kaokakusi[] = {
     {5, "A_1"},
     {4, "A_1"},
     {3, "A_1"},
-    {28, "A_1"},
+    {BTL_POSE_NORMAL, "A_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_1"},
-    {39, "D_1"},
-    {42, "A_1"},
-    {40, "A_1"},
-    {56, "A_1"},
-    {57, "A_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_RUN, "A_1"},
+    {BTL_POSE_WALK, "A_1"},
+    {BTL_POSE_DANGER, "A_1"},
+    {BTL_POSE_PERIL, "A_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "A_1"},
 };
 
+/**
+ * Event data table of the Atomic Boo: no custom reactions, so the standard battle handlers run for every
+ * event.
+ */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Parts of the Atomic Boo: a single body part (part 1, model c_atmic_trs), each with its defense tables,
+ * attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_atmic_teresa", "c_atmic_trs", 0.0f, 0.0f, 0.0f, 10.0f, 80.0f, 0.0f, 0.0f, 110.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
+    {1, "btl_un_atmic_teresa", "c_atmic_trs", 0.0f, 0.0f, 0.0f, 10.0f, 80.0f, 0.0f, 0.0f, 110.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 };
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Atomic Boo (both demos), as the percent chance each status takes hold:
+ * immune to Huge, Tiny, Attack Down and Fright; resists 12 statuses (down to 5% of the normal chance).
+ */
 static StatusVulnerability regist = {40, 40, 40, 40, 40, 40, 100, 30, 0, 0, 100, 0, 100, 40, 40, 0, 10, 100, 40, 100, 100, 5};
 #else
+/**
+ * Status vulnerability of the Atomic Boo (the retail releases), as the percent chance each status takes
+ * hold: immune to Huge, Tiny, Attack Down and Fright; resists 10 statuses (down to 5% of the normal
+ * chance).
+ */
 static StatusVulnerability regist = {40, 40, 40, 100, 40, 100, 100, 30, 0, 0, 100, 0, 100, 80, 40, 0, 10, 100, 40, 100, 100, 5};
 #endif
 
+/** Weapon record of the Atomic Boo's Press: 4 damage and can hit several targets. */
 BattleWeapon weapon_atmic_teresa_press = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -219,7 +253,7 @@ BattleWeapon weapon_atmic_teresa_press = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -236,6 +270,10 @@ BattleWeapon weapon_atmic_teresa_press = {
     {0, 50, 50, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon record of the Atomic Boo's split-up attack (bikkuri, Japanese for surprise, in the code):
+ * 4 damage, can hit several targets and ignores Defense.
+ */
 BattleWeapon weapon_atmic_teresa_bikkuri = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -258,7 +296,7 @@ BattleWeapon weapon_atmic_teresa_bikkuri = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -282,6 +320,10 @@ BattleWeapon weapon_atmic_teresa_bikkuri = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon record of the Atomic Boo's surprise attack (surprise_event): 4 damage, can hit several targets and
+ * ignores Defense.
+ */
 BattleWeapon weapon_atmic_teresa_surprise = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -304,7 +346,7 @@ BattleWeapon weapon_atmic_teresa_surprise = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -328,6 +370,7 @@ BattleWeapon weapon_atmic_teresa_surprise = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon record of the Atomic Boo's breath attack: 3 damage and can hit several targets. */
 BattleWeapon weapon_atmic_teresa_breath = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -350,7 +393,7 @@ BattleWeapon weapon_atmic_teresa_breath = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -399,8 +442,8 @@ EVT_END()
 /**
  * Chooses the Atomic Boo's attack: item use first;
  * while its face is visible (unit work 0 = 0) it covers its face 30 times in 70,
- * uses the Press 20 in 70 and the Startle (bikkuri_event) 20 in 70;
- * while its face is covered (unit work 0 = 1) it picks the Surprise (surprise_event)
+ * uses the Press 20 in 70 and the split-up attack (bikkuri_event) 20 in 70;
+ * while its face is covered (unit work 0 = 1) it picks the surprise attack (surprise_event)
  * or the Breath (breath_event) with equal chance.
  */
 static EVT_BEGIN(attack_event)
@@ -410,7 +453,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_ATMIC_TERESA_FACE_HIDDEN, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         SET_VALUE(LW(1), 30)
         ADD(LW(1), 20)
@@ -448,14 +491,15 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 /**
- * Guess: atomic Boo covers its face ('kaokakusi'):
- * it shies away with a dive, turns 180 degrees, spins back around and settles on the hands-over-face pose table,
- * with unit work 0 set to 1. Runs when the Boo is hit or flustered.
+ * The Atomic Boo covers its face ('kaokakusi'), one of its turn actions (30 in 70 while its face shows):
+ * it backs off with a dive (pose type 40, SFX_BOSS_ATMTLSA_MOVE2), turns its back (A_1,
+ * SFX_BOSS_ATMTLSA_FACE_HIDE1), glides home while spinning back round, then sets unit work 0 to 1 and the
+ * hands-over-face pose table.
  */
 EVT_BEGIN(kaokakusi_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_MOVE2"), EVT_NULLPTR, 0, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 60)
     SUBTRACT(LW(1), 10)
@@ -473,22 +517,23 @@ EVT_BEGIN(kaokakusi_event)
         CALL(btlevtcmd_AddPartsRotate, BTL_UNIT_SELF, 1, 0, 12, 0)
     END_LOOP
     WAIT_FRAMES(20)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ATMIC_TERESA_FACE_HIDDEN, 1)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_kaokakusi))
     RETURN
 EVT_END()
 
 /**
- * Guess: atomic Boo's Press attack: it picks all targets, flies up behind the party (x -125),
- * slams down on them and shakes the camera, resolving each target with the weapon_atmic_teresa_press damage
- * check and its action-command block, then glides back home to its waiting pose.
+ * The Atomic Boo's Press: it declares an attack on every target, flies to x -125 at height 100 (R_1) and drops
+ * onto the ground there (Z_1) with a long camera shake.
+ * Each target in turn dodges or takes weapon_atmic_teresa_press (the guard result is applied on the first hit
+ * only); then it floats home to its waiting pose.
  */
 EVT_BEGIN(press_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_press))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_press), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -544,7 +589,7 @@ EVT_BEGIN(press_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_press))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_press), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_press), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -566,16 +611,20 @@ EVT_BEGIN(press_event)
 EVT_END()
 
 /**
- * Guess: atomic Boo's Surprise attack: it turns its back (pose type 40),
- * whirls around with a loud cry and a camera shake, and hits every target with weapon_atmic_teresa_surprise;
- * avoided or blocked hits play the matching reactions.
+ * The Atomic Boo's surprise attack (surprise_event), used while its face is covered:
+ * it turns its back and backs off, uncovers its face
+ * (unit work 0 = 0, normal pose table), lunges to x 0 in pose A_2 with SFX_BOSS_ATMTLSA_SURPRISED1 and a strong
+ * camera shake, and each target dodges or takes weapon_atmic_teresa_surprise (the guard result on the first hit
+ * only).
+ * Then it floats home.
  */
 EVT_BEGIN(surprise_event)
+    // The Atomic Boo picks its targets for the surprise attack, which hits the whole party.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_surprise))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_surprise), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -583,11 +632,13 @@ EVT_BEGIN(surprise_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_atmic_teresa_surprise))
+    // The attack is announced.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_atmic_teresa_surprise))
+    // The Atomic Boo turns its back to the party, still covering its face, and drifts away.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 180, 0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
@@ -597,16 +648,18 @@ EVT_BEGIN(surprise_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ATMIC_TERESA_FACE_HIDDEN, 0)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, 0, LW(1), LW(2), 10, 0, 5, 0, -1)
+    // It spins around, uncovers its face and lunges at the party with a strong camera shake.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_SURPRISED1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_shake_w, 0, 10, 0, 60, 0)
     CALL(evt_btl_camera_shake_h, 0, 10, 0, 60, 4)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
+    // For each target in turn, find out how it reacts: it dodges or takes the hit.
     LABEL(0)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_surprise), 0, LW(5))
     SWITCH(LW(5))
@@ -633,12 +686,14 @@ EVT_BEGIN(surprise_event)
     END_SWITCH
     LABEL(90)
     GOTO(97)
+    // The surprise attack lands: the damage is applied (the guard result only counts on the first target).
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_surprise))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_surprise), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_surprise), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
+    // Move on to the next target, if there is one.
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -646,6 +701,7 @@ EVT_BEGIN(surprise_event)
         GOTO(0)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
+    // The Atomic Boo floats back to its home position.
     LABEL(98)
     WAIT_FRAMES(90)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -659,17 +715,20 @@ EVT_BEGIN(surprise_event)
 EVT_END()
 
 /**
- * Guess: atomic Boo's Startle attack ('bikkuri' = surprise):
- * eight small Boos appear around the target and the camera pulls back;
- * the targets take weapon_atmic_teresa_bikkuri damage,
- * then the small Boos merge back into the big one with a puff of smoke.
+ * The Atomic Boo's split-up attack (bikkuri_event): eight small Boos split off it
+ * (it shrinks a little for each)
+ * and circle the party's side of the stage (teresa_appear_bikkuri, teresa_wait_bikkuri), then cry out
+ * (SFX_BOSS_ATMTLSA_SURPRISED2) and each target dodges or takes weapon_atmic_teresa_bikkuri.
+ * It whistles them back (SFX_BOSS_ATMTLSA_WHISTLE1) and they merge into it in puffs of smoke
+ * (SFX_BOSS_ATMTLSA_UNION1), restoring its size.
  */
 EVT_BEGIN(bikkuri_event)
+    // The Atomic Boo picks its targets for the split-up attack, which hits the whole party.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_bikkuri))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_bikkuri), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -677,9 +736,11 @@ EVT_BEGIN(bikkuri_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_atmic_teresa_bikkuri))
+    // The attack is announced.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_atmic_teresa_press))
+    // Small Boos split off the Atomic Boo and circle the party's side of the stage.
     CALL(teresa_appear_bikkuri)
     WAIT_FRAMES(75)
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -692,11 +753,13 @@ EVT_BEGIN(bikkuri_event)
     CALL(teresa_wait_bikkuri)
     CALL(evt_snd_sfxoff, LW(15))
     WAIT_FRAMES(30)
+    // The Atomic Boo cries out and the Boos swoop in.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_SURPRISED2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 350)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
+    // For each target in turn, find out how it reacts: it dodges or takes the hit.
     LABEL(0)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_bikkuri), 0, LW(5))
     SWITCH(LW(5))
@@ -722,12 +785,14 @@ EVT_BEGIN(bikkuri_event)
     END_SWITCH
     LABEL(90)
     GOTO(97)
+    // The split-up attack lands: the damage is applied.
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_bikkuri))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_bikkuri), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_bikkuri), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
+    // Move on to the next target, if there is one.
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -738,6 +803,7 @@ EVT_BEGIN(bikkuri_event)
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_FRAMES(60)
+    // The Atomic Boo whistles the small Boos back and they merge into it in puffs of smoke.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_WHISTLE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_4"))
     WAIT_FRAMES(30)
@@ -759,18 +825,18 @@ EVT_BEGIN(bikkuri_event)
 EVT_END()
 
 /**
- * Guess: the Atomic Boo's breath attack, used while it has its face covered:
- * it turns around and uncovers its face (SFX_BOSS_ATMTLSA_FACE_HIDE1, pose A_3),
- * blows (SFX_BOSS_ATMTLSA_BLOW2) a wind at the targets one after another,
- * checking the weapon_atmic_teresa_breath damage on each,
- * and then whistles back into its idle pose (SFX_BOSS_ATMTLSA_WHISTLE1, UNION1) in a puff of smoke.
+ * The Atomic Boo's breath, used while its face is covered: it turns its back, backs off and uncovers its face
+ * (unit work 0 = 0, pose A_3), returns home and blows (SFX_BOSS_ATMTLSA_BLOW2) a swarm of 30 small Boos at the
+ * targets (teresa_appear_breath), with breath_event_sub resolving each target.
+ * It then whistles them back (SFX_BOSS_ATMTLSA_WHISTLE1) and they merge into it in puffs of smoke
+ * (SFX_BOSS_ATMTLSA_UNION1), restoring its size.
  */
 static EVT_BEGIN(breath_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_breath))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_atmic_teresa_breath), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -783,14 +849,14 @@ static EVT_BEGIN(breath_event)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_atmic_teresa_breath))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_FACE_HIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 180, 0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
     SUBTRACT(LW(1), 10)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_ATMIC_TERESA_FACE_HIDDEN, 0)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3"))
     CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 1, 0, 0, 0)
@@ -869,7 +935,7 @@ EVT_BEGIN(breath_event_sub)
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
     WAIT_FRAMES(30)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_atmic_teresa_breath))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(99)
     RETURN
 EVT_END()
@@ -880,20 +946,31 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/** Unit id of the Atomic Boo, stored when it starts an attack so that the small Boos' code can find it. */
 s32 atmic_teresa_id[] = {
     -1,
 };
 
+/** Unit id of the target of the Atomic Boo's current attack, which the small Boos fly around. */
 s32 target_unit_id[] = {
     -1,
 };
 
+/** Part id of the target of the Atomic Boo's current attack, which the small Boos fly around. */
 s32 target_parts_id[] = {
     -1,
 };
 
+/**
+ * Body scale the Atomic Boo is meant to have; teresa_ext_main eases it back toward this value as small
+ * Boos split off and return.
+ */
 f32 atmic_teresa_scale = 1.0f;
 
+/**
+ * Models and starting poses of the 30 small Atomic Boos (model c_teresa): idle (S_1) or attack (A_1, A_2)
+ * animations, each at a different time offset so they move out of step.
+ */
 ExtTexInfo teresa_ext_entry_data[] = {
     {"c_teresa", "S_1", 0.0f},
     {"c_teresa", "S_1", 2.0f},
@@ -953,10 +1030,14 @@ void teresa_ext_init(void) {
 }
 
 /**
- * Guess: per-frame update of the 30 small Atomic Boos:
- * a state machine per Boo (states 1-31 for the Startle gather,
- * 51-71 for the breath swarm) that flies them in around the Atomic Boo and target unit,
- * then queues teresa_ext_disp.
+ * Per-frame update of the 30 small Atomic Boos (extdrv poses), one state machine each.
+ * Split-up attack, bikkuri (states 1 to 31, first eight Boos):
+ * they split off the Atomic Boo (shrinking it by 0.05 each), circle
+ * at radius 90 around x -100, play an animation together for 180 frames, fly back to random spots
+ * around the Atomic Boo and shrink away.
+ * Breath (51 to 71): they burst out of the Atomic Boo (shrinking it by 0.015 each) along random easing curves
+ * to points around 200 units past the target's hit position, then fly back around it and shrink away.
+ * It then queues teresa_ext_disp.
  */
 void teresa_ext_main(void) {
     s32 i;
@@ -1339,7 +1420,7 @@ USER_FUNC(target_id_set) {
     return EVT_RETURN_DONE;
 }
 
-/** Script helper: starts the first eight small Boos on their appearance (state 1) for the Startle attack. */
+/** Script helper: starts the first eight small Boos on their appearance (state 1) for the split-up attack. */
 USER_FUNC(teresa_appear_bikkuri) {
     s32 i;
 
@@ -1349,7 +1430,7 @@ USER_FUNC(teresa_appear_bikkuri) {
     return EVT_RETURN_DONE;
 }
 
-/** Script helper: blocks until all eight Startle Boos have reached state 15 (in position). */
+/** Script helper: blocks until all eight split-up Boos have reached state 15 (in position). */
 USER_FUNC(teresa_wait_bikkuri) {
     s32 i;
 
@@ -1362,7 +1443,7 @@ USER_FUNC(teresa_wait_bikkuri) {
 }
 
 /**
- * Script helper: blocks until all eight Startle Boos have reached state 30,
+ * Script helper: blocks until all eight split-up Boos have reached state 30,
  * then sends them back toward the big Boo (state 31) and resets ATMIC_TERESA_SCALE to 1.0.
  */
 USER_FUNC(teresa_wait_bikkuri2) {

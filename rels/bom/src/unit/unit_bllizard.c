@@ -19,6 +19,12 @@
 #include "evt/evt_sub.h"
 #include "version.h"
 
+// Unit work slots of the Ice Puff (btlevtcmd_SetUnitWork / GetUnitWork, unit->work)
+enum {
+    UW_BLLIZARD_DRIFT_TOGGLE = 0, // flips on each random drift: 1 drifts and turns hammer/shell-toss proof, 0 drifts back and drops it
+    UW_BLLIZARD_CLOUD_EFFECT = 1, // icy cloud effect (EffectEntry*) around the unit, 0 when none
+};
+
 static USER_FUNC(eff_ice_barrier);
 
 BattleUnitKind unit_bllizard;
@@ -42,20 +48,21 @@ static EvtWord charge_event[58];
 static EvtWord wait_event[12];
 
 /**
- * Script helper: args[0] is a battle unit; deletes the ice-barrier cloud effect stored in unit->work[1] (if any)
+ * Script helper: args[0] is a battle unit; deletes the ice-barrier cloud effect stored in unit->work[UW_BLLIZARD_CLOUD_EFFECT] (if any)
  * and clears the slot.
  */
 static USER_FUNC(eff_ice_barrier_end) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
 
-    if (unit->work[1] != 0) {
-        effDelete((EffectEntry*)unit->work[1]);
-        unit->work[1] = 0;
+    if (unit->work[UW_BLLIZARD_CLOUD_EFFECT] != 0) {
+        effDelete((EffectEntry*)unit->work[UW_BLLIZARD_CLOUD_EFFECT]);
+        unit->work[UW_BLLIZARD_CLOUD_EFFECT] = 0;
     }
     return EVT_RETURN_DONE;
 }
 
+/** Unit data of the Ice Puff: 9 HP, level 25; the battle starts it from init_event. */
 BattleUnitKind unit_bllizard = {
     112,
     "btl_un_bllizard",
@@ -114,7 +121,7 @@ BattleUnitKind unit_bllizard = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     1,
     parts,
@@ -122,20 +129,32 @@ BattleUnitKind unit_bllizard = {
     data_table,
 };
 
+/** Defence of the Ice Puff: none against any element. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Elemental reactions of the Ice Puff: takes 1 extra damage from fire attacks; is healed by ice attacks. */
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Ice Puff (percent, 100 is normal) in the demo builds: immune to electric and
+ * freeze; resists most statuses (60-95%).
+ */
 static StatusVulnerability regist = {70, 70, 80, 100, 60, 0, 100, 0, 100, 60, 100, 60, 100, 70, 60, 70, 80, 100, 60, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Ice Puff (percent, 100 is normal) in the retail builds: immune to electric and
+ * freeze; resists most statuses (60-95%).
+ */
 static StatusVulnerability regist = {65, 65, 95, 100, 60, 0, 100, 0, 100, 75, 100, 75, 100, 90, 65, 70, 85, 100, 65, 100, 100, 95};
 #endif
 
+/** Body part of the Ice Puff, model c_kmoon_b: its one target part. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_bllizard", "c_kmoon_b", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
+    {1, "btl_un_bllizard", "c_kmoon_b", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 };
 
+/** Weapon data for the Ice Puff's dive attack: 4 damage, one target. */
 static BattleWeapon weapon_bllizard_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -154,7 +173,7 @@ static BattleWeapon weapon_bllizard_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -172,6 +191,10 @@ static BattleWeapon weapon_bllizard_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon data for the Ice Puff's blizzard blast: 5 damage, ice element, a jump-type hit, every target, may
+ * inflict freeze (60%, differs in the demo).
+ */
 static BattleWeapon weapon_bllizard_bllizard_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -194,7 +217,7 @@ static BattleWeapon weapon_bllizard_bllizard_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    2, // element
+    ELEMENT_ICE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -232,7 +255,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 64, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ICY, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_bllizard_bllizard_attack))
         CALL_CHILD(bllizard_event)
@@ -261,17 +284,20 @@ EVT_END()
  * effect) and checks the damage for each in turn (usually with its freeze effect), then moves back home.
  */
 static EVT_BEGIN(bllizard_event)
+    // Its blast reaches every opposing unit: a target is chosen only to aim the camera.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
+    // No valid target: a confused Ice Puff is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera pulls back and the blast is declared on all targets; the guard window opens.
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -280,7 +306,8 @@ static EVT_BEGIN(bllizard_event)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 64)
+    // It drops its barrier and drifts back from its spot to gather the blast.
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ICY)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE3"), EVT_NULLPTR, 0, LW(15))
@@ -288,9 +315,11 @@ static EVT_BEGIN(bllizard_event)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, -40, 15, LW(2), 30, 0, 4, 0, -1)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Charge-up: it puffs itself up (A_2B) for a second.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BLIZ_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     WAIT_FRAMES(60)
+    // It blasts a cloud of freezing air across the opposing side.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BLIZ_KUMO_CHARGE_ATTACK1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(5))
@@ -304,6 +333,7 @@ static EVT_BEGIN(bllizard_event)
     ELSE
         CALL(evt_eff64, STRING(""), STRING("kumokumo_n64"), 4, LW(0), LW(1), LW(2), 180, 0, LW(5), 140, 0, 0, 0, 0)
     END_IF
+    // The blast poses (A_3A, A_3B) play while the camera returns to normal.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3B"))
@@ -311,7 +341,8 @@ static EVT_BEGIN(bllizard_event)
     WAIT_FRAMES(20)
     SET_VALUE(LW(6), 0)
     LABEL(0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Each target in turn gets the hit check and then the damage; the action-command result is read once.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -340,7 +371,7 @@ static EVT_BEGIN(bllizard_event)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -349,6 +380,7 @@ static EVT_BEGIN(bllizard_event)
     END_IF
     GOTO(0)
     LABEL(98)
+    // Retreat: after a pause it floats back to its home position.
     WAIT_FRAMES(60)
     CALL(evt_snd_sfxoff, LW(15))
     WAIT_FRAMES(60)
@@ -363,6 +395,7 @@ static EVT_BEGIN(bllizard_event)
     RETURN
 EVT_END()
 
+/** Pose table of the Ice Puff: the animation each battle pose (idle, hurt, walk, attack and so on) plays. */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -370,19 +403,23 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "X_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "A_1"},
-    {39, "D_1"},
-    {40, "W_1"},
-    {42, "R_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Event table of the Ice Puff: the attacker being hurt by its barrier (counter_event, tag 41) and the First
+ * Strike reaction (dmg_first_attack_pos, tag 48).
+ */
 static BattleDataEntry data_table[] = {
     {41, counter_event},
     {48, dmg_first_attack_pos},
@@ -399,8 +436,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BLLIZARD_DRIFT_TOGGLE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BLLIZARD_CLOUD_EFFECT, 0)
     SPAWN_EVENT(barrier_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -417,7 +454,7 @@ static EVT_BEGIN(barrier_event)
     IF_INT_EQUAL(LW(0), -1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 64, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ICY, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(eff_ice_barrier, BTL_UNIT_SELF)
     ELSE
@@ -428,7 +465,10 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
-/** Lowers the Ice Puff to y=10 and waits for the attack to end (its position when it is first hit from above). */
+/**
+ * Data-table event 48, run when the battle opens with Mario's or his partner's First Strike on the Ice Puff:
+ * lowers it to y = 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -444,11 +484,11 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_KO, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_LIFE_SHROOM, LW(0))
         IF_INT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 64)
+            CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ICY)
             CALL(eff_ice_barrier_end, BTL_UNIT_SELF)
         END_IF
     END_IF
@@ -476,29 +516,29 @@ static EVT_BEGIN(unison_phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 64, LW(0))
+    CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ICY, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
     CALL(evt_sub_random, 99, LW(0))
     IF_INT_LESS(LW(0), 50)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BLLIZARD_DRIFT_TOGGLE, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE4"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 40)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+            CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BLLIZARD_DRIFT_TOGGLE, 0)
         ELSE
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE5"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 10)
             CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -10, 4, 0, -1)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BLLIZARD_DRIFT_TOGGLE, 1)
         END_IF
     END_IF
     LABEL(99)
@@ -512,7 +552,8 @@ EVT_END()
  * then returns home and restores its scale.
  */
 static EVT_BEGIN(normal_attack_event)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // Choose the target: the First Strike victim, otherwise a sampled opposing unit.
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     ELSE
@@ -520,24 +561,28 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No valid target: a confused unit is flustered, otherwise the turn is skipped.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is declared and the guard window opens.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // It turns to the target while the camera follows.
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
+    // Wind-up: it rattles from side to side while shrinking.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         LOOP(10)
@@ -554,6 +599,7 @@ static EVT_BEGIN(normal_attack_event)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // It springs up and back, swelling to full size again.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -562,11 +608,13 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, 0, 4, 0, -1)
     WAIT_FRAMES(10)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    // It dives at the target in a swooping arc.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE2"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 40, -40, 1, 0, -1)
     CALL(evt_snd_sfxoff, LW(15))
+    // Hit check: a miss or dodge goes on to the fly-by, a hit to the damage.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -593,13 +641,15 @@ static EVT_BEGIN(normal_attack_event)
     LABEL(90)
     GOTO(98)
     LABEL(91)
+    // Hit: the camera shakes and the damage is dealt with the action-command result.
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(98)
     LABEL(98)
+    // It rebounds up off the target and floats back to its home position.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 40)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(10), LW(11), LW(12))
@@ -620,7 +670,7 @@ EVT_END()
 
 /**
  * Script helper, run every frame while the Bllizard's ice barrier is up:
- * creates the cloud/mist effect on the first call (stored in unit->work[1]) and keeps it on the unit,
+ * creates the cloud/mist effect on the first call (stored in unit->work[UW_BLLIZARD_CLOUD_EFFECT]) and keeps it on the unit,
  * 10 units above its position scaled by its size.
  */
 static USER_FUNC(eff_ice_barrier) {
@@ -629,10 +679,10 @@ static USER_FUNC(eff_ice_barrier) {
     EffectEntry* eff;
     f32 x, y, z;
 
-    if (isFirstCall && unit->work[1] == 0) {
-        unit->work[1] = (EvtWord)effKumokumoN64Entry(3, 1000, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    if (isFirstCall && unit->work[UW_BLLIZARD_CLOUD_EFFECT] == 0) {
+        unit->work[UW_BLLIZARD_CLOUD_EFFECT] = (EvtWord)effKumokumoN64Entry(3, 1000, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     }
-    eff = (EffectEntry*)unit->work[1];
+    eff = (EffectEntry*)unit->work[UW_BLLIZARD_CLOUD_EFFECT];
     BtlUnit_GetPos(unit, &x, &y, &z);
     ((EffKumokumoN64Particle*)eff->userdata)->x = x;
     ((EffKumokumoN64Particle*)eff->userdata)->y = 10.0f * unit->sizeMultiplier + y;
@@ -651,7 +701,7 @@ static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 300)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BLIZ_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 64)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_ICY)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2A"))
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))

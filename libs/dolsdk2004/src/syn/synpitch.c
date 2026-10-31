@@ -4,6 +4,7 @@
 
 #include "__syn.h"
 
+/** Pitch ratios for 0 to 99 cents. */
 static f32 __SYNCentsTable[100] = {
     1.000000f,
     1.000578f,
@@ -107,6 +108,7 @@ static f32 __SYNCentsTable[100] = {
     1.058851f,
 };
 
+/** Pitch ratios for 0 to 11 octaves up (powers of two). */
 static f32 __SYNOctavesTableUp[12] = {
     1.000000f,
     2.000000f,
@@ -122,6 +124,7 @@ static f32 __SYNOctavesTableUp[12] = {
     2048.000000f,
 };
 
+/** Pitch ratios for 0 to 11 semitones up. */
 static f32 __SYNSemitonesTableUp[12] = {
     1.000000f,
     1.059463f,
@@ -137,6 +140,7 @@ static f32 __SYNSemitonesTableUp[12] = {
     1.887749f,
 };
 
+/** Pitch ratios for 0 to 127 semitones down. */
 static f32 __SYNSemitonesTableDown[128] = {
     1.000000f,
     0.943874f,

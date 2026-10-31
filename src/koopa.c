@@ -34,10 +34,15 @@ static void kpa3DMain(void);
 static void kpaFireAttack(void);
 static void kpaFireMain(void);
 static void kpaFall(void);
+/** Zero vector: the origin that Bowser's fire-breath collision check moves to each flame's position. */
 const f32 kpaZeroVec[3] = {0.0f, 0.0f, 0.0f};
 
 #define KPW(m) ((m)->kpaWork)
 
+/**
+ * Bowser's size per power-up level (small, normal, big, giant): his width (kpaGetWidth) and model scale
+ * (kpaSetLevel); then the 28 voice clips of which one plays at random when the pause menu opens as Bowser.
+ */
 f32 kpaWidthDat[4] = {20.0f, 60.0f, 84.0f, 186.0f};
 f32 baseScaleTbl[4] = {0.3f, 1.0f, 1.4f, 3.1f};
 s32 kpaPauseSeTable[28] = {0x10C, 0x10D, 0x10E, 0x10F, 0x111, 0x112, 0x113, 0x114, 0x116, 0x117,
@@ -67,7 +72,7 @@ static inline void kpaFireEntry2(Vec pos) {
         dir = (mario->displayDirection >= 90.0f && mario->displayDirection <= 270.0f) ? 1.0f : -1.0f;
         scale = kpaGetBaseScale(kpaGetLevel());
         x = 40.0f * dir * scale + pos.x;
-        t = (marioGetPtr()->stageFlags & 1) ^ 1;
+        t = (marioGetPtr()->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW) ^ 1;
         y = pos.y + (20.0f * scale + (t == 1 ? 6.0f : 0.0f));
         z = pos.z;
         type = 7;
@@ -154,14 +159,14 @@ s32 kpaMutekiCheck(void) {
 void kpaMutekiOn(void) {
     MarioWork* mario = marioGetPtr();
     animPoseSetMaterialFlagOn(mario->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_HIGHLIGHT);
-    KPW(mario)->flags |= 0x10000;
+    KPW(mario)->flags |= KPA_WORK_FLAG_MUTEKI;
 }
 
 /** Ends Bowser's invincibility and his highlight. */
 void kpaMutekiOff(void) {
     MarioWork* mario = marioGetPtr();
     animPoseSetMaterialFlagOff(mario->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_HIGHLIGHT);
-    KPW(mario)->flags &= ~0x10000;
+    KPW(mario)->flags &= ~KPA_WORK_FLAG_MUTEKI;
 }
 
 /**
@@ -176,7 +181,7 @@ void kpaMSetMutekiTimer(void) {
 
 /** Sets Bowser's pose: a in the 3D maps, b in the side-scrolling stages (the KPA2_ poses). */
 void kpaChgPose(const char* a, const char* b) {
-    s32 v = (marioGetPtr()->stageFlags & 1) ^ 1;
+    s32 v = (marioGetPtr()->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW) ^ 1;
     marioChgPose(v == 1 ? a : b);
 }
 
@@ -251,7 +256,7 @@ s32 kpaGetStageType(void) {
 
 /** 1 in the 3D maps, 0 in the side-scrolling stages kpa_02 to kpa_06 (stageFlags bit 1). */
 s32 kpaGetStageViewType(void) {
-    return !(marioGetPtr()->stageFlags & 1);
+    return !(marioGetPtr()->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW);
 }
 
 /**
@@ -261,7 +266,7 @@ s32 kpaGetStageViewType(void) {
 s32 kpaCamFollow(void) {
     MarioWork* mario = marioGetPtr();
     s32 v;
-    if (marioBgmodeChk() == 1 || (v = (marioGetPtr()->stageFlags & 1) ^ 1, (s32)v == 1)) {
+    if (marioBgmodeChk() == 1 || (v = (marioGetPtr()->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW) ^ 1, (s32)v == 1)) {
         return 0;
     }
     if (mario->position.y > 76.0f) {
@@ -290,24 +295,22 @@ void kpaPreInit(void) {
     if (strcmp(gp->currentMapName, "kpa_02") == 0 || strcmp(gp->currentMapName, "kpa_03") == 0 ||
         strcmp(gp->currentMapName, "kpa_04") == 0 || strcmp(gp->currentMapName, "kpa_05") == 0 ||
         strcmp(gp->currentMapName, "kpa_06") == 0) {
-        mario->stageFlags |= 1;
+        mario->stageFlags |= MARIO_STAGE_FLAG_SIDE_VIEW;
     } else {
-        mario->stageFlags &= ~1;
+        mario->stageFlags &= ~MARIO_STAGE_FLAG_SIDE_VIEW;
     }
     mario = marioGetPtr();
     if (strcmp(gp->currentMapName, "kpa_03") == 0) {
-        mario->stageFlags |= 2;
+        mario->stageFlags |= MARIO_STAGE_FLAG_WATER;
     } else {
-        mario->stageFlags &= ~2;
+        mario->stageFlags &= ~MARIO_STAGE_FLAG_WATER;
     }
     fireefp = 0;
 }
 
-f32 __fabsf(f32);
-
 /** Per-frame player update while playing as Bowser: the side-scrolling or the 3D version. */
 void kpaMain(void) {
-    if (marioGetPtr()->stageFlags & 1) {
+    if (marioGetPtr()->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW) {
         kpa2DMain();
     } else {
         kpa3DMain();
@@ -668,7 +671,7 @@ static void kpaFall(void) {
             } else {
                 mario->hitobjStandOn = h;
                 mario->hitobjJumpFrom = NULL;
-                if (hitGetAttr(h) & 0x200) {
+                if (hitGetAttr(h) & HIT_ATTR_DEEP_WATER) {
                     mario->position.y += fs;
                 } else {
                     mario->position.y = ly;
@@ -682,10 +685,10 @@ static void kpaFall(void) {
 }
 
 /**
- * Nothing calls it.
- * Guess: stands in for a stripped function so the fall constants (the two kpaSetFallPara sets) keep their place
- * in the literal pool.
+ * Stand-in for a stripped function (in no version's symbols, never called):
+ * it only keeps the fall constants (the two kpaSetFallPara sets) in their place in the literal pool.
  */
+// FAKE: uncalled stand-in for a stripped function; puts the fall constants ahead of -20.0f in .sdata2
 void kpaStrippedFallPool(f32* f) {
     f[0] = -0.05f;
     f[1] = -0.08f;
@@ -904,9 +907,10 @@ void kpaFireDelete(void) {
 }
 
 /**
- * Nothing calls it.
- * Guess: stands in for a stripped function so its int-to-float conversion constant keeps its place in the pool.
+ * Stand-in for a stripped function (in no version's symbols, never called):
+ * it only keeps the int-to-float conversion constant in its place in the pool.
  */
+// FAKE: uncalled stand-in for a stripped function; creates the int-to-float double in .rodata
 void kpaStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }
@@ -945,7 +949,7 @@ static void kpaFireMain(void) {
         dir = (mario->displayDirection >= 90.0f && mario->displayDirection <= 270.0f) ? 1.0f : -1.0f;
         scale = kpaGetBaseScale(kpaGetLevel());
         f30 = 40.0f * dir * scale + mario->position.x;
-        t = (marioGetPtr()->stageFlags & 1) ^ 1;
+        t = (marioGetPtr()->stageFlags & MARIO_STAGE_FLAG_SIDE_VIEW) ^ 1;
         y = mario->position.y + (20.0f * scale + (t == 1 ? 6.0f : 0.0f));
         z = mario->position.z;
         ((EffGonbabaBreathWork*)fireefp->userdata)->position.x = f30;

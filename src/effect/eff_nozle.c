@@ -131,6 +131,7 @@ static u32 nozle_1_dl_0_7[] __attribute__((aligned(32))) = {0x9800040E, 0x000111
 static u32 nozle_1_dl_0_8[] __attribute__((aligned(32))) = {0x9800030C, 0x00040C0C, 0x1B00040D, 0x0D0A0002, 0x0A0A0000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_1_dl_0_9[] __attribute__((aligned(32))) = {0x98000316, 0x00000101, 0x15000102, 0x02000001, 0x03030000, 0x00000000, 0x00000000, 0x00000000};
 static void* nozle_1_dl_0_tbl[] __attribute__((aligned(32))) = {nozle_1_dl_0_0, nozle_1_dl_0_1, nozle_1_dl_0_2, nozle_1_dl_0_3, nozle_1_dl_0_4, nozle_1_dl_0_5, nozle_1_dl_0_6, nozle_1_dl_0_7, nozle_1_dl_0_8, nozle_1_dl_0_9};
+/** Display-list sizes (32-byte units) for the first layer of nozzle model 1 (type 0). */
 static u8 nozle_1_dl_0_size_tbl[] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x01, 0x01};
 static u32 nozle_1_dl_1_0[] __attribute__((aligned(32))) = {0x98000A30, 0x00043131, 0x2E000230, 0x30450004, 0x2D2D4400, 0x032B2B37, 0x00042E2E, 0x3600052C, 0x2C3E0004, 0x28283D00, 0x0326262D, 0x00022525, 0x2B000023, 0x23000000, 0x00000000, 0x00000000};
 static u32 nozle_1_dl_1_1[] __attribute__((aligned(32))) = {0x98000A2E, 0x00023030, 0x2C00002F, 0x2F440003, 0x2B2B4300, 0x00292936, 0x00052C2C, 0x3500002A, 0x2A3D0003, 0x26263C00, 0x0024242B, 0x00002323, 0x2900000C, 0x0C000000, 0x00000000, 0x00000000};
@@ -143,6 +144,7 @@ static u32 nozle_1_dl_1_7[] __attribute__((aligned(32))) = {0x98000431, 0x000115
 static u32 nozle_1_dl_1_8[] __attribute__((aligned(32))) = {0x9800032F, 0x00042727, 0x3E000428, 0x282D0002, 0x25250000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_1_dl_1_9[] __attribute__((aligned(32))) = {0x98000339, 0x00000909, 0x38000107, 0x07230001, 0x06060000, 0x00000000, 0x00000000, 0x00000000};
 static void* nozle_1_dl_1_tbl[] __attribute__((aligned(32))) = {nozle_1_dl_1_0, nozle_1_dl_1_1, nozle_1_dl_1_2, nozle_1_dl_1_3, nozle_1_dl_1_4, nozle_1_dl_1_5, nozle_1_dl_1_6, nozle_1_dl_1_7, nozle_1_dl_1_8, nozle_1_dl_1_9};
+/** Display-list sizes for the second layer of nozzle model 1 (type 0), drawn over the first. */
 static u8 nozle_1_dl_1_size_tbl[] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x01, 0x01};
 static s8 nozle_3_normal_tbl[] __attribute__((aligned(32))) = {
     0, 0, 64, 0,
@@ -283,6 +285,7 @@ static u32 nozle_3_dl_0_14[] __attribute__((aligned(32))) = {0x98000400, 0x22000
 static u32 nozle_3_dl_0_15[] __attribute__((aligned(32))) = {0x98000400, 0x20000000, 0x06002200, 0x22003400, 0x00000700, 0x35003500, 0x2A000000, 0x06003600, 0x36003300, 0x00000900, 0x33003300, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_3_dl_0_16[] __attribute__((aligned(32))) = {0x98000300, 0x06000000, 0x00000100, 0x01000100, 0x00000100, 0x02000200, 0x00000000, 0x01000300, 0x03000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static void* nozle_3_dl_0_tbl[] __attribute__((aligned(32))) = {nozle_3_dl_0_0, nozle_3_dl_0_1, nozle_3_dl_0_2, nozle_3_dl_0_3, nozle_3_dl_0_4, nozle_3_dl_0_5, nozle_3_dl_0_6, nozle_3_dl_0_7, nozle_3_dl_0_8, nozle_3_dl_0_9, nozle_3_dl_0_10, nozle_3_dl_0_11, nozle_3_dl_0_12, nozle_3_dl_0_13, nozle_3_dl_0_14, nozle_3_dl_0_15, nozle_3_dl_0_16};
+/** Display-list sizes for list set 0 of nozzle model 3 (type 2), drawn after set 1. */
 static u8 nozle_3_dl_0_size_tbl[] = {0x06, 0x06, 0x05, 0x03, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
 static u32 nozle_3_dl_1_0[] __attribute__((aligned(32))) = {0x98001100, 0x39000000, 0x12001300, 0x13003800, 0x00001200, 0x12001200, 0x3E000000, 0x11001800, 0x18003D00, 0x00001100, 0x17001700, 0x43000000, 0x13001D00, 0x1D004200, 0x00001300, 0x1C001C00, 0x48000000, 0x14002200, 0x22004700, 0x00001400, 0x21002100, 0x4D000000, 0x15003B00, 0x3B004C00, 0x00001500, 0x3A003A00, 0x52000000, 0x16004000, 0x40005100, 0x00001600, 0x3F003F00, 0x55000000, 0x17004500, 0x45005400, 0x00001700, 0x44004400, 0x69000000, 0x17005800, 0x58005300, 0x00001700, 0x43004300, 0x68000000, 0x18005600, 0x56000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_3_dl_1_1[] __attribute__((aligned(32))) = {0x98001100, 0x37000000, 0x12001100, 0x11003600, 0x00001200, 0x10001000, 0x3C000000, 0x11001600, 0x16003B00, 0x00001100, 0x15001500, 0x41000000, 0x13001B00, 0x1B004000, 0x00001300, 0x1A001A00, 0x46000000, 0x14002000, 0x20004500, 0x00001400, 0x1F001F00, 0x4B000000, 0x15003900, 0x39004A00, 0x00001500, 0x38003800, 0x50000000, 0x16003E00, 0x3E004F00, 0x00001600, 0x3D003D00, 0x53000000, 0x17004300, 0x43006000, 0x00001700, 0x42004200, 0x61000000, 0x17004600, 0x46005700, 0x00001700, 0x47004700, 0x58000000, 0x18004900, 0x49000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
@@ -302,6 +305,7 @@ static u32 nozle_3_dl_1_14[] __attribute__((aligned(32))) = {0x98000400, 0x57000
 static u32 nozle_3_dl_1_15[] __attribute__((aligned(32))) = {0x98000400, 0x55000000, 0x17004500, 0x45006900, 0x00001700, 0x58005800, 0x5F000000, 0x17005900, 0x59006800, 0x00001800, 0x56005600, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_3_dl_1_16[] __attribute__((aligned(32))) = {0x98000300, 0x3B000000, 0x11001500, 0x15003600, 0x00001200, 0x10001000, 0x35000000, 0x12000F00, 0x0F000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static void* nozle_3_dl_1_tbl[] __attribute__((aligned(32))) = {nozle_3_dl_1_0, nozle_3_dl_1_1, nozle_3_dl_1_2, nozle_3_dl_1_3, nozle_3_dl_1_4, nozle_3_dl_1_5, nozle_3_dl_1_6, nozle_3_dl_1_7, nozle_3_dl_1_8, nozle_3_dl_1_9, nozle_3_dl_1_10, nozle_3_dl_1_11, nozle_3_dl_1_12, nozle_3_dl_1_13, nozle_3_dl_1_14, nozle_3_dl_1_15, nozle_3_dl_1_16};
+/** Display-list sizes for list set 1 of nozzle model 3 (type 2), drawn first. */
 static u8 nozle_3_dl_1_size_tbl[] = {0x06, 0x06, 0x05, 0x03, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
 static s16 nozle_4_vertex_tbl[] __attribute__((aligned(32))) = {
     -23040, 0, 0, -17280, 0, 0,
@@ -362,7 +366,12 @@ static u32 nozle_4_dl_0_5[] __attribute__((aligned(32))) = {0x98000617, 0x000017
 static u32 nozle_4_dl_0_6[] __attribute__((aligned(32))) = {0x98000618, 0x00001818, 0x19000119, 0x190F0000, 0x0C0C1000, 0x010E0E06, 0x00000D0D, 0x0700010F, 0x0F000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_4_dl_0_7[] __attribute__((aligned(32))) = {0x98000619, 0x00011919, 0x1A00021A, 0x1A100001, 0x0E0E1100, 0x02101007, 0x00010F0F, 0x08000211, 0x11000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static void* nozle_4_dl_0_tbl[] = {nozle_4_dl_0_0, nozle_4_dl_0_1, nozle_4_dl_0_2, nozle_4_dl_0_3, nozle_4_dl_0_4, nozle_4_dl_0_5, nozle_4_dl_0_6, nozle_4_dl_0_7};
+/** Display-list sizes for nozzle model 4, drawn once for each spray piece of type 3. */
 static u8 nozle_4_dl_0_size_tbl[] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
+/**
+ * Width and height percentages per frame as a type 0 or 2 nozzle grows in; read backwards from its
+ * remaining life as it shrinks away at the end.
+ */
 static u8 scale_dt[][2] = {{0, 0}, {11, 13}, {22, 27}, {34, 41}, {46, 55}, {57, 69}, {68, 82}, {79, 94}, {87, 105}, {94, 113}, {100, 120}, {102, 123}, {103, 124}, {101, 123}, {98, 120}, {95, 116}, {90, 111}, {86, 107}, {83, 103}, {81, 101}, {80, 100}, {0, 0}
 #if VERSION <= VERSION_DEMO_US
     // the demo keeps a fade-out half after the grow-in half

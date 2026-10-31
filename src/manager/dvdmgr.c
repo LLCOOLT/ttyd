@@ -187,7 +187,7 @@ DVDEntry* DVDMgrOpen(const char* path, u8 priority, u16 unknown) {
     entry->status |= DVDMGR_INUSE;
     if (!DVDOpen(entry->name, &entry->info)) {
 #if VERSION <= VERSION_DEMO_US
-        entry->status |= 0x10;
+        entry->status |= DVDMGR_OPEN_FAILED;
         entry->status |= DVDMGR_UNK_ERROR2;
         entry->status &= ~DVDMGR_INUSE;
 #endif

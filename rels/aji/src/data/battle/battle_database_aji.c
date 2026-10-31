@@ -81,6 +81,10 @@ NpcSetupBattleInfo btlsetup_aji_tbl[24];
 NpcTerritoryInfo btl_aji_setup_no_tbl[24];
 extern EvtWord bgset_aji_space_event[];
 
+/**
+ * Scenery objects of the fortress battle arenas (electric pylons, backdrops and floor pieces), shared by the
+ * stages below.
+ */
 BattleStageObjectData aji_btlobject_data[] = {
     {"dentou_01", 2, 0, {144.0f, 0.0f, -54.0f}, 0, 60, {0}},
     {"dentou_02", 2, 0, {64.0f, 0.0f, -47.0f}, 10, 50, {0}},
@@ -111,6 +115,7 @@ BattleStageObjectData aji_btlobject_data[] = {
     {"star_03", 2, 3, {0.0f, 0.0f, 31.0f}, 0, 60, {0}},
 };
 
+/** The seven battle arenas of the X-Naut Fortress, each with its model folders and the objects it uses. */
 BattleStageData aji_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -185,6 +190,7 @@ BattleStageData aji_btlstage_data[] = {
     },
 };
 
+/** Enemy of the boss fight in the boss room: Magnus von Grapple 2.0. */
 BattleUnitSetup btlparty_aji_aji_mbmkII[] = {
     {
         &unit_boss_magnum_battender_mkII, // unitKindParams
@@ -198,6 +204,7 @@ BattleUnitSetup btlparty_aji_aji_mbmkII[] = {
     },
 };
 
+/** Fight group for the Magnus von Grapple 2.0 boss fight, with its drop weights. */
 BattleGroupSetup btlgrp_aji_aji_mbmkII = {
     1, // numEnemies
     btlparty_aji_aji_mbmkII, // enemyData
@@ -208,6 +215,7 @@ BattleGroupSetup btlgrp_aji_aji_mbmkII = {
     5, // reserved_1C
 };
 
+/** Enemies of the generic fortress group, used by the debug battle entries: 2 Elite X-Naut. */
 BattleUnitSetup btlparty_aji_aji_zako[] = {
     {
         &unit_gundan_zako_elite, // unitKindParams
@@ -231,6 +239,9 @@ BattleUnitSetup btlparty_aji_aji_zako[] = {
     },
 };
 
+/**
+ * Fight group for the generic fortress group: its enemy party with the item, heart and flower drop weights.
+ */
 BattleGroupSetup btlgrp_aji_aji_zako = {
     2, // numEnemies
     btlparty_aji_aji_zako, // enemyData
@@ -241,6 +252,7 @@ BattleGroupSetup btlgrp_aji_aji_zako = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_01_off_1: 2 Elite X-Naut. */
 BattleUnitSetup btlparty_aji_aji_01_01_off_1[] = {
     {
         &unit_gundan_zako_elite, // unitKindParams
@@ -264,6 +276,7 @@ BattleUnitSetup btlparty_aji_aji_01_01_off_1[] = {
     },
 };
 
+/** Fight group for 01_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_01_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_01_01_off_1, // enemyData
@@ -275,6 +288,7 @@ BattleGroupSetup btlgrp_aji_aji_01_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_02_off_1: 2 X-Naut and Elite X-Naut. */
 BattleUnitSetup btlparty_aji_aji_01_02_off_1[] = {
     {
         &unit_gundan_zako, // unitKindParams
@@ -308,6 +322,7 @@ BattleUnitSetup btlparty_aji_aji_01_02_off_1[] = {
     },
 };
 
+/** Fight group for 01_02_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_02_off_1 = {
     3, // numEnemies
     btlparty_aji_aji_01_02_off_1, // enemyData
@@ -319,6 +334,7 @@ BattleGroupSetup btlgrp_aji_aji_01_02_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_03_off_1: Elite X-Naut and 3 X-Naut. */
 BattleUnitSetup btlparty_aji_aji_01_03_off_1[] = {
     {
         &unit_gundan_zako_elite, // unitKindParams
@@ -362,6 +378,7 @@ BattleUnitSetup btlparty_aji_aji_01_03_off_1[] = {
     },
 };
 
+/** Fight group for 01_03_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_03_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_01_03_off_1, // enemyData
@@ -373,6 +390,7 @@ BattleGroupSetup btlgrp_aji_aji_01_03_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_04_off_1: X-Naut PhD and Elite X-Naut. */
 BattleUnitSetup btlparty_aji_aji_01_04_off_1[] = {
     {
         &unit_gundan_zako_magician, // unitKindParams
@@ -396,6 +414,7 @@ BattleUnitSetup btlparty_aji_aji_01_04_off_1[] = {
     },
 };
 
+/** Fight group for 01_04_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_04_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_01_04_off_1, // enemyData
@@ -407,6 +426,7 @@ BattleGroupSetup btlgrp_aji_aji_01_04_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_05_off_1: Z-Yux and X-Naut PhD. */
 BattleUnitSetup btlparty_aji_aji_01_05_off_1[] = {
     {
         &unit_barriern_z, // unitKindParams
@@ -430,6 +450,7 @@ BattleUnitSetup btlparty_aji_aji_01_05_off_1[] = {
     },
 };
 
+/** Fight group for 01_05_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_05_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_01_05_off_1, // enemyData
@@ -441,6 +462,7 @@ BattleGroupSetup btlgrp_aji_aji_01_05_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_06_off_1: 4 Elite X-Naut. */
 BattleUnitSetup btlparty_aji_aji_01_06_off_1[] = {
     {
         &unit_gundan_zako_elite, // unitKindParams
@@ -484,6 +506,7 @@ BattleUnitSetup btlparty_aji_aji_01_06_off_1[] = {
     },
 };
 
+/** Fight group for 01_06_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_06_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_01_06_off_1, // enemyData
@@ -495,6 +518,7 @@ BattleGroupSetup btlgrp_aji_aji_01_06_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_07_off_1: X-Naut and 2 Z-Yux. */
 BattleUnitSetup btlparty_aji_aji_01_07_off_1[] = {
     {
         &unit_gundan_zako, // unitKindParams
@@ -540,6 +564,7 @@ BattleUnitSetup btlparty_aji_aji_01_07_off_1[] = {
     },
 };
 
+/** Fight group for 01_07_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_07_off_1 = {
     3, // numEnemies
     btlparty_aji_aji_01_07_off_1, // enemyData
@@ -551,6 +576,7 @@ BattleGroupSetup btlgrp_aji_aji_01_07_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 01_08_off_1: 2 X-Naut, X-Naut PhD and Elite X-Naut. */
 BattleUnitSetup btlparty_aji_aji_01_08_off_1[] = {
     {
         &unit_gundan_zako, // unitKindParams
@@ -594,6 +620,7 @@ BattleUnitSetup btlparty_aji_aji_01_08_off_1[] = {
     },
 };
 
+/** Fight group for 01_08_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_01_08_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_01_08_off_1, // enemyData
@@ -605,6 +632,7 @@ BattleGroupSetup btlgrp_aji_aji_01_08_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 04_01_off_1: 2 X-Yux. */
 BattleUnitSetup btlparty_aji_aji_04_01_off_1[] = {
     {
         &unit_barriern_custom, // unitKindParams
@@ -636,6 +664,7 @@ BattleUnitSetup btlparty_aji_aji_04_01_off_1[] = {
     },
 };
 
+/** Fight group for 04_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_04_01_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_04_01_off_1, // enemyData
@@ -646,6 +675,7 @@ BattleGroupSetup btlgrp_aji_aji_04_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 06_01_off_1: 2 X-Naut PhD. */
 BattleUnitSetup btlparty_aji_aji_06_01_off_1[] = {
     {
         &unit_gundan_zako_magician, // unitKindParams
@@ -669,6 +699,7 @@ BattleUnitSetup btlparty_aji_aji_06_01_off_1[] = {
     },
 };
 
+/** Fight group for 06_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_06_01_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_06_01_off_1, // enemyData
@@ -680,6 +711,7 @@ BattleGroupSetup btlgrp_aji_aji_06_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 08_01_off_1: X-Naut PhD, Yux and Z-Yux. */
 BattleUnitSetup btlparty_aji_aji_08_01_off_1[] = {
     {
         &unit_gundan_zako_magician, // unitKindParams
@@ -725,6 +757,7 @@ BattleUnitSetup btlparty_aji_aji_08_01_off_1[] = {
     },
 };
 
+/** Fight group for 08_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_08_01_off_1 = {
     3, // numEnemies
     btlparty_aji_aji_08_01_off_1, // enemyData
@@ -736,6 +769,7 @@ BattleGroupSetup btlgrp_aji_aji_08_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 09_01_off_1: 4 X-Naut and X-Naut PhD. */
 BattleUnitSetup btlparty_aji_aji_09_01_off_1[] = {
     {
         &unit_gundan_zako, // unitKindParams
@@ -789,6 +823,7 @@ BattleUnitSetup btlparty_aji_aji_09_01_off_1[] = {
     },
 };
 
+/** Fight group for 09_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_09_01_off_1 = {
     5, // numEnemies
     btlparty_aji_aji_09_01_off_1, // enemyData
@@ -800,6 +835,7 @@ BattleGroupSetup btlgrp_aji_aji_09_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 10_01_off_1: X-Yux. */
 BattleUnitSetup btlparty_aji_aji_10_01_off_1[] = {
     {
         &unit_barriern_custom, // unitKindParams
@@ -813,6 +849,7 @@ BattleUnitSetup btlparty_aji_aji_10_01_off_1[] = {
     },
 };
 
+/** Fight group for 10_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_10_01_off_1 = {
     1, // numEnemies
     btlparty_aji_aji_10_01_off_1, // enemyData
@@ -823,6 +860,7 @@ BattleGroupSetup btlgrp_aji_aji_10_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 13_01_off_1: 4 X-Naut PhD. */
 BattleUnitSetup btlparty_aji_aji_13_01_off_1[] = {
     {
         &unit_gundan_zako_magician, // unitKindParams
@@ -866,6 +904,7 @@ BattleUnitSetup btlparty_aji_aji_13_01_off_1[] = {
     },
 };
 
+/** Fight group for 13_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_13_01_off_1 = {
     4, // numEnemies
     btlparty_aji_aji_13_01_off_1, // enemyData
@@ -877,6 +916,7 @@ BattleGroupSetup btlgrp_aji_aji_13_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 13_02_off_1: 2 Z-Yux. */
 BattleUnitSetup btlparty_aji_aji_13_02_off_1[] = {
     {
         &unit_barriern_z, // unitKindParams
@@ -908,6 +948,7 @@ BattleUnitSetup btlparty_aji_aji_13_02_off_1[] = {
     },
 };
 
+/** Fight group for 13_02_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_13_02_off_1 = {
     2, // numEnemies
     btlparty_aji_aji_13_02_off_1, // enemyData
@@ -919,6 +960,7 @@ BattleGroupSetup btlgrp_aji_aji_13_02_off_1 = {
     5, // reserved_1C
 };
 
+/** Enemies of 15_01_off_1: Elite X-Naut. */
 BattleUnitSetup btlparty_aji_aji_15_01_off_1[] = {
     {
         &unit_gundan_zako_elite, // unitKindParams
@@ -932,6 +974,7 @@ BattleUnitSetup btlparty_aji_aji_15_01_off_1[] = {
     },
 };
 
+/** Fight group for 15_01_off_1: its enemy party with the item, heart and flower drop weights. */
 BattleGroupSetup btlgrp_aji_aji_15_01_off_1 = {
     1, // numEnemies
     btlparty_aji_aji_15_01_off_1, // enemyData
@@ -943,121 +986,145 @@ BattleGroupSetup btlgrp_aji_aji_15_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Debug battle entry 1: fights the generic fortress group. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_test1_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[1]},
     {0},
 };
 
+/** Debug battle entry 2: fights the generic fortress group. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_test2_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[4]},
     {0},
 };
 
+/** Debug battle entry 3: fights the generic fortress group. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_test3_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[5]},
     {0},
 };
 
+/** Debug battle entry 4: fights the generic fortress group. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_test4_off[] = {
     {50, &btlgrp_aji_aji_zako, aji_btlstage_data},
     {0},
 };
 
+/** Debug battle entry 5: fights the generic fortress group. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_test5_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[6]},
     {0},
 };
 
+/** Selects the boss fight against Magnus von Grapple 2.0 and its arena. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_mbmkii_off[] = {
     {50, &btlgrp_aji_aji_mbmkII, &aji_btlstage_data[5]},
     {0},
 };
 
+/** Selects the generic fortress group for the elite X-Naut encounters. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_00_00_off[] = {
     {50, &btlgrp_aji_aji_zako, &aji_btlstage_data[6]},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_01_off[] = {
     {20, &btlgrp_aji_aji_01_01_off_1, &aji_btlstage_data[6]},
     {0},
 };
 
+/** Selects the group and arena for fight 2 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_02_off[] = {
     {20, &btlgrp_aji_aji_01_02_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
+/** Selects the group and arena for fight 3 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_03_off[] = {
     {20, &btlgrp_aji_aji_01_03_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
+/** Selects the group and arena for fight 4 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_04_off[] = {
     {20, &btlgrp_aji_aji_01_04_off_1, &aji_btlstage_data[2]},
     {0},
 };
 
+/** Selects the group and arena for fight 5 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_05_off[] = {
     {20, &btlgrp_aji_aji_01_05_off_1, &aji_btlstage_data[2]},
     {0},
 };
 
+/** Selects the group and arena for fight 6 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_06_off[] = {
     {20, &btlgrp_aji_aji_01_06_off_1, &aji_btlstage_data[2]},
     {0},
 };
 
+/** Selects the group and arena for fight 7 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_07_off[] = {
     {20, &btlgrp_aji_aji_01_07_off_1, &aji_btlstage_data[3]},
     {0},
 };
 
+/** Selects the group and arena for fight 8 in aji_01. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_01_08_off[] = {
     {20, &btlgrp_aji_aji_01_08_off_1, &aji_btlstage_data[3]},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_04. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_04_01_off[] = {
     {20, &btlgrp_aji_aji_04_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_06. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_06_01_off[] = {
     {20, &btlgrp_aji_aji_06_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_08. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_08_01_off[] = {
     {20, &btlgrp_aji_aji_08_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_09. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_09_01_off[] = {
     {20, &btlgrp_aji_aji_09_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_10. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_10_01_off[] = {
     {20, &btlgrp_aji_aji_10_01_off_1, aji_btlstage_data},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_13. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_13_01_off[] = {
     {20, &btlgrp_aji_aji_13_01_off_1, &aji_btlstage_data[4]},
     {0},
 };
 
+/** Selects the group and arena for fight 2 in aji_13. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_13_02_off[] = {
     {20, &btlgrp_aji_aji_13_02_off_1, &aji_btlstage_data[4]},
     {0},
 };
 
+/** Selects the group and arena for fight 1 in aji_15. */
 NpcBattleSelect btlgrpsel_aji_btlno_aji_15_01_off[] = {
     {20, &btlgrp_aji_aji_15_01_off_1, &aji_btlstage_data[1]},
     {0},
 };
 
+/** The battle setups of the fortress: one entry per fight with its name, group selector and battle music. */
 NpcSetupBattleInfo btlsetup_aji_tbl[] = {
     {
         "マップstg_07_1", // name
@@ -1296,6 +1363,7 @@ NpcSetupBattleInfo btlsetup_aji_tbl[] = {
     {0},
 };
 
+/** Maps each fortress battle id (BTLNO_AJI_*) to its entry in btlsetup_aji_tbl. */
 NpcTerritoryInfo btl_aji_setup_no_tbl[] = {
     {"BTLNO_AJI_TEST1", 0},
     {"BTLNO_AJI_TEST2", 1},

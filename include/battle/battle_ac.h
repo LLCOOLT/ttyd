@@ -25,9 +25,18 @@ typedef struct BattleACDispParams {
     f32 gaugeRatio;            // 0x28, power gauge fill, 0..1
 } BattleACDispParams;
 
+// BattleActions.setupFlags (BattleActionCommandSetup)
+enum BattleAcSetupFlags {
+    AC_SETUP_FLAG_CONFUSED_AUTO = 0x1, // a confused unit's command plays itself (TOKEN_FLAG_CONFUSED_ACTION)
+    AC_SETUP_FLAG_RETRIES = 0x2,       // a failed input may be retried: setupParam counts the tries left
+};
+
+// BattleActions.doneFlags
+#define AC_DONE_FLAG_FINISHED 0x1 // the command reached its end state (the delete handler forces it otherwise)
+
 typedef struct BattleActions {
     struct BattleUnit* acUnit;       // 0x0
-    s32 setupFlags;                  // 0x4, BattleActionCommandSetup setupFlags; bit0: auto-play while confused
+    s32 setupFlags;                  // 0x4, BattleAcSetupFlags (BattleActionCommandSetup)
     s32 setupParam;                  // 0x8, BattleActionCommandSetup setupParam
     s32 acState;                     // 0xC
     BattleACMainCallback maincb;     // 0x10
@@ -39,7 +48,7 @@ typedef struct BattleActions {
     s32 result;                      // 0x28
     s8 baseAcDifficulty;             // 0x2C
     u8 acDifficulty;                 // 0x2D, 0 (easiest) to 6
-    s32 doneFlags;                   // 0x30, bit 1: AC finished (delete handler forces the end state otherwise)
+    s32 doneFlags;                   // 0x30, AC_DONE_FLAG_FINISHED
     u32 acFlags;                     // 0x34, btlevtcmd_AcSetFlag; 0x10 tested in signal timing
     s32 params[8];                   // 0x38, btlevtcmd_AcSetParam/AcSetParamAll/AcGetParam
     s32 outputParams[8];             // 0x58

@@ -14,6 +14,10 @@ typedef struct JetwEnt {
     u8 alpha, pad;
 } JetwEnt;
 
+/**
+ * Steps of the type 0 water spray's three streams (20 per stream): blob offset, size,
+ * tilt and fade as each blob rises.
+ */
 static JetwEnt adata[] = {
     {0, 0, 30, 140, 0, 255, 0},
     {0, 6, 30, 120, 0, 250, 0},
@@ -117,8 +121,13 @@ static struct {
             },
             0};
 
+/**
+ * Extra tilt in degrees for each spray blob, picked by stream
+ * and step so neighbouring blobs turn differently.
+ */
 static s32 dat_ry[] = {0, 40, 55, 190, 20, 130, 270, 300};
 
+/** 16x16 quad drawn for the central blob and for every blob in the spray streams. */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 255, 255, 255, 255},
     {8, -8, 0, 1024, 0, 255, 255, 255, 255},
@@ -126,6 +135,7 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 1024, 255, 255, 255, 255},
 };
 
+/** A tall 6x22 quad standing on its origin; nothing in this effect draws it. */
 effN64Vtx size6x22_tex32x32_vtx[] = {
     {-3, 0, 0, 0, 0, 255, 255, 255, 255},
     {3, 0, 0, 1024, 0, 255, 255, 255, 255},

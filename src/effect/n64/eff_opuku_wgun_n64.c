@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "eff/eff_n64.h"
 #include "libc_decls.h"
+#include <dolphin/os.h>
 
 /** Returns the sine of an angle given in degrees. */
 static inline f32 dsin(f32 a) {
@@ -47,27 +48,6 @@ typedef struct EffOpukuWgunN64Work {
 static void effOpukuWgunMain(EffectEntry* effect);
 static void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect);
 
-void DCFlushRange(void* addr, u32 nBytes);
-void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
-void GXInvalidateVtxCache(void);
-void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
-void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
-void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
-void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
-void GXSetCullMode(GXCullMode mode);
-void GXSetCurrentMtx(u32 id);
-void GXSetNumChans(u8 nChans);
-void GXSetNumTevStages(u8 nStages);
-void GXSetNumTexGens(u8 nTexGens);
-void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
-void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevColor(GXTevRegID id, GXColor color);
-void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d);
-void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
-void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
-void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 /**
  * Spawns a water-gun shot from (x1, y1, z1) to (x2, y2, z2) living `lifetime` frames at `scale`.
  * Spawned only by event scripts through evt_eff.
@@ -200,6 +180,10 @@ static void effOpukuWgunMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuWgunDisp, effect);
 }
 
+/**
+ * Alpha of each of the twelve water-gun ribbon points: solid along the shot,
+ * fading over the last three at the tail.
+ */
 static u8 a_data[12] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 128, 32};
 /**
  * Builds a camera-view ribbon through the twelve points (width grows with each point age, texture 0x8D or 0x8E)

@@ -34,7 +34,7 @@ typedef struct EffKemuri3N64Work {
 static void effKemuri3Main(EffectEntry* effect);
 static void effKemuri3Disp(CameraId cameraId, EffectEntry* effect);
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 /**
  * Spawns five flower-smoke puffs ("jump" in the effect table) at (x, y, z), 72 degrees apart around the angle;

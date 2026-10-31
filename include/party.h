@@ -44,8 +44,14 @@ typedef enum PartyFlags {
     PARTY_FLAG_IS_STEPPING = (1 << 6),
     PARTY_FLAG_IN_SHALLOW_WATER = (1 << 7),
     PARTY_FLAG_IS_BEING_USED = (1 << 8),
+    // Guess: no setter in C or scripts. While set, partyPreDisp keeps the facing and draws the partner tilted (rotOfs
+    // -6.8) and party_motion keeps the pose when stopping; party_motion clears it on leaving the slit.
+    PARTY_FLAG_POSE_TILTED = (1 << 9),
     PARTY_FLAG_PAPER_MODE = (1 << 12),
     PARTY_FLAG_MOT_SLIT_FLOOR = (1 << 13),
+    // Set with move mode 6 when the partner is set up while Mario's party walk is disabled (party.c);
+    // partyChgMoveMode clears it on leaving mode 6. Nothing reads it.
+    PARTY_FLAG_MOVE_MODE_HOLD = (1 << 15),
     PARTY_FLAG_IS_RIDING_PLANE = (1 << 16),
     PARTY_FLAG_IS_RIDING_SHIP = (1 << 17),
     PARTY_FLAG_IS_RIDING_JABARA = (1 << 18), // bellows ride (the demo's allPartyRideJabara); cleared with the plane and ship bits

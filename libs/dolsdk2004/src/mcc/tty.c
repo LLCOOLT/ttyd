@@ -2,8 +2,16 @@
 #include <dolphin/mcc.h>
 
 #ifdef DEBUG
+/**
+ * Version string of the TTY (text console over the memory card channel) library in the debug build, kept in
+ * the binary as a build stamp.
+ */
 const char* __TTYVersion = "<< Dolphin SDK - TTY\tdebug build: Apr  5 2004 03:57:08 (0x2301) >>";
 #else
+/**
+ * Version string of the TTY (text console over the memory card channel) library in the release build, kept in
+ * the binary as a build stamp.
+ */
 const char* __TTYVersion = "<< Dolphin SDK - TTY\trelease build: Apr  5 2004 04:15:50 (0x2301) >>";
 #endif
 

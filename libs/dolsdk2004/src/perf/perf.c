@@ -7,8 +7,10 @@
 #include "../gx/__gx.h"
 
 #if DEBUG
+/** Library version string kept in the binary (debug build). */
 const char* __PERFVersion = "<< Dolphin SDK - PERF\tdebug build: Apr  5 2004 03:57:10 (0x2301) >>";
 #else
+/** Library version string kept in the binary (release build). */
 const char* __PERFVersion = "<< Dolphin SDK - PERF\trelease build: Apr  5 2004 04:15:51 (0x2301) >>";
 #endif
 

@@ -1,6 +1,5 @@
-#pragma once
-
 // Declarations shared by the kpa.rel units (クッパ, Bowser's side-scrolling stages).
+#pragma once
 
 #include "version.h"
 #include "dolphin/types.h"

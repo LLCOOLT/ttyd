@@ -36,8 +36,12 @@ static EvtWord wait_event_yoshi[6];
 static EvtWord wait_event_yoshi[7];
 #endif
 
+/**
+ * Unit kind of the Yoshi double:
+ * 10 HP, level 0, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 BattleUnitKind unit_gullible_yoshi = {
-    82,
+    UNIT_YOSHI_CHAPTER4,
     "btl_un_gullible_yoshi",
     10,
     0,
@@ -94,7 +98,7 @@ BattleUnitKind unit_gullible_yoshi = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x10000000,
+    UNIT_ATTR_IGNORE_FOR_CLEAR,
     &regist_yoshi,
     1,
     parts_yoshi,
@@ -102,6 +106,9 @@ BattleUnitKind unit_gullible_yoshi = {
     data_table_yoshi,
 };
 
+/**
+ * Yoshi double's YoshiNormalAttack: damage scaled to the party level to a single target, a jump-style hit.
+ */
 static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -120,7 +127,7 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -138,23 +145,37 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Defence of the Yoshi double's body per damage type: 0 against every damage type. */
 static BattleUnitDefense defence_yoshi = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of the Yoshi double's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr_yoshi = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Yoshi double in the demo, as a percent of the normal chance:
+ * immune to fright, gale force, instant kill;
+ * sleep 60%, stop 80%, freeze 70% (and 7 other statuses lowered).
+ */
 static StatusVulnerability regist_yoshi = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 0, 0, 100, 70, 100, 100, 0};
 #else
+/**
+ * Status vulnerability of the Yoshi double in the retail versions, as a percent of the normal chance:
+ * immune to fright, gale force, instant kill;
+ * sleep 60%, stop 80%, freeze 70% (and 7 other statuses lowered).
+ */
 static StatusVulnerability regist_yoshi = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
 #endif
 
+/** Event table of the Yoshi double: its defeat script. */
 static BattleDataEntry data_table_yoshi[] = {
     {49, dead_event_yoshi},
     {0, NULL},
 };
 
+/** Body part of the Yoshi double: a single part using the model "c_babyyoshi". */
 static BattleUnitKindPart parts_yoshi[] = {
-    {1, "btl_un_yoshi", "c_babyyoshi", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_yoshi, &defence_attr_yoshi, 0x9, 0, pose_table_yoshi_stay},
+    {1, "btl_un_yoshi", "c_babyyoshi", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_yoshi, &defence_attr_yoshi, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table_yoshi_stay},
 };
 
 /**
@@ -178,7 +199,7 @@ EVT_END()
  * so the fake Mario's phase script knows the partner was struck, then runs the default damage handling.
  */
 EVT_BEGIN(damage_event_yoshi)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(20), 1)
     END_IF
@@ -209,7 +230,7 @@ static EVT_BEGIN(dead_event_yoshi)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -261,6 +282,7 @@ EVT_END()
  * A miss or block makes him tumble back, and he then walks home.
  */
 static EVT_BEGIN(attack_event_yoshi)
+    // He may use an enemy item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -270,12 +292,14 @@ static EVT_BEGIN(attack_event_yoshi)
     SET_VALUE(LW(12), PTR(&enemyWeapon_YoshiNormalAttack))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: he picks one for his stomp.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -291,6 +315,7 @@ static EVT_BEGIN(attack_event_yoshi)
     CALL(evt_btl_camera_set_zoom, 0, 350)
     BEGIN_INLINE_EVENT_GET_ID(LW(13))
         LOOP(0)
+            // He runs in place with a patter of steps, then hops.
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), EVT_NULLPTR, 0, EVT_NULLPTR)
             WAIT_FRAMES(2)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1R"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -302,6 +327,7 @@ static EVT_BEGIN(attack_event_yoshi)
     DELETE_EVENT(LW(13))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Flutter jump: he leaps, flaps his legs in the air over the target and works out the dive.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_J_1A"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -344,14 +370,16 @@ static EVT_BEGIN(attack_event_yoshi)
     CALL(btl_yoshi_yoroyoro_jump_calc_param, BTL_UNIT_SELF, LW(6), LW(7), LW(8), LW(10), LW(9))
     CALL(btl_yoshi_yoroyoro_jump_move, BTL_UNIT_SELF, LW(6), LW(7), LW(8), LW(10), LW(9))
     DELETE_EVENT(LW(13))
+    // He draws lots for how many stomps follow (one to four in all).
     CALL(evt_sub_random, 4, LW(11))
     ADD(LW(11), 1)
     SET_VALUE(LW(10), 0)
+    // Each stomp: the pre-damage check decides between a dodge and a hit.
     LABEL(10)
     IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 1048832, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_ALWAYS_HIT, LW(5))
     ELSE
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     SWITCH(LW(5))
         CASE_OR_EQUAL(2)
@@ -378,6 +406,7 @@ static EVT_BEGIN(attack_event_yoshi)
         WAIT_FRAMES(15)
         LOOP(LW(0))
             SET_VALUE(LW(2), LW(1))
+            // He spins in the air and dives onto the target.
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_YOSHI_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             LOOP(LW(2))
                 CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(15))
@@ -419,6 +448,7 @@ static EVT_BEGIN(attack_event_yoshi)
         GOTO(95)
     END_IF
     IF_INT_LESS(LW(10), LW(11))
+        // Hit: the stomp lands; he bounces up and dives again until the last one deals the damage.
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 0, LW(5))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -429,8 +459,9 @@ static EVT_BEGIN(attack_event_yoshi)
         GOTO(10)
     ELSE
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
+    // Miss: he tumbles back (the target dodges for some kinds of miss).
     LABEL(90)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -440,13 +471,14 @@ static EVT_BEGIN(attack_event_yoshi)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_D_1"))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 25)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 16, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     WAIT_FRAMES(20)
+    // He walks back to his home position.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "dolphin/types.h"
+#include "version.h"
 #include <dolphin/mtx.h>
 #include "evt/evt_word.h"
 
@@ -23,8 +24,25 @@ typedef struct BreakSlotReel {
     u8 alpha;      // 0x58
 } BreakSlotReel;
 
+// BreakSlotWork.flags. Bit 0x2 changed meaning after the demos; the Shadow Queen fight's card-forcing bit is
+// 0x2 in the demos and 0x4 later. Cards: 0 Mushroom, 1 Fire Flower, 2 Star, 3 Shine Sprite, 4 Poison Mushroom.
+enum BreakSlotFlags {
+    // Frankly's lecture (lecture_init): every reel is forced to and stops on card 3 (Shine Sprite)
+    BREAK_SLOT_FLAG_LECTURE = 1 << 0,
+#if VERSION <= VERSION_DEMO_US
+    // Shadow Queen fight (slot_init): every card is forced to and stops on card 2 (Star) until the first BINGO
+    BREAK_SLOT_FLAG_QUEEN_FORCE_STAR = 1 << 1,
+#else
+    // Shadow Queen entry event: the third reel never stops on a Poison Mushroom when the first two show one
+    BREAK_SLOT_FLAG_NO_POISON_BINGO = 1 << 1,
+    // Shadow Queen fight (slot_init): every card is forced to and stops on card 3 (Shine Sprite) until the
+    // first BINGO
+    BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE = 1 << 2,
+#endif
+};
+
 typedef struct BreakSlotWork {
-    u32 flags;              // 0x000
+    u32 flags;              // 0x000, BreakSlotFlags
     s32 phase;              // 0x004
     s32 phaseTimer;         // 0x008, frame counter of the current phase
     s32 reelNo;             // 0x00C

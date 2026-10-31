@@ -30,16 +30,19 @@ f32 bom_dir[10] = {
     100.0f, 25.0f, 155.0f, 60.0f, 120.0f
 };
 
+/** Launch speed of each of the ten explosion fragments (paired with bom_dir). */
 f32 bom_spd[] = {
     2.2f, 2.7f, 3.0f, 2.2f, 2.7f,
     3.0f, 1.9f, 1.9f, 1.5f, 1.5f
 };
 
+/** Sprite size of each of the ten explosion fragments. */
 f32 bom_scale[10] = {
     1.4f, 1.3f, 1.2f, 1.3f, 1.4f,
     1.3f, 1.6f, 1.6f, 1.6f, 1.6f
 };
 
+/** Z rotation in degrees of each of the ten explosion fragments' sprites. */
 f32 bom_ry[10] = {
     0.0f, 234.0f, 468.0f, 702.0f, 936.0f,
     1260.0f, 1404.0f, 1638.0f, 1902.0f, 1976.0f

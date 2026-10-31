@@ -1,3 +1,4 @@
+// VERSION and VERSION_PICK: selects the demo, JP, US or EU code and data from one source tree.
 #pragma once
 
 // Building one source tree for five releases

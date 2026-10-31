@@ -83,6 +83,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[17];
 NpcTerritoryInfo btl_moo_setup_no_tbl[17];
 extern EvtWord bgset_moo_space_event[];
 
+/** Scenery pieces of the Moon battle stage; moo_btlstage_data points into this array. */
 BattleStageObjectData moo_btlobject_data[] = {
     {"B", 2, 2, {0}, 0, 60, {0}},
     {"space", 2, 3, {0}, 0, 60, {0}},
@@ -91,6 +92,7 @@ BattleStageObjectData moo_btlobject_data[] = {
     {"star_03", 2, 3, {0}, 0, 60, {0}},
 };
 
+/** The battle stage used for fights on the Moon: its backdrop folder and scenery pieces. */
 BattleStageData moo_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -105,6 +107,7 @@ BattleStageData moo_btlstage_data[] = {
     },
 };
 
+/** Lineup of battle moo_00_01_off_1: Goomba x3. */
 BattleUnitSetup btlparty_moo_moo_00_01_off_1[] = {
     {
         &unit_kuriboo, // unitKindParams
@@ -138,6 +141,7 @@ BattleUnitSetup btlparty_moo_moo_00_01_off_1[] = {
     },
 };
 
+/** Battle group moo_00_01_off_1: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_00_01_off_1 = {
     3, // numEnemies
     btlparty_moo_moo_00_01_off_1, // enemyData
@@ -149,6 +153,7 @@ BattleGroupSetup btlgrp_moo_moo_00_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_01_off_1: Moon Cleft x2. */
 BattleUnitSetup btlparty_moo_moo_01_01_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -172,6 +177,7 @@ BattleUnitSetup btlparty_moo_moo_01_01_off_1[] = {
     },
 };
 
+/** Battle group moo_01_01_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_01_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_01_01_off_1, // enemyData
@@ -183,6 +189,7 @@ BattleGroupSetup btlgrp_moo_moo_01_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_02_off_1: Moon Cleft x2. */
 BattleUnitSetup btlparty_moo_moo_01_02_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -206,6 +213,7 @@ BattleUnitSetup btlparty_moo_moo_01_02_off_1[] = {
     },
 };
 
+/** Battle group moo_01_02_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_02_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_01_02_off_1, // enemyData
@@ -217,6 +225,7 @@ BattleGroupSetup btlgrp_moo_moo_01_02_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_02_off_2: Moon Cleft x3. */
 BattleUnitSetup btlparty_moo_moo_01_02_off_2[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -250,6 +259,7 @@ BattleUnitSetup btlparty_moo_moo_01_02_off_2[] = {
     },
 };
 
+/** Battle group moo_01_02_off_2: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_02_off_2 = {
     3, // numEnemies
     btlparty_moo_moo_01_02_off_2, // enemyData
@@ -261,6 +271,7 @@ BattleGroupSetup btlgrp_moo_moo_01_02_off_2 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_03_off_1: Moon Cleft x3. */
 BattleUnitSetup btlparty_moo_moo_01_03_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -294,6 +305,7 @@ BattleUnitSetup btlparty_moo_moo_01_03_off_1[] = {
     },
 };
 
+/** Battle group moo_01_03_off_1: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_03_off_1 = {
     3, // numEnemies
     btlparty_moo_moo_01_03_off_1, // enemyData
@@ -305,6 +317,7 @@ BattleGroupSetup btlgrp_moo_moo_01_03_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_04_off_1: Moon Cleft x2. */
 BattleUnitSetup btlparty_moo_moo_01_04_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -328,6 +341,7 @@ BattleUnitSetup btlparty_moo_moo_01_04_off_1[] = {
     },
 };
 
+/** Battle group moo_01_04_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_04_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_01_04_off_1, // enemyData
@@ -339,6 +353,7 @@ BattleGroupSetup btlgrp_moo_moo_01_04_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_04_off_2: Moon Cleft x3. */
 BattleUnitSetup btlparty_moo_moo_01_04_off_2[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -372,6 +387,7 @@ BattleUnitSetup btlparty_moo_moo_01_04_off_2[] = {
     },
 };
 
+/** Battle group moo_01_04_off_2: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_04_off_2 = {
     3, // numEnemies
     btlparty_moo_moo_01_04_off_2, // enemyData
@@ -383,6 +399,7 @@ BattleGroupSetup btlgrp_moo_moo_01_04_off_2 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_04_off_3: Moon Cleft x4. */
 BattleUnitSetup btlparty_moo_moo_01_04_off_3[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -426,6 +443,7 @@ BattleUnitSetup btlparty_moo_moo_01_04_off_3[] = {
     },
 };
 
+/** Battle group moo_01_04_off_3: its 4 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_04_off_3 = {
     4, // numEnemies
     btlparty_moo_moo_01_04_off_3, // enemyData
@@ -437,6 +455,7 @@ BattleGroupSetup btlgrp_moo_moo_01_04_off_3 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_01_05_off_1: Moon Cleft x4. */
 BattleUnitSetup btlparty_moo_moo_01_05_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -480,6 +499,7 @@ BattleUnitSetup btlparty_moo_moo_01_05_off_1[] = {
     },
 };
 
+/** Battle group moo_01_05_off_1: its 4 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_01_05_off_1 = {
     4, // numEnemies
     btlparty_moo_moo_01_05_off_1, // enemyData
@@ -491,6 +511,7 @@ BattleGroupSetup btlgrp_moo_moo_01_05_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_02_01_off_1: Z-Yux x2. */
 BattleUnitSetup btlparty_moo_moo_02_01_off_1[] = {
     {
         &unit_barriern_z, // unitKindParams
@@ -522,6 +543,7 @@ BattleUnitSetup btlparty_moo_moo_02_01_off_1[] = {
     },
 };
 
+/** Battle group moo_02_01_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_02_01_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_02_01_off_1, // enemyData
@@ -533,6 +555,7 @@ BattleGroupSetup btlgrp_moo_moo_02_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_02_02_off_1: Z-Yux and Moon Cleft. */
 BattleUnitSetup btlparty_moo_moo_02_02_off_1[] = {
     {
         &unit_barriern_z, // unitKindParams
@@ -556,6 +579,7 @@ BattleUnitSetup btlparty_moo_moo_02_02_off_1[] = {
     },
 };
 
+/** Battle group moo_02_02_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_02_02_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_02_02_off_1, // enemyData
@@ -567,6 +591,7 @@ BattleGroupSetup btlgrp_moo_moo_02_02_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_02_03_off_1: Z-Yux x2. */
 BattleUnitSetup btlparty_moo_moo_02_03_off_1[] = {
     {
         &unit_barriern_z, // unitKindParams
@@ -598,6 +623,7 @@ BattleUnitSetup btlparty_moo_moo_02_03_off_1[] = {
     },
 };
 
+/** Battle group moo_02_03_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_02_03_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_02_03_off_1, // enemyData
@@ -609,6 +635,7 @@ BattleGroupSetup btlgrp_moo_moo_02_03_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_02_04_off_1: Moon Cleft, Z-Yux and Moon Cleft. */
 BattleUnitSetup btlparty_moo_moo_02_04_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -642,6 +669,7 @@ BattleUnitSetup btlparty_moo_moo_02_04_off_1[] = {
     },
 };
 
+/** Battle group moo_02_04_off_1: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_02_04_off_1 = {
     3, // numEnemies
     btlparty_moo_moo_02_04_off_1, // enemyData
@@ -653,6 +681,7 @@ BattleGroupSetup btlgrp_moo_moo_02_04_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_02_05_off_1: Moon Cleft and Z-Yux. */
 BattleUnitSetup btlparty_moo_moo_02_05_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -676,6 +705,7 @@ BattleUnitSetup btlparty_moo_moo_02_05_off_1[] = {
     },
 };
 
+/** Battle group moo_02_05_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_02_05_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_02_05_off_1, // enemyData
@@ -687,6 +717,7 @@ BattleGroupSetup btlgrp_moo_moo_02_05_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_01_off_1: Moon Cleft x2. */
 BattleUnitSetup btlparty_moo_moo_05_01_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -710,6 +741,7 @@ BattleUnitSetup btlparty_moo_moo_05_01_off_1[] = {
     },
 };
 
+/** Battle group moo_05_01_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_01_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_05_01_off_1, // enemyData
@@ -721,6 +753,7 @@ BattleGroupSetup btlgrp_moo_moo_05_01_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_01_off_2: Moon Cleft x3. */
 BattleUnitSetup btlparty_moo_moo_05_01_off_2[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -754,6 +787,7 @@ BattleUnitSetup btlparty_moo_moo_05_01_off_2[] = {
     },
 };
 
+/** Battle group moo_05_01_off_2: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_01_off_2 = {
     3, // numEnemies
     btlparty_moo_moo_05_01_off_2, // enemyData
@@ -765,6 +799,7 @@ BattleGroupSetup btlgrp_moo_moo_05_01_off_2 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_01_off_3: Moon Cleft x4. */
 BattleUnitSetup btlparty_moo_moo_05_01_off_3[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -808,6 +843,7 @@ BattleUnitSetup btlparty_moo_moo_05_01_off_3[] = {
     },
 };
 
+/** Battle group moo_05_01_off_3: its 4 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_01_off_3 = {
     4, // numEnemies
     btlparty_moo_moo_05_01_off_3, // enemyData
@@ -819,6 +855,7 @@ BattleGroupSetup btlgrp_moo_moo_05_01_off_3 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_02_off_1: Moon Cleft x2. */
 BattleUnitSetup btlparty_moo_moo_05_02_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -842,6 +879,7 @@ BattleUnitSetup btlparty_moo_moo_05_02_off_1[] = {
     },
 };
 
+/** Battle group moo_05_02_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_02_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_05_02_off_1, // enemyData
@@ -853,6 +891,7 @@ BattleGroupSetup btlgrp_moo_moo_05_02_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_03_off_1: Moon Cleft x2. */
 BattleUnitSetup btlparty_moo_moo_05_03_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -876,6 +915,7 @@ BattleUnitSetup btlparty_moo_moo_05_03_off_1[] = {
     },
 };
 
+/** Battle group moo_05_03_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_03_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_05_03_off_1, // enemyData
@@ -887,6 +927,7 @@ BattleGroupSetup btlgrp_moo_moo_05_03_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_03_off_2: Moon Cleft x3. */
 BattleUnitSetup btlparty_moo_moo_05_03_off_2[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -920,6 +961,7 @@ BattleUnitSetup btlparty_moo_moo_05_03_off_2[] = {
     },
 };
 
+/** Battle group moo_05_03_off_2: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_03_off_2 = {
     3, // numEnemies
     btlparty_moo_moo_05_03_off_2, // enemyData
@@ -931,6 +973,7 @@ BattleGroupSetup btlgrp_moo_moo_05_03_off_2 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_04_off_1: Moon Cleft x3. */
 BattleUnitSetup btlparty_moo_moo_05_04_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -964,6 +1007,7 @@ BattleUnitSetup btlparty_moo_moo_05_04_off_1[] = {
     },
 };
 
+/** Battle group moo_05_04_off_1: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_04_off_1 = {
     3, // numEnemies
     btlparty_moo_moo_05_04_off_1, // enemyData
@@ -975,6 +1019,7 @@ BattleGroupSetup btlgrp_moo_moo_05_04_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_05_off_1: Moon Cleft x2. */
 BattleUnitSetup btlparty_moo_moo_05_05_off_1[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -998,6 +1043,7 @@ BattleUnitSetup btlparty_moo_moo_05_05_off_1[] = {
     },
 };
 
+/** Battle group moo_05_05_off_1: its 2 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_05_off_1 = {
     2, // numEnemies
     btlparty_moo_moo_05_05_off_1, // enemyData
@@ -1009,6 +1055,7 @@ BattleGroupSetup btlgrp_moo_moo_05_05_off_1 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_05_off_2: Moon Cleft x3. */
 BattleUnitSetup btlparty_moo_moo_05_05_off_2[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -1042,6 +1089,7 @@ BattleUnitSetup btlparty_moo_moo_05_05_off_2[] = {
     },
 };
 
+/** Battle group moo_05_05_off_2: its 3 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_05_off_2 = {
     3, // numEnemies
     btlparty_moo_moo_05_05_off_2, // enemyData
@@ -1053,6 +1101,7 @@ BattleGroupSetup btlgrp_moo_moo_05_05_off_2 = {
     5, // reserved_1C
 };
 
+/** Lineup of battle moo_05_05_off_3: Moon Cleft x4. */
 BattleUnitSetup btlparty_moo_moo_05_05_off_3[] = {
     {
         &unit_sinemon, // unitKindParams
@@ -1096,6 +1145,7 @@ BattleUnitSetup btlparty_moo_moo_05_05_off_3[] = {
     },
 };
 
+/** Battle group moo_05_05_off_3: its 4 enemies; item weights held 25, random 25, none 50. */
 BattleGroupSetup btlgrp_moo_moo_05_05_off_3 = {
     4, // numEnemies
     btlparty_moo_moo_05_05_off_3, // enemyData
@@ -1107,27 +1157,38 @@ BattleGroupSetup btlgrp_moo_moo_05_05_off_3 = {
     5, // reserved_1C
 };
 
+/** Battle choice BTLNO_MOO_TEST1_OFF (group and stage by weight): moo_00_01_off_1 (weight 50). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_test1_off[] = {
     {50, &btlgrp_moo_moo_00_01_off_1, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_01_01_OFF (group and stage by weight): moo_01_01_off_1 (weight 10). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_01_01_off[] = {
     {10, &btlgrp_moo_moo_01_01_off_1, moo_btlstage_data},
     {0},
 };
 
+/**
+ * Battle choice BTLNO_MOO_01_02_OFF (group and stage by weight): moo_01_02_off_1 (weight 10),
+ * moo_01_02_off_2 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_01_02_off[] = {
     {10, &btlgrp_moo_moo_01_02_off_1, moo_btlstage_data},
     {10, &btlgrp_moo_moo_01_02_off_2, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_01_03_OFF (group and stage by weight): moo_01_03_off_1 (weight 10). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_01_03_off[] = {
     {10, &btlgrp_moo_moo_01_03_off_1, moo_btlstage_data},
     {0},
 };
 
+/**
+ * Battle choice BTLNO_MOO_01_04_OFF (group and stage by weight): moo_01_04_off_1 (weight 10),
+ * moo_01_04_off_2 (weight 10), moo_01_04_off_3 (weight 5).
+ */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_01_04_off[] = {
     {10, &btlgrp_moo_moo_01_04_off_1, moo_btlstage_data},
     {10, &btlgrp_moo_moo_01_04_off_2, moo_btlstage_data},
@@ -1135,36 +1196,46 @@ NpcBattleSelect btlgrpsel_moo_btlno_moo_01_04_off[] = {
     {0},
 };
 
+/** Battle choice BTLNO_MOO_01_05_OFF (group and stage by weight): moo_01_05_off_1 (weight 5). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_01_05_off[] = {
     {5, &btlgrp_moo_moo_01_05_off_1, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_02_01_OFF (group and stage by weight): moo_02_01_off_1 (weight 20). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_02_01_off[] = {
     {20, &btlgrp_moo_moo_02_01_off_1, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_02_02_OFF (group and stage by weight): moo_02_02_off_1 (weight 20). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_02_02_off[] = {
     {20, &btlgrp_moo_moo_02_02_off_1, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_02_03_OFF (group and stage by weight): moo_02_03_off_1 (weight 20). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_02_03_off[] = {
     {20, &btlgrp_moo_moo_02_03_off_1, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_02_04_OFF (group and stage by weight): moo_02_04_off_1 (weight 20). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_02_04_off[] = {
     {20, &btlgrp_moo_moo_02_04_off_1, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_02_05_OFF (group and stage by weight): moo_02_05_off_1 (weight 20). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_02_05_off[] = {
     {20, &btlgrp_moo_moo_02_05_off_1, moo_btlstage_data},
     {0},
 };
 
+/**
+ * Battle choice BTLNO_MOO_05_01_OFF (group and stage by weight): moo_05_01_off_1 (weight 10),
+ * moo_05_01_off_2 (weight 10), moo_05_01_off_3 (weight 5).
+ */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_05_01_off[] = {
     {10, &btlgrp_moo_moo_05_01_off_1, moo_btlstage_data},
     {10, &btlgrp_moo_moo_05_01_off_2, moo_btlstage_data},
@@ -1172,22 +1243,32 @@ NpcBattleSelect btlgrpsel_moo_btlno_moo_05_01_off[] = {
     {0},
 };
 
+/** Battle choice BTLNO_MOO_05_02_OFF (group and stage by weight): moo_05_02_off_1 (weight 20). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_05_02_off[] = {
     {20, &btlgrp_moo_moo_05_02_off_1, moo_btlstage_data},
     {0},
 };
 
+/**
+ * Battle choice BTLNO_MOO_05_03_OFF (group and stage by weight): moo_05_03_off_1 (weight 10),
+ * moo_05_03_off_2 (weight 10).
+ */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_05_03_off[] = {
     {10, &btlgrp_moo_moo_05_03_off_1, moo_btlstage_data},
     {10, &btlgrp_moo_moo_05_03_off_2, moo_btlstage_data},
     {0},
 };
 
+/** Battle choice BTLNO_MOO_05_04_OFF (group and stage by weight): moo_05_04_off_1 (weight 20). */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_05_04_off[] = {
     {20, &btlgrp_moo_moo_05_04_off_1, moo_btlstage_data},
     {0},
 };
 
+/**
+ * Battle choice BTLNO_MOO_05_05_OFF (group and stage by weight): moo_05_05_off_1 (weight 10),
+ * moo_05_05_off_2 (weight 10), moo_05_05_off_3 (weight 5).
+ */
 NpcBattleSelect btlgrpsel_moo_btlno_moo_05_05_off[] = {
     {10, &btlgrp_moo_moo_05_05_off_1, moo_btlstage_data},
     {10, &btlgrp_moo_moo_05_05_off_2, moo_btlstage_data},
@@ -1195,6 +1276,10 @@ NpcBattleSelect btlgrpsel_moo_btlno_moo_05_05_off[] = {
     {0},
 };
 
+/**
+ * Encounter settings of every Moon map: which battle choice its enemies use, the battle music and the random
+ * audience rolls.
+ */
 NpcSetupBattleInfo btlsetup_moo_tbl[] = {
     {
         "マップstg_07_4", // name
@@ -1359,6 +1444,10 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
     {0},
 };
 
+/**
+ * Names the Moon battle ids (BTLNO_MOO_*) and the btlsetup_moo_tbl entry each one uses; registered with
+ * relSetBtlAddr.
+ */
 NpcTerritoryInfo btl_moo_setup_no_tbl[] = {
     {"BTLNO_MOO_TEST1", 0},
     {"BTLNO_MOO_01_01", 1},

@@ -15,6 +15,7 @@
 
 static BeroEntry bero_entry_data[2];
 
+/** Exit of mri_10: south road s_bero to mri_09 (n_bero). */
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName

@@ -1,3 +1,4 @@
+// ICON_xxx: the ids of the game's icon sheet (item, button and status icons), used by the item, window and battle code.
 #pragma once
 
 // ICON_xxx is named by the JP icon id; the value is the US id when building G8ME01.

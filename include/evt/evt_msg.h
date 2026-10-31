@@ -4,6 +4,10 @@
 #include <dolphin/types.h>
 #include "evt/evt_cmd.h"
 
+// Flag word (first argument) of evt_msg_print, evt_msg_print_insert, evt_msg_print_add(_insert) and evt_msg_select.
+#define MSG_PRINT_DIRECT 0x1      // the message argument is the text itself, not a message id for msgSearch
+#define MSG_PRINT_BATTLE_UNIT 0x2 // evt_msg_print: the speaker is a battle unit (MSG_WIN_FLAG_BATTLE_UNIT)
+
 void evt_msg_init(void);
 
 USER_FUNC(evt_msg_close);

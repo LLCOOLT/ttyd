@@ -61,6 +61,9 @@ extern EvtWord namiyoke_se[];
 extern EvtWord namiyoke_check[];
 static HitDamageReturn hitDmgRetPoints[4];
 
+/**
+ * Exits (beros) of this room: w_bero_1 to dou_09, w_bero_2 to dou_09, n_bero to dou_06 and e_bero to dou_11.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
@@ -129,6 +132,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Map objects of the 15 waves that are moved along their lanes by the wave script. */
 const char* namiyoke_mapobj[] = {
     "S_nami1",
     "S_nami2",
@@ -440,9 +444,9 @@ EVT_BEGIN(namiyoke_init)
 EVT_END()
 
 /**
- * Guess: sound loop for the waves: while any wave is active,
- * finds the wave closest to Mario and plays or moves the wave sound at its position;
- * stops it when no wave is active.
+ * Sound loop for the waves (namiyoke_check spawns it): every frame it finds the active wave nearest Mario among
+ * the 15 wave slots (namiyoke_se_check) and starts SFX_STG5_MINIGAME_WAVE1 there or moves it there;
+ * it stops the sound when no wave is active. The first start passes the wave's x as its z position too.
  */
 EVT_BEGIN(namiyoke_se)
     SET_VALUE(LW(12), 0)
@@ -592,6 +596,9 @@ static EVT_BEGIN(dou_puka_event_main0)
     RETURN
 EVT_END()
 
+/**
+ * Hazard-water floors of this room (map hit names) and the point each puts Mario back at after he is bitten.
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_01", {-700.0f, 50.0f, -90.0f}},
     {"mod_03", {-130.0f, 50.0f, -90.0f}},

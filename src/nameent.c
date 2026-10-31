@@ -15,9 +15,8 @@
 #include "pmario_sound.h"
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
+#include <dolphin/gx.h>
 
-void GXGetProjectionv(f32* ptr);
-void GXGetViewportv(f32* vp);
 static void nameBG(void);
 static void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h);
 void nameWinGX(f32 x, f32 y, f32 w, f32 h, TEXPalette* tpl, s32 type);
@@ -30,6 +29,11 @@ static void nameEntDisp(CameraId cameraId, void* param);
 
 #define NAMEENT_COLS 14 // characters per row of hiragana_tbl, katakana_tbl and latin_tbl
 
+/**
+ * Hiragana grid of the name-entry screen, NAMEENT_COLS characters per row, in the order they are drawn.
+ * NULL marks an empty cell and a full-width space a blank key; cell 9 is patched at run time between the "n" kana
+ * and a blank, depending on the name type.
+ */
 const char* hiragana_tbl[] = {
     "\x82\xA0", "\x82\xA2", "\x82\xA4", "\x82\xA6", "\x82\xA8", "\x82\xED",
     "\x81\x40", "\x82\xF0", "\x81\x40", "\x82\xF1", "\x82\x4F", "\x82\x50",
@@ -54,6 +58,7 @@ const char* hiragana_tbl[] = {
     "\x81\x44", "\x81\x40", NULL,       NULL,       NULL,       NULL
 };
 
+/** Katakana grid of the name-entry screen: the same layout as hiragana_tbl, cell for cell. */
 const char* katakana_tbl[] = {
     "\x83\x41", "\x83\x43", "\x83\x45", "\x83\x47", "\x83\x49", "\x83\x8F",
     "\x81\x40", "\x83\x92", "\x81\x40", "\x83\x93", "\x82\x4F", "\x82\x50",
@@ -102,6 +107,11 @@ void nameEntReInit(void) {
 }
 
 #if VERSION >= VERSION_US
+/**
+ * Letter grid of the name-entry screen in the US and PAL releases: capitals, small letters and accented forms,
+ * digits and punctuation, NAMEENT_COLS characters per row. Cell 47 is patched at run time between a space and "p",
+ * depending on the name type.
+ */
 const char* latin_tbl[] = {
     "A", "B", "C", "D", "E", "a",
     "b", "c", "d", "e", "\xFC", "\xFA",
@@ -230,9 +240,9 @@ void nameEntOff(void) {
     wp->loadState = 3;
 }
 
-/** Lets the screen take input (flag 1) and returns TRUE while the player has not yet confirmed or cancelled. */
+/** Lets the screen take input (NAMEENT_FLAG_INPUT_ON) and returns TRUE while the player has not yet confirmed or cancelled. */
 BOOL nameEntWait(void) {
-    wp->flags |= 1;
+    wp->flags |= NAMEENT_FLAG_INPUT_ON;
     return wp->state != 0x65;
 }
 
@@ -337,7 +347,7 @@ static s32 nameMain(void) {
 
     switch (wp->state) {
         case 0:
-            if ((wp->flags & 1) && gp->debugFlag == 0) {
+            if ((wp->flags & NAMEENT_FLAG_INPUT_ON) && gp->debugFlag == 0) {
                 if (keyGetButtonTrg(0) & PAD_BUTTON_A) {
                     off = wp->cursorX;
                     if (off >= 10 && wp->cursorY >= 4) {
@@ -390,7 +400,7 @@ static s32 nameMain(void) {
                     } else if (wp->nameLen == 0 && wp->type == 0) {
                         psndSFXOn((const char*)0x13);
                         wp->state = 0x65;
-                        wp->flags |= 2;
+                        wp->flags |= NAMEENT_FLAG_CANCELLED;
                     }
                 } else if (keyGetDirRep(0) & DEMO_STICK_LEFT) {
                     wp->cursorX--;
@@ -511,7 +521,7 @@ static s32 nameMain(void) {
     dist = distABf(wp->x2, wp->y2, wp->x1, wp->y1);
     switch (wp->state) {
         case 0:
-            if ((wp->flags & 1) && gp->debugFlag == 0) {
+            if ((wp->flags & NAMEENT_FLAG_INPUT_ON) && gp->debugFlag == 0) {
                 if (keyGetButtonTrg(0) & PAD_BUTTON_A) {
                     off = wp->cursorX;
 #if VERSION >= VERSION_US
@@ -717,7 +727,7 @@ static s32 nameMain(void) {
                         if (wp->nameLen == 0 && wp->type == 0 && !strncmp(wp->name, "\x81\x40", 2)) {
                             psndSFXOn((const char*)0x13);
                             wp->state = 0x65;
-                            wp->flags |= 2;
+                            wp->flags |= NAMEENT_FLAG_CANCELLED;
                         } else {
                             ((u16*)wp->name)[wp->nameLen] = *(u16*)"\x81\x40";
                             wp->nameLen--;
@@ -730,7 +740,7 @@ static s32 nameMain(void) {
                         if (wp->nameLen == 0 && wp->type == 0 && !strncmp(wp->name, " ", 1)) {
                             psndSFXOn((const char*)0x13);
                             wp->state = 0x65;
-                            wp->flags |= 2;
+                            wp->flags |= NAMEENT_FLAG_CANCELLED;
                         } else {
                             wp->name[wp->nameLen] = *" ";
                             wp->nameLen--;
@@ -744,7 +754,7 @@ static s32 nameMain(void) {
                     if (wp->nameLen == 0 && wp->type == 0 && !strncmp(wp->name, "\x81\x40", 2)) {
                         psndSFXOn((const char*)0x13);
                         wp->state = 0x65;
-                        wp->flags |= 2;
+                        wp->flags |= NAMEENT_FLAG_CANCELLED;
                     } else {
                         ((u16*)wp->name)[wp->nameLen] = *(u16*)"\x81\x40";
                         wp->nameLen--;
@@ -1157,9 +1167,9 @@ static void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h) {
 }
 
 /**
- * Draws the full-screen mask behind the confirm window from fade texture 1,
- * scaling the texture about its centre by 1000 t^5 (t is maskAlpha, 0 to 1, raised while confirming).
- * Guess: this fades the screen behind the window darker.
+ * Draws the full-screen mask behind the confirm window: fade.tpl image 1 (the spot-fade texture of the
+ * FADE_*_SPOT fades) in black at half opacity, scaled about its centre by 1000 t^5
+ * (t is maskAlpha, 0 to 1, raised while confirming), so the spot closes in and the screen behind darkens.
  */
 void nameMaskGX(f32 t) {
     Mtx a, b, c;

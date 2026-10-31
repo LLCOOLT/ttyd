@@ -6,7 +6,9 @@
 
 typedef enum BackgroundFlags {
     BG_RENDERING = (1 << 0),
-    BG_DO_MULTIPLY = (1 << 1),
+    // no texture (bgEntry found no file): draws a flat quad in the multiply colour (green), tinted like the
+    // texture would be
+    BG_FLAT_COLOR = (1 << 1),
     BG_NO_AUTOSCROLL = (1 << 2),
     BG_NO_TRANSLATION = (1 << 3)
 } BackgroundFlags;
@@ -19,7 +21,7 @@ typedef struct BackgroundWork {
     f32 scrl_x;       // 0xC
     f32 scrl_y;       // 0x10
     GXColor color;    // 0x14
-    GXColor multiply; // 0x18, see BG_DO_MULTIPLY
+    GXColor multiply; // 0x18, the flat colour drawn under BG_FLAT_COLOR
     void* data;       // 0x1C
 } BackgroundWork;
 

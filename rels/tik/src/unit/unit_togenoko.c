@@ -14,6 +14,13 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
 
+// Unit work slots of the Koopatrol (LW(10) in guard_event and guard_cancel_event is the Koopatrol itself).
+enum {
+    UW_TOGENOKO_GUARDING = 0,   // 1 while it is withdrawn into its shell (guard_event)
+    UW_TOGENOKO_SPIN_STOP = 1,  // 1 stops the shell spin loop of shell_attack_event
+    UW_TOGENOKO_SPIN_SPEED = 2, // degrees the shell turns per frame while it charges
+};
+
 static USER_FUNC(togenoko_getnum);
 
 BattleUnitKind unit_togenoko;
@@ -51,8 +58,12 @@ static EvtWord guard_cancel_event[90];
 static EvtWord friend_event[88];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the Koopatrol (HP 6, level 26): its size, offsets, damage sounds, status vulnerability,
+ * parts and init event.
+ */
 BattleUnitKind unit_togenoko = {
-    11,
+    UNIT_KOOPATROL,
     "btl_un_togenoko",
     6,
     0,
@@ -117,103 +128,139 @@ BattleUnitKind unit_togenoko = {
     data_table,
 };
 
+/** Defence of the Koopatrol: 2 damage points off every hit. */
 static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
+/** Element reactions of the Koopatrol: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Koopatrol (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {70, 70, 60, 100, 60, 100, 100, 60, 100, 70, 100, 70, 100, 70, 70, 60, 60, 100, 60, 100, 100, 95};
 #else
+/** Status vulnerability of the Koopatrol (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {70, 75, 75, 100, 75, 100, 100, 70, 100, 90, 100, 90, 100, 95, 80, 70, 70, 100, 80, 100, 100, 95};
 #endif
 
+/** Defence of the Koopatrol (flipped over): no damage reduction. */
 static BattleUnitDefense defence_turn = {0};
 
+/** Element reactions of the Koopatrol (flipped over): no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
+/**
+ * Status vulnerability of the Koopatrol (flipped over) (percent chance to take each status):
+ * average vulnerability to every status.
+ */
 static StatusVulnerability regist_turn = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Defence of the Koopatrol while it is withdrawn into its shell:
+ * defence 99 against every kind of hit, so no attack does damage.
+ */
 static BattleUnitDefense defence_guard = {{99, 99, 99, 99, 99}};
 
+/**
+ * Element reactions of the Koopatrol (guarding): normal: no damage, fire: no damage, ice: no damage, explosion:
+ * no damage, electric: no damage.
+ */
 static BattleUnitDefenseAttr defence_attr_guard = {{2, 2, 2, 2, 2}};
 
+/**
+ * Status vulnerability of the Koopatrol (guarding) (percent chance to take each status):
+ * average vulnerability to every status.
+ */
 static StatusVulnerability regist_guard = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/** Pose table of the Koopatrol: maps each battle pose to the animation it plays (N_* animations). */
 static PoseTableEntry pose_table[] = {
-    {1, "N_1"},
-    {2, "Y_1"},
-    {9, "Y_1"},
-    {5, "K_1"},
-    {4, "X_1"},
-    {3, "X_1"},
-    {28, "S_1"},
+    {STATUS_SLEEP, "N_1"},
+    {STATUS_STOP, "Y_1"},
+    {STATUS_FREEZE, "Y_1"},
+    {STATUS_CONFUSE, "K_1"},
+    {STATUS_POISON, "X_1"},
+    {STATUS_DIZZY, "X_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_1"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_1"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Pose table (flipped over) of the Koopatrol: maps each battle pose to the animation it plays (N_* animations).
+ */
 static PoseTableEntry pose_table_turn[] = {
-    {1, "N_2"},
-    {2, "Z_2"},
-    {9, "Z_2"},
-    {5, "K_2"},
-    {4, "S_2"},
-    {3, "S_2"},
-    {28, "S_2"},
+    {STATUS_SLEEP, "N_2"},
+    {STATUS_STOP, "Z_2"},
+    {STATUS_FREEZE, "Z_2"},
+    {STATUS_CONFUSE, "K_2"},
+    {STATUS_POISON, "S_2"},
+    {STATUS_DIZZY, "S_2"},
+    {BTL_POSE_NORMAL, "S_2"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "D_1"},
-    {39, "D_1"},
-    {56, "S_2"},
-    {57, "S_2"},
+    {BTL_POSE_DAMAGE, "D_1"},
+    {BTL_POSE_DANGER, "S_2"},
+    {BTL_POSE_PERIL, "S_2"},
     {BTL_POSE_TALK, "S_2"},
     {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
+/**
+ * Pose table (guarding) of the Koopatrol: maps each battle pose to the animation it plays (A_* animations).
+ */
 static PoseTableEntry pose_table_guard[] = {
-    {1, "A_1"},
-    {2, "A_1"},
-    {9, "A_1"},
-    {5, "A_1"},
-    {4, "A_1"},
-    {3, "A_1"},
-    {28, "A_1"},
+    {STATUS_SLEEP, "A_1"},
+    {STATUS_STOP, "A_1"},
+    {STATUS_FREEZE, "A_1"},
+    {STATUS_CONFUSE, "A_1"},
+    {STATUS_POISON, "A_1"},
+    {STATUS_DIZZY, "A_1"},
+    {BTL_POSE_NORMAL, "A_1"},
     {29, "A_1"},
     {30, "A_1"},
     {31, "A_1"},
-    {39, "A_1"},
-    {56, "A_1"},
-    {57, "A_1"},
+    {BTL_POSE_DAMAGE, "A_1"},
+    {BTL_POSE_DANGER, "A_1"},
+    {BTL_POSE_PERIL, "A_1"},
     {BTL_POSE_TALK, "A_1"},
     {BTL_POSE_STAY_DEFAULT, "A_1"},
 };
 
+/**
+ * Pose table (guard turn) of the Koopatrol: maps each battle pose to the animation it plays (G_* animations).
+ */
 static PoseTableEntry pose_table_guard_turn[] = {
-    {1, "G_1"},
-    {2, "G_1"},
-    {9, "G_1"},
-    {5, "G_1"},
-    {4, "G_1"},
-    {3, "G_1"},
-    {28, "G_1"},
+    {STATUS_SLEEP, "G_1"},
+    {STATUS_STOP, "G_1"},
+    {STATUS_FREEZE, "G_1"},
+    {STATUS_CONFUSE, "G_1"},
+    {STATUS_POISON, "G_1"},
+    {STATUS_DIZZY, "G_1"},
+    {BTL_POSE_NORMAL, "G_1"},
     {29, "G_1"},
     {30, "G_1"},
     {31, "G_1"},
-    {39, "G_1"},
-    {56, "G_1"},
-    {57, "G_1"},
+    {BTL_POSE_DAMAGE, "G_1"},
+    {BTL_POSE_DANGER, "G_1"},
+    {BTL_POSE_PERIL, "G_1"},
     {BTL_POSE_TALK, "G_1"},
     {BTL_POSE_STAY_DEFAULT, "G_1"},
 };
 
+/**
+ * Data table of the Koopatrol: event handlers for being flipped over,
+ * the attacker hurt by its spikes and a First Strike on it (no reaction).
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
@@ -221,12 +268,20 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Data table of the Koopatrol while flipped on its back: the flip-over reaction;
+ * a First Strike on it is ignored.
+ */
 static BattleDataEntry data_table_turn[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0},
 };
 
+/**
+ * Data table of the Koopatrol while guarding in its shell:
+ * the spike counter, the flip-over reaction and an ignored First Strike.
+ */
 static BattleDataEntry data_table_guard[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {13, dmg_turn_event},
@@ -234,10 +289,12 @@ static BattleDataEntry data_table_guard[] = {
     {0},
 };
 
+/** Body part of the Koopatrol (model c_togenoko): hit position, defences, attributes and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_togenoko", "c_togenoko", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x1009, 0x1, pose_table},
+    {1, "btl_un_togenoko", "c_togenoko", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_SHELLED, COUNTER_ATTR_TOP_SPIKY, pose_table},
 };
 
+/** Weapon of the Koopatrol's normal attack: 4 damage, hammer-type contact attack. */
 static BattleWeapon weapon_togenoko_normal_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -256,7 +313,7 @@ static BattleWeapon weapon_togenoko_normal_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -275,6 +332,7 @@ static BattleWeapon weapon_togenoko_normal_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Koopatrol's shell attack: 4 damage, shell-toss-type attack. */
 static BattleWeapon weapon_togenoko_shell_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -293,7 +351,7 @@ static BattleWeapon weapon_togenoko_shell_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -312,6 +370,7 @@ static BattleWeapon weapon_togenoko_shell_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the Koopatrol's charge: no HP damage. */
 static BattleWeapon weapon_togenoko_charge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -329,7 +388,7 @@ static BattleWeapon weapon_togenoko_charge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -368,18 +427,21 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Runs when an attack on the Koopatrol is stopped by its spiked helmet. Checks statuses 10 and 11 of the unit.
- * Guess: it is the counter for stomps on the spike.
+ * Data event 37, run by the default damage event for damage code 0x1F (the name: an attack avoided by the
+ * thorn-head counter, i.e. bounced off its spiked helmet): waits 30 frames
+ * and flashes the "toge_flush" spike effect for 60 frames above the unit,
+ * 70 units up when it is Huge (status 10),
+ * 40 when Tiny (status 11) and 55 otherwise.
  */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 70)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 40)
         GOTO(90)
@@ -392,9 +454,11 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
 EVT_END()
 
 /**
- * Guess: Reaction when a flipped Koopatrol is struck:
- * it is turned over (pose table for the turned state, SFX_ENM_INSIDE1), hops,
- * and rests helpless on its back (unit work 0 set).
+ * Data event 13 (an attack flips the Koopatrol over): switches to the flipped defence, defence-attribute, status
+ * and data tables and the flipped pose table (the guarding one if unit work 0 says it was in its shell), sets
+ * STATUS_FLAG_FLIPPED with the over-turn counter at 2, turns its counter attribute off,
+ * lowers its hit offset and
+ * hops twice with SFX_ENM_INSIDE1.
  */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
@@ -403,17 +467,17 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr_turn))
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist_turn))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_GUARDING, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     ELSE
         CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_guard_turn))
         CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
     END_IF
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
-    CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), LW(11), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
+    CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), LW(11), COUNTER_ATTR_TOP_SPIKY)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -426,8 +490,10 @@ static EVT_BEGIN(dmg_turn_event)
 EVT_END()
 
 /**
- * Guess: Recovery when the Koopatrol gets up from the turned state:
- * restores the normal pose table and counter attribute with SFX_ENM_INSIDE2, hops, and clears unit work 0.
+ * Runs in place of a flipped Koopatrol's attack:
+ * counts the over-turn counter down by one and just waits while turns
+ * remain; at zero it restores the normal defence, status, pose and data tables and its counter attribute, clears
+ * STATUS_FLAG_FLIPPED, hops back up (S_1, SFX_ENM_INSIDE2) and clears unit work 0 (the guard state).
  */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
@@ -444,19 +510,20 @@ static EVT_BEGIN(wakeup_event)
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
-    CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
+    CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), COUNTER_ATTR_TOP_SPIKY)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("S_1"))
     CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 12, -1)
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_GUARDING, 0)
     CALL(btlevtcmd_StartWaitEvent, LW(10))
     RETURN
 EVT_END()
 
+/** Spawn setup for a Koopatrol: starts off-screen on the enemy side until it is moved into place. */
 static BattleUnitSetup entry_togenoko = {
     &unit_togenoko, // unitKindParams
     1, // alliance
@@ -474,18 +541,21 @@ static BattleUnitSetup entry_togenoko = {
  * based on its state, the number of Koopatrols alive (togenoko_getnum) and random chances.
  */
 static EVT_BEGIN(attack_event)
+    // In a forced (confused or scripted) turn it just attacks normally.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_togenoko_normal_attack))
         CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
+    // A Koopatrol flipped onto its back spends its turn getting back up.
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    // A guarding Koopatrol usually lowers its guard on its turn.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_GUARDING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(0), 80)
         ADD(LW(0), 20)
@@ -497,7 +567,9 @@ static EVT_BEGIN(attack_event)
         END_IF
         GOTO(99)
     ELSE
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
+        // A Koopatrol that is not guarding checks its state: one that is bothered by a status mostly uses its
+        // shell attack, otherwise it may use an item.
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CHARGE, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(0), 0)
             ADD(LW(0), 25)
@@ -520,6 +592,7 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             RETURN
         END_IF
+        // It looks for free room on the stage near itself, since a friend needs room to join the fight.
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         LOOP(0)
             CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
@@ -550,6 +623,7 @@ static EVT_BEGIN(attack_event)
                 GOTO(11)
             END_IF
         END_LOOP
+        // With room to spare, it may call a friend to join (the fewer Koopatrols are alive, the likelier).
         LABEL(10)
         CALL(togenoko_getnum, LW(10))
         CALL(evt_sub_random, 99, LW(11))
@@ -573,6 +647,7 @@ static EVT_BEGIN(attack_event)
             END_IF
             CASE_END
         END_SWITCH
+        // Otherwise it picks its move at random: the normal attack, the shell attack, the charge or guarding.
         LABEL(11)
         SET_VALUE(LW(0), 0)
         ADD(LW(0), 25)
@@ -602,6 +677,7 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(guard_event)
         GOTO(99)
     END_IF
+    // The move is done and the Koopatrol returns to waiting.
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -612,6 +688,7 @@ EVT_END()
  * and the pre-damage check decides between a miss and a hit; then it hops back.
  */
 static EVT_BEGIN(normal_attack_event)
+    // Choose the target: the First Strike target if the battle opened with one, otherwise a normal pick.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         WAIT_MS(750)
@@ -621,14 +698,17 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     END_IF
+    // No target left: a confused Koopatrol is flustered; either way it ends its turn.
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The attack is announced and the guard timing is awaited, and the camera frames the Koopatrol
+    // and its target.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
@@ -639,6 +719,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // It marches up to the target with a stamping tread, then lunges with its spear.
     BEGIN_SIBLING_EVENT
         LOOP(10)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGENOKO_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -655,6 +736,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
+    // Check how the target defends against the thrust.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -677,6 +759,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The target dodged: the Koopatrol runs on past, reappears from the far side and walks home.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 500)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
@@ -690,12 +773,13 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     GOTO(98)
+    // The thrust hits: the camera shakes and the damage is dealt, then it hops back toward home in two hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
@@ -716,6 +800,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGENOKO_MOVE6"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // It settles at home.
     LABEL(98)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     WAIT_MS(500)
@@ -723,22 +808,27 @@ static EVT_BEGIN(normal_attack_event)
 EVT_END()
 
 /**
- * Guess: The Koopatrol's shell attack: it pulls into its shell
- * and spins at the target (A_1, SFX_ENM_TOGENOKO_SHELL1), the pre-damage check decides between a miss and a hit,
- * and it comes back and pops out of the shell (SHELL2).
+ * The Koopatrol's shell attack (weapon in LW(9)):
+ * it hops into its shell (A_1, SFX_ENM_TOGENOKO_SHELL1), spins up
+ * (10, 20, then 40 degrees per frame) and slides through every selected target in turn,
+ * each one avoiding or taking
+ * the damage (the action-command result only once), trailing dust; it slides 500 units on, reappears at x 250,
+ * slides home and pops out of the shell (SHELL2).
  */
 static EVT_BEGIN(shell_attack_event)
+    // Choose the targets for the shell attack; a confused Koopatrol with none is flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // The camera frames the Koopatrol and its target, and the attack is announced.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -750,32 +840,35 @@ static EVT_BEGIN(shell_attack_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(100)
+    // The Koopatrol hops into its shell.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGENOKO_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGENOKO_SHELL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1"))
+    // It spins up in three steps, faster each time.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGENOKO_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 10)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_SPIN_STOP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_SPIN_SPEED, 10)
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(15))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_SPIN_STOP, LW(15))
             IF_INT_EQUAL(LW(15), 1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
             WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(14))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_SPIN_SPEED, LW(14))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(14), 0)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_MS(200)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 20)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_SPIN_SPEED, 20)
     WAIT_MS(200)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 40)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_SPIN_SPEED, 40)
     WAIT_MS(200)
+    // It starts its slide, kicking up dust.
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -792,11 +885,12 @@ static EVT_BEGIN(shell_attack_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, 0, 0)
     SET_VALUE(LW(6), 0)
+    // It slides through each target in turn: those that dodge are slipped past, the rest take the damage.
     LABEL(10)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(12.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -827,19 +921,21 @@ static EVT_BEGIN(shell_attack_event)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
         GOTO(10)
     END_IF
+    // After the last target it slides on off the stage, reappears on the far side and slides home.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 500)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(12.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 0)
     WAIT_MS(500)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, 250, LW(1), LW(2))
+    // It pops out of its shell at home.
     LABEL(98)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGENOKO_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(12.0f))
@@ -851,7 +947,7 @@ static EVT_BEGIN(shell_attack_event)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_TOGENOKO_SPIN_STOP, 1)
     WAIT_FRAMES(3)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -889,13 +985,15 @@ static EVT_BEGIN(charge_event)
         CALL(evt_btl_camera_set_mode, 0, 0)
     END_INLINE_EVENT
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_togenoko_charge))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togenoko_charge), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togenoko_charge), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 
 /**
- * Guess: The Koopatrol pulls into its shell to guard (SHELL1, A_1):
- * it takes the guarding pose table and resistances (regist_guard) and sets unit work 0.
+ * The Koopatrol pulls into its shell to guard (SHELL1, A_1): it hops and wobbles, then takes the guarding
+ * defence, defence-attribute, status (regist_guard), pose and data tables,
+ * sets unit work 0 to 1 and lowers its hit
+ * offset.
  */
 static EVT_BEGIN(guard_event)
     SET_VALUE(LW(10), -2)
@@ -926,15 +1024,15 @@ static EVT_BEGIN(guard_event)
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist_guard))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_guard))
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table_guard))
-    CALL(btlevtcmd_SetUnitWork, LW(10), 0, 1)
+    CALL(btlevtcmd_SetUnitWork, LW(10), UW_TOGENOKO_GUARDING, 1)
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, -20, 0)
     WAIT_MS(300)
     RETURN
 EVT_END()
 
 /**
- * Guess: The Koopatrol comes out of guard (SHELL2, S_1):
- * restores the normal pose table and resistances and clears unit work 0.
+ * The Koopatrol comes out of guard (SHELL2, S_1): it hops and restores the normal defence, defence-attribute,
+ * status, pose and data tables, clears unit work 0 and resets its hit offset.
  */
 static EVT_BEGIN(guard_cancel_event)
     SET_VALUE(LW(10), -2)
@@ -954,7 +1052,7 @@ static EVT_BEGIN(guard_cancel_event)
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table))
-    CALL(btlevtcmd_SetUnitWork, LW(10), 0, 0)
+    CALL(btlevtcmd_SetUnitWork, LW(10), UW_TOGENOKO_GUARDING, 0)
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, 0, 0)
     WAIT_MS(300)
     RETURN
@@ -1001,7 +1099,7 @@ static USER_FUNC(togenoko_getnum) {
 
     for (i = 0; i < 64; i++) {
         BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
-        if (unit != NULL && unit->currentKind == 11) {
+        if (unit != NULL && unit->currentKind == UNIT_KOOPATROL) {
             num++;
         }
     }

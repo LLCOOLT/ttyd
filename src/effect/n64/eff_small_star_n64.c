@@ -175,9 +175,9 @@ EffectEntry* effSmallStarN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-// lifetimes optimisation off for _cosf, alphaf, effSmallStarMain: the original register allocation and scheduling need it
+// FAKE: lifetimes optimisation off for _cosf, alphaf, effSmallStarMain: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 /** Polynomial cosine approximation on [0, 2*pi), written out to match the original's inlined code. */
 static inline f32 _cosf(f32 x) {
@@ -284,11 +284,13 @@ static void effSmallStarMain(EffectEntry* effect) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** RGB colours the small stars cycle through (pinks, purples and blues), three bytes per step. */
 static u8 color_rotation_data[] = {
     0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
     0xB4, 0xB4, 0xFE, 0xB4, 0xDD, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5,
     0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
 };
+/** 16x16 camera-facing quad drawn for each small star. */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 0xFF},
     {8, -8, 0, 64, 0, 0, 0, 0, 0xFF},

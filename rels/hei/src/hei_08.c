@@ -22,6 +22,7 @@ extern s32 hei_test_water_tev[];
 
 static BeroEntry bero_entry_data[2];
 
+/** Doors of this room: the east exit (e_bero) to hei_09. */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName

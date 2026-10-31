@@ -4,6 +4,10 @@
 
 #include "__demo.h"
 
+/**
+ * Non-zero while the on-screen hardware statistics overlay is turned on. The statics below hold its
+ * counters.
+ */
 u8 DemoStatEnable = 0;
 static DemoStatData* DemoStat;
 static u32 DemoStatIndx;

@@ -1,7 +1,6 @@
-#pragma once
-
 // Glitz Pit fighter ranking: the tables and work shared by the tou and tou2 RELs (tou.c and tou2.c each
 // carry the ranking code).
+#pragma once
 
 #include <dolphin/types.h>
 

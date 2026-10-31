@@ -80,8 +80,8 @@ USER_FUNC(evt_snd_bgm_freq) {
 }
 
 /**
- * Guess: muffles or restores the BGM on slot args[0].
- * args[1] > 0 sets its scope timer to 255, < 0 clears it, 0 sets 30.
+ * Exempts the BGM on slot args[0] from the master BGM volume (psndBGMScope), which drops to 65% in the camera
+ * idle mix: args[1] > 0 for good (scope timer 255), < 0 not at all (0), 0 for 30 more frames.
  */
 USER_FUNC(evt_snd_bgm_scope) {
     EvtWord* args = event->args;

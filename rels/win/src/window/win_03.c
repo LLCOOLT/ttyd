@@ -42,9 +42,11 @@ EVT_BEGIN(clouda_house_in)
 EVT_END()
 
 /**
- * Guess: bero enter script used when Mario returns outside Flurrie's door:
- * turns on Mario's background mode, removes the partner, resets the camera,
- * places Mario at (277, 54, -450) and re-enters the bero; returns LW(0) = 1.
+ * Bero script that nothing in the tree references:
+ * turns on Mario's background mode, removes the partner, turns off the camera's y follow,
+ * places Mario at (277, 54, -450), next to Flurrie's door at (306, 23, -448), and runs bero_case_entry;
+ * returns LW(0) = 1.
+ * Guess: an unused variant for coming out of Flurrie's house.
  */
 EVT_BEGIN(clouda_house_out)
     CALL(evt_mario_bgmode_on)
@@ -70,6 +72,10 @@ EVT_BEGIN(cloud_in)
     RETURN
 EVT_END()
 
+/**
+ * Exits of this map: west to win_02, the pipe pair dokan_1/dokan_2 within this map,
+ * and Flurrie's door (n_bero) to win_04, which plays the wooden door sounds.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -166,9 +172,9 @@ EVT_BEGIN(lookat_house)
 EVT_END()
 
 /**
- * Guess: script helper that bobs the 3D camera in
- * and out around (290, 150, 491) looking at (290, 90, -6) with an accelerating motion,
- * used by the Flurrie-lost-item scene to shake the view.
+ * Script helper for cloud_toujou: pans the 3D camera sideways from x -10 to x 290 (position y 150, z 491,
+ * looking at y 90, z -6),
+ * 2.5 units a frame and easing to a stop at the end; blocks until the pan is done.
  */
 static USER_FUNC(camera_action) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -220,9 +226,10 @@ static USER_FUNC(camera_action) {
 }
 
 /**
- * Guess: Flurrie appears outside her house (Boggly Woods):
- * Mario is moved offscreen, the camera frames the house,
- * "stg2_win_e04_00_01" plays and the map changes to win_04 with an iris wipe.
+ * First part of Flurrie's intro, spawned by the init script at STORY_STG2_03_02:
+ * Mario and the partners are moved off the map, the camera pans to her house (camera_action)
+ * and a voice without a speaker tail praises the woods and the house she built there (stg2_win_e04_00_01);
+ * then the map changes to win_04 with an iris wipe.
  */
 static EVT_BEGIN(cloud_toujou)
     CALL(evt_mario_key_onoff, 0)
@@ -245,9 +252,10 @@ static EVT_BEGIN(cloud_toujou)
 EVT_END()
 
 /**
- * Guess: cutscene at Flurrie's house where she has lost her precious item:
- * the camera bobs, the surprised jingle plays, "stg2_win_e04_00_05" is shown
- * and the story becomes STORY_STG2_03_04_SHES_LOST_HER_PRECIOUS.
+ * Last part of Flurrie's intro, spawned by the init script at STORY_STG2_03_03 (after win_05):
+ * with Mario off the map, the camera shakes toward the house with a blur and the surprised jingle,
+ * a voice wails that something is gone (stg2_win_e04_00_05),
+ * the story becomes STORY_STG2_03_04_SHES_LOST_HER_PRECIOUS and the map changes to win_01 ("n_bero").
  */
 EVT_BEGIN(cloud_lostitem)
     CALL(evt_mario_key_onoff, 0)
@@ -315,6 +323,7 @@ EVT_BEGIN(tree_evt_01)
     RETURN
 EVT_END()
 
+/** Trees of this map that shake when Mario hammers them; the second drops a Star Piece once. */
 static TreeAccess tree_access_data[] = {
     {4, "A_tree_01", "S_tree_mki_01", "S_tree_ha01", 0, NULL},
     {4, "A_tree_02", "S_tree_mki_02", "S_tree_ha03", 0, tree_evt_01},
@@ -324,8 +333,8 @@ static TreeAccess tree_access_data[] = {
 };
 
 /**
- * Guess: empty case event for the "n_bero" area: it only exits the case event;
- * used so the area registers as a case without doing anything.
+ * Case script the init script registers for pressing A while standing on "n_bero":
+ * it only ends the case event, so pressing A there does nothing.
  */
 EVT_BEGIN(dummy_event)
     CALL(evt_exit_case_evt)
@@ -333,9 +342,12 @@ EVT_BEGIN(dummy_event)
 EVT_END()
 
 /**
- * Guess: map init script of Boggly Woods' Flurrie's-house map (win_03):
- * registers exits, trees, the Volt Shroom and Star Piece items, hides the cave and castle scenery,
- * and starts the Flurrie scenes by story progress.
+ * Map init script of win_03, outside Flurrie's house:
+ * registers exits, the "n_bero" A case, BGM and ambience, trees, a recovery block,
+ * the Volt Shroom and a Star Piece,
+ * hides the "S_ana" and "S_siro_asu" objects (and the "A_siro_asu" hit),
+ * and spawns lookat_house at STORY_STG2_03_05,
+ * cloud_toujou at STORY_STG2_03_02 and cloud_lostitem at STORY_STG2_03_03.
  */
 EVT_BEGIN(win_03_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))

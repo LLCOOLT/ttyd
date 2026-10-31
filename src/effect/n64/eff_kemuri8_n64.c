@@ -52,7 +52,7 @@ inline float inline_fn(f32 a, f32 b) {
     return a * (-b);
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 /**
  * Spawns a ring of smoke puffs (7/9/11 for type 0/1/other, radius 14/28/42) around (x, y, z) that fly outward in

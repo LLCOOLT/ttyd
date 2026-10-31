@@ -32,6 +32,12 @@ typedef struct LinkDt {
     u8 links[4];       // 0x18
 } LinkDt;
 
+/**
+ * Entries of the pause menu's Mario screen: level, Star Rank, hammer, boots, HP, FP, BP,
+ * the four curses, Star Power, special moves, Star Points, coins, Star Pieces,
+ * Shine Sprites and play time. Each gives the cursor spot, Mario's poses, the item it needs,
+ * its help text and the entry reached by up, down, left and right. winMarioMain moves through it.
+ */
 LinkDt linkDt[18] = {
     {-268, 142, ("M_S_1"), NULL, ("S_1"), 0, 0, ("msg_menu_mario_lv"), {6, 1, 11, 9}},
     {-268, 118, ("M_S_1"), NULL, ("S_1"), 0, 0, ("msg_menu_mario_star_r"), {0, 2, 11, 7}},
@@ -67,7 +73,7 @@ void winMarioInit(WindowWork* w) {
     s32 i;
 
     pouch = pouchGetPtr();
-    if (w->flags & 0x2000) {
+    if (w->flags & WIN_FLAG_8BIT_MARIO) {
         name = "S_1";
         switch (marioGetColor()) {
             case 0:
@@ -105,18 +111,18 @@ void winMarioInit(WindowWork* w) {
         animPoseSetAnim(w->mario.poseId, "M_S_1", 1);
     }
     animPoseSetMaterialFlagOn(w->mario.poseId, ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2);
-    if (marioGetPtr()->flags & 0x40000000) {
+    if (marioGetPtr()->flags & MARIO_FLAG_IS_SHADOW_MARIO) {
         animPoseSetMaterialFlagOn(w->mario.poseId, ANIM_MATERIAL_TEV_CALLBACK(10));
     }
 #if VERSION >= VERSION_JP
-    w->mario.f18C = 0;
+    w->mario.hammerHold = 0;
 #endif
-    w->mario.f190 = 0;
-    w->mario.f194 = 0;
-    w->mario.f198 = 0;
+    w->mario.wazaOpen = 0;
+    w->mario.wazaCursor = 0;
+    w->mario.wazaCount = 0;
     for (i = 0; i < 8; i++) {
         if (pouch->starPowersObtained & (1 << i)) {
-            w->mario.f198++;
+            w->mario.wazaCount++;
         }
     }
 }
@@ -141,10 +147,10 @@ void winMarioInit2(WindowWork* w) {
             break;
     }
 #if VERSION >= VERSION_JP
-    w->mario.f18C = 0;
+    w->mario.hammerHold = 0;
 #endif
-    w->mario.f190 = 0;
-    w->mario.f194 = 0;
+    w->mario.wazaOpen = 0;
+    w->mario.wazaCursor = 0;
 }
 
 /** Frees the Mario model loaded by winMarioInit. */
@@ -190,7 +196,7 @@ void winMarioExit(WindowWork* w) {
     p = &linkDt[w->marioSel];                                      \
     while (1) {                                                    \
         if (w->marioSel == 11 || w->marioSel == 12) {              \
-            if (w->mario.f198 != 0)                                \
+            if (w->mario.wazaCount != 0)                           \
                 break;                                             \
         } else if (p->item == 0 || pouchCheckItem(p->item) != 0) { \
             break;                                                 \
@@ -212,20 +218,20 @@ s32 winMarioMain(WindowWork* w) {
     LinkDt* lp;
     LinkDt* p;
 
-    switch (w->mario.f190) {
+    switch (w->mario.wazaOpen) {
         case 0:
             if (w->buttonTrg & PAD_BUTTON_A) {
                 if (w->marioSel == 12) {
-                    w->mario.f190 = 1;
-                    w->mario.f194 = 0;
+                    w->mario.wazaOpen = 1;
+                    w->mario.wazaCursor = 0;
                     psndSFXOn((const char*)0x20012);
                 }
             } else if (w->buttonTrg & PAD_BUTTON_B) {
                 psndSFXOn((const char*)0x20013);
 #if VERSION <= VERSION_DEMO_US
-                animPoseSetAnim(w->mario.poseId, (w->flags & 0x2000) ? "S_1" : "M_S_1", 0);
+                animPoseSetAnim(w->mario.poseId, (w->flags & WIN_FLAG_8BIT_MARIO) ? "S_1" : "M_S_1", 0);
 #else
-                if (w->flags & 0x2000) {
+                if (w->flags & WIN_FLAG_8BIT_MARIO) {
                     COLOR_ANIM(anims[1], "S_1")
                 } else {
                     anims[1] = "M_S_1";
@@ -249,30 +255,30 @@ s32 winMarioMain(WindowWork* w) {
             w->helpTgtY = lp->y;
             switch (w->marioSel) {
                 case 2:
-                    if (w->flags & 0x2000) {
+                    if (w->flags & WIN_FLAG_8BIT_MARIO) {
                         COLOR_ANIM(anims[0], lp->pose2)
                     } else {
                         anims[0] = hammer_pose[pouchGetHammerLv()];
                     }
                     animPoseSetAnim(w->mario.poseId, anims[0], 0);
 #if VERSION >= VERSION_JP
-                    if (w->mario.f18C == 0) {
+                    if (w->mario.hammerHold == 0) {
                         if (animPoseGetLoopTimes(w->mario.poseId) >= 0.89f) {
-                            w->mario.f18C = 30;
+                            w->mario.hammerHold = 30;
                         }
                     } else {
-                        w->mario.f18C--;
+                        w->mario.hammerHold--;
                     }
-                    if (w->flags & 0x2000) {
-                        w->mario.f18C = 0;
+                    if (w->flags & WIN_FLAG_8BIT_MARIO) {
+                        w->mario.hammerHold = 0;
                     }
 #endif
                     break;
                 default:
 #if VERSION >= VERSION_JP
-                    w->mario.f18C = 0;
+                    w->mario.hammerHold = 0;
 #endif
-                    if (w->flags & 0x2000) {
+                    if (w->flags & WIN_FLAG_8BIT_MARIO) {
                         COLOR_ANIM(anims[0], lp->pose2)
                     } else {
                         anims[0] = lp->pose0;
@@ -294,26 +300,26 @@ s32 winMarioMain(WindowWork* w) {
             break;
         case 1:
             if (w->dirRep & DEMO_STICK_UP) {
-                w->mario.f194--;
-                if (w->mario.f194 < 0) {
-                    w->mario.f194 = w->mario.f198 - 1;
+                w->mario.wazaCursor--;
+                if (w->mario.wazaCursor < 0) {
+                    w->mario.wazaCursor = w->mario.wazaCount - 1;
                 }
                 psndSFXOn((const char*)0x20005);
             } else if (w->dirRep & DEMO_STICK_DOWN) {
-                w->mario.f194++;
-                if (w->mario.f194 >= w->mario.f198) {
-                    w->mario.f194 = 0;
+                w->mario.wazaCursor++;
+                if (w->mario.wazaCursor >= w->mario.wazaCount) {
+                    w->mario.wazaCursor = 0;
                 }
                 psndSFXOn((const char*)0x20005);
             } else if (w->buttonTrg & PAD_BUTTON_B) {
-                w->mario.f190 = 0;
+                w->mario.wazaOpen = 0;
                 psndSFXOn((const char*)0x20013);
             } else if (w->buttonTrg & PAD_BUTTON_START) {
                 return -2;
             }
             w->helpTgtX = -280.0f;
-            w->helpTgtY = 10.0f + (120.0f - 26.0f * w->mario.f194 - 12.0f);
-            winMsgEntry(w, 0, superActionTable[w->mario.f194]->description, 0);
+            w->helpTgtY = 10.0f + (120.0f - 26.0f * w->mario.wazaCursor - 12.0f);
+            winMsgEntry(w, 0, superActionTable[w->mario.wazaCursor]->description, 0);
             break;
     }
     return 0;
@@ -608,7 +614,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winFontSet((Vec){col5 = 200.0f + (x - 270.0f), row2, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumHP));
     winFontSet((Vec){col5, rowC, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumFP));
 
-    if (w->mario.f198 > 0) {
+    if (w->mario.wazaCount > 0) {
         winKirinukiGX(w, 0, 10.0f + x, (20.0f + (130.0f + y)) - 20.0f, 260.0f, 80.0f);
         winIconInit();
         col6 = 10.0f + (40.0f + x);
@@ -620,7 +626,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         winFontSetWidth((Vec){10.0f + (70.0f + x), 10.0f + cx3, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, 175.0f, msgSearch("msg_menu_mario_special"));
         winIconInit();
         cx4 = 10.0f + (80.0f + x);
-        for (i = 0; i < w->mario.f198; i++) {
+        for (i = 0; i < w->mario.wazaCount; i++) {
             if (i < pouch->currentSP / 100) {
                 winIconSet(ICON_1B7 + i, (Vec){cx4 + (f32)(i * 22), nameW3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
             } else {
@@ -693,7 +699,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
 
     animPoseGetAnimPosePtr(w->mario.poseId);
     anim = animPoseGetAnimDataPtr(w->mario.poseId);
-    if (w->mario.f18C == 0) {
+    if (w->mario.hammerHold == 0) {
         animPoseSetLocalTime(w->mario.poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
     }
     animPoseMain(w->mario.poseId);
@@ -702,7 +708,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winZClear();
     animPoseDrawMtx(w->mario.poseId, mtx, 2, 0.0f, 5.0f);
 
-    if (w->mario.f190) {
+    if (w->mario.wazaOpen) {
         const char* msg = msgSearch("msg_menu_mario_sac_waza");
         winWazaGX(w, 0, x - 270.0f, 160.0f, 270.0f, 254.0f);
         winFontInit();
@@ -711,7 +717,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         y2 = 10.0f + (left - 270.0f);
         x2 = (228.0f + x) - 270.0f;
         cx6 = 4.0f + ((17.0f + rowB3) - 270.0f);
-        for (i = 0; i < w->mario.f198; i++) {
+        for (i = 0; i < w->mario.wazaCount; i++) {
             char sbuf[0x20];
 
             winFontSetWidth((Vec){y2, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, 180.0f, msgSearch(superActionTable[i]->name));
@@ -771,7 +777,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     char buf[0x100];
 
     w = param;
-    // FAKE: dead store; makes y the first float referenced, so its later web (the f190 label x) is split before x's (register order)
+    // FAKE: dead store; makes y the first float referenced, so its later web (the wazaOpen list label x) is split before x's (register order)
     y = 0.0f;
     pouch = pouchGetPtr();
     white = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
@@ -850,7 +856,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winFontSet((Vec){col, row2, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumHP));
     winFontSet((Vec){col, rowB, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumFP));
 
-    if (w->mario.f198 > 0) {
+    if (w->mario.wazaCount > 0) {
         winKirinukiGX(w, 0, 10.0f + x, (20.0f + (130.0f + y)) - 20.0f, 260.0f, 80.0f);
         winIconInit();
         col = 10.0f + (40.0f + x);
@@ -862,7 +868,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         winFontSet((Vec){10.0f + (70.0f + x), 10.0f + cx, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, msgSearch("msg_menu_mario_special"));
         winIconInit();
         cx = 10.0f + (80.0f + x);
-        for (i = 0; i < w->mario.f198; i++) {
+        for (i = 0; i < w->mario.wazaCount; i++) {
             if (i < pouch->currentSP / 100) {
                 winIconSet(0x1B7 + i, (Vec){cx + (f32)(i * 22), rowB, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
             } else {
@@ -952,7 +958,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
 #if VERSION <= VERSION_DEMO_US
     animPoseSetLocalTime(w->mario.poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
 #else
-    if (w->mario.f18C == 0) {
+    if (w->mario.hammerHold == 0) {
         animPoseSetLocalTime(w->mario.poseId, (f32)(gp->retraceCount % (s32)anim->loopInfo[2]));
     }
 #endif
@@ -962,7 +968,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     winZClear();
     animPoseDrawMtx(w->mario.poseId, mtx, 2, 0.0f, 5.0f);
 
-    if (w->mario.f190) {
+    if (w->mario.wazaOpen) {
         winWazaGX(w, 0, x - 270.0f, 160.0f, 270.0f, 254.0f);
         winFontInit();
         winFontSetEdge((Vec){(90.0f + x) - 270.0f, 155.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_mario_sac_waza"));
@@ -971,7 +977,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         winFontSetEdge((Vec){numX, 155.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, "\x82\x72\x82\x6F");
         x = left - 270.0f;
         cx = (17.0f + rowB) - 270.0f;
-        for (i = 0; i < w->mario.f198; i++) {
+        for (i = 0; i < w->mario.wazaCount; i++) {
             char sbuf[0x20];
 
             winFontSetLabel((Vec){x, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, superActionTable[i]->name);
@@ -984,7 +990,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         y = 10.0f + (left - 270.0f);
         x = (228.0f + x) - 270.0f;
         cx = 4.0f + ((17.0f + rowB) - 270.0f);
-        for (i = 0; i < w->mario.f198; i++) {
+        for (i = 0; i < w->mario.wazaCount; i++) {
             char sbuf[0x20];
 
             winFontSetLabel((Vec){y, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, superActionTable[i]->name);

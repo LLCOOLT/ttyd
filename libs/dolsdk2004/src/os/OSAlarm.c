@@ -16,6 +16,7 @@ static void DecrementerExceptionCallback(register __OSException exception, regis
 static void DecrementerExceptionHandler(__OSException exception, OSContext* context);
 static BOOL OnReset(BOOL final);
 
+/** Registers OnReset (priority 0xFFFFFFFF) with the OS so pending alarms are cancelled before a reset. */
 static OSResetFunctionInfo ResetFunctionInfo = {OnReset, 0xFFFFFFFF, NULL, NULL};
 static OSAlarmQueue AlarmQueue;
 

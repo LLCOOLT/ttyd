@@ -16,6 +16,11 @@
 static USER_FUNC(_wave_offset);
 extern EvtWord bgset_tst_wave_event[];
 
+/**
+ * Stage objects of the test battle stages, in four runs: entries 0-7 (trees ki_1 to ki_3, fence saku_1,
+ * background sets B and C, and the if_wire and if_body objects), 8-12 (a smaller scene of two trees, the
+ * fence, B and C), and 13-18 (the tree scene again without the wire objects).
+ */
 BattleStageObjectData tst_btlobject_data[] = {
     {"ki_1", 0, 0, {136.0f, 0.0f, -63.0f}, 50, 40, {0}},
     {"ki_2", 0, 0, {86.0f, 0.0f, -30.0f}, 0, 90, {0}},
@@ -38,6 +43,11 @@ BattleStageObjectData tst_btlobject_data[] = {
     {"C", 2, 3, {0}, 0, 90, {0}},
 };
 
+/**
+ * Test battle stages used only by the BTLNO_TEST_* fights: [0] is empty (no objects), [1] to [4] are the
+ * bti_01 to bti_04 variants (stg_01_0 to stg_01_3) with the first six objects, [5] swaps in objects 13-18
+ * and runs bgset_tst_wave_event to sway background set B, and [6] uses all eight objects of the first run.
+ */
 BattleStageData tst_btlstage_data[] = {
     {
         "bti_01", // globalStageDataDir
@@ -111,6 +121,7 @@ BattleStageData tst_btlstage_data[] = {
     },
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_KURIBOO_1: Goomba. */
 BattleUnitSetup btlparty_test_kuriboo_1[] = {
     {
         &unit_kuriboo, // unitKindParams
@@ -124,6 +135,10 @@ BattleUnitSetup btlparty_test_kuriboo_1[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_KURIBOO_1: Goomba, with its item drop odds and heart and flower
+ * drop tables.
+ */
 BattleGroupSetup btlgrp_test_kuriboo_1 = {
     1, // numEnemies
     btlparty_test_kuriboo_1, // enemyData
@@ -135,6 +150,7 @@ BattleGroupSetup btlgrp_test_kuriboo_1 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_KURIBOO: Goomba, Spiky Goomba, Paragoomba. */
 BattleUnitSetup btlparty_test_kuriboo[] = {
     {
         &unit_kuriboo, // unitKindParams
@@ -168,6 +184,10 @@ BattleUnitSetup btlparty_test_kuriboo[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_KURIBOO: Goomba, Spiky Goomba, Paragoomba, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_kuriboo = {
     3, // numEnemies
     btlparty_test_kuriboo, // enemyData
@@ -179,6 +199,7 @@ BattleGroupSetup btlgrp_test_kuriboo = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_HYPER_KURIBOO: Hyper Goomba, H. S. Goomba, H. Paragoomba. */
 BattleUnitSetup btlparty_test_hyper_kuriboo[] = {
     {
         &unit_hyper_kuriboo, // unitKindParams
@@ -212,6 +233,10 @@ BattleUnitSetup btlparty_test_hyper_kuriboo[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_HYPER_KURIBOO: Hyper Goomba, H. S. Goomba, H. Paragoomba, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_hyper_kuriboo = {
     3, // numEnemies
     btlparty_test_hyper_kuriboo, // enemyData
@@ -223,6 +248,7 @@ BattleGroupSetup btlgrp_test_hyper_kuriboo = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_YAMIKURIBOO: Gloomba, Spiky Gloomba, Paragloomba. */
 BattleUnitSetup btlparty_test_yamikuriboo[] = {
     {
         &unit_yami_kuriboo, // unitKindParams
@@ -256,6 +282,10 @@ BattleUnitSetup btlparty_test_yamikuriboo[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_YAMIKURIBOO: Gloomba, Spiky Gloomba, Paragloomba, with its item
+ * drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_yamikuriboo = {
     3, // numEnemies
     btlparty_test_yamikuriboo, // enemyData
@@ -267,6 +297,10 @@ BattleGroupSetup btlgrp_test_yamikuriboo = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup of test battle BTLNO_TEST_NOKONOKO_YAMINOKO: Koopa Troopa, Paratroopa, Dark Koopa, D.
+ * Paratroopa.
+ */
 BattleUnitSetup btlparty_test_nokonoko_yaminoko[] = {
     {
         &unit_nokonoko, // unitKindParams
@@ -310,6 +344,10 @@ BattleUnitSetup btlparty_test_nokonoko_yaminoko[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_NOKONOKO_YAMINOKO: Koopa Troopa, Paratroopa, Dark Koopa, D.
+ * Paratroopa, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_nokonoko_yaminoko = {
     4, // numEnemies
     btlparty_test_nokonoko_yaminoko, // enemyData
@@ -321,6 +359,10 @@ BattleGroupSetup btlgrp_test_nokonoko_yaminoko = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup of test battle BTLNO_TEST_URA_NOKO_TOGE_NOKO: Shady Koopa, S. Paratroopa, Koopatrol, D.
+ * Koopatrol.
+ */
 BattleUnitSetup btlparty_test_ura_noko_toge_noko[] = {
     {
         &unit_ura_noko, // unitKindParams
@@ -364,6 +406,10 @@ BattleUnitSetup btlparty_test_ura_noko_toge_noko[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_URA_NOKO_TOGE_NOKO: Shady Koopa, S. Paratroopa, Koopatrol, D.
+ * Koopatrol, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_ura_noko_toge_noko = {
     4, // numEnemies
     btlparty_test_ura_noko_toge_noko, // enemyData
@@ -375,6 +421,9 @@ BattleGroupSetup btlgrp_test_ura_noko_toge_noko = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup of test battle BTLNO_TEST_HONENOKO_FIGHTER: Dull Bones, Dry Bones, KP Koopa, KP Paratroopa.
+ */
 BattleUnitSetup btlparty_test_honenoko_fighter[] = {
     {
         &unit_honenoko, // unitKindParams
@@ -418,6 +467,10 @@ BattleUnitSetup btlparty_test_honenoko_fighter[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_HONENOKO_FIGHTER: Dull Bones, Dry Bones, KP Koopa, KP Paratroopa,
+ * with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_honenoko_fighter = {
     4, // numEnemies
     btlparty_test_honenoko_fighter, // enemyData
@@ -429,6 +482,7 @@ BattleGroupSetup btlgrp_test_honenoko_fighter = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_BASABASA: Swooper x2, Swoopula x2, Swampire. */
 BattleUnitSetup btlparty_test_basabasa[] = {
     {
         &unit_basabasa, // unitKindParams
@@ -482,6 +536,10 @@ BattleUnitSetup btlparty_test_basabasa[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_BASABASA: Swooper x2, Swoopula x2, Swampire, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_basabasa = {
     5, // numEnemies
     btlparty_test_basabasa, // enemyData
@@ -493,6 +551,7 @@ BattleGroupSetup btlgrp_test_basabasa = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_CHOROBON: Fuzzy, Green Fuzzy, Flower Fuzzy x2. */
 BattleUnitSetup btlparty_test_chorobon[] = {
     {
         &unit_chorobon, // unitKindParams
@@ -536,6 +595,10 @@ BattleUnitSetup btlparty_test_chorobon[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_CHOROBON: Fuzzy, Green Fuzzy, Flower Fuzzy x2, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_chorobon = {
     4, // numEnemies
     btlparty_test_chorobon, // enemyData
@@ -547,6 +610,10 @@ BattleGroupSetup btlgrp_test_chorobon = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup of test battle BTLNO_TEST_SINEMON: Bald Cleft, Moon Cleft, Cleft, H. Bald Cleft, Hyper
+ * Cleft.
+ */
 BattleUnitSetup btlparty_test_sinemon[] = {
     {
         &unit_sinnosuke, // unitKindParams
@@ -600,6 +667,10 @@ BattleUnitSetup btlparty_test_sinemon[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_SINEMON: Bald Cleft, Moon Cleft, Cleft, H. Bald Cleft, Hyper
+ * Cleft, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_sinemon = {
     5, // numEnemies
     btlparty_test_sinemon, // enemyData
@@ -611,6 +682,7 @@ BattleGroupSetup btlgrp_test_sinemon = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_MET: Buzzy Beetle, Spike Top, Parabuzzy, S. Parabuzzy. */
 BattleUnitSetup btlparty_test_met[] = {
     {
         &unit_met, // unitKindParams
@@ -654,6 +726,10 @@ BattleUnitSetup btlparty_test_met[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_MET: Buzzy Beetle, Spike Top, Parabuzzy, S. Parabuzzy, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_met = {
     4, // numEnemies
     btlparty_test_met, // enemyData
@@ -665,6 +741,7 @@ BattleGroupSetup btlgrp_test_met = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_CRIMSON_MET: Red Buzzy, R. S. Buzzy, R. Parabuzzy x2. */
 BattleUnitSetup btlparty_test_crimson_met[] = {
     {
         &unit_crimson_met, // unitKindParams
@@ -708,6 +785,10 @@ BattleUnitSetup btlparty_test_crimson_met[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_CRIMSON_MET: Red Buzzy, R. S. Buzzy, R. Parabuzzy x2, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_crimson_met = {
     4, // numEnemies
     btlparty_test_crimson_met, // enemyData
@@ -719,6 +800,7 @@ BattleGroupSetup btlgrp_test_crimson_met = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_PANSY: Crazee Dayzee x2, Amazy Dayzee x2. */
 BattleUnitSetup btlparty_test_pansy[] = {
     {
         &unit_pansy, // unitKindParams
@@ -762,6 +844,10 @@ BattleUnitSetup btlparty_test_pansy[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_PANSY: Crazee Dayzee x2, Amazy Dayzee x2, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_pansy = {
     4, // numEnemies
     btlparty_test_pansy, // enemyData
@@ -773,6 +859,7 @@ BattleGroupSetup btlgrp_test_pansy = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_BOMHEI: Bob-omb x4. */
 BattleUnitSetup btlparty_test_bomhei[] = {
     {
         &unit_bomhei, // unitKindParams
@@ -816,6 +903,10 @@ BattleUnitSetup btlparty_test_bomhei[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_BOMHEI: Bob-omb x4, with its item drop odds and heart and flower
+ * drop tables.
+ */
 BattleGroupSetup btlgrp_test_bomhei = {
     4, // numEnemies
     btlparty_test_bomhei, // enemyData
@@ -827,6 +918,7 @@ BattleGroupSetup btlgrp_test_bomhei = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_HEABY_BOMB: Bulky Bob-omb x2, Bob-ulk x2. */
 BattleUnitSetup btlparty_test_heaby_bomb[] = {
     {
         &unit_heavy_bom, // unitKindParams
@@ -870,6 +962,10 @@ BattleUnitSetup btlparty_test_heaby_bomb[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_HEABY_BOMB: Bulky Bob-omb x2, Bob-ulk x2, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_heaby_bomb = {
     4, // numEnemies
     btlparty_test_heaby_bomb, // enemyData
@@ -881,6 +977,10 @@ BattleGroupSetup btlgrp_test_heaby_bomb = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup of test battle BTLNO_TEST_KILLER: Bullet Bill, Bombshell Bill, Bill Blaster, B. Bill
+ * Blaster.
+ */
 BattleUnitSetup btlparty_test_killer[] = {
     {
         &unit_killer, // unitKindParams
@@ -924,6 +1024,10 @@ BattleUnitSetup btlparty_test_killer[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_KILLER: Bullet Bill, Bombshell Bill, Bill Blaster, B. Bill
+ * Blaster, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_killer = {
     4, // numEnemies
     btlparty_test_killer, // enemyData
@@ -935,6 +1039,9 @@ BattleGroupSetup btlgrp_test_killer = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup of test battle BTLNO_TEST_PAKKUN_FLOWER: Piranha Plant x2, Putrid Piranha x2, Frost Piranha.
+ */
 BattleUnitSetup btlparty_test_pakkun_flower[] = {
     {
         &unit_pakkun_flower, // unitKindParams
@@ -988,6 +1095,10 @@ BattleUnitSetup btlparty_test_pakkun_flower[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_PAKKUN_FLOWER: Piranha Plant x2, Putrid Piranha x2, Frost Piranha,
+ * with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_pakkun_flower = {
     5, // numEnemies
     btlparty_test_pakkun_flower, // enemyData
@@ -999,6 +1110,7 @@ BattleGroupSetup btlgrp_test_pakkun_flower = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_TOGEDARUMA: Bristle x2, Dark Bristle x2. */
 BattleUnitSetup btlparty_test_togedaruma[] = {
     {
         &unit_togedaruma, // unitKindParams
@@ -1042,6 +1154,10 @@ BattleUnitSetup btlparty_test_togedaruma[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_TOGEDARUMA: Bristle x2, Dark Bristle x2, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_togedaruma = {
     4, // numEnemies
     btlparty_test_togedaruma, // enemyData
@@ -1053,6 +1169,7 @@ BattleGroupSetup btlgrp_test_togedaruma = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_HANNYA: Spinia, Spania x2, Spunia. */
 BattleUnitSetup btlparty_test_hannya[] = {
     {
         &unit_hinnya, // unitKindParams
@@ -1096,6 +1213,10 @@ BattleUnitSetup btlparty_test_hannya[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_HANNYA: Spinia, Spania x2, Spunia, with its item drop odds and
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_hannya = {
     4, // numEnemies
     btlparty_test_hannya, // enemyData
@@ -1107,6 +1228,7 @@ BattleGroupSetup btlgrp_test_hannya = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_SAMBO: Pokey x2, Poison Pokey x2. */
 BattleUnitSetup btlparty_test_sambo[] = {
     {
         &unit_sambo, // unitKindParams
@@ -1150,6 +1272,10 @@ BattleUnitSetup btlparty_test_sambo[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_SAMBO: Pokey x2, Poison Pokey x2, with its item drop odds and
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_sambo = {
     4, // numEnemies
     btlparty_test_sambo, // enemyData
@@ -1161,6 +1287,7 @@ BattleGroupSetup btlgrp_test_sambo = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_BROS: Hammer Bro, Boomerang Bro, Fire Bro, Bob-omb. */
 BattleUnitSetup btlparty_test_bros[] = {
     {
         &unit_hammer_bros, // unitKindParams
@@ -1204,6 +1331,10 @@ BattleUnitSetup btlparty_test_bros[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_BROS: Hammer Bro, Boomerang Bro, Fire Bro, Bob-omb, with its item
+ * drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_bros = {
     4, // numEnemies
     btlparty_test_bros, // enemyData
@@ -1215,6 +1346,7 @@ BattleGroupSetup btlgrp_test_bros = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_TOGEZO_JYUGEM: Spiny, Lakitu, S. Blue Spiny, Dark Lakitu. */
 BattleUnitSetup btlparty_test_togezo_jyugem[] = {
     {
         &unit_togezo, // unitKindParams
@@ -1258,6 +1390,10 @@ BattleUnitSetup btlparty_test_togezo_jyugem[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_TOGEZO_JYUGEM: Spiny, Lakitu, S. Blue Spiny, Dark Lakitu, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_togezo_jyugem = {
     4, // numEnemies
     btlparty_test_togezo_jyugem, // enemyData
@@ -1269,6 +1405,7 @@ BattleGroupSetup btlgrp_test_togezo_jyugem = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_WANWAN: Chain-Chomp x4. */
 BattleUnitSetup btlparty_test_wanwan[] = {
     {
         &unit_wanwan, // unitKindParams
@@ -1312,6 +1449,10 @@ BattleUnitSetup btlparty_test_wanwan[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_WANWAN: Chain-Chomp x4, with its item drop odds and heart and
+ * flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_wanwan = {
     4, // numEnemies
     btlparty_test_wanwan, // enemyData
@@ -1323,6 +1464,7 @@ BattleGroupSetup btlgrp_test_wanwan = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_KUROKUMORN: Ruff Puff, Poison Puff, Ice Puff, Dark Puff. */
 BattleUnitSetup btlparty_test_kurokumorn[] = {
     {
         &unit_kurokumorn, // unitKindParams
@@ -1366,6 +1508,10 @@ BattleUnitSetup btlparty_test_kurokumorn[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_KUROKUMORN: Ruff Puff, Poison Puff, Ice Puff, Dark Puff, with its
+ * item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_kurokumorn = {
     4, // numEnemies
     btlparty_test_kurokumorn, // enemyData
@@ -1377,6 +1523,7 @@ BattleGroupSetup btlgrp_test_kurokumorn = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_PIDERS: Pider x2, Arantula x2. */
 BattleUnitSetup btlparty_test_piders[] = {
     {
         &unit_piders, // unitKindParams
@@ -1420,6 +1567,10 @@ BattleUnitSetup btlparty_test_piders[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_PIDERS: Pider x2, Arantula x2, with its item drop odds and heart
+ * and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_piders = {
     4, // numEnemies
     btlparty_test_piders, // enemyData
@@ -1431,6 +1582,7 @@ BattleGroupSetup btlgrp_test_piders = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_BUBBLE: Lava Bubble, Ember, Phantom Ember. */
 BattleUnitSetup btlparty_test_bubble[] = {
     {
         &unit_bubble, // unitKindParams
@@ -1464,6 +1616,10 @@ BattleUnitSetup btlparty_test_bubble[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_BUBBLE: Lava Bubble, Ember, Phantom Ember, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_bubble = {
     3, // numEnemies
     btlparty_test_bubble, // enemyData
@@ -1475,6 +1631,7 @@ BattleGroupSetup btlgrp_test_bubble = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_MONBAN: Swooper, Gus, Paratroopa, Dark Craw. */
 BattleUnitSetup btlparty_test_monban[] = {
     {
         &unit_basabasa, // unitKindParams
@@ -1518,6 +1675,10 @@ BattleUnitSetup btlparty_test_monban[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_MONBAN: Swooper, Gus, Paratroopa, Dark Craw, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_monban = {
     4, // numEnemies
     btlparty_test_monban, // enemyData
@@ -1529,6 +1690,7 @@ BattleGroupSetup btlgrp_test_monban = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_BORODO: Bandit, Badge Bandit, Big Bandit. */
 BattleUnitSetup btlparty_test_borodo[] = {
     {
         &unit_borodo, // unitKindParams
@@ -1562,6 +1724,10 @@ BattleUnitSetup btlparty_test_borodo[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_BORODO: Bandit, Badge Bandit, Big Bandit, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_borodo = {
     3, // numEnemies
     btlparty_test_borodo, // enemyData
@@ -1573,6 +1739,7 @@ BattleGroupSetup btlgrp_test_borodo = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_TAMURA: Yux, Pokey, Hyper Cleft x2, B. Bill Blaster. */
 BattleUnitSetup btlparty_test_tamura[] = {
     {
         &unit_barriern, // unitKindParams
@@ -1626,6 +1793,10 @@ BattleUnitSetup btlparty_test_tamura[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_TAMURA: Yux, Pokey, Hyper Cleft x2, B. Bill Blaster, with its item
+ * drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_tamura = {
     5, // numEnemies
     btlparty_test_tamura, // enemyData
@@ -1637,6 +1808,7 @@ BattleGroupSetup btlgrp_test_tamura = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_KISHI: Pale Piranha x2. */
 BattleUnitSetup btlparty_test_kishi[] = {
     {
         &unit_monochrome_pakkun, // unitKindParams
@@ -1660,6 +1832,10 @@ BattleUnitSetup btlparty_test_kishi[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_KISHI: Pale Piranha x2, with its item drop odds and heart and
+ * flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_kishi = {
     2, // numEnemies
     btlparty_test_kishi, // enemyData
@@ -1671,6 +1847,7 @@ BattleGroupSetup btlgrp_test_kishi = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_TAMURA2: Pennington. */
 BattleUnitSetup btlparty_test_tamura2[] = {
     {
         &unit_powan, // unitKindParams
@@ -1684,6 +1861,10 @@ BattleUnitSetup btlparty_test_tamura2[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_TAMURA2: Pennington, with its item drop odds and heart and flower
+ * drop tables.
+ */
 BattleGroupSetup btlgrp_test_tamura2 = {
     1, // numEnemies
     btlparty_test_tamura2, // enemyData
@@ -1695,6 +1876,7 @@ BattleGroupSetup btlgrp_test_tamura2 = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_NAKAYAMA: Wanawana x3. */
 BattleUnitSetup btlparty_test_nakayama[] = {
     {
         &unit_wanawana, // unitKindParams
@@ -1728,6 +1910,10 @@ BattleUnitSetup btlparty_test_nakayama[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_NAKAYAMA: Wanawana x3, with its item drop odds and heart and
+ * flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_nakayama = {
     3, // numEnemies
     btlparty_test_nakayama, // enemyData
@@ -1739,6 +1925,7 @@ BattleGroupSetup btlgrp_test_nakayama = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_BARRIERN: Z-Yux, X-Yux. */
 BattleUnitSetup btlparty_test_barriern[] = {
     {
         &unit_barriern_z, // unitKindParams
@@ -1770,6 +1957,10 @@ BattleUnitSetup btlparty_test_barriern[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_BARRIERN: Z-Yux, X-Yux, with its item drop odds and heart and
+ * flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_barriern = {
     2, // numEnemies
     btlparty_test_barriern, // enemyData
@@ -1781,6 +1972,10 @@ BattleGroupSetup btlgrp_test_barriern = {
     5, // reserved_1C
 };
 
+/**
+ * Enemy lineup of test battle BTLNO_TEST_VRIETY_HEIGHT: Buzzy Beetle, Lava Bubble, Ruff Puff, Paragloomba,
+ * Swooper.
+ */
 BattleUnitSetup btlparty_test_vriety_height[] = {
     {
         &unit_met, // unitKindParams
@@ -1834,6 +2029,10 @@ BattleUnitSetup btlparty_test_vriety_height[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_VRIETY_HEIGHT: Buzzy Beetle, Lava Bubble, Ruff Puff, Paragloomba,
+ * Swooper, with its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_vriety_height = {
     5, // numEnemies
     btlparty_test_vriety_height, // enemyData
@@ -1845,6 +2044,7 @@ BattleGroupSetup btlgrp_test_vriety_height = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_TERESA: Boo x2, Dark Boo, Goomba. */
 BattleUnitSetup btlparty_test_teresa[] = {
     {
         &unit_teresa, // unitKindParams
@@ -1888,6 +2088,10 @@ BattleUnitSetup btlparty_test_teresa[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_TERESA: Boo x2, Dark Boo, Goomba, with its item drop odds and
+ * heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_teresa = {
     4, // numEnemies
     btlparty_test_teresa, // enemyData
@@ -1899,6 +2103,7 @@ BattleGroupSetup btlgrp_test_teresa = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_DAISAN: X-Naut, X-Naut PhD, Elite X-Naut. */
 BattleUnitSetup btlparty_test_daisan[] = {
     {
         &unit_gundan_zako, // unitKindParams
@@ -1932,6 +2137,10 @@ BattleUnitSetup btlparty_test_daisan[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_DAISAN: X-Naut, X-Naut PhD, Elite X-Naut, with its item drop odds
+ * and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_daisan = {
     3, // numEnemies
     btlparty_test_daisan, // enemyData
@@ -1943,6 +2152,7 @@ BattleGroupSetup btlgrp_test_daisan = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_MAHORN: Wizzerd, Dark Wizzerd, Elite Wizzerd. */
 BattleUnitSetup btlparty_test_mahorn[] = {
     {
         &unit_mahorn, // unitKindParams
@@ -1976,6 +2186,10 @@ BattleUnitSetup btlparty_test_mahorn[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_MAHORN: Wizzerd, Dark Wizzerd, Elite Wizzerd, with its item drop
+ * odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_mahorn = {
     3, // numEnemies
     btlparty_test_mahorn, // enemyData
@@ -1987,6 +2201,7 @@ BattleGroupSetup btlgrp_test_mahorn = {
     5, // reserved_1C
 };
 
+/** Enemy lineup of test battle BTLNO_TEST_KAMEC: Magikoopa, R. Magikoopa, W. Magikoopa, G. Magikoopa. */
 BattleUnitSetup btlparty_test_kamec[] = {
     {
         &unit_kamec, // unitKindParams
@@ -2030,6 +2245,10 @@ BattleUnitSetup btlparty_test_kamec[] = {
     },
 };
 
+/**
+ * Battle group of test battle BTLNO_TEST_KAMEC: Magikoopa, R. Magikoopa, W. Magikoopa, G. Magikoopa, with
+ * its item drop odds and heart and flower drop tables.
+ */
 BattleGroupSetup btlgrp_test_kamec = {
     4, // numEnemies
     btlparty_test_kamec, // enemyData
@@ -2041,196 +2260,240 @@ BattleGroupSetup btlgrp_test_kamec = {
     5, // reserved_1C
 };
 
+/** Group choice for BTLNO_TEST_KURIBOO_1: the one test group (weight 10) on test stage [5]. */
 NpcBattleSelect btlgrpsel_test_kuriboo_1[] = {
     {10, &btlgrp_test_kuriboo_1, &tst_btlstage_data[5]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_KURIBOO: the one test group (weight 10) on test stage [5]. */
 NpcBattleSelect btlgrpsel_test_kuriboo[] = {
     {10, &btlgrp_test_kuriboo, &tst_btlstage_data[5]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_HYPER_KURIBOO: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_hyper_kuriboo[] = {
     {10, &btlgrp_test_hyper_kuriboo, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_YAMIKURIBOO: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_yamikuriboo[] = {
     {10, &btlgrp_test_yamikuriboo, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_NOKONOKO_YAMINOKO: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_nokonoko_yaminoko[] = {
     {10, &btlgrp_test_nokonoko_yaminoko, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_URA_NOKO_TOGE_NOKO: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_ura_noko_toge_noko[] = {
     {10, &btlgrp_test_ura_noko_toge_noko, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_HONENOKO_FIGHTER: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_honenoko_fighter[] = {
     {10, &btlgrp_test_honenoko_fighter, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_BASABASA: the one test group (weight 10) on test stage [6]. */
 NpcBattleSelect btlgrpsel_test_basabasa[] = {
     {10, &btlgrp_test_basabasa, &tst_btlstage_data[6]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_CHOROBON: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_chorobon[] = {
     {10, &btlgrp_test_chorobon, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_SINEMON: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_sinemon[] = {
     {10, &btlgrp_test_sinemon, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_MET: the one test group (weight 10) on test stage [6]. */
 NpcBattleSelect btlgrpsel_test_met[] = {
     {10, &btlgrp_test_met, &tst_btlstage_data[6]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_CRIMSON_MET: the one test group (weight 10) on test stage [6]. */
 NpcBattleSelect btlgrpsel_test_crimson_met[] = {
     {10, &btlgrp_test_crimson_met, &tst_btlstage_data[6]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_PANSY: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_pansy[] = {
     {10, &btlgrp_test_pansy, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_BOMHEI: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_bomhei[] = {
     {10, &btlgrp_test_bomhei, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_HEABY_BOMB: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_heaby_bomb[] = {
     {10, &btlgrp_test_heaby_bomb, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_KILLER: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_killer[] = {
     {10, &btlgrp_test_killer, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_PAKKUN_FLOWER: the one test group (weight 10) on test stage [6]. */
 NpcBattleSelect btlgrpsel_test_pakkun_flower[] = {
     {10, &btlgrp_test_pakkun_flower, &tst_btlstage_data[6]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_TOGEDARUMA: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_togedaruma[] = {
     {10, &btlgrp_test_togedaruma, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_HANNYA: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_hannya[] = {
     {10, &btlgrp_test_hannya, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_SAMBO: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_sambo[] = {
     {10, &btlgrp_test_sambo, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_BROS: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_bros[] = {
     {10, &btlgrp_test_bros, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_TOGEZO_JYUGEM: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_togezo_jyugem[] = {
     {10, &btlgrp_test_togezo_jyugem, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_WANWAN: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_wanwan[] = {
     {10, &btlgrp_test_wanwan, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_KUROKUMORN: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_kurokumorn[] = {
     {10, &btlgrp_test_kurokumorn, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_PIDERS: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_piders[] = {
     {10, &btlgrp_test_piders, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_BUBBLE: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_bubble[] = {
     {10, &btlgrp_test_bubble, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_BARRIERN: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_barriern[] = {
     {10, &btlgrp_test_barriern, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_VRIETY_HEIGHT: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_vriety_height[] = {
     {10, &btlgrp_test_vriety_height, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_TERESA: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_teresa[] = {
     {10, &btlgrp_test_teresa, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_DAISAN: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_daisan[] = {
     {10, &btlgrp_test_daisan, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_MAHORN: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_mahorn[] = {
     {10, &btlgrp_test_mahorn, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_KAMEC: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_kamec[] = {
     {10, &btlgrp_test_kamec, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_MONBAN: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_monban[] = {
     {10, &btlgrp_test_monban, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_BORODO: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_borodo[] = {
     {10, &btlgrp_test_borodo, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_TAMURA: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_tamura[] = {
     {10, &btlgrp_test_tamura, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_TAMURA2: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_tamura2[] = {
     {10, &btlgrp_test_tamura2, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_NAKAYAMA: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_nakayama[] = {
     {10, &btlgrp_test_nakayama, &tst_btlstage_data[1]},
     {0},
 };
 
+/** Group choice for BTLNO_TEST_KISHI: the one test group (weight 10) on test stage [1]. */
 NpcBattleSelect btlgrpsel_test_kishi[] = {
     {10, &btlgrp_test_kishi, &tst_btlstage_data[1]},
     {0},
 };
 
+/**
+ * Encounter table of tst.rel, indexed by BTLNO_TEST_*: 38 debug fights, one per enemy family (Goombas,
+ * Koopas, Buzzies, Bob-ombs, Magikoopas and so on) plus a few developer test rooms. Each entry has one
+ * group choice, the shared battle music BGM_ZAKO_BATTLE1 and a fixed random placement range. Registered
+ * with relSetBtlAddr in tst.c.
+ */
 NpcSetupBattleInfo btlsetup_tst_tbl[] = {
     {
         "クリボー", // name
@@ -2615,6 +2878,10 @@ NpcSetupBattleInfo btlsetup_tst_tbl[] = {
     {0},
 };
 
+/**
+ * Maps the BTLNO_TEST_* battle ids to their index in btlsetup_tst_tbl; registered with relSetBtlAddr in
+ * tst.c.
+ */
 NpcTerritoryInfo btl_tst_setup_no_tbl[] = {
     {"BTLNO_TEST_KURIBOO_1", 0},
     {"BTLNO_TEST_KURIBOO", 1},

@@ -31,6 +31,9 @@ static EvtWord song_event[300];
 static EvtWord escape_event[96];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the Crazee Dayzee: 7 HP, level 16, 1 part, with its sounds, init script and data table.
+ */
 BattleUnitKind unit_pansy = {
     69,
     "btl_un_pansy",
@@ -97,20 +100,35 @@ BattleUnitKind unit_pansy = {
     data_table,
 };
 
+/** Defence of the Crazee Dayzee: none, so it takes full damage from every kind of attack. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type modifiers of the Crazee Dayzee: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Crazee Dayzee (100% is the normal chance): resists Sleep 95%, Stop 30%, Dizzy
+ * 30%, Confusion 30%, Freeze 30%, Tiny 30%, Attack Down 30%, Defense Down 30%, Allergic 30%, Gale Force 80%,
+ * Slow 30% and instant KO 30%.
+ */
 static StatusVulnerability regist = {95, 30, 30, 100, 30, 100, 100, 30, 100, 30, 100, 30, 100, 30, 30, 100, 80, 100, 30, 100, 100, 30};
 #else
 static StatusVulnerability regist = {95, 30, 30, 100, 50, 100, 100, 30, 100, 30, 100, 30, 100, 30, 30, 100, 80, 100, 30, 100, 100, 30};
 #endif
 
+/**
+ * Body of the Crazee Dayzee: one targetable part, the model `c_pansy`, with its hit box, defence tables and
+ * pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_pansy", "c_pansy", 0.0f, 0.0f, 0.0f, 0.0f, 29.0f, 0.0f, 0.0f, 34.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_pansy", "c_pansy", 0.0f, 0.0f, 0.0f, 0.0f, 29.0f, 0.0f, 0.0f, 34.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/**
+ * Attack data of the Crazee Dayzee's lullaby: hits every opposing unit for 2 damage, ignoring the target's
+ * defence; may inflict Sleep (50%, 5 turns).
+ */
 BattleWeapon weapon_pansy_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -133,7 +151,7 @@ BattleWeapon weapon_pansy_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -193,6 +211,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Pose table of the Crazee Dayzee: its 18 battle poses (status, hurt and action) and the animation each one
+ * plays; the idle animation is `PAN_S_1`.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "PAN_N_1"},
     {2, "PAN_Y_1"},
@@ -200,20 +222,21 @@ static PoseTableEntry pose_table[] = {
     {5, "PAN_K_1"},
     {4, "PAN_X_1"},
     {3, "PAN_X_1"},
-    {28, "PAN_S_1"},
+    {BTL_POSE_NORMAL, "PAN_S_1"},
     {29, "PAN_Q_1"},
     {30, "PAN_Q_1"},
     {31, "PAN_S_1"},
-    {39, "PAN_D_1"},
+    {BTL_POSE_DAMAGE, "PAN_D_1"},
     {50, "PAN_A_1"},
-    {42, "PAN_R_1"},
-    {40, "PAN_W_1"},
-    {56, "PAN_X_1"},
-    {57, "PAN_X_1"},
+    {BTL_POSE_RUN, "PAN_R_1"},
+    {BTL_POSE_WALK, "PAN_W_1"},
+    {BTL_POSE_DANGER, "PAN_X_1"},
+    {BTL_POSE_PERIL, "PAN_X_1"},
     {BTL_POSE_TALK, "PAN_T_1"},
     {BTL_POSE_STAY_DEFAULT, "PAN_S_1"},
 };
 
+/** Data table of the Crazee Dayzee: event 48 does nothing (btldefaultevt_Dummy). */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
@@ -251,23 +274,27 @@ EVT_END()
  * A flustered (confused) unit with no target runs the confused subset instead.
  */
 static EVT_BEGIN(song_event)
+    // Picks the target: the preset first-attack target when battle flag 2 is set, otherwise a random opposing unit;
+    // with no target it does nothing (or is flustered when confused).
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Declares the lullaby and pays its cost, turning toward the party.
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // The stage dims and takes on a blue tint as the Crazee Dayzee starts to sing.
     SET_VALUE(LW(0), 255)
     SET_VALUE(LW(1), 255)
     LOOP(0)
@@ -278,6 +305,7 @@ static EVT_BEGIN(song_event)
         SUBTRACT(LW(0), 2)
         WAIT_FRAMES(1)
     END_LOOP
+    // It sings (pose 50, song sound) and a stream of music notes drifts out of it every 12 frames.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     BEGIN_SIBLING_EVENT
@@ -291,6 +319,7 @@ static EVT_BEGIN(song_event)
             WAIT_FRAMES(12)
         END_LOOP
     END_SIBLING_EVENT
+    // After about two seconds the song reaches the party.
 #if VERSION <= VERSION_DEMO_US
     WAIT_FRAMES(60)
     WAIT_FRAMES(60)
@@ -300,8 +329,9 @@ static EVT_BEGIN(song_event)
     SET_VALUE(LW(6), 0)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
 #endif
+    // Goes through every opposing unit in turn and works out whether the song affects it.
     LABEL(10)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -323,21 +353,25 @@ static EVT_BEGIN(song_event)
         GOTO(97)
         CASE_END
     END_SWITCH
+    // Miss branch: this unit is unaffected.
     LABEL(90)
     GOTO(97)
+    // Hit branch: reads the defence result (once, for the first unit) and applies the song's effect.
     LABEL(91)
     IF_INT_EQUAL(LW(6), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         SET_VALUE(LW(6), 1)
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     GOTO(97)
+    // Next target, until all have been checked.
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(98)
     END_IF
     GOTO(10)
+    // The stage light fades back to normal.
     LABEL(98)
     SET_VALUE(LW(0), 192)
     SET_VALUE(LW(1), 255)
@@ -351,6 +385,7 @@ static EVT_BEGIN(song_event)
     END_LOOP
     CALL(evt_map_blend_off, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
+    // The Crazee Dayzee returns to its idle pose.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     LABEL(99)
@@ -369,7 +404,7 @@ static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 180, 0)
     WAIT_MS(250)
     CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, 1, 255, 255, 255, 255, 100, 100, 100, 100, 0)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 67108864)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ESCAPE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
@@ -377,7 +412,7 @@ static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ESCAPE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(9.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, 300, LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 67108864)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
     WAIT_MS(500)
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN

@@ -23,6 +23,7 @@ typedef struct EffAkariSflushN64Work {
     s32 count;    // 0x30
 } EffAkariSflushN64Work;
 
+/** One pointed flare of the flash, a long thin diamond; the ring of five flares is drawn from it. */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {16, 0, 0, 0, 0, 0, 0, 0, 255},
     {3, 4, 0, 0, 0, 0, 0, 0, 255},
@@ -32,6 +33,7 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-16, 0, 0, 0, 0, 255, 255, 255, 255},
 };
 
+/** White, used as the flash's second colour when drawing the flares. */
 static const GXColor kWhite = {255, 255, 255, 0};
 
 static void effAkariSflushMain(EffectEntry* effect);

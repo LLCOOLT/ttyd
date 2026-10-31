@@ -15,8 +15,8 @@
 // and draws the item, badge and log lists).
 //
 // The offset comments in the Win*State sub-structs below are WindowWork offsets (not offsets inside the
-// sub-struct), for JP. The demo lacks texBuf/texBufValid (0x34-0x3B) and mario.f18C, so its offsets are 8 lower
-// from currentEvent and 0xC lower from mario.f190 on. US and PAL add WinLogPage.page, so log.badgeIds and
+// sub-struct), for JP. The demo lacks texBuf/texBufValid (0x34-0x3B) and mario.hammerHold, so its offsets are 8 lower
+// from currentEvent and 0xC lower from mario.wazaOpen on. US and PAL add WinLogPage.page, so log.badgeIds and
 // log.recipe are 4 higher there and everything after log.recipe is 8 higher.
 
 // Directory of the window files on the disc (format prefix "%s/" is the DVD root); the demo uses "window".
@@ -64,11 +64,11 @@ typedef struct WinBadgeEnt {
 typedef struct WinMarioState {
     s32 poseId; // 0x188
 #if VERSION >= VERSION_JP
-    s32 f18C; // 0x18C, not in the demo
+    s32 hammerHold; // 0x18C, not in the demo: frames the hammer pose runs on its own clock after a swing (30); 0 = synced to the retrace count
 #endif
-    s32 f190; // 0x190
-    s32 f194; // 0x194
-    s32 f198; // 0x198
+    s32 wazaOpen;   // 0x190, the Star Power (special move) list is open
+    s32 wazaCursor; // 0x194, its cursor
+    s32 wazaCount;  // 0x198, Star Powers obtained (the list length)
 } WinMarioState;
 
 typedef struct WinPartyState {
@@ -147,10 +147,10 @@ typedef struct WinLogPage {
     s32 idx;       // 0x18, first row shown
     f32 scroll;    // 0x1C
     f32 scrollTgt; // 0x20
-    f32 f24;       // 0x24
-    f32 tf24;      // 0x28
-    f32 f2C;       // 0x2C
-    f32 tf2C;      // 0x30
+    f32 iconX;     // 0x24, box with the selected icon
+    f32 iconTx;    // 0x28
+    f32 iconY;     // 0x2C
+    f32 iconTy;    // 0x30
 } WinLogPage;
 
 typedef struct WinLogMenu {
@@ -168,50 +168,60 @@ struct EffectEntry;
 struct MonosiriWork;
 
 typedef struct WinLogState {
-    s32 fD68;                     // 0xD68
+    s32 state;                    // 0xD68, 0 entry list, 10 + entry id inside one, 21/22 tattle open/closing, 1000/1001 sort menu
     s32 cursor;                   // 0xD6C
     s32 count;                    // 0xD70
     WinLogMenu menu[5];           // 0xD74
-    s32 fE14;                     // 0xE14
+    s32 mapSel;                   // 0xE14, tubuDt index of the place under the map cursor, -1 none
     s32 mapIdx;                   // 0xE18
     s32 pose;                     // 0xE1C
     f32 mapX;                     // 0xE20
     f32 mapY;                     // 0xE24
-    f32 fE28;                     // 0xE28
-    f32 fE2C;                     // 0xE2C
-    f32 fE30;                     // 0xE30
-    f32 fE34;                     // 0xE34
+    f32 mapPanelTx;               // 0xE28, map panel target and eased offset
+    f32 mapPanelX;                // 0xE2C
+    f32 mapPanelTy;               // 0xE30
+    f32 mapPanelY;                // 0xE34
     f32 scrollX;                  // 0xE38
     f32 scrollY;                  // 0xE3C
     s32 stoneNum;                 // 0xE40
     struct EffectEntry* eff[7];   // 0xE44
-    s32 fE60;                     // 0xE60
-    f32 fE64;                     // 0xE64
-    f32 fE68;                     // 0xE68
-    f32 fE6C;                     // 0xE6C
-    f32 fE70;                     // 0xE70
-    f32 fE74;                     // 0xE74
-    f32 fE78;                     // 0xE78
-    f32 fE7C;                     // 0xE7C
-    f32 fE80;                     // 0xE80
+    s32 stoneSel;                 // 0xE60, Crystal Star in front (0-6)
+    f32 stoneTx;                  // 0xE64, Crystal Star carousel target and eased offset
+    f32 stoneX;                   // 0xE68
+    f32 stoneTy;                  // 0xE6C
+    f32 stoneY;                   // 0xE70
+    f32 stoneTgtAlpha;            // 0xE74, alpha of the carousel backdrop
+    f32 stoneAlpha;               // 0xE78
+    f32 stoneTgtRot;              // 0xE7C, carousel turn in degrees (stoneSel * 360 / 7)
+    f32 stoneRot;                 // 0xE80
     WinLogPage badge;             // 0xE84
     s16 badgeIds[100];            // 0xEB8, badge item ids - BADGE_MIN
     WinLogPage recipe;            // 0xF80 (US 0xF84)
     s16 recipeIds[58];            // 0xFB4, item ids - WIN_RECIPE_MIN
-    f32 f1028;                    // 0x1028
-    f32 f102C;                    // 0x102C
-    f32 f1030;                    // 0x1030
-    f32 f1034;                    // 0x1034
+    f32 enemyX;                   // 0x1028, Guess: tattle panel offset like WinLogPage x/tx/y/ty; set, never read
+    f32 enemyTx;                  // 0x102C
+    f32 enemyY;                   // 0x1030
+    f32 enemyTy;                  // 0x1034
     s32 enemyNum;                 // 0x1038
     s32 enemyKnown;               // 0x103C
     s32 enemySel;                 // 0x1040
     s32 enemyPage;                // 0x1044
-    f32 f1048;                    // 0x1048
-    f32 f104C;                    // 0x104C
+    f32 enemyScroll;              // 0x1048, Guess: list scroll like WinLogPage scroll; zeroed, never read
+    f32 enemyScrollTgt;           // 0x104C
     WinSortEnt enemy[0xD8];       // 0x1050, tattle log
     struct MonosiriWork* mono;    // 0x1200
     u8 pad_1204[0x1208 - 0x1204]; // 0x1204
 } WinLogState;
+
+// WindowWork.flags bits.
+enum WinFlags {
+    WIN_FLAG_OPEN_DISABLED = 0x1,      // winOpenDisable: the pause menu cannot open (winMain checks it first)
+    WIN_FLAG_LECTURE_KEY_MASK = 0x800, // retail: the badge tutorial blocks all menu input while its text runs
+    WIN_FLAG_LECTURE = 0x1000,         // the badge tutorial (winLectureOn) runs the menu; winCheck reports it closed
+    WIN_FLAG_8BIT_MARIO = 0x2000,      // Mario is 8-bit: the menus show the 8-bit sprite poses
+    WIN_FLAG_SUBMENU = 0x4000,         // a tab's inner menu is open: the help box eases to its target height too
+    WIN_FLAG_BOOK_OPEN = 0x8000,       // retail: a Super Luigi book is open; the help box shadow is not drawn
+};
 
 typedef struct WindowWork {
     u16 flags;                // 0x0

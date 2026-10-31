@@ -15,10 +15,8 @@
 #include "pmario_sound.h"
 #include "version.h"
 #include "libc_decls.h"
-
-// FAKE: local prototype: effStardustEntry declares the parameters as (s32, f32 x5, s32, s32) (eff_stardust.h: (s32, s32, s32, f32 x5), same registers); this file was compiled with it and the header prototype changes the code.
-EffectEntry* effStardustEntry(s32, f32, f32, f32, f32, f32, s32, s32);
-u32 strlen(const char* s);
+#include "eff/eff_stardust.h"
+#include <string.h>
 
 #define QUAD(l, r, t, b, u)           \
     GXBegin(GX_QUADS, GX_VTXFMT0, 4); \
@@ -31,11 +29,16 @@ u32 strlen(const char* s);
     GXPosition3f32((l), (b), 0.0f);   \
     GXTexCoord2f32(0.0f, 1.0f);
 
+/** Twelve pastel colours the recovery sparkles cycle through, one step per frame. */
 static u8 color_rotation_data[] = {
     0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
     0xB4, 0xB4, 0xFE, 0xB4, 0xDD, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5,
     0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
 };
+/**
+ * Keyframes of the recovery icon over 79 frames: it grows from nothing while dropping into place,
+ * bounces, holds, then dips and shoots upward at the end.
+ */
 MayaHermitKey recovery_effHermit_0[] = {
     {
         0, // time
@@ -148,6 +151,7 @@ MayaHermitKey recovery_effHermit_0[] = {
         },
     },
 };
+/** The recovery icon's square plane that carries the heart or flower texture. */
 s16 recovery_effFace_pPlane2_q007_0[] = {
     4, // vertex count
     -768, -768, 0, 0, 512,
@@ -156,10 +160,13 @@ s16 recovery_effFace_pPlane2_q007_0[] = {
     -768, 768, 0, 0, 0,
 };
 s16* recovery_effFaceDt_pPlane2_q007 = recovery_effFace_pPlane2_q007_0;
+/** The recovery icon's single animated part: its keyframes and plane. */
 MayaPoly recovery_effAnimRST[] = {
     {10, recovery_effHermit_0, 1, &recovery_effFaceDt_pPlane2_q007},
 };
+/** Part list of the recovery icon animation. */
 MayaPolyList recovery_effAnimRSTDt = {1, recovery_effAnimRST};
+/** Recovery icon animation (79 frames), started by effRecoveryEntry and drawn under each icon. */
 MayaAnimData recovery_effAnimDt = {{0}, 79.0f, &recovery_effAnimRSTDt};
 
 static void effRecoveryMain(EffectEntry* effect);
@@ -434,9 +441,9 @@ static void effRecoveryMain(EffectEntry* effect) {
                     if (count > 100) {
                         count = 100;
                     }
-                    effStardustEntry(2, x, y - 20.0f, z, 30.0f, 30.0f, count, 30);
+                    effStardustEntry(2, count, 30, x, y - 20.0f, z, 30.0f, 30.0f);
 #else
-                    effStardustEntry(2, x, y - 20.0f, z, 30.0f, 30.0f, 2, 30);
+                    effStardustEntry(2, 2, 30, x, y - 20.0f, z, 30.0f, 30.0f);
 #endif
                     {
                         Vec pos = {0.0f, 0.0f, 0.0f};
@@ -521,7 +528,7 @@ static void effRecoveryMain2(EffectEntry* effect) {
         work->alpha = work->timer << 3;
     }
     if (work->timer < 0) {
-        effStardustEntry(2, work->position.x, work->position.y, work->position.z, 40.0f, 45.0f, 6, 30);
+        effStardustEntry(2, 6, 30, work->position.x, work->position.y, work->position.z, 40.0f, 45.0f);
         effDelete(effect);
         return;
     }

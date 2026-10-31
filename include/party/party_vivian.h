@@ -14,3 +14,5 @@ void vivianUnhold(PartyEntry* party);
 void vivianShadow(PartyEntry* party);
 void vivian_move(PartyEntry* party);
 void vivian_use(PartyEntry* party);
+void L_partyVivianTailStop(PartyEntry* party);
+void L_partyVivianTailStart(PartyEntry* party);

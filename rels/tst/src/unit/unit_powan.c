@@ -1,4 +1,4 @@
-// Powan: a tst-only test unit, a c_kinopio rider (part 1) on a c_gazigazi body (parts 2 and 3). After each won
+// Pennington (`powan`): a tst-only test unit, a c_kinopio rider (part 1) on a c_gazigazi body (parts 2 and 3). After each won
 // battle the field battle's post-battle event respawns it, four times in all, with a new line each time.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -17,6 +17,11 @@
 #include "tst.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_msg.h"
+
+// Unit work slots of Powan (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_POWAN_RESPAWN_COUNT = 0, // how many times it has respawned; picks its complaint and last line
+};
 
 static USER_FUNC(powan_set_post_battle_mode);
 static USER_FUNC(powan_set_post_battle_event);
@@ -46,6 +51,10 @@ static EvtWord post_battle_event_5[13];
 static EvtWord respawn_event[111];
 static EvtWord dead_event[116];
 
+/**
+ * Unit definition of Pennington: 1 HP and level 1, with its sizes, damage sounds, status vulnerability,
+ * parts and init script.
+ */
 BattleUnitKind unit_powan = {
     209,
     "btl_un_powan",
@@ -112,36 +121,48 @@ BattleUnitKind unit_powan = {
     data_table,
 };
 
+/** Defence of Pennington: none, every hit does its full damage. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element modifiers of Pennington: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Status vulnerability of Pennington: immune to fright; extra prone to nearly every status. */
 static StatusVulnerability regist = {150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 150};
 
+/** Pose table of the rider on Pennington (part 1): maps each battle pose to its KNP_* animations. */
 static PoseTableEntry pose_table_kinopio[] = {
-    {28, "KNP_S_1"},
+    {BTL_POSE_NORMAL, "KNP_S_1"},
     {31, "KNP_S_1"},
-    {39, "KNP_O_1"},
-    {42, "KNP_R_1"},
+    {BTL_POSE_DAMAGE, "KNP_O_1"},
+    {BTL_POSE_RUN, "KNP_R_1"},
     {BTL_POSE_STAY_DEFAULT, "KNP_S_1"},
 };
 
+/**
+ * Pose table of the body Pennington rides on (parts 2 and 3): maps each battle pose to its GAZ_* animations.
+ */
 static PoseTableEntry pose_table_gazigazi[] = {
-    {28, "GAZ_S_1"},
+    {BTL_POSE_NORMAL, "GAZ_S_1"},
     {31, "GAZ_A_1"},
-    {39, "GAZ_A_1"},
+    {BTL_POSE_DAMAGE, "GAZ_A_1"},
     {BTL_POSE_STAY_DEFAULT, "GAZ_S_1"},
 };
 
+/** Data table of Pennington: reaction scripts for being defeated. */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/**
+ * Parts of Pennington: the rider (part 1, model c_kinopio)
+ * and the two-piece body he sits on (parts 2 and 3, model c_gazigazi).
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_powan", "c_kinopio", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table_kinopio},
-    {2, "btl_un_powan", "c_gazigazi", 0.0f, 10.0f, 6.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2010000, 0, pose_table_gazigazi},
-    {3, "btl_un_powan", "c_gazigazi", 0.0f, 10.0f, 6.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_gazigazi},
+    {1, "btl_un_powan", "c_kinopio", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table_kinopio},
+    {2, "btl_un_powan", "c_gazigazi", 0.0f, 10.0f, 6.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table_gazigazi},
+    {3, "btl_un_powan", "c_gazigazi", 0.0f, 10.0f, 6.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table_gazigazi},
 };
 
 /**
@@ -192,6 +213,7 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack data of Pennington's attack: 3 damage. */
 static BattleWeapon weapon_powan_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -210,7 +232,7 @@ static BattleWeapon weapon_powan_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -246,7 +268,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -261,22 +283,22 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 20)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     WAIT_FRAMES(20)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("GAZ_A_1"))
     WAIT_FRAMES(12)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, -2, 0)
@@ -291,12 +313,12 @@ EVT_END()
  * and comes back.
  */
 static EVT_BEGIN(hit_event)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 0x1000000)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 10)
     ADD(LW(2), 6)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 0x1000000)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KNP_O_1"))
     CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(0), EVT_NULLPTR, EVT_NULLPTR)
@@ -308,7 +330,7 @@ static EVT_BEGIN(hit_event)
         END_LOOP
     END_SIBLING_EVENT
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2), 90, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
     MULTIPLY(LW(5), -1)
@@ -318,8 +340,8 @@ static EVT_BEGIN(hit_event)
     MULTIPLY(LW(5), -1)
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 0x1000000)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 0x1000000)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -337,6 +359,10 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Setup the field battle's post-battle event uses to respawn Pennington for the next battle:
+ * enemy side, placed far off-screen until the script moves it into position.
+ */
 static BattleUnitSetup entry_powan = {
     &unit_powan, // unitKindParams
     1, // alliance
@@ -398,7 +424,7 @@ EVT_END()
  */
 static EVT_BEGIN(respawn_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_powan), 0)
-    CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(5))
+    CALL(btlevtcmd_SetUnitWork, LW(3), UW_POWAN_RESPAWN_COUNT, LW(5))
     SET_VALUE(LW(0), 80)
     SET_VALUE(LW(1), 240)
     SET_VALUE(LW(2), 0)
@@ -432,7 +458,7 @@ EVT_END()
  */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(10))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_POWAN_RESPAWN_COUNT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(evt_msg_print, 3, STRING("もう\nからだもたんわー<key>"), 0, BTL_UNIT_SELF)
     END_IF
@@ -462,7 +488,7 @@ static EVT_BEGIN(dead_event)
     IF_INT_GREATER(LW(0), 0)
         GOTO(20)
     END_IF
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_KillUnit, LW(10), 0)
     ELSE

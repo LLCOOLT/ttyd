@@ -21,6 +21,10 @@ static EvtWord damage_event[56];
 static EvtWord attack_event[2];
 static EvtWord wait_event[7];
 
+/**
+ * Unit definition of the test UFO unit: 120 HP and level 1, with its sizes, damage sounds, status vulnerability,
+ * parts and init script.
+ */
 BattleUnitKind unit_ufo = {
     208,
     "btl_un_ufo",
@@ -79,7 +83,7 @@ BattleUnitKind unit_ufo = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x100C0000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR | UNIT_ATTR_NO_TURN | UNIT_ATTR_IGNORE_FOR_CLEAR,
     &regist,
     2,
     parts,
@@ -87,34 +91,44 @@ BattleUnitKind unit_ufo = {
     data_table,
 };
 
+/** Defence of the test UFO unit: none, every hit does its full damage. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element modifiers of the test UFO unit: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Status vulnerability of the test UFO unit: immune to every status. */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/** Pose table of the UFO itself (part 1): maps the battle poses to its CAT_* animations. */
 static PoseTableEntry pose_table[] = {
-    {28, "CAT_S_1"},
+    {BTL_POSE_NORMAL, "CAT_S_1"},
     {31, "CAT_S_1"},
-    {39, "CAT_K_1"},
-    {40, "CAT_W_1"},
+    {BTL_POSE_DAMAGE, "CAT_K_1"},
+    {BTL_POSE_WALK, "CAT_W_1"},
     {BTL_POSE_STAY_DEFAULT, "CAT_S_1"},
 };
 
+/** Pose table of the coin the UFO carries (part 2): every pose shows BRT_O_1. */
 static PoseTableEntry pose_table_2[] = {
-    {28, "BRT_O_1"},
+    {BTL_POSE_NORMAL, "BRT_O_1"},
     {31, "BRT_O_1"},
-    {39, "BRT_O_1"},
+    {BTL_POSE_DAMAGE, "BRT_O_1"},
     {BTL_POSE_STAY_DEFAULT, "BRT_O_1"},
 };
 
+/** Data table of the test UFO unit: it has no special reaction scripts. */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Parts of the test UFO unit: the UFO itself (part 1, model ufo)
+ * and the coin it carries as a dropped item (part 2, model coin).
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "bll_un_ufo", "ufo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 65.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
-    {2, "おとしもの", "coin", 0.0f, -15.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x410000, 0, pose_table_2},
+    {1, "bll_un_ufo", "ufo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 65.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {2, "おとしもの", "coin", 0.0f, -15.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table_2},
 };
 
 /**
@@ -144,14 +158,14 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(14), 39)
         SET_VALUE(LW(15), LW(14))
         CALL(btlevtcmd_UFODamageOn)
         CALL_CHILD(subsetevt_damage)
         SET_VALUE(LW(14), 40)
-        CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+        CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LAST_HIT, LW(0))
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(10), LW(14))
         CALL(btlevtcmd_UFOEscapeOn)
     ELSE

@@ -73,11 +73,11 @@ static USER_FUNC(pre_kurio_use) {
     {
         MapObjectEntry* mobj;
         hit = mario->hitobjPush;
-        if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
+        if (!hit || !(hitGetAttr(hit) & HIT_ATTR_MOBJ)) {
             hit = mario->hitobjFront;
-            if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
+            if (!hit || !(hitGetAttr(hit) & HIT_ATTR_MOBJ)) {
                 hit = mario->hitobjStandOn;
-                if (!hit || !(hitGetAttr(hit) & 0x80000000)) {
+                if (!hit || !(hitGetAttr(hit) & HIT_ATTR_MOBJ)) {
                     event->lwData[0] = (EvtWord) "msg_kuri_map";
                     return EVT_RETURN_DONE;
                 }
@@ -207,7 +207,7 @@ static USER_FUNC(post_kurio_use) {
  * Marco, the guide, the gatekeepers): sets the 26 wide by 24 tall collision size.
  */
 void kuribo_init(PartyEntry* party) {
-    party->memberKind = 1;
+    party->memberKind = PARTY_MEMBER_GOOMBELLA;
     party->moveKind = 0;
     party->height = 24.0f;
     party->width = 26.0f;

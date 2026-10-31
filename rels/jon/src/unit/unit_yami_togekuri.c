@@ -35,6 +35,10 @@ static f32 SinTable[91];
 static EvtWord attack_event[597];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Spiky Gloomba in the Pit of 100 Trials: 7 HP, level 13;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_yami_togekuri = {
     155,
     "btl_un_yami_togekuri",
@@ -93,7 +97,7 @@ BattleUnitKind unit_yami_togekuri = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -101,20 +105,38 @@ BattleUnitKind unit_yami_togekuri = {
     data_table,
 };
 
+/**
+ * Defence of the Spiky Gloomba against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of the Spiky Gloomba per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of the Spiky Gloomba:
+ * percent chance that each status takes hold (100 is normal).
+ */
 static StatusVulnerability regist = {80, 100, 80, 100, 80, 100, 100, 80, 100, 80, 100, 80, 100, 80, 80, 100, 100, 100, 80, 100, 100, 80};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of the Spiky Gloomba:
+ * percent chance that each status takes hold (100 is normal).
+ */
 static StatusVulnerability regist = {80, 90, 80, 100, 80, 100, 100, 80, 100, 90, 100, 90, 100, 90, 80, 90, 90, 100, 80, 100, 100, 80};
 #endif
 
+/** Part of the Spiky Gloomba: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_yami_togekuri", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
+    {1, "btl_un_yami_togekuri", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_TOP_SPIKY, pose_table},
 };
 
+/** Weapon of the Spiky Gloomba's spiked tumble: damage 4. */
 static BattleWeapon weapon_togekuri_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -133,7 +155,7 @@ static BattleWeapon weapon_togekuri_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -151,6 +173,9 @@ static BattleWeapon weapon_togekuri_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Pose table of the Spiky Gloomba: animation names for each pose type (idle, walk, hurt, attack and so on).
+ */
 static PoseTableEntry pose_table[] = {
     {1, "TGK_N_1"},
     {2, "TGK_Y_1"},
@@ -158,21 +183,25 @@ static PoseTableEntry pose_table[] = {
     {5, "TGK_K_1"},
     {4, "TGK_I_1"},
     {3, "TGK_I_1"},
-    {28, "TGK_S_1"},
+    {BTL_POSE_NORMAL, "TGK_S_1"},
     {29, "TGK_Q_1"},
     {30, "TGK_Q_1"},
     {31, "TGK_S_1"},
-    {39, "TGK_D_1"},
+    {BTL_POSE_DAMAGE, "TGK_D_1"},
     {50, "TGK_A_1"},
     {41, "TGK_R_2"},
-    {42, "TGK_R_1"},
-    {40, "TGK_W_1"},
-    {56, "TGK_I_1"},
-    {57, "TGK_I_1"},
+    {BTL_POSE_RUN, "TGK_R_1"},
+    {BTL_POSE_WALK, "TGK_W_1"},
+    {BTL_POSE_DANGER, "TGK_I_1"},
+    {BTL_POSE_PERIL, "TGK_I_1"},
     {BTL_POSE_TALK, "TGK_T_1"},
     {BTL_POSE_STAY_DEFAULT, "TGK_S_1"},
 };
 
+/**
+ * Data table of the Spiky Gloomba: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
     {48, btldefaultevt_Dummy},
@@ -196,21 +225,22 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Guess: waits half a second, then shows the toge_flush spike flash above the Spiky Gloomba's head (higher for a
- * big, lower for a small one).
- * If a tutorial lecture unit (BTL_UNIT_LECTURE) exists and has not spoken yet,
- * it then hides the status window and prints one of two tutorial messages (mac_0_092_06 or _07, chosen by who
- * attacked), unless the attacker was of side 2.
+ * Top-spike counter (data table entry 37, hit event 0x1F: an attacker hurt by its spiked head, as from a stomp):
+ * waits half a second, then shows the toge_flush spike flash above the Spiky Gloomba's head
+ * (higher when Huge, lower when Tiny).
+ * If a tutorial lecture unit (BTL_UNIT_LECTURE) exists and has not spoken yet (its work 0),
+ * it then hides the status window and has it scold the attacker for jumping on the Spiky Goomba:
+ * mac_0_092_06 for Mario, mac_0_092_07 for Goombella; any other attacker gets no message.
  */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 50)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 30)
         GOTO(90)
@@ -252,6 +282,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Sine of 0 to 90 degrees in one-degree steps; the Spiky Gloomba's krb_get_dir searches it to turn a slope
+ * into an angle.
+ */
 static f32 SinTable[] = {
     0.0f, 0.017452f, 0.034899f, 0.052336f, 0.069756f, 0.087156f, 0.104528f, 0.121869f,
     0.139173f, 0.156434f, 0.173648f, 0.190809f, 0.207912f, 0.224951f, 0.241922f, 0.258819f,
@@ -268,25 +302,27 @@ static f32 SinTable[] = {
 };
 
 /**
- * Guess: attack event of the Spiky Gloomba: picks a target (the first attack target in the forced case),
- * flusters if there is none, and uses an enemy item first if it has one.
+ * Attack event of the Spiky Gloomba (weapon_togekuri_attack): uses an enemy item if it has one,
+ * otherwise picks a target and flusters if there is none.
  * Otherwise it runs at the target and tumbles onto it with its spikes (krb_get_dir gives the spin).
  * A miss makes it land on its back (TGK_D_1) and roll upright again (TGK_A_2, TGK_K_1);
- * a hit applies the damage with the action command defence check. It then hops back to its place.
+ * a hit applies the damage with the action command defence check. It then hops off and walks back to its place.
  */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // It uses an enemy item if it has one.
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_togekuri_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_togekuri_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -298,22 +334,25 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_togekuri_attack))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_togekuri_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // Run at the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 80)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(170)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 1)
+    // Curl up and tumble onto the target, spikes first.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 15, 0)
     BEGIN_INLINE_EVENT
@@ -338,7 +377,8 @@ static EVT_BEGIN(attack_event)
     ADD(LW(2), 2)
     SUBTRACT(LW(1), 4)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 28, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togekuri_attack), 256, LW(5))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togekuri_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -360,12 +400,15 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_LANDING_MISS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetDispOffset, BTL_UNIT_SELF, 0, FLOAT(-12.0f), 0)
+    // A miss makes it land on its back.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGK_D_1"))
     WAIT_FRAMES(40)
+    // It rolls upright again.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGK_A_2"))
     CALL(btlevtcmd_SetDispOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 12, 0)
@@ -390,18 +433,21 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     WAIT_FRAMES(40)
     GOTO(95)
+    // The attack connects.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     LOOP(4)
+        // The landing squashes it flat for a moment.
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.07910156f), FLOAT(-0.119140625f), 0)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_togekuri_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togekuri_attack), 256, LW(5))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togekuri_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // It tumbles off the target and hops clear.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
         DIVIDE(LW(6), 10)
@@ -425,6 +471,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 10)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 6, -1)
     GOTO(95)
+    // Walk back to its place.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_MOVE1"), STRING("SFX_ENM_KURI_MOVE2"), 0, 3, 3, 0, 0)
@@ -432,6 +479,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -2, 0)
+    // The attack is over; back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -497,9 +545,8 @@ static u16 krb_comp_dir(f32 x, f32 z) {
 }
 
 /**
- * Script helper: returns in args[0] which kind of unit acted:
- * 0 if the active unit began as kind 0xDE, 1 if 0xE0, else
- * 2. Guess: the Gloomba family the attack belongs to.
+ * Script helper: returns in args[0] who is acting: 0 if the active unit began as Mario (kind 0xDE),
+ * 1 if as Goombella (0xE0), else 2. Picks the tutorial line in dmg_avoid_counter_thorn_head_event.
  */
 static USER_FUNC(get_attacker) {
     BattleWork* wp = _battleWorkPointer;

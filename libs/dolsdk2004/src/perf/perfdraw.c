@@ -23,6 +23,10 @@ static u32 DrawFrameMax;
 static f32 DrawFrameH;
 static u32 MaxBusTransactions;
 
+/**
+ * Settings for the performance monitor graph: how many frames it shows, the frame width, and the colour of
+ * each bar.
+ */
 static u32 DrawNumFrames = 3;
 static f32 DrawFrameW = 205.33333f;
 static GXColor DrawFrameBGColor = { 0xC8, 0xC8, 0xC8, 0xC8 };
@@ -50,6 +54,7 @@ static GXColor DrawGPXFIColor = { 0x00, 0xC8, 0x00, 0xAA };
 static GXColor DrawGPXFOColor = { 0x00, 0x00, 0xC8, 0xAA };
 static GXColor DrawGPRASIDLEColor = { 0xC8, 0xC8, 0x00, 0xAA };
 
+/** Switches for which bars the performance monitor draws, and whether its scale adjusts automatically. */
 static BOOL bDrawBWBar = TRUE;
 static BOOL bDrawCPUBar = TRUE;
 static BOOL bDrawXFBars = TRUE;
@@ -59,6 +64,7 @@ static BOOL bAutoScale = TRUE;
 static BOOL bDrawBWBarKey;
 static f32 lastx;
 
+/** Corner points of the frame outline drawn around the performance graph. */
 static f32 FramePts[28] = {
     0.0f,
     0.0f,
@@ -90,6 +96,7 @@ static f32 FramePts[28] = {
     10.0f,
 };
 
+/** Corner points of the CPU time bar. */
 static f32 CPUPts[4] = {
     0.0f,  
     0.0f,
@@ -97,6 +104,7 @@ static f32 CPUPts[4] = {
     0.0f,
 };
 
+/** Corner points of the graphics processor time bar. */
 static f32 GPPts[4] = {
     0.0f,  
     0.0f,

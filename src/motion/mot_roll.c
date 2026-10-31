@@ -17,6 +17,17 @@
 #include "version.h"
 #include <dolphin/pad.h>
 
+// Bits of MarioWork.mot.roll.flags (all cleared when the roll starts).
+enum MotRollFlag {
+    ROLL_FLAG_FLAT_TURN = 0x10,     // Unknown: never set; on flat ground damps the speed and turns Mario round (makeVec)
+    ROLL_FLAG_NO_SLOPE = 0x20,      // Unknown: never set; skips the push down a sloped floor
+    ROLL_FLAG_EVT = 0x100,          // setRollEvtFlag: a script moves the tube (getRollEvtFlag)
+    ROLL_FLAG_FIXED = 0x200,        // marioRollFixOn: Mario cannot leave Tube Mode
+    ROLL_FLAG_SFX_ON = 0x1000,      // the rolling sound has been started
+    ROLL_FLAG_STICK_MOVED = 0x4000, // the stick was tilted; nothing reads it
+    ROLL_FLAG_KEEP_SPEED = 0x10000, // Unknown: never set; skips the base speed update from the roll velocity
+};
+
 typedef struct MotRollWork {
     f32 spdX;          // 0x00: roll velocity x (marioResetRollSpd clears it)
     f32 spdZ;          // 0x04: roll velocity z
@@ -33,6 +44,10 @@ f32 roll_grz;
 s32 roll_flyout_flag2;
 static __declspec(section ".rodata") Vec rollOfs = {0.0f, 40.0f, 0.0f};
 
+/**
+ * Tuning values of Mario's paper tube rolling: top speed, slowing, the slope push (180 or 140
+ * by which way he rolls across the tilt), and the speed factor on slopes.
+ */
 f32 rollData[] = {3.0f, -0.05f, -0.5f, 0.5f, 7.0f, 180.0f, 140.0f, 10.0f, 1.2f, 2.0f, 0.8f};
 
 // ground tilt (degrees) below which a slope does not push the roll
@@ -222,7 +237,7 @@ static inline void marioRollCan(void);
 void marioRollFixOn(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->currMotionId == MARIO_MOTION_ROLL) {
-        mario->mot.roll.flags |= 0x200;
+        mario->mot.roll.flags |= ROLL_FLAG_FIXED;
     }
 }
 
@@ -232,7 +247,7 @@ void marioRollFixOn(void) {
  */
 s32 marioRollCancelDisable(void) {
     MarioWork* mario = marioGetPtr();
-    if (mario->mot.roll.flags & 0x200) {
+    if (mario->mot.roll.flags & ROLL_FLAG_FIXED) {
         return 1;
     }
     if ((mario->flags & MARIO_FLAG_IS_TOUCHING_CEILING) != 0) {
@@ -268,13 +283,13 @@ s32 marioRollKeyDisable(void) {
  */
 void setRollEvtFlag(void) {
     MarioWork* mario = marioGetPtr();
-    mario->mot.roll.flags |= 0x100;
+    mario->mot.roll.flags |= ROLL_FLAG_EVT;
 }
 
 /** Clears the script-driven roll flag once evt_mario's move ends. */
 void clrRollEvtFlag(void) {
     MarioWork* mario = marioGetPtr();
-    mario->mot.roll.flags &= ~0x100;
+    mario->mot.roll.flags &= ~ROLL_FLAG_EVT;
 }
 
 /**
@@ -285,7 +300,7 @@ s32 getRollEvtFlag(void) {
     s32 r = 0;
     MarioWork* mario = marioGetPtr();
     if (mario->flags & MARIO_FLAG_TUBE_MODE) {
-        if (mario->mot.roll.flags & 0x100) {
+        if (mario->mot.roll.flags & ROLL_FLAG_EVT) {
             r = 1;
         }
     }
@@ -331,13 +346,13 @@ s32 marioRollTryCancel(void) {
     if (!(mario->flags & MARIO_FLAG_TUBE_MODE)) {
         return 0;
     }
-    if (mario->mot.roll.flags & 0x200) {
+    if (mario->mot.roll.flags & ROLL_FLAG_FIXED) {
         return 0;
     }
     {
         s32 r;
         MarioWork* m = marioGetPtr();
-        if (m->mot.roll.flags & 0x200) {
+        if (m->mot.roll.flags & ROLL_FLAG_FIXED) {
             r = 1;
         } else if (m->flags & MARIO_FLAG_IS_TOUCHING_CEILING) {
             r = 1;
@@ -368,7 +383,7 @@ s32 marioRollCancel(void) {
     if (!(mario->flags & MARIO_FLAG_TUBE_MODE)) {
         return 0;
     }
-    if (mario->mot.roll.flags & 0x200) {
+    if (mario->mot.roll.flags & ROLL_FLAG_FIXED) {
         return 0;
     }
     if (!(mario->flags & MARIO_FLAG_IS_TOUCHING_CEILING)) {
@@ -388,7 +403,7 @@ s32 marioRollCancel(void) {
     if (!(mario->flags & MARIO_FLAG_TUBE_MODE)) {
         return 0;
     }
-    if (mario->mot.roll.flags & 0x200) {
+    if (mario->mot.roll.flags & ROLL_FLAG_FIXED) {
         return 0;
     }
     mario->currSubMotionId = 0x14;
@@ -568,7 +583,7 @@ void marioReInit_roll(void) {
 #endif
     }
     mario->trigFlags &= ~MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION;
-    mario->currMotionId = 0x16;
+    mario->currMotionId = MARIO_MOTION_ROLL;
     mario->flags |= MARIO_FLAG_TUBE_MODE;
     mario->rollFlags = 0x10;
     marioPaperOn("p_roll");
@@ -600,7 +615,7 @@ void marioReInit_roll(void) {
 static inline s32 rollChk(void) {
     s32 r;
     MarioWork* mario = marioGetPtr();
-    if (mario->mot.roll.flags & 0x200) {
+    if (mario->mot.roll.flags & ROLL_FLAG_FIXED) {
         r = 1;
     } else if (mario->flags & MARIO_FLAG_IS_TOUCHING_CEILING) {
         r = 1;
@@ -859,7 +874,7 @@ void mot_roll(void) {
         return;
     }
 #if VERSION <= VERSION_DEMO_US
-    if (!(mario->mot.roll.flags & 0x200) && (mario->buttonTrg & PAD_BUTTON_B)) {
+    if (!(mario->mot.roll.flags & ROLL_FLAG_FIXED) && (mario->buttonTrg & PAD_BUTTON_B)) {
         if (!(mario->flags & MARIO_FLAG_IS_TOUCHING_CEILING)) {
             mario->currSubMotionId = 0x14;
             camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_DISABLE;
@@ -948,7 +963,7 @@ void mot_roll(void) {
         if (mario->airTimer == 0 && (mario->buttonTrg & PAD_BUTTON_A)) {
             {
 #else
-        if (!(hitGetAttr(mario->hitobjStandOn) & 0xa00) && mario->airTimer == 0 && (mario->buttonTrg & PAD_BUTTON_A)) {
+        if (!(hitGetAttr(mario->hitobjStandOn) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_SPIKES)) && mario->airTimer == 0 && (mario->buttonTrg & PAD_BUTTON_A)) {
             if (!(strcmp(gp->currentMapName, "eki_04") == 0 && __fabsf(mario->groundSlope) >= 40.0f)) {
 #endif
                 MarioWork* m = marioGetPtr();
@@ -1030,7 +1045,7 @@ void mot_roll(void) {
             nz = nz * (f32)cos(3.1415927f * ((MarioWork*)mario)->directionView / 180.0f);
         }
     }
-    if (!(mario->flags & (MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING)) && !(mario->mot.roll.flags & 0x20)) {
+    if (!(mario->flags & (MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING)) && !(mario->mot.roll.flags & ROLL_FLAG_NO_SLOPE)) {
         angle = angleABf(0.0f, 0.0f, velX, -velZ);
         if (((MarioWork*)mario)->groundRot.z > ROLL_TILT_POS) {
             tmp = (angle > 180.0f) ? rollData[5] : rollData[6];
@@ -1140,7 +1155,7 @@ void mot_roll(void) {
             }
         }
     } else { // correctness: target runs the speed clamp only on this path (first branch jumps past it)
-        if ((mario->mot.roll.flags & 0x10) && mario->groundRot.z == 0.0f) {
+        if ((mario->mot.roll.flags & ROLL_FLAG_FLAT_TURN) && mario->groundRot.z == 0.0f) {
             if (makeVec(135.0f) == 1) {
                 velX = 0.2f * -velX + velX;
                 velZ = 0.2f * -velZ + velZ;
@@ -1232,7 +1247,7 @@ void mot_roll(void) {
     s = 0.05f * velZ2;
     if (!getRollEvtFlag() && mario->forceMoveTimer == 0) {
         unusedF = angleABf(0.0f, 0.0f, velX, angle);
-        if (!(mario->mot.roll.flags & 0x10000)) {
+        if (!(mario->mot.roll.flags & ROLL_FLAG_KEEP_SPEED)) {
             s = s * mario->playerGravity;
             if (s < 0.05f) {
                 s = 0.0f;
@@ -1248,12 +1263,12 @@ void mot_roll(void) {
 #if VERSION >= VERSION_US
         if (marioGetPtr()->motStruct && (u32)marioGetPtr()->motRoll->sfxId == (u32)-1) {
             marioGetPtr()->motRoll->sfxId = (s32)psndSFXOn_3D((char*)0x17b, &m->position);
-            m->mot.roll.flags |= 0x1000;
+            m->mot.roll.flags |= ROLL_FLAG_SFX_ON;
         }
 #else
         if ((u32)m->mot.roll.sfxId == (u32)-1) {
             m->mot.roll.sfxId = (s32)psndSFXOn_3D((char*)0x17b, &m->position);
-            m->mot.roll.flags |= 0x1000;
+            m->mot.roll.flags |= ROLL_FLAG_SFX_ON;
         }
 #endif
     } else {
@@ -1298,10 +1313,10 @@ void mot_roll(void) {
         mario->rot.x = 0.0f;
     }
     if (mario->wStickDir1 || mario->wStickDir2) {
-        mario->mot.roll.flags |= 0x4000;
+        mario->mot.roll.flags |= ROLL_FLAG_STICK_MOVED;
     }
 #if VERSION <= VERSION_DEMO_US
-    if (!(mario->mot.roll.flags & 0x200) && (mario->buttonTrg & PAD_BUTTON_B) && !(mario->flags & MARIO_FLAG_IS_TOUCHING_CEILING) && mario->hitobjStandOn) {
+    if (!(mario->mot.roll.flags & ROLL_FLAG_FIXED) && (mario->buttonTrg & PAD_BUTTON_B) && !(mario->flags & MARIO_FLAG_IS_TOUCHING_CEILING) && mario->hitobjStandOn) {
         mario->currSubMotionId = 0x14;
         camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_DISABLE;
     }
@@ -1448,6 +1463,7 @@ static inline void marioRollCan(void) {
 #endif
 }
 
+// FAKE: stand-in for a stripped function; it only orders this file's float constants in .sdata2
 /**
  * Never called (the link strips it): its stores only place float constants in the order the rest of the file
  * expects in the constant pool.

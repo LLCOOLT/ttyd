@@ -139,6 +139,7 @@ EVT_BEGIN(kpa_01_door_close)
         SET_FLOAT_VALUE(GW(0), LW(0))
         SET_VALUE(GW(1), LW(1))
         WAIT_FRAMES(1)
+        // The two door leaves swing shut, easing to the closed angle.
         IF_INT_EQUAL(LW(1), 1)
             GOTO(0)
         END_IF
@@ -158,6 +159,7 @@ EVT_BEGIN(kpa_01_door_close)
         CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+        // The first Spiny guard walks back to its post beside the door.
         CALL(evt_npc_set_anim, STRING("トゲノコＡ"), STRING("W_3"))
         LOOP(0)
             IF_INT_NOT_EQUAL(GW(1), 1)
@@ -175,6 +177,7 @@ EVT_BEGIN(kpa_01_door_close)
         CALL(evt_npc_set_stop_anim, STRING("トゲノコＡ"))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+        // The second guard does the same on the other side.
         CALL(evt_npc_set_anim, STRING("トゲノコＢ"), STRING("W_3"))
         LOOP(0)
             IF_INT_NOT_EQUAL(GW(1), 1)
@@ -195,6 +198,7 @@ EVT_BEGIN(kpa_01_door_close)
     BEGIN_INLINE_EVENT
         WAIT_MS(1500)
         CALL(evt_mapobj_get_position, STRING("door"), LW(0), LW(1), LW(2))
+        // The door slams with its shutting sound.
         CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_CASTLE1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
     LOOP(0)
@@ -277,6 +281,7 @@ EVT_END()
  * Plays when Bowser reaches x = 625 or re-enters from the other side.
  */
 EVT_BEGIN(kpa_01_syuppatu_evt)
+    // The big castle door swings open and Bowser is startled by the person on the other side.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mapobj_get_position, STRING("door"), LW(0), LW(1), LW(2))
     SET_VALUE(LW(0), 0)
@@ -300,6 +305,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     WAIT_FRAMES(1)
     CALL(evt_npc_move_position, STRING("ババ"), -650, 0, 0, FLOAT(60.0f), 0)
     WAIT_FRAMES(1)
+    // Kammy Koopa arrives out of breath; the door shuts behind her.
     CALL(evt_msg_print, 0, STRING("kpa_stg1_021"), 0, STRING("ババ"))
     SPAWN_EVENT(kpa_01_door_close)
     CALL(evt_npc_move_position, STRING("ババ"), -480, 0, 0, FLOAT(90.0f), 0)
@@ -321,6 +327,8 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     CALL(evt_npc_set_stay_anim, STRING("ババ"))
     CALL(evt_cam3d_evt_set, 470, 85, 311, 470, 44, -14, 0, 11)
     WAIT_FRAMES(1)
+    // Bowser demands to know why she called him here; she asks for patience and explains that Mario is hunting
+    // for treasure, the Crystal Stars.
     CALL(evt_msg_print, 0, STRING("kpa_stg1_022"), 0, STRING("ババ"))
     CALL(evt_cam3d_evt_set, 600, 158, 338, 600, 99, 20, 0, 11)
     WAIT_FRAMES(1)
@@ -343,6 +351,8 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_029"), 0, STRING("ババ"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_1"), STRING("KPA_T_1"))
     CALL(evt_msg_print, 0, STRING("kpa_stg1_030"), 0, STRING("mario"))
+    // Bowser loves the idea of using the Crystal Stars to conquer the world; Kammy asks the question of the
+    // choice (does he like fried eggs?).
     CALL(evt_msg_print, 0, STRING("kpa_stg1_031"), 0, STRING("ババ"))
     CALL(evt_msg_select, 0, STRING("kpa_stg1_032"))
     CALL(evt_msg_continue)
@@ -365,6 +375,8 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
         CALL(evt_npc_set_anim, STRING("ババ"), STRING("A_2A"))
     END_INLINE_EVENT
     CALL(evt_npc_set_autotalkpose, STRING("ババ"), STRING("U_1"), STRING("T_5"))
+    // Kammy confesses she took a picnic break in Petal Meadows and Bowser explodes in rage, shaking the room
+    // and scaring the guards.
     CALL(evt_msg_print, 0, STRING("kpa_stg1_034"), PTR(kpa_stg1_034_cb), STRING("ババ"))
     CALL(evt_npc_set_autotalkpose, STRING("ババ"), STRING("S_1"), STRING("T_1"))
     DELETE_EVENT(LW(0))
@@ -441,6 +453,8 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     CALL(evt_npc_set_anim, STRING("ババ"), STRING("P_1"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 470, 85, 311, 470, 44, -14, 500, 11)
+    // Kammy tries to calm him down; a message arrives that Princess Peach was abducted in Rogueport and Bowser
+    // rages again.
     CALL(evt_msg_print, 0, STRING("kpa_stg1_037"), 0, STRING("ババ"))
     CALL(evt_npc_set_autotalkpose, STRING("ババ"), STRING("S_1"), STRING("T_1"))
     CALL(evt_npc_set_position, STRING("カメック"), 300, 0, -5)
@@ -470,6 +484,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     WAIT_MS(600)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_043"), 0, STRING("ババ"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_4"), STRING("KPA_T_3"))
+    // Bowser storms off; the Spiny guards break through the wall as he leaves in his airship.
     CALL(evt_msg_print, 0, STRING("kpa_stg1_044"), 0, STRING("mario"))
     CALL(evt_cam3d_evt_set, 430, 180, 517, 430, 90, 0, 1500, 11)
     BEGIN_INLINE_EVENT
@@ -511,6 +526,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
             GOTO(0)
         END_IF
     END_INLINE_EVENT
+    // The airship flies across the hall and out of the castle; the camera follows it.
     CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_AIRSHIP_MOVE1"), 200, 50, 0, LW(9))
     CALL(evt_sub_intpl_msec_init, 11, 200, 625, 2000)
     LABEL(1)
@@ -700,6 +716,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
         GOTO(7)
     END_IF
     SET_VALUE(GF(0), 1)
+    // Kammy rushes after him on her broom and the scene returns to kpa_00 for the flight to Petalburg.
     CALL(evt_msg_print, 0, STRING("kpa_stg1_045"), 0, STRING("ババ"))
     CALL(evt_sub_get_sincos, 132, LW(0), LW(1))
     SET_FLOAT_VALUE(GW(0), LW(1))
@@ -926,7 +943,7 @@ EVT_BEGIN(hammer_D_talk_evt)
     RETURN
 EVT_END()
 
-/** Init for the fifth Hammer Bro.: standard NPC init plus status bit 2. */
+/** Init for the fifth Hammer Bro.: standard NPC init plus NPC_STATUS_FACE_MOVE_DIR. */
 EVT_BEGIN(hammer_E_init_evt)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -939,7 +956,7 @@ EVT_BEGIN(hammer_E_talk_evt)
     RETURN
 EVT_END()
 
-/** Init for Kammy Koopa: standard NPC init, status bit 2, and the grounded tribe model. */
+/** Init for Kammy Koopa: standard NPC init, NPC_STATUS_FACE_MOVE_DIR, and the grounded tribe model. */
 EVT_BEGIN(baba_init_evt)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -947,20 +964,24 @@ EVT_BEGIN(baba_init_evt)
     RETURN
 EVT_END()
 
-/** Init for the Magikoopa: standard NPC init plus status bit 2. */
+/** Init for the Magikoopa: standard NPC init plus NPC_STATUS_FACE_MOVE_DIR. */
 EVT_BEGIN(kamek_init_evt)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
-/** Init for the flying Bowser NPC: standard NPC init plus status bit 2. */
+/** Init for the flying Bowser NPC: standard NPC init plus NPC_STATUS_FACE_MOVE_DIR. */
 EVT_BEGIN(hkoopa_init_evt)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of Bowser's hall: the four Spiny guards (A and B can be talked to), the five Hammer Bros., Kammy
+ * Koopa (ババ), a Magikoopa (カメック) and Bowser's airship.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "トゲノコＡ", // name

@@ -1,5 +1,6 @@
 #include "fdlibm.h"
 
+/** Constants for sqrt: 1.0 and a tiny value used to raise the inexact flag. */
 static const double one = 1.0, tiny = 1.0e-300;
 
 /**

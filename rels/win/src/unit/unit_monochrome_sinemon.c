@@ -28,6 +28,11 @@ static EvtWord dmg_turn_event[96];
 static EvtWord attack_event[454];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Cleft (btl_un_monochrome_sinemon), the grey Cleft of Boggly Woods: 2 HP, level 12,
+ * a spiky rock that charges head first for 2 damage and can be flipped onto its back.
+ * Boggly Woods' battle groups use it.
+ */
 BattleUnitKind unit_monochrome_sinemon = {
     26,
     "btl_un_monochrome_sinemon",
@@ -86,7 +91,7 @@ BattleUnitKind unit_monochrome_sinemon = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -94,22 +99,46 @@ BattleUnitKind unit_monochrome_sinemon = {
     data_table,
 };
 
+/**
+ * Defence of the Cleft: 2 against normal, ice, explosion and electric hits;
+ * immune to fire (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{2, 99, 2, 2, 2}};
 
+/** Element response of the Cleft: immune to fire, which does no damage at all. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
+/** Damage reduction of the Cleft while it is flipped onto its back: none against any element. */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Cleft in the demo builds, as a percent of the normal chance of each status:
+ * immune to burn; 50% for sleep, dizzy, confusion, fright; 70% for freeze, Tiny, Attack Down, Gale Force;
+ * 80% for Defense Down, allergy, Slow; 90% for stop; 95% for instant KO.
+ */
 static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 80, 80, 50, 70, 100, 80, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Cleft in the retail builds, as a percent of the normal chance of each status:
+ * immune to burn; 50% for sleep, dizzy, confusion, fright; 70% for freeze, Tiny, Attack Down, allergy,
+ * Gale Force, Slow; 95% for instant KO.
+ */
 static StatusVulnerability regist = {50, 100, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 100, 70, 50, 70, 100, 70, 100, 100, 95};
 #endif
 
+/**
+ * The Cleft's single part: the Cleft model (c_sinemon_w), the main target and the part that covers for
+ * allies; it can be flipped by explosions and carries a spiky top.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_monochrome_sinemon", "c_sinemon_w", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0x1, pose_table},
+    {1, "btl_un_monochrome_sinemon", "c_sinemon_w", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_BOMB_FLIPPABLE, COUNTER_ATTR_TOP_SPIKY, pose_table},
 };
 
+/**
+ * The Cleft's head-butt charge: 2 damage to the front-most opposing target,
+ * a hammer-like attack that can be guarded.
+ */
 static BattleWeapon weapon_sinemon_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -128,7 +157,7 @@ static BattleWeapon weapon_sinemon_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -146,6 +175,9 @@ static BattleWeapon weapon_sinemon_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Poses of the Cleft (SIN_*) while it is upright: idle, status, hurt, walk, charge and talking animations.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "SIN_N_1"},
     {2, "SIN_Y_1"},
@@ -153,20 +185,24 @@ static PoseTableEntry pose_table[] = {
     {5, "SIN_K_1"},
     {4, "SIN_I_1"},
     {3, "SIN_I_1"},
-    {28, "SIN_S_1"},
+    {BTL_POSE_NORMAL, "SIN_S_1"},
     {29, "SIN_Q_1"},
     {30, "SIN_Q_1"},
     {31, "SIN_A_1a"},
-    {39, "SIN_D_1"},
+    {BTL_POSE_DAMAGE, "SIN_D_1"},
     {50, "SIN_A_1a"},
-    {40, "SIN_W_1"},
-    {42, "SIN_R_1"},
-    {56, "SIN_I_1"},
-    {57, "SIN_I_1"},
+    {BTL_POSE_WALK, "SIN_W_1"},
+    {BTL_POSE_RUN, "SIN_R_1"},
+    {BTL_POSE_DANGER, "SIN_I_1"},
+    {BTL_POSE_PERIL, "SIN_I_1"},
     {BTL_POSE_TALK, "SIN_T_1"},
     {BTL_POSE_STAY_DEFAULT, "SIN_S_1"},
 };
 
+/**
+ * Poses of the Cleft while it lies flipped on its back:
+ * nearly every slot uses the upside-down animations (SIN_*_2).
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "SIN_N_2"},
     {2, "SIN_Y_2"},
@@ -174,17 +210,22 @@ static PoseTableEntry pose_table_turn[] = {
     {5, "SIN_K_2"},
     {4, "SIN_K_2"},
     {3, "SIN_K_2"},
-    {28, "SIN_D_2"},
+    {BTL_POSE_NORMAL, "SIN_D_2"},
     {29, "SIN_D_2"},
     {30, "SIN_D_2"},
     {31, "SIN_D_2"},
-    {39, "SIN_D_2"},
-    {56, "SIN_K_2"},
-    {57, "SIN_K_2"},
+    {BTL_POSE_DAMAGE, "SIN_D_2"},
+    {BTL_POSE_DANGER, "SIN_K_2"},
+    {BTL_POSE_PERIL, "SIN_K_2"},
     {BTL_POSE_TALK, "SIN_D_2"},
     {BTL_POSE_STAY_DEFAULT, "SIN_D_2"},
 };
 
+/**
+ * Data table of the Cleft: event 13 flips it onto its back (dmg_turn_event),
+ * event 37 (an attacker is hurt by its spiky top) flashes the spikes and event 48
+ * (First Strike) does nothing.
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
@@ -217,13 +258,13 @@ EVT_END()
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
         ADD(LW(1), 45)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 7)
         ADD(LW(1), 25)
@@ -261,7 +302,10 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Data-table hook (entry 13) for being flipped over (Guess: by a quake attack or bomb blast):
+ * Data-table event 13, run by subsetevt_damage on a hit with DAMAGE_FLAG_FLIPPED:
+ * its part is PART_ATTR_BOMB_FLIPPABLE,
+ * so weapons with SPECIAL_FLIPS_BOMB_FLIPPABLE (the Quake Hammer badges, the POW Block,
+ * Bobbery's and the enemy bombs' blasts) flip it over:
  * switches to the defenseless upside-down defense and pose tables,
  * sets the flipped status flag with a 2-turn timer,
  * bounces it down to height 7 and turns off its spiky-top counter.
@@ -271,7 +315,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -284,7 +328,7 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, -10, 0)
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     RETURN
 EVT_END()
 
@@ -303,14 +347,14 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("SIN_S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, 0, 0)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -326,11 +370,14 @@ EVT_END()
  * on a miss it overshoots, on a hit it bounces back twice, then walks home.
  */
 static EVT_BEGIN(attack_event)
+    // A Cleft lying on its back only spends its turn getting up (wakeup_event).
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
+    // A First Strike aims at the first-strike target; otherwise the Cleft uses an item if it has one or
+    // picks the front-most target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -349,13 +396,14 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sinemon_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
+    // Aim the camera at the target, declare the attack, wait for any guard and pay the cost.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -364,7 +412,8 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_sinemon_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // Walk to a spot 100 units in front of the target and turn to face it.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -381,19 +430,22 @@ static EVT_BEGIN(attack_event)
             WAIT_FRAMES(7)
         END_LOOP
     END_SIBLING_EVENT
+    // Wind-up: the Cleft crouches into its charging pose while the camera pulls in.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(750)
     CALL(evt_btl_camera_set_mode, 0, 3)
+    // Dash at the target at full speed.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_DASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, -1, 0)
     DELETE_EVENT(LW(15))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), 256, LW(5))
+    // Damage pre-check: the target either sidesteps the charge or takes it.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -415,17 +467,20 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: the Cleft overshoots and trots on past the target.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 50)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_MS(500)
     GOTO(98)
     LABEL(91)
+    // Hit: the camera shakes, the guard result is resolved and the damage is dealt;
+    // the Cleft bounces back off the target twice.
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sinemon_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(1.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
@@ -438,8 +493,9 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
     LABEL(98)
+    // Walk back to the home position and return to the waiting pose.
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)

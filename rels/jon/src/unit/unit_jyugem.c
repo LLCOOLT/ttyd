@@ -15,6 +15,13 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
 
+// Unit work slots of the Lakitu (btlevtcmd_Get/SetUnitWork).
+enum {
+    UW_JYUGEM_EGG_HELD = 0,    // 1 while it holds a Spiny egg overhead (top-spiky)
+    UW_JYUGEM_EGG_HATCHES = 1, // 1 when this throw's egg hatches a Spiny if the target guards
+    UW_JYUGEM_CHARGED = 2,     // cleared by init_event; nothing in this file reads it
+};
+
 static USER_FUNC(togezo_copy_status);
 extern BattleUnitKind unit_togezo;
 
@@ -38,6 +45,7 @@ static EvtWord normal_attack_event[585];
 static EvtWord friend_event[263];
 static EvtWord wait_event[6];
 
+/** Unit data of the Lakitu: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_jyugem = {
     40,
     "btl_un_jyugem",
@@ -96,7 +104,7 @@ BattleUnitKind unit_jyugem = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     2,
     parts,
@@ -104,16 +112,24 @@ BattleUnitKind unit_jyugem = {
     data_table,
 };
 
+/** Damage reduction of the Lakitu: none, every attack type does full damage. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element response of the Lakitu: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Lakitu (percent, 0 is immune): every status effect can land. Demo values. */
 static StatusVulnerability regist = {80, 90, 100, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 90, 100, 100, 80, 100, 100, 95};
 #else
+/**
+ * Status vulnerability of the Lakitu (percent, 0 is immune): every status effect can land. Released game
+ * values.
+ */
 static StatusVulnerability regist = {80, 90, 105, 100, 80, 100, 100, 100, 100, 90, 100, 90, 100, 95, 80, 90, 100, 100, 80, 100, 100, 95};
 #endif
 
+/** Pose table of the Lakitu: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "JGM_N_1"},
     {2, "JGM_Y_1"},
@@ -134,6 +150,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "JGM_S_1"},
 };
 
+/** Pose table of the Lakitu, holding a Spiny: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_hold[] = {
     {1, "JGM_S_2"},
     {2, "JGM_S_2"},
@@ -154,17 +171,23 @@ static PoseTableEntry pose_table_hold[] = {
     {BTL_POSE_STAY_DEFAULT, "JGM_S_2"},
 };
 
+/**
+ * Data table of the Lakitu: event handlers keyed by tag (avoid_counter_thorn_head_event,
+ * dmg_first_attack_pos_event).
+ */
 static BattleDataEntry data_table[] = {
     {37, avoid_counter_thorn_head_event},
     {48, dmg_first_attack_pos_event},
     {0, NULL},
 };
 
+/** Body parts of the Lakitu: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_jyugem", "c_jugemu", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
-    {2, "パイポ", "c_jugemu", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {1, "btl_un_jyugem", "c_jugemu", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {2, "パイポ", "c_jugemu", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW | PART_ATTR_WORLD_POSITION, 0, pose_table},
 };
 
+/** Attack data for the Lakitu's egg throw: 2 damage. */
 static BattleWeapon weapon_jyugem_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -183,7 +206,7 @@ static BattleWeapon weapon_jyugem_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -201,6 +224,10 @@ static BattleWeapon weapon_jyugem_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Spawn setup for the Spiny that the Lakitu summons mid-battle: enemy side, parked off-screen until its
+ * script places it.
+ */
 static BattleUnitSetup entry_togezo = {
     &unit_togezo, // unitKindParams
     1, // alliance
@@ -223,8 +250,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HELD, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_CHARGED, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("JGM_P_1"))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -233,16 +260,20 @@ EVT_END()
 /**
  * Damage script of the Lakitu. While it is not holding an egg it just takes the default damage.
  * While it is holding one (unit work 0 set), a hit that damages it,
- * or that applies one of a set of status effects (Guess: the ones that stun or disable it),
+ * or one after which it has status 27, 1, 3, 5, 6, 9 or 2 (KO, Sleep, Dizzy, Confuse, Electric, Freeze, Stop),
  * makes it drop the egg: the egg part is thrown away behind it,
  * the holding state and counter attribute are cleared and its pose table is restored
  * before the default damage runs.
- * Other status-inflicting damage codes (22, 30, 31, 38, 39 and 41) drop the egg too, with a shorter toss.
+ * Otherwise, unless the damage code is 22, 30, 31, 38, 39 or 41,
+ * it tosses the egg part a shorter way and hides it
+ * while it has status 4, 8, 11, 15, 20 or 0 (Poison, Burn, Tiny, Defense Down, Slow, Allergic), without clearing
+ * the holding state; the default damage then runs.
  */
 static EVT_BEGIN(damage_event)
+    // While the Lakitu is not holding an egg it just takes the default damage.
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HELD, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL_CHILD(btldefaultevt_Damage)
     ELSE
@@ -252,23 +283,26 @@ static EVT_BEGIN(damage_event)
         ELSE
             SET_VALUE(LW(15), 0)
         END_IF
-        CALL(btlevtcmd_CheckStatus, LW(10), 27, LW(14))
+        // Holding an egg: a hit that damages it, or leaves it knocked out, asleep, dizzy, confused, shocked,
+        // frozen or stopped, makes it drop the egg.
+        CALL(btlevtcmd_CheckStatus, LW(10), STATUS_INSTANT_KILL, LW(14))
         OR(LW(15), LW(14))
-        CALL(btlevtcmd_CheckStatus, LW(10), 1, LW(14))
+        CALL(btlevtcmd_CheckStatus, LW(10), STATUS_SLEEP, LW(14))
         OR(LW(15), LW(14))
-        CALL(btlevtcmd_CheckStatus, LW(10), 3, LW(14))
+        CALL(btlevtcmd_CheckStatus, LW(10), STATUS_DIZZY, LW(14))
         OR(LW(15), LW(14))
-        CALL(btlevtcmd_CheckStatus, LW(10), 5, LW(14))
+        CALL(btlevtcmd_CheckStatus, LW(10), STATUS_CONFUSE, LW(14))
         OR(LW(15), LW(14))
-        CALL(btlevtcmd_CheckStatus, LW(10), 6, LW(14))
+        CALL(btlevtcmd_CheckStatus, LW(10), STATUS_ELECTRIC, LW(14))
         OR(LW(15), LW(14))
-        CALL(btlevtcmd_CheckStatus, LW(10), 9, LW(14))
+        CALL(btlevtcmd_CheckStatus, LW(10), STATUS_FREEZE, LW(14))
         OR(LW(15), LW(14))
-        CALL(btlevtcmd_CheckStatus, LW(10), 2, LW(14))
+        CALL(btlevtcmd_CheckStatus, LW(10), STATUS_STOP, LW(14))
         OR(LW(15), LW(14))
         IF_INT_NOT_EQUAL(LW(15), 0)
+            // The egg part is thrown away behind the Lakitu.
             BEGIN_INLINE_EVENT
-                CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 50331648)
+                CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
                 CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
                 ADD(LW(1), 35)
                 CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
@@ -276,16 +310,20 @@ static EVT_BEGIN(damage_event)
                 CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(0), 200)
                 CALL(btlevtcmd_JumpPartsSetting, LW(10), 2, 0, FLOAT(5.0f), FLOAT(0.2998047f))
                 CALL(btlevtcmd_JumpPartsPosition, LW(10), 2, LW(0), 0, LW(2), 0, -1)
-                CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, 16777216)
-                CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, 33554432)
+                CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, PART_ATTR_HIDDEN)
+                CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, PART_ATTR_NO_SHADOW)
             END_INLINE_EVENT
-            CALL(btlevtcmd_SetUnitWork, LW(10), 0, 0)
-            CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), 1, 1)
+            CALL(btlevtcmd_SetUnitWork, LW(10), UW_JYUGEM_EGG_HELD, 0)
+            // The spikes are gone and its normal poses return.
+            CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), 1, COUNTER_ATTR_TOP_SPIKY)
             CALL(btlevtcmd_AnimeSetPoseTable, LW(10), 1, PTR(pose_table))
             CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
             CALL_CHILD(btldefaultevt_Damage)
         ELSE
             CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
+            // Otherwise, unless the hit is one of a few special kinds, a lingering status (poison, burn, tiny,
+            // defense down, slow or allergic) makes it fumble the egg a short way and hide it; it still counts
+            // as holding it.
             IF_INT_EQUAL(LW(0), 22)
                 GOTO(90)
             END_IF
@@ -304,27 +342,27 @@ static EVT_BEGIN(damage_event)
             IF_INT_EQUAL(LW(0), 41)
                 GOTO(90)
             END_IF
-            CALL(btlevtcmd_CheckStatus, LW(10), 4, LW(15))
-            CALL(btlevtcmd_CheckStatus, LW(10), 8, LW(14))
+            CALL(btlevtcmd_CheckStatus, LW(10), STATUS_POISON, LW(15))
+            CALL(btlevtcmd_CheckStatus, LW(10), STATUS_BURN, LW(14))
             OR(LW(15), LW(14))
-            CALL(btlevtcmd_CheckStatus, LW(10), 11, LW(14))
+            CALL(btlevtcmd_CheckStatus, LW(10), STATUS_TINY, LW(14))
             OR(LW(15), LW(14))
-            CALL(btlevtcmd_CheckStatus, LW(10), 15, LW(14))
+            CALL(btlevtcmd_CheckStatus, LW(10), STATUS_DEFENSE_DOWN, LW(14))
             OR(LW(15), LW(14))
-            CALL(btlevtcmd_CheckStatus, LW(10), 20, LW(14))
+            CALL(btlevtcmd_CheckStatus, LW(10), STATUS_SLOW, LW(14))
             OR(LW(15), LW(14))
-            CALL(btlevtcmd_CheckStatus, LW(10), 0, LW(14))
+            CALL(btlevtcmd_CheckStatus, LW(10), STATUS_ALLERGIC, LW(14))
             OR(LW(15), LW(14))
             IF_INT_NOT_EQUAL(LW(15), 0)
                 BEGIN_INLINE_EVENT
-                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 50331648)
+                    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
                     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
                     ADD(LW(1), 35)
                     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
                     CALL(btlevtcmd_JumpPartsSetting, LW(10), 2, 30, 0, FLOAT(0.099609375f))
                     CALL(btlevtcmd_JumpPartsPosition, LW(10), 2, LW(0), LW(1), LW(2), 30, -1)
-                    CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, 33554432)
+                    CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, LW(10), 2, PART_ATTR_NO_SHADOW)
                 END_INLINE_EVENT
             END_IF
             LABEL(90)
@@ -336,8 +374,8 @@ EVT_END()
 
 /**
  * Before the player's phase, on every turn but the first, if the Lakitu can act and is not in status 27, 3,
- * 5 or 6 (Guess: the ailments that disable it), it has a 50 percent chance to pick up an egg:
- * it plays JGM_A_1 and A_2 with the hold sounds, sets unit work 0 and counter attribute 1 on part 1,
+ * 5 or 6 (KO, Dizzy, Confuse, Electric), it has a 50 percent chance to pick up an egg:
+ * it plays JGM_A_1 and A_2 with the hold sounds, sets unit work 0 and counter attribute 1 (top-spiky) on part 1,
  * switches to the holding pose table and raises its hit offset by 20.
  */
 static EVT_BEGIN(unison_phase_event)
@@ -349,7 +387,7 @@ static EVT_BEGIN(unison_phase_event)
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(0))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_INSTANT_KILL, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         GOTO(99)
     END_IF
@@ -358,11 +396,11 @@ static EVT_BEGIN(unison_phase_event)
         GOTO(99)
     END_IF
     SET_VALUE(LW(15), 0)
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 3, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_DIZZY, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 5, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CONFUSE, LW(14))
     OR(LW(15), LW(14))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 6, LW(14))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_ELECTRIC, LW(14))
     OR(LW(15), LW(14))
     IF_INT_NOT_EQUAL(LW(15), 0)
         GOTO(99)
@@ -375,8 +413,8 @@ static EVT_BEGIN(unison_phase_event)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_JUGEM_HOLD1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("JGM_A_2"))
         WAIT_FRAMES(30)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-        CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HELD, 1)
+        CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_hold))
         CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
         CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 20, 0)
@@ -386,18 +424,19 @@ static EVT_BEGIN(unison_phase_event)
 EVT_END()
 
 /**
- * Plays the "toge_flush" spark effect over the Lakitu 30 frames after it is hit,
- * at a height that depends on its size statuses 10 and 11 (Guess: the big and small size changes).
+ * Plays the "toge_flush" spark effect over the Lakitu 30 frames
+ * after an attacker is hurt by the spiked egg it holds,
+ * at a height that depends on its size statuses 10 (Huge) and 11 (Tiny).
  */
 static EVT_BEGIN(avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 45)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 25)
         GOTO(90)
@@ -409,7 +448,10 @@ static EVT_BEGIN(avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
-/** Data event 48 of the Lakitu: after a first strike it is set to y 10 and waits for the attack to end. */
+/**
+ * Data event 48 of the Lakitu, run when the battle opens with Mario's or the partner's First Strike on it:
+ * it is set to y 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -481,11 +523,11 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(11), LW(10))
     SET_VALUE(LW(11), 65)
     IF_INT_LESS(LW(10), LW(11))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HATCHES, 0)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
     ELSE
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HATCHES, 1)
         CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
@@ -497,16 +539,17 @@ EVT_END()
 /**
  * The Lakitu's egg throw: if it is not already holding an egg it takes one (JGM_A_1 and A_2),
  * then throws it (SFX_ENM_JUGEM_THROW1) in an arc at the target and the target takes the damage.
- * If unit work 1 is set and the egg hits a target with damage code 262144 (Guess: a target that can be hit) the
+ * If unit work 1 is set and the target guarded the egg (damage flag 0x40000) the
  * egg also bounces to a free spot and hatches a Spiny there (togezo_copy_status copies its size status).
  * Otherwise the egg hops and lands behind the target and is picked up again.
  */
 static EVT_BEGIN(normal_attack_event)
+    // Pick a target; a confused Lakitu with nobody to hit gets flustered.
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_jyugem_attack))
     CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_jyugem_attack), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -515,13 +558,15 @@ static EVT_BEGIN(normal_attack_event)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_jyugem_attack))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_jyugem_attack))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HELD, LW(10))
     IF_INT_EQUAL(LW(10), 0)
+        // If it is not already holding an egg it reaches for one first (JGM_A_1, A_2).
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_JUGEM_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("JGM_A_1"))
         WAIT_FRAMES(40)
@@ -529,14 +574,15 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("JGM_A_2"))
         WAIT_FRAMES(30)
     ELSE
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-        CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HELD, 0)
+        CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
         CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     END_IF
+    // It winds up and lobs the egg at the target in a high arc.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("JGM_A_3"))
     WAIT_FRAMES(2)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 50331648)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 35)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
@@ -544,7 +590,8 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 2, 45, 0, FLOAT(0.2998047f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 45, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_jyugem_attack), 256, LW(5))
+    // Find out whether the egg lands.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_jyugem_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -566,16 +613,19 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss or dodge: the egg sails on past the target.
     LABEL(90)
     CALL(btlevtcmd_JumpPartsContinue, BTL_UNIT_SELF, 2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_JUGEM_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // Hit: the egg strikes the target and the damage is dealt.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_jyugem_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_jyugem_attack), 256, LW(5))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_jyugem_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HATCHES, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(btlevtcmd_CheckDamageCode, LW(3), 262144, LW(0))
+        // If this egg was meant to hatch and the target guarded it, the egg bounces off toward a free spot.
+        CALL(btlevtcmd_CheckDamageCode, LW(3), DAMAGE_FLAG_GUARDED, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             SET_VALUE(LW(1), 0)
@@ -624,10 +674,11 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2), 15, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_JUGEM_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_FRAMES(20)
+    // A Spiny hatches from the egg and spins into place.
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_togezo), 0)
     CALL(togezo_copy_status, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 50331648)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_AnimeChangePose, LW(3), LW(4), STRING("TGZ_P_1"))
@@ -645,13 +696,14 @@ static EVT_BEGIN(normal_attack_event)
     END_LOOP
     CALL(btlevtcmd_SetRotateOffset, LW(3), 0, 0, 0)
     GOTO(99)
+    // The egg hops back to the Lakitu and is picked up again.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 150)
     CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 2, 0, FLOAT(5.0f), FLOAT(0.2998047f))
     CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 2, LW(0), 0, LW(2), 0, -1)
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 50331648)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
     WAIT_FRAMES(10)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -667,7 +719,7 @@ EVT_END()
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HELD, LW(10))
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_JUGEM_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("JGM_A_1"))
@@ -676,15 +728,15 @@ static EVT_BEGIN(friend_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("JGM_A_2"))
         WAIT_FRAMES(30)
     ELSE
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-        CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_JYUGEM_EGG_HELD, 0)
+        CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
         CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     END_IF
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("JGM_A_3"))
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_JUGEM_THROW2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 50331648)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(10), LW(11), LW(12))
     ADD(LW(11), 35)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(10), LW(11), LW(12))
@@ -700,7 +752,7 @@ static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_togezo), 0)
     CALL(togezo_copy_status, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 50331648)
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW)
     CALL(btlevtcmd_SetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_AnimeChangePose, LW(3), LW(4), STRING("TGZ_P_1"))

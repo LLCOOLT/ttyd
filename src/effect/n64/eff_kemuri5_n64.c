@@ -31,6 +31,7 @@ typedef struct EffKemuri5N64Work {
     f32 dirZ;        // 0x48
 } EffKemuri5N64Work;
 
+/** Camera-facing landing puff quad. */
 static effN64Vtx kmr_a_1_v[] = {
     {-8, 7, 0, 0, 0, 255, 255, 255, 255},
     {7, 7, 0, 512, 0, 255, 255, 255, 255},
@@ -48,7 +49,7 @@ static inline GXColor mkc(u8 a) {
 
 static void effKemuri5Disp(CameraId cameraId, EffectEntry* effect);
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 /**
  * Spawns eight dust puffs at (x, y, z) fanned 45 degrees apart from the angle, with randomized sizes; 30 frames.

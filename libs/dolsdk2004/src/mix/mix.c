@@ -1,6 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/mix.h>
 
+/** AX volume for each attenuation from -90.4 dB to +6.0 dB in 0.1 dB steps (index = tenths of a dB + 904). */
 u16 __MIXVolumeTable[965] = {
     0,      1,      1,      1,      1,      1,      1,      1,
     1,      1,      1,      1,      1,      1,      1,      1,
@@ -125,6 +126,7 @@ u16 __MIXVolumeTable[965] = {
     62438,  63161,  63892,  64632,  65380
 };
 
+/** Attenuation in tenths of a dB for pan positions 0-127, used outside Pro Logic II mode. */
 int __MIXPanTable[128] = {
     0x00000000,
     0x00000000,
@@ -256,6 +258,7 @@ int __MIXPanTable[128] = {
     0xFFFFFC78
 };
 
+/** Front-channel attenuation in tenths of a dB for pan positions 0-127 in Pro Logic II mode. */
 s16 __MIX_DPL2_front[128] = {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -281,6 +284,7 @@ s16 __MIX_DPL2_front[128] = {
 	0xFE83, 0xFC40
 };
 
+/** Rear-channel attenuation in tenths of a dB for pan positions 0-127 in Pro Logic II mode. */
 s16 __MIX_DPL2_rear[128] = {
     0xFFC3, 0xFFC3, 0xFFC4, 0xFFC5, 0xFFC5, 0xFFC6,
 	0xFFC6, 0xFFC7, 0xFFC8, 0xFFC8, 0xFFC9, 0xFFC9,
@@ -306,6 +310,9 @@ s16 __MIX_DPL2_rear[128] = {
 	0xFFF4, 0xFFF5
 };
 
+/**
+ * Streamed disc audio volume for each step of the DVD stream attenuation, applied one step per audio frame.
+ */
 u8 __MIXAIVolumeTable[50] = {
     0x00, 0x01, 0x01, 0x01,
     0x01, 0x01, 0x01, 0x02,
@@ -338,7 +345,7 @@ static int __MIXClampPan(int pan);
 
 /**
  * Looks up the AX volume for an attenuation in tenths of a dB:
- * 0 at or below -0x388 (-88.8 dB), 0xFF64 at or above +6.0 dB, otherwise from __MIXVolumeTable.
+ * 0 at or below -0x388 (-90.4 dB), 0xFF64 at or above +6.0 dB, otherwise from __MIXVolumeTable.
  */
 static u16 __MIXGetVolume(int db_) {
     int db = db_;

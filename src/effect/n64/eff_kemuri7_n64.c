@@ -31,6 +31,7 @@ typedef struct EffKemuri7N64Work {
     f32 cosAngle;    // 0x84
 } EffKemuri7N64Work;
 
+/** Flat 10x10 snow footprint quad lying on the ground. */
 effN64Vtx foot_vtx[] = {
     {-5, 0, -5, 0, 1024, 0, 0, 0, 255},
     {5, 0, -5, 1024, 1024, 0, 0, 0, 255},

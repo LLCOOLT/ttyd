@@ -53,6 +53,10 @@ static EVT_BEGIN(door01_open)
     RETURN
 EVT_END()
 
+/**
+ * Exits (beros) of this room: w_bero_1 to gon_00, w_bero_2 to gon_00, e_bero to gon_02 and e_bero_2 to
+ * gon_02.
+ */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero_1", // hitName
@@ -130,6 +134,7 @@ static BeroEntry bero_entry_data[] = {
  * stg1_gon_14). Then the door to gon_02 is usable again.
  */
 EVT_BEGIN(honenoko_oidasare_evt)
+    // Control is taken; Mario appears at the east edge of the room with his partner, the door shut.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_DIR_LOCK)
     CALL(evt_party_set_dir, 0, 270, -1)
@@ -140,6 +145,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
     SET_FLOAT_VALUE(LW(0), FLOAT(180.0f))
     CALL_CHILD(door01_close)
     CALL(evt_seq_wait, 2)
+    // Mario and the partner lie on the floor in the poses of being thrown.
     CALL(evt_mario_set_pose, STRING("M_I_O"))
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
@@ -149,6 +155,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
         CALL(evt_party_set_pose, 0, STRING("PNK_D_1"))
     END_SWITCH
     WAIT_MS(1000)
+    // The door bursts open (closing animation played backward with its sound).
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         SET_VALUE(LW(1), 2)
@@ -162,6 +169,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+    // The partner is flung out through the door and bounces twice on the floor.
     BEGIN_SIBLING_EVENT
         WAIT_MS(500)
         SET_FLOAT_VALUE(LW(5), FLOAT(500.0f))
@@ -207,6 +215,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
             CALL(evt_party_set_pose, 0, STRING("PNK_D_3"))
         END_SWITCH
     END_SIBLING_EVENT
+    // Mario is thrown out the same way and bounces twice.
     SET_FLOAT_VALUE(LW(10), FLOAT(500.0f))
     SET_FLOAT_VALUE(LW(11), FLOAT(0.099609375f))
     SET_FLOAT_VALUE(LW(12), FLOAT(-5.0f))
@@ -242,6 +251,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // Mario lies on the floor while the partner pops back up.
     CALL(evt_mario_set_pose, STRING("M_D_2"))
     WAIT_FRAMES(120)
     BEGIN_SIBLING_EVENT
@@ -272,6 +282,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // Mario gets up and the partner returns to a standing pose.
     CALL(evt_mario_set_pose, STRING("M_U_3"))
     WAIT_FRAMES(20)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
@@ -284,6 +295,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
     END_SWITCH
     WAIT_FRAMES(30)
     CALL(evt_mario_cont_onoff, 1)
+    // Pushed out of the castle twice: the partner turns and comments on it.
     IF_INT_EQUAL(GSWF(GSWF_GON03_PUSHED_OUT_TWICE), 1)
         CALL(evt_mario_set_dispdir, 180)
         CALL(evt_mario_get_party, LW(0))
@@ -300,6 +312,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
             CALL(evt_msg_print, 0, STRING("stg1_gon_14"), 0, STRING("party"))
         END_SWITCH
     END_IF
+    // Control returns, the pushed-out flag is cleared and the door to gon_02 becomes usable again.
     WAIT_FRAMES(1)
     CALL(evt_party_cont_onoff, 0, 1)
     CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_DIR_LOCK)
@@ -368,6 +381,9 @@ EVT_BEGIN(gon_01_GATEEVENT_evt)
     RETURN
 EVT_END()
 
+/**
+ * Hazard-water floors of this room (map hit names) and the point each puts Mario back at after he is bitten.
+ */
 static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_00", {0.0f, -1000.0f, 0.0f}},
     {"mod_01", {0.0f, -1000.0f, 0.0f}},

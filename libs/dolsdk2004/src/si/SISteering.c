@@ -12,6 +12,7 @@ static int OnReset(BOOL final);
 SISteeringControl __SISteering[4];
 BOOL __SIResetSteering;
 
+/** Reset hook registered with the OS (priority 127) so the serial interface is shut down on reset. */
 static OSResetFunctionInfo ResetFunctionInfo = {OnReset, 127};
 
 /**

@@ -10,8 +10,8 @@
 #include "driver/effdrv.h"
 #include "mario/mario_pouch.h"
 
-#define UNIT_ALLIANCE_ENEMY (unit->alliance == 0)
-#define UNIT_ALLIANCE_PARTY (unit->alliance == 1)
+#define UNIT_ALLIANCE_PARTY (unit->alliance == 0) // Mario's side
+#define UNIT_ALLIANCE_ENEMY (unit->alliance == 1) // the enemy side
 
 // BattleUnit.flags (btlevtcmd_OnUnitFlag / OffUnitFlag / CheckUnitFlag).
 typedef enum BattleUnit_Flags {
@@ -47,6 +47,10 @@ typedef enum BattleUnitToken_Flags {
     TOKEN_FLAG_GUARD_DECLARED = (1 << 2),    // 0x4, a guard step-in was declared for or by this unit this action
     TOKEN_FLAG_CHARGE_EXPENDED = (1 << 3),   // 0x8, Charge was used up; its status is cleared at the end of the action
     TOKEN_FLAG_CONFUSED_ACTION = (1 << 4),   // 0x10, acting while confused
+    TOKEN_FLAG_KNOCKED_AWAY = (1 << 5),      // 0x20, a hammer knockback hit sent the unit flying (subsetevt_shot_damage)
+    TOKEN_FLAG_OFF_STAGE = (1 << 6),         // 0x40, Ultra Hammer: the unit waits off stage until Mario's script clears it
+    TOKEN_FLAG_KNOCKBACK_LANDED = (1 << 7),  // 0x80, the knocked-away unit has landed back home
+    TOKEN_FLAG_UNUSED_8 = (1 << 8),          // 0x100, polled by Mario's Ultra Hammer wait (empty branch); nothing sets it
     TOKEN_FLAG_CURRENTLY_ACTING = (1 << 12), // 0x1000
     TOKEN_FLAG_RALLY_WINK = (1 << 13),       // 0x2000, an extra (Rally Wink) turn while slowed; kept over the turn reset
     TOKEN_FLAG_PERSISTENT = (1 << 31)        // 0x80000000, kept by the turn-start reset; nothing sets it
@@ -701,7 +705,7 @@ typedef struct BattleUnit {
     s32 unitId;                               // 0x0
     BattleUnitType initialKind;               // 0x4
     BattleUnitType currentKind;               // 0x8
-    s8 alliance;                              // 0xC
+    s8 alliance;                              // 0xC, 0 Mario's side, 1 the enemies, 2 stage objects
     u8 level;                                 // 0xD
     s8 groupSetupId;                          // 0xE
     struct BattleUnitKind* kindParams;        // 0x10

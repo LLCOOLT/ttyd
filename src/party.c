@@ -568,6 +568,10 @@ static inline s32 partyGetFreeSlot2(void) {
     return -1;
 }
 
+/**
+ * Animation group names for Yoshi's seven colours,
+ * indexed by the colour he hatched with (pouchGetPartyColor).
+ */
 char* yoshigroup[7] = {
         "c_babyyoshi",
         "c_babyyoshi2",
@@ -873,7 +877,7 @@ void partyReInit(void) {
             partyChgRunMode(party, 2);
             party->moveMode = 6;
             party->motionStep = 0;
-            party->flags |= 0x8000;
+            party->flags |= PARTY_FLAG_MOVE_MODE_HOLD;
         }
         if (party->currentMemberId == PARTY_MEMBER_MS_MOWZ) {
             chuchu_reinit(party);
@@ -1108,7 +1112,7 @@ static inline s32 partyCountActive(void) {
     s32 count = 0;
     s32 i;
     for (i = 0; i < 2; i++) {
-        if (partyPtrTbl[i] && (partyGetPtr(i)->flags & 1)) {
+        if (partyPtrTbl[i] && (partyGetPtr(i)->flags & PARTY_FLAG_IS_ACTIVE)) {
             count++;
         }
     }
@@ -1182,7 +1186,7 @@ static void driveParty(PartyEntry* party) {
             partyPreDisp(party);
             return;
     }
-    if (*(u32*)mario & 0x2000000) {
+    if (*(u32*)mario & MARIO_FLAG_BG_MODE) {
         party->flags |= PARTY_FLAG_BG_MODE;
     } else {
         party->flags &= ~PARTY_FLAG_BG_MODE;
@@ -2599,7 +2603,7 @@ extern s32 marioPlaneGetFlyingDir(void);
 
 /** TRUE when hit is a floor the partner may stand on (not flagged with hit attributes 0x200 or 0x800). */
 static inline BOOL partyAppearChkFloor(HitEntry* hit) {
-    return hit == NULL ? FALSE : (hitGetAttr(hit) & 0xa00) == 0;
+    return hit == NULL ? FALSE : (hitGetAttr(hit) & (HIT_ATTR_DEEP_WATER | HIT_ATTR_SPIKES)) == 0;
 }
 
 /** Slope angle in degrees of the floor normal n (partyNrmToAngle on a copy). */
@@ -3385,7 +3389,7 @@ static void partyPreDisp(PartyEntry* party) {
     s32 mode;
     s32 v;
 
-    if (!(party->flags2 & PARTY_DISP_FLAG_DIR_LOCK) && !(party->flags & 0x200)) {
+    if (!(party->flags2 & PARTY_DISP_FLAG_DIR_LOCK) && !(party->flags & PARTY_FLAG_POSE_TILTED)) {
         partyMakeDispDir(party);
     }
     if (party->trigFlags & (PARTY_TRIG_FLAG_CHG_ANIM | PARTY_TRIG_FLAG_CHG_PAPER_ANIM)) {
@@ -3484,7 +3488,7 @@ static void partyDisp(CameraId cam, void* param) {
     if (!partyCountActive()) {
         return;
     }
-    if (party->flags & 0x200) {
+    if (party->flags & PARTY_FLAG_POSE_TILTED) {
         party->rotOfs.x = -6.8f;
         party->rotOfsY = 6.8f;
     }

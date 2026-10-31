@@ -30,6 +30,10 @@ static EvtWord kohatty_spawn_event[41];
 static EvtWord attack_event[375];
 static EvtWord wait_event[6];
 
+/**
+ * Unit kind of the test enemy hatty: 5 max HP, level 1. The battle engine reads it when the unit spawns:
+ * size, offsets, sounds, status vulnerability, parts, init script and event table.
+ */
 BattleUnitKind unit_hatty = {
     206,
     "btl_un_hatty",
@@ -107,12 +111,22 @@ USER_FUNC(hatty_main) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Defence of the test enemy hatty per element (normal, fire, ice, explosion, electric),
+ * subtracted from each hit: none.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Element reactions of the test enemy hatty: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/** Status vulnerability of the test enemy hatty: every status effect always lands (100%). */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Pose table of the test enemy hatty: maps its battle pose types (stay, walk, hurt, dead, talk and so on)
+ * to animation names, 4 entries such as PTK_S_1, PTK_D_1.
+ */
 static PoseTableEntry pose_table[] = {
     {28, "PTK_S_1"},
     {31, "PTK_S_1"},
@@ -120,14 +134,23 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "PTK_S_1"},
 };
 
+/**
+ * Event table of the test enemy hatty: maps event tags to the scripts that react to them (no custom
+ * reactions); tag 0 ends it.
+ */
 static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Body parts of the test enemy hatty: a single part (model c_kuribo_y) holding its hit box.
+ * Each part names its defence tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_hatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
 };
 
+/** Attack data of the test enemy hatty's attack: base damage 1, 100% accuracy. */
 static BattleWeapon weapon_hatty_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -146,7 +169,7 @@ static BattleWeapon weapon_hatty_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -164,6 +187,7 @@ static BattleWeapon weapon_hatty_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data of the test enemy hatty's attack2: base damage 1, 100% accuracy. */
 static BattleWeapon weapon_hatty_attack2 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -182,7 +206,7 @@ static BattleWeapon weapon_hatty_attack2 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -236,6 +260,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Spawn setup for a unit that the the test enemy hatty script adds to the battle mid-fight:
+ * unit kind unit_kohatty, parked far off screen until its script moves it.
+ */
 static BattleUnitSetup entry_kohatty = {
     &unit_kohatty, // unitKindParams
     1, // alliance
@@ -263,23 +291,27 @@ static EVT_BEGIN(kohatty_spawn_event)
 EVT_END()
 
 /**
- * Guess: attack script of hatty: after the item-use check it looks along its row for free space
- * (btlevtcmd_CheckSpace) and spawns up to three kohatty helpers with kohatty_spawn_event,
- * then picks weapon_hatty_attack or weapon_hatty_attack2 (50 percent each), dives at a target with a pause,
- * applies the damage with the guard-timing check and flies home.
+ * Attack script of hatty: after the item-use check it rolls 0 to 99 and, as that is always below 100, checks up
+ * to three spots 160, 120 and 80 units in its facing direction for free space (btlevtcmd_CheckSpace), spawns one
+ * kohatty helper in the first free one (kohatty_spawn_event) and ends its turn, spawned or not.
+ * The dive attack after it (weapon_hatty_attack below 50, else weapon_hatty_attack2: a dive at the target, the
+ * guard-timing damage check and the flight home) is therefore never reached.
  */
 static EVT_BEGIN(attack_event)
+    // hatty first checks whether to use a held item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
+    // It rolls for a helper; as the roll is always under 100, it always tries to call one.
     CALL(evt_sub_random, 99, LW(10))
     IF_INT_LESS(LW(10), 100)
         SET_VALUE(LW(15), 0)
         SET_VALUE(LW(14), 160)
         SET_VALUE(LW(13), 30)
+        // It checks up to three spots in front of itself for free room, nearest last.
         LOOP(0)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), LW(14))
@@ -291,6 +323,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
+                    // In the first free spot it spawns a kohatty helper, and its turn ends.
                     CALL_CHILD(kohatty_spawn_event)
                     GOTO(99)
                 END_IF
@@ -304,6 +337,7 @@ static EVT_BEGIN(attack_event)
         END_LOOP
         GOTO(99)
     END_IF
+    // The dive attack that follows (a swoop at a target) is never reached, because the helper roll always ends the turn first.
     IF_INT_LESS(LW(10), 50)
         SET_VALUE(LW(6), PTR(&weapon_hatty_attack))
     ELSE
@@ -322,7 +356,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(6))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 40)
     ADD(LW(1), 5)
@@ -331,6 +365,7 @@ static EVT_BEGIN(attack_event)
     WAIT_MS(300)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
+    // The damage check decides between a miss and a hit for the dive.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -353,6 +388,7 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // On a miss it flies past the target.
     LABEL(90)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -362,6 +398,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     GOTO(98)
+    // On a hit the damage is dealt and hatty flies back home.
     LABEL(91)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -372,7 +409,7 @@ static EVT_BEGIN(attack_event)
     GOTO(98)
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -10, 0, 0, -1)

@@ -42,9 +42,9 @@ EffectEntry* effSyuryouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-// Match-forcing setting: the same code without it compiles differently (removal tried).
+// FAKE: match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma push
-// dead assignments optimisation off for effSyuryouMain, effSyuryouDisp: the original register allocation and scheduling need it
+// FAKE: dead assignments optimisation off for effSyuryouMain, effSyuryouDisp: the original register allocation and scheduling need it
 #pragma opt_dead_assignments off
 /**
  * Waits for the animation group to load, starts the pose, then runs the timer:

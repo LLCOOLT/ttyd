@@ -26,6 +26,7 @@ static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn);
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr);
 
 #if DEBUG
+/** Name printed by the FIFO overflow handler in debug builds. */
 static char __data_0[] = "[GXOverflowHandler]";
 #endif
 
@@ -173,7 +174,7 @@ void GXInitFifoLimits(GXFifoObj* fifo, u32 hiWatermark, u32 loWatermark) {
 /**
  * Makes a FIFO object the one the CPU write gather pipe feeds:
  * programs the PI base, end and write pointer, and links it with the GPU FIFO if they are the same object,
- * otherwise unlinks them. NONMATCHING DEBUG
+ * otherwise unlinks them. Matches in this build; upstream notes a mismatch in its debug build only.
  */
 void GXSetCPUFifo(GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
@@ -641,7 +642,8 @@ u32 GXResetOverflowCount(void) {
 
 /**
  * Flushes the GX FIFO and redirects the CPU write gather pipe to plain memory at ptr (unlinking the CPU and GPU
- * FIFOs); returns the gather pipe address to write through. NONMATCHING
+ * FIFOs); returns the gather pipe address to write through. Not in any TTYD DOL (unused, stripped); upstream marks
+ * it as not matching.
  */
 volatile void* GXRedirectWriteGatherPipe(void* ptr) {
     u32 reg = 0;
@@ -676,7 +678,7 @@ volatile void* GXRedirectWriteGatherPipe(void* ptr) {
 
 /**
  * Pads out the gather pipe, then points it back at the CPU FIFO and relinks the CPU and GPU FIFOs
- * if they were linked. NONMATCHING
+ * if they were linked. Not in any TTYD DOL (unused, stripped); upstream marks it as not matching.
  */
 void GXRestoreWriteGatherPipe(void) {
     u32 reg = 0;

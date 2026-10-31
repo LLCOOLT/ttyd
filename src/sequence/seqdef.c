@@ -14,8 +14,16 @@
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * The game's sequences (logo, title, game, map change, battle, game over, file select, demo playback, E3 menu):
+ * init, main and exit of each; seqMain runs them.
+ */
 SequenceCallback seq_data[9][3] = {
 #else
+/**
+ * The game's sequences (logo, title, game, map change, battle, game over, file select, E3 menu):
+ * init, main and exit of each; seqMain runs them.
+ */
 SequenceCallback seq_data[8][3] = {
 #endif
     {seq_logoInit, seq_logoMain, seq_logoExit},

@@ -12,6 +12,7 @@ BeroEntry bero_data_a_nidome[2];
 BeroEntry bero_data_b_nidome[2];
 BeroEntry bero_data_c_nidome[2];
 
+/** Doors and exits of rsh_08 variant a (second visit): e_bero to rsh_01_a. */
 BeroEntry bero_data_a_nidome[] = {
     {
         "e_bero", // hitName
@@ -34,6 +35,7 @@ BeroEntry bero_data_a_nidome[] = {
     {0},
 };
 
+/** Doors and exits of rsh_08 variant b (second visit): e_bero to rsh_01_b. */
 BeroEntry bero_data_b_nidome[] = {
     {
         "e_bero", // hitName
@@ -56,6 +58,7 @@ BeroEntry bero_data_b_nidome[] = {
     {0},
 };
 
+/** Doors and exits of rsh_08 variant c (second visit): e_bero to rsh_01_c. */
 BeroEntry bero_data_c_nidome[] = {
     {
         "e_bero", // hitName

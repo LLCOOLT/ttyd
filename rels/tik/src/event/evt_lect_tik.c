@@ -435,9 +435,10 @@ static USER_FUNC(effitemget_open_ptr) {
 
 /**
  * Script helper.
- * With args[0] nonzero moves the 3D camera up by 2016 units, otherwise down by 2016,
- * to switch between the lecture view and the item-get view stacked above it.
- * Guess: the item-get scene is built 2016 units above the lecture stage.
+ * With args[0] nonzero moves the 3D camera (position and look-at) up by 2016 units, otherwise down by 2016.
+ * Nothing in this file calls it; the identical copies in evt_lect_eki.c and evt_lect_tou.c lift the view, with
+ * the lecture actor moved up 2016 units too, while the item-get screen is captured into a paper image, then
+ * move both back down.
  */
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
@@ -566,9 +567,9 @@ static USER_FUNC(evtflash) {
 }
 
 /**
- * Guess: sets up the paper demon's (peramajin) lecture on the airplane power:
- * sets the lecture system level, moves the camera to the lecture stage,
- * places Mario at (-300, -600, 0) and puts the "hikou" objects on camera 7.
+ * Sets up the black-chest demon's (peramajin) lecture on plane mode; run by tik_19's evt_majin2 just before
+ * plane_majin_lecture: sets Mario's system level to 0, moves the camera over one second, places Mario at
+ * (-300, -600, 0) facing 90 degrees, and moves the "hikou" map objects onto camera 7 (lect_map_cam_chg).
  */
 EVT_BEGIN(plane_majin_lecture_init)
     CALL(lect_set_systemlevel, 0)
@@ -595,6 +596,7 @@ EVT_END()
  * and asks if he wants to hear it again (mac_majin_17); at the end the status window comes back.
  */
 EVT_BEGIN(plane_majin_lecture)
+    // The button prompt and the moving airplane panel are set up; the paper demon hovers before the camera.
     BEGIN_SIBLING_EVENT
         CALL(lecture_button_rtn)
     END_SIBLING_EVENT
@@ -627,6 +629,7 @@ EVT_BEGIN(plane_majin_lecture)
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
+    // The demon reveals his trick, laughs at Mario and curses him in flashes of light.
     CALL(evt_npc_set_anim, STRING("ペラ魔人"), STRING("P_1"))
     WAIT_MS(200)
     CALL(evt_msg_toge, 1, 0, 0, 0)
@@ -640,6 +643,7 @@ EVT_BEGIN(plane_majin_lecture)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("mac_majin_14"), 0, STRING("ペラ魔人"))
+    // The camera pans as the airplane panel slides in beside Mario.
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(98.0f), FLOAT(558.0f), FLOAT(80.0f), FLOAT(42.0f), FLOAT(-101.799805f), 1000, 11)
     SET_FLOAT_VALUE(LW(1), FLOAT(2.6660156f))
     CALL(dai_moveti_get, LW(0), LW(2), LW(3))
@@ -654,6 +658,7 @@ EVT_BEGIN(plane_majin_lecture)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The demon explains airplane panels; the lesson below repeats until Mario says he gets it.
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("mac_majin_15"), 0, STRING("ペラ魔人"))
     LOOP(0)
@@ -712,6 +717,7 @@ EVT_BEGIN(plane_majin_lecture)
                 WAIT_FRAMES(1)
             END_LOOP
         END_SIBLING_EVENT
+        // Mario walks onto the panel and is told to press the button; its icon flashes until he does.
         CALL(evt_mario_mov_pos2, FLOAT(-200.0f), FLOAT(0.0f), FLOAT(80.0f))
         CALL(evt_msg_print_add, 0, STRING("mac_majin_15_1"))
         CALL(lecture_button_set_pos, 0, FLOAT(-200.0f), FLOAT(-25.0f), FLOAT(0.0f))
@@ -774,6 +780,7 @@ EVT_BEGIN(plane_majin_lecture)
         CALL(evt_msg_continue)
         CALL(evt_mario_paper_plane, 1)
 #endif
+        // Mario turns into a paper airplane and glides off the panel, and the view follows him down.
         CALL(x_flag_set, 0, 2)
         CALL(lecture_button_set_seq, 0, 3)
         BEGIN_INLINE_EVENT
@@ -813,6 +820,7 @@ EVT_BEGIN(plane_majin_lecture)
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
+        // The demon explains steering and asks whether Mario got all that.
         CALL(lecture_button_seq_wait, 0, 1)
         CALL(lecture_button_flag_on_off, 0, 2, 0)
         WAIT_MS(300)
@@ -862,6 +870,7 @@ EVT_BEGIN(plane_majin_lecture)
             CALL(x_flag_set, 0, 2)
             CALL(evt_mario_paper_plane, 0)
 #endif
+            // After "I zoned out", Mario lands, the panel slides back in and the demon goes over it again.
             CALL(evt_mario_wait_landon)
             CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(98.0f), FLOAT(558.0f), FLOAT(80.0f), FLOAT(42.0f), FLOAT(-101.799805f), 1000, 11)
             SET_FLOAT_VALUE(LW(1), FLOAT(2.6660156f))
@@ -882,6 +891,7 @@ EVT_BEGIN(plane_majin_lecture)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // The demon hints at how to change back; Mario drops out of plane mode and the demon leaves.
     CALL(evt_msg_print_add, 0, STRING("mac_majin_18_1"))
 #if VERSION >= VERSION_JP
     CALL(x_flag_set, 1, 2)

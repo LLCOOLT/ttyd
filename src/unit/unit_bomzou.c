@@ -12,6 +12,12 @@
 #include "evt/evt_snd.h"
 #include "version.h"
 
+// Unit work slots of a Bomb Squad bomb (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_BOMZOU_FUSE_TURNS = 0,   // turns left on the fuse; it explodes when this reaches 0
+    UW_BOMZOU_SIZZLE_SOUND = 1, // sound id of the fuse sizzle loop (set by Bobbery's throw), 0 when none
+};
+
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 BattleUnitKind unit_bomzou;
@@ -35,10 +41,17 @@ static EvtWord explosion_event[172];
 static EvtWord explosion_event[173];
 #endif
 
+/** Damage reduction of the bomb: none. It has 1 HP, so any hit knocks it out (and sets it off). */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** The bomb has no elemental defence. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Unit data of the bomb that Admiral Bobbery's Bomb Squad leaves on the field (its debug name in the game
+ * text is "BOMBZO GLOBAL 1701"): 1 HP, no HP gauge or damage numbers,
+ * explodes when its fuse runs out or when it is destroyed.
+ */
 BattleUnitKind unit_bomzou = {
     219,
     "btl_un_bomzou",
@@ -105,6 +118,10 @@ BattleUnitKind unit_bomzou = {
     data_table,
 };
 
+/**
+ * The bomb's blast: 3 damage with the explosion element to every enemy in range, ignoring guarding,
+ * able to shatter frozen enemies; used by explosion_event.
+ */
 BattleWeapon weapon_bomzou_explosion = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -117,7 +134,7 @@ BattleWeapon weapon_bomzou_explosion = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ANY_PART | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -136,8 +153,10 @@ BattleWeapon weapon_bomzou_explosion = {
     {0, 10, 10, 100, 30, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+/** The bomb has no status vulnerabilities (all zero). */
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+/** Poses while the fuse has 3 or more turns left (all frames use B_2). */
 static PoseTableEntry pose_table_3[] = {
     {28, "B_2"},
     {31, "B_2"},
@@ -145,6 +164,7 @@ static PoseTableEntry pose_table_3[] = {
     {BTL_POSE_STAY_DEFAULT, "B_2"},
 };
 
+/** Poses while the fuse has 2 turns left (all frames use B_3). */
 static PoseTableEntry pose_table_2[] = {
     {28, "B_3"},
     {31, "B_3"},
@@ -152,6 +172,7 @@ static PoseTableEntry pose_table_2[] = {
     {BTL_POSE_STAY_DEFAULT, "B_3"},
 };
 
+/** Poses while the fuse has 1 turn left (all frames use B_4). */
 static PoseTableEntry pose_table_1[] = {
     {28, "B_4"},
     {31, "B_4"},
@@ -159,6 +180,10 @@ static PoseTableEntry pose_table_1[] = {
     {BTL_POSE_STAY_DEFAULT, "B_4"},
 };
 
+/**
+ * Data table events: knocked out (49) queues the blast, tag 53 is the blast itself,
+ * and the battle end (63) cuts off the fuse sound.
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {53, explosion_event},
@@ -166,6 +191,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * The bomb's single part: the bomb model (c_bakudan), the main target,
+ * which cannot be tattled or have its HP shown.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_bomzou", "c_bakudan", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_UNTATTLEABLE, 0, pose_table_3},
 };
@@ -181,10 +210,10 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_FUSE_TURNS, 2)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_SIZZLE_SOUND, 0)
     CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_FUSE_TURNS, LW(0))
     SWITCH(LW(0))
         CASE_GREATER_OR_EQUAL(3)
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_3))
@@ -212,9 +241,9 @@ EVT_END()
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_FUSE_TURNS, LW(0))
         SUBTRACT(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_FUSE_TURNS, LW(0))
         SWITCH(LW(0))
             CASE_GREATER_OR_EQUAL(3)
             CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_3))
@@ -248,7 +277,7 @@ EVT_END()
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_FUSE_TURNS, LW(0))
     IF_INT_GREATER(LW(0), 1)
         WAIT_FRAMES(1)
         GOTO(0)
@@ -278,10 +307,10 @@ EVT_END()
  * so the sound does not outlive the battle.
  */
 EVT_BEGIN(end_battle_evt)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_SIZZLE_SOUND, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(evt_snd_sfxoff, LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_SIZZLE_SOUND, 0)
     END_IF
     RETURN
 EVT_END()
@@ -292,10 +321,10 @@ EVT_END()
  * then removes the bomb.
  */
 static EVT_BEGIN(explosion_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_SIZZLE_SOUND, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(evt_snd_sfxoff, LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOMZOU_SIZZLE_SOUND, 0)
     END_IF
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING(""), STRING("hibashira"), 2, LW(0), LW(1), LW(2), LW(0), LW(1), LW(2), 1, FLOAT(1.0f), 60, 0, 0)

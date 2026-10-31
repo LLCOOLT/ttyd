@@ -4,6 +4,10 @@
 
 #include "__ax.h"
 
+/**
+ * Estimated DSP cycles of a voice's sample-rate conversion, by the integer part of its ratio;
+ * __AXSyncPBs adds them up against the cycle budget.
+ */
 static u32 __AXSrcCycles[5] = {
     0x00000DF8,
     0x00000F78,
@@ -12,6 +16,7 @@ static u32 __AXSrcCycles[5] = {
     0x000019F8
 };
 
+/** Estimated DSP cycles of a voice's main-bus mixing, by the low 4 bits of its mixer control. */
 static u32 __AXMainMixCycles[16] = {
     0x00000000, 0x000002F8, 0x000002F8,
 	0x000005BE, 0x000002F8, 0x000005F0,
@@ -21,6 +26,9 @@ static u32 __AXMainMixCycles[16] = {
 	0x00000E97
 };
 
+/**
+ * Estimated DSP cycles of a voice's aux A or aux B mixing, by that bus's 5-bit field of the mixer control.
+ */
 static u32 __AXAuxMixCycles[32] = {
     0x00000000, 0x000002F8, 0x000002F8,
 	0x000005BE, 0x00000000, 0x000004F1,
@@ -783,10 +791,10 @@ void AXSetVoiceFir(AXVPB* p, AXPBFIR* fir) {
 }
 
 /**
- * Sets the voice's sample addresses (loop, end and current, and format)
- * and fills in the ADPCM parameters appropriate to the format:
- * ADPCM (format 0), or fixed values for formats 10 and 25 (Guess: 16-bit and 8-bit PCM,
- * since they need no decoder state).
+ * Sets the voice's sample addresses (loop, end and current, and format) and fills in the ADPCM parameters
+ * for the format: ADPCM (format 0) only checks the addresses; 16-bit PCM (format 10) and 8-bit PCM (format 25)
+ * get zero coefficients and a gain of 0x800 or 0x100,
+ * the same values __SYNSetupPcm16 and __SYNSetupPcm8 write.
  */
 void AXSetVoiceAddr(AXVPB* p, AXPBADDR* addr) {
     BOOL old;

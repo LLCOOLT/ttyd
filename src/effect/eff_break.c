@@ -20,6 +20,10 @@ typedef struct EffBreakWork {
 } EffBreakWork;
 
 #if VERSION >= VERSION_US
+/**
+ * Effect texture ids of the banner's letter sprites, left to right, one list per language (Japanese, English,
+ * German, French, Spanish, Italian); the Spanish banner has seven letters. Indexed through texid_tbl.
+ */
 static s16 tex_jp[] = {145, 146, 147, 148, 149, 150};
 static s16 tex_us[] = {155, 156, 157, 158, 159, 160};
 static s16 tex_lang3[] = {151, 152, 153, 154, 155, 156};
@@ -30,15 +34,23 @@ typedef struct TexIdEntry {
     s16* ids;
     s32 count;
 } TexIdEntry;
+/** Letter texture list and letter count per language, indexed by the game language; used to lay out and draw. */
 static TexIdEntry texid_tbl[] = {
     { tex_jp, 6 }, { tex_us, 6 }, { tex_lang3, 6 }, { tex_lang4, 6 }, { tex_lang5, 7 }, { tex_lang6, 6 },
 };
 #else
+/** Effect texture ids of the banner's six letter sprites: the Japanese set and the English set. */
 static s32 tex_jp[] = {0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2};
 static s32 tex_us[] = {0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6};
+/** Letter texture list per language: Japanese, or English for any other language setting. */
 static s32* texid_tbl[] = {tex_jp, tex_us};
 #endif
 
+/**
+ * Per-frame vertical texture offset of a letter as it drops into its box (3 down to 0, then a small bounce);
+ * the frame it reaches 0 puffs star dust. ty_data2 is the per-frame offset as it slides back out (0 up to 3),
+ * upward or downward for alternating letters. Both are read by effBreakMain.
+ */
 static f32 ty_data[] = {3.0f, 3.0f, 2.7857144f, 2.5714285f, 2.357143f, 2.142857f, 1.9285715f, 1.7142857f, 1.5f, 1.2857143f, 1.0714285f, 0.85714287f, 0.64285713f, 0.42857143f, 0.21428572f, 0.0f, 0.083333336f, 0.16666667f, 0.25f, 0.125f, 0.0f};
 static f32 ty_data2[] = {0.0f, 0.15f, 0.3f, 0.45f, 0.6f, 0.75f, 0.9f, 1.05f, 1.2f, 1.35f, 1.5f, 1.65f, 1.8f, 1.95f, 2.1f, 2.25f, 2.4f, 2.55f, 2.7f, 2.85f, 3.0f};
 

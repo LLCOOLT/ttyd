@@ -18,6 +18,10 @@
 #include "himo.h"
 #include "libc_decls.h"
 #include "version.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+#include <dolphin/os.h>
+#include "sdk/texPalette.h"
 
 #define TESTHEAP_SIZE (u32)(1.5 * 1024 * 1024)
 #define PI 3.14159265358979323846264338327950288419716939937510f
@@ -3102,6 +3106,11 @@ u8 _vivihimoData[3][0x400] ATTRIBUTE_ALIGN(32) = {
 #if VERSION <= VERSION_DEMO_US
 // the demo's -sdata 8 puts these in .data, ahead of the chain table
 s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = {0, 2, -1, -1}; // G5: target .sdata is 32-aligned
+/**
+ * Vivian's hair (himo) swing data for each type:
+ * entry 0 none, 1-3 the three blocks of _vivihimoData (two floats per animation),
+ * filled from a/vivian.bin when the driver starts.
+ */
 void* vivihimoData[4] = {
     NULL,
     _vivihimoData[0],
@@ -3110,6 +3119,10 @@ void* vivihimoData[4] = {
 };
 #endif
 
+/**
+ * The Smorg's 47 body chains as pairs of model joints: the Tattle Log picture and the ending's Smorg scene
+ * spread its swarm of small pieces along the line between each pair.
+ */
 const s32 g_moamoa_chain_max = 0x2F;
 MoaChain g_moamoa_chain_tbl[47] = {
     { "joint_00", "jointdai1_A01" },
@@ -3176,6 +3189,11 @@ extern f32 tanfTbl[0xB2];
 //.sdata
 #if VERSION >= VERSION_JP
 s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = {0, 2, -1, -1}; // G5: target .sdata is 32-aligned
+/**
+ * Vivian's hair (himo) swing data for each type:
+ * entry 0 none, 1-3 the three blocks of _vivihimoData (two floats per animation),
+ * filled from a/vivian.bin when the driver starts.
+ */
 void* vivihimoData[4] = {
     NULL,
     _vivihimoData[0],
@@ -3183,6 +3201,7 @@ void* vivihimoData[4] = {
     _vivihimoData[2],
 };
 #endif
+/** Points at the animation driver's work (files, textures, pose pool, scratch buffers). */
 static AnimationWork* wp = &work;
 
 //.sbss
@@ -3237,51 +3256,6 @@ static void* testAlloc(u32 size) {
     return alloc;
 }
 
-void DCFlushRange(void* addr, u32 nBytes);
-void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
-void GXClearBoundingBox(void);
-void GXClearVtxDesc(void);
-void GXCopyTex(void* dest, GXBool clear);
-u32 GXGetTexBufferSize(u16 width, u16 height, u32 format, u8 mipmap, u8 max_lod);
-void GXInitTexObj(GXTexObj* obj, void* image_ptr, u16 width, u16 height, GXTexFmt format, GXTexWrapMode wrap_s, GXTexWrapMode wrap_t, u8 mipmap);
-void GXInitTexObjCI(GXTexObj* obj, void* image_ptr, u16 width, u16 height, GXCITexFmt format, GXTexWrapMode wrap_s, GXTexWrapMode wrap_t, u8 mipmap, u32 tlut_name);
-void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt,
-                     f32 min_lod, f32 max_lod, f32 lod_bias, GXBool bias_clamp,
-                     GXBool do_edge_lod, GXAnisotropy max_aniso);
-void GXInitTlutObj(GXTlutObj* tlut_obj, void* lut, GXTlutFmt fmt, u16 n_entries);
-void GXInvalidateVtxCache(void);
-void GXLoadNrmMtxImm(const f32 mtx[3][4], u32 id);
-void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
-void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
-void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
-void GXLoadTlut(GXTlutObj* tlut_obj, u32 tlut_name);
-void GXPixModeSync(void);
-void GXReadBoundingBox(u16* left, u16* top, u16* right, u16* bottom);
-void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, u8 ref1);
-void GXSetArray(GXAttr attr, void* base_ptr, u8 stride);
-void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
-void GXSetCullMode(GXCullMode mode);
-void GXSetCurrentMtx(u32 id);
-void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
-void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap);
-void GXSetTexCopySrc(u16 left, u16 top, u16 wd, u16 ht);
-void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
-void GXSetVtxDesc(GXAttr attr, GXAttrType type);
-void GXSetZCompLoc(GXBool before_tex);
-void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable);
-void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
-void PSMTXCopy(const Mtx src, Mtx dst);
-void PSMTXIdentity(Mtx m);
-u32 PSMTXInvXpose(const Mtx src, Mtx invX);
-void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
-void PSMTXRotRad(Mtx m, char axis, f32 rad);
-void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
-void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
-TEXDescriptor* TEXGet(TEXPalette* pal, u32 id);
-int __cvt_dbl_usll();
-int __cvt_ull_flt();
-int __div2i();
 int printf(const char*, ...);
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
 static void animPose_AllocBuffer(AnimationPose* pose);
@@ -5153,8 +5127,6 @@ static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 s
 }
 #endif
 
-#include "sdk/texPalette.h"
-
 static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
 #if VERSION <= VERSION_DEMO_US
 /**
@@ -5262,6 +5234,7 @@ static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEn
         s32 j[1];
         s32 k;
         k = 0;
+        // FAKE: dead guard (see the block note above); the demos need it, JP builds the same without it
         gz = 0;
         if (gz != 0) {
             k = 0;

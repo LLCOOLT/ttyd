@@ -61,8 +61,13 @@ typedef struct SignalTimingWork {
 #define ST_OUT_HITS(w) ((w)->actionCommands.outputParams[0])
 #define ST_OUT_RESULT(w) ((w)->actionCommands.outputParams[1])
 #define ST_COUNTDOWN(w) ((w)->actionCommands.countdown)
-#define ST_CONF(work) ((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))
+#define ST_CONF(work) ((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))
 
+/**
+ * Buttons a signal can ask for (the four stick directions, or A, B, X and Y)
+ * and the frames a signal stays answerable by difficulty (the second table when params[1] is 1).
+ * Used by Vivian's Shade Fist, Flurrie's Dodgy Fog and Bobbery's Hold Fast.
+ */
 u32 _button_table_4dir[4] = {0x10000, 0x20000, 0x40000, 0x80000};
 u32 _button_table_abxy[4] = {PAD_BUTTON_A, PAD_BUTTON_B, PAD_BUTTON_X, PAD_BUTTON_Y};
 s32 ac_signaltiming_ok_frame_range[7] = {20, 16, 12, 10, 6, 4, 2};
@@ -71,7 +76,7 @@ s32 ac_signaltiming_ok_frame_range_2[7] = {30, 30, 30, 30, 25, 20, 15};
 static void actionCommandDisp(f32 x, f32 y);
 static s32 _get_ok_frame_range(s32 difficulty);
 
-// inlining off for _get_ok_frame_range, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _get_ok_frame_range is inlined into battleAcMain_SignalTiming (531 -> 561 instructions)
 #pragma dont_inline on
 /** Frames a signal stays pressable: params[7] plus 20 down to 2 by difficulty, or 30 down to 15 when params[1] is 1. */
 static s32 _get_ok_frame_range(s32 difficulty) {
@@ -209,10 +214,10 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                 w->nextEnd = ((w->next + 1) * ST_STEP(work)) - 1;
                 w->next++;
                 if (w->next < (ST_LEAD(work) + 1)) {
-                    if (!((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
+                    if (!((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
                         psndSFXOn(sfxPi);
                     }
-                } else if (!((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
+                } else if (!((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
                     psndSFXOn(sfxPone);
                 }
                 w->pressed = 0;
@@ -266,7 +271,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                         ST_OUT_RESULT(work) = 1;
                         if ((w->index >= ST_LEAD(work)) && (w->index < (ST_COUNT(work) + ST_LEAD(work)))) {
                             w->results[w->index - ST_LEAD(work)] = 1;
-                            if (!((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
+                            if (!((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
                                 psndSFXOn(sfxOk);
                             }
                         }
@@ -285,7 +290,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
 #endif
                         if (w->frame >= w->rangeStart) {
                             w->results[w->index - ST_LEAD(work)] = -1;
-                            if (!((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
+                            if (!((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
                                 psndSFXOn(sfxNg2);
                             }
                             ST_OUT_RESULT(work) = -1;
@@ -302,7 +307,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                         w->misses++;
 #endif
                         w->results[w->index - ST_LEAD(work)] = -1;
-                        if (!((work->actionCommands.setupFlags & 1) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
+                        if (!((work->actionCommands.setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (work->actionCommands.acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION))) {
                             psndSFXOn(sfxNg);
                         }
                     }

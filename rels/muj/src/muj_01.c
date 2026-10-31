@@ -135,9 +135,9 @@ EVT_BEGIN(custom_door_light2)
 EVT_END()
 
 /**
- * Guess: init event of the rude sailor (Garawaru) in the camp:
- * placed at different spots for each story stage between STORY_STG5_11_DESERTED_ISLAND
- * and the later Rogueport stages.
+ * Init event of the rough sailor (NPC ガラの悪い水夫) in the camp: placed at (-155, 0, 170) from
+ * STORY_STG5_11_DESERTED_ISLAND to STORY_STG5_34_KICKED_OFF and from STORY_STG5_59_ROGUEPORT_DOCK on,
+ * except at STORY_STG5_18_01_BOBBERY_JOINS, when he stands at (-110, 0, 225).
  */
 static EVT_BEGIN(garawaru_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -157,12 +157,15 @@ EVT_END()
 static EVT_BEGIN(garawaru_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_12_FLAVIO_AND_PA_PATCH)
+        // Early on, the rough sailor muses about the mysterious eastern end of the island.
         CALL(evt_msg_print, 0, STRING("stg5_muj_22_1"), 0, STRING("me"))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_18_BOBBERY_RESCUE_2)
+        // While Bobbery is being rescued, he comments on the admiral's plight.
         CALL(evt_msg_print, 0, STRING("stg5_muj_32_02"), 0, STRING("me"))
         CASE_EQUAL(STORY_STG5_18_01_BOBBERY_JOINS)
         CALL(evt_mario_get_party, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 3)
+            // With Bobbery in the party, he greets the captain and spots Bobbery.
             CALL(evt_msg_print, 0, STRING("stg5_muj_71_05"), 0, STRING("me"))
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_71_04"), 0, STRING("me"))
@@ -170,6 +173,7 @@ static EVT_BEGIN(garawaru_talk)
         CASE_BETWEEN(STORY_STG5_18_02_FLAVIOS_FAVOR_2, STORY_STG5_18_03_MARCOS_JEWEL)
         CALL(evt_mario_get_party, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 3)
+            // He grows suspicious of the skull rock.
             CALL(evt_msg_print, 0, STRING("stg5_muj_90_02"), 0, STRING("me"))
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_90_02_01"), 0, STRING("me"))
@@ -184,6 +188,7 @@ static EVT_BEGIN(garawaru_talk)
         CASE_BETWEEN(STORY_STG5_58_FAIR_WINDS, STORY_STG5_61_FRANKLYS_HOUSE)
         CALL(evt_mario_get_party, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 3)
+            // After the departure, he reacts to the Piantas' commotion.
             CALL(evt_msg_print, 0, STRING("stg5_muj_149"), 0, STRING("me"))
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_1492_01"), 0, STRING("me"))
@@ -230,6 +235,7 @@ static EVT_BEGIN(garawaru_talk)
         CASE_LESS(STORY_STG8_16_SHADOW_QUEEN)
         CALL(evt_mario_get_party, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 3)
+            // Late in the game, he remarks that the camp is quiet but dull.
             CALL(evt_msg_print, 0, STRING("stg5_muj_153"), 0, STRING("me"))
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_1532_01"), 0, STRING("me"))
@@ -246,8 +252,8 @@ static EVT_BEGIN(garawaru_talk)
 EVT_END()
 
 /**
- * Guess: init event of Marco in the camp: placed for STORY_STG5_11 to 18_01 and STORY_STG5_19_01 to 34,
- * with different positions per stage.
+ * Init event of Flavio (NPC マルコ) in the camp: placed at (-64, 0, 170) facing right for STORY_STG5_11 to 18_01
+ * and STORY_STG5_19_01 to 34.
  */
 static EVT_BEGIN(marco_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -262,8 +268,8 @@ static EVT_BEGIN(marco_init)
 EVT_END()
 
 /**
- * Guess: Marco glancing around in the shop: turns him from LW(0) to LW(1) degrees over 150 ms.
- * Called from his shop talk event.
+ * Turns Flavio (マルコ) from LW(0) to LW(1) degrees about y over 150 ms; marco_talk calls it in pairs
+ * (0 to 180 and back) so he glances around while talking.
  */
 EVT_BEGIN(marco_kyorokyoro)
     CALL(evt_sub_intpl_msec_init, 0, LW(0), LW(1), 150)
@@ -279,27 +285,31 @@ EVT_BEGIN(marco_kyorokyoro)
 EVT_END()
 
 /**
- * Talk event of Marco: during STORY_STG5_13 to 17 he starts settoku_event_main
+ * Talk event of Flavio: during STORY_STG5_13 to 17 he starts settoku_event_main
  * if the timid sailor has not yet been persuaded, otherwise he talks according to the story stage.
  */
 static EVT_BEGIN(marco_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_17_WINE_OBTAINED)
         IF_INT_EQUAL(GSWF(GSWF_MUJ01_TIMID_SAILOR_PERSUADED), 0)
+            // While Bobbery is being found, the timid sailor must first be persuaded.
             CALL_CHILD(settoku_event_main)
         END_IF
     END_SWITCH
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_12_FLAVIO_AND_PA_PATCH)
+        // Flavio asks what Mario has found.
         CALL(evt_msg_print, 0, STRING("stg5_muj_22_0"), 0, STRING("me"))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_13_BOBBERY_AND_THE_BRIDGE)
         IF_INT_EQUAL(GSWF(GSWF_MUJ01_FLAVIO_FIRST_TALK_234), 0)
+            // Flavio brushes off talk of the admiral and tells Mario to hurry.
             CALL(evt_msg_print, 0, STRING("stg5_muj_31"), 0, STRING("me"))
             SET_VALUE(GSWF(GSWF_MUJ01_FLAVIO_FIRST_TALK_234), 1)
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_32"), 0, STRING("me"))
         END_IF
         CASE_EQUAL(STORY_STG5_15_RUNAWAY_SAILORS)
+        // Mario asks Flavio for Chuckola Cola to help the admiral.
         CALL(evt_msg_print, 0, STRING("stg5_muj_31_01"), 0, STRING("me"))
         CALL(evt_mario_set_pose, STRING("M_I_2"))
         WAIT_MS(500)
@@ -334,6 +344,7 @@ static EVT_BEGIN(marco_talk)
             RETURN
         END_IF
 #if VERSION <= VERSION_DEMO_US
+        // Mario chooses an item to trade for the Chuckola Cola.
         CALL(evt_win_item_select, LW(10), LW(0))
 #else
         CALL(evt_win_item_select, 0, LW(10), LW(0), 0)
@@ -382,6 +393,7 @@ static EVT_BEGIN(marco_talk)
         END_IF
         CALL(evt_pouch_remove_item, LW(0), LW(1))
         IF_INT_EQUAL(LF(0), 0)
+            // Flavio inspects the item he is offered.
             CALL(evt_msg_print, 0, STRING("stg5_muj_31_02_03"), 0, STRING("me"))
             RETURN
         END_IF
@@ -394,6 +406,7 @@ static EVT_BEGIN(marco_talk)
         WAIT_MS(500)
         CALL(evt_npc_set_anim, STRING("me"), STRING("I_2"))
         WAIT_MS(500)
+        // Flavio hands over the Chuckola Cola.
         CALL(evt_item_entry, STRING("itemwine"), ITEM_CHUCKOLA_COLA, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
         CALL(evt_item_flag_on, STRING("itemwine"), ITEM_FLAG_NO_TOUCH)
         CALL(evt_item_get_item, STRING("itemwine"))
@@ -445,6 +458,7 @@ static EVT_BEGIN(marco_talk)
             CALL(evt_party_set_dir, 0, 270, -1)
             SET_VALUE(GF(0), 0)
         END_INLINE_EVENT
+        // Bobbery rejoins and Flavio welcomes him back.
         CALL(evt_msg_print, 0, STRING("stg5_muj_71"), 0, STRING("me"))
         WAIT_WHILE(GF(0))
         IF_INT_EQUAL(LF(10), 0)
@@ -459,6 +473,7 @@ static EVT_BEGIN(marco_talk)
             CALL(evt_msg_print, 0, STRING("stg5_muj_80"), 0, STRING("extparty"))
         END_IF
         CALL(evt_set_dir_to_target, STRING("ガラの悪い水夫"), STRING("me"))
+        // The rough sailor heckles Flavio.
         CALL(evt_msg_print, 0, STRING("stg5_muj_81"), 0, STRING("ガラの悪い水夫"))
         CALL(evt_npc_get_position, STRING("ガラの悪い水夫"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_SAILER_FART1"), LW(0), LW(1), LW(2), 0)
@@ -473,6 +488,7 @@ static EVT_BEGIN(marco_talk)
 #if VERSION >= VERSION_JP
         CALL(evt_party_run, 1)
 #endif
+        // Flavio stammers an excuse and paces nervously.
         CALL(evt_msg_print, 0, STRING("stg5_muj_84"), 0, STRING("me"))
         LOOP(3)
             SET_VALUE(LW(0), 0)
@@ -489,6 +505,7 @@ static EVT_BEGIN(marco_talk)
         CALL(evt_cam3d_evt_set, -60, 144, 753, -60, 40, 162, 500, 11)
         WAIT_MS(500)
         BEGIN_INLINE_EVENT
+            // The sailors cheer at the thought of Flavio going away.
             CALL(evt_msg_print, 0, STRING("stg5_muj_86"), 0, STRING("ガラの悪い水夫"))
         END_INLINE_EVENT
         BEGIN_INLINE_EVENT
@@ -538,6 +555,7 @@ static EVT_BEGIN(marco_talk)
             WAIT_MS(160)
         END_LOOP
         WAIT_MS(1000)
+        // Flavio calls it unfair but joins the party for a short time.
         CALL(evt_msg_print, 0, STRING("stg5_muj_90"), 0, STRING("me"))
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg5_sys_00"), 0, 0)
@@ -572,9 +590,10 @@ static EVT_BEGIN(megane_init)
 EVT_END()
 
 /**
- * Guess: talk event of the bespectacled sailor:
- * stg5_muj_32_01 until Bobbery is rescued, a special exchange with the partner when Bobbery joins,
- * other lines later.
+ * Talk event of the bespectacled sailor (めがね水夫): stg5_muj_32_01 (wondering what happened to Admiral Bobbery)
+ * until Bobbery is rescued; at STORY_STG5_18_01_BOBBERY_JOINS a line that depends on whether Bobbery (party 3)
+ * is
+ * the partner out; later stage lines.
  */
 static EVT_BEGIN(megane_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -608,8 +627,9 @@ static EVT_BEGIN(odoodo_init)
 EVT_END()
 
 /**
- * Guess: talk event of the timid sailor: stg5_muj_32_00 until Bobbery is rescued,
- * a special exchange with the partner when Bobbery joins, other lines later.
+ * Talk event of the timid sailor (オドオド水夫): stg5_muj_32_00 until Bobbery is rescued;
+ * at STORY_STG5_18_01_BOBBERY_JOINS a joyful line when Bobbery (party 3) is the partner out, else a worried one;
+ * later stage lines.
  */
 static EVT_BEGIN(odoodo_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -765,8 +785,8 @@ EVT_BEGIN(borosuifu_a_talk)
 EVT_END()
 
 /**
- * Init event of the shabby sailor B: turns on his NPC status bit 2 and, after STORY_STG5_59_ROGUEPORT_DOCK,
- * sets him up to wander.
+ * Init event of the shabby sailor B: turns on NPC_STATUS_FACE_MOVE_DIR and,
+ * after STORY_STG5_59_ROGUEPORT_DOCK, sets him up to wander.
  */
 EVT_BEGIN(borosuifu_b_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -894,6 +914,10 @@ static EVT_BEGIN(musume_c_entry)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the camp: the rough sailor, Flavio, the bespectacled sailor, the nervous sailor, the shop and inn
+ * clerks, sailors A, bomb and D, the two ragged sailors, Mony, Peeton and the three Elmos ghosts.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "ガラの悪い水夫", // name
@@ -1080,12 +1104,13 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
-/** Guess: door-in event for the camp exit: only clears LW(0) (no special entrance action). */
+/** Enter event of both camp exits (w_bero and e_bero1 in bero_entry_data): only clears LW(0). */
 static EVT_BEGIN(bero_in_event)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/** Doors and exits of muj_01: w_bero to muj_00; e_bero1 to muj_02. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -1226,6 +1251,7 @@ EVT_BEGIN(muj_00_door_close)
     RETURN
 EVT_END()
 
+/** NPCs inside the camp shop: the shop clerk. */
 static const char* mise_npc[] = {
     "店員",
     NULL,
@@ -1263,6 +1289,10 @@ EVT_BEGIN(mise_data_close)
     RETURN
 EVT_END()
 
+/**
+ * Door of the camp shop: the outer door hit area A_mise_doa, the inside room S_mise and the scripts that run
+ * as the door opens and closes.
+ */
 static DoorParam mise_data = {
     0, // flags
     3, // type
@@ -1278,6 +1308,7 @@ static DoorParam mise_data = {
     mise_data_close, // evtClose
 };
 
+/** NPCs inside the camp inn: the innkeeper. */
 static const char* yado_npc[] = {
     "宿店員",
     NULL,
@@ -1306,6 +1337,10 @@ EVT_BEGIN(mise_close_event)
     RETURN
 EVT_END()
 
+/**
+ * Door of the camp inn: the outer door hit area A_yado_doa, the inside room and the scripts that run as the
+ * door opens and closes.
+ */
 static DoorParam yado_data = {
     0, // flags
     3, // type
@@ -1349,6 +1384,7 @@ EVT_BEGIN(evt_door_entry_custom01)
     RETURN
 EVT_END()
 
+/** Shelf slots of the camp shop: the display model and hit area of each of the six items on show. */
 static ShopObj obj_list[] = {
     {"S_item_01", "A_item_01"},
     {"S_item_02", "A_item_02"},
@@ -1358,6 +1394,10 @@ static ShopObj obj_list[] = {
     {"S_item_06", "A_item_06"},
 };
 
+/**
+ * Items the camp shop sells with their prices in coins: Ice Storm, Fire Flower, Sleepy Sheep, Fright Mask,
+ * Honey Syrup and Super Shroom.
+ */
 static ShopItem goods_list[] = {
     {ITEM_ICE_STORM, 15},
     {ITEM_FIRE_FLOWER, 5},
@@ -1367,6 +1407,7 @@ static ShopItem goods_list[] = {
     {ITEM_SUPER_SHROOM, 12},
 };
 
+/** Prices the camp shop pays when Mario sells it items; the stocked goods come first. */
 static ShopDb trade_list[] = {
     {ITEM_ICE_STORM, 10, 0},
     {ITEM_FIRE_FLOWER, 2, 0},
@@ -1382,12 +1423,20 @@ static ShopDb trade_list[] = {
     {0},
 };
 
+/**
+ * The shop clerk's name and the 35 shop messages (shop_00 to shop_34) that drive the buying and selling
+ * dialogue.
+ */
 static ShopperData35 shopper_data = {
     "店員", // name
     NULL, NULL, // fook_evt..buy_evt
     {"shop_00", "shop_01", "shop_02", "shop_03", "shop_04", "shop_05", "shop_06", "shop_07", "shop_08", "shop_09", "shop_10", "shop_11", "shop_12", "shop_13", "shop_14", "shop_15", "shop_16", "shop_17", "shop_18", "shop_19", "shop_20", "shop_21", "shop_22", "shop_23", "shop_24", "shop_25", "shop_26", "shop_27", "shop_28", "shop_29", "shop_30", "shop_31", "shop_32", "shop_33", "shop_34"}, // msgs
 };
 
+/**
+ * Inn data of the camp: the price of a night, the bed, the bedside and camera positions, the innkeeper and
+ * the 14 inn messages (yado_00 to yado_13).
+ */
 static KinopioData kino_dt = {
     0, // breakfastItem
     {0}, // breakfastPos
@@ -1408,7 +1457,7 @@ static KinopioData kino_dt = {
 
 /**
  * The sailors' homesickness (kyoshu): Mario and his partner overhear the crew (stg5_muj_15 to 22);
- * Marco asks whether Mario will help, then the story advances to STORY_STG5_12_FLAVIO_AND_PA_PATCH
+ * Flavio asks whether Mario will help, then the story advances to STORY_STG5_12_FLAVIO_AND_PA_PATCH
  * and control returns.
  */
 EVT_BEGIN(kyoshu_event)
@@ -1469,7 +1518,7 @@ EVT_BEGIN(kyoshu_event)
     RETURN
 EVT_END()
 
-/** Makes Marco shiver (muj_npc_buruburu, 1 unit every 10 ms for 10 seconds). */
+/** Makes Flavio shiver (muj_npc_buruburu, 1 unit every 10 ms for 10 seconds). */
 EVT_BEGIN(maruco_buruburu)
     CALL(evt_npc_flag_onoff, 0, STRING("マルコ"), NPC_FLAG_MOVE_ANIM)
     LOOP(0)
@@ -1512,9 +1561,11 @@ EVT_END()
  * The GSWF_MUJ01_SKIP_TO_SHOW_OF_HANDS flag jumps straight to kyoshu_event.
  */
 EVT_BEGIN(nakamaware_event)
+    // If the quarrel was already seen, go straight to the show of hands.
     IF_INT_EQUAL(GSWF(GSWF_MUJ01_SKIP_TO_SHOW_OF_HANDS), 1)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_cam3d_evt_set, -85, 134, 714, -85, 38, 172, 500, 11)
+        // After the fight the crew votes by show of hands.
         SPAWN_EVENT(kyoshu_event)
         RETURN
     END_IF
@@ -1540,6 +1591,7 @@ EVT_BEGIN(nakamaware_event)
     CALL(evt_mario_normalize)
     CALL(evt_npc_set_position, STRING("水夫A"), -220, 0, 0)
     CALL(evt_npc_move_position, STRING("水夫A"), -330, 0, 0, FLOAT(120.0f), 0)
+    // Sailor A begs the captain to stop Flavio and the rough sailor, who are about to fight.
     CALL(evt_msg_print, 0, STRING("stg5_muj_05"), 0, STRING("水夫A"))
     CALL(evt_mario_mov_pos2, -385, 0, FLOAT(120.0f))
     BEGIN_INLINE_EVENT
@@ -1551,6 +1603,7 @@ EVT_BEGIN(nakamaware_event)
     CALL(evt_mario_mov_pos2, -247, 26, FLOAT(120.0f))
     CALL(evt_mario_mov_pos2, -170, 174, FLOAT(120.0f))
     WAIT_MS(1000)
+    // Flavio and the rough sailor trade insults about who was the coward.
     CALL(evt_msg_print, 0, STRING("stg5_muj_06"), 0, STRING("マルコ"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_07"), 0, STRING("ガラの悪い水夫"))
     CALL(evt_npc_get_position, STRING("マルコ"), LW(0), LW(1), LW(2))
@@ -1581,6 +1634,7 @@ EVT_BEGIN(nakamaware_event)
     CALL(evt_npc_set_ry, STRING("マルコ"), 90)
     CALL(evt_npc_move_position, STRING("マルコ"), 98, 166, 0, FLOAT(100.0f), 0)
     WAIT_MS(1000)
+    // Flavio shrieks that the ghosts are here and the sailors cower.
     CALL(evt_msg_print, 0, STRING("stg5_muj_12"), 0, STRING("マルコ"))
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_dispflag_onoff, 1, 2)
@@ -1653,6 +1707,7 @@ EVT_BEGIN(nakamaware_event)
     WAIT_MS(3200)
     CALL(evt_cam3d_evt_set, -100, 136, 714, -100, 40, 172, 1000, 11)
     WAIT_MS(1000)
+    // Flavio pushes Mario to the front.
     CALL(evt_msg_print, 0, STRING("stg5_muj_14"), 0, STRING("マルコ"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1679,6 +1734,7 @@ EVT_BEGIN(nakamaware_event)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     WAIT_MS(100)
     CALL(evt_npc_set_battle_info, STRING("エルモスA"), 6)
+    // Mario fights the Elmos ghosts.
     CALL(evt_npc_battle_start, STRING("エルモスA"))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -1697,7 +1753,7 @@ EVT_BEGIN(nakamaware_event)
     RETURN
 EVT_END()
 
-/** Moves the sailors and Marco to their places in the camp for the persuasion scene. */
+/** Moves the sailors and Flavio to their places in the camp for the persuasion scene. */
 EVT_BEGIN(settoku_event)
     CALL(evt_npc_set_position, STRING("水夫A"), -203, 0, 61)
     CALL(evt_npc_set_ry, STRING("水夫A"), 90)
@@ -1713,7 +1769,7 @@ EVT_BEGIN(settoku_event)
 EVT_END()
 
 /**
- * Marco persuades the timid sailor (settoku): everyone turns to face Marco, he speaks (stg5_muj_29),
+ * Flavio persuades the timid sailor (settoku): everyone turns to face Flavio, he speaks (stg5_muj_29),
  * the timid sailor answers (stg5_muj_30) and GSWF_MUJ01_TIMID_SAILOR_PERSUADED is set.
  */
 EVT_BEGIN(settoku_event_main)
@@ -1744,8 +1800,8 @@ EVT_BEGIN(settoku_event_main)
 EVT_END()
 
 /**
- * Guess: stops the regular events of the sailors (poor sailors B and D and others)
- * so they stop wandering during the dark ending scene.
+ * Stops the regular events of only two sailors, shabby sailor B (ボロ水夫B) and sailor D (水夫D), so they stay put;
+ * the map init runs it before sekai_yami_evt or minnnanokoe_evt (STORY_STG8_15_GRODUS).
  */
 static EVT_BEGIN(delete_npc_regl_evt)
     CALL(evt_npc_change_interrupt, STRING("ボロ水夫B"), 1, 0)
@@ -1926,10 +1982,13 @@ static USER_FUNC(starstone_set_ry) {
 }
 
 /**
- * Guess: the dark world scene after STORY_STG8_15_GRODUS (entered from "sekai_yami2"):
- * control is taken, the camp goes dark (yami view, dark shop icons) and the sailors react in the dark.
+ * The world-goes-dark cutaway at STORY_STG8_15_GRODUS (entered from "sekai_yami2"):
+ * control is taken, the camp is drawn dark with the camera shaking and a quake sound,
+ * four sailors run back and forth in panic, someone screams for help (stg8_dark_06), the screen flashes,
+ * and the game returns to pik_01 at "sekai_yami2".
  */
 static EVT_BEGIN(sekai_yami_evt)
+    // The darkening of the world: Mario loses control and the island starts to shake.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -1990,6 +2049,7 @@ static EVT_BEGIN(sekai_yami_evt)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(1000)
+    // Someone screams as the darkness spreads.
     CALL(evt_msg_print, 0, STRING("stg8_dark_06"), 0, 0)
     BEGIN_INLINE_EVENT
 #if VERSION >= VERSION_US
@@ -2002,6 +2062,7 @@ static EVT_BEGIN(sekai_yami_evt)
         WAIT_MS(1000)
         LOOP(2)
 #endif
+            // The screen flashes white several times.
             CALL(evt_snd_sfxon, STRING("SFX_STG8_LIGHT1"), 0)
             CALL(evt_fade_entry, FADE_OUT_BLACK, 0, 255, 255, 255)
             WAIT_MS(100)
@@ -2022,16 +2083,20 @@ static EVT_BEGIN(sekai_yami_evt)
 #endif
     CALL(evt_snd_sfxoff, LW(0))
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
+    // Fade out and continue the scene at pik_01.
     CALL(evt_bero_mapchange, STRING("pik_01"), STRING("sekai_yami2"))
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 /**
- * Guess: the voices of everyone scene (entered from "minnnanokoe", STORY_STG8_15_GRODUS):
- * control is taken and the camp is drawn in the dark view while the villagers' voices call out.
+ * The cheering cutaway of the final battle at STORY_STG8_15_GRODUS (entered from "minnnanokoe"):
+ * the camp is drawn dark with a bobbing, spinning Crystal Star,
+ * and the four sailors cheer Mario and Admiral Bobbery on (stg8_las_148_38 to _52),
+ * then the game returns to pik_01 at "minnnanokoe".
  */
 static EVT_BEGIN(minnnanokoe_evt)
+    // Everyone's voices: Mario loses control and the crew gathers.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -2104,6 +2169,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_seq_wait, 2)
     WAIT_MS(500)
     CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_INSTANT_TURN)
+    // The sailors cheer the fighter on: don't give up, thump them.
     CALL(evt_msg_print, 0, STRING("stg8_las_148_38"), 0, STRING("水夫D"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_39"), 0, STRING("ボロ水夫A"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_40"), 0, STRING("ボロ水夫B"))
@@ -2118,6 +2184,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_43"), 0, STRING("ボロ水夫A"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_44"), 0, STRING("ボロ水夫B"))
     CALL(evt_npc_jump_position_nohit, STRING("ガラの悪い水夫"), LW(0), LW(1), LW(2), 300, 10)
+    // The cheering grows louder.
     CALL(evt_msg_print, 0, STRING("stg8_las_148_45"), 0, STRING("ガラの悪い水夫"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_46"), 0, STRING("水夫D"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_47"), 0, STRING("ボロ水夫A"))
@@ -2130,13 +2197,14 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_msg_print, 0, STRING("stg8_las_148_51"), 0, STRING("ボロ水夫A"))
     CALL(evt_msg_print, 0, STRING("stg8_las_148_52"), 0, STRING("ボロ水夫B"))
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
+    // Fade out and continue the scene at pik_01.
     CALL(evt_bero_mapchange, STRING("pik_01"), STRING("minnnanokoe"))
     RETURN
 EVT_END()
 
 /**
- * Guess: adds the ending-scene NPCs Christine (クリスチーヌ) and Bobbery (サンダース)
- * and hooks up the sailors for the epilogue.
+ * Adds the epilogue NPCs Goombella (クリスチーヌ) and Bobbery (サンダース, placed off screen),
+ * and stops sailor D's regular event and moves him beside them.
  */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
@@ -2156,8 +2224,9 @@ static EVT_BEGIN(epilogue_npc_entry)
 EVT_END()
 
 /**
- * Guess: sub-event of the epilogue: Christine and the rude sailor play their talk animations in turn with a
- * speech bubble above Christine.
+ * Animation loop of the epilogue: Goombella and the rough sailor (ガラの悪い水夫) take turns talking,
+ * a speech bubble pops over Goombella, the sailor turns around, Bobbery walks in from the left,
+ * and then all three keep taking turns talking.
  */
 static EVT_BEGIN(epilogue_evt_sub)
     WAIT_MS(500)
@@ -2196,8 +2265,9 @@ static EVT_BEGIN(epilogue_evt_sub)
 EVT_END()
 
 /**
- * Guess: the epilogue in the camp (STORY_STG8_END_AFTER_THE_BATTLE):
- * the Keelhaul music plays, the camera pans over the cast, ep_42 is shown and the party leaves for another map.
+ * The camp's epilogue scene (STORY_STG8_END_AFTER_THE_BATTLE):
+ * with the Keelhaul Key music, the epilogue narration says that Bobbery now goes out to sea with Cortez every
+ * day (ep_42); then the ending moves to Ms. Mowz's scene in gor_01 if she joined the party, else to pik_04.
  */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
@@ -2237,7 +2307,7 @@ EVT_END()
 
 /**
  * Map init for muj_01 (the camp): picks music (ending-scene variants after STORY_STG8_15_GRODUS),
- * registers the exits, Marco's shop and the inn, the save block and Star Pieces,
+ * registers the exits, Flavio's shop and the inn, the save block and Star Pieces,
  * then spawns the scene for the story stage (nakamaware_event, settoku_event or the ending epilogue).
  */
 EVT_BEGIN(muj_01_init_evt)

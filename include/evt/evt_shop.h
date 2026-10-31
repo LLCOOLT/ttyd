@@ -33,6 +33,18 @@ typedef struct ShopDb {
     s16 save;  // 0x6
 } ShopDb;
 
+// ShopWork.flags bits; evtShopIsActive reports any of them.
+enum ShopWorkFlags {
+    SHOP_FLAG_ITEM_SELECTED = 0x1, // Mario stands at an item: its name and price windows are up (cleared every frame)
+    SHOP_FLAG_BUYING = 0x2,        // the buy script for the selected item is running
+    SHOP_FLAG_TALKING = 0x4000,    // the counter talk menu is up (shop_flag_onoff in the talk script)
+};
+
+// ShopWork.itemFlags bits.
+enum ShopItemFlags {
+    SHOP_ITEM_FLAG_SOLD_OUT = 0x1, // a one-off item already owned or bought: hidden and not selectable
+};
+
 typedef struct ShopWork {
     u16 flags;              // 0x0
     ShopObj* objs;          // 0x4

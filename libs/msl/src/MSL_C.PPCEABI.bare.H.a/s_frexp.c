@@ -1,5 +1,6 @@
 #include "fdlibm.h"
 
+/** The value 2^54, used to scale denormal numbers. */
 static const double two54 = 1.80143985094819840000e+16;
 
 /**

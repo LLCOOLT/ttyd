@@ -126,10 +126,10 @@ s32 battleAcMain_Shot(BattleWork* work) {
                 ac->acState = 1000;
                 sw->sfxId = psndSFXOn(sfx);
             case 1000:
-                if ((ac->setupFlags & 1) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
+                if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (ac->acUnit->tokenFlags & TOKEN_FLAG_CONFUSED_ACTION)) {
                     f32 range;
                     s32 r;
-                    if (ac->setupFlags & 2) {
+                    if (ac->setupFlags & AC_SETUP_FLAG_RETRIES) {
                         ac->setupParam--;
                         if (ac->setupParam >= 0) {
                             break;
@@ -152,7 +152,7 @@ s32 battleAcMain_Shot(BattleWork* work) {
                         ac->result = 2;
                         return 0;
                     }
-                    if (ac->setupFlags & 2) {
+                    if (ac->setupFlags & AC_SETUP_FLAG_RETRIES) {
                         ac->setupParam = 30;
                     }
                     break;
@@ -318,7 +318,7 @@ void battleAcDelete_Shot(BattleWork* work) {
     work->actionCommands.acState = 1004;
 }
 
-// inlining off for _ac_disp_init, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _ac_disp_init is inlined into battleAcMain_Shot (649 -> 667 instructions)
 #pragma dont_inline on
 /** Resets the display state: the gauge off screen to the left with a 20-frame slide, white colour, empty fill. */
 static void _ac_disp_init(BattleWork* work) {
@@ -381,7 +381,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 }
 
-// inlining off for _draw_target_mark, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it _draw_target_mark is inlined into _disp_target_mark_afterimage (93 -> 251 instructions; one other caller grows)
 #pragma dont_inline on
 /** Draws the reticle: two textures spinning in opposite directions by angle, at half size, in the given colour. */
 static void _draw_target_mark(GXColor color, f32 x, f32 y, f32 z, f32 angle) {

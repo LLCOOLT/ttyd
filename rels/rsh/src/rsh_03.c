@@ -36,13 +36,13 @@
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
+#include "eff/eff_fire.h"
 
 // mario_flag's copy of the last NPC talked to. The demo map has it as a static local of mario_flag (tmp$729);
 // as one it would be emitted before camAt and camPt in .bss, so it stays at file scope.
 static char tmp[32];
 Vec camPt;
 Vec camAt;
-EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 
 static USER_FUNC(fire);
 static USER_FUNC(mario_flag);
@@ -174,6 +174,7 @@ static USER_FUNC(omiseFukki) {
     return EVT_RETURN_DONE;
 }
 
+/** Doors and exits of rsh_03 variant a: w_bero to rsh_04_a; e_bero to rsh_02_a. */
 static BeroEntry bero_data_a[] = {
     {
         "w_bero", // hitName
@@ -214,6 +215,7 @@ static BeroEntry bero_data_a[] = {
     {0},
 };
 
+/** Doors and exits of rsh_03 variant b: w_bero to rsh_04_b; e_bero to rsh_02_b. */
 static BeroEntry bero_data_b[] = {
     {
         "w_bero", // hitName
@@ -254,6 +256,7 @@ static BeroEntry bero_data_b[] = {
     {0},
 };
 
+/** Doors and exits of rsh_03 variant c: w_bero to rsh_04_c; e_bero to rsh_02_c. */
 static BeroEntry bero_data_c[] = {
     {
         "w_bero", // hitName
@@ -311,6 +314,7 @@ EVT_BEGIN(init_cook)
     RETURN
 EVT_END()
 
+/** Items the player may give the cook when returning his pot: the Galley Pot only, ended by -1. */
 s32 item_tbl_cook[] = {
     ITEM_GALLEY_POT, -1,
 };
@@ -337,6 +341,10 @@ EVT_BEGIN(talk_cook_nabe_return)
     RETURN
 EVT_END()
 
+/**
+ * Item list for Trouble Center request 22, rebuilt by a script helper each time with the ingredients Mario
+ * still has to deliver (Golden Leaf, Mystic Egg, Keel Mango); unused slots stay -1.
+ */
 s32 iri_22_item_tbl[] = {
     -1, -1, -1, -1,
 };
@@ -354,6 +362,7 @@ EVT_BEGIN(talk_cook)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
             SET_VALUE(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
             IF_INT_EQUAL(LW(1), 0)
+                // Trouble Center request 22: the cook asks for the ingredients of his dish.
                 CALL(evt_msg_print, 0, STRING("irai_22_00"), 0, 0)
             ELSE
                 CALL(evt_msg_print, 0, STRING("irai_22_01"), 0, 0)
@@ -380,6 +389,7 @@ EVT_BEGIN(talk_cook)
                     DEBUG_PUT_MSG(STRING("iri_22 status ???"))
                 END_SWITCH
             ELSE
+                // Mario picks which ingredient to hand over.
                 CALL(evt_msg_print, 0, STRING("irai_22_09"), 0, 0)
                 GOTO(0)
             END_IF
@@ -393,6 +403,7 @@ EVT_BEGIN(talk_cook)
 #endif
         SWITCH(LW(1))
             CASE_EQUAL(169)
+            // The Golden Leaf, Mystic Egg and Keel Mango are taken one at a time.
             CALL(evt_pouch_remove_item, ITEM_GOLDEN_LEAF, LW(0))
             CALL(evt_msg_print, 0, STRING("irai_22_10"), 0, 0)
             OR(GSW(GSW_TROUBLE_WORK_FIRST), 1)
@@ -410,6 +421,7 @@ EVT_BEGIN(talk_cook)
             CALL(evt_sub_get_coin, 40)
             SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
             SET_VALUE(GSWF(GSWF_TROUBLE_22_SOLVED), 1)
+            // With all three delivered, the request is recorded as solved.
             CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
         ELSE
             IF_INT_NOT_EQUAL(LW(1), -1)
@@ -418,6 +430,7 @@ EVT_BEGIN(talk_cook)
         END_IF
         RETURN
     END_IF
+    // If Mario has the Galley Pot, he can return it.
     CALL(evt_pouch_check_item, ITEM_GALLEY_POT, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(talk_cook_nabe_return)
@@ -427,6 +440,7 @@ EVT_BEGIN(talk_cook)
         CASE_LESS(STORY_STG6_01_THE_CONDUCTOR)
         IF_INT_EQUAL(LSWF(5), 0)
             SET_VALUE(LSWF(5), 1)
+            // Without a request, his line depends on the story stage.
             CALL(evt_msg_print, 0, STRING("stg6_rsh_04"), 0, 0)
         ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_05"), 0, 0)
@@ -490,6 +504,7 @@ static EVT_BEGIN(init_waitless)
     RETURN
 EVT_END()
 
+/** Items the player may give the waitress: the Shell Earrings only, ended by -1. */
 s32 item_tbl_waitless[] = {
     ITEM_SHELL_EARRINGS, -1,
 };
@@ -569,6 +584,7 @@ EVT_END()
  * and otherwise says a line for the story stage.
  */
 static EVT_BEGIN(talk_waitless)
+    // From Pennington's assistant on, the waitress asks Mario for help.
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_06_PENNINGTONS_ASSISTANT)
         IF_INT_EQUAL(GSWF(GSWF_RSH03_WAITRESS_HELP_ACCEPTED), 0)
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
@@ -596,12 +612,14 @@ static EVT_BEGIN(talk_waitless)
             RETURN
         END_IF
     END_IF
+    // If Mario has the Shell Earrings, he can return them.
     CALL(evt_pouch_check_item, ITEM_SHELL_EARRINGS, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(talk_waitless_pias_return)
         RETURN
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
+        // Otherwise her line depends on the story stage.
         CASE_LESS(STORY_STG6_01_THE_CONDUCTOR)
         IF_INT_EQUAL(LSWF(7), 0)
             SET_VALUE(LSWF(7), 1)
@@ -678,6 +696,7 @@ EVT_BEGIN(move_waitless)
     RETURN
 EVT_END()
 
+/** NPCs of the dining car: the cook and the waitress. */
 static NpcSetupInfo npc_data[] = {
     {
         "コック", // name
@@ -765,6 +784,7 @@ EVT_BEGIN(evt_lanch_missing)
     CALL(evt_set_dir_to_target, STRING("トロン"), STRING("ポワン探偵"))
     CALL(evt_set_dir_to_target, STRING("ウェイトレス"), STRING("ポワン探偵"))
     CALL(evt_set_dir_to_target, STRING("コック"), STRING("ポワン探偵"))
+    // The missing lunch mystery: Pennington's theme plays.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_POWAN1"))
     CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(evt_npc_flag_onoff, 1, STRING("ポワン探偵"), NPC_FLAG_INTANGIBLE)
@@ -782,6 +802,7 @@ EVT_BEGIN(evt_lanch_missing)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, 0, 102, 174, 0, 50, -122, 500, 11)
     WAIT_MS(600)
+    // Pennington begins the questioning.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_23"), 0, STRING("ポワン探偵"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 45, 75, 75, 45, 40, -122, 500, 11)
@@ -840,6 +861,7 @@ EVT_BEGIN(evt_lanch_missing)
     WAIT_MS(500)
     SET_VALUE(LW(0), STRING("コック"))
     SPAWN_EVENT(dir_target)
+    // The cook gives his account.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_26"), 0, STRING("コック"))
     WAIT_MS(300)
     BEGIN_INLINE_EVENT
@@ -913,6 +935,7 @@ EVT_BEGIN(evt_lanch_missing)
     END_INLINE_EVENT
     WAIT_MS(1500)
     CALL(evt_npc_set_autotalkpose, STRING("ウェイトレス"), STRING("B_2"), STRING("T_2"))
+    // The waitress gives hers.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_31"), 0, STRING("ウェイトレス"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 0, 102, 174, 0, 50, -122, 0, 11)
@@ -939,6 +962,7 @@ EVT_BEGIN(evt_lanch_missing)
     CALL(evt_npc_set_autotalkpose, STRING("ウェイトレス"), STRING("O_1"), STRING("T_3"))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_34"), 0, STRING("ポワン探偵"))
     WAIT_MS(300)
+    // The salaryman and Toron take their turns.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_35"), 0, STRING("サラリーマン"))
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_36"), 0, STRING("トロン"))
@@ -947,11 +971,13 @@ EVT_BEGIN(evt_lanch_missing)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_38"), 0, STRING("ウェイトレス"))
     WAIT_MS(300)
+    // Pennington gives his conclusion.
     CALL(evt_msg_print, 0, STRING("stg6_rsh_39"), 0, STRING("ポワン探偵"))
     WAIT_MS(300)
     CALL(evt_npc_set_autotalkpose, STRING("ウェイトレス"), STRING("S_1"), STRING("T_1"))
     CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("S_1"))
     CALL(evt_cam3d_evt_off, 500, 11)
+    // The story advances.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_02_A_CASE_OF_LOST_STEW)
     CALL(evt_run_case_evt, CASE_COND_STAND_ON_A, 1, STRING("a_yuka_simi"), 0, PTR(evt_yuka_simi), 0)
     CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
@@ -1017,6 +1043,10 @@ static EVT_BEGIN(talk_powan)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the dining car during the missing lunch mystery: the cook, the waitress, Toron, the salaryman, the
+ * shop clerk and Pennington.
+ */
 NpcSetupInfo npc_data_lunch[] = {
     {
         "コック", // name
@@ -1080,6 +1110,9 @@ NpcSetupInfo npc_data_lunch[] = {
     {0},
 };
 
+/**
+ * Pairs of NPC name and message key (stg6_rsh_18_01 to 05) for the lines each person says in the lunch scene.
+ */
 static const char* msg_tbl[] = {
     "コック",
     "stg6_rsh_18_01",
@@ -1185,6 +1218,7 @@ EVT_BEGIN(evt_shop_moamoa_talk)
     RETURN
 EVT_END()
 
+/** Shelf slots of the Smorg shop: the display model and hit area of each item on show. */
 static ShopObj obj_list[] = {
     {"sina_1", "a_sina_1"},
     {"sina_2", "a_sina_2"},
@@ -1194,6 +1228,7 @@ static ShopObj obj_list[] = {
     {"sina_6", "a_sina_6"},
 };
 
+/** Items the Smorg shop sells with their prices in coins. */
 static ShopItem goods_list[] = {
     {ITEM_THUNDER_RAGE, 15},
     {ITEM_MYSTERY, 3},
@@ -1203,6 +1238,7 @@ static ShopItem goods_list[] = {
     {ITEM_SUPER_SHROOM, 15},
 };
 
+/** Prices the Smorg shop pays when Mario sells it items. */
 static ShopDb trade_list[] = {
     {ITEM_THUNDER_RAGE, 7, 0},
     {ITEM_MYSTERY, 1, 0},
@@ -1224,6 +1260,7 @@ static ShopDb trade_list[] = {
     {0},
 };
 
+/** The shop clerk's name, the talk hook and the 35 shop messages (stg6_shop_00 to 34). */
 static ShopperData35 shopper_data = {
     "店員", // name
     evt_shop_moamoa_talk, // fook_evt
@@ -1465,6 +1502,7 @@ EVT_BEGIN(evt_shop_close)
         SUBTRACT(LW(12), 30)
         CALL(evt_party_move_pos, 1, LW(10), LW(12), 300)
     END_INLINE_EVENT
+    // Mario steps out of the shop: the shop door slides open.
     CALL_CHILD(shop_door_open)
     CALL(evt_cam3d_evt_off, 500, 11)
     BEGIN_INLINE_EVENT
@@ -1483,6 +1521,7 @@ EVT_BEGIN(evt_shop_close)
         CALL(evt_party_move_pos, 1, LW(10), LW(12), 300)
     END_INLINE_EVENT
     WAIT_MS(500)
+    // The door closes behind them and the page turns back to the dining car.
     CALL_CHILD(shop_door_close)
     CALL(evt_hitobj_attr_onoff, 0, 0, STRING("tobira_omise"), 8388608)
     CALL(evt_hitobj_attr_onoff, 0, 0, STRING("tobira_omise_heya"), 8388608)
@@ -1502,7 +1541,7 @@ static USER_FUNC(fire) {
 
     mapObjGetPos(name, &pos);
     mapObjFlagOn(name, 0x4000);
-    effFireEntry(3, pos.x, pos.y - 4.0f, pos.z, 0.5f, 0);
+    effFireEntry(3, 0, pos.x, pos.y - 4.0f, pos.z, 0.5f);
     return EVT_RETURN_DONE;
 }
 
@@ -1622,6 +1661,7 @@ EVT_END()
  */
 EVT_BEGIN(rsh_03_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
+        // Load the NPCs for the story stage: the lunch mystery at the start, the normal crew afterwards.
         CASE_BETWEEN(STORY_STG6_27_RIVERSIDE_STATION, STORY_STG6_42_DRAWBRIDGE_DOWN)
         CASE_GREATER_OR_EQUAL(STORY_STG6_48_01_ARRIVING_AT_POSHLEY)
         CASE_DEFAULT
@@ -1651,6 +1691,7 @@ EVT_BEGIN(rsh_03_init_evt)
         CASE_BETWEEN(STORY_STG6_05_GALLEY_KETTLE_DISCOVERED, STORY_STG7_00_START)
         CALL(evt_npc_setup, PTR(npc_data))
     END_SWITCH
+    // Set up the shop door and the Smorg shop.
     CALL_CHILD(evt_shop_door_init)
     CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     BEGIN_INLINE_EVENT
@@ -1667,9 +1708,11 @@ EVT_BEGIN(rsh_03_init_evt)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
+    // Set up the shelf signs.
     CALL_CHILD(evt_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_02_A_CASE_OF_LOST_STEW, STORY_STG6_04_GRILLING_HEFF_T)
+        // Pick the music for the story stage.
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_POWAN1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_3"))
         CASE_BETWEEN(STORY_STG6_22_DOCUMENT, STORY_STG6_26_ZIP_TOAD_CAUGHT)
@@ -1787,6 +1830,7 @@ EVT_BEGIN(rsh_03_b_init_evt)
     RETURN
 EVT_END()
 
+/** Map objects of the scenery that passes by the windows. */
 static const char* window_tbl[] = {
     "mado_uturi_1",
     "mado_uturi_2",

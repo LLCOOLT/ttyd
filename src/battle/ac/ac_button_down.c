@@ -21,6 +21,11 @@ typedef struct BDWork {
     s32 endTimer;
 } BDWork;
 
+/**
+ * Buttons the button-press command can ask for: A, B, X, Y, then L, R and Z;
+ * random picks use the first four or all seven.
+ * Used by Tornado Jump's second part and Vivian's Veil and Fiery Jinx.
+ */
 static u32 _button_table[7] = {PAD_BUTTON_A, PAD_BUTTON_B, PAD_BUTTON_X, PAD_BUTTON_Y, PAD_TRIGGER_L, PAD_TRIGGER_R, PAD_TRIGGER_Z};
 
 static void actionCommandDisp(s32 unused, f32 x, f32 y);
@@ -131,8 +136,8 @@ s32 battleAcMain_ButtonDown(BattleWork* work) {
                 p->timer = work->actionCommands.params[0];
 
             case 1000:
-                if ((ac->setupFlags & 1) && (((u32)ac->acUnit->tokenFlags) & TOKEN_FLAG_CONFUSED_ACTION)) {
-                    if (ac->setupFlags & 2) {
+                if ((ac->setupFlags & AC_SETUP_FLAG_CONFUSED_AUTO) && (((u32)ac->acUnit->tokenFlags) & TOKEN_FLAG_CONFUSED_ACTION)) {
+                    if (ac->setupFlags & AC_SETUP_FLAG_RETRIES) {
                         ac->setupParam--;
                         if (ac->setupParam >= 0) {
                             break;

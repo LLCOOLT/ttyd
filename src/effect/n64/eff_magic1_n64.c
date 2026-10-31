@@ -12,6 +12,7 @@
 #include "libc_decls.h"
 #include "version.h"
 
+/** Colour pulse of the magic bolt's three rings: a phase and an RGB colour for each ring. */
 static u8 anime_data[12] = {0x00, 0xFF, 0xD0, 0x1A, 0x78, 0x4D, 0xD0, 0xFE, 0xF0, 0xFE, 0x4C, 0x6E};
 
 static void effMagic1Main(EffectEntry* effect);

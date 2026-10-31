@@ -10,6 +10,7 @@ u32 SendMailData;
 InterruptHandlerLike DBGCallback;
 InterruptHandlerLike MTRCallback;
 
+/** Running count of messages sent to the debugger host, folded into each message header; starts at 0x80. */
 u8 SendCount = 0x80;
 
 static void DBGHandler(__OSInterrupt interrupt, OSContext* context);

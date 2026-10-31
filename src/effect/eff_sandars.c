@@ -16,6 +16,7 @@ static void effSandarsMain(EffectEntry* effect);
 static void effSandarsDisp(CameraId cameraId, EffectEntry* effect);
 static void effSandarsDisp2(CameraId cameraId, EffectEntry* effect);
 
+/** Size percentages per frame as each type 5 sprite grows in: up to 120%, then it collapses. */
 static u8 scale_data[] = {0, 0, 0, 13, 0x1C, 0x2C, 0x3C, 0x4B, 0x59, 0x65, 0x6F, 0x75, 0x78, 0x4B, 0};
 
 /**

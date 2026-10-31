@@ -29,6 +29,7 @@ static EvtWord dmg_turn_event[96];
 static EvtWord attack_event[595];
 static EvtWord wait_event[6];
 
+/** Unit data of the Hyper Cleft: stats, sounds, attributes, parts, init script and data table. */
 BattleUnitKind unit_hyper_sinemon = {
     71,
     "btl_un_hyper_sinemon",
@@ -87,7 +88,7 @@ BattleUnitKind unit_hyper_sinemon = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x40000,
+    UNIT_ATTR_REQUIRED_FOR_CLEAR,
     &regist,
     1,
     parts,
@@ -96,29 +97,41 @@ BattleUnitKind unit_hyper_sinemon = {
 };
 
 #if VERSION <= VERSION_DEMO_US
+/** Damage reduction of the Hyper Cleft: defence 3 against every attack type. Demo values. */
 static BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
 #else
+/**
+ * Defence of the Hyper Cleft (released game values): 3 against normal, ice, explosion and electric hits;
+ * immune to fire (defence 99 cancels the hit).
+ */
 static BattleUnitDefense defence = {{3, 99, 3, 3, 3}};
 #endif
 
+/** Damage reduction of the Hyper Cleft, flipped on its back: none, every attack type does full damage. */
 static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/** Element response of the Hyper Cleft: none, every attack type is treated normally. Demo values. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 #else
+/** Element response of the Hyper Cleft: it is immune to fire. Released game values. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 #endif
 
 #if VERSION <= VERSION_DEMO_US
+/** Status vulnerability of the Hyper Cleft (percent, 0 is immune): immune to burn. Demo values. */
 static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 80, 80, 50, 30, 100, 80, 100, 100, 95};
 #else
+/** Status vulnerability of the Hyper Cleft (percent, 0 is immune): immune to burn. Released game values. */
 static StatusVulnerability regist = {40, 90, 40, 100, 40, 100, 0, 60, 100, 65, 100, 65, 100, 100, 60, 40, 30, 100, 70, 100, 100, 95};
 #endif
 
+/** Body part of the Hyper Cleft: hit position, size, defence tables and attributes. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_hyper_sinemon", "c_sinemon_h", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0x1, pose_table},
+    {1, "btl_un_hyper_sinemon", "c_sinemon_h", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_BOMB_FLIPPABLE, COUNTER_ATTR_TOP_SPIKY, pose_table},
 };
 
+/** Attack data for the Hyper Cleft's dash: 3 damage. */
 static BattleWeapon weapon_sinemon_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -137,7 +150,7 @@ static BattleWeapon weapon_sinemon_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -155,6 +168,7 @@ static BattleWeapon weapon_sinemon_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack data for the Hyper Cleft's charge-up that powers up its next attack: no damage, next attack +6. */
 static BattleWeapon weapon_sinemon_charge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -172,7 +186,7 @@ static BattleWeapon weapon_sinemon_charge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -190,6 +204,7 @@ static BattleWeapon weapon_sinemon_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of the Hyper Cleft: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table[] = {
     {1, "SIN_N_1"},
     {2, "SIN_Y_1"},
@@ -197,20 +212,21 @@ static PoseTableEntry pose_table[] = {
     {5, "SIN_K_1"},
     {4, "SIN_I_1"},
     {3, "SIN_I_1"},
-    {28, "SIN_S_1"},
+    {BTL_POSE_NORMAL, "SIN_S_1"},
     {29, "SIN_Q_1"},
     {30, "SIN_Q_1"},
     {31, "SIN_A_1a"},
-    {39, "SIN_D_1"},
+    {BTL_POSE_DAMAGE, "SIN_D_1"},
     {50, "SIN_A_1a"},
-    {40, "SIN_W_1"},
-    {42, "SIN_R_1"},
-    {56, "SIN_I_1"},
-    {57, "SIN_I_1"},
+    {BTL_POSE_WALK, "SIN_W_1"},
+    {BTL_POSE_RUN, "SIN_R_1"},
+    {BTL_POSE_DANGER, "SIN_I_1"},
+    {BTL_POSE_PERIL, "SIN_I_1"},
     {BTL_POSE_TALK, "SIN_T_1"},
     {BTL_POSE_STAY_DEFAULT, "SIN_S_1"},
 };
 
+/** Pose table of the Hyper Cleft, flipped on its back: battle pose types mapped to animation names. */
 static PoseTableEntry pose_table_turn[] = {
     {1, "SIN_N_2"},
     {2, "SIN_Y_2"},
@@ -218,17 +234,21 @@ static PoseTableEntry pose_table_turn[] = {
     {5, "SIN_K_2"},
     {4, "SIN_K_2"},
     {3, "SIN_K_2"},
-    {28, "SIN_D_2"},
+    {BTL_POSE_NORMAL, "SIN_D_2"},
     {29, "SIN_D_2"},
     {30, "SIN_D_2"},
     {31, "SIN_D_2"},
-    {39, "SIN_D_2"},
-    {56, "SIN_K_2"},
-    {57, "SIN_K_2"},
+    {BTL_POSE_DAMAGE, "SIN_D_2"},
+    {BTL_POSE_DANGER, "SIN_K_2"},
+    {BTL_POSE_PERIL, "SIN_K_2"},
     {BTL_POSE_TALK, "SIN_D_2"},
     {BTL_POSE_STAY_DEFAULT, "SIN_D_2"},
 };
 
+/**
+ * Data table of the Hyper Cleft: event handlers keyed by tag (dmg_turn_event,
+ * dmg_avoid_counter_thorn_head_event).
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_head_event},
@@ -254,19 +274,19 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Plays the "toge_flush" spark effect over the Hyper Cleft 30 frames after it is hit,
- * at a position that depends on its size statuses 10 and 11 (Guess: the big and small size changes).
+ * Plays the "toge_flush" spark effect over the Hyper Cleft 30 frames after an attacker is hurt by its spikes,
+ * at a position that depends on its size statuses 10 (Huge) and 11 (Tiny).
  */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
         ADD(LW(1), 45)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 7)
         ADD(LW(1), 25)
@@ -313,7 +333,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     WAIT_FRAMES(2)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -326,7 +346,7 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 7, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, -10, 0)
-    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OffPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     RETURN
 EVT_END()
 
@@ -346,14 +366,14 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("SIN_S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_SetHitOffset, LW(10), LW(11), 0, 0, 0)
-    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_OnPartsCounterAttribute, BTL_UNIT_SELF, 1, COUNTER_ATTR_TOP_SPIKY)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -373,19 +393,22 @@ EVT_END()
  * afterwards it hops back past the target to its home position.
  */
 static EVT_BEGIN(attack_event)
+    // If the Hyper Cleft is still on its back it gets up instead of attacking.
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
+    // After a First Strike it waits a moment; otherwise it uses an item if it has one, or picks a target (a
+    // confused Hyper Cleft with nobody to hit gets flustered).
+    CALL(btlevtcmd_check_battleflag, LW(0), BATTLE_FLAG_FIRST_ATTACK)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
         CALL(evt_btl_camera_set_mode, 0, 8)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 3)
         WAIT_MS(800)
     ELSE
-        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_CHARGE, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             GOTO(10)
         END_IF
@@ -395,6 +418,7 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             RETURN
         END_IF
+        // It may charge up instead of attacking (likely on the first turn).
         CALL(btlevtcmd_get_turn, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 1)
             CALL(btlevtcmd_DrawLots, LW(0), 2, 25, 75)
@@ -412,6 +436,7 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             ADD(LW(1), 15)
             ADD(LW(2), 10)
+            // Charging: a crystal glows around the Hyper Cleft as it powers itself up, which uses up its turn.
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
             CALL(evt_eff64, STRING(""), STRING("crystal_n64"), 7, LW(0), LW(1), LW(2), FLOAT(1.5f), 60, 0, 0, 0, 0, 0, 0)
             WAIT_MS(1000)
@@ -423,7 +448,7 @@ static EVT_BEGIN(attack_event)
                 WAIT_MS(500)
                 CALL(evt_btl_camera_set_mode, 0, 0)
             END_INLINE_EVENT
-            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
             RETURN
         END_IF
         LABEL(10)
@@ -432,7 +457,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sinemon_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -444,10 +469,12 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_sinemon_attack))
+    // Declare the attack.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_sinemon_attack))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // It runs around to the far side of the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 100)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -470,13 +497,15 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     WAIT_MS(750)
     CALL(evt_btl_camera_set_mode, 0, 3)
+    // It curls up and rushes back through the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_DASH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(5), EVT_NULLPTR)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 0, -1, 0)
     DELETE_EVENT(LW(15))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), 256, LW(5))
+    // Find out whether the rush connects.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -498,17 +527,19 @@ static EVT_BEGIN(attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss or dodge: it runs on through to the other side and stops.
     LABEL(90)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 50)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 0)
     WAIT_MS(500)
     GOTO(98)
+    // Hit: the damage is dealt and the Hyper Cleft bounces off in two hops.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_add_zoom, 0, -50)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_sinemon_attack))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_sinemon_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(1.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 75)
@@ -520,9 +551,10 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 20, -1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_EMON_MOVE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     GOTO(98)
+    // Walk back home.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)

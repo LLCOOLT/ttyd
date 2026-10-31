@@ -1,4 +1,4 @@
-// tou_08 (闘技場, Glitz Pit): the locker room; exits to tou_04 and tou_05; champion belt, the poisoned cake scene.
+// tou_08 (闘技場, Glitz Pit): the major-league locker room; exits to tou_04 and tou_05; champion belt, the poisoned cake scene.
 
 #include "battle/battle_unit.h"
 #include "eff/eff_starstone.h"
@@ -111,6 +111,7 @@ static EVT_BEGIN(toile_out)
     RETURN
 EVT_END()
 
+/** Exits of this room: the door back to the main corridor tou_04 and the restroom pipe down to tou_04. */
 static BeroEntry bero_data[] = {
     {
         "n_bero", // hitName
@@ -150,7 +151,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
-/** NPC init for the Spiny (togenoko) fighter in the locker room: placed at (90, 0, -50) facing 270. */
+/** NPC init for the Koopatrol (togenoko) fighter in the locker room: placed at (90, 0, -50) facing 270. */
 EVT_BEGIN(init_togenoko)
     CALL(evt_npc_set_position, STRING("me"), 90, 0, -50)
     CALL(evt_npc_set_ry, STRING("me"), 270)
@@ -158,8 +159,8 @@ EVT_BEGIN(init_togenoko)
 EVT_END()
 
 /**
- * Talk script of the Spiny fighter: story-dependent locker-room lines (the first Rawk Hawk match, the rematch
- * stages).
+ * Talk script of the Koopatrol fighter:
+ * story-dependent locker-room lines (the first Rawk Hawk match, the rematch stages).
  */
 EVT_BEGIN(talk_togenoko)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
@@ -371,6 +372,10 @@ static EVT_BEGIN(talk_uranoko)
     RETURN
 EVT_END()
 
+/**
+ * NPCs of the major-league locker room: Grubba, Jolene, a guard, the Koopatrol and Shady Koopa fighters
+ * and Rawk Hawk.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "ガンス", // name
@@ -436,9 +441,9 @@ static NpcSetupInfo npcEnt[] = {
 };
 
 /**
- * Guess: scene when Mario first reaches this room through the corridor:
- * Grubba (ガンス) stands next to Mario and says stg3_tou_50,
- * then the screen changes to tou_05 with a page-flip transition.
+ * Second stop of Grubba's tour, run from the map init before STORY_STG3_03_GRUBBA:
+ * Grubba (ガンス) stands next to Mario and introduces the major-league locker room (stg3_tou_50),
+ * then the map changes to tou_05 with a page-flip transition.
  */
 static EVT_BEGIN(evt_sensyu)
     CALL(evt_mario_key_onoff, 0)
@@ -459,8 +464,11 @@ static EVT_BEGIN(evt_sensyu)
 EVT_END()
 
 /**
- * Guess: door helper for the first-match scenes:
- * the NPC in LW(0) (Jolene or Grubba) walks to the door and opens it, with the door sound.
+ * Exit helper for the promotion scene (evt_1st_leagu):
+ * the NPC named in LW(0) (Jolene or the champion) turns intangible,
+ * walks to the door at (0, -130) with Mario turning to watch,
+ * opens it (180 degrees for Jolene, 260 for anyone else) with the door sounds, walks out and is parked off-map,
+ * and the door closes.
  */
 EVT_BEGIN(evt_1st_sub)
     SET_VALUE(LW(8), LW(0))
@@ -513,6 +521,7 @@ EVT_END()
  * the Glitz Pit music resumes and the story advances to STORY_STG3_20_MAJORS_10TH.
  */
 static EVT_BEGIN(evt_1st_leagu)
+    // Jolene opens the door and leads Mario and the partner into the major-league locker room.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -180)
@@ -562,6 +571,7 @@ static EVT_BEGIN(evt_1st_leagu)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+    // She explains the major league and walks out.
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -20, 84, 174, -20, 37, -93, 1000, 11)
     WAIT_MS(1000)
@@ -573,6 +583,7 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_cam3d_evt_off, 1000, 11)
     SET_VALUE(LW(0), STRING("キノシコワ"))
     CALL_CHILD(evt_1st_sub)
+    // The camera pans over the silent fighters and the partner remarks on the cold welcome.
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -138, 150, 533, -138, 50, -8, 0, 11)
     WAIT_MS(300)
@@ -582,6 +593,7 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_mario_set_dir, 90, 0, 0)
     WAIT_MS(1000)
     CALL(evt_msg_print_party, STRING("stg3_tou_294_01"))
+    // The music fades and Rawk Hawk swaggers in through the door.
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     WAIT_MS(500)
     CALL(evt_npc_set_position, STRING("チャンピョン"), 0, 0, -180)
@@ -615,6 +627,7 @@ static EVT_BEGIN(evt_1st_leagu)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // Rawk Hawk boasts about the rising star and recognises Mario as him.
     CALL(evt_msg_print, 0, STRING("stg3_tou_294_02"), 0, STRING("チャンピョン"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, -30, 104, 238, -30, 60, -8, 500, 11)
@@ -630,6 +643,7 @@ static EVT_BEGIN(evt_1st_leagu)
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_N_5B"))
     WAIT_MS(1000)
+    // Mario eyes the belt and the partner realises its Crystal Star is a fake.
     CALL(evt_cam3d_evt_set, -80, 104, 238, -80, 60, -8, 500, 11)
     CALL(evt_mario_set_dir, 270, 200, 0)
     WAIT_MS(300)
@@ -651,6 +665,7 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_mario_set_pose, STRING("M_N_2"))
     WAIT_MS(1000)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
+    // Rawk Hawk is furious, threatens Mario in the ring and storms out.
     CALL(evt_msg_print, 0, STRING("stg3_tou_294_06"), 0, STRING("チャンピョン"))
     CALL(evt_party_set_dir_npc, 0, STRING("チャンピョン"))
     WAIT_MS(500)
@@ -662,6 +677,7 @@ static EVT_BEGIN(evt_1st_leagu)
     WAIT_MS(300)
     SET_VALUE(LW(0), STRING("チャンピョン"))
     CALL_CHILD(evt_1st_sub)
+    // The partner shrugs him off and wonders where the real Crystal Star is.
     CALL(evt_cam3d_evt_set, -45, 120, 484, -45, 45, -9, 1000, 11)
     WAIT_MS(1000)
     CALL(evt_party_set_dir, 0, 270, 300)
@@ -673,6 +689,7 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_msg_print_party, STRING("stg3_tou_294_10"))
     WAIT_MS(300)
     WAIT_MS(1000)
+    // Mail arrives: the jingle plays, the partner points it out and Mario waits with a "!" until A is pressed.
     BEGIN_INLINE_EVENT_GET_ID(LW(11))
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
@@ -700,6 +717,8 @@ static EVT_BEGIN(evt_1st_leagu)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_mario_balloon_off)
+    // Mario reads X's mail about the Crystal Star, the partner finds it fishy, mail 6 is filed
+    // and the story advances.
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -731,8 +750,12 @@ static EVT_BEGIN(evt_1st_leagu)
 EVT_END()
 
 /**
- * Guess: door of the restroom (t_door_2/3) from the locker room:
- * refuses with stg3_tou_t_00 if a match is reserved, otherwise walks Mario and the partner through the door.
+ * Restroom door (t_door_2) used from the locker room:
+ * Mario gets "OCCUPIED!" (stg3_tou_t_00) while a non-title match is reserved,
+ * before STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK, from STORY_STG3_34_RETURN_TO_ROGUEPORT on,
+ * and in JP and later once the champion's opening scene has played.
+ * Otherwise Mario and the partner walk to the door, it opens with a wood-door sound,
+ * they step through into the restroom and it shuts.
  */
 EVT_BEGIN(evt_toile_door)
     IF_INT_EQUAL(GSWF(GSWF_TOU_TITLE_MATCH_RESERVED), 0)
@@ -855,8 +878,13 @@ EVT_BEGIN(evt_toile_door2)
 EVT_END()
 
 /**
- * Guess: scene after Mario wins the title match:
- * Grubba (ガンス) and Jolene (キノシコワ) congratulate Mario in the locker room.
+ * Scene after Mario wins the title match (rank 0 on returning with a match result pending):
+ * in US and later the Hammer Bro's script is stopped first.
+ * Grubba (ガンス) calls it Mario's first day as champ and gives him the Champ's Belt (stg3_tou_445;
+ * in JP and later the belt NPC and star stone glow are put on camera 7),
+ * then asks Jolene (キノシコワ) to show him the champion's room (447).
+ * She tells Mario to follow her (448) and leaves through the door with Mario behind her;
+ * GSWF_TOU_JOLENE_ESCORT_CHAMP_PENDING is set and the map changes to tou_04.
  */
 EVT_BEGIN(evt_champion_win)
     CALL(evt_mario_key_onoff, 0)
@@ -964,8 +992,9 @@ static EVT_BEGIN(bed_entry)
 EVT_END()
 
 /**
- * Guess: scene where the poison-cake NPC (ウラノコ) is checked on:
- * the camera frames him and he speaks stg3_tou_297_2; clears GSWF_TOU_CAKE_WAITING.
+ * Run on entering while GSWF_TOU_CAKE_WAITING is set (Mario left the cake uneaten):
+ * the camera turns to the Shady Koopa (ウラノコ), who tells Mario he ate the cake himself
+ * and it was the best he ever had (stg3_tou_297_2); clears GSWF_TOU_CAKE_WAITING.
  */
 EVT_BEGIN(evt_tou_08_cake)
     CALL(evt_mario_key_onoff, 0)
@@ -1023,11 +1052,14 @@ static EVT_BEGIN(epilogue_npc_entry)
 EVT_END()
 
 /**
- * Guess: background action of the epilogue room scene:
- * Goombella and Yoshi take turns talking, a guard (ガードマン) enters through the door and looks at Yoshi,
- * Yoshi walks up to him and leaves with him, the door closes, and Goombella keeps turning back and forth.
+ * Background action of the epilogue scene: Goombella (クリスチーヌ)
+ * and Yoshi (チビヨッシー) take turns in their talking animation;
+ * after 3 seconds the door opens and a guard (ガードマン) walks in and faces Yoshi.
+ * Once Yoshi has talked once more he walks over to the guard and both leave through the door, which closes,
+ * and Goombella then keeps turning back and forth.
  */
 static EVT_BEGIN(epilogue_evt_sub)
+    // Goombella and Yoshi chat in turn.
     WAIT_MS(500)
     CALL(evt_npc_set_anim, STRING("クリスチーヌ"), STRING("PKR_T_1"))
     WAIT_MS(1500)
@@ -1036,6 +1068,7 @@ static EVT_BEGIN(epilogue_evt_sub)
     WAIT_MS(1500)
     CALL(evt_npc_set_anim, STRING("チビヨッシー"), STRING("PYS_S_1"))
     SET_VALUE(GF(0), 1)
+    // Three seconds later a guard opens the door, walks in and faces Yoshi.
     BEGIN_INLINE_EVENT
         WAIT_MS(3000)
         SET_VALUE(LW(1), 0)
@@ -1067,6 +1100,7 @@ static EVT_BEGIN(epilogue_evt_sub)
         END_LOOP
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
+    // They keep chatting until the guard is in.
     LOOP(0)
         CALL(evt_npc_set_anim, STRING("クリスチーヌ"), STRING("PKR_T_1"))
         WAIT_MS(1500)
@@ -1081,6 +1115,7 @@ static EVT_BEGIN(epilogue_evt_sub)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // Yoshi says one last thing, walks over to the guard and both leave through the door.
     WAIT_MS(500)
     CALL(evt_npc_set_anim, STRING("チビヨッシー"), STRING("PYS_T_1"))
     WAIT_MS(1500)
@@ -1125,6 +1160,7 @@ static EVT_BEGIN(epilogue_evt_sub)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // Goombella stays behind, turning back and forth.
     LOOP(0)
         WAIT_MS(3000)
         CALL(evt_npc_reverse_ry, STRING("クリスチーヌ"))
@@ -1138,9 +1174,10 @@ static EVT_BEGIN(epilogue_evt_sub)
 EVT_END()
 
 /**
- * Epilogue scene in Mario's room: Glitz Pit epilogue music, Mario hidden,
- * the camera framing Goombella and Yoshi, who talk while epilogue_evt_sub runs;
- * the narration ep_40 shows Yoshi's name, then the screen fades out and the map changes to usu_00.
+ * Epilogue scene in the major-league locker room:
+ * Glitz Pit epilogue music, Mario hidden, the camera framing Goombella and Yoshi,
+ * who talk while epilogue_evt_sub runs; the narration ep_40 shows Yoshi's name,
+ * then the screen fades out and the map changes to usu_00.
  */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_URN1"))
@@ -1200,11 +1237,18 @@ EVT_END()
 #endif
 
 /**
- * Guess: map init for tou_08, the locker room: sets the story stage to match the player's rank
- * when the map is entered by debugging flags (skip flags), places the fighters, the belt and the cake scene,
- * and sets up the match monitor.
+ * Map init for tou_08, the major-league locker room.
+ * It first moves the story up to Mario's rank (at least STORY_STG3_20_MAJORS_10TH at rank 10,
+ * 20_00_MAJORS_8TH_PLACE at 8, 20_04_CONFISCATED at 7 to 4,
+ * 20_12_JOLENES_SECRET at 3 to 0) and applies the one-shot debug-start flags GSWF_TOU08_SKIP_TO_143/144/153.
+ * Then it sets up the entrances, the Ice Storm badge, the lockers,
+ * the fighters with the Hammer Bro and Spike Top talk hooks, the match sign-up and monitor,
+ * the restroom doors and the bed, and picks the music and scene:
+ * the title win or the after-match scene when a match result is pending, Grubba's tour on the first visit,
+ * the promotion scene, the cake follow-up and the epilogue.
  */
 EVT_BEGIN(tou_08_init_evt)
+    // The story is moved up to match Mario's rank, then the debug story-skip flags are applied.
     CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
         CASE_LESS_OR_EQUAL(3)
@@ -1236,6 +1280,8 @@ EVT_BEGIN(tou_08_init_evt)
         SET_VALUE(GSWF(GSWF_TOU08_SKIP_TO_153), 0)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_13_MAJORS_1ST_PL)
     END_IF
+    // Doors, the Ice Storm badge, lockers, the fighters, the match terminal and monitor,
+    // the restroom doors and the bed.
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
@@ -1258,6 +1304,7 @@ EVT_BEGIN(tou_08_init_evt)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("t_door_3"), 0, PTR(evt_toile_door2), 0)
     CALL(evt_hitobj_name_callback, STRING("a_b_H"), PTR(bed_entry))
     CALL(evt_sub_animgroup_async, STRING("p_slit"))
+    // After a match: the title win scene at rank 0, otherwise the default after-match scene.
     IF_INT_EQUAL(GSWF(GSWF_TOU_MATCH_RESULT_PENDING), 1)
         SET_VALUE(GSWF(GSWF_TOU_MATCH_RESULT_PENDING), 0)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
@@ -1276,6 +1323,7 @@ EVT_BEGIN(tou_08_init_evt)
         END_IF
         RETURN
     END_IF
+    // Music: Grubba's theme and his tour on the first visit, else the music for the story stage.
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_03_GRUBBA)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG3_GANCE1"))
@@ -1316,6 +1364,7 @@ EVT_BEGIN(tou_08_init_evt)
             END_IF
         END_SWITCH
     END_SWITCH
+    // The promotion scene, Shady Koopa's word about the cake, and the epilogue.
     IF_INT_EQUAL(GSWF(GSWF_TOU_PROMOTION_PENDING), 1)
         SET_VALUE(GSWF(GSWF_TOU_PROMOTION_PENDING), 0)
         SPAWN_EVENT(evt_1st_leagu)

@@ -96,6 +96,7 @@ static void OSSetCurrentThread(OSThread* thread);
 
 /** Empty default for the thread-switch hook. */
 static void DefaultSwitchThreadCallback(OSThread* from, OSThread* to) {}
+/** Callback run on every thread switch (empty by default), set with OSSetSwitchThreadCallback. */
 static OSSwitchThreadCallback SwitchThreadCallback = DefaultSwitchThreadCallback;
 
 /**

@@ -19,6 +19,14 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_snd.h"
 #include "jin.h"
+
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_FAKER_MARIO_HP_LINE = 0, // low-HP lines already spoken: 0 none, 1 partner's, 2 first, 3 second
+    UW_FAKER_MARIO_HP_66 = 1,   // 66% of his max HP: below it the partner double calls out
+    UW_FAKER_MARIO_HP_50 = 2,   // 50% of his max HP: below it he complains (stg4_jin_26_01)
+    UW_FAKER_MARIO_HP_25 = 3,   // 25% of his max HP: below it he is nearly beaten (stg4_jin_26_02)
+};
 // FAKE: unit_faker_mario.c calls BattlePartyAnimeLoad through this prototype (the types it was compiled with) instead of the one in battle/battle.h; same registers, behaviour-identical.
 typedef BOOL (*BattlePartyAnimeLoadRetBoolFn)(s32);
 
@@ -88,18 +96,18 @@ static USER_FUNC(_anime_load_wait) {
     s32 anime;
 
     switch (unit->currentKind) {
-        case 0x50:
-            anime = 0xE0;
+        case UNIT_GOOMBELLA_CHAPTER4:
+            anime = UNIT_GOOMBELLA;
             break;
-        case 0x51:
-            anime = 0xE1;
+        case UNIT_KOOPS_CHAPTER4:
+            anime = UNIT_KOOPS;
             break;
-        case 0x53:
-            anime = 0xE3;
+        case UNIT_FLURRIE_CHAPTER4:
+            anime = UNIT_FLURRIE;
             break;
-        case 0x52:
+        case UNIT_YOSHI_CHAPTER4:
         default:
-            anime = 0xE2;
+            anime = UNIT_YOSHI;
             break;
     }
     if (((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(anime)) {
@@ -120,18 +128,18 @@ static USER_FUNC(_anime_load) {
     s32 anime;
 
     switch (unit->currentKind) {
-        case 0x50:
-            anime = 0xE0;
+        case UNIT_GOOMBELLA_CHAPTER4:
+            anime = UNIT_GOOMBELLA;
             break;
-        case 0x51:
-            anime = 0xE1;
+        case UNIT_KOOPS_CHAPTER4:
+            anime = UNIT_KOOPS;
             break;
-        case 0x53:
-            anime = 0xE3;
+        case UNIT_FLURRIE_CHAPTER4:
+            anime = UNIT_FLURRIE;
             break;
-        case 0x52:
+        case UNIT_YOSHI_CHAPTER4:
         default:
-            anime = 0xE2;
+            anime = UNIT_YOSHI;
             break;
     }
     ((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(anime);
@@ -154,16 +162,16 @@ static USER_FUNC(_save_param) {
     FakerParam* p;
 
     switch (party->currentKind) {
-        case 0x50:
+        case UNIT_GOOMBELLA_CHAPTER4:
             p = &params[0];
             break;
-        case 0x51:
+        case UNIT_KOOPS_CHAPTER4:
             p = &params[1];
             break;
-        case 0x53:
+        case UNIT_FLURRIE_CHAPTER4:
             p = &params[2];
             break;
-        case 0x52:
+        case UNIT_YOSHI_CHAPTER4:
             p = &params[3];
             break;
     }
@@ -197,16 +205,16 @@ static USER_FUNC(_load_param) {
     FakerParam* p;
 
     switch (party->currentKind) {
-        case 0x50:
+        case UNIT_GOOMBELLA_CHAPTER4:
             p = &params[0];
             break;
-        case 0x51:
+        case UNIT_KOOPS_CHAPTER4:
             p = &params[1];
             break;
-        case 0x53:
+        case UNIT_FLURRIE_CHAPTER4:
             p = &params[2];
             break;
-        case 0x52:
+        case UNIT_YOSHI_CHAPTER4:
             p = &params[3];
             break;
     }
@@ -224,6 +232,10 @@ static USER_FUNC(_load_param) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unit kind of Doopliss as Mario:
+ * 40 HP, level 54, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 BattleUnitKind unit_faker_mario = {
     79,
     "btl_un_rampell",
@@ -290,16 +302,32 @@ BattleUnitKind unit_faker_mario = {
     data_table_fmario,
 };
 
+/** Defence of Doopliss as Mario's body per damage type: 0 against every damage type. */
 static BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Doopliss as Mario's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr_fmario = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of Doopliss as Mario in the demo, as a percent of the normal chance:
+ * immune to fright, gale force;
+ * sleep 50%, stop 50%, freeze 40%, instant kill 3% (and 9 other statuses lowered).
+ */
 static StatusVulnerability regist_fmario = {50, 50, 50, 50, 50, 50, 100, 40, 100, 50, 100, 50, 100, 25, 50, 0, 0, 100, 50, 100, 100, 3};
 #else
+/**
+ * Status vulnerability of Doopliss as Mario in the retail versions, as a percent of the normal chance:
+ * immune to fright, gale force;
+ * sleep 50%, stop 50%, freeze 40%, instant kill 3% (and 9 other statuses lowered).
+ */
 static StatusVulnerability regist_fmario = {50, 50, 70, 50, 50, 50, 100, 40, 100, 70, 100, 70, 100, 90, 50, 0, 0, 100, 50, 100, 100, 3};
 #endif
 
+/**
+ * Pose table of Doopliss as Mario:
+ * the animation played for each pose type (idle, hurt, walk, run, attack and so on).
+ */
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
     {2, "EM_Y_2"},
@@ -307,26 +335,29 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {5, "EM_K_1"},
     {4, "EM_K_1"},
     {3, "EM_K_1"},
-    {28, "EM_S_1"},
-    {39, "EM_D_1"},
+    {BTL_POSE_NORMAL, "EM_S_1"},
+    {BTL_POSE_DAMAGE, "EM_D_1"},
     {50, "EM_A_1"},
-    {42, "EM_R_1"},
-    {40, "EM_W_1"},
-    {56, "EM_D_3"},
-    {57, "EM_D_3"},
+    {BTL_POSE_RUN, "EM_R_1"},
+    {BTL_POSE_WALK, "EM_W_1"},
+    {BTL_POSE_DANGER, "EM_D_3"},
+    {BTL_POSE_PERIL, "EM_D_3"},
     {BTL_POSE_TALK, "EM_T_1"},
     {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
+/** Event table of Doopliss as Mario: its defeat script. */
 static BattleDataEntry data_table_fmario[] = {
     {49, dead_event_fmario},
     {0, NULL},
 };
 
+/** Body part of Doopliss as Mario: a single part using the model "c_mario". */
 static BattleUnitKindPart parts_fmario[] = {
-    {1, "btl_un_rampell", "c_mario", 0.0f, 0.0f, 0.0f, 3.0f, 27.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_fmario, &defence_attr_fmario, 0x9, 0, pose_table_fmario_stay},
+    {1, "btl_un_rampell", "c_mario", 0.0f, 0.0f, 0.0f, 3.0f, 27.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_fmario, &defence_attr_fmario, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table_fmario_stay},
 };
 
+/** Doopliss as Mario's jump: 2 damage to a single target, a jump-style hit. */
 static BattleWeapon weapon_masao_jump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -345,7 +376,7 @@ static BattleWeapon weapon_masao_jump = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -363,6 +394,7 @@ static BattleWeapon weapon_masao_jump = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Doopliss as Mario's hammer: 4 damage to a single target, a hammer-style hit. */
 static BattleWeapon weapon_masao_hammer = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -381,7 +413,7 @@ static BattleWeapon weapon_masao_hammer = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -403,6 +435,7 @@ static BattleWeapon weapon_masao_hammer = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Doopliss as Mario's kururin jump: 2 damage to a single target, a jump-style hit. */
 static BattleWeapon weapon_masao_kururin_jump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -421,7 +454,7 @@ static BattleWeapon weapon_masao_kururin_jump = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -439,6 +472,7 @@ static BattleWeapon weapon_masao_kururin_jump = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Doopliss as Mario's kaiten hammer: 4 damage to a single target, a hammer-style hit. */
 static BattleWeapon weapon_masao_kaiten_hammer = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -457,7 +491,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -479,6 +513,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Setup entry that adds the Goombella double to Doopliss's battle. */
 BattleUnitSetup entry_gullible_christine = {
     &unit_gullible_christine, // unitKindParams
     1, // alliance
@@ -490,6 +525,7 @@ BattleUnitSetup entry_gullible_christine = {
     NULL, // itemDropTable
 };
 
+/** Setup entry that adds the Koops double to Doopliss's battle. */
 BattleUnitSetup entry_gullible_nokotarou = {
     &unit_gullible_nokotarou, // unitKindParams
     1, // alliance
@@ -501,6 +537,7 @@ BattleUnitSetup entry_gullible_nokotarou = {
     NULL, // itemDropTable
 };
 
+/** Setup entry that adds the Flurrie double to Doopliss's battle. */
 BattleUnitSetup entry_gullible_clauda = {
     &unit_gullible_clauda, // unitKindParams
     1, // alliance
@@ -512,6 +549,7 @@ BattleUnitSetup entry_gullible_clauda = {
     NULL, // itemDropTable
 };
 
+/** Setup entry that adds the Yoshi double to Doopliss's battle. */
 BattleUnitSetup entry_gullible_yoshi = {
     &unit_gullible_yoshi, // unitKindParams
     1, // alliance
@@ -612,16 +650,16 @@ static EVT_BEGIN(init_event_fmario)
     SET_VALUE(LW(1), LW(0))
     MULTIPLY(LW(1), 66)
     DIVIDE(LW(1), 100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(1))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_66, LW(1))
     SET_VALUE(LW(1), LW(0))
     MULTIPLY(LW(1), 50)
     DIVIDE(LW(1), 100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_50, LW(1))
     SET_VALUE(LW(1), LW(0))
     MULTIPLY(LW(1), 25)
     DIVIDE(LW(1), 100)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(1))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_25, LW(1))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_LINE, 0)
     SET_VALUE(GW(21), 0)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_MOVE1L"), STRING("SFX_BOSS_NM_MOVE1R"), 0, 20, 20)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_MOVE1L"), STRING("SFX_BOSS_NM_MOVE1R"), 0, 10, 10)
@@ -687,7 +725,7 @@ static EVT_BEGIN(dead_event_fmario)
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -742,11 +780,13 @@ EVT_END()
 
 /**
  * Damage event of the fake Mario in the second battle:
- * a hit with damage code 1024 sets GW(19) to 1 (Guess: it tells the defeat scripts that the double was struck
- * first), then the default damage handling runs.
+ * a hit with damage flag 0x400 (the hit that defeats him) sets GW(19) to 1,
+ * then the default damage handling runs.
+ * The partner doubles' death events read GW(19) (0 still standing, 1 defeated, 2 fallen over after
+ * dead_event_fmario) to choose between their exchange with him and waiting for his fall.
  */
 static EVT_BEGIN(damage_event_fmario)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(19), 1)
     END_IF
@@ -757,21 +797,25 @@ static EVT_BEGIN(damage_event_fmario)
 EVT_END()
 
 /**
- * Phase script of the fake Mario: on turn 3 Vivian rejoins (the story message stg4_jin_23 to 25,
- * she spawns at (-140, 0, 5) and the camera zooms in);
- * after the player's phase, if a gullible partner has just been defeated its farewell line plays (Goombella,
- * Koops, Flurrie or Yoshi) and the next partner is switched in;
- * also handles the fake Mario's own low-HP lines (stg4_jin_26_01 and 02).
+ * Phase script of the fake Mario: before the player's phase on turn 3 Vivian rejoins Mario (stg4_jin_23 to 25;
+ * she spawns at (-140, 0, 5) and the camera zooms in).
+ * After the player's phase, when the partner double has been beaten (GW(20) set) party_change_event switches in the
+ * next one; then one low-HP line plays per threshold crossed: below 66% of his HP the partner double warns him
+ * (stg4_jin_26_kur, _nok, _win or _yos; skipped once a double has been beaten), below 50% he complains
+ * (stg4_jin_26_01), below 25% he says he is nearly beaten (stg4_jin_26_02).
  */
 EVT_BEGIN(phase_event_fmario)
+    // Before the player's phase on turn 3: Vivian makes her choice.
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_get_turn, LW(0))
         IF_INT_EQUAL(LW(0), 3)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
+            // Vivian says she is sorry to her sister but Mario has been the only one kind to her.
             CALL(evt_msg_print, 0, STRING("stg4_jin_23"), 0, 0)
             WAIT_MS(200)
             SET_VALUE(GW(21), 1)
+            // She rejoins Mario: she appears at (-140, 0, 5) and the camera zooms in.
             CALL(vivian_comeback)
             CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entryunit_party[4]), 0)
             CALL(btlevtcmd_SetHomePos, LW(3), FLOAT(-140.0f), FLOAT(0.0f), FLOAT(5.0f))
@@ -803,6 +847,7 @@ EVT_BEGIN(phase_event_fmario)
                 END_LOOP
             END_SIBLING_EVENT
             CALL(btlevtcmd_WaitEventEnd, LW(0))
+            // Vivian: she will fight at his side from now on.
             CALL(evt_msg_print, 2, STRING("stg4_jin_24"), 0, LW(3))
             WAIT_MS(200)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_FIND1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -810,6 +855,7 @@ EVT_BEGIN(phase_event_fmario)
             CALL(btlevtcmd_JumpSetting, LW(5), 12, FLOAT(1.0f), FLOAT(1.1992188f))
             CALL(btlevtcmd_JumpPosition, LW(5), LW(7), LW(8), LW(10), 0, -1)
             WAIT_MS(1000)
+            // Vivian: she has made her choice and is not turning back.
             CALL(evt_msg_print, 2, STRING("stg4_jin_25"), 0, LW(3))
             WAIT_MS(1000)
             BEGIN_SIBLING_EVENT_GET_ID(LW(0))
@@ -829,24 +875,28 @@ EVT_BEGIN(phase_event_fmario)
             CALL(btlevtcmd_StartWaitEvent, LW(3))
         END_IF
     END_IF
+    // After the player's phase: if a partner double has just been beaten, the next one is switched in.
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
         IF_INT_NOT_EQUAL(GW(20), 0)
             CALL_CHILD(party_change_event)
         END_IF
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(2))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_LINE, LW(2))
         IF_INT_NOT_EQUAL(GW(20), 0)
             IF_INT_EQUAL(LW(2), 0)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_LINE, 1)
                 SET_VALUE(LW(2), 1)
             END_IF
         END_IF
         SWITCH(LW(2))
             CASE_EQUAL(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(1))
+            // The fake Mario's HP has dropped low:
+            // the camera zooms to the partner double in front (Goombella, Koops, Flurrie or Yoshi)
+            // and she calls out to him.
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_66, LW(1))
             IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_LINE, 1)
                 CALL(btlevtcmd_StatusWindowOnOff, 0)
                 CALL_CHILD(enemy_zoom)
                 SWITCH(GW(18))
@@ -863,9 +913,10 @@ EVT_BEGIN(phase_event_fmario)
                 CALL(btlevtcmd_StatusWindowOnOff, 1)
             END_IF
             CASE_EQUAL(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_50, LW(1))
             IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_LINE, 2)
+                // The fake Mario is hurting and complains.
                 CALL(btlevtcmd_StatusWindowOnOff, 0)
                 CALL_CHILD(fmario_zoom)
                 CALL(evt_msg_print, 2, STRING("stg4_jin_26_01"), 0, BTL_UNIT_SELF)
@@ -873,9 +924,10 @@ EVT_BEGIN(phase_event_fmario)
                 CALL(btlevtcmd_StatusWindowOnOff, 1)
             END_IF
             CASE_EQUAL(2)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_25, LW(1))
             IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_FAKER_MARIO_HP_LINE, 3)
+                // The fake Mario is nearly beaten.
                 CALL(btlevtcmd_StatusWindowOnOff, 0)
                 CALL_CHILD(fmario_zoom)
                 CALL(evt_msg_print, 2, STRING("stg4_jin_26_02"), 0, BTL_UNIT_SELF)
@@ -942,16 +994,18 @@ EVT_END()
 static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: it picks one for the jump.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -959,7 +1013,8 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // He walks to the take-off point in front of the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(6))
@@ -969,11 +1024,13 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(2), 5)
+    // He jumps with a Mario jump cry and comes down on the target;
+    // the pre-damage check decides between a dodge and a hit.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL_CHILD(jump_attack_voice)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -995,15 +1052,17 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: he falls back to the floor (the target dodges for some kinds of miss).
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_D_2"))
     WAIT_FRAMES(40)
     GOTO(98)
+    // Hit: the stomp lands for its damage, then he bounces off in three small hops.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1015,11 +1074,12 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    // He walks back to his home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -1034,16 +1094,18 @@ EVT_END()
 static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: it picks one for the jump.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1051,7 +1113,8 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // He walks to the take-off point in front of the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(6))
@@ -1061,11 +1124,13 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     ADD(LW(2), 5)
+    // First hop: he jumps and comes down on the target; the pre-damage check decides between a dodge
+    // and a hit.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL_CHILD(jump_attack_voice)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1087,15 +1152,19 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: he falls back to the floor (the target dodges for some kinds of miss).
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_D_2"))
     WAIT_FRAMES(40)
     GOTO(98)
+    // Hit: the first stomp lands for its damage.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // Second hop: he jumps again, spins in the air with the spin-jump cry
+    // and dives onto the target for a second hit.
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
@@ -1123,7 +1192,8 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 4, 0, 0, 0, -1)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // He bounces off in three small hops.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1135,11 +1205,12 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    // He walks back to his home position.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -1154,16 +1225,18 @@ EVT_END()
  */
 static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: it picks one for the hammer swing.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1171,7 +1244,8 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 100)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // He walks up beside the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 24)
@@ -1184,6 +1258,7 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Wind-up: he raises the hammer over his head, holds it, then swings it down.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1A"))
     WAIT_MS(66)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_FURU2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1194,7 +1269,8 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     WAIT_MS(50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_DON2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_MS(100)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // The pre-damage check decides between a dodge and a hit.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1216,11 +1292,14 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: the hammer hits only the floor (the target dodges for some kinds of miss).
     LABEL(90)
     GOTO(98)
+    // Hit: the hammer lands for its damage.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // He pauses, straightens up and walks back to his home position.
     LABEL(98)
     WAIT_MS(700)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_S_1"))
@@ -1229,7 +1308,7 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -1243,16 +1322,18 @@ EVT_END()
  */
 static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: it picks one for the hammer swing.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1260,7 +1341,8 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 100)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // He walks up beside the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 24)
@@ -1273,6 +1355,7 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Wind-up: he raises the hammer over his head, holds it, then swings it down.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1A"))
     WAIT_MS(66)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_FURU2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1283,7 +1366,8 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     WAIT_MS(50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_DON2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_MS(100)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // The pre-damage check decides between a dodge and a hit.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1305,11 +1389,14 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // Miss: the hammer hits only the floor (the target dodges for some kinds of miss).
     LABEL(90)
     GOTO(98)
+    // Hit: the hammer lands for its damage.
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // He pauses, straightens up and walks back to his home position.
     LABEL(98)
     WAIT_MS(700)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_S_1"))
@@ -1318,7 +1405,7 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -1452,7 +1539,7 @@ USER_FUNC(faker_mario_sync_max_moves) {
 
 /** Battle script helper: clears the "away" flag in Vivian's party data so she is back in the party; returns 1. */
 static USER_FUNC(vivian_comeback) {
-    pouchGetPtr()->partyData[6].flags &= ~2;
+    pouchGetPtr()->partyData[PARTNER_VIVIAN].flags &= ~POUCH_PARTY_FLAG_AWAY;
     return 1;
 }
 

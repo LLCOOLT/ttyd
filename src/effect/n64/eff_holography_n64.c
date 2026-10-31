@@ -20,7 +20,12 @@ typedef struct EffHolographyN64Work {
     f32 scale;    // 0x28
 } EffHolographyN64Work;
 
+/** Flicker of the Fright Mask hologram: alpha over a 16-frame cycle, dipping to invisible and back. */
 u8 xlu_data[16] = {255, 255, 220, 190, 160, 120, 80, 40, 0, 0, 40, 80, 120, 160, 190, 220};
+/**
+ * The hologram ribbon's 55 unfurl poses, 22 vertices (ten segments) each;
+ * drawn from the last pose back to the first.
+ */
 effN64Vtx ach_01_v[55][22] = {
     {
         {-639, 1280, 0, 0, 0, 0, 0, 120, 255},
@@ -1350,7 +1355,8 @@ static void effHolographyDisp(CameraId cameraId, EffectEntry* effect);
 /**
  * Spawns the holography effect at (x, y, z), scaled by 0.1 * scale,
  * for lifetime frames (0 = until soft-deleted).
- * Unknown: which scene uses it; the only caller is event scripts through evt_eff.
+ * The Fright Mask item script (ItemEvent_Attiike_Shisshi) spawns it twice through evt_eff64 as its scary
+ * hologram; the effect table labels it ホログラフ (holograph).
  */
 EffectEntry* effHolographyN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;

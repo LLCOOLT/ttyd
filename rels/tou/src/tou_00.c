@@ -330,6 +330,7 @@ static USER_FUNC(npc_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Names of the five smoke puffs that pour out of Bowser's failing airship in tou_00_koopa_evt. */
 const char* kemuri_name[] = {
     "kosyo01",
     "kosyo02",
@@ -353,6 +354,7 @@ static USER_FUNC(kpa_hikousen_yure) {
  * Bowser talks (kpa_stg4_008, kpa_stg4_009) and the script then changes map to muj_20.
  */
 EVT_BEGIN(tou_00_koopa_evt)
+    // Mario is hidden, the airship is placed off to the left and the sky starts scrolling past.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_kill_party, 0)
@@ -372,6 +374,7 @@ EVT_BEGIN(tou_00_koopa_evt)
         END_LOOP
     END_INLINE_EVENT
     SET_VALUE(GF(1), 0)
+    // The airship bobs gently while cruising.
     BEGIN_INLINE_EVENT
         SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
         SET_FLOAT_VALUE(LW(1), FLOAT(0.0f))
@@ -389,6 +392,7 @@ EVT_BEGIN(tou_00_koopa_evt)
             SET_FLOAT_VALUE(LW(1), LW(2))
         END_LOOP
     END_INLINE_EVENT
+    // The airship flies in from the left over Glitzville.
     CALL(evt_seq_wait, 2)
     CALL(evt_npc_set_anim, STRING("飛クッパ"), STRING("HKPA_W_1"))
     CALL(evt_snd_sfxon, STRING("SFX_KUPPA_AIRSHIP_MOVE1"), GW(2))
@@ -402,6 +406,7 @@ EVT_BEGIN(tou_00_koopa_evt)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
+    // Something breaks: the music winds down and two smoke puffs stream out behind the ship.
     WAIT_MS(3750)
     SET_VALUE(GF(1), 1)
     CALL(evt_npc_get_position, STRING("飛クッパ"), LW(0), LW(1), LW(2))
@@ -431,6 +436,7 @@ EVT_BEGIN(tou_00_koopa_evt)
         MULTIPLY_FLOAT(LW(0), FLOAT(-1000.0f))
         CALL(kemuri_move, STRING("kosyo2"), LW(0))
     END_INLINE_EVENT
+    // The ship lurches and slows down while the engine sound drops in pitch.
     CALL(evt_npc_get_position, STRING("飛クッパ"), LW(2), LW(3), LW(4))
     SET_VALUE(GW(1), LW(3))
     BEGIN_INLINE_EVENT
@@ -460,6 +466,7 @@ EVT_BEGIN(tou_00_koopa_evt)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(4)
     END_IF
+    // Bowser looks around, then the ship starts shaking unsteadily.
     MULTIPLY_FLOAT(GW(0), FLOAT(0.5f))
     CALL(evt_npc_set_anim, STRING("飛クッパ"), STRING("HKPA_S_1"))
     WAIT_MS(300)
@@ -508,6 +515,7 @@ EVT_BEGIN(tou_00_koopa_evt)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
+    // Bowser wonders about the warning light while more smoke pours out and the engine dies.
     CALL(evt_msg_print, 0, STRING("kpa_stg4_008"), 0, STRING("飛クッパ"))
     CALL(evt_npc_get_position, STRING("飛クッパ"), LW(0), LW(1), LW(2))
     ADD(LW(2), 80)
@@ -539,6 +547,7 @@ EVT_BEGIN(tou_00_koopa_evt)
         END_LOOP
         CALL(evt_snd_sfxoff, GW(2))
     END_INLINE_EVENT
+    // The sky stops scrolling and Bowser panics.
     CALL(evt_npc_set_anim, STRING("飛クッパ"), STRING("HKPA_O_1"))
     WAIT_MS(1500)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
@@ -548,6 +557,7 @@ EVT_BEGIN(tou_00_koopa_evt)
     WAIT_MS(200)
     WAIT_MS(500)
     CALL(evt_npc_flag_onoff, 0, STRING("飛クッパ"), NPC_FLAG_TALK_ANIM)
+    // Bowser screams, the ship tips over and falls out of the sky.
     BEGIN_INLINE_EVENT
         CALL(evt_msg_print, 0, STRING("kpa_stg4_009"), 0, STRING("飛クッパ"))
     END_INLINE_EVENT
@@ -573,15 +583,16 @@ EVT_BEGIN(tou_00_koopa_evt)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(6)
     END_IF
+    // Cut to the next scene in muj_20.
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
     CALL(evt_bero_mapchange, STRING("muj_20"), STRING(""))
     RETURN
 EVT_END()
 
 /**
- * Guess: init event of the flying Koopa NPC ("飛クッパ") on the blimp:
- * sets bit 2 of its jumpFlags field (evt_npc_status_onoff),
- * which other scripts clear while an NPC is walking around.
+ * Init event of Bowser's flying fortress NPC (飛クッパ, flown across in the chapter 4 interlude tou_00_koopa_evt):
+ * sets status bit 2 of its jumpFlags field (evt_npc_status_onoff), with which npcdrv takes a moving NPC's facing
+ * for spotting Mario from its move direction.
  */
 static EVT_BEGIN(hkoopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -605,6 +616,7 @@ static USER_FUNC(kemuri_move) {
     return EVT_RETURN_BLOCK;
 }
 
+/** NPCs of this map: Bowser in his airship, who flies over Glitzville in the chapter 4 interlude. */
 static NpcSetupInfo npcEnt[] = {
     {
         "飛クッパ", // name

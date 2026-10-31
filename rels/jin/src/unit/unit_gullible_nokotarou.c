@@ -11,6 +11,15 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_GULLIBLE_NOKOTAROU_SPIN_SFX_PITCH = 5, // the partner Koops' spin-sound pitch ramp; this copy only clears it
+    UW_GULLIBLE_NOKOTAROU_SPINNING = 8,       // 1 while the shell-spin loop runs; 0 stops it
+    UW_GULLIBLE_NOKOTAROU_SPIN_TARGET = 9,    // spin speed the loop ramps toward, in degrees per frame
+    UW_GULLIBLE_NOKOTAROU_SPIN_REVERSE = 10,  // 1 asks the spin loop to reverse its direction
+    UW_GULLIBLE_NOKOTAROU_UNUSED_11 = 11,     // cleared at init with the spin slots; nothing reads it
+};
+
 BattleUnitKind unit_gullible_nokotarou;
 static BattleWeapon enemyWeapon_NokotarouKouraAttack;
 static BattleWeapon enemyWeapon_NokotarouShubibinAttack;
@@ -34,6 +43,10 @@ static EvtWord attack_event_nokotarou_koura[393];
 static EvtWord attack_event_nokotarou_shubibin[339];
 static EvtWord wait_event_nokotarou[6];
 
+/**
+ * Unit kind of the Koops double:
+ * 10 HP, level 0, with its size, sounds and the links to its parts, status vulnerability and scripts.
+ */
 BattleUnitKind unit_gullible_nokotarou = {
     81,
     "btl_un_gullible_nokotarou",
@@ -92,7 +105,7 @@ BattleUnitKind unit_gullible_nokotarou = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x10000000,
+    UNIT_ATTR_IGNORE_FOR_CLEAR,
     &regist_nokotarou,
     1,
     parts_nokotarou,
@@ -100,6 +113,10 @@ BattleUnitKind unit_gullible_nokotarou = {
     data_table_nokotarou,
 };
 
+/**
+ * Koops double's NokotarouKouraAttack:
+ * damage scaled to the party level to a single target, a shell-toss-style hit.
+ */
 static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -118,7 +135,7 @@ static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -137,6 +154,10 @@ static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Koops double's NokotarouShubibinAttack:
+ * damage scaled to the party level to every target, a shell-toss-style hit.
+ */
 static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -155,7 +176,7 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -174,26 +195,41 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Defence of the Koops double's body per damage type: 1 against every damage type. */
 static BattleUnitDefense defence_nokotarou = {{1, 1, 1, 1, 1}};
 
+/** Defence attributes of the Koops double's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr_nokotarou = {{0, 0, 0, 0, 0}};
 
+/** Defence of the Koops double's body per damage type while flipped over: 0 against every damage type. */
 static BattleUnitDefense defence_turn_nokotarou = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Koops double in the demo, as a percent of the normal chance:
+ * immune to fright, gale force, instant kill;
+ * sleep 60%, stop 80%, freeze 70% (and 7 other statuses lowered).
+ */
 static StatusVulnerability regist_nokotarou = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 0, 0, 100, 70, 100, 100, 0};
 #else
+/**
+ * Status vulnerability of the Koops double in the retail versions, as a percent of the normal chance:
+ * immune to fright, gale force, instant kill;
+ * sleep 60%, stop 80%, freeze 70% (and 7 other statuses lowered).
+ */
 static StatusVulnerability regist_nokotarou = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
 #endif
 
+/** Event table of the Koops double: its defeat script, its reaction to being flipped over. */
 static BattleDataEntry data_table_nokotarou[] = {
     {49, dead_event_nokotarou},
     {13, dmg_turn_event},
     {0, NULL},
 };
 
+/** Body part of the Koops double: a single part using the model "c_pnk". */
 static BattleUnitKindPart parts_nokotarou[] = {
-    {1, "btl_un_nokotarou", "c_pnk", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_nokotarou, &defence_attr_nokotarou, 0x1009, 0, pose_table_nokotarou_stay},
+    {1, "btl_un_nokotarou", "c_pnk", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_nokotarou, &defence_attr_nokotarou, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_SHELLED, 0, pose_table_nokotarou_stay},
 };
 
 /**
@@ -206,7 +242,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn_nokotarou))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_nokotarou_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("PNK_D_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -233,7 +269,7 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_nokotarou))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_nokotarou_stay))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("PNK_S_1"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
@@ -254,10 +290,10 @@ static EVT_BEGIN(init_event_nokotarou)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_nokotarou))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event_nokotarou))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 11, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPINNING, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_TARGET, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_REVERSE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_UNUSED_11, 0)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 6, 12, 16)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 0, 9, 3)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), STRING("SFX_PARTY_BATTLE_LANDING1"))
@@ -272,7 +308,7 @@ EVT_END()
  * then runs the default damage handling.
  */
 static EVT_BEGIN(damage_event_nokotarou)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(20), 1)
     END_IF
@@ -303,7 +339,7 @@ static EVT_BEGIN(dead_event_nokotarou)
         END_IF
     END_IF
     IF_INT_EQUAL(LW(6), 1)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -392,7 +428,7 @@ EVT_END()
  * then unfolds through PNK_K_1 (6 frames of 45 degrees) and PNK_K_2 (6 frames of 15 degrees).
  */
 static EVT_BEGIN(_restore_koura_pose)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPINNING, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_K_1"))
@@ -415,23 +451,23 @@ EVT_END()
  * when unit work 10 is set.
  */
 static EVT_BEGIN(_koura_rotate_start)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPINNING, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_REVERSE, 0)
     BEGIN_INLINE_EVENT
         LABEL(0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 8, LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPINNING, LW(1))
         IF_INT_EQUAL(LW(1), 0)
             GOTO(10)
         END_IF
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 10, LW(11))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_REVERSE, LW(11))
         IF_INT_NOT_EQUAL(LW(11), 0)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, 0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(10))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_REVERSE, 0)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_TARGET, LW(10))
             MULTIPLY(LW(10), -1)
             MULTIPLY(LW(0), -1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, LW(10))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_TARGET, LW(10))
         END_IF
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(10))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_TARGET, LW(10))
         IF_INT_GREATER_OR_EQUAL(LW(10), 0)
             ADD(LW(0), 1)
             IF_INT_GREATER(LW(0), LW(10))
@@ -456,7 +492,7 @@ EVT_END()
  * and resets his rotation to 0.
  */
 static EVT_BEGIN(_koura_rotate_stop)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPINNING, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     RETURN
 EVT_END()
@@ -492,6 +528,7 @@ EVT_END()
  * comes out of the shell and walks home.
  */
 static EVT_BEGIN(attack_event_nokotarou_koura)
+    // He may use an enemy item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -500,12 +537,14 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
     END_IF
     SET_VALUE(LW(12), PTR(&enemyWeapon_NokotarouKouraAttack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: he picks one for his shell attack.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -518,13 +557,15 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL_CHILD(_change_koura_pose)
+    // Wind-up: he pulls into his shell and spins up while the camera zooms in.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_ATTACK1"), EVT_NULLPTR, 0, LW(13))
     SET_VALUE(LW(0), 15)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 45)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_TARGET, 45)
     CALL_CHILD(_koura_rotate_start)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+    // He slides at the target; the pre-damage check decides between a dodge and a hit.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 4)
     CALL(evt_btl_camera_set_zoom, 0, 400)
     WAIT_FRAMES(30)
@@ -557,19 +598,22 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL_CHILD(_koura_rotate_stop)
         CALL_CHILD(_restore_koura_pose)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
         WAIT_FRAMES(30)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
         CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         GOTO(99)
     END_IF
+    // Hit: the shell slams into the target for its damage.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // Miss: he slides on past the target (which dodges for some kinds of miss).
     LABEL(90)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He tumbles back in three decreasing hops and comes out of the shell.
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 18, -1)
@@ -579,12 +623,13 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
     CALL_CHILD(_restore_koura_pose)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     WAIT_FRAMES(30)
+    // He walks back to his home position.
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -600,6 +645,7 @@ EVT_END()
  * he reappears on the opposite side, returns home and comes out of the shell.
  */
 static EVT_BEGIN(attack_event_nokotarou_shubibin)
+    // He may use an enemy item instead of attacking.
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(LW(0))
@@ -608,12 +654,14 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     END_IF
     SET_VALUE(LW(12), PTR(&enemyWeapon_NokotarouShubibinAttack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Target: he picks the targets for his attack.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // The attack is declared.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -626,11 +674,12 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL_CHILD(_change_koura_pose)
+    // Wind-up: he pulls into his shell and spins up for a second.
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_SHUBIBIN1"), EVT_NULLPTR, 0, LW(13))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_SFX_PITCH, 0)
     SET_VALUE(LW(0), 15)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 45)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GULLIBLE_NOKOTAROU_SPIN_TARGET, 45)
     CALL_CHILD(_koura_rotate_start)
     WAIT_MS(500)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 4)
@@ -644,13 +693,14 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     CALL(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     SET_VALUE(LW(10), 0)
+    // He slides through the targets in turn; the pre-damage check decides between a dodge and a hit for each.
     LABEL(10)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(10.0f))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(5), LW(2))
     ADD(LW(2), 5)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -665,17 +715,20 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
+    // Hit: the shell slams into that target for its damage.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(50)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
         ADD(LW(10), 1)
         GOTO(10)
     END_IF
+    // After the last target he slides off the edge of the stage.
     LABEL(80)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -400, LW(1), LW(2), 0, -1, 0)
+    // He reappears on the opposite side and walks back to his home position, coming out of his shell.
     LABEL(90)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -686,7 +739,7 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL_CHILD(_koura_rotate_stop)
     CALL_CHILD(_restore_koura_pose)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     WAIT_FRAMES(30)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)

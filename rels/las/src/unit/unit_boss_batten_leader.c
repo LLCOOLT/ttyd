@@ -1,4 +1,4 @@
-// Palace of Shadow battle unit: the Sir Grodus (boss) (`boss_batten_leader`): parts, stats, poses and AI scripts.
+// Palace of Shadow battle unit: Sir Grodus (boss) (`boss_batten_leader`): parts, stats, poses and AI scripts.
 
 #include "version.h"
 #include "battle/battle_unit.h"
@@ -34,6 +34,21 @@
 #include "unit/unit_barriern.h"
 #include "libc_decls.h"
 #include "driver/camdrv.h"
+
+// Unit work slots (btlevtcmd_SetUnitWork / GetUnitWork)
+enum {
+    UW_BOSS_BATTEN_LEADER_NEW_SATELLITES = 0,    // satellites summoned by the last call; pulled back in next turn
+    UW_BOSS_BATTEN_LEADER_HP_STAGE = 1,          // story stage by HP: 0, then 1 at 75%, 2 at 50%, 3 at 25%
+    UW_BOSS_BATTEN_LEADER_FIZZLE = 2,            // percent chance his next spell fizzles, raised by hits on his staff
+    UW_BOSS_BATTEN_LEADER_SELF_SPELL = 3,        // self-cast spell in progress: 4 Shikaeshi, 5 Yokeyoke, else 0
+    UW_BOSS_BATTEN_LEADER_HEAD_LIGHT_EVT = 4,    // event id of the head-lamp animation (light_anim_rtn)
+    UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT = 5,     // event id of the staff-lamp animation (light_rod_anim_rtn)
+    UW_BOSS_BATTEN_LEADER_HEAD_LIGHT = 6,        // head-lamp sequence now running (0 normal, 2 blinking, ...)
+    UW_BOSS_BATTEN_LEADER_ROD_LIGHT = 7,         // staff-lamp sequence now running (8 lit, 9 off)
+    UW_BOSS_BATTEN_LEADER_BARRIER = 8,           // his barrier effect (EffectEntry*), 0 when none
+    UW_BOSS_BATTEN_LEADER_SATELLITE = 9,         // first of four slots (9-12) holding satellite unit ids, -1 empty
+    UW_BOSS_BATTEN_LEADER_SATELLITE_SPLINE = 13, // first of four slots (13-16) holding each satellite's path
+};
 
 Vec nowv;
 f32 maer;
@@ -204,6 +219,7 @@ static EVT_BEGIN(mario_party_zoom)
     RETURN
 EVT_END()
 
+/** Weapon of Grodus's thunder spell: damage 7. */
 BattleWeapon weapon_batten_leader_thunder = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -226,7 +242,7 @@ BattleWeapon weapon_batten_leader_thunder = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    4, // element
+    ELEMENT_ELECTRIC, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -245,6 +261,7 @@ BattleWeapon weapon_batten_leader_thunder = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Grodus's fire spell: damage 6; inflicts Burn (75% in US and PAL, 20% in the demos and JP). */
 BattleWeapon weapon_batten_leader_fire = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -267,7 +284,7 @@ BattleWeapon weapon_batten_leader_fire = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
+    ELEMENT_FIRE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -292,6 +309,7 @@ BattleWeapon weapon_batten_leader_fire = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Grodus's ice spell: damage 5; inflicts Frozen (30%). */
 BattleWeapon weapon_batten_leader_ice = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -314,7 +332,7 @@ BattleWeapon weapon_batten_leader_ice = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    2, // element
+    ELEMENT_ICE, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -336,6 +354,7 @@ BattleWeapon weapon_batten_leader_ice = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Grodus's shikaeshi support spell. */
 BattleWeapon weapon_batten_leader_shikaeshi = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -353,7 +372,7 @@ BattleWeapon weapon_batten_leader_shikaeshi = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -372,6 +391,7 @@ BattleWeapon weapon_batten_leader_shikaeshi = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Grodus's spell that makes a unit dodgy: inflicts Dodgy. */
 BattleWeapon weapon_batten_leader_yokeyoke = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -389,7 +409,7 @@ BattleWeapon weapon_batten_leader_yokeyoke = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -409,6 +429,7 @@ BattleWeapon weapon_batten_leader_yokeyoke = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Grodus's spell that freezes its target in time: inflicts Stop (30%). */
 BattleWeapon weapon_batten_leader_stop = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -431,7 +452,7 @@ BattleWeapon weapon_batten_leader_stop = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -451,6 +472,10 @@ BattleWeapon weapon_batten_leader_stop = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Unit data of Grodus in the Palace of Shadow: 50 HP, level 87;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_boss_batten_leader = {
     146,
     "btl_un_batten_leader",
@@ -521,15 +546,37 @@ BattleUnitKind unit_boss_batten_leader = {
     data_table,
 };
 
+/**
+ * Defence of Grodus against each element (normal, fire, ice, explosion, electric):
+ * 1 against every element, so each hit is cut by 1.
+ */
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
+/**
+ * Damage modifiers of Grodus per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of Grodus while invincible per element (normal, fire, ice, explosion, electric): normal:
+ * immune, fire: immune, ice: immune, explosion: immune, electric: immune.
+ */
 BattleUnitDefenseAttr defence_attr_muteki = {{2, 2, 2, 2, 2}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Grodus:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Stop, Dizzy, Confuse, Frozen, Defense Down, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 30, 100, 50, 100, 50, 100, 30, 30, 0, 0, 100, 30, 100, 100, 1};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Grodus:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Stop, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 30, 100, 60, 100, 60, 100, 75, 30, 0, 0, 100, 30, 100, 100, 1};
 #endif
 
@@ -537,6 +584,7 @@ u8 defencecopy[8] __attribute__((aligned(4))) = { // defenses[5] copied into the
     1, 1, 1, 1, 1, 0, 0, 0,
 };
 
+/** Pose table of Grodus: animation names for each pose type (idle, walk, hurt, attack and so on). */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -544,20 +592,24 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "K_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "D_1"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_2"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Pose table of Grodus while dizzy and wobbling:
+ * animation names for each pose type (idle, walk, hurt, attack and so on).
+ */
 static PoseTableEntry pose_table_furafura[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -565,20 +617,24 @@ static PoseTableEntry pose_table_furafura[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "K_1"},
-    {28, "X_1"},
+    {BTL_POSE_NORMAL, "X_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "D_1"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_2"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_3"},
     {BTL_POSE_STAY_DEFAULT, "X_1"},
 };
 
+/**
+ * Data table of Grodus: event scripts and values the battle looks up by tag (damage reactions, dodge, first
+ * strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {9, damage_sub_event},
 #if VERSION <= VERSION_DEMO_US
@@ -589,14 +645,15 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of Grodus: 7 parts with their hit boxes, defence tables and pose tables. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_batten_leader", "c_shuryo", 0.0f, 0.0f, 0.0f, 0.0f, 56.0f, 0.0f, -6.0f, 55.0f, 0.0f, 53, 69, 255, &defence, &defence_attr, 0x9, 0, pose_table},
-    {2, "btl_un_batten_leader", "c_shuryo", 0.0f, 0.0f, 0.0f, 18.0f, 9.0f, 0.0f, 16.0f, 15.0f, 0.0f, 64, 36, 255, &defence, &defence_attr, 0x80800000, 0, NULL},
-    {3, "電源ランプ", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {4, "頭のランプ１", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {5, "頭のランプ２", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {6, "頭のランプ３", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {7, "杖のランプ１", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
+    {1, "btl_un_batten_leader", "c_shuryo", 0.0f, 0.0f, 0.0f, 0.0f, 56.0f, 0.0f, -6.0f, 55.0f, 0.0f, 53, 69, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
+    {2, "btl_un_batten_leader", "c_shuryo", 0.0f, 0.0f, 0.0f, 18.0f, 9.0f, 0.0f, 16.0f, 15.0f, 0.0f, 64, 36, 255, &defence, &defence_attr, PART_ATTR_NO_HP_LOSS | PART_ATTR_IMMUNE_TO_STATUS, 0, NULL},
+    {3, "電源ランプ", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {4, "頭のランプ１", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {5, "頭のランプ２", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {6, "頭のランプ３", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
+    {7, "杖のランプ１", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_NO_SHADOW, 0, pose_table},
 };
 
 /** Event script: plays the sound of Grodus's barrier breaking (SFX_BOSS_SRYO_BARRIER_BREAK1). */
@@ -795,7 +852,7 @@ static USER_FUNC(check_satellite) {
     if (unit == NULL) {
         return EVT_RETURN_DONE;
     }
-    for (i = 9; i < 13; i++) {
+    for (i = UW_BOSS_BATTEN_LEADER_SATELLITE; i < UW_BOSS_BATTEN_LEADER_SATELLITE + 4; i++) {
         if (unit->work[i] != -1) {
             if (BattleGetUnitPtr(_battleWorkPointer, unit->work[i]) != NULL) {
                 count++;
@@ -822,8 +879,8 @@ static USER_FUNC(check_satellite) {
             }
             evt->uwBase = event->uwBase;
             evt->ufBase = event->ufBase;
-            effDelete((EffectEntry*)unit->work[8]);
-            unit->work[8] = 0;
+            effDelete((EffectEntry*)unit->work[UW_BOSS_BATTEN_LEADER_BARRIER]);
+            unit->work[UW_BOSS_BATTEN_LEADER_BARRIER] = 0;
             BtlUnit_GetPos(unit, &x, &y, &z);
             for (i = 0; i < 20; i++) {
                 s32 w = BtlUnit_GetWidth(unit) + 15;
@@ -851,10 +908,10 @@ static USER_FUNC(check_satellite) {
 
             BtlUnit_snd_se(unit, "SFX_BOSS_SRYO_LIGHT_ROUND1", 0xF1194D80, 0);
             BtlUnit_GetPos(unit, &px, &py, &pz);
-            unit->work[8] = (EvtWord)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
+            unit->work[UW_BOSS_BATTEN_LEADER_BARRIER] = (EvtWord)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
         }
-        if (unit->work[8] != 0) {
-            EffSyuryouWork* barrier = ((EffectEntry*)unit->work[8])->userdata;
+        if (unit->work[UW_BOSS_BATTEN_LEADER_BARRIER] != 0) {
+            EffSyuryouWork* barrier = ((EffectEntry*)unit->work[UW_BOSS_BATTEN_LEADER_BARRIER])->userdata;
             f32 ex;
             f32 ey;
             f32 ez;
@@ -934,6 +991,7 @@ static USER_FUNC(battleGetBattenSatelliteInitPos) {
     return EVT_RETURN_DONE;
 }
 
+/** Setup used to spawn one of Grodus's satellites: unit kind, alliance, position and turn phase. */
 BattleUnitSetup entry_batten_satellite = {
     &unit_boss_batten_satellite, // unitKindParams
     1, // alliance
@@ -945,50 +1003,73 @@ BattleUnitSetup entry_batten_satellite = {
     NULL, // itemDropTable
 };
 
+/** Lamp sequence of Grodus's power lamp: a steady cycle of its lit and dim animations. */
 LightSeq3 btl_shuryolight_pow_normal = {{{"L_1B", -2}, {"L_1A", 80}, {"L_1B", 80}}, NULL};
 
+/** Lamp sequence of Grodus's power lamp: blinking. */
 LightSeq1 btl_shuryolight_pow_tenmetu2 = {{{"L_4E", 0}}, NULL};
 
+/** Lamp sequence of Grodus's power lamp: blinking. */
 LightSeq2 btl_shuryolight_pow_tenmetu = {{{"L_1B", -3}, {"L_1A", 200}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 1: a steady cycle of its lit and dim animations. */
 LightSeq4 btl_shuryolight_head_1_normal = {{{"L_4A", 400}, {"L_4A", 400}, {"L_4B", 400}, {"L_4A", 400}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 2: a steady cycle of its lit and dim animations. */
 LightSeq4 btl_shuryolight_head_2_normal = {{{"L_3A", 400}, {"L_3B", 400}, {"L_3A", 400}, {"L_3A", 400}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 3: a steady cycle of its lit and dim animations. */
 LightSeq4 btl_shuryolight_head_3_normal = {{{"L_2B", 400}, {"L_2A", 400}, {"L_2A", 400}, {"L_2A", 400}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 1: a fast cycle. */
 LightSeq4 btl_shuryolight_head_1_quick = {{{"L_4A", 200}, {"L_4A", 200}, {"L_4B", 200}, {"L_4A", 200}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 2: a fast cycle. */
 LightSeq4 btl_shuryolight_head_2_quick = {{{"L_3A", 200}, {"L_3B", 200}, {"L_3A", 200}, {"L_3A", 200}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 3: a fast cycle. */
 LightSeq4 btl_shuryolight_head_3_quick = {{{"L_2B", 200}, {"L_2A", 200}, {"L_2A", 200}, {"L_2A", 200}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 1: random flicker. */
 LightSeq2 btl_shuryolight_head_1_random = {{{"L_4A", -4}, {"L_4B", -4}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 2: random flicker. */
 LightSeq2 btl_shuryolight_head_2_random = {{{"L_3A", -4}, {"L_3B", -4}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 3: random flicker. */
 LightSeq2 btl_shuryolight_head_3_random = {{{"L_2B", -4}, {"L_2A", -4}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 1: blinking. */
 LightSeq1 btl_shuryolight_head_1_tenmetu = {{{"L_4E", 0}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 2: blinking. */
 LightSeq1 btl_shuryolight_head_2_tenmetu = {{{"L_3E", 0}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 3: blinking. */
 LightSeq1 btl_shuryolight_head_3_tenmetu = {{{"L_2E", 0}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 1: dark. */
 LightSeq1 btl_shuryolight_head_1_off = {{{"L_4A", -1}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 2: dark. */
 LightSeq1 btl_shuryolight_head_2_off = {{{"L_3A", -1}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 3: dark. */
 LightSeq1 btl_shuryolight_head_3_off = {{{"L_2A", -1}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 1: lit. */
 LightSeq1 btl_shuryolight_head_1_on = {{{"L_4B", -1}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 2: lit. */
 LightSeq1 btl_shuryolight_head_2_on = {{{"L_3B", -1}}, NULL};
 
+/** Lamp sequence of Grodus's head lamp 3: lit. */
 LightSeq1 btl_shuryolight_head_3_on = {{{"L_2B", -1}}, NULL};
 
+/** Lamp sequence of Grodus's staff lamp: a steady cycle of its lit and dim animations. */
 LightSeq4 btl_shuryolight_rod_normal = {{{"L_3C", 0}, {"L_3B", 1000}, {"L_3D", 0}, {"L_3A", 1000}}, NULL};
 
+/** Lamp sequence of Grodus's staff lamp: dark. */
 LightSeq1 btl_shuryolight_rod_off = {{{"L_3A", -1}}, NULL};
 
 /**
@@ -997,6 +1078,7 @@ LightSeq1 btl_shuryolight_rod_off = {{{"L_3A", -1}}, NULL};
  * -2 blinks randomly, -3 and -4 are random waits). Runs the table forever in a sibling event.
  */
 EVT_BEGIN(light_anim_rtn)
+    // First head lamp (part 4): play the animation sequence given in LW(6) over and over.
     BEGIN_SIBLING_EVENT
         SET_INT_READ_ADDR(LW(6))
         LOOP(0)
@@ -1048,6 +1130,7 @@ EVT_BEGIN(light_anim_rtn)
             END_IF
         END_LOOP
     END_SIBLING_EVENT
+    // Second head lamp (part 5): play the sequence given in LW(7).
     BEGIN_SIBLING_EVENT
         SET_INT_READ_ADDR(LW(7))
         LOOP(0)
@@ -1099,6 +1182,7 @@ EVT_BEGIN(light_anim_rtn)
             END_IF
         END_LOOP
     END_SIBLING_EVENT
+    // Third head lamp: play the sequence given in LW(8).
     BEGIN_SIBLING_EVENT
         SET_INT_READ_ADDR(LW(8))
         LOOP(0)
@@ -1150,6 +1234,7 @@ EVT_BEGIN(light_anim_rtn)
             END_IF
         END_LOOP
     END_SIBLING_EVENT
+    // Power lamp (part 3): play the sequence given in LW(5), looping in the main event.
     SET_INT_READ_ADDR(LW(5))
     LOOP(0)
         READ_INT(LW(1))
@@ -1264,6 +1349,7 @@ EVT_END()
 EVT_BEGIN(light_pose_change)
     CALL(enzan_lw_save2)
     CALL(btlevtcmd_AnimeGetPose, BTL_UNIT_SELF, 1, LW(0))
+    // Casting poses A_1B and A_1C: the head lamps blink quickly and the power lamp stays steady.
     IF_STR_EQUAL(LW(0), STRING("A_1B"))
         CALL(enzan_lw_save)
         SET_VALUE(LW(5), PTR(&btl_shuryolight_pow_normal))
@@ -1291,6 +1377,7 @@ EVT_BEGIN(light_pose_change)
         SET_VALUE(LW(0), 2)
         GOTO(0)
     END_IF
+    // Other poses (hurt, dizzy, dead and so on) use their own mix of steady, blinking, random or dark lamps.
     IF_STR_EQUAL(LW(0), STRING("H_1"))
         CALL(enzan_lw_save)
         SET_VALUE(LW(5), PTR(&btl_shuryolight_pow_normal))
@@ -1370,13 +1457,14 @@ EVT_BEGIN(light_pose_change)
     SET_VALUE(LW(8), PTR(&btl_shuryolight_head_3_normal))
     SET_VALUE(LW(0), 0)
     LABEL(0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT_EVT, LW(0))
+        // Restart the lamp animation event with the chosen sequences.
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
     CALL(enzan_lw_load2)
@@ -1425,22 +1513,22 @@ static EVT_BEGIN(init_event)
     SET_VALUE(LW(7), PTR(&btl_shuryolight_head_2_normal))
     SET_VALUE(LW(8), PTR(&btl_shuryolight_head_3_normal))
     SET_VALUE(LW(0), 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT, LW(0))
     SPAWN_EVENT_GET_ID(PTR(light_anim_rtn), LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT_EVT, LW(0))
     CALL(enzan_lw_load)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
     SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     CALL(enzan_lw_load)
     CALL(pose_check_evt_run)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, -1)
-    SET_VALUE(LW(0), 9)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HP_STAGE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_SELF_SPELL, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, -1)
+    SET_VALUE(LW(0), UW_BOSS_BATTEN_LEADER_SATELLITE)
     LOOP(4)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(0), -1)
         ADD(LW(0), 1)
@@ -1484,13 +1572,13 @@ EVT_END()
 
 /**
  * Damage event of Sir Grodus: default damage handling, then clears unit work 3,
- * the record of the attack he was in the middle of (his 4 and 5 states are stop-type moves).
+ * which his self-cast Shikaeshi (4) and Yokeyoke (5) spells set; for those it first waits and resets the camera.
  */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL_CHILD(btldefaultevt_Damage)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_SELF_SPELL, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SWITCH(LW(0))
             CASE_EQUAL(4)
@@ -1502,7 +1590,7 @@ static EVT_BEGIN(damage_event)
             CALL(evt_btl_camera_set_mode, 0, 0)
             WAIT_MS(300)
         END_SWITCH
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_SELF_SPELL, 0)
     END_IF
     RETURN
 EVT_END()
@@ -1516,7 +1604,7 @@ EVT_END()
  */
 EVT_BEGIN(damage_sub_event)
 #if VERSION >= VERSION_JP
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(_hp_gauge_flag_on, LW(10))
     END_IF
@@ -1529,28 +1617,28 @@ EVT_BEGIN(damage_sub_event)
     END_IF
     CALL(btlevtcmd_GetDamagePartsId, LW(10), LW(11))
     IF_INT_EQUAL(LW(11), 1)
-        CALL(btlevtcmd_AnimeChangePoseType, LW(10), 1, 39)
+        CALL(btlevtcmd_AnimeChangePoseType, LW(10), 1, BTL_POSE_DAMAGE)
     ELSE
         CALL(enzan_lw_save)
         SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_off))
         SET_VALUE(LW(0), 9)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(1))
         IF_INT_NOT_EQUAL(LW(0), LW(1))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
             DELETE_EVENT(LW(0))
             SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
         END_IF
         CALL(enzan_lw_load)
         CALL(btlevtcmd_AnimeChangePose, LW(10), 1, STRING("D_2"))
     END_IF
     LABEL(90)
-    CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, LW(10), DAMAGE_FLAG_LAST_HIT, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         IF_INT_NOT_EQUAL(LW(11), 1)
             CALL(btlevtcmd_GetTotalDamage, LW(10), LW(0))
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
             IF_INT_LESS(LW(1), 0)
                 SET_VALUE(LW(1), 100)
             ELSE
@@ -1560,7 +1648,7 @@ EVT_BEGIN(damage_sub_event)
                     SET_VALUE(LW(1), 100)
                 END_IF
             END_IF
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
         END_IF
     END_IF
     WAIT_MS(500)
@@ -1596,7 +1684,7 @@ EVT_BEGIN(monster_before_phase_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(0)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HP_STAGE, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
@@ -1604,7 +1692,7 @@ EVT_BEGIN(monster_before_phase_event)
         DIVIDE(LW(0), 100)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HP_STAGE, 1)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
@@ -1622,7 +1710,7 @@ EVT_BEGIN(monster_before_phase_event)
         DIVIDE(LW(0), 100)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 2)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HP_STAGE, 2)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
@@ -1638,14 +1726,14 @@ EVT_BEGIN(monster_before_phase_event)
         DIVIDE(LW(0), 100)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(1))
         IF_INT_LESS_OR_EQUAL(LW(1), LW(0))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 3)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HP_STAGE, 3)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
             CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_furafura))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
             CALL_CHILD(batten_leader_zoom)
             CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-            CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
+            CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
             CALL(evt_msg_print, 2, STRING("stg8_las_68"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
@@ -1663,7 +1751,7 @@ EVT_END()
  */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
-    SET_VALUE(LW(0), 9)
+    SET_VALUE(LW(0), UW_BOSS_BATTEN_LEADER_SATELLITE)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(1))
 #if VERSION >= VERSION_JP
@@ -1673,14 +1761,14 @@ static EVT_BEGIN(dead_event)
 #if VERSION <= VERSION_DEMO_US
             CALL(btlevtcmd_KillUnit, LW(1), 1)
 #else
-            CALL(btlevtcmd_CheckDamageCode, LW(1), 512, LW(2))
+            CALL(btlevtcmd_CheckDamageCode, LW(1), DAMAGE_FLAG_KO, LW(2))
             IF_INT_EQUAL(LW(2), 0)
                 SET_VALUE(LW(10), LW(1))
                 BEGIN_INLINE_EVENT
                     CALL_CHILD(subsetevt_dead_core)
                     CALL(btlevtcmd_GetBodyId, LW(10), LW(11))
-                    CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 16777216)
-                    CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 33554432)
+                    CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), PART_ATTR_HIDDEN)
+                    CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), PART_ATTR_NO_SHADOW)
                 END_INLINE_EVENT
                 WAIT_MS(200)
             END_IF
@@ -1699,13 +1787,13 @@ static EVT_BEGIN(dead_event)
     SET_VALUE(LW(7), PTR(&btl_shuryolight_head_2_off))
     SET_VALUE(LW(8), PTR(&btl_shuryolight_head_3_off))
     SET_VALUE(LW(0), 7)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT_EVT, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_3"))
@@ -1717,9 +1805,9 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_4"))
     WAIT_MS(500)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HEAD_LIGHT_EVT, LW(0))
     DELETE_EVENT(LW(0))
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     DELETE_EVENT(LW(0))
 #if VERSION >= VERSION_JP
     SET_VALUE(LW(10), -2)
@@ -1728,6 +1816,10 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 1 of 1 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn1_1[] = {
     {38.0f, 45.0f, 5.0f},
     {30.4f, -0.6000023f, -5.0f},
@@ -1736,6 +1828,10 @@ static Vec splineTableIn1_1[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 1 of 2 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn2_1[] = {
     {38.0f, 45.0f, 5.0f},
     {30.4f, -0.6000023f, -5.0f},
@@ -1744,6 +1840,10 @@ static Vec splineTableIn2_1[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 2 of 2 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn2_2[] = {
     {-38.0f, 45.0f, 5.0f},
     {-30.4f, 90.600006f, -5.0f},
@@ -1752,6 +1852,10 @@ static Vec splineTableIn2_2[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 1 of 3 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn3_1[] = {
     {0.0f, 83.0f, 5.0f},
     {0.0f, 113.4f, -5.0f},
@@ -1760,6 +1864,10 @@ static Vec splineTableIn3_1[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 2 of 3 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn3_2[] = {
     {38.0f, 7.0f, 5.0f},
     {60.8f, -15.799999f, -5.0f},
@@ -1768,6 +1876,10 @@ static Vec splineTableIn3_2[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 3 of 3 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn3_3[] = {
     {-38.0f, 7.0f, 5.0f},
     {-60.8f, -15.799999f, -5.0f},
@@ -1776,6 +1888,10 @@ static Vec splineTableIn3_3[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 1 of 4 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn4_1[] = {
     {38.0f, 83.0f, 5.0f},
     {45.600002f, 98.2f, -5.0f},
@@ -1784,6 +1900,10 @@ static Vec splineTableIn4_1[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 2 of 4 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn4_2[] = {
     {-38.0f, 83.0f, 5.0f},
     {-45.600002f, 98.2f, -5.0f},
@@ -1792,6 +1912,10 @@ static Vec splineTableIn4_2[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 3 of 4 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn4_3[] = {
     {38.0f, 7.0f, 5.0f},
     {45.600002f, -8.200001f, -5.0f},
@@ -1800,6 +1924,10 @@ static Vec splineTableIn4_3[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/**
+ * Guess: spline path of five control points that Grodus's satellite 4 of 4 follows
+ * when it flies back into place.
+ */
 static Vec splineTableIn4_4[] = {
     {-38.0f, 7.0f, 5.0f},
     {-45.600002f, -8.200001f, -5.0f},
@@ -1808,6 +1936,7 @@ static Vec splineTableIn4_4[] = {
     {0.0f, 45.0f, -5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 1 of 1 follows when it flies out. */
 static Vec splineTableOut1_1[] = {
     {0.0f, 45.0f, -5.0f},
     {-53.2f, -8.200001f, -5.0f},
@@ -1816,6 +1945,7 @@ static Vec splineTableOut1_1[] = {
     {38.0f, 45.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 1 of 2 follows when it flies out. */
 static Vec splineTableOut2_1[] = {
     {0.0f, 45.0f, -5.0f},
     {7.6f, 90.600006f, -5.0f},
@@ -1824,6 +1954,7 @@ static Vec splineTableOut2_1[] = {
     {38.0f, 45.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 2 of 2 follows when it flies out. */
 static Vec splineTableOut2_2[] = {
     {0.0f, 45.0f, -5.0f},
     {-7.6f, -0.6000023f, -5.0f},
@@ -1832,6 +1963,7 @@ static Vec splineTableOut2_2[] = {
     {-38.0f, 45.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 1 of 3 follows when it flies out. */
 static Vec splineTableOut3_1[] = {
     {0.0f, 45.0f, -5.0f},
     {0.0f, 83.0f, -5.0f},
@@ -1840,6 +1972,7 @@ static Vec splineTableOut3_1[] = {
     {0.0f, 83.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 2 of 3 follows when it flies out. */
 static Vec splineTableOut3_2[] = {
     {0.0f, 45.0f, -5.0f},
     {38.0f, 14.6f, -5.0f},
@@ -1848,6 +1981,7 @@ static Vec splineTableOut3_2[] = {
     {38.0f, 7.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 3 of 3 follows when it flies out. */
 static Vec splineTableOut3_3[] = {
     {0.0f, 45.0f, -5.0f},
     {-38.0f, 14.6f, -5.0f},
@@ -1856,6 +1990,7 @@ static Vec splineTableOut3_3[] = {
     {-38.0f, 7.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 1 of 4 follows when it flies out. */
 static Vec splineTableOut4_1[] = {
     {0.0f, 45.0f, -5.0f},
     {38.0f, 75.4f, -5.0f},
@@ -1864,6 +1999,7 @@ static Vec splineTableOut4_1[] = {
     {38.0f, 83.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 2 of 4 follows when it flies out. */
 static Vec splineTableOut4_2[] = {
     {0.0f, 45.0f, -5.0f},
     {-38.0f, 75.4f, -5.0f},
@@ -1872,6 +2008,7 @@ static Vec splineTableOut4_2[] = {
     {-38.0f, 83.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 3 of 4 follows when it flies out. */
 static Vec splineTableOut4_3[] = {
     {0.0f, 45.0f, -5.0f},
     {38.0f, 14.6f, -5.0f},
@@ -1880,6 +2017,7 @@ static Vec splineTableOut4_3[] = {
     {38.0f, 7.0f, 5.0f},
 };
 
+/** Guess: spline path of five control points that Grodus's satellite 4 of 4 follows when it flies out. */
 static Vec splineTableOut4_4[] = {
     {0.0f, 45.0f, -5.0f},
     {-38.0f, 14.6f, -5.0f},
@@ -1893,13 +2031,13 @@ static Vec splineTableOut4_4[] = {
  * so it is drawn blurred while it spins.
  */
 static EVT_BEGIN(satellite_blur_on)
-    SET_VALUE(LW(2), 9)
+    SET_VALUE(LW(2), UW_BOSS_BATTEN_LEADER_SATELLITE)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(2), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
             CALL(btlevtcmd_SetPartsBlur, LW(3), LW(4), 255, 255, 255, 255, 255, 255, 255, 100, 0)
-            CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), 67108864)
+            CALL(btlevtcmd_OnPartsAttribute, LW(3), LW(4), PART_ATTR_BLUR)
         END_IF
         ADD(LW(2), 1)
     END_LOOP
@@ -1908,12 +2046,12 @@ EVT_END()
 
 /** Event script: removes the blur attribute from the satellite in the unit work slot LW(2). */
 static EVT_BEGIN(satellite_blur_off)
-    SET_VALUE(LW(2), 9)
+    SET_VALUE(LW(2), UW_BOSS_BATTEN_LEADER_SATELLITE)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(2), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
-            CALL(btlevtcmd_OffPartsAttribute, LW(3), LW(4), 67108864)
+            CALL(btlevtcmd_OffPartsAttribute, LW(3), LW(4), PART_ATTR_BLUR)
         END_IF
         ADD(LW(2), 1)
     END_LOOP
@@ -1927,7 +2065,7 @@ EVT_END()
  */
 EVT_BEGIN(sub_call_satellite)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(4))
-    SET_VALUE(LW(1), 9)
+    SET_VALUE(LW(1), UW_BOSS_BATTEN_LEADER_SATELLITE)
     SET_VALUE(LW(5), 0)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(2))
@@ -1952,7 +2090,7 @@ EVT_BEGIN(sub_call_satellite)
     CALL(battenSatelliteToOutside, BTL_UNIT_SELF, LW(0))
     WAIT_MS(1000)
     CALL_CHILD(satellite_blur_off)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_NEW_SATELLITES, LW(0))
     RETURN
 EVT_END()
 
@@ -1974,7 +2112,7 @@ EVT_BEGIN(player_before_phase_event)
     CALL(evt_sub_random, 10, LW(0))
     WAIT_FRAMES(LW(0))
     SET_VALUE(LW(0), 0)
-    SET_VALUE(LW(1), 9)
+    SET_VALUE(LW(1), UW_BOSS_BATTEN_LEADER_SATELLITE)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(3))
         IF_INT_NOT_EQUAL(LW(3), -1)
@@ -1989,10 +2127,10 @@ EVT_BEGIN(player_before_phase_event)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_SPLIT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_NEW_SATELLITES, LW(1))
     CALL(battenSatelliteToInside, BTL_UNIT_SELF, LW(1))
     CALL_CHILD(satellite_blur_off)
-    SET_VALUE(LW(1), 9)
+    SET_VALUE(LW(1), UW_BOSS_BATTEN_LEADER_SATELLITE)
     LOOP(3)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(2))
         IF_INT_EQUAL(LW(2), -1)
@@ -2007,7 +2145,7 @@ EVT_BEGIN(player_before_phase_event)
                     ADD(LW(3), 0)
                 END_IF
                 SUBTRACT(LW(3), 0)
-                IF_INT_GREATER(LW(3), 12)
+                IF_INT_GREATER(LW(3), UW_BOSS_BATTEN_LEADER_SATELLITE + 3)
                     ADD(LW(3), 0)
                     BREAK_LOOP
                 END_IF
@@ -2028,10 +2166,11 @@ EVT_BEGIN(player_before_phase_event)
 EVT_END()
 
 /**
- * Attack event of Sir Grodus: when at most one satellite is left he only uses the thunder attack;
+ * Attack event of Sir Grodus: on the first battle turn (turn count at most 1) he only uses the thunder attack;
  * otherwise he draws among the thunder, fire and ice spells,
- * Shikaeshi (Guess: reflects an attack back, from the name), Yokeyoke (Guess: a dodge buff) and the Stop spell,
- * with weights 60, 40, 30, 20, 20 and 20.
+ * Shikaeshi (Payback on himself), Yokeyoke (Dodgy on himself) and the Stop spell, with weights 60, 40, 30, 20,
+ * 20
+ * and 20 (both branches on unit work 1 draw the same).
  */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_get_turn, LW(0))
@@ -2040,7 +2179,7 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(batten_leader_thunder_attack_event)
         GOTO(99)
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(2))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_HP_STAGE, LW(2))
     IF_INT_LESS(LW(2), 2)
         CALL(btlevtcmd_DrawLots, LW(0), 6, 60, 40, 30, 20, 20, 20)
         SWITCH(LW(0))
@@ -2098,6 +2237,7 @@ EVT_END()
  */
 EVT_BEGIN(batten_leader_thunder_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Grodus raises his staff, surrounded by the barrier glow.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -2105,23 +2245,24 @@ EVT_BEGIN(batten_leader_thunder_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He holds the casting pose for two seconds, then casts with the staff lamp lit.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
             CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2134,18 +2275,21 @@ EVT_BEGIN(batten_leader_thunder_attack_event)
         END_IF
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // Lightning bolts crash down across the stage.
     WAIT_MS(500)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_THUNDER1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(evt_eff_pokopi_thunder, -80, 0, 25)
@@ -2168,10 +2312,12 @@ EVT_BEGIN(batten_leader_thunder_attack_event)
         CALL(evt_eff_pokopi_thunder, -160, 0, 25)
         CALL(evt_eff_pokopi_thunder, -80, 0, -25)
     END_INLINE_EVENT
+    // Check every target in turn; the lightning hits those it reaches.
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(0)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        // Find out whether the attack will connect or miss.
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         SWITCH(LW(5))
             CASE_OR_EQUAL(4)
             GOTO(90)
@@ -2193,14 +2339,18 @@ EVT_BEGIN(batten_leader_thunder_attack_event)
             GOTO(98)
             CASE_END
         END_SWITCH
+        // The attack misses or is dodged.
         LABEL(90)
         GOTO(98)
+        // The attack connects.
         LABEL(91)
         IF_INT_EQUAL(LW(10), 0)
             SET_VALUE(LW(10), 1)
+            // Deal the damage, reduced by the action command defence.
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         END_IF
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+        // Wrap up the attack.
         LABEL(98)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_INT_EQUAL(LW(3), -1)
@@ -2218,6 +2368,7 @@ EVT_END()
  */
 EVT_BEGIN(batten_leader_fire_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Grodus raises his staff, surrounded by the barrier glow.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -2225,23 +2376,24 @@ EVT_BEGIN(batten_leader_fire_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He holds the casting pose for two seconds, then casts with the staff lamp lit.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
             CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2254,18 +2406,21 @@ EVT_BEGIN(batten_leader_fire_attack_event)
         END_IF
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // A ball of fire flies at the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_FIRE1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2288,7 +2443,8 @@ EVT_BEGIN(batten_leader_fire_attack_event)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(0)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        // Find out whether the attack will connect or miss.
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         SWITCH(LW(5))
             CASE_OR_EQUAL(4)
             SET_VALUE(LW(6), 90)
@@ -2311,19 +2467,23 @@ EVT_BEGIN(batten_leader_fire_attack_event)
             CASE_END
         END_SWITCH
         GOTO(LW(6))
+        // The attack misses or is dodged.
         LABEL(90)
         GOTO(97)
+        // The attack connects.
         LABEL(91)
         IF_INT_EQUAL(LW(10), 0)
             SET_VALUE(LW(10), 1)
+            // Deal the damage, reduced by the action command defence.
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
             ADD(LW(7), 1)
             BEGIN_SIBLING_EVENT
+                // The blast shakes the camera.
                 CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.005859375f), FLOAT(0.0f), 500)
                 CALL(bts_x_flag_add, 1)
             END_SIBLING_EVENT
         END_IF
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         LABEL(97)
         WAIT_MS(150)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
@@ -2342,6 +2502,7 @@ EVT_END()
  */
 EVT_BEGIN(batten_leader_ice_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Grodus raises his staff, surrounded by the barrier glow.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -2349,23 +2510,24 @@ EVT_BEGIN(batten_leader_ice_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He holds the casting pose for two seconds, then casts with the staff lamp lit.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
             CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2378,19 +2540,22 @@ EVT_BEGIN(batten_leader_ice_attack_event)
         END_IF
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // A blast of ice flies from his staff at the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_ICE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD_FLOAT(LW(0), FLOAT(-52.0f))
@@ -2400,7 +2565,8 @@ EVT_BEGIN(batten_leader_ice_attack_event)
     ADD_FLOAT(LW(7), FLOAT(10.0f))
     CALL(evt_eff64, STRING("ICE_EFF_00"), STRING("opuku_wgun_n64"), 0, LW(0), LW(1), LW(2), LW(5), LW(6), LW(7), FLOAT(1.0f), 9, 0, 0, 0)
     WAIT_MS(150)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -2422,22 +2588,29 @@ EVT_BEGIN(batten_leader_ice_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(300)
     GOTO(98)
+    // The attack connects.
     LABEL(91)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
+    // Wrap up the attack.
     LABEL(98)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 /**
- * Guess: Grodus's "shikaeshi" (retaliation) move:
- * he raises his staff and casts a support effect rather than damaging.
+ * Grodus's "shikaeshi" (retaliation) spell: he raises his staff (staff effect, rod light sequence) and,
+ * unless the fizzle chance in unit work 2 (raised by the damage he takes,
+ * cleared by each spell) turns it into a puff
+ * of smoke, applies weapon_batten_leader_shikaeshi to himself: Payback for 3 turns.
+ * Unit work 3 = 4 tells damage_event to wait and reset the camera.
  */
 EVT_BEGIN(batten_leader_shikaeshi_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -2453,18 +2626,18 @@ EVT_BEGIN(batten_leader_shikaeshi_attack_event)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
             CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2481,12 +2654,16 @@ EVT_BEGIN(batten_leader_shikaeshi_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 400)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 4)
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_SELF_SPELL, 4)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 
-/** Guess: Grodus's "yokeyoke" (dodge) move: he raises his staff and casts a support effect rather than damaging. */
+/**
+ * Grodus's "yokeyoke" (dodge) spell: the same staff cast
+ * and fizzle roll as batten_leader_shikaeshi_attack_event,
+ * applying weapon_batten_leader_yokeyoke to himself: Dodgy for 3 turns (unit work 3 = 5).
+ */
 EVT_BEGIN(batten_leader_yokeyoke_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
@@ -2501,18 +2678,18 @@ EVT_BEGIN(batten_leader_yokeyoke_attack_event)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
             CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2529,8 +2706,8 @@ EVT_BEGIN(batten_leader_yokeyoke_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 400)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 5)
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_SELF_SPELL, 5)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 
@@ -2540,6 +2717,7 @@ EVT_END()
  */
 EVT_BEGIN(batten_leader_stop_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Grodus raises his staff, surrounded by the barrier glow.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(170)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PUTOUT2"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -2547,23 +2725,24 @@ EVT_BEGIN(batten_leader_stop_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
     WAIT_MS(2000)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_SRYO_STUFF_PISECE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He holds the casting pose for two seconds, then casts with the staff lamp lit.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2"))
     WAIT_MS(270)
     CALL(enzan_lw_save)
     SET_VALUE(LW(9), PTR(&btl_shuryolight_rod_normal))
     SET_VALUE(LW(0), 8)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(1))
     IF_INT_NOT_EQUAL(LW(0), LW(1))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
         DELETE_EVENT(LW(0))
         SPAWN_EVENT_GET_ID(PTR(light_rod_anim_rtn), LW(0))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_ROD_LIGHT_EVT, LW(0))
     END_IF
     CALL(enzan_lw_load)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, LW(1))
     IF_INT_GREATER(LW(1), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BATTEN_LEADER_FIZZLE, 0)
         CALL(btlevtcmd_GetRandomValue, 100, LW(2))
         IF_INT_LESS(LW(2), LW(1))
             CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2582,23 +2761,27 @@ EVT_BEGIN(batten_leader_stop_attack_event)
     CALL(evt_eff64, STRING("TIMESTOP_EFF_00"), STRING("timestamp_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 150, 0, 0, 0, 0, 0, 0)
     WAIT_MS(2500)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
+    // Check every target in turn; the time-stop effect catches those it reaches.
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(10), 0)
     LOOP(0)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        // Find out whether the attack will connect or miss.
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         SWITCH(LW(5))
             CASE_OR_EQUAL(4)
             SET_VALUE(LW(6), 90)
@@ -2621,14 +2804,17 @@ EVT_BEGIN(batten_leader_stop_attack_event)
             CASE_END
         END_SWITCH
         GOTO(LW(6))
+        // The attack misses or is dodged.
         LABEL(90)
         GOTO(97)
+        // The attack connects.
         LABEL(91)
         IF_INT_EQUAL(LW(10), 0)
             SET_VALUE(LW(10), 1)
+            // Deal the damage, reduced by the action command defence.
             CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
         END_IF
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
         LABEL(97)
         CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
         IF_INT_EQUAL(LW(3), -1)
@@ -2852,7 +3038,7 @@ USER_FUNC(_hp_gauge_flag_on) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     if (unit != NULL) {
-        unit->hpGauge.flags |= 1;
+        unit->hpGauge.flags |= HP_GAUGE_FADE_OUT;
     }
     return EVT_RETURN_DONE;
 }
@@ -2866,15 +3052,15 @@ static u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
     SatelliteSpline* sp;
 
     sp = BTL_ALLOC(sizeof(SatelliteSpline));
-    if (unit->work[9 + n] == -1) {
+    if (unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE + n] == -1) {
         return FALSE;
     }
-    unit->work[13 + n] = (EvtWord)sp;
+    unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE_SPLINE + n] = (EvtWord)sp;
     sp->numPoints = 5;
     sp->points = table;
     sp->frame = 0;
     spline_maketable(5, sp->points, sp->knots, sp->curvature);
-    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + n]), 1)->work[1] = (EvtWord)table;
+    BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE + n]), 1)->work[1] = (EvtWord)table;
     return TRUE;
 }
 /**
@@ -2888,22 +3074,22 @@ static u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
     Vec upos;
     Vec pos;
 
-    if (unit->work[9 + n] == -1) {
+    if (unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE + n] == -1) {
         return FALSE;
     }
-    sp = (SatelliteSpline*)unit->work[13 + n];
+    sp = (SatelliteSpline*)unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE_SPLINE + n];
     if (sp == NULL) {
         return FALSE;
     }
     if (sp->frame >= 60) {
         if (sp != NULL) {
             BTL_FREE(sp);
-            unit->work[13 + n] = 0;
+            unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE_SPLINE + n] = 0;
         }
         return FALSE;
     }
     spline_getvalue(&pos, intplGetValue(4, 0.0f, 1.0f, sp->frame, 60), sp->numPoints, sp->points, sp->knots, sp->curvature);
-    sat = BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + n]);
+    sat = BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE + n]);
     if (sat == NULL) {
         return FALSE;
     }
@@ -2929,8 +3115,8 @@ static USER_FUNC(battenSatelliteToInside) {
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     if (isFirstCall) {
         for (i = 0; i < 4; i++) {
-            if (unit->work[9 + i] != -1) {
-                EvtWord table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[9 + i]), 1)->work[1];
+            if (unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE + i] != -1) {
+                EvtWord table = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[UW_BOSS_BATTEN_LEADER_SATELLITE + i]), 1)->work[1];
 
                 if (table == (EvtWord)splineTableOut1_1) {
                     battenSatelliteTo_Init(unit, i, splineTableIn1_1);

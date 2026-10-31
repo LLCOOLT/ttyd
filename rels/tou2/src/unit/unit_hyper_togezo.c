@@ -1,4 +1,4 @@
-// unit_hyper_togezo: Hyper Spiny, battle unit.
+// unit_hyper_togezo: Sky-Blue Spiny, battle unit.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -12,6 +12,14 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_snd.h"
+
+// Unit work slots of the Sky-Blue Spiny (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_HYPER_TOGEZO_GUARDING = 0,   // 1 while curled up in its guard
+    UW_HYPER_TOGEZO_SPINNING = 1,   // 1 while the spin loop of its attacks runs
+    UW_HYPER_TOGEZO_SPIN_SPEED = 2, // rotation per frame of that spin
+    UW_HYPER_TOGEZO_CHARGED = 3     // 1 after a charge-up: the next attack is the normal one
+};
 
 BattleUnitKind unit_hyper_togezo;
 static BattleUnitDefense defence;
@@ -38,6 +46,10 @@ static EvtWord guard_cancel_event[89];
 static EvtWord charge_event[102];
 static EvtWord wait_event[6];
 
+/**
+ * Unit data of the Sky-Blue Spiny: 6 HP and level 22, with its parts, status vulnerability, init event and
+ * event data table.
+ */
 BattleUnitKind unit_hyper_togezo = {
     160,
     "btl_un_hyper_togezo",
@@ -104,28 +116,66 @@ BattleUnitKind unit_hyper_togezo = {
     data_table,
 };
 
+/** Defense of the Sky-Blue Spiny against normal, fire, ice, explosion and electric attacks: 4, 4, 4, 4, 4. */
 static BattleUnitDefense defence = {{4, 4, 4, 4, 4}};
 
+/** Damage-type reactions of the Sky-Blue Spiny: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Status vulnerability of the Sky-Blue Spiny (both demos), as the percent chance each status takes hold:
+ * resists 13 statuses (down to 50% of the normal chance).
+ */
 static StatusVulnerability regist = {70, 70, 60, 100, 70, 100, 100, 60, 100, 70, 100, 70, 100, 70, 70, 80, 60, 100, 70, 100, 100, 50};
 #else
+/**
+ * Status vulnerability of the Sky-Blue Spiny (the retail releases), as the percent chance each status
+ * takes hold: resists 13 statuses (down to 10% of the normal chance).
+ */
 static StatusVulnerability regist = {60, 70, 60, 100, 60, 100, 100, 50, 100, 85, 100, 85, 100, 90, 70, 80, 10, 100, 70, 100, 100, 50};
 #endif
 
+/**
+ * Defense of the Sky-Blue Spiny against normal, fire, ice, explosion and electric attacks while it is
+ * flipped onto its back: none, so it takes full damage from every element.
+ */
 static BattleUnitDefense defence_turn = {0};
 
+/**
+ * Damage-type reactions of the Sky-Blue Spiny while it is flipped onto its back: none, so every element
+ * hurts it normally.
+ */
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
+/**
+ * Status vulnerability of the Sky-Blue Spiny while it is flipped onto its back, as the percent chance each
+ * status takes hold: every status lands at the normal rate.
+ */
 static StatusVulnerability regist_turn = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Defence of the Sky-Blue Spiny while it is curled up guarding:
+ * defence 99 against every kind of hit, so no attack does damage.
+ */
 static BattleUnitDefense defence_guard = {{99, 99, 99, 99, 99}};
 
+/**
+ * Damage-type reactions of the Sky-Blue Spiny while it is curled up guarding: immune to normal, fire, ice,
+ * explosion and electric.
+ */
 static BattleUnitDefenseAttr defence_attr_guard = {{2, 2, 2, 2, 2}};
 
+/**
+ * Status vulnerability of the Sky-Blue Spiny while it is curled up guarding, as the percent chance each
+ * status takes hold: every status lands at the normal rate.
+ */
 static StatusVulnerability regist_guard = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Pose table of the Sky-Blue Spiny: maps each battle pose (idle, hurt, attacking and so on) to its
+ * animation, named TGZ_*.
+ */
 static PoseTableEntry pose_table[] = {
     {1, "TGZ_N_1"},
     {2, "TGZ_Y_1"},
@@ -144,6 +194,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "TGZ_S_1"},
 };
 
+/**
+ * Pose table of the Sky-Blue Spiny while it is flipped onto its back: maps each battle pose (idle, hurt,
+ * attacking and so on) to its animation, named TGZ_*.
+ */
 static PoseTableEntry pose_table_turn[] = {
     {1, "TGZ_N_2"},
     {2, "TGZ_Y_2"},
@@ -163,6 +217,10 @@ static PoseTableEntry pose_table_turn[] = {
     {BTL_POSE_STAY_DEFAULT, "TGZ_S_2"},
 };
 
+/**
+ * Pose table of the Sky-Blue Spiny while it is curled up guarding: maps each battle pose (idle, hurt,
+ * attacking and so on) to its animation, named TGZ_*.
+ */
 static PoseTableEntry pose_table_guard[] = {
     {1, "TGZ_P_1"},
     {2, "TGZ_P_1"},
@@ -178,6 +236,10 @@ static PoseTableEntry pose_table_guard[] = {
     {BTL_POSE_STAY_DEFAULT, "TGZ_P_1"},
 };
 
+/**
+ * Event data table of the Sky-Blue Spiny: scripts that replace the standard handling for being flipped
+ * over by a stomp (tag 13) and an attacker being hurt by its spikes (tags 37 and 39).
+ */
 static BattleDataEntry data_table[] = {
     {13, dmg_turn_event},
     {37, dmg_avoid_counter_thorn_event},
@@ -186,12 +248,20 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Event data table of the Sky-Blue Spiny while it is flipped onto its back: scripts that replace the
+ * standard handling for being flipped over by a stomp (tag 13).
+ */
 static BattleDataEntry data_table_turn[] = {
     {13, dmg_turn_event},
     {48, btldefaultevt_Dummy},
     {0},
 };
 
+/**
+ * Event data table of the Sky-Blue Spiny while it is curled up guarding: scripts that replace the standard
+ * handling for an attacker being hurt by its spikes (tags 37 and 39).
+ */
 static BattleDataEntry data_table_guard[] = {
     {37, dmg_avoid_counter_thorn_event},
     {39, dmg_avoid_counter_thorn_event},
@@ -199,10 +269,15 @@ static BattleDataEntry data_table_guard[] = {
     {0},
 };
 
+/**
+ * Parts of the Sky-Blue Spiny: a single body part (part 1, model c_togezo_b), each with its defense
+ * tables, attributes and pose table.
+ */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_hyper_togezo", "c_togezo_b", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x1009, 0x5, pose_table},
 };
 
+/** Weapon record of the Sky-Blue Spiny's rolling attack: 6 damage and counts as a hammer-type hit. */
 static BattleWeapon weapon_togezo_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -221,7 +296,7 @@ static BattleWeapon weapon_togezo_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -243,6 +318,7 @@ static BattleWeapon weapon_togezo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon record of the Sky-Blue Spiny's charge-up: no HP damage. */
 static BattleWeapon weapon_togezo_charge = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -260,7 +336,7 @@ static BattleWeapon weapon_togezo_charge = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -279,7 +355,7 @@ static BattleWeapon weapon_togezo_charge = {
 };
 
 /**
- * Init event of the Hyper Spiny: registers its wait, attack, damage and confusion events,
+ * Init event of the Sky-Blue Spiny: registers its wait, attack, damage and confusion events,
  * clears unit work 0 (guarding) and 3 (charged), and sets its run, walk and jump sounds,
  * then starts the wait event.
  */
@@ -288,8 +364,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_GUARDING, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_CHARGED, 0)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEZO_MOVE1L"), STRING("SFX_ENM_TOGEZO_MOVE1R"), 0, 10, 10)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEZO_MOVE1L"), STRING("SFX_ENM_TOGEZO_MOVE1R"), 0, 6, 6)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_ENM_KURI_JUMP1"), STRING("SFX_ENM_KURI_LANDING1"))
@@ -298,18 +374,19 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 /**
- * Data event 37 (the thorn counter): after 30 frames flashes the "toge_flush" spike effect above the unit,
+ * Data event 39 (damage code 33, run when an attacker is hurt by its spikes):
+ * after 30 frames flashes the "toge_flush" spike effect above the unit,
  * 45 units up when Huge (status 10), 25 when Tiny (status 11) and 35 otherwise.
  */
 static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 10, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_HUGE, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 45)
         GOTO(90)
     END_IF
-    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(3))
+    CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, STATUS_TINY, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
         ADD(LW(1), 25)
         GOTO(90)
@@ -330,7 +407,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Data event 13 (the Hyper Spiny is flipped over):
+ * Data event 13 (the Sky-Blue Spiny is flipped over):
  * switches to the flipped defence, attribute, status-resist, pose and data tables,
  * sets STATUS_FLAG_FLIPPED with the over-turn counter at 1 and removes its counterattack attributes,
  * plays the "inside" sound and hops twice.
@@ -342,12 +419,12 @@ static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr_turn))
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
-    CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), LW(11), 1)
-    CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), LW(11), 4)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
+    CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), LW(11), COUNTER_ATTR_TOP_SPIKY)
+    CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), LW(11), COUNTER_ATTR_FRONT_SPIKY)
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table_turn))
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 1)
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_DAMAGE)
     CALL(evt_snd_sfxon, STRING("SFX_CONDITION_INSIDE"), 0)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -357,7 +434,7 @@ static EVT_BEGIN(dmg_turn_event)
 EVT_END()
 
 /**
- * Runs in place of a flipped Hyper Spiny's attack: counts the over-turn counter down;
+ * Runs in place of a flipped Sky-Blue Spiny's attack: counts the over-turn counter down;
  * at zero it restores the upright tables, clears STATUS_FLAG_FLIPPED,
  * turns the counterattack attributes back on and hops back on its feet.
  */
@@ -374,10 +451,10 @@ static EVT_BEGIN(wakeup_event)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr))
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
-    CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), 1)
-    CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), 4)
+    CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), COUNTER_ATTR_TOP_SPIKY)
+    CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), COUNTER_ATTR_FRONT_SPIKY)
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table))
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
@@ -388,7 +465,7 @@ static EVT_BEGIN(wakeup_event)
 EVT_END()
 
 /**
- * Attack event of the Hyper Spiny: a flipped unit runs wakeup_event;
+ * Attack event of the Sky-Blue Spiny: a flipped unit runs wakeup_event;
  * otherwise it uses an enemy item if one fits.
  * While curled up guarding (unit work 0 = 1) it runs guard_cancel_event;
  * after a charge (unit work 3 = 1) it does the rolling attack.
@@ -408,14 +485,14 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_GUARDING, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL_CHILD(guard_cancel_event)
         GOTO(99)
     ELSE
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_CHARGED, LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_CHARGED, 0)
             CALL_CHILD(normal_attack_event)
             GOTO(99)
         END_IF
@@ -431,7 +508,7 @@ static EVT_BEGIN(attack_event)
             CASE_EQUAL(1)
             CALL_CHILD(guard_event)
             CASE_EQUAL(2)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_CHARGED, 1)
             SET_VALUE(LW(9), PTR(&weapon_togezo_charge))
             CALL_CHILD(charge_event)
         END_SWITCH
@@ -442,7 +519,7 @@ static EVT_BEGIN(attack_event)
 EVT_END()
 
 /**
- * The Hyper Spiny's rolling attack (weapon_togezo_attack):
+ * The Sky-Blue Spiny's rolling attack (weapon_togezo_attack):
  * it curls up with the turn sounds, spins faster and faster and rolls along the floor into the target.
  * A miss rolls past and winds down; a hit shakes the camera,
  * knocks the target and the Spiny rebounds in two hops.
@@ -451,6 +528,7 @@ EVT_END()
  * otherwise it unrolls, returns home and stands up.
  */
 static EVT_BEGIN(normal_attack_event)
+    // Use the target of the opening first attack if there was one, otherwise choose a target.
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -460,7 +538,7 @@ static EVT_BEGIN(normal_attack_event)
         CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_togezo_attack), LW(3), LW(4))
     END_IF
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
@@ -468,6 +546,7 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_togezo_attack))
+    // The attack is announced.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, PTR(&weapon_togezo_attack))
@@ -477,6 +556,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(14))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(14))
+    // The Spiny curls up into a spiky ball, spinning faster and faster.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEZO_TURN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 15, 0)
@@ -494,22 +574,23 @@ static EVT_BEGIN(normal_attack_event)
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_FRAMES(5)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPINNING, 1)
     SET_VALUE(LW(0), -36)
     MULTIPLY(LW(0), LW(14))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPINNING, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 BREAK_LOOP
             END_IF
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(0))
             WAIT_FRAMES(1)
         END_LOOP
     END_SIBLING_EVENT
     WAIT_FRAMES(10)
+    // It hops up and rolls across the stage toward the target.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEZO_ROLL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 30, 0, FLOAT(0.14941406f))
@@ -518,6 +599,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(9.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0, 1)
+    // Find out how the target reacts to the rolling Spiny.
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togezo_attack), 0, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
@@ -540,16 +622,17 @@ static EVT_BEGIN(normal_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The roll missed: the Spiny rolls on past the target, slowing to a stop.
     LABEL(90)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEZO_ROLL5"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         SET_VALUE(LW(0), -18)
         MULTIPLY(LW(0), LW(14))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
         SET_VALUE(LW(0), 1)
         MULTIPLY(LW(0), LW(14))
         LOOP(18)
-            CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
             WAIT_FRAMES(3)
         END_LOOP
     END_SIBLING_EVENT
@@ -559,9 +642,10 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 26)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPINNING, 0)
     WAIT_FRAMES(10)
     GOTO(97)
+    // The roll connects: the damage is applied and the Spiny bounces back in two hops, still spinning.
     LABEL(91)
     CALL(evt_btl_camera_shake_h, 0, 1, 1, 8, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -571,7 +655,7 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_togezo_attack), 256, LW(5))
     SET_VALUE(LW(0), 36)
     MULTIPLY(LW(0), LW(14))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, -36)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, -36)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 30)
     ADD(LW(2), 10)
@@ -586,11 +670,11 @@ static EVT_BEGIN(normal_attack_event)
     BEGIN_SIBLING_EVENT
         SET_VALUE(LW(0), 18)
         MULTIPLY(LW(0), LW(14))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
         SET_VALUE(LW(0), -1)
         MULTIPLY(LW(0), LW(14))
         LOOP(18)
-            CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
             WAIT_FRAMES(2)
         END_LOOP
     END_SIBLING_EVENT
@@ -602,7 +686,7 @@ static EVT_BEGIN(normal_attack_event)
     ADD(LW(2), 5)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(0.5f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, 0, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPINNING, 0)
     WAIT_FRAMES(3)
     CALL(evt_sub_random, 99, LW(0))
     IF_INT_LESS(LW(0), 50)
@@ -610,6 +694,7 @@ static EVT_BEGIN(normal_attack_event)
     ELSE
         GOTO(97)
     END_IF
+    // The Spiny uncurls with a spin and runs back to its home position.
     LABEL(97)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEZO_TURN2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -629,27 +714,28 @@ static EVT_BEGIN(normal_attack_event)
     END_LOOP
     WAIT_FRAMES(5)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("TGZ_S_1"))
     WAIT_MS(250)
     GOTO(99)
+    // It curls up and rolls back home.
     LABEL(98)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEZO_ROLL3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPINNING, 1)
     SET_VALUE(LW(0), 36)
     MULTIPLY(LW(0), LW(14))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
     BEGIN_SIBLING_EVENT
         LOOP(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPINNING, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 BREAK_LOOP
             END_IF
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPIN_SPEED, LW(0))
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(0))
             WAIT_FRAMES(1)
         END_LOOP
@@ -658,14 +744,15 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_SPINNING, 0)
+    // It ends in its guarded ball form, using its spiked-ball defense, status and pose tables until its next turn.
     CALL(btlevtcmd_SetPartsDefenceTable, BTL_UNIT_SELF, 1, PTR(&defence_guard))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, BTL_UNIT_SELF, 1, PTR(&defence_attr_guard))
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_guard))
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_guard))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_guard))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4096)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_SHELLED)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_HYPER_TOGEZO_GUARDING, 1)
     WAIT_MS(250)
     GOTO(99)
     LABEL(99)
@@ -674,7 +761,7 @@ static EVT_BEGIN(normal_attack_event)
 EVT_END()
 
 /**
- * The Hyper Spiny curls up to guard: spins into its ball pose "TGZ_P_1", switches to the guard defence,
+ * The Sky-Blue Spiny curls up to guard: spins into its ball pose "TGZ_P_1", switches to the guard defence,
  * attribute, status-resist, pose and data tables and sets unit work 0 to 1.
  */
 static EVT_BEGIN(guard_event)
@@ -699,13 +786,13 @@ static EVT_BEGIN(guard_event)
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist_guard))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_guard))
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table_guard))
-    CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 4096)
-    CALL(btlevtcmd_SetUnitWork, LW(10), 0, 1)
+    CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), PART_ATTR_SHELLED)
+    CALL(btlevtcmd_SetUnitWork, LW(10), UW_HYPER_TOGEZO_GUARDING, 1)
     RETURN
 EVT_END()
 
 /**
- * The Hyper Spiny uncurls: spins back to "TGZ_S_1", restores the normal defence, attribute, status-resist,
+ * The Sky-Blue Spiny uncurls: spins back to "TGZ_S_1", restores the normal defence, attribute, status-resist,
  * pose and data tables and sets unit work 0 to 0.
  */
 static EVT_BEGIN(guard_cancel_event)
@@ -729,16 +816,16 @@ static EVT_BEGIN(guard_cancel_event)
     CALL(btlevtcmd_SetRegistStatus, LW(10), PTR(&regist))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table))
-    CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 4096)
-    CALL(btlevtcmd_SetUnitWork, LW(10), 0, 0)
+    CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), PART_ATTR_SHELLED)
+    CALL(btlevtcmd_SetUnitWork, LW(10), UW_HYPER_TOGEZO_GUARDING, 0)
     RETURN
 EVT_END()
 
 /**
- * Guess: the Hyper Spiny charges up: pays the weapon cost (LW(9) is weapon_togezo_charge), zooms in,
- * plays the charge sound and a "crystal_n64" crystal effect for a second,
- * hops once and applies the weapon to itself (CheckDamage with itself as the target) to give itself the charge
- * status.
+ * The Sky-Blue Spiny charges up (weapon_togezo_charge in LW(9): charge +6 on itself):
+ * it pays the weapon cost, the camera homes in (zoom 300),
+ * and after 40 frames the charge sound plays with a "crystal_n64" effect over it;
+ * a second later it hops once while the weapon is applied to itself.
  */
 static EVT_BEGIN(charge_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))

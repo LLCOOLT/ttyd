@@ -1,4 +1,4 @@
-// Palace of Shadow battle unit: the Doopliss (Shadow Sirens rematch, transformed) (`boss_rampell_las`): parts, stats, poses and AI scripts.
+// Palace of Shadow battle unit: Doopliss (Shadow Sirens rematch, transformed) (`boss_rampell_las`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "eff/eff_scanning.h"
@@ -30,6 +30,22 @@
 #include "evt/evt_snd.h"
 #include "las.h"
 #include "version.h"
+
+// Unit work slots of Doopliss (slots read on the other Shadow Sirens stay raw).
+enum {
+    UW_BOSS_RAMPELL_LAS_VIVIAN_HIDING = 3,       // Vivian form: her hiding-in-shadow flag (from her partner script); cleared here
+    UW_BOSS_RAMPELL_LAS_SIREN_RANK = 4,          // his spot in the Sirens' HP order, where he stands
+    UW_BOSS_RAMPELL_LAS_SIREN_RANK_NEW = 5,      // his new spot, from majo_unison_phase_event (the Koops form's shubibin attack also clears it)
+    UW_BOSS_RAMPELL_LAS_LOW_HP_NOTED = 6,        // set by Beldam once she has remarked on his low HP
+    UW_BOSS_RAMPELL_LAS_SIREN_ANGRY = 7,         // set by Beldam when she is low on HP; not read in this file
+    UW_BOSS_RAMPELL_LAS_SHELL_SPINNING = 8,      // Koops form: 1 while the shell spins
+    UW_BOSS_RAMPELL_LAS_SHELL_SPIN_SPEED = 9,    // Koops form: top spin speed; its sign is the direction
+    UW_BOSS_RAMPELL_LAS_SHELL_SPIN_REVERSE = 10, // Koops form: set to reverse the spin
+    UW_BOSS_RAMPELL_LAS_UNUSED_11 = 11,          // Koops form: cleared at init with the shell-spin slots; nothing reads it
+    UW_BOSS_RAMPELL_LAS_FORM = 12,               // copied character: 0 himself, 1 Mario, 2-8 Goombella, Koops, Yoshi, Flurrie, Vivian, Bobbery, Ms. Mowz
+    UW_BOSS_RAMPELL_LAS_HAS_ATTACKED = 13,       // 1 once he has attacked in his own form; he transforms only after that
+    UW_BOSS_RAMPELL_LAS_SHADOW_TAIL_EVENT = 14,  // Vivian form: id of vivian_shadow_tail_event, deleted when he transforms
+};
 
 #if VERSION >= VERSION_JP
 USER_FUNC(mario_shadow_guard_check);
@@ -181,6 +197,10 @@ extern EvtWord attack_event_chuchurina[];
 extern EvtWord attack_event_chuchurina_normal[];
 extern EvtWord wait_event_chuchurina[];
 
+/**
+ * Unit data of Doopliss in his own form in the Palace of Shadow: 40 HP, level 57;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_boss_rampell_las = {
     135,
     "btl_un_rampell",
@@ -247,16 +267,39 @@ BattleUnitKind unit_boss_rampell_las = {
     data_table,
 };
 
+/**
+ * Defence of Doopliss in his own form against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of Doopliss in his own form per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss in his own form:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss in his own form:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Pose table of Doopliss in his own form: animation names for each pose type (idle, walk, hurt, attack and
+ * so on).
+ */
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
     {2, "Y_1"},
@@ -264,29 +307,35 @@ static PoseTableEntry pose_table[] = {
     {5, "K_1"},
     {4, "X_1"},
     {3, "K_1"},
-    {28, "S_1"},
+    {BTL_POSE_NORMAL, "S_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_1"},
-    {39, "D_1"},
+    {BTL_POSE_DAMAGE, "D_1"},
     {50, "A_2"},
-    {42, "R_1"},
-    {40, "W_1"},
-    {56, "X_1"},
-    {57, "X_1"},
+    {BTL_POSE_RUN, "R_1"},
+    {BTL_POSE_WALK, "W_1"},
+    {BTL_POSE_DANGER, "X_1"},
+    {BTL_POSE_PERIL, "X_1"},
     {BTL_POSE_TALK, "T_1"},
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Data table of Doopliss in his own form: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/** Part of Doopliss in his own form: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_rampell", "c_ranpel", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+    {1, "btl_un_rampell", "c_ranpel", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, pose_table},
 };
 
+/** Weapon of Doopliss's own attack: damage 6. */
 static BattleWeapon weapon_rampell_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -305,7 +354,7 @@ static BattleWeapon weapon_rampell_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -323,6 +372,7 @@ static BattleWeapon weapon_rampell_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Setup used to spawn Marilyn: unit kind, alliance, position and turn phase. */
 static BattleUnitSetup entry_marilyn = {
     &unit_boss_marilyn_las, // unitKindParams
     1, // alliance
@@ -334,6 +384,7 @@ static BattleUnitSetup entry_marilyn = {
     NULL, // itemDropTable
 };
 
+/** Setup used to spawn Beldam: unit kind, alliance, position and turn phase. */
 static BattleUnitSetup entry_majolyne = {
     &unit_boss_majolyne_las, // unitKindParams
     1, // alliance
@@ -355,7 +406,7 @@ static BattleUnitSetup entry_majolyne = {
  * He copies Mario when he is not currently Mario, otherwise the partner.
  */
 EVT_BEGIN(mutate_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 12, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(evt_sub_random, 1, LW(5))
@@ -364,19 +415,19 @@ EVT_BEGIN(mutate_event)
         CASE_DEFAULT
         CALL(btlevtcmd_GetUnitKind, BTL_UNIT_PARTNER, LW(2))
         SWITCH(LW(2))
-            CASE_EQUAL(224)
+            CASE_EQUAL(UNIT_GOOMBELLA)
             SET_VALUE(LW(1), 2)
-            CASE_EQUAL(225)
+            CASE_EQUAL(UNIT_KOOPS)
             SET_VALUE(LW(1), 3)
-            CASE_EQUAL(226)
+            CASE_EQUAL(UNIT_YOSHI)
             SET_VALUE(LW(1), 4)
-            CASE_EQUAL(227)
+            CASE_EQUAL(UNIT_FLURRIE)
             SET_VALUE(LW(1), 5)
-            CASE_EQUAL(228)
+            CASE_EQUAL(UNIT_VIVIAN)
             SET_VALUE(LW(1), 6)
-            CASE_EQUAL(229)
+            CASE_EQUAL(UNIT_BOBBERY)
             SET_VALUE(LW(1), 7)
-            CASE_EQUAL(230)
+            CASE_EQUAL(UNIT_MS_MOWZ)
             SET_VALUE(LW(1), 8)
         END_SWITCH
         IF_INT_EQUAL(LW(0), LW(1))
@@ -385,18 +436,20 @@ EVT_BEGIN(mutate_event)
             CALL(evt_sub_random, 1, LW(5))
         END_IF
     END_SWITCH
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 14, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHADOW_TAIL_EVENT, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 14, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHADOW_TAIL_EVENT, 0)
         DELETE_EVENT(LW(0))
     END_IF
+    // The camera moves in on Doopliss.
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(10), EVT_NULLPTR, EVT_NULLPTR)
     CALL(evt_btl_camera_set_moveto, 0, LW(10), 65, 332, LW(10), 30, -340, 30, 11)
     WAIT_FRAMES(37)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 12, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_RNPL_ARM_UP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        // He strikes a pose and flashes his eyes.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_3A"))
         WAIT_MS(600)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_RNPL_ARM_UP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -432,14 +485,16 @@ EVT_BEGIN(mutate_event)
     ADD(LW(2), 5)
     CALL(evt_eff, STRING(""), STRING("kemuri_test"), 7, LW(0), LW(1), LW(2), FLOAT(2.0f), 0, 0, 0, 0, 0, 0, 0)
     WAIT_MS(200)
+    // He vanishes in a puff of smoke and is moved off the stage.
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, -1000, -1000, 0)
     WAIT_MS(500)
+    // The scan effect sweeps over Mario or the current partner and the transformation sounds play.
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, -110, 65, 332, -110, 30, -340, 30, 11)
     WAIT_FRAMES(37)
     SWITCH(LW(5))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 1)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 1)
         CALL(btlevtcmd_GetPos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
         ADD(LW(0), 2)
         ADD(LW(1), -5)
@@ -454,6 +509,7 @@ EVT_BEGIN(mutate_event)
         CALL(evt_btl_camera_set_mode, 0, 3)
         CALL(evt_btl_camera_set_moveto, 0, LW(10), 65, 332, LW(10), 30, -340, 30, 11)
         WAIT_FRAMES(37)
+        // If he is copying Mario, he rebuilds himself as a fake Mario.
         CALL_CHILD(init_event_fmario)
         CASE_EQUAL(1)
         CALL(btlevtcmd_GetPos, BTL_UNIT_PARTNER, LW(0), LW(1), LW(2))
@@ -472,26 +528,27 @@ EVT_BEGIN(mutate_event)
         WAIT_FRAMES(37)
         CALL(btlevtcmd_GetUnitKind, BTL_UNIT_PARTNER, LW(0))
         SWITCH(LW(0))
-            CASE_EQUAL(224)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 2)
+            CASE_EQUAL(UNIT_GOOMBELLA)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 2)
+            // Otherwise he rebuilds himself as the current partner, Goombella to Ms. Mowz.
             CALL_CHILD(init_event_christine)
-            CASE_EQUAL(225)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 3)
+            CASE_EQUAL(UNIT_KOOPS)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 3)
             CALL_CHILD(init_event_nokotarou)
-            CASE_EQUAL(226)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 4)
+            CASE_EQUAL(UNIT_YOSHI)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 4)
             CALL_CHILD(init_event_yoshi)
-            CASE_EQUAL(227)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 5)
+            CASE_EQUAL(UNIT_FLURRIE)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 5)
             CALL_CHILD(init_event_clauda)
-            CASE_EQUAL(228)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 6)
+            CASE_EQUAL(UNIT_VIVIAN)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 6)
             CALL_CHILD(init_event_vivian)
-            CASE_EQUAL(229)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 7)
+            CASE_EQUAL(UNIT_BOBBERY)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 7)
             CALL_CHILD(init_event_sanders)
-            CASE_EQUAL(230)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 8)
+            CASE_EQUAL(UNIT_MS_MOWZ)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 8)
             CALL_CHILD(init_event_chuchurina)
         END_SWITCH
     END_SWITCH
@@ -499,6 +556,7 @@ EVT_BEGIN(mutate_event)
     CALL(evt_sub_intpl_msec_init, 11, -50, 0, 1000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+        // He rises out of the floor in his new shape.
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(5), LW(0), LW(7))
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
@@ -506,7 +564,7 @@ EVT_BEGIN(mutate_event)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
-    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
+    CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY)
     CALL(evt_btl_camera_set_mode, 0, 0)
     RETURN
 EVT_END()
@@ -523,13 +581,13 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(entry_event))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 13, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 14, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SIREN_RANK, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SIREN_RANK_NEW, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_LOW_HP_NOTED, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SIREN_ANGRY, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_HAS_ATTACKED, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHADOW_TAIL_EVENT, 0)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, GW(10))
     CALL(btlevtcmd_SpawnUnit, GW(9), PTR(&entry_marilyn), 0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -584,11 +642,11 @@ static EVT_BEGIN(entry_event)
 EVT_END()
 
 /**
- * Damage event of the Doopliss forms: runs the default damage handling only
- * when the damage code 1024 is set (Guess: the damage that can defeat him); other hits do nothing to his HP.
+ * Damage event of the Doopliss forms: when the hit defeats him (damage flag 0x400) sets GW(13) = 1 (he is going
+ * down; the Sirens' scripts check it), then runs the default damage handling for every hit.
  */
 static EVT_BEGIN(damage_event)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(13), 1)
     END_IF
@@ -618,28 +676,31 @@ static EVT_BEGIN(dead_event)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        // He walks back to his place.
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
     CALL(btlevtcmd_WaitAttackEnd)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_GetUnitKind, BTL_UNIT_SELF, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 135)
+    IF_INT_NOT_EQUAL(LW(0), UNIT_DOOPLISS_CHAPTER8)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         ADD(LW(2), 5)
         CALL(evt_eff, STRING(""), STRING("kemuri_test"), 7, LW(0), LW(1), LW(2), FLOAT(2.0f), 0, 0, 0, 0, 0, 0, 0)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_RNPL_TRANSFORM4"), EVT_NULLPTR, 0, EVT_NULLPTR)
         WAIT_MS(300)
+        // He returns to his own look: the pose table, status table and wait event are restored.
         CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table))
         CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table))
         CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts), 1)
-        CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 135)
+        CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8)
         CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist))
         CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
-        CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+        CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
         CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     END_IF
+    // He sinks into his defeat pose.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_2"))
     CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("D_2"))
     CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("D_2"))
@@ -680,6 +741,7 @@ static EVT_BEGIN(dead_event)
             CASE_EQUAL(2)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             CALL_CHILD(btl_vivian_zoom)
+            // If a Siren is already down, he cries out in despair.
             CALL(evt_msg_print, 2, STRING("btl_majo3_13"), 0, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             GOTO(90)
@@ -687,6 +749,7 @@ static EVT_BEGIN(dead_event)
     END_SWITCH
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL_CHILD(btl_vivian_zoom)
+    // Otherwise he gasps that it is bad news.
     CALL(evt_msg_print, 2, STRING("btl_majo3_10"), 0, BTL_UNIT_SELF)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     LABEL(90)
@@ -694,6 +757,7 @@ static EVT_BEGIN(dead_event)
     LABEL(99)
     SET_VALUE(GW(13), 2)
     SET_VALUE(LW(10), -2)
+    // The slow death sequence plays out.
     CALL_CHILD(subsetevt_dead_core_nospin_norotate)
     RETURN
 EVT_END()
@@ -709,10 +773,10 @@ static EVT_BEGIN(unison_phase_event)
     IF_INT_NOT_EQUAL(LW(0), 0)
         DEBUG_PUT_MSG(STRING("ランペル　ユニゾンフェーズ"))
         CALL_CHILD(majo_unison_phase_event)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(4))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SIREN_RANK, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SIREN_RANK_NEW, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SIREN_RANK, LW(4))
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             WAIT_MS(500)
             SWITCH(LW(4))
@@ -747,13 +811,13 @@ static EVT_BEGIN(phase_event)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 13, LW(0))
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_HAS_ATTACKED, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
 #if VERSION >= VERSION_JP
                 CALL(mario_shadow_guard_check, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
 #endif
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 12, LW(0))
+                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_FORM, LW(0))
                     IF_INT_EQUAL(LW(0), 0)
                         CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
                         CALL_CHILD(mutate_event)
@@ -786,7 +850,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 13, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_HAS_ATTACKED, 1)
     SET_VALUE(LW(9), PTR(&weapon_rampell_attack))
     CALL_CHILD(ogg_attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -800,16 +864,18 @@ EVT_END()
  */
 static EVT_BEGIN(ogg_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -817,11 +883,13 @@ static EVT_BEGIN(ogg_attack_event)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // Doopliss walks up to the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(2.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    // He winds up and lunges at it.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1A"))
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_1B"))
@@ -838,6 +906,7 @@ static EVT_BEGIN(ogg_attack_event)
         WAIT_FRAMES(15)
         CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(1.0f))
     END_SIBLING_EVENT
+    // He dives at the target.
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 50, 7, 4, 0, -1)
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(0.75f))
     WAIT_MS(200)
@@ -861,7 +930,8 @@ static EVT_BEGIN(ogg_attack_event)
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(2.0f))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.009765625f))
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 15, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -883,23 +953,27 @@ static EVT_BEGIN(ogg_attack_event)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_RNPL_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(2.0f))
+    // After the blow he staggers back.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_2"))
     WAIT_MS(200)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("O_1"))
     WAIT_MS(800)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_2"))
     GOTO(98)
+    // The attack connects.
     LABEL(91)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
 #if VERSION >= VERSION_JP
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(1.0f))
 #endif
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
 #if VERSION >= VERSION_JP
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(2.0f))
 #endif
@@ -916,6 +990,7 @@ static EVT_BEGIN(ogg_attack_event)
         END_LOOP
     END_SIBLING_EVENT
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(1.0f))
+    // He hops back.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), 60)
@@ -926,10 +1001,12 @@ static EVT_BEGIN(ogg_attack_event)
     WAIT_MS(200)
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(2.0f))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
+    // Return to its place.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(1.0f))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
@@ -942,16 +1019,36 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Defence of Doopliss as Mario against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence_fmario = {0};
 
+/**
+ * Damage modifiers of Doopliss as Mario per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr_fmario = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Mario:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist_fmario = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Mario:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist_fmario = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/** Pose table of Doopliss as Mario while standing in place: animation names for each pose type. */
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
     {2, "EM_Y_2"},
@@ -959,22 +1056,27 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {5, "EM_K_1"},
     {4, "EM_K_1"},
     {3, "EM_K_1"},
-    {28, "EM_S_1"},
-    {39, "EM_D_1"},
+    {BTL_POSE_NORMAL, "EM_S_1"},
+    {BTL_POSE_DAMAGE, "EM_D_1"},
     {50, "EM_A_1"},
-    {42, "EM_R_1"},
-    {40, "EM_W_1"},
-    {56, "EM_D_3"},
-    {57, "EM_D_3"},
+    {BTL_POSE_RUN, "EM_R_1"},
+    {BTL_POSE_WALK, "EM_W_1"},
+    {BTL_POSE_DANGER, "EM_D_3"},
+    {BTL_POSE_PERIL, "EM_D_3"},
     {BTL_POSE_TALK, "EM_T_1"},
     {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
+/**
+ * Data table of Doopliss as Mario: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table_fmario[] = {
     {49, dead_event_fmario},
     {0},
 };
 
+/** Part of Doopliss as Mario: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts_fmario[] = {
     {
         1, // partNum
@@ -994,6 +1096,7 @@ static BattleUnitKindPart parts_fmario[] = {
     },
 };
 
+/** Weapon of Doopliss's jump as Mario: damage 6. */
 static BattleWeapon weapon_masao_jump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1012,7 +1115,7 @@ static BattleWeapon weapon_masao_jump = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1030,6 +1133,7 @@ static BattleWeapon weapon_masao_jump = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Doopliss's hammer swing as Mario: damage 6. */
 static BattleWeapon weapon_masao_hammer = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1048,7 +1152,7 @@ static BattleWeapon weapon_masao_hammer = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1070,6 +1174,7 @@ static BattleWeapon weapon_masao_hammer = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Doopliss's spin jump as Mario: damage 8. */
 static BattleWeapon weapon_masao_kururin_jump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1088,7 +1193,7 @@ static BattleWeapon weapon_masao_kururin_jump = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1106,6 +1211,7 @@ static BattleWeapon weapon_masao_kururin_jump = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Doopliss's spinning hammer as Mario: damage 8. */
 static BattleWeapon weapon_masao_kaiten_hammer = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1124,7 +1230,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1186,13 +1292,13 @@ static EVT_BEGIN(init_event_fmario)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_fmario_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_fmario))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_fmario), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 136)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_MARIO)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_fmario))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_fmario))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_fmario))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     SET_VALUE(GW(17), -1)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_MOVE1L"), STRING("SFX_BOSS_NM_MOVE1R"), 0, 20, 20)
@@ -1215,7 +1321,7 @@ static EVT_BEGIN(dead_event_fmario)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -1280,16 +1386,18 @@ EVT_END()
 static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1297,7 +1405,8 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // The fake Mario runs up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(6))
@@ -1310,8 +1419,9 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL_CHILD(jump_attack_voice)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He leaps and stomps on the target.
     CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1333,32 +1443,39 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He pauses after the stomp.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_D_2"))
     WAIT_FRAMES(40)
     GOTO(98)
+    // The attack connects.
     LABEL(91)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
+    // He hops off the target.
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    // Return to its place.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -1372,16 +1489,18 @@ EVT_END()
 static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1389,7 +1508,8 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // The fake Mario runs up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(6))
@@ -1402,8 +1522,9 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL_CHILD(jump_attack_voice)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He leaps for the first stomp.
     CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 0, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1425,27 +1546,33 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_DOWN1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // He pauses after the stomp.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_D_2"))
     WAIT_FRAMES(40)
     GOTO(98)
+    // The attack connects.
     LABEL(91)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
         ADD(LW(2), 5)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
         CALL_CHILD(jump_attack_voice)
+        // He jumps again.
         CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 0, -1)
     END_SIBLING_EVENT
     WAIT_FRAMES(15)
     DELETE_EVENT(LW(14))
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(15))
     MULTIPLY(LW(15), -30)
+    // At the top of the jump he spins.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_Z_2"))
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 12, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -1459,26 +1586,30 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     WAIT_FRAMES(15)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+    // He drops onto the target.
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 4, 0, 0, 0, -1)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_J_1B"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
+    // He hops off the target.
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    // Return to its place.
     LABEL(98)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -1491,16 +1622,18 @@ EVT_END()
  */
 static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1508,7 +1641,8 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 100)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // The fake Mario runs up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 24)
@@ -1521,17 +1655,20 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // He raises his hammer overhead.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1A"))
     WAIT_MS(66)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_FURU2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_MS(233)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1B"))
     WAIT_MS(500)
+    // He swings it down on the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1C"))
     WAIT_MS(50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_DON2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_MS(100)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1553,11 +1690,15 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     GOTO(98)
+    // The attack connects.
     LABEL(91)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // Return to its place.
     LABEL(98)
     WAIT_MS(700)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_S_1"))
@@ -1566,8 +1707,9 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -1580,16 +1722,18 @@ EVT_END()
  */
 static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
         RETURN
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
@@ -1597,7 +1741,8 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 100)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // The fake Mario runs up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 24)
@@ -1610,17 +1755,20 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
+    // He raises his hammer overhead.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1A"))
     WAIT_MS(66)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_FURU2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_MS(233)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1B"))
     WAIT_MS(500)
+    // He spins and swings it round at the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_A_1C"))
     WAIT_MS(50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_NM_HAMMER_DON2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     WAIT_MS(100)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -1642,11 +1790,15 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
         GOTO(98)
         CASE_END
     END_SWITCH
+    // The attack misses or is dodged.
     LABEL(90)
     GOTO(98)
+    // The attack connects.
     LABEL(91)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // Return to its place.
     LABEL(98)
     WAIT_MS(700)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_S_1"))
@@ -1655,8 +1807,9 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("EM_W_1"))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -1669,6 +1822,10 @@ static EVT_BEGIN(wait_event_fmario)
     RETURN
 EVT_END()
 
+/**
+ * Weapon of Doopliss's headbonk as Goombella: damage 1, 2 or 3 by the real partner's rank (Normal, Super, Ultra;
+ * weaponGetPowerFromGulliblePartyAttackLv).
+ */
 static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1687,7 +1844,7 @@ static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -1705,21 +1862,45 @@ static BattleWeapon enemyWeapon_ChristineNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Defence of Doopliss as Goombella against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence_christine = {0};
 
+/**
+ * Damage modifiers of Doopliss as Goombella per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr_christine = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Goombella:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist_christine = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Goombella:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist_christine = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Data table of Doopliss as Goombella: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table_christine[] = {
     {49, dead_event_christine},
     {0},
 };
 
+/** Part of Doopliss as Goombella: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts_christine[] = {
     {
         1, // partNum
@@ -1763,13 +1944,13 @@ static EVT_BEGIN(init_event_christine)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_christine_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_christine))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_christine), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 137)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_GOOMBELLA)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_christine))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_christine))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_christine))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 6, 12, 16)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 0, 9, 3)
@@ -1792,7 +1973,7 @@ static EVT_BEGIN(dead_event_christine)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -1814,6 +1995,7 @@ EVT_END()
 static EVT_BEGIN(attack_event_christine)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // Doopliss, as Goombella, uses an enemy item if he has one.
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -1821,12 +2003,14 @@ static EVT_BEGIN(attack_event_christine)
     SET_VALUE(LW(12), PTR(&enemyWeapon_ChristineNormalAttack))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -1835,7 +2019,8 @@ static EVT_BEGIN(attack_event_christine)
     CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    // She walks up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -1859,9 +2044,10 @@ static EVT_BEGIN(attack_event_christine)
     SET_VALUE(LW(10), 0)
     LABEL(10)
     IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 1048832, LW(5))
+        // Find out whether the attack will connect or miss.
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_ALWAYS_HIT, LW(5))
     ELSE
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     SWITCH(LW(5))
         CASE_OR_EQUAL(2)
@@ -1874,9 +2060,11 @@ static EVT_BEGIN(attack_event_christine)
         WAIT_MS(1000)
     END_SWITCH
     IF_INT_LESS_OR_EQUAL(LW(10), 0)
+        // She crouches and winds up.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_A_2B"))
         WAIT_FRAMES(20)
     END_IF
+    // She spins up into the air.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_J_1A"))
     BEGIN_INLINE_EVENT
         WAIT_FRAMES(15)
@@ -1897,6 +2085,7 @@ static EVT_BEGIN(attack_event_christine)
                 WAIT_FRAMES(1)
             END_LOOP
         END_SIBLING_EVENT
+        // She comes down on the target headfirst.
         CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 3, -1)
     ELSE
         CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
@@ -1942,6 +2131,7 @@ static EVT_BEGIN(attack_event_christine)
     END_IF
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     LOOP(4)
+        // She is squashed flat for a moment on impact.
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.07910156f), FLOAT(-0.119140625f), 0)
         WAIT_FRAMES(1)
     END_LOOP
@@ -1954,14 +2144,16 @@ static EVT_BEGIN(attack_event_christine)
         CALL(evt_btl_camera_set_zoom, 0, 200)
     END_INLINE_EVENT
     IF_INT_LESS(LW(10), LW(11))
+        // Deal the damage, reduced by the action command defence.
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 0, LW(5))
         ADD(LW(10), 1)
         GOTO(10)
     ELSE
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
+    // The attack misses or is dodged.
     LABEL(90)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
@@ -1972,6 +2164,7 @@ static EVT_BEGIN(attack_event_christine)
         MULTIPLY(LW(6), LW(0))
         DIVIDE(LW(6), 15)
         SET_VALUE(LW(7), 15)
+        // She tumbles off the target.
         LABEL(20)
         CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(6))
         SUBTRACT(LW(7), 1)
@@ -1995,9 +2188,11 @@ static EVT_BEGIN(attack_event_christine)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // She walks back to her place.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    // The attack is over; back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -2010,6 +2205,10 @@ static EVT_BEGIN(wait_event_christine)
     RETURN
 EVT_END()
 
+/**
+ * Weapon of Doopliss's shell slam as Koops: damage 2, 3 or 5 by the real partner's rank (Normal, Super, Ultra;
+ * weaponGetPowerFromGulliblePartyAttackLv).
+ */
 static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2028,7 +2227,7 @@ static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -2047,6 +2246,10 @@ static BattleWeapon enemyWeapon_NokotarouKouraAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of Doopliss's shell toss as Koops: damage 2, 3 or 5 by the real partner's rank (Normal, Super, Ultra;
+ * weaponGetPowerFromGulliblePartyAttackLv).
+ */
 static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2065,7 +2268,7 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_SHELL_TOSS_LIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     8, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -2084,24 +2287,52 @@ static BattleWeapon enemyWeapon_NokotarouShubibinAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Defence of Doopliss as Koops against each element (normal, fire, ice, explosion, electric):
+ * 1 against every element, so each hit is cut by 1.
+ */
 static BattleUnitDefense defence_nokotarou = {{1, 1, 1, 1, 1}};
 
+/**
+ * Damage modifiers of Doopliss as Koops per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr_nokotarou = {0};
 
+/**
+ * Defence of Doopliss as Koops while flipped over against each element (normal, fire, ice, explosion,
+ * electric): none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence_turn_nokotarou = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Koops:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist_nokotarou = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Koops:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist_nokotarou = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 100, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Data table of Doopliss as Koops: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table_nokotarou[] = {
     {49, dead_event_nokotarou},
     {13, dmg_turn_event},
     {0},
 };
 
+/** Part of Doopliss as Koops: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts_nokotarou[] = {
     {
         1, // partNum
@@ -2130,7 +2361,7 @@ static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn_nokotarou))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_nokotarou_turn))
-    CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OnStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 2)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("PNK_D_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -2156,7 +2387,7 @@ static EVT_BEGIN(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_nokotarou))
-    CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
+    CALL(btlevtcmd_OffStatusFlag, LW(10), STATUS_FLAG_FLIPPED)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_nokotarou_stay))
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("PNK_S_1"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
@@ -2174,18 +2405,18 @@ static EVT_BEGIN(init_event_nokotarou)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_nokotarou_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_nokotarou))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_nokotarou), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 138)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_KOOPS)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_nokotarou))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_nokotarou))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_nokotarou))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event_nokotarou))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 11, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPINNING, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_SPEED, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_REVERSE, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_UNUSED_11, 0)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 6, 12, 16)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_MOVE1L"), STRING("SFX_PARTY_BATTLE_MOVE1R"), 0, 9, 3)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), STRING("SFX_PARTY_BATTLE_LANDING1"))
@@ -2213,7 +2444,7 @@ static EVT_BEGIN(dead_event_nokotarou)
         END_IF
     END_IF
     IF_INT_EQUAL(LW(6), 1)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -2263,7 +2494,7 @@ EVT_END()
 
 /** Event script: Koops comes back out of his shell (PNK_K_1 then PNK_K_2) and clears the spin flag (unit work 8). */
 static EVT_BEGIN(_restore_koura_pose)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPINNING, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_K_1"))
@@ -2284,23 +2515,23 @@ EVT_END()
  * while unit work 8 is 1.
  */
 static EVT_BEGIN(_koura_rotate_start)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPINNING, 1)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_REVERSE, 0)
     BEGIN_INLINE_EVENT
         LABEL(0)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 8, LW(1))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPINNING, LW(1))
         IF_INT_EQUAL(LW(1), 0)
             GOTO(10)
         END_IF
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 10, LW(11))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_REVERSE, LW(11))
         IF_INT_NOT_EQUAL(LW(11), 0)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, 0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(10))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_REVERSE, 0)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_SPEED, LW(10))
             MULTIPLY(LW(10), -1)
             MULTIPLY(LW(0), -1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, LW(10))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_SPEED, LW(10))
         END_IF
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(10))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_SPEED, LW(10))
         IF_INT_GREATER_OR_EQUAL(LW(10), 0)
             ADD(LW(0), 1)
             IF_INT_GREATER(LW(0), LW(10))
@@ -2322,7 +2553,7 @@ EVT_END()
 
 /** Event script: stops the Koops shell spin by clearing unit work 8. */
 static EVT_BEGIN(_koura_rotate_stop)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPINNING, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     RETURN
 EVT_END()
@@ -2359,18 +2590,21 @@ EVT_END()
 static EVT_BEGIN(attack_event_nokotarou_koura)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // Doopliss, as Koops, uses an enemy item if he has one.
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     SET_VALUE(LW(12), PTR(&enemyWeapon_NokotarouKouraAttack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -2382,14 +2616,16 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
     WAIT_FRAMES(20)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Koops withdraws into his shell.
     CALL_CHILD(_change_koura_pose)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_ATTACK1"), EVT_NULLPTR, 0, LW(13))
     SET_VALUE(LW(0), 15)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 45)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_SPEED, 45)
+    // He starts spinning inside it.
     CALL_CHILD(_koura_rotate_start)
     WAIT_FRAMES(30)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 4)
     CALL(evt_btl_camera_set_zoom, 0, 400)
     WAIT_FRAMES(30)
@@ -2403,6 +2639,7 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(5), LW(2))
     ADD(LW(2), 5)
     CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, LW(13))
+    // He slams into the target.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(13), -1, 0)
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
@@ -2420,18 +2657,22 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
 #endif
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+        // The spinning stops and he pops out of the shell.
         CALL_CHILD(_koura_rotate_stop)
         CALL_CHILD(_restore_koura_pose)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
         WAIT_FRAMES(30)
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
         CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        // After the hit he bounces back with a hop.
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         GOTO(99)
     END_IF
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2444,14 +2685,15 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
     CALL_CHILD(_restore_koura_pose)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     WAIT_FRAMES(30)
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -2465,18 +2707,21 @@ EVT_END()
 static EVT_BEGIN(attack_event_nokotarou_shubibin)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // Doopliss, as Koops, uses an enemy item if he has one.
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     SET_VALUE(LW(12), PTR(&enemyWeapon_NokotarouShubibinAttack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -2488,12 +2733,14 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     WAIT_FRAMES(20)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // Koops withdraws into his shell.
     CALL_CHILD(_change_koura_pose)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 50)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_NOKO_SHUBIBIN1"), EVT_NULLPTR, 0, LW(13))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SIREN_RANK_NEW, 0)
     SET_VALUE(LW(0), 15)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 45)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHELL_SPIN_SPEED, 45)
+    // He spins the shell up to speed.
     CALL_CHILD(_koura_rotate_start)
     WAIT_MS(500)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 4)
@@ -2513,7 +2760,8 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(5), LW(2))
     ADD(LW(2), 5)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+    // Find out whether the attack will connect or miss.
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -2528,8 +2776,9 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(50)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -2538,19 +2787,22 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     END_IF
     LABEL(80)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+    // Guess: on a miss the shell flies off toward the left edge of the stage.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -400, LW(1), LW(2), 0, -1, 0)
     LABEL(90)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     MULTIPLY(LW(0), -1)
+    // The shell comes back to him.
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     CALL_CHILD(_koura_rotate_stop)
     CALL_CHILD(_restore_koura_pose)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     WAIT_FRAMES(30)
+    // The attack is over; back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -2562,6 +2814,10 @@ static EVT_BEGIN(wait_event_nokotarou)
     RETURN
 EVT_END()
 
+/**
+ * Weapon of Doopliss's body slam as Flurrie: damage 2, 4 or 6 by the real partner's rank (Normal, Super, Ultra;
+ * weaponGetPowerFromGulliblePartyAttackLv).
+ */
 static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2580,7 +2836,7 @@ static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     10, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -2599,21 +2855,45 @@ static BattleWeapon enemyWeapon_ClaudaNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Defence of Doopliss as Flurrie against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence_clauda = {0};
 
+/**
+ * Damage modifiers of Doopliss as Flurrie per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr_clauda = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Flurrie:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist_clauda = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Flurrie:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist_clauda = {40, 50, 100, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Data table of Doopliss as Flurrie: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table_clauda[] = {
     {49, dead_event_clauda},
     {0},
 };
 
+/** Part of Doopliss as Flurrie: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts_clauda[] = {
     {
         1, // partNum
@@ -2641,13 +2921,13 @@ static EVT_BEGIN(init_event_clauda)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_clauda_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_clauda))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_clauda), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 140)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_FLURRIE)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_clauda))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_clauda))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_clauda))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_HANG1"), STRING("SFX_PARTY_BATTLE_HANG1"), 6, 12, 16)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_HANG1"), STRING("SFX_PARTY_BATTLE_HANG1"), 0, 9, 3)
@@ -2671,7 +2951,7 @@ static EVT_BEGIN(dead_event_clauda)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -2693,18 +2973,21 @@ EVT_END()
 static EVT_BEGIN(attack_event_clauda)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // Doopliss, as Flurrie, uses an enemy item if he has one.
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
     SET_VALUE(LW(12), PTR(&enemyWeapon_ClaudaNormalAttack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -2716,6 +2999,7 @@ static EVT_BEGIN(attack_event_clauda)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     WAIT_MS(400)
+    // Flurrie leans back, ready to slam.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A1_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
@@ -2730,8 +3014,9 @@ static EVT_BEGIN(attack_event_clauda)
         SUBTRACT(LW(5), 10)
         ADD(LW(1), LW(5))
     END_IF
+    // She jumps high toward the target.
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -1)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -2742,6 +3027,7 @@ static EVT_BEGIN(attack_event_clauda)
         IF_INT_EQUAL(LW(6), 2)
             CALL(btlevtcmd_StartAvoid, LW(3), 40)
         END_IF
+        // She slams down on it.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A1_2"))
         CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_D_3"))
@@ -2749,14 +3035,17 @@ static EVT_BEGIN(attack_event_clauda)
         GOTO(95)
     END_IF
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CLAUD_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
+    // The camera shakes hard.
     CALL(evt_btl_camera_shake_h, 0, 8, 0, 30, 13)
     BEGIN_SIBLING_EVENT_GET_ID(LW(15))
         CALL(evt_sub_intpl_init_float, 11, FLOAT(1.0f), FLOAT(0.39941406f), 10)
         LOOP(10)
             CALL(evt_sub_intpl_get_float, LW(5), EVT_NULLPTR)
+            // Her body squashes and stretches after the slam.
             CALL(btlevtcmd_GetScale, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
             CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, LW(0), LW(5), LW(2))
             WAIT_FRAMES(1)
@@ -2791,9 +3080,11 @@ static EVT_BEGIN(attack_event_clauda)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // She walks back to her place.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    // The attack is over; back to waiting.
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -2806,6 +3097,7 @@ static EVT_BEGIN(wait_event_clauda)
     RETURN
 EVT_END()
 
+/** Weapon of Doopliss's attack as Yoshi: damage 1 at every partner rank. */
 static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2824,7 +3116,7 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -2842,21 +3134,45 @@ static BattleWeapon enemyWeapon_YoshiNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Defence of Doopliss as Yoshi against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence_yoshi = {0};
 
+/**
+ * Damage modifiers of Doopliss as Yoshi per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr_yoshi = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Yoshi:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 static StatusVulnerability regist_yoshi = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Yoshi:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist_yoshi = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Data table of Doopliss as Yoshi: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 static BattleDataEntry data_table_yoshi[] = {
     {49, dead_event_yoshi},
     {0},
 };
 
+/** Part of Doopliss as Yoshi: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts_yoshi[] = {
     {
         1, // partNum
@@ -2884,14 +3200,14 @@ static EVT_BEGIN(init_event_yoshi)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_yoshi_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_yoshi))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_yoshi), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 139)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_YOSHI)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_yoshi))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_yoshi))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_yoshi))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(yoshi_original_color_anim_set, BTL_UNIT_SELF)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -2911,7 +3227,7 @@ static EVT_BEGIN(dead_event_yoshi)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -2932,6 +3248,7 @@ EVT_END()
 static EVT_BEGIN(attack_event_yoshi)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
+        // Doopliss, as Yoshi, uses an enemy item if he has one.
         CALL_CHILD(LW(0))
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -2939,12 +3256,14 @@ static EVT_BEGIN(attack_event_yoshi)
     SET_VALUE(LW(12), PTR(&enemyWeapon_YoshiNormalAttack))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -2966,11 +3285,13 @@ static EVT_BEGIN(attack_event_yoshi)
             WAIT_FRAMES(3)
         END_LOOP
     END_INLINE_EVENT
+    // Yoshi crouches and winds up.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_R_5"))
     WAIT_FRAMES(25)
     DELETE_EVENT(LW(13))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+    // He jumps and flutters toward the target.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_J_1A"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -3018,9 +3339,10 @@ static EVT_BEGIN(attack_event_yoshi)
     SET_VALUE(LW(10), 0)
     LABEL(10)
     IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 1048832, LW(5))
+        // Find out whether the attack will connect or miss.
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_ALWAYS_HIT, LW(5))
     ELSE
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
     SWITCH(LW(5))
         CASE_OR_EQUAL(2)
@@ -3077,6 +3399,7 @@ static EVT_BEGIN(attack_event_yoshi)
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
         SUBTRACT(LW(15), LW(1))
         DIVIDE(LW(15), 10)
+        // He plunges onto the target and the camera shakes.
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(15), 0, 0, 0, -1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_D_1"))
         CALL(btlevtcmd_SetDispOffset, BTL_UNIT_SELF, 0, -7, 0)
@@ -3088,18 +3411,21 @@ static EVT_BEGIN(attack_event_yoshi)
         GOTO(95)
     END_IF
     IF_INT_LESS(LW(10), LW(11))
+        // Deal the damage, reduced by the action command defence.
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 0, LW(5))
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
         ADD(LW(1), 40)
+        // He bounces off with a few hops.
         CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
         ADD(LW(10), 1)
         GOTO(10)
     ELSE
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     END_IF
+    // The attack misses or is dodged.
     LABEL(90)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -3109,14 +3435,15 @@ static EVT_BEGIN(attack_event_yoshi)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_D_1"))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 25)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 16, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     WAIT_FRAMES(20)
     LABEL(95)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -3130,21 +3457,45 @@ static EVT_BEGIN(wait_event_yoshi)
     RETURN
 EVT_END()
 
+/**
+ * Defence of Doopliss as Vivian against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 BattleUnitDefense defence_vivian = {0};
 
+/**
+ * Damage modifiers of Doopliss as Vivian per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 BattleUnitDefenseAttr defence_attr_vivian = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Vivian:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 StatusVulnerability regist_vivian = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Vivian:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 StatusVulnerability regist_vivian = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Data table of Doopliss as Vivian: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 BattleDataEntry data_table_vivian[] = {
     {49, dead_event_vivian},
     {0},
 };
 
+/** Part of Doopliss as Vivian: its one body part with hit box, defence tables and pose table. */
 BattleUnitKindPart parts_vivian[] = {
     {
         1, // partNum
@@ -3164,6 +3515,10 @@ BattleUnitKindPart parts_vivian[] = {
     },
 };
 
+/**
+ * Weapon of Doopliss's kagenuke attack as Vivian: damage 3, 4 or 5 by the real partner's rank (Normal, Super, Ultra;
+ * weaponGetPowerFromGulliblePartyAttackLv).
+ */
 BattleWeapon weapon_vivian_kagenuke_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3182,7 +3537,7 @@ BattleWeapon weapon_vivian_kagenuke_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -3235,16 +3590,16 @@ EVT_BEGIN(init_event_vivian)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_vivian_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_vivian))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_vivian), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 141)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_VIVIAN)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_vivian))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_vivian))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_vivian))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_VIVIAN_HIDING, 0)
     SPAWN_EVENT_GET_ID(PTR(vivian_shadow_tail_event), LW(0))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 14, LW(0))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_RAMPELL_LAS_SHADOW_TAIL_EVENT, LW(0))
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -3267,7 +3622,7 @@ EVT_BEGIN(dead_event_vivian)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -3297,7 +3652,7 @@ EVT_BEGIN(attack_event_vivian)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
@@ -3323,7 +3678,7 @@ EVT_BEGIN(attack_event_vivian)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PTR_A2_2"))
     WAIT_MS(300)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_VIVI_ATTACK4"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -3349,9 +3704,9 @@ EVT_BEGIN(attack_event_vivian)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(98)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY)
     CALL_CHILD(vivian_down)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(200)
@@ -3367,21 +3722,45 @@ EVT_BEGIN(wait_event_vivian)
     RETURN
 EVT_END()
 
+/**
+ * Defence of Doopliss as Bobbery against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 BattleUnitDefense defence_sanders = {0};
 
+/**
+ * Damage modifiers of Doopliss as Bobbery per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 BattleUnitDefenseAttr defence_attr_sanders = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Bobbery:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 StatusVulnerability regist_sanders = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Bobbery:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Allergic, Slow, Instant KO.
+ */
 StatusVulnerability regist_sanders = {40, 50, 40, 100, 40, 100, 100, 100, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Data table of Doopliss as Bobbery: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 BattleDataEntry data_table_sanders[] = {
     {49, dead_event_sanders},
     {0},
 };
 
+/** Part of Doopliss as Bobbery: its one body part with hit box, defence tables and pose table. */
 BattleUnitKindPart parts_sanders[] = {
     {
         1, // partNum
@@ -3401,6 +3780,10 @@ BattleUnitKindPart parts_sanders[] = {
     },
 };
 
+/**
+ * Weapon of Doopliss's attack as Bobbery: damage 4, 5 or 6 by the real partner's rank (Normal, Super, Ultra;
+ * weaponGetPowerFromGulliblePartyAttackLv).
+ */
 BattleWeapon enemyWeapon_SandersNormalAttack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3419,7 +3802,7 @@ BattleWeapon enemyWeapon_SandersNormalAttack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    3, // element
+    ELEMENT_EXPLOSION, // element
     0, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -3447,13 +3830,13 @@ EVT_BEGIN(init_event_sanders)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_sanders_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_sanders))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_sanders), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 142)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_BOBBERY)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_sanders))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_sanders))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_sanders))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -3473,7 +3856,7 @@ EVT_BEGIN(dead_event_sanders)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -3505,9 +3888,9 @@ EVT_BEGIN(attack_event_sanders)
 EVT_END()
 
 /**
- * Guess: the normal attack of Doopliss as Bobbery:
- * he charges at the chosen target and explodes (bomb effect and Bobbery's attack sounds),
- * followed by the damage check.
+ * The normal attack of Doopliss as Bobbery (the weapon in LW(12), enemyWeapon_SandersNormalAttack from
+ * attack_event_sanders): he runs up beside the target, lights his fuse (A_3, Bobbery's THUNDERS attack sounds)
+ * and explodes after a second (bomb effect), then the damage check runs and he is blown back home in a jump.
  */
 EVT_BEGIN(attack_event_sanders_normal)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -3552,7 +3935,7 @@ EVT_BEGIN(attack_event_sanders_normal)
     DIVIDE(LW(6), 2)
     ADD(LW(1), LW(6))
     CALL(evt_eff64, STRING(""), STRING("bomb_n64"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
             CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -3566,7 +3949,7 @@ EVT_BEGIN(attack_event_sanders_normal)
         GOTO(92)
     END_IF
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(92)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -3582,7 +3965,7 @@ EVT_BEGIN(attack_event_sanders_normal)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)
@@ -3596,21 +3979,45 @@ EVT_BEGIN(wait_event_sanders)
     RETURN
 EVT_END()
 
+/**
+ * Defence of Doopliss as Ms. Mowz against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 BattleUnitDefense defence_chuchurina = {0};
 
+/**
+ * Damage modifiers of Doopliss as Ms. Mowz per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 BattleUnitDefenseAttr defence_attr_chuchurina = {0};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Doopliss as Ms. Mowz:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow,
+ * Instant KO.
+ */
 StatusVulnerability regist_chuchurina = {40, 50, 40, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Doopliss as Ms. Mowz:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Sleep, Dizzy, Confuse, Frozen, Allergic, Slow, Instant KO.
+ */
 StatusVulnerability regist_chuchurina = {40, 50, 40, 100, 40, 100, 100, 30, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/**
+ * Data table of Doopliss as Ms. Mowz: event scripts
+ * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
+ */
 BattleDataEntry data_table_chuchurina[] = {
     {49, dead_event_chuchurina},
     {0},
 };
 
+/** Part of Doopliss as Ms. Mowz: its one body part with hit box, defence tables and pose table. */
 BattleUnitKindPart parts_chuchurina[] = {
     {
         1, // partNum
@@ -3630,6 +4037,10 @@ BattleUnitKindPart parts_chuchurina[] = {
     },
 };
 
+/**
+ * Weapon of Doopliss's right-hand slaps as Ms. Mowz: no damage function, so these hits do no damage; only the
+ * last hit does.
+ */
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackR = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3648,7 +4059,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackR = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     22, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -3671,6 +4082,10 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackR = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Weapon of Doopliss's left-hand slaps as Ms. Mowz: no damage function, so these hits do no damage; only the
+ * last hit does.
+ */
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackL = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3689,7 +4104,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackL = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     21, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -3712,6 +4127,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackL = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the last right-hand hit of Doopliss's Ms. Mowz attack: damage 2, 3 or 4 by partner rank. */
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackRlast = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3730,7 +4146,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackRlast = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     24, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -3749,6 +4165,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackRlast = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of the last left-hand hit of Doopliss's Ms. Mowz attack: damage 2, 3 or 4 by partner rank. */
 BattleWeapon enemyWeapon_ChuchurinaNormalAttackLlast = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -3767,7 +4184,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackLlast = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
+    ELEMENT_NORMAL, // element
     23, // damagePattern
     3, // acLevel
     2, // reserved_6F
@@ -3791,13 +4208,13 @@ EVT_BEGIN(init_event_chuchurina)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_chuchurina_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_chuchurina))
     CALL(btlevtcmd_ReplaceParts, BTL_UNIT_SELF, LW(11), PTR(parts_chuchurina), 1)
-    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, 143)
+    CALL(btlevtcmd_ChangeKind, BTL_UNIT_SELF, UNIT_DOOPLISS_CHAPTER8_MS_MOWZ)
     CALL(btlevtcmd_SetRegistStatus, BTL_UNIT_SELF, PTR(&regist_chuchurina))
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_chuchurina))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_chuchurina))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 4)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_KIND_CHANGED)
     CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -3817,7 +4234,7 @@ EVT_BEGIN(dead_event_chuchurina)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -3849,17 +4266,21 @@ EVT_BEGIN(attack_event_chuchurina)
 EVT_END()
 
 /**
- * Guess: the normal attack of Doopliss as Ms. Mowz:
- * he runs at the chosen target and attacks with her pose set (PCH_A1_1), followed by the damage check.
+ * The normal attack of Doopliss as Ms. Mowz (the weapon in LW(12), enemyWeapon_ChuchurinaNormalAttackR from
+ * attack_event_chuchurina): he walks to the chosen target
+ * and attacks with her pose set (PCH_A1_1, then PCH_A1_2),
+ * followed by the damage check.
  */
 EVT_BEGIN(attack_event_chuchurina_normal)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
+    // Pick a target for the attack; a confused unit that has none flusters.
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(12), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    // Announce the attack; the camera swings to follow it.
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
@@ -3881,7 +4302,8 @@ EVT_BEGIN(attack_event_chuchurina_normal)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    // Doopliss, as Ms. Mowz, walks up to the target.
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     ADD(LW(2), 5)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
@@ -3889,6 +4311,7 @@ EVT_BEGIN(attack_event_chuchurina_normal)
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 350)
+    // He winds up.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PCH_A1_1"))
     BEGIN_SIBLING_EVENT_GET_ID(LW(14))
         SET_VALUE(LW(6), 0)
@@ -3957,11 +4380,12 @@ EVT_BEGIN(attack_event_chuchurina_normal)
     SET_VALUE(LW(10), 0)
     LABEL(10)
     ADD(LW(10), 1)
+    // He strikes, spinning round on the spot.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PCH_A1_2"))
     IF_INT_GREATER_OR_EQUAL(LW(10), 2)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 1048832, LW(6))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT | DAMAGE_FLAG_ALWAYS_HIT, LW(6))
     ELSE
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
+        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(6))
     END_IF
     IF_INT_NOT_EQUAL(LW(6), 1)
         IF_INT_EQUAL(LW(6), 3)
@@ -3982,6 +4406,7 @@ EVT_BEGIN(attack_event_chuchurina_normal)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+        // He follows up with a final strike.
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PCH_A2_4"))
         WAIT_FRAMES(52)
         GOTO(95)
@@ -4014,8 +4439,9 @@ EVT_BEGIN(attack_event_chuchurina_normal)
             CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_CHUCHURINA_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         END_IF
     END_IF
+    // Deal the damage, reduced by the action command defence.
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(10))
         CASE_LESS_OR_EQUAL(2)
         BEGIN_SIBLING_EVENT_GET_ID(LW(15))
@@ -4116,8 +4542,9 @@ EVT_BEGIN(attack_event_chuchurina_normal)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    // He walks back to his place.
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -4170,7 +4597,7 @@ USER_FUNC(mario_shadow_guard_check) {
  * after the fight (the pouch's partyData[6] flags).
  */
 static USER_FUNC(vivian_comeback) {
-    pouchGetPtr()->partyData[6].flags &= ~2;
+    pouchGetPtr()->partyData[PARTNER_VIVIAN].flags &= ~POUCH_PARTY_FLAG_AWAY;
     return 1;
 }
 

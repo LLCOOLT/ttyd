@@ -36,6 +36,7 @@ typedef struct EffBombN64Work {
     u8 pad_c4[8];      // 0xC4
 } EffBombN64Work;
 
+/** Small 8x8 quad the bomb's flash and burst sprite are scaled up from. */
 static effN64Vtx size8x8_tex32x32_vtx[] = {
     {-4, -4, 0, 0, 0, 255, 255, 255, 255},
     {4, -4, 0, 1024, 0, 255, 255, 255, 255},

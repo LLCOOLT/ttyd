@@ -25,7 +25,7 @@ void marioWalkDashSe(HitEntry* hitObj, u32 interval) {
     mario = marioGetPtr();
     hitAttr = hitGetAttr(hitObj);
     if ((mario->multiTimer % interval) == 0) {
-        if (hitAttr & 0x100) {
+        if (hitAttr & HIT_ATTR_SHALLOW_WATER) {
             psndSFXOn_3D((char*)0x143, &mario->position);
             return;
         }
@@ -37,7 +37,7 @@ void marioWalkDashSe(HitEntry* hitObj, u32 interval) {
             psndSFXOn_3D((char*)0x147, &mario->position);
             return;
         }
-        if (hitAttr & 0x1000) {
+        if (hitAttr & HIT_ATTR_GRASS) {
             if (strncmp(gp->currentMapName, "mri", 3) != 0) {
                 psndSFXOn_3D((char*)0x149, &mario->position);
                 return;
@@ -53,7 +53,7 @@ void marioWalkDashSe(HitEntry* hitObj, u32 interval) {
         return;
     }
     if ((mario->multiTimer % (interval >> 1U)) == 0) {
-        if (hitAttr & 0x100) {
+        if (hitAttr & HIT_ATTR_SHALLOW_WATER) {
             psndSFXOn_3D((char*)0x142, &mario->position);
             return;
         }
@@ -65,7 +65,7 @@ void marioWalkDashSe(HitEntry* hitObj, u32 interval) {
             psndSFXOn_3D((char*)0x146, &mario->position);
             return;
         }
-        if (hitAttr & 0x1000) {
+        if (hitAttr & HIT_ATTR_GRASS) {
             if (strncmp(gp->currentMapName, "mri", 3) != 0) {
                 psndSFXOn_3D((char*)0x148, &mario->position);
                 return;

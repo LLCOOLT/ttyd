@@ -1,6 +1,5 @@
-#pragma once
-
 // Declarations shared by the moo.rel units (月, the Moon).
+#pragma once
 
 #include "version.h"
 #include "dolphin/types.h"

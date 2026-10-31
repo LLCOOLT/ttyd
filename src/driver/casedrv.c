@@ -29,6 +29,7 @@ typedef struct CaseWork {
 
 //.sbss
 static CaseWork work;
+/** The table of case entries (64 slots); wp is the pointer the code uses. */
 static CaseWork* wp = &work;
 
 /** Allocates and clears the table of 64 case entries at boot. */

@@ -108,7 +108,7 @@ void nokonoko_bye(PartyEntry* party) {
  * and clears the stored shell-spin sound handle.
  */
 void nokonoko_init(PartyEntry* party) {
-    party->memberKind = 2;
+    party->memberKind = PARTY_MEMBER_KOOPS;
     party->moveKind = 0;
     party->height = 37.0f;
     party->width = 24.0f;
@@ -467,7 +467,7 @@ void nokonoko_use(PartyEntry* party) {
                 if (mario->currMotionId == MARIO_MOTION_SHIP || mario->currMotionId == MARIO_MOTION_JABARA || mario->currMotionId == MARIO_MOTION_PLANE || mario->currMotionId == MARIO_MOTION_ROLL ||
                     (mario->flags & MARIO_FLAG_FORCED_MOVEMENT) || !marioChkKey()) {
 #else
-                if (mario->currMotionId == MARIO_MOTION_SHIP || mario->currMotionId == MARIO_MOTION_JABARA || mario->currMotionId == MARIO_MOTION_PLANE || mario->currMotionId == MARIO_MOTION_ROLL || (u16)(mario->currMotionId - 0x1f) <= 1 ||
+                if (mario->currMotionId == MARIO_MOTION_SHIP || mario->currMotionId == MARIO_MOTION_JABARA || mario->currMotionId == MARIO_MOTION_PLANE || mario->currMotionId == MARIO_MOTION_ROLL || (u16)(mario->currMotionId - MARIO_MOTION_DAMAGE) <= 1 ||
                     (mario->flags & MARIO_FLAG_FORCED_MOVEMENT) || !marioChkKey()) {
 #endif
                     nokonoko_finish(party);
@@ -669,7 +669,7 @@ void nokonoko_use(PartyEntry* party) {
             NOKO_ITEM(party, psndSFXOn_3D((const char*)0x92c, &party->position); noko_star(party, 1);)
             hit = ccwall(party, 1);
             if (hit != NULL) {
-                if (!(hitGetAttr(hit) & 0x80000000)) {
+                if (!(hitGetAttr(hit) & HIT_ATTR_MOBJ)) {
                     party->useMotionId = 100;
                     return;
                 }
@@ -893,7 +893,7 @@ void nokonoko_finish(PartyEntry* party) {
                 partyChgRunMode(party, 2);
                 party->moveMode = 0;
             } else {
-                party->flags &= 0x7FFFFFFF;
+                party->flags &= ~PARTY_FLAG_IS_EVT_USE;
                 partyChgRunMode(party, 0);
             }
         }
@@ -1067,6 +1067,7 @@ static HitEntry* ccwall(PartyEntry* party, s32 mode) {
  * Never called and dropped by the link: it only puts the float constants 10, 30, 100,
  * 11 and 6 in their original order in the literal pool.
  */
+// FAKE: uncalled stand-in for a stripped function; orders 10, 30, 100, 11 and 6 (ahead of 1.0f) in .sdata2
 void nokoStrippedPool(f32* p) {
     p[0] = 10.0f;
     p[1] = 30.0f;

@@ -22,6 +22,7 @@ static u32 __THPOldGQR6;
 static u8* __THPWorkArea;
 static THPCoeff* __THPMCUBuffer[6];
 static THPFileInfo* __THPInfo;
+/** Set once the movie decoder has been initialised. */
 static BOOL __THPInitFlag = FALSE;
 #ifdef VERSION_G8MP01
 const char* __THPVersion = "<< Dolphin SDK - THP\trelease build: Jan  9 2004 13:06:55 (0x2301) >>";
@@ -35,6 +36,7 @@ static const u8 __THPJpegNaturalOrder[80]
 	    58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63,
 	    63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63 };
 
+/** Scale factors for the fast inverse DCT used to decode movie frames. */
 static const f64 __THPAANScaleFactor[8] = {
 	1.0f, 1.387039845f, 1.306562965f, 1.175875602f,
 	1.0f, 0.785694958f, 0.541196100f, 0.275899379f,

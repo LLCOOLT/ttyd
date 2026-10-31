@@ -19,6 +19,10 @@
 #include "icon_ids.h"
 #include "battle/battle_seq_command.h"
 #include "driver/shadowdrv.h"
+#include "unit/unit_koura.h"
+#include "unit/party/unit_party_vivian.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 // FAKE: battle_disp.c calls iconDispGx through this prototype (the types it was compiled with) instead of the one in driver/icondrv.h; same registers, behaviour-identical.
 typedef void (*IconDispGxArgOrderFn)(f32, Vec*, s16, u16);
@@ -136,24 +140,6 @@ void btlDispGXInit2D(void) {
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
 
-void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
-GXTexFmt GXGetTexObjFmt(const GXTexObj* to);
-u16 GXGetTexObjHeight(const GXTexObj* to);
-u16 GXGetTexObjWidth(const GXTexObj* to);
-void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
-void GXSetNumTevStages(u8 nStages);
-void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
-void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d);
-void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevOp(GXTevStageID id, GXTevMode mode);
-void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
-void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
-void PSMTXCopy(const Mtx src, Mtx dst);
-void PSMTXIdentity(Mtx m);
-void PSMTXRotRad(Mtx m, char axis, f32 rad);
-void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
-void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
 static void BattleStockExpDisp(void);
 void btlDispAnimeSpeed(BattleUnitPart* part, f32 speed);
 static void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, GXColor color, f32 rotation);
@@ -315,7 +301,7 @@ void btlDispGetTexSize(u32 id, u16* width, u16* height) {
 }
 
 /**
- * Battle display setup at battle start: the battle cameras, the menu display, and dispFlags bit 2,
+ * Battle display setup at battle start: the battle cameras, the menu display, and BATTLE_DISP_FLAG_STAR_POINTS,
  * which turns on the Star Point counter.
  */
 void btlDispInit(void) {
@@ -323,7 +309,7 @@ void btlDispInit(void) {
 
     battleCameraInit();
     battleMenuDispInit();
-    wp->dispFlags |= 2;
+    wp->dispFlags |= BATTLE_DISP_FLAG_STAR_POINTS;
 }
 
 /**
@@ -403,8 +389,8 @@ void btlDispMain(void) {
         unit = BattleGetUnitPtr(_battleWorkPointer, i);
         if (!unit)
             continue;
-        if (unit->currentKind == UNIT_SHELL_SHIELD && unit->work[2] != 0) {
-            target = BattleGetUnitPtr(wp, unit->work[0]);
+        if (unit->currentKind == UNIT_SHELL_SHIELD && unit->work[UW_KOURA_FOLLOWS_UNIT] != 0) {
+            target = BattleGetUnitPtr(wp, unit->work[UW_KOURA_SHIELDED_UNIT]);
             if (target) {
                 if (target->attackEventId && evtCheckID(target->attackEventId)) {
                     if (!((u32)target->attackEventFlags & ATTACK_EVENT_SHELL_FOLLOWS))
@@ -423,8 +409,8 @@ void btlDispMain(void) {
                 // retail puts the shell on the floor; the demo keeps it at the target's height
                 h = BattleGetFloorHeight(wp, tpos.x, tpos.y, tpos.z);
 #endif
-                switch (unit->work[2]) {
-                    case 2:
+                switch (unit->work[UW_KOURA_FOLLOWS_UNIT]) {
+                    case KOURA_FOLLOW_TRAIL:
                         dist = __fabs(pos.x - tpos.x);
                         if (dist > 10.0) {
                             if (tpos.x > pos.x) {
@@ -435,14 +421,14 @@ void btlDispMain(void) {
                         }
                         BtlUnit_SetPos(unit, pos.x, tpos.y, tpos.z);
                         break;
-                    case 3:
+                    case KOURA_FOLLOW_SLIDE:
                         if (__fabs(pos.x - tpos.x) < 1.0) {
 #if VERSION <= VERSION_DEMO_US
                             BtlUnit_SetPos(unit, tpos.x, tpos.y, tpos.z);
 #else
                             BtlUnit_SetPos(unit, tpos.x, h, tpos.z);
 #endif
-                            unit->work[2] = 1;
+                            unit->work[UW_KOURA_FOLLOWS_UNIT] = KOURA_FOLLOW_ON;
                         } else if (tpos.x > pos.x) {
                             pos.x += 1.0f;
 #if VERSION <= VERSION_DEMO_US
@@ -645,10 +631,11 @@ void btlDispMain(void) {
             }
             {
                 s32 k = unit->currentKind;
-                if (k == 0xE4 || k == 0x8D || k == 0x86 || (u32)(k - 0x1F) <= 2 || (u32)(k - 0xBD) <= 4 || k == 0x85) {
-                    viv.x = unit->work[0];
-                    viv.y = unit->work[1];
-                    viv.z = unit->work[2];
+                if (k == UNIT_VIVIAN || k == UNIT_DOOPLISS_CHAPTER8_VIVIAN || k == UNIT_MARILYN_CHAPTER8 || (u32)(k - UNIT_BELDAM_CHAPTER2) <= 2 ||
+                    (u32)(k - UNIT_UNUSED_BELDAM2) <= 4 || k == UNIT_BELDAM_CHAPTER8) {
+                    viv.x = unit->work[UW_VIVIAN_SHADOW_X];
+                    viv.y = unit->work[UW_VIVIAN_SHADOW_Y];
+                    viv.z = unit->work[UW_VIVIAN_SHADOW_Z];
                     animPoseVivianMain(part->poseId, &viv);
                 }
             }
@@ -1000,11 +987,11 @@ static void btlUnitItemDisp2(CameraId camId, BattleUnit* unit) {
     BattleWork* wp = _battleWorkPointer;
     s32 kind = unit->currentKind;
 
-    if (kind >= 1 && kind < 0xD8)
+    if (kind >= UNIT_GOOMBA && kind < UNIT_UNUSED_TREE)
         goto disp;
-    if (kind >= 0xDE && kind < 0xE0)
+    if (kind >= UNIT_MARIO && kind < UNIT_GOOMBELLA)
         goto disp;
-    if (kind < 0xE0 || kind >= 0xE7)
+    if (kind < UNIT_GOOMBELLA || kind >= UNIT_MAX)
         return;
 disp:
     if (wp->flags & BATTLE_FLAG_SHOW_HELD_ITEMS) {
@@ -1260,7 +1247,9 @@ static void _pose_def(BattleUnitPart* part) {
 
 /**
  * Starts a one-shot "p_b_st" effect animation for the draw type: PM_Y_1A for translucent (type 7).
- * Guess: PM_C_1A and PM_F_1A (types 2 and 3) are the stone-like and frozen looks, from the effect names.
+ * Types 2 and 3 (PM_C_1A, PM_F_1A) are never set:
+ * the draw code and btlevtcmd only give a part types 0, 1, 4 and 7.
+ * Guess: C and F are a stone-like and a frozen look, from the effect names.
  */
 static void _pose_one_pattern(BattleUnitPart* part) {
     switch (PART_POSESTATE(part)) {
@@ -1460,7 +1449,7 @@ static void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scal
 /**
  * Counts the displayed Star Points up towards the ones earned
  * so far this battle (one per frame after a 4-frame delay) and queues the counter draw
- * while dispFlags bit 2 is on.
+ * while BATTLE_DISP_FLAG_STAR_POINTS is on.
  */
 static void BattleStockExpDisp(void) {
     BattleWork* wp = _battleWorkPointer;
@@ -1471,7 +1460,7 @@ static void BattleStockExpDisp(void) {
             wp->stockExpDisp++;
         }
     }
-    if (wp->dispFlags & 2) {
+    if (wp->dispFlags & BATTLE_DISP_FLAG_STAR_POINTS) {
         dispEntry(CAMERA_2D, 901.0f, 1, _btlStockExpDisp, NULL);
     }
 }

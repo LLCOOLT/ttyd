@@ -14,34 +14,47 @@
 static BeroEntry bero_entry_data[3];
 extern EvtWord warning_event[];
 
-/** Guess: closes the left door (S_doa_l) of the corridor by turning it over a short interpolation. */
+/**
+ * Enter hook of the west door (w_bero, from muj_10, enter anime type 5): turns S_doa_l to LW(0) x 0.444 degrees;
+ * the door code feeds 180 down to 0, so the door stands 80 degrees open and swings shut.
+ */
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-/** Guess: opens the left door (S_doa_l) of the corridor by turning it over a short interpolation. */
+/**
+ * Exit hook of the west door: turns S_doa_l to LW(0) x -0.444 degrees;
+ * the door code feeds 0 up to 180, so it swings 80 degrees open the other way as Mario leaves.
+ */
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-/** Guess: closes the right door (S_doa_r) of the corridor by turning it over a short interpolation. */
+/**
+ * Enter hook of the east door (e_bero, from muj_12): turns S_doa_r to LW(0) x -0.444 degrees;
+ * fed 180 down to 0, the door swings shut from 80 degrees open.
+ */
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
-/** Guess: opens the right door (S_doa_r) of the corridor by turning it over a short interpolation. */
+/**
+ * Exit hook of the east door: turns S_doa_r to LW(0) x 0.444 degrees;
+ * fed 0 up to 180, it swings 80 degrees open the other way as Mario leaves.
+ */
 static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Doors and exits of muj_11: w_bero to muj_10; e_bero to muj_12. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName

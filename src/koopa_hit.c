@@ -525,6 +525,10 @@ typedef struct HeadSphereSet4 {
     s32 count;
     HeadSphere spheres[4];
 } HeadSphereSet4;
+/**
+ * Bowser's collision spheres for each power-up level (small, normal, big, giant): count, then forward offset,
+ * height, radius and when each is active; kpaHitCheck tests them against map objects through head_sphere_data.
+ */
 static HeadSphereSet1 head_sphere_data_lv0 = {
     1,
     {
@@ -613,7 +617,7 @@ HitEntry* kpaHitCheck(void) {
                 break;
         }
         hit = hitCheckSphereFilter(NULL, x, y, z, r);
-        if ((mario->flags & MARIO_FLAG_IS_JUMPING) && (hitGetAttr(hit) & 0x80000000) && mobjHitObjPtrToPtr(hit)->position.y > y) {
+        if ((mario->flags & MARIO_FLAG_IS_JUMPING) && (hitGetAttr(hit) & HIT_ATTR_MOBJ) && mobjHitObjPtrToPtr(hit)->position.y > y) {
             KHEAD(j) = hit;
         }
         if (hit) {

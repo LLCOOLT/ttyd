@@ -41,6 +41,14 @@ typedef struct BattleStageData {
     s8 disableBgBDestroy;           // 0x1B3
 } BattleStageData;
 
+// StageLight.flags (no C code sets the spline bits).
+enum StageLightFlags {
+    STAGE_LIGHT_ACTIVE = 0x1,      // the light slot is in use
+    STAGE_LIGHT_RELEASING = 0x2,   // BattleStageLightRelease: fading to black, then freed
+    STAGE_LIGHT_SPLINE = 0x4,      // the target follows the LightSpline in data; cleared by a target move
+    STAGE_LIGHT_SPLINE_LOOP = 0x8, // the spline restarts at its end instead of stopping
+};
+
 typedef struct StageLight {
     u32 flags;           // 0x0
     char name[0x20];     // 0x4

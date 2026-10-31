@@ -40,10 +40,15 @@ extern EvtWord majinaisi_direct_talk[];
 extern EvtWord majinaisi_init[];
 static NpcSetupInfo npcEnt[2];
 
+/**
+ * Merlee's charm prices, read by majinaisi_ryokin_kaisu: pairs of fee and the number of times the charm works,
+ * for Special (50 coins, 20), Normal (20 coins, 10) and Cheap (5 coins, 5).
+ */
 s32 majinaisi_ryokin_kaisu_tbl[] = {
     50, 20, 20, 10, 5, 5,
 };
 
+/** Doors of this room: the east exit back to tik_01. */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -77,15 +82,16 @@ EVT_BEGIN(suisyou_kirakira)
 EVT_END()
 
 /**
- * Guess: Talk script at Merlee's table (majinaisi, the charm-caster).
- * She greets Mario (majinaisi_01), offers the menu (majinaisi_02) and
- * then the list of blessings with prices (majinaisi_05);
- * the price and the number of battles come from majinaisi_ryokin_kaisu.
+ * Talk script at Merlee's table (まじない師, majinaisi, the fortune-teller under Rogueport).
+ * She greets Mario and asks whether he wants her service (majinaisi_01, yes/no majinaisi_02; no ends with
+ * majinaisi_03), then offers three paths (majinaisi_05): Special 50 coins, Normal 20 coins or Cheap 5 coins,
+ * whose fee and charm count (20, 10 or 5) come from majinaisi_ryokin_kaisu.
  * If Mario cannot pay she refuses (majinaisi_06);
- * otherwise she takes the coins, casts the charm (evt_pouch_majinai_set), the partners step back,
- * a crystal effect plays, and she wishes him luck (majinaisi_08).
+ * otherwise she takes the coins, sets the charm (evt_pouch_majinai_set), Mario and the partners move into place,
+ * the box and crystal effects play around Mario, and she promises he will win battles in style (majinaisi_08).
  */
 EVT_BEGIN(majinaisi_table_talk)
+    // Merlee greets Mario and asks whether he wants a charm; saying no ends the talk.
     CALL(setmertn, STRING("まじない師"))
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -101,6 +107,7 @@ EVT_BEGIN(majinaisi_table_talk)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+    // She shows Mario's coins and the three prices; he can back out, or be turned away if he is short of coins.
     CALL(evt_msg_print_add, 0, STRING("majinaisi_04"))
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_unitwin_alloc)
@@ -129,6 +136,7 @@ EVT_BEGIN(majinaisi_table_talk)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+    // Mario pays, the charm is set, and Mario and the partners step into place in front of her.
     MULTIPLY(LW(1), -1)
     CALL(evt_pouch_add_coin, LW(1))
     CALL(unitwincoin_wait)
@@ -150,6 +158,7 @@ EVT_BEGIN(majinaisi_table_talk)
     CALL(evt_mario_mov_pos2, 25, 0, 60)
     CALL(evt_mario_set_dir, 270, 300, 0)
     WAIT_MS(1000)
+    // The charm cube moves under Mario, unfolds around him and closes over him, then rises into the air.
     CALL(evt_mapobj_get_position, STRING("majinai_BOX"), LW(0), LW(1), LW(2))
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
     SUBTRACT(LW(3), LW(0))
@@ -185,6 +194,7 @@ EVT_BEGIN(majinaisi_table_talk)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(1)
     END_IF
+    // The cube spins faster and faster while crystal sparkles pulse around it, then slows to a stop.
     CALL(evt_npc_set_anim, STRING("me"), STRING("S_2"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -265,6 +275,7 @@ EVT_BEGIN(majinaisi_table_talk)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+    // The cube sinks back to the floor and the room fades out around it.
     WAIT_MS(1000)
     CALL(evt_npc_set_anim, STRING("me"), STRING("H_2"))
     SET_VALUE(LW(3), LW(13))
@@ -303,6 +314,7 @@ EVT_BEGIN(majinaisi_table_talk)
             GOTO(4)
         END_IF
     END_INLINE_EVENT
+    // The cube opens and Mario jumps out in a burst of star dust; Merlee promises he will win in style.
     BEGIN_INLINE_EVENT
         WAIT_MS(100)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -324,6 +336,7 @@ EVT_BEGIN(majinaisi_table_talk)
     CALL(evt_map_checkanim, STRING("anm_ten"), LW(0), LW(1))
     WAIT_MS(LW(1))
     CALL(evt_msg_print, 0, STRING("majinaisi_08"), 0, STRING("me"))
+    // The room and the cube are put back and control returns.
     CALL(evt_mario_set_motion, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("majinai_BOX"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_blend_off, 0)
@@ -343,6 +356,7 @@ EVT_BEGIN(majinaisi_table_talk)
     RETURN
 EVT_END()
 
+/** Items Merlee accepts for Trouble Center request 14: Cake Mix (-1 ends the list). */
 s32 iri_14_item_tbl[] = {
     ITEM_CAKE_MIX, -1,
 };
@@ -398,6 +412,7 @@ EVT_BEGIN(majinaisi_init)
     RETURN
 EVT_END()
 
+/** NPCs of this room: Merlee, whose table talk is registered on the a_majinai area. */
 static NpcSetupInfo npcEnt[] = {
     {
         "まじない師", // name

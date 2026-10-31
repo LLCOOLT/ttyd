@@ -10,10 +10,15 @@
 #include <dolphin/mtx.h>
 #include <stdlib.h>
 
+/**
+ * Colours a wind band can take (white, red or blue), as red, green and blue tables;
+ * the type picks one per band.
+ */
 u8 col_r[3] = {0xFF, 0xFF, 0x40};
 u8 col_g[3] = {0xFF, 0x40, 0x40};
 u8 col_b[3] = {0xFF, 0x40, 0xFF};
 
+/** The wind band mesh: a thin curved strip that wraps around the centre, drawn once for each band. */
 effN64Vtx eff_whirlwind_v[] = {
     {-5, -2, 9, 939, 0, 0xFF, 0xFF, 0xFF, 0xFF},
     {-5, 2, 9, 939, 512, 0xFF, 0xFF, 0xFF, 0xFF},

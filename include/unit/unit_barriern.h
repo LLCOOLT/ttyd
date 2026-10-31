@@ -1,8 +1,7 @@
-#pragma once
-
-// Barriern (Boo-like shield boss): the satellite flight paths shared by every copy of the unit
+// Barriern (Yux, the shield unit guarded by Mini-Yux): the satellite flight paths shared by every copy of the unit
 // (aji unit_barriern / unit_barriern_custom / unit_barriern_z, moo unit_barriern_z, mri unit_barriern
 // and the tst copies), and Sir Grodus (rels/las unit_boss_batten_leader, satellites in unit->work[13 + satellite]).
+#pragma once
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>

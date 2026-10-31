@@ -1,7 +1,6 @@
-#pragma once
-
 // Shuryo (Grodus) staff lights: the five lamps on the staff NPC, carried as evt_shuryolight.c by both
 // aji (X-Naut fortress) and las (Palace of Shadow).
+#pragma once
 
 #include "driver/npcdrv.h"
 #include "evt/evt_cmd.h"

@@ -93,12 +93,17 @@ const char* a_nametbl[21];
 s32 turn_tbl[22];
 s32 hoko_tbl[22];
 
+/**
+ * Map object names of the Boat Mode hazards by index: 1-4 the big whirlpools, 5-12 the small whirlpools
+ * and 13-20 the barrels (index 0 is unused). a2_nametbl and a_nametbl below list their hit objects.
+ */
 const char* s_nametbl[] = {
     NULL, "S_dai_uzu1", "S_dai_uzu2", "S_dai_uzu3", "S_dai_uzu4", "S_uzu1", "S_uzu2", "S_uzu3", "S_uzu4", "S_uzu5",
     "S_uzu6", "S_uzu7", "S_uzu8", "S_taru01", "S_taru02", "S_taru03", "S_taru04", "S_taru05", "S_taru06",
     "S_taru07", "S_taru08",
 };
 
+/** Unused: a second list of Boat Mode hazard collision names (map polygons for the whirlpools). */
 const char* a2_nametbl[] = {
     NULL,
     "polySurface439_q00000",
@@ -123,24 +128,34 @@ const char* a2_nametbl[] = {
     "A_taru08",
 };
 
+/** Hit object names of the Boat Mode hazards, indexed like s_nametbl; yuuminigame2_get_name returns them. */
 const char* a_nametbl[] = {
     NULL, "A_dai_uzu1", "A_dai_uzu2", "A_dai_uzu3", "A_dai_uzu4", "A_uzu1", "A_uzu2", "A_uzu3", "A_uzu4", "A_uzu5",
     "A_uzu6", "A_uzu7", "A_uzu8", "A_taru01", "A_taru02", "A_taru03", "A_taru04", "A_taru05", "A_taru06",
     "A_taru07", "A_taru08",
 };
 
+/**
+ * Degrees per frame the boat turns while caught by each Boat Mode hazard (same indices as s_nametbl):
+ * 5 for the big whirlpools and 10 for the small ones, alternating direction; the barrels do not turn it.
+ */
 s32 turn_tbl[] = {
     0, 5, -5, 5, -5, 10, -10, 10,
     -10, 10, -10, 10, -10, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
 };
 
+/**
+ * Direction (degrees, give or take 45 at random) each small whirlpool (indices 5-12) flings the boat;
+ * yuuminigame2_gamerule passes it to marioSetSwirlPower.
+ */
 s32 hoko_tbl[] = {
     0, 0, 0, 0, 0, 45, 135, 45,
     135, 45, 45, 135, 180, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
 };
 
+/** Where fall_rtn scatters the Boat Mode coins: five spots, one coin each (x range, then z range). */
 static MonteTable montetable[] = {
     {0.0f, 0.0f, 50.0f, 340.0f, 1},
     {250.0f, 250.0f, 50.0f, 340.0f, 1},
@@ -359,12 +374,14 @@ EVT_END()
  * and (US and later) hides all but the current game-language sign graphics.
  */
 EVT_BEGIN(yuu_01_init_evt)
+    // The room's lights, clouds and water start animating.
     CALL(evt_map_playanim, STRING("den1"), 1, 0)
     CALL(evt_map_playanim, STRING("den2"), 1, 0)
     CALL(evt_map_playanim, STRING("kumo"), 1, 0)
     CALL(evt_map_playanim, STRING("wakka"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu"), 1, 0)
     CALL(evt_map_playanim, STRING("nagare"), 1, 0)
+    // The four big whirlpools (S_dai_uzu1-4) each drift on their own path; the demos move them more slowly.
     CALL(yuuminigame2_get_name, 1, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
@@ -441,6 +458,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(12), 2)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
     CALL(yuuminigame_set_dataadr, 3, LW(15))
+    // Big whirlpool 4 stays in place in the demos; later versions slide it a short way.
     CALL(yuuminigame2_get_name, 4, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
@@ -465,6 +483,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(12), 2)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
     CALL(yuuminigame_set_dataadr, 4, LW(15))
+    // The eight small whirlpools (S_uzu1-8), which spin the boat around, slide back and forth.
     CALL(yuuminigame2_get_name, 5, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
@@ -548,6 +567,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(12), 2)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
     CALL(yuuminigame_set_dataadr, 8, LW(15))
+    // Small whirlpools 5 to 8.
     CALL(yuuminigame2_get_name, 9, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
@@ -612,6 +632,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(12), 2)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
     CALL(yuuminigame_set_dataadr, 12, LW(15))
+    // The eight barrels (S_taru01-08) bob and float back and forth across the course.
     CALL(yuuminigame2_get_name, 13, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
@@ -676,6 +697,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(12), 1)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
     CALL(yuuminigame_set_dataadr, 16, LW(15))
+    // Barrels 5 to 7 hold still in the demos; later versions move them too.
     CALL(yuuminigame2_get_name, 17, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
@@ -763,9 +785,11 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(12), 1)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
     CALL(yuuminigame_set_dataadr, 20, LW(15))
+    // The game is set up and the audience appears.
     SPAWN_EVENT(minigame02_main)
     CALL_CHILD(evt_yuunpc_minigame2)
 #if VERSION >= VERSION_US
+    // US and later: show only the current language's sign.
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("J_mon"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("E_mon"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_mon"), MAPOBJ_FLAG_DISABLE)

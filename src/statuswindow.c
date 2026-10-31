@@ -97,29 +97,29 @@ void statusWinInit(void) {
     wp->closeY = 334.0f;
     wp->idle = 0;
     wp->forceTimer = 0;
-    wp->flags &= ~0xA;
-    wp->flags |= 5;
+    wp->flags &= ~(STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ);
+    wp->flags |= STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ;
 }
 
 /** Resets the HUD's idle timers on a map change and turns a pending forced open/close into a normal open/close. */
 void statusWinReInit(void) {
     wp->idle = 0;
     wp->forceTimer = 0;
-    if (wp->flags & 0x10) {
-        wp->flags &= ~0x10;
-        wp->flags &= ~0xA;
-        wp->flags |= 5;
-    } else if (wp->flags & 1) {
-        wp->flags &= ~0xA;
-        wp->flags |= 5;
+    if (wp->flags & STATUSWIN_FLAG_FORCE_OPEN) {
+        wp->flags &= ~STATUSWIN_FLAG_FORCE_OPEN;
+        wp->flags &= ~(STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ);
+        wp->flags |= STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ;
+    } else if (wp->flags & STATUSWIN_FLAG_OPEN) {
+        wp->flags &= ~(STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ);
+        wp->flags |= STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ;
     }
-    if (wp->flags & 0x20) {
-        wp->flags &= ~0x20;
-        wp->flags |= 0xA;
-        wp->flags &= ~5;
-    } else if (wp->flags & 2) {
-        wp->flags |= 0xA;
-        wp->flags &= ~5;
+    if (wp->flags & STATUSWIN_FLAG_FORCE_CLOSE) {
+        wp->flags &= ~STATUSWIN_FLAG_FORCE_CLOSE;
+        wp->flags |= STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ;
+        wp->flags &= ~(STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ);
+    } else if (wp->flags & STATUSWIN_FLAG_CLOSED) {
+        wp->flags |= STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ;
+        wp->flags &= ~(STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ);
     }
 }
 
@@ -139,7 +139,7 @@ void statusWinMain(void) {
     one = 1.0f;
     mario = marioGetPtr();
     if (mario->characterId) {
-        wp->flags = 2;
+        wp->flags = STATUSWIN_FLAG_CLOSED;
         wp->duration = one;
         wp->timer = one;
         wp->tEnd = 0.0f;
@@ -150,8 +150,8 @@ void statusWinMain(void) {
         return;
     }
     switch (seqGetSeq()) {
-        case 2:
-        case 3:
+        case SEQ_GAME:
+        case SEQ_MAP_CHANGE:
             if ((marioChkCtrl() ? FALSE : TRUE) || (marioChkKey() ? FALSE : TRUE) || !(mario->flags & MARIO_FLAG_ACTIVE)) {
                 if (statusWinCheck()) {
                     statusWinClose();
@@ -167,7 +167,7 @@ void statusWinMain(void) {
                         if (!wp->forcedClose && !wp->forceTimer && !statusWinCheck()) {
                             statusWinOpen();
 #if VERSION >= VERSION_JP
-                            wp->flags |= 0x100;
+                            wp->flags |= STATUSWIN_FLAG_MENU_HINTS;
 #endif
                         }
                     }
@@ -183,7 +183,7 @@ void statusWinMain(void) {
                         statusWinOpen();
                         wp->forceTimer = gp->framerate * 10;
                         psndSFXOn((const char*)0x2A);
-                        wp->flags |= 0x100;
+                        wp->flags |= STATUSWIN_FLAG_MENU_HINTS;
                     } else {
                         statusWinClose();
                         wp->forceTimer = gp->framerate * 10;
@@ -202,14 +202,14 @@ void statusWinMain(void) {
                 wp->forceTimer--;
             }
             wp->prevPos = mario->position;
-            if (wp->flags & 0x10) {
-                wp->flags &= ~0xA;
+            if (wp->flags & STATUSWIN_FLAG_FORCE_OPEN) {
+                wp->flags &= ~(STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ);
             }
-            if (wp->flags & 0x20) {
-                wp->flags &= ~5;
+            if (wp->flags & STATUSWIN_FLAG_FORCE_CLOSE) {
+                wp->flags &= ~(STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ);
             }
             break;
-        case 4:
+        case SEQ_BATTLE:
             break;
         default:
             if (statusWinCheck()) {
@@ -217,15 +217,15 @@ void statusWinMain(void) {
             }
             break;
     }
-    if (wp->flags & 4 || wp->flags & 8 || wp->flags & 0x40 || wp->flags & 0x80) {
+    if (wp->flags & STATUSWIN_FLAG_OPEN_REQ || wp->flags & STATUSWIN_FLAG_CLOSE_REQ || wp->flags & STATUSWIN_FLAG_FORCE_OPEN_REQ || wp->flags & STATUSWIN_FLAG_FORCE_CLOSE_REQ) {
         wp->tStart = wp->t;
-        wp->tEnd = (wp->flags & 0x44) ? 1.0f : 0.0f;
+        wp->tEnd = (wp->flags & (STATUSWIN_FLAG_OPEN_REQ | STATUSWIN_FLAG_FORCE_OPEN_REQ)) ? 1.0f : 0.0f;
         wp->timer = 0.0f;
-        wp->duration = (wp->flags & 0x44) ? 16.0f / wp->speed : 28.0f / wp->speed;
-        wp->flags &= ~4;
-        wp->flags &= ~8;
-        wp->flags &= ~0x40;
-        wp->flags &= ~0x80;
+        wp->duration = (wp->flags & (STATUSWIN_FLAG_OPEN_REQ | STATUSWIN_FLAG_FORCE_OPEN_REQ)) ? 16.0f / wp->speed : 28.0f / wp->speed;
+        wp->flags &= ~STATUSWIN_FLAG_OPEN_REQ;
+        wp->flags &= ~STATUSWIN_FLAG_CLOSE_REQ;
+        wp->flags &= ~STATUSWIN_FLAG_FORCE_OPEN_REQ;
+        wp->flags &= ~STATUSWIN_FLAG_FORCE_CLOSE_REQ;
     }
 #if VERSION >= VERSION_US
     wp->timer += 60.0f / gp->framerate;
@@ -236,7 +236,7 @@ void statusWinMain(void) {
         wp->timer = wp->duration;
         wp->t = wp->tEnd;
         if (wp->t == 0.0f) {
-            wp->flags &= ~0x100;
+            wp->flags &= ~STATUSWIN_FLAG_MENU_HINTS;
         }
     } else {
         inv = (f32)cos(3.1415927f * wp->timer / wp->duration);
@@ -247,7 +247,7 @@ void statusWinMain(void) {
     wp->x = wp->openX * t + wp->closeX * inv;
     wp->y = wp->openY * t + wp->closeY * inv;
     valueUpdate();
-    if (!(wp->flags & 0x1000)) {
+    if (!(wp->flags & STATUSWIN_FLAG_DISP_OFF)) {
         dispEntry(CAMERA_2D, 500.0f, 0, statusWinDisp, NULL);
     }
 }
@@ -375,8 +375,8 @@ static void statusWinDisp(CameraId camId, void* param) {
 
     if (wp->cur.party) {
         partysDt[1].iconId = party_icon[wp->cur.party];
-        if (wp->cur.party == 4) {
-            switch (pouchGetPartyColor(4)) {
+        if (wp->cur.party == PARTNER_YOSHI) {
+            switch (pouchGetPartyColor(PARTNER_YOSHI)) {
                 case 0:
                     partysDt[1].iconId = ICON_1A7;
                     break;
@@ -418,7 +418,7 @@ static void statusWinDisp(CameraId camId, void* param) {
     }
 
 #if VERSION >= VERSION_JP
-    if (wp->flags & 0x100 && !gp->inBattle) {
+    if (wp->flags & STATUSWIN_FLAG_MENU_HINTS && !gp->inBattle) {
         y2 = -180.0f + (wp->openY - wp->y);
         MTXTrans(m2, -190.0f, y2, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
@@ -426,7 +426,7 @@ static void statusWinDisp(CameraId camId, void* param) {
         // US and PAL pick the menu icons (and the badge icon's offset) per language; JP and the demos use fixed icons
 #if VERSION >= VERSION_US
         iconDispGxCol(m2, 0x10, ICON_212, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(1)) {
+        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(PARTNER_GOOMBELLA)) {
             MTXTrans(m2, -250.0f, 16.0f + y2, 0.0f);
             MTXScale(s2, 0.75f, 0.75f, 0.75f);
             MTXConcat(m2, s2, m2);
@@ -449,7 +449,7 @@ static void statusWinDisp(CameraId camId, void* param) {
         iconDispGxCol(m2, 0x10, (u16)journal_icon_tbl[gp->language], (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
         iconDispGxCol(m2, 0x10, 0x212, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(1)) {
+        if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(PARTNER_GOOMBELLA)) {
             MTXTrans(m2, -250.0f, 16.0f + y2, 0.0f);
             MTXScale(s2, 0.75f, 0.75f, 0.75f);
             MTXConcat(m2, s2, m2);
@@ -661,64 +661,64 @@ static void valueUpdate(void) {
 
 /** Requests the HUD to slide in. */
 void statusWinOpen(void) {
-    wp->flags &= ~0xA;
-    wp->flags |= 5;
+    wp->flags &= ~(STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ);
+    wp->flags |= STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ;
 }
 
 /** Requests the HUD to slide out. */
 void statusWinClose(void) {
-    wp->flags |= 0xA;
-    wp->flags &= ~5;
+    wp->flags |= STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ;
+    wp->flags &= ~(STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ);
 }
 
 /** Slides the HUD in and pins it open regardless of Mario's movement, until statusWinForceOff. */
 void statusWinForceOpen(void) {
-    wp->flags &= ~0xA;
-    wp->flags &= ~0xA0;
-    wp->flags |= 0x50;
+    wp->flags &= ~(STATUSWIN_FLAG_CLOSED | STATUSWIN_FLAG_CLOSE_REQ);
+    wp->flags &= ~(STATUSWIN_FLAG_FORCE_CLOSE | STATUSWIN_FLAG_FORCE_CLOSE_REQ);
+    wp->flags |= STATUSWIN_FLAG_FORCE_OPEN | STATUSWIN_FLAG_FORCE_OPEN_REQ;
 }
 
 /** Slides the HUD out and keeps it closed, until statusWinForceOff or statusWinForceCloseClear. */
 void statusWinForceClose(void) {
-    wp->flags &= ~5;
-    wp->flags &= ~0x50;
-    wp->flags |= 0xA0;
+    wp->flags &= ~(STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_OPEN_REQ);
+    wp->flags &= ~(STATUSWIN_FLAG_FORCE_OPEN | STATUSWIN_FLAG_FORCE_OPEN_REQ);
+    wp->flags |= STATUSWIN_FLAG_FORCE_CLOSE | STATUSWIN_FLAG_FORCE_CLOSE_REQ;
 }
 
 /** Drops a forced close without reopening the HUD. */
 void statusWinForceCloseClear(void) {
-    wp->flags &= ~0xA0;
+    wp->flags &= ~(STATUSWIN_FLAG_FORCE_CLOSE | STATUSWIN_FLAG_FORCE_CLOSE_REQ);
 }
 
 /** Ends a forced open or close, leaving the HUD in the matching normal state; called when message windows close. */
 void statusWinForceOff(void) {
-    if (wp->flags & 0x10) {
-        wp->flags &= ~0x10;
+    if (wp->flags & STATUSWIN_FLAG_FORCE_OPEN) {
+        wp->flags &= ~STATUSWIN_FLAG_FORCE_OPEN;
         statusWinOpen();
-    } else if (wp->flags & 1) {
+    } else if (wp->flags & STATUSWIN_FLAG_OPEN) {
         statusWinOpen();
     }
-    if (wp->flags & 0x20) {
-        wp->flags &= ~0x20;
+    if (wp->flags & STATUSWIN_FLAG_FORCE_CLOSE) {
+        wp->flags &= ~STATUSWIN_FLAG_FORCE_CLOSE;
         statusWinClose();
-    } else if (wp->flags & 2) {
+    } else if (wp->flags & STATUSWIN_FLAG_CLOSED) {
         statusWinClose();
     }
 }
 
 /** Lets the HUD draw again after statusWinDispOff. */
 void statusWinDispOn(void) {
-    wp->flags &= ~0x1000;
+    wp->flags &= ~STATUSWIN_FLAG_DISP_OFF;
 }
 
 /** Stops drawing the HUD without changing whether it is open. */
 void statusWinDispOff(void) {
-    wp->flags |= 0x1000;
+    wp->flags |= STATUSWIN_FLAG_DISP_OFF;
 }
 
 /** Returns TRUE when the HUD is open or forced open. */
 BOOL statusWinCheck(void) {
-    return (wp->flags & 0x11) ? TRUE : FALSE;
+    return (wp->flags & (STATUSWIN_FLAG_OPEN | STATUSWIN_FLAG_FORCE_OPEN)) ? TRUE : FALSE;
 }
 
 /** Returns TRUE when a shown value changed since the last display (see valueCheck). */
@@ -796,10 +796,11 @@ void statusPartyHPBlink(s32 frames) {
 }
 
 /**
- * Unknown: nothing calls it.
+ * Stand-in for a stripped function: it is in no version's symbols and nothing calls it, so the link drops it.
  * It fills f with 0, 1, pi and 0.5 (and 60 in US and PAL), the float constants the file uses,
  * in the order the original keeps them.
  */
+// FAKE: uncalled stand-in for a stripped function; orders 0, 1, pi, 0.5 (and US/PAL 60) in .sdata2
 void statusWinEase(f32* f) {
     f[0] = 0.0f;
 #if VERSION >= VERSION_US

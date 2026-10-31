@@ -12,6 +12,7 @@ typedef enum DVDFlags {
     DVDMGR_READING = (1 << 0),
     DVDMGR_FINISHED = (1 << 1),
     DVDMGR_CLOSED = (1 << 3),
+    DVDMGR_OPEN_FAILED = (1 << 4), // demo: dvdMgrOpen's DVDOpen failed (the entry is cleared right after)
     DVDMGR_UNK_ERROR1 = (1 << 5),
     DVDMGR_UNK_ERROR2 = (1 << 7),
     DVDMGR_INUSE = (1 << 15)

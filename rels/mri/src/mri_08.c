@@ -244,6 +244,7 @@ EVT_BEGIN(toge_6_talk)
     RETURN
 EVT_END()
 
+/** The six Jabbies (トゲ族１ to 6) of the first hive. */
 static NpcSetupInfo npcEnt[] = {
     {
         "トゲ族１", // name
@@ -333,6 +334,7 @@ static EVT_BEGIN(patolight_sound_off)
     RETURN
 EVT_END()
 
+/** Exits of mri_08: east road e_bero to mri_09 (w_bero); west road w_bero to mri_06 (e_bero02). */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -678,6 +680,7 @@ static EVT_BEGIN(puni_vs_toge)
     RETURN
 EVT_END()
 
+/** Plants Mario can search in mri_08: A_ueki01, A_ueki02, A_ueki03, A_ueki04, A_ueki05. */
 static KusaAccess ueki_access_data[] = {
     {1, "A_ueki01", "S_ueki01", NULL},
     {1, "A_ueki02", "S_ueki02", NULL},

@@ -57,6 +57,7 @@ static EVT_BEGIN(s_door_close)
     RETURN
 EVT_END()
 
+/** Exit of this room: the south door to aji_01. */
 static BeroEntry bero_entry_data[] = {
     {
         "s_bero", // hitName
@@ -103,6 +104,7 @@ static USER_FUNC(scale_func) {
  * to moo_04 during STORY_STG7_25_THE_LAST_MAIL.
  */
 EVT_BEGIN(tensou_ride)
+    // Mario and his partner walk onto the teleporter pad.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
@@ -138,6 +140,7 @@ EVT_BEGIN(tensou_ride)
             BREAK_LOOP
         END_IF
     END_LOOP
+    // They spin faster and faster, shrink and rise out of sight.
     CALL(evt_mario_cam_off)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -174,6 +177,8 @@ EVT_BEGIN(tensou_ride)
     END_LOOP
     WAIT_MS(2000)
     CALL(evt_snd_sfxoff, LW(9))
+    // The map changes: to the Rogueport sewers normally, or to the Moon (moo_04) during the story point of the
+    // last mail.
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_25_THE_LAST_MAIL)
         SET_VALUE(GSWF(GSWF_TIK00_TELEPORTER_ARRIVAL), 1)

@@ -95,6 +95,7 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/** Exit of this room: the east door to aji_17. */
 static BeroEntry bero_entry_data[] = {
     {
         "e_bero", // hitName
@@ -164,9 +165,10 @@ EVT_BEGIN(evt_kaitentou2)
 EVT_END()
 
 /**
- * Swings the needle map object named in LW(10) (Guess: a gauge needle such as S_hari01) around its Z axis:
- * picks random target angles up to 90 degrees (alternating sides) over 1.5 to 3 seconds each,
- * until GF(15) is raised by a switch reset, then eases it back to 0 over one second.
+ * Swings the needle (hari) map object named in LW(10) (S_hari01 to S_hari06, started when the crane game is
+ * switched on) around its Z axis: picks random target angles up to 90 degrees (alternating sides)
+ * over 1.5 to 3 seconds each, until GF(15) is raised by a switch reset, then eases it back to 0 over one second.
+ * Guess: the needles are dial pointers on the machinery.
  */
 static EVT_BEGIN(evt_hari)
     SET_VALUE(LW(6), LW(8))
@@ -265,8 +267,8 @@ EVT_BEGIN(ufo_hand)
 EVT_END()
 
 /**
- * Sets GF(10) to 1.
- * Guess: an unused leftover of the crane's left-right control; evt_ufo_sousaban sets GF(10) directly.
+ * Sets GF(10) to 1, the flag evt_ufo_sousaban raises while the crane is driven along X.
+ * Nothing runs this script; evt_ufo_sousaban sets GF(10) itself.
  */
 EVT_BEGIN(move_left)
     SET_VALUE(GF(10), 1)
@@ -280,8 +282,8 @@ EVT_BEGIN(move_left2)
 EVT_END()
 
 /**
- * Sets GF(11) to 1.
- * Guess: an unused leftover of the crane's forward-back control; evt_ufo_sousaban sets GF(11) directly.
+ * Sets GF(11) to 1, the flag evt_ufo_sousaban raises while the crane is driven along Z.
+ * Nothing runs this script; evt_ufo_sousaban sets GF(11) itself.
  */
 EVT_BEGIN(move_up)
     SET_VALUE(GF(11), 1)
@@ -314,9 +316,8 @@ EVT_BEGIN(hand_success)
 EVT_END()
 
 /**
- * Closes the claw to 50 degrees over one second and opens it again.
- * Guess: the claw's missed-grab motion; nothing in this map runs it (ufo_main calls hand_success on both
- * outcomes).
+ * Closes the claw to 50 degrees over one second and opens it again: the missed-grab motion its name describes,
+ * but nothing runs it (ufo_main calls hand_success whether item_chk finds a prize or not).
  */
 EVT_BEGIN(hand_fail)
     CALL(evt_sub_intpl_msec_init, 11, 0, 5000, 1000)
@@ -384,6 +385,7 @@ EVT_BEGIN(ufo_main)
     SET_VALUE(GW(10), 230)
     SET_VALUE(GW(11), 100)
     CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
+    // The claw slides sideways while the player holds A and stops when A is released.
     LOOP(0)
         SPAWN_EVENT_GET_ID(PTR(ufo_hand), LW(9))
         LOOP(0)
@@ -409,6 +411,7 @@ EVT_BEGIN(ufo_main)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_snd_sfxoff, LW(3))
+        // Then it slides forward while B is held.
         LOOP(0)
             IF_INT_EQUAL(GF(11), 1)
                 BREAK_LOOP
@@ -432,6 +435,7 @@ EVT_BEGIN(ufo_main)
         END_LOOP
         CALL(evt_snd_sfxoff, LW(3))
         LABEL(100)
+        // The claw lowers, closes and looks for a prize underneath.
         IF_INT_EQUAL(GF(9), 1)
             WAIT_FRAMES(1)
             GOTO(100)
@@ -458,6 +462,7 @@ EVT_BEGIN(ufo_main)
             CALL_CHILD(hand_success)
             SET_VALUE(LF(0), 0)
         END_IF
+        // A prize is lifted and carried to the drop point, then dropped with a random bounce.
         IF_INT_EQUAL(LF(0), 1)
             BEGIN_INLINE_EVENT
                 CALL(evt_item_move_3d_position, LW(8), GW(10), 105, GW(11), 2000, 11)
@@ -532,6 +537,7 @@ EVT_BEGIN(ufo_main)
                 CALL(evt_item_status_on, LW(8), ITEM_STATUS_CUSTOM_LAUNCH)
                 CALL(evt_item_change_mode, LW(8), 5)
             END_INLINE_EVENT
+            // The claw opens and is ready for the next try.
             CALL_CHILD(hand_release)
         ELSE
             CALL_CHILD(hand_release)
@@ -655,6 +661,7 @@ EVT_END()
  * and the claw then grabs (ufo_main). GF(14) is set when the game ends.
  */
 EVT_BEGIN(evt_ufo_sousaban)
+    // Mario is locked in place while the crane powers up.
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 230, 200, 380, 230, 130, -13, 1000, 11)
     WAIT_MS(1200)
@@ -683,6 +690,7 @@ EVT_BEGIN(evt_ufo_sousaban)
         CALL(evt_msg_print, 0, STRING("stg7_aji_00_01"), 0, 0)
     END_IF
     WAIT_MS(300)
+    // The A button icon is shown until the player holds A to move the claw sideways.
     BEGIN_INLINE_EVENT_GET_ID(LW(10))
         LOOP(0)
             CALL(evt_sousa_icon, 0, 200, 130)
@@ -715,6 +723,7 @@ EVT_BEGIN(evt_ufo_sousaban)
 #endif
     SET_VALUE(GF(10), 0)
     DELETE_EVENT(LW(10))
+    // The B button icon is shown until the player holds B to move the claw forward.
     BEGIN_INLINE_EVENT_GET_ID(LW(10))
         LOOP(0)
             CALL(evt_sousa_icon, 1, 200, 70)
@@ -747,6 +756,7 @@ EVT_BEGIN(evt_ufo_sousaban)
 #endif
     SET_VALUE(GF(11), 0)
     DELETE_EVENT(LW(10))
+    // The claw grabs; when the game ends the crane lights go out and Mario gets control back.
     LOOP(0)
         IF_INT_EQUAL(GF(12), 0)
             BREAK_LOOP
@@ -965,6 +975,7 @@ EVT_BEGIN(evt_sw2)
     RETURN
 EVT_END()
 
+/** Key item list for the item menu in the crane game room: the Cog. */
 s32 haguruma_tbl[] = {
     85, -1,
 };
@@ -1051,6 +1062,7 @@ EVT_END()
  * finally it places the prizes (coins, the two badges and the Star Piece) on the crane floor unless already won.
  */
 EVT_BEGIN(aji_03_init_evt)
+    // The room's music and ambience start, and the crane lights are hidden.
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI3"))
 #if VERSION >= VERSION_JP
@@ -1068,11 +1080,14 @@ EVT_BEGIN(aji_03_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_1_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_3_2"), MAPOBJ_FLAG_HIDE)
+    // If the crane was already activated in an earlier visit, all three crane buttons count as pressed.
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_ACTIVATED), 1)
         SET_VALUE(GSWF(GSWF_AJI03_CRANE_BUTTON_1), 1)
         SET_VALUE(GSWF(GSWF_AJI03_CRANE_BUTTON_2), 1)
         SET_VALUE(GSWF(GSWF_AJI03_CRANE_BUTTON_3), 1)
     END_IF
+    // Before the cog is inserted, the shelf door is the place to use it; afterwards the clockwork runs and the
+    // crane panel can be used.
     IF_INT_EQUAL(GSWF(GSWF_AJI03_COG_INSERTED), 0)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_tanadoor_1"), 0, PTR(evt_haguruma), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_zenmais_ari"), MAPOBJ_FLAG_HIDE)
@@ -1099,6 +1114,8 @@ EVT_BEGIN(aji_03_init_evt)
             SPAWN_EVENT_GET_ID(PTR(blink_sw), GW(15))
         END_IF
     END_IF
+    // The three crane buttons blink until the player has pressed them, and the lit or unlit versions of their
+    // parts are shown.
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_ACTIVATED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui__2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_2_2"), MAPOBJ_FLAG_HIDE)
@@ -1136,6 +1153,7 @@ EVT_BEGIN(aji_03_init_evt)
         SPAWN_EVENT(evt_hari)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_pato4"), MAPOBJ_FLAG_HIDE)
+    // Guess: the spinning lamps (kaitentou) and hands (hari) start moving once the crane is active.
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_ACTIVATED), 1)
         SET_VALUE(LW(10), STRING("S_pato4"))
         SPAWN_EVENT(evt_kaitentou)
@@ -1148,6 +1166,7 @@ EVT_BEGIN(aji_03_init_evt)
         SET_VALUE(LW(10), STRING("S_hari02"))
         SPAWN_EVENT(evt_hari)
     END_IF
+    // The metal covers are shown or hidden according to whether the crane is active.
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_ACTIVATED), 1)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_1_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_1"), MAPOBJ_FLAG_HIDE)
@@ -1163,6 +1182,7 @@ EVT_BEGIN(aji_03_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_3_2"), MAPOBJ_FLAG_HIDE)
     END_IF
+    // The prizes sit in a grid: coins, and the Feeling Fine badges and a Star Piece if not yet taken.
     CALL(evt_item_entry, STRING("keihin00"), ITEM_COIN, -150, 50, 100, ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_entry, STRING("keihin01"), ITEM_COIN, -100, 50, 100, ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_entry, STRING("keihin02"), ITEM_COIN, -50, 50, 100, ITEM_ENTRY_FIXED, -1, 0)
@@ -1178,6 +1198,7 @@ EVT_BEGIN(aji_03_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_STAR_PIECE_PRIZE), 0)
         CALL(evt_item_entry, STRING("keihin08"), ITEM_STAR_PIECE, -50, 50, -100, ITEM_ENTRY_FIXED, -1, PTR(badge_evt3))
     END_IF
+    // The emergency alarm script starts.
     SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()

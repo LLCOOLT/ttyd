@@ -20,6 +20,10 @@ static EvtWord damage_event[12];
 static EvtWord attack_event[7];
 static EvtWord wait_event[6];
 
+/**
+ * Unit definition of the `kohatty` helper unit: 4 HP, level 1, 7 parts, with its sounds, init script and data
+ * table.
+ */
 BattleUnitKind unit_kohatty = {
     207,
     "btl_un_kohatty",
@@ -78,7 +82,7 @@ BattleUnitKind unit_kohatty = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x4,
+    UNIT_ATTR_FLOATING,
     &regist,
     7,
     parts,
@@ -86,41 +90,57 @@ BattleUnitKind unit_kohatty = {
     data_table,
 };
 
+/** Defence of the `kohatty` helper unit: none, so it takes full damage from every kind of attack. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Damage-type modifiers of the `kohatty` helper unit: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+/**
+ * Status vulnerability of the `kohatty` helper unit (100% is the normal chance): takes every status at the
+ * normal rate.
+ */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
+/**
+ * Pose table of the `kohatty` helper unit: its 11 battle poses (status, hurt and action) and the animation
+ * each one plays; the idle animation is `KIL_S_1`.
+ */
 static PoseTableEntry pose_table[] = {
     {2, "KIL_Z_1"},
     {9, "KIL_Z_1"},
-    {28, "KIL_S_1"},
+    {BTL_POSE_NORMAL, "KIL_S_1"},
     {29, "KIL_Q_1"},
     {30, "KIL_Q_1"},
     {31, "KIL_A_1"},
-    {39, "KIL_D_1"},
+    {BTL_POSE_DAMAGE, "KIL_D_1"},
     {50, "KIL_A_1"},
-    {40, "KIL_W_1"},
-    {42, "KIL_R_1"},
+    {BTL_POSE_WALK, "KIL_W_1"},
+    {BTL_POSE_RUN, "KIL_R_1"},
     {BTL_POSE_STAY_DEFAULT, "KIL_S_1"},
 };
 
+/** Data table of the `kohatty` helper unit: event 48 does nothing (btldefaultevt_Dummy). */
 static BattleDataEntry data_table[] = {
     {48, btldefaultevt_Dummy},
     {0, NULL},
 };
 
+/**
+ * Parts of the `kohatty` helper unit: 7 parts sharing the model `c_kuribo_y`, each with its hit box, defence
+ * tables and pose table.
+ */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x1600009, 0, pose_table},
-    {2, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x610000, 0, pose_table},
-    {3, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x610000, 0, pose_table},
-    {4, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x610000, 0, pose_table},
-    {5, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x610000, 0, pose_table},
-    {6, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x610000, 0, pose_table},
-    {7, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x610000, 0, pose_table},
+    {1, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET | PART_ATTR_HIDDEN, 0, pose_table},
+    {2, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {3, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {4, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {5, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {6, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
+    {7, "btl_un_kohatty", "c_kuribo_y", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_NOT_TARGETABLE | PART_ATTR_HAMMERLIKE_CANNOT_TARGET | PART_ATTR_SHELL_TOSSLIKE_CANNOT_TARGET, 0, pose_table},
 };
 
+/** Attack data of the `kohatty` helper unit's attack: hits one opposing unit for 1 damage. */
 BattleWeapon weapon_kohatty_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -139,7 +159,7 @@ BattleWeapon weapon_kohatty_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg

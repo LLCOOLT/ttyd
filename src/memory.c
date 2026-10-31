@@ -30,6 +30,10 @@ SmartWork smartWork;
 // US: no fixed battle heap (battle maps use a map sub-heap); the smart heap is index 4
 #define HEAP_COUNT 5
 #define SMART_HEAP 4
+/**
+ * Sizes of the game's main heaps: per heap, 1 with a fixed size in KiB or 0 with a percentage of what is left;
+ * memInit carves the OS arena into the heaps from this table, the smart heap last.
+ */
 s32 size_table[HEAP_COUNT][2] = {
     {1, 0x1C84},
     {1, 0xD90},
@@ -40,6 +44,10 @@ s32 size_table[HEAP_COUNT][2] = {
 #else
 #define HEAP_COUNT 6
 #define SMART_HEAP 5
+/**
+ * Sizes of the game's main heaps: per heap, 1 with a fixed size in KiB or 0 with a percentage of what is left;
+ * memInit carves the OS arena into the heaps from this table, the smart heap last.
+ */
 s32 size_table[HEAP_COUNT][2] = {
 #if VERSION <= VERSION_DEMO_US
     {1, 0x3784}, //0xDE1000

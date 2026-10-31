@@ -83,17 +83,19 @@ Placements that stay are needed or kept on purpose: SDK startup sections, paddin
 
 ### Review census (2026-10-28)
 
-A second, stricter census measured what a reviewer would still flag in the game code (`src/`, `rels/`, `include/`: 1,594 files) after the cleanup above. These are the starting figures for the next pass; the "Now" column is measured on the cleanup branch (2026-10-29) with the same census scripts and is refreshed as work lands.
+A second, stricter census measured what a reviewer would still flag in the game code (`src/`, `rels/`, `include/`: 1,594 files) after the cleanup above. These are the starting figures for the next pass; the "Now" column is measured on the cleanup branch (2026-10-31) with the same census scripts.
 
 | What | Start (2026-10-28) | Now |
 |---|---|---|
 | Battle scripts passing the acting unit as a bare `-2` | 48,595 in 412 files | 0 |
-| The "no output" script slot written as a bare `-250000000` | 9,058 in 391 files | 49 in 12 files |
-| Story flags and words written as bare numbers (`GSWF(n)` / `GSW(n)`) | 2,864 / 2,611 | 2,866 / 2,621 |
-| `USER_FUNC(x);` declarations in `.c` files | 22,803 (17,567 repeat a header) | 1,117 (214 repeat a header) |
-| Non-static prototypes in `.c` files | 3,471 (138 with types that differ from the header) | 1,354 (739 repeat a header, 287 of them with types that differ) |
-| `FAKE` comments / [FAKES.md](FAKES.md) rows | 233 / 138 | 238 / 140 |
-| Struct and union types defined in more than one file | 65 names | 15 names |
-| Files without a description comment | 1,553 of 1,594 | 1,609 of 1,649 |
-| Lines of version conditionals | 4,166 in 537 files | 4,103 in 539 files |
-| C files a strict clang parse rejects (per version) | 240 of 1,167 | 57 of 1,167 (JP) |
+| The "no output" script slot written as a bare `-250000000` | 9,058 in 391 files | 61 in 9 files |
+| Story flags and words written as bare numbers (`GSWF(n)` / `GSW(n)`) | 2,864 / 2,611 | 1 / 1 |
+| `USER_FUNC(x);` declarations in `.c` files | 22,803 (17,567 repeat a header) | 122 (13 repeat a header) |
+| Non-static prototypes in `.c` files | 3,471 (138 with types that differ from the header) | 41 (39 repeat a header; the 8 whose types differ are listed fakes) |
+| `FAKE` comments / [FAKES.md](FAKES.md) rows | 233 / 138 | 623 / 470 |
+| Struct and union types defined in more than one file | 65 names | 6 names (all in the SDK, MusyX, libc and SGI GLU sources, as in the originals) |
+| Files without a description comment | 1,553 of 1,594 | 0 of 1,654 |
+| Lines of version conditionals | 4,166 in 537 files | 6,888 in 865 files (the Japanese demo was added on 2026-10-29) |
+| C files a strict clang parse rejects (per version) | 240 of 1,167 | 57 of 1,167 (JP; last measured 2026-10-29) |
+
+The FAKE figures grew because the 2026-10-30 and 2026-10-31 passes marked and listed tricks that were already in the code (stripped-function stand-ins, compiler-setting regions, calls through casts and local prototypes), each measured by removing it and rebuilding; they are not new tricks.

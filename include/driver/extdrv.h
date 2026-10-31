@@ -11,6 +11,11 @@ typedef struct ExtdrvTexInfo {
     f32 frame;         // 0x8
 } ExtdrvTexInfo;
 
+// ExtdrvPose.flags (set by the map that uses the driver, bom_01)
+#define EXT_POSE_FLAG_ACTIVE 0x1      // drawn (extDraw, extPoseDraw) and depth-sorted by texId
+#define EXT_POSE_FLAG_FACE_CAMERA 0x2 // turns toward the camera like a paper pose (targetRy from dir)
+#define EXT_POSE_FLAG_NO_SHADOW 0x4   // no shadow drawn
+#define EXT_POSE_FLAG_SHADOW_Y 0x10   // the shadow is placed at shadowY instead of under the pose
 typedef struct ExtdrvPose {
     u32 flags;    // 0x0
     f32 dir;      // 0x4

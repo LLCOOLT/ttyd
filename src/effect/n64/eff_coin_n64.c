@@ -25,6 +25,7 @@ typedef struct EffCoinN64Data {
     s32 scale; // 0x10
 } EffCoinN64Data;
 
+/** The four coin sprites: start delay, offset from the spawn point and scale (in percent) of each. */
 static EffCoinN64Data _data[] = {
     {2, 0, 0, 0, 100},
     {4, 4, -2, 0, 100},
@@ -32,6 +33,7 @@ static EffCoinN64Data _data[] = {
     {8, 2, 4, 0, 40},
 };
 
+/** Camera-facing 16x16 coin sprite. */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, 1024, 0, 0, 0, 0, 255},

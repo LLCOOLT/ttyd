@@ -53,10 +53,18 @@ void setupDataLoad(const char* mapName) {
     }
 }
 
+// MapAttrEntry.flags, read by setupDataBase. The table uses 7 (all three) for most maps and 5 (no
+// MAP_ATTR_FLAG_KEEP_AREA) for the open field maps of an area (hei, win, gra, muj, moo, ...).
+enum MapAttrFlags {
+    MAP_ATTR_FLAG_RECORD_DEFEATS = 0x1, // defeated enemies stay away; leaving the area clears the records
+    MAP_ATTR_FLAG_KEEP_AREA = 0x2,      // keep every record of the area (overrides MAP_ATTR_FLAG_TRIM_RECENT)
+    MAP_ATTR_FLAG_TRIM_RECENT = 0x4,    // keep only the records of this map and the one before it
+};
+
 typedef struct MapAttrEntry {
     const char* name;
     s32 area;
-    u32 flags;
+    u32 flags; // MapAttrFlags
 } MapAttrEntry;
 
 extern MapAttrEntry _map_attr_data[];
@@ -76,7 +84,7 @@ BOOL setupDataCheck(void) {
         return TRUE;
     parseInit(ptr, size);
     while (parsePush("<Npc>")) {
-        parseTagGet1("<tribe>", 0, tribeName);
+        parseTagGet1("<tribe>", PARSE_STRING, tribeName);
         parsePopNext();
         b = gp->inBattle != 0;
         if (!animGroupBaseAsync(npcGetTribe(tribeName)->modelName, b, NULL))
@@ -152,38 +160,38 @@ void setupDataBase(const char* areaName, const char* mapName) {
         fbat->deadInfo[0] = tmp;
     }
 
-    if (attr->flags & 1) {
+    if (attr->flags & MAP_ATTR_FLAG_RECORD_DEFEATS) {
         a = findMapAttr(mapName);
         b = findMapAttr(dead1->mapName);
         if (a->area != b->area) {
             memset(dead, 0, 0x500);
             strcpy(dead->mapName, mapName);
-        } else if (!(attr->flags & 2) && (attr->flags & 4)) {
+        } else if (!(attr->flags & MAP_ATTR_FLAG_KEEP_AREA) && (attr->flags & MAP_ATTR_FLAG_TRIM_RECENT)) {
             memset(&fbat->deadInfo[2], 0, 0x4d8);
         }
     }
 
     k = 0;
     isMarker = 0;
-    if (attr->flags & 1)
+    if (attr->flags & MAP_ATTR_FLAG_RECORD_DEFEATS)
         isMarker = 1;
     if (ptr) {
         parseInit(ptr, size);
         while (parsePush("<Npc>")) {
-            parseTagGet1("<name>", 0, npcName);
-            parseTagGet1("<tribe>", 0, tribeName);
-            parseTagGet1("<position>", 3, &pos);
-            parseTagGet1("<dir>", 2, &dir);
-            parseTagGet1("<aitype>", 0, aiType);
-            parseTagGet1("<territory_type>", 0, terrType);
-            parseTagGet1("<territory_base>", 3, &base);
-            parseTagGet1("<territory_loiter>", 3, &loiter);
-            parseTagGet1("<territory_homing>", 3, &homing);
-            parseTagGet1("<search_range>", 2, &searchRange);
-            parseTagGet1("<search_angle>", 2, &searchAngle);
-            parseTagGet1("<homing_range>", 2, &homingRange);
-            parseTagGet1("<homing_angle>", 2, &homingAngle);
-            parseTagGet1("<btl_setup_no>", 0, btlSetup);
+            parseTagGet1("<name>", PARSE_STRING, npcName);
+            parseTagGet1("<tribe>", PARSE_STRING, tribeName);
+            parseTagGet1("<position>", PARSE_VEC, &pos);
+            parseTagGet1("<dir>", PARSE_FLOAT, &dir);
+            parseTagGet1("<aitype>", PARSE_STRING, aiType);
+            parseTagGet1("<territory_type>", PARSE_STRING, terrType);
+            parseTagGet1("<territory_base>", PARSE_VEC, &base);
+            parseTagGet1("<territory_loiter>", PARSE_VEC, &loiter);
+            parseTagGet1("<territory_homing>", PARSE_VEC, &homing);
+            parseTagGet1("<search_range>", PARSE_FLOAT, &searchRange);
+            parseTagGet1("<search_angle>", PARSE_FLOAT, &searchAngle);
+            parseTagGet1("<homing_range>", PARSE_FLOAT, &homingRange);
+            parseTagGet1("<homing_angle>", PARSE_FLOAT, &homingAngle);
+            parseTagGet1("<btl_setup_no>", PARSE_STRING, btlSetup);
             parsePopNext();
             if (!isMarker || !(dead->mask & (1 << (u8)k))) {
                 tribe = npcGetTribe(tribeName);
@@ -253,6 +261,10 @@ void setupDataBase(const char* areaName, const char* mapName) {
     }
 }
 
+/**
+ * Field-enemy attributes of each map (area group number and reset flags), ending with a NULL-named entry:
+ * setupDataBase looks the map up here to decide when the defeated-enemy records are cleared.
+ */
 MapAttrEntry _map_attr_data[] = {
     { "tik_00", 16, 7 },
     { "tik_01", 16, 7 },

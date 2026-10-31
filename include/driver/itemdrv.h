@@ -16,8 +16,8 @@ enum ItemFlags {
     ITEM_FLAG_COLLECT_GSWF = 0x20,    // collectFlag is a GSWF, set on pickup
     ITEM_FLAG_COLLECT_LSWF = 0x40,    // collectFlag is an LSWF, set on pickup
     ITEM_FLAG_ELASTIC = 0x80,         // bounces keep their speed; no setter in C
-    ITEM_FLAG_BADGE_RETURN = 0x100,   // retail: a badge goes back to the pouch when the item is deleted
-                                      // (the demo reads the bit the other way round: set = stays out)
+    ITEM_FLAG_BADGE_RETURN = 0x100,   // retail: a field badge left uncollected goes on sale at the badge shop
+                                      // (the demo reads the bit the other way round: clear = goes on sale)
     ITEM_FLAG_RESTORE_MOTION = 0x200, // first bounce restores savedDirection/savedSpeed; no setter in C
     ITEM_FLAG_REPLACEABLE = 0x400,    // a dropped coin/heart/flower itemEntry may delete when the list is full
     ITEM_FLAG_NO_CEILING = 0x800,     // itemseq_Bound skips the ceiling check

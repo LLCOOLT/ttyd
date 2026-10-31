@@ -131,7 +131,7 @@ void BattleActionCommandStop(BattleWork* work) {
     }
 }
 
-// inlining off for BattleActionCommandCheckDefence, BattleACPadCheckRecordTrigger, as in the original (the object differs without it)
+// FAKE: inlining off (FAKES.md); without it 1 function changes length, e.g. BattleActionCommandCheckDefence 154 -> 212 instructions
 #pragma dont_inline on
 /**
  * Judges Mario's or a partner's guard against weapon from the recent pad history and returns defenseResult:
@@ -292,7 +292,7 @@ void BattleActionCommandSetDifficulty(BattleWork* work, BattleUnit* unit, s32 di
  * so harder commands earn the better rating; -1 when the unit's damage code is 0x1E.
  */
 s32 BattleActionCommandGetPrizeLv(BattleWork* work, BattleUnit* unit, s32 lv) {
-    if (unit != NULL && (u8)unit->damageCode == 0x1E) {
+    if (unit != NULL && (u8)unit->damageCode == DAMAGE_HIT_NONE) {
         return -1;
     }
     lv += work->actionCommands.acDifficulty;

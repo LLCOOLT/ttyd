@@ -30,11 +30,13 @@ typedef struct EffFireDustWork {
     f32 phase2;     // 0x68, random start, advanced each frame; never read
 } EffFireDustWork;
 
+/** Fire-dust particle size over its 20-step cycle: swells to 1.5 then shrinks (the ten steps are listed twice). */
 static f32 scale_data[] = {
     0.2f, 0.4f, 0.8f, 1.3f, 1.5f, 1.3f, 0.9f, 0.6f, 0.4f, 0.3f,
     0.2f, 0.4f, 0.8f, 1.3f, 1.5f, 1.3f, 0.9f, 0.6f, 0.4f, 0.3f,
 };
 
+/** Fire-dust particle quads: eight cells of the texture strip, one picked per particle. */
 static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, 704, 0, 0, 0, 0, 255},

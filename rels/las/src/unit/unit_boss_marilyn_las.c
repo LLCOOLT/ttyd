@@ -1,4 +1,4 @@
-// Palace of Shadow battle unit: the Marilyn (Shadow Sirens rematch) (`boss_marilyn_las`): parts, stats, poses and AI scripts.
+// Palace of Shadow battle unit: Marilyn (Shadow Sirens rematch) (`boss_marilyn_las`): parts, stats, poses and AI scripts.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -16,6 +16,15 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_msg.h"
 #include "version.h"
+
+// Unit work slots of Marilyn (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BOSS_MARILYN_LAS_SHADOW_HELD = 3, // non-zero stops the shadow position from following her
+    UW_BOSS_MARILYN_LAS_RANK = 4,        // the HP rank (0 to 2) she stands at
+    UW_BOSS_MARILYN_LAS_NEW_RANK = 5,    // her HP rank among the Sirens (set by Beldam's majo3_sort)
+    UW_BOSS_MARILYN_LAS_ATTACK_STEP = 8, // step of her attack cycle
+    UW_BOSS_MARILYN_LAS_CHARGE_COUNT = 9 // charge-ups in a row
+};
 
 BattleUnitKind unit_boss_marilyn_las;
 static BattleUnitDefense defence;
@@ -45,6 +54,10 @@ static EvtWord wait_event[7];
 static EvtWord wait_event[6];
 #endif
 
+/**
+ * Unit data of Marilyn in the Palace of Shadow: 40 HP, level 57;
+ * names its parts, status table and init script.
+ */
 BattleUnitKind unit_boss_marilyn_las = {
     134,
     "btl_un_marilyn4",
@@ -111,16 +124,35 @@ BattleUnitKind unit_boss_marilyn_las = {
     data_table,
 };
 
+/**
+ * Defence of Marilyn against each element (normal, fire, ice, explosion, electric):
+ * none, so every hit does its full damage.
+ */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/**
+ * Damage modifiers of Marilyn per element (normal, fire, ice, explosion, electric):
+ * none, so no element is a weakness, an immunity or a heal.
+ */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo values of the status vulnerability of Marilyn:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Frozen, Tiny, Attack Down, Defense Down, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist = {50, 50, 50, 100, 50, 100, 100, 30, 100, 40, 100, 40, 100, 40, 40, 0, 0, 100, 40, 100, 100, 5};
 #else
+/**
+ * JP, US and PAL values of the status vulnerability of Marilyn:
+ * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
+ * strongly resistant to Frozen, Allergic, Slow, Instant KO.
+ */
 static StatusVulnerability regist = {50, 50, 50, 100, 50, 100, 100, 40, 100, 60, 100, 60, 100, 80, 40, 0, 0, 100, 40, 100, 100, 5};
 #endif
 
+/** Pose table of Marilyn: animation names for each pose type (idle, walk, hurt, attack and so on). */
 static PoseTableEntry pose_table[] = {
     {1, "MRR_N_1"},
     {2, "MRR_Z_1"},
@@ -128,29 +160,35 @@ static PoseTableEntry pose_table[] = {
     {5, "MRR_X_1"},
     {4, "MRR_X_1"},
     {3, "MRR_X_1"},
-    {28, "MRR_S_1"},
+    {BTL_POSE_NORMAL, "MRR_S_1"},
     {29, "MRR_Q_2"},
     {30, "MRR_Q_2"},
     {31, "MRR_D_1"},
-    {39, "MRR_D_1"},
+    {BTL_POSE_DAMAGE, "MRR_D_1"},
     {50, "MRR_S_1"},
-    {42, "MRR_R_1"},
-    {40, "MRR_W_1"},
-    {56, "MRR_S_1"},
-    {57, "MRR_S_1"},
+    {BTL_POSE_RUN, "MRR_R_1"},
+    {BTL_POSE_WALK, "MRR_W_1"},
+    {BTL_POSE_DANGER, "MRR_S_1"},
+    {BTL_POSE_PERIL, "MRR_S_1"},
     {BTL_POSE_TALK, "MRR_T_1"},
     {BTL_POSE_STAY_DEFAULT, "MRR_S_1"},
 };
 
+/**
+ * Data table of Marilyn: event scripts and values the battle looks up by tag (damage reactions, dodge, first
+ * strike and so on).
+ */
 static BattleDataEntry data_table[] = {
     {49, dead_event},
     {0, NULL},
 };
 
+/** Part of Marilyn: its one body part with hit box, defence tables and pose table. */
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_marilyn4", "c_maririn", 0.0f, 0.0f, 0.0f, 15.0f, 45.0f, 0.0f, 0.0f, 50.0f, 0.0f, 38, 56, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/** Weapon of Marilyn's kagenuke attack: damage 7. */
 static BattleWeapon weapon_marilyn_kagenuke_attack1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -169,7 +207,7 @@ static BattleWeapon weapon_marilyn_kagenuke_attack1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -187,6 +225,7 @@ static BattleWeapon weapon_marilyn_kagenuke_attack1 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Marilyn's thunder: damage 7. */
 static BattleWeapon weapon_marilyn_thunder_attack1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -209,7 +248,7 @@ static BattleWeapon weapon_marilyn_thunder_attack1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -227,6 +266,7 @@ static BattleWeapon weapon_marilyn_thunder_attack1 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Weapon of Marilyn's charge-up. */
 static BattleWeapon weapon_marilyn_charge1 = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -244,7 +284,7 @@ static BattleWeapon weapon_marilyn_charge1 = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -300,8 +340,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_ATTACK_STEP, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_SHADOW_HELD, 0)
     SPAWN_EVENT(majo3_shadow_tail_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -312,7 +352,7 @@ EVT_END()
  * when the hit carries damage code 1024, then runs the default damage script.
  */
 static EVT_BEGIN(damage_event)
-    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
+    CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, DAMAGE_FLAG_DEFEATED, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(12), 1)
     END_IF
@@ -325,10 +365,11 @@ EVT_END()
 /**
  * Marilyn's defeat (data table entry 49): walks back to her home spot if displaced
  * and waits for the attack to end.
- * The camera zooms on her and she says "btl_majo3_12" when Beldam (GW(11)) and Vivian (GW(13)) are both down,
- * else "btl_majo3_09"; if Beldam is mid-knockout she waits for it to finish and says nothing.
+ * The camera zooms on her and she cries out: the long "btl_majo3_12" when Beldam (GW(11)) is dead and Doopliss
+ * (GW(13)) is down, else "btl_majo3_09"; if Beldam is mid-knockout she waits for it to finish and says nothing.
  * Then GW(12) = 2 and the shared no-spin dead sequence runs.
- * Guess: GW(11/12/13) are 0 alive, 1 being knocked out, 2 dead.
+ * GW(11), GW(12) and GW(13) (Beldam, Marilyn, Doopliss) are 0 while alive, 1 once their damage event sees a
+ * defeating hit, and 2 at the end of their dead event.
  */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -343,7 +384,7 @@ static EVT_BEGIN(dead_event)
     END_IF
     IF_INT_EQUAL(LW(6), 1)
         CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_WALK)
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     END_IF
@@ -388,7 +429,8 @@ static EVT_BEGIN(dead_event)
 EVT_END()
 
 /**
- * Guess: Marilyn's unison-phase script (not installed by init_event here), run after the player's phase:
+ * Marilyn's unison-phase script; nothing installs it (no SetEventUnisonPhase in the las Siren units).
+ * After the player's phase it
  * runs the shared majo_unison_phase_event, and if her slot in the HP order (unit work 5) changed,
  * sinks into her shadow and re-emerges at the new home spot (x 55 / 105 / 155), then re-sorts the turn order.
  */
@@ -396,10 +438,10 @@ static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL_CHILD(majo_unison_phase_event)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(4))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_RANK, LW(3))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_NEW_RANK, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_RANK, LW(4))
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             WAIT_MS(200)
             CALL_CHILD(marilyn_down)
@@ -445,7 +487,7 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     SET_VALUE(LW(2), 0)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(0))
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_CHARGE_COUNT, LW(0))
     IF_INT_LESS(LW(0), 2)
         SET_VALUE(LW(2), 25)
     END_IF
@@ -456,17 +498,17 @@ static EVT_BEGIN(attack_event)
 #endif
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_CHARGE_COUNT, 0)
         SET_VALUE(LW(9), PTR(&weapon_marilyn_kagenuke_attack1))
         CALL_CHILD(kagenuke_attack_event)
         CASE_EQUAL(1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_CHARGE_COUNT, 0)
         SET_VALUE(LW(9), PTR(&weapon_marilyn_thunder_attack1))
         CALL_CHILD(thunder_attack_event)
         CASE_EQUAL(2)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_CHARGE_COUNT, LW(0))
         ADD(LW(0), 1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, LW(0))
+        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_MARILYN_LAS_CHARGE_COUNT, LW(0))
         SET_VALUE(LW(9), PTR(&weapon_marilyn_charge1))
         CALL_CHILD(charge_attack_event)
     END_SWITCH
@@ -487,7 +529,7 @@ static EVT_BEGIN(kagenuke_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
@@ -523,7 +565,7 @@ static EVT_BEGIN(kagenuke_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MRR_A2_3"))
     WAIT_MS(100)
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -549,7 +591,7 @@ static EVT_BEGIN(kagenuke_attack_event)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(98)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MRR_A2_4"))
     WAIT_MS(400)
@@ -572,7 +614,7 @@ static EVT_BEGIN(thunder_attack_event)
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
+        CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, TOKEN_FLAG_CONFUSED_ACTION, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL_CHILD(subsetevt_confuse_flustered)
         END_IF
@@ -605,7 +647,7 @@ static EVT_BEGIN(thunder_attack_event)
         CALL(evt_sub_rumble_onoff, 1, 0)
     END_INLINE_EVENT
     WAIT_MS(83)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     SWITCH(LW(5))
         CASE_OR_EQUAL(4)
         GOTO(90)
@@ -633,7 +675,7 @@ static EVT_BEGIN(thunder_attack_event)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
@@ -666,7 +708,7 @@ static EVT_BEGIN(charge_attack_event)
         CALL(evt_btl_camera_set_mode, 0, 0)
     END_INLINE_EVENT
     CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), 256, LW(5))
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_SELF, 1, LW(9), DAMAGE_FLAG_LAST_HIT, LW(5))
     RETURN
 EVT_END()
 

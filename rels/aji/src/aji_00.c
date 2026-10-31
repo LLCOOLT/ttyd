@@ -90,6 +90,7 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/** Exits of this room: the west door to aji_19 and the east door to aji_01. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -223,6 +224,10 @@ static EVT_BEGIN(evt_door_msg)
     RETURN
 EVT_END()
 
+/**
+ * The two X-Naut underlings (teshita) who ambush Mario at the west door; their behaviour is scripted by the
+ * room.
+ */
 static NpcSetupInfo npcEnt[] = {
     {
         "手下１", // name

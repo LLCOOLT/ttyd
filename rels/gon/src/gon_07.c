@@ -63,6 +63,7 @@ EVT_BEGIN(out_func)
     RETURN
 EVT_END()
 
+/** Exits (beros) of this room: w_bero to gon_06 and e_bero to gon_13. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -149,26 +150,32 @@ EVT_END()
  * Runs when Mario opens the Black Key chest (gon07treasure):
  * sets the story to STORY_STG1_13_A_SUSPICIOUS_ROOM and GSWF_GON07_BLACK_KEY_CHEST_OPENED,
  * picks up the key (ITEM_BLACK_KEY_0x22), starts the earthquake (SFX_STG1_QUAKE4, shake_evt)
- * and the danger music, raises the spikes (a_togeshita, SFX_STG1_TOGE_UP1; Guess: floor spikes,
- * with a_to_ue the ceiling spikes), with Mario and his partner scrambling away and lines stg1_gon_15
- * and stg1_gon_16.
+ * and the danger music, raises the lower spikes (map animation a_to_shita, hit object a_togeshita,
+ * SFX_STG1_TOGE_UP1), then starts the upper animation a_to_ue as a countdown of its own length
+ * (evt_sub_countdown_start): if it runs out before Mario leaves through a door, the game is over.
+ * The partner speaks stg1_gon_15 and stg1_gon_16. Guess: a_to_ue is the spiked ceiling coming down
+ * (gon_06's tsuritenjo_event, "hanging ceiling", runs once he escapes).
  */
 static EVT_BEGIN(item_evt)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
         RETURN
     END_IF
+    // Story advances and the chest is marked opened; the room music stops.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
     SET_VALUE(GSWF(GSWF_GON07_BLACK_KEY_CHEST_OPENED), 1)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
+    // The Black Key pops out of the chest and Mario takes it.
     CALL(evt_mobj_get_position, STRING("gon07treasure"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("k_slit"), ITEM_BLACK_KEY_0x22, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("k_slit"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("gon07treasure"))
     CALL(evt_item_get_item, STRING("k_slit"))
+    // A rumbling earthquake starts shaking the room.
     CALL(evt_snd_sfxon, STRING("SFX_STG1_QUAKE4"), GW(10))
     SPAWN_EVENT_GET_ID(PTR(shake_evt), LW(10))
     WAIT_MS(500)
+    // Mario and his partner step to the middle of the room.
     BEGIN_INLINE_EVENT
         CALL(evt_mario_mov_pos2, 20, 35, FLOAT(60.0f))
         CALL(evt_mario_set_dir, 270, 300, 0)
@@ -177,6 +184,7 @@ static EVT_BEGIN(item_evt)
         CALL(evt_party_move_pos2, 0, -20, 35, FLOAT(60.0f))
         CALL(evt_party_set_dir, 0, 90, 300)
     END_INLINE_EVENT
+    // The camera frames the room and the floor spikes rise from below.
     CALL(evt_cam3d_evt_set, 0, 124, 408, 0, 57, 21, 500, 11)
     WAIT_MS(400)
     CALL(evt_snd_sfxon, STRING("SFX_STG1_TOGE_UP1"), 0)
@@ -193,9 +201,11 @@ static EVT_BEGIN(item_evt)
     WAIT_FRAMES(2)
     CALL(evt_sub_rumble_onoff, 1, 0)
     WAIT_MS(1000)
+    // The partner reacts to the trap.
     CALL(evt_party_stop, 0)
     WAIT_MS(200)
     CALL(evt_msg_print_party, STRING("stg1_gon_15"))
+    // The danger music starts and the ceiling spikes begin to move.
     CALL(evt_map_playanim, STRING("a_to_ue"), 0, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER1"))
     CALL(evt_cam3d_evt_set_at, 0, 300, 0, 0, 900, 11)
@@ -206,8 +216,11 @@ static EVT_BEGIN(item_evt)
     CALL(evt_map_pauseanim, 0, STRING("a_to_ue"))
     CALL(evt_party_stop, 0)
     WAIT_MS(200)
+    // The partner warns that the ceiling is coming down.
     CALL(evt_msg_print_party, STRING("stg1_gon_16"))
     CALL(evt_map_replayanim, 0, STRING("a_to_ue"))
+    // The ceiling closes in and a countdown starts; if Mario does not escape through a door in time, the game
+    // is over.
     SPAWN_EVENT_GET_ID(PTR(shake_evt), LW(10))
     CALL(evt_map_checkanim, STRING("a_to_ue"), LW(0), LW(1))
     CALL(evt_sub_countdown_start, LW(1), LW(1))
@@ -227,6 +240,7 @@ static EVT_BEGIN(item_evt)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
+    // Mario escaped (or the loop ended): control returns and the partner follows.
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)

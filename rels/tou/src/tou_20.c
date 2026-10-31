@@ -47,8 +47,10 @@ static EVT_BEGIN(evt_tou_balloon)
 EVT_END()
 
 /**
- * Guess: chapter 3 title sequence, first part: the blimp rises past the camera
- * and the script changes to the title map sys_01 ("stg_3").
+ * Chapter title scene when entered at "start": the distant arena (tou_enkei1) is hidden,
+ * the blimp (Hikousen) bobs up and down while the camera sweeps for 10 seconds,
+ * and after 14 seconds the blimp sounds stop and the map changes to the chapter title screen sys_01 (entrance
+ * stg_3).
  */
 EVT_BEGIN(evt_anim)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tou_enkei1"), MAPOBJ_FLAG_HIDE)
@@ -73,14 +75,16 @@ EVT_BEGIN(evt_anim)
     RETURN
 EVT_END()
 
+/** The three points (x, y, z) of the blimp's flight path in the chapter title scene (evt_anim2). */
 static f32 spline_dt[] = {
     -808.0f, 971.0f, 4897.0f, -801.0f, 895.0f, 4359.0f, -744.0f, 880.0f,
     3982.0f,
 };
 
 /**
- * Guess: chapter 3 title sequence: Mario and the partner are hidden
- * while the blimp flies along a spline path (spline_dt), and the script then changes map to tou_00.
+ * Chapter title scene for any other entrance: Mario and the partner are hidden,
+ * the blimp (Hikousen) appears after 2 seconds and flies along the spline path spline_dt for 10 seconds
+ * while bobbing up and down, and 20 seconds in the blimp sounds stop and the map changes to tou_00.
  */
 EVT_BEGIN(evt_anim2)
     CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)

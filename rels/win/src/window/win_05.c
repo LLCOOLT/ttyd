@@ -1,4 +1,4 @@
-// win_05 (ウィンディん家周辺, Flurrie's house in Boggly Woods): inside Flurrie's house.
+// win_05 (ウィンディん家周辺, Flurrie's house in Boggly Woods): Flurrie's bedroom, with its canopy bed.
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -43,6 +43,7 @@ EVT_BEGIN(win_05_door_close)
     RETURN
 EVT_END()
 
+/** The only exit of this room: the west door back to win_04, with its opening and closing animation. */
 static BeroEntry bero_entry_data[] = {
     {
         "w_bero", // hitName
@@ -86,7 +87,9 @@ static EVT_BEGIN(item_get00)
 EVT_END()
 
 /**
- * Guess: Flurrie appears in this small room: the screen fades up from black, she speaks "stg2_win_e04_00_04",
+ * Middle part of Flurrie's intro, spawned at STORY_STG2_03_02:
+ * with Mario off the map, the screen fades in on Flurrie ("クラウダ"),
+ * who resolves to make her stage comeback after some makeup, then stops short (stg2_win_e04_00_04);
  * the story becomes STORY_STG2_03_03_FLURRIE_INTRO and the map changes to win_03.
  */
 static EVT_BEGIN(cloud_toujou)
@@ -124,10 +127,10 @@ static EVT_BEGIN(cloud_toujou)
 EVT_END()
 
 /**
- * Guess: map init script of the small interior room win_05:
- * registers its exit, places the Super Appeal P chest and the Star Piece spinning panel,
- * plays the Boggly Woods BGM, and starts Flurrie's appearance (cloud_toujou) at
- * STORY_STG2_03_02_SEALED_ENTRANCE_2.
+ * Map init script of win_05: registers its exit,
+ * places the Super Appeal P chest and the spinning floor panel that hides a Star Piece,
+ * plays the Boggly Woods BGM with the ENV_STG2_WIN2 ambience,
+ * and spawns cloud_toujou at STORY_STG2_03_02_SEALED_ENTRANCE_2.
  */
 EVT_BEGIN(win_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))

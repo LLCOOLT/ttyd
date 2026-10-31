@@ -1,4 +1,4 @@
-// Keelhaul Key (muj) battle unit: Cortez's rapier (cortez_rapier), one of his weapons: its parts, defence/status
+// Keelhaul Key (muj) battle unit: Cortez Rapier (cortez_rapier), Cortez's rapier, one of his weapons: its parts, defence/status
 // tables, and attack events.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
@@ -11,6 +11,12 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
 #include "muj.h"
+
+// Unit work slots of this unit (btlevtcmd_SetUnitWork / GetUnitWork).
+enum {
+    UW_BOSS_CORTEZ_RAPIER_DOWN_COUNT = 1, // revive countdown while knocked down (0: active)
+    UW_BOSS_CORTEZ_RAPIER_WEAPON_NO = 2,  // which of Cortez's weapons this is (3 for the rapier)
+};
 
 BattleUnitKind unit_boss_cortez_rapier;
 static BattleUnitDefense defence;
@@ -31,6 +37,10 @@ static EvtWord attack_event[545];
 static EvtWord wait_event[10];
 static EvtWord cortez_damage_sub_event[25];
 
+/**
+ * Unit data of Cortez Rapier: 4 HP, 140x30 units in size; ties together its sounds, parts,
+ * status vulnerability, init event and event table.
+ */
 BattleUnitKind unit_boss_cortez_rapier = {
     96,
     "btl_un_cortez_rapier",
@@ -89,7 +99,7 @@ BattleUnitKind unit_boss_cortez_rapier = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-    0x2000004,
+    UNIT_ATTR_FLOATING | UNIT_ATTR_NO_HP_GAUGE,
     &regist,
     1,
     parts,
@@ -97,16 +107,32 @@ BattleUnitKind unit_boss_cortez_rapier = {
     data_table,
 };
 
+/** Defence of Cortez Rapier: 0 against every kind of hit. */
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
+/** Defence attributes of Cortez Rapier: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_US
+/**
+ * Demo builds: Status vulnerability of Cortez Rapier (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; resists freeze (50%),
+ * Defense Down (50%), allergic (50%), Slow (50%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 50, 0, 0, 100, 0, 100, 50, 50, 0, 90, 100, 50, 0, 0, 0};
 #else
+/**
+ * Retail builds: Status vulnerability of Cortez Rapier (percent chance each status takes hold):
+ * immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible, instant KO; resists allergic (50%),
+ * Slow (50%); the rest take hold at 80% or better.
+ */
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
 #endif
 
+/**
+ * Weapon of Cortez Rapier (float attack): targets every unit for 2 damage, ignores Defense;
+ * used by attack_event.
+ */
 BattleWeapon weapon_cortez_rapier_float_attack = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -125,7 +151,7 @@ BattleWeapon weapon_cortez_rapier_float_attack = {
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
+    ELEMENT_NORMAL, 0, // element..damagePattern
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
@@ -143,17 +169,24 @@ BattleWeapon weapon_cortez_rapier_float_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Pose table of Cortez Rapier: maps its battle poses to its animations (KRT_*). */
 static PoseTableEntry pose_table[] = {
 #if VERSION >= VERSION_JP
     {2, "KRT_Z_1"},
     {9, "KRT_Z_1"},
 #endif
-    {28, "KRT_S_1"},
+    {BTL_POSE_NORMAL, "KRT_S_1"},
     {31, "KRT_S_1"},
-    {39, "KRT_S_1"},
+    {BTL_POSE_DAMAGE, "KRT_S_1"},
     {BTL_POSE_STAY_DEFAULT, "KRT_S_1"},
 };
 
+/**
+ * Event table of Cortez Rapier: cortez_damage_sub_event (tag 9), cortez_weapon_dead_event (tag 49),
+ * cortez_weapon_break_event (tags 70, 71), cortez_weapon_blow_dead_event (tag 58),
+ * cortez_weapon_counter_damage_event (tags 36, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35),
+ * avoid_thorn_event (tags 39, 37, 38).
+ */
 static BattleDataEntry data_table[] = {
     {9, cortez_damage_sub_event},
     {49, cortez_weapon_dead_event},
@@ -182,8 +215,9 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Parts of Cortez Rapier: 1 part (model c_buki3). */
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_cortez_rapier", "c_buki3", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0x6, pose_table},
+    {1, "btl_un_cortez_rapier", "c_buki3", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_NOT_TARGETABLE | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, COUNTER_ATTR_PREEMPTIVE_FRONT_SPIKY | COUNTER_ATTR_FRONT_SPIKY, pose_table},
 };
 
 /**
@@ -193,15 +227,15 @@ static BattleUnitKindPart parts[] = {
  * and allows no movement.
  */
 static EVT_BEGIN(init_event)
-    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
+    CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_NO_BACKFACE_FLIP)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(cortez_weapon_phase_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(cortez_weapon_unison_phase_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 3)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_RAPIER_WEAPON_NO, 3)
+    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_RAPIER_DOWN_COUNT, 0)
     CALL(btlevtcmd_SetMaxMoveCount, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -216,8 +250,8 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /**
- * Guess: shows the toge_flush spike flash at the rapier's hit position on part 1,
- * offset forward by 40 and back by 5 in z, when a spiky attacker is avoided.
+ * Data event (tags 37 to 39) run when an attacker is hurt by the rapier's spikes:
+ * shows the toge_flush spike flash at its hit position on part 1, 40 forward and 5 back in z.
  */
 static EVT_BEGIN(avoid_thorn_event)
     CALL(btlevtcmd_GetHitPos, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2))
@@ -233,15 +267,17 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 /**
- * Guess: attack event of Cortez's rapier while it flies free (unit work 1 is 0;
- * otherwise it just restarts the wait event): it takes the selected targets of
+ * Attack event of Cortez's rapier; while knocked down (unit work 1, its revive countdown, is not 0) it only
+ * restarts the wait event.
+ * Otherwise it takes the selected targets of
  * weapon_cortez_rapier_float_attack, spins in the KRT_Z_1 pose (six turns in 60 frames) with the sword-dance
  * sound while it flies across the stage through them,
  * damage-checking each target as it passes (avoid poses on a dodge, defence check on the first),
  * then returns home.
  */
 static EVT_BEGIN(attack_event)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
+    // While the Rapier is knocked down it only goes back to idling.
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_RAPIER_DOWN_COUNT, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -258,6 +294,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
     CALL(btlevtcmd_AnimeWaitPlayLoopTiming, BTL_UNIT_SELF, 1)
+    // The Rapier lies flat and spins six times in 60 frames, boring through the air.
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_Z_1"))
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 13, 0)
@@ -274,6 +311,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 20)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 0, 4, 0, -1)
+    // It flies across the whole stage through every target, with a whirring sound.
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOR_SWORD_DANCE2"), EVT_NULLPTR, 0, LW(9))
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         SET_VALUE(LW(5), 5)
@@ -307,6 +345,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(14), 0, 1, 0, 0)
     END_SIBLING_EVENT
     SET_VALUE(LW(10), 0)
+    // As it passes each target, that target is checked in turn.
     LABEL(10)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(1), EVT_NULLPTR, EVT_NULLPTR)
@@ -344,11 +383,13 @@ static EVT_BEGIN(attack_event)
     END_SWITCH
     LABEL(90)
     GOTO(97)
+    // A hit applies the damage (the Action Command defence result is used for the first target only).
     LABEL(91)
     IF_INT_EQUAL(LW(10), 0)
         CALL(btlevtcmd_ResultACDefence, LW(3), LW(12))
     END_IF
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
+    // If a target Superguarded, the Rapier is repelled: it tumbles backwards and recoils home at once.
     IF_INT_EQUAL(LW(5), 21)
         DELETE_EVENT(LW(13))
         CALL(evt_snd_sfxoff, LW(9))
@@ -381,6 +422,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, 0, 4, 0, -1)
         RETURN
     END_IF
+    // After the last target, it flies back in from the other side of the stage and returns home.
     LABEL(97)
     CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
     IF_INT_NOT_EQUAL(LW(3), -1)
