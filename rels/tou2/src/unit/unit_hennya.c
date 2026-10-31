@@ -83,7 +83,7 @@ static BattleUnitDefenseAttr defence_attr = {0};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Spunia (both demos), as the percent chance each status takes hold: immune to
+ * Status vulnerability of the Spunia (both early demos), as the percent chance each status takes hold: immune to
  * Dodgy and Invisible; resists 13 statuses (down to 30% of the normal chance); extra vulnerable to poison,
  * shock, burn, Huge, Attack Up, Defense Up and Fast.
  */

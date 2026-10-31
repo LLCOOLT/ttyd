@@ -233,19 +233,18 @@ BOOL Btl_UnitSetup(BattleWork* wp) {
     }
 
     enemyData = groupSetup->enemyData;
-#if VERSION <= VERSION_DEMO_JP
+    // Every demo (the early ones and the 2004-09 ones): the enemies carry no held or stolen items.
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
     heldItem = ITEM_NULL;
 #endif
     for (i = 0; i < groupSetup->numEnemies; enemyData++, i++) {
         enemy = BtlUnit_Entry(enemyData);
         enemy->groupSetupId = i;
-#if VERSION <= VERSION_DEMO_JP
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
         enemy->heldItem = heldItem;
 #else
         enemy->heldItem = ITEM_NULL;
-#endif
-#if VERSION >= VERSION_JP
-        // The demo's enemies carry no held or stolen items.
+        // The releases give each enemy its held item, or the item it stole in the field.
         heldItem = setup->stolenItems[enemy->groupSetupId];
         if (heldItem) {
             enemy->heldItem = heldItem;

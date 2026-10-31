@@ -111,7 +111,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Dark Craw (both demos), as the percent chance each status takes hold: immune
+ * Status vulnerability of the Dark Craw (both early demos), as the percent chance each status takes hold: immune
  * to Fright; resists 12 statuses (down to 60% of the normal chance).
  */
 static StatusVulnerability regist = {70, 70, 60, 100, 60, 100, 100, 60, 100, 60, 100, 60, 100, 60, 60, 0, 60, 100, 60, 100, 100, 95};

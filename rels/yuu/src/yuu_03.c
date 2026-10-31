@@ -720,7 +720,7 @@ EVT_BEGIN(minigame04_end)
     SET_VALUE(GF(0), 1)
     SET_VALUE(LW(3), 1)
     BEGIN_INLINE_EVENT
-        // Both demos watch Mario's height in an extra event (cancel the slit below -100, clamp him at -500); the releases wait for him to land instead
+        // Both early demos watch Mario's height in an extra event (cancel the slit below -100, clamp him at -500); the releases wait for him to land instead
 #if VERSION <= VERSION_DEMO_JP
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         LOOP(0)
@@ -1023,7 +1023,7 @@ void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall) {
             wp->subEvent = evtEntry(minigame04_end, 0, 0);
             wp->subEvent->lwData[0] = data->coins;
             switch (data->coins) {
-                // Both demos give other results for zero to two coins
+                // Both early demos give other results for zero to two coins
 #if VERSION <= VERSION_DEMO_JP
                 case 0:
                     data->result = 0x2;

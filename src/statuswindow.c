@@ -57,8 +57,8 @@ u16 party_icon[8] = {ICON_1A4, ICON_1A4, ICON_1A5, ICON_1A6, ICON_1A7, ICON_1AE,
 u16 gauge_back[8] = {ICON_1B7, ICON_1B8, ICON_1B9, ICON_1BA, ICON_1BB, ICON_1BC, ICON_1BD, ICON_1BE};
 u16 gauge_wakka[16] = { ICON_1C0, ICON_1C1, ICON_1C2, ICON_1C3, ICON_1C4, ICON_1C5, ICON_1C6, ICON_1C7,
                         ICON_1C8, ICON_1C9, ICON_1CA, ICON_1CB, ICON_1CC, ICON_1CD, ICON_1CE, ICON_1CF };
-#if VERSION >= VERSION_US
-// US: pause-menu icons per language
+#if VERSION == VERSION_US || VERSION == VERSION_EU
+// US and PAL: pause-menu icons per language (the 2004-09 demos draw no menu hints, so they lack these)
 s16 party_icon_tbl[6] = {0x215, 0x22B, 0x22C, 0x22D, 0x22E, 0x22F};
 s16 gear_icon_tbl[6] = {0x216, 0x230, 0x231, 0x232, 0x233, 0x234};
 s16 badge_icon_tbl[6] = {0x217, 0x235, 0x236, 0x235, 0x237, 0x238};
@@ -417,13 +417,14 @@ static void statusWinDisp(CameraId camId, void* param) {
         numDisp(186.0f + x - 6.0f - 10.0f, 4.0f + (2.0f + (y - 78.0f)), wp->cur.partyMaxHp, 1);
     }
 
-#if VERSION >= VERSION_JP
+    // Only the releases draw the menu hints; no demo has them (the 2004-09 demos still set the flag).
+#if VERSION == VERSION_JP || VERSION == VERSION_US || VERSION == VERSION_EU
     if (wp->flags & STATUSWIN_FLAG_MENU_HINTS && !gp->inBattle) {
         y2 = -180.0f + (wp->openY - wp->y);
         MTXTrans(m2, -190.0f, y2, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
         MTXConcat(m2, s2, m2);
-        // US and PAL pick the menu icons (and the badge icon's offset) per language; JP and the demos use fixed icons
+        // US and PAL pick the menu icons (and the badge icon's offset) per language; JP uses fixed icons
 #if VERSION >= VERSION_US
         iconDispGxCol(m2, 0x10, ICON_212, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(PARTNER_GOOMBELLA)) {

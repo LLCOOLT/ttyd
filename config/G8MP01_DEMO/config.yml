@@ -362,6 +362,18 @@ force_active:
 - CurAudioBuffer
 - LastAudioBuffer
 - SoundBufferIndex
+- sysDebugReport
+- __assert2
+- __assert
+- npcGetReactionOfLivingBody
+- evt_npc_get_battle_rule_keep_result
+- evt_npc_set_battle_rule
+- evt_npc_set_force_regl_anim
+- evt_npc_clear_paper
+- evt_npc_set_home_position
+- evt_npc_get_scale
+- evt_npc_get_ReactionOfLivingBody
+- statusWinDispOn
 block_relocations:
 # unit_party_chuchurina partyWeapon_ChuchurinaKiss+0x7C holds the flag word 0x80003500, not a pointer
 - source: 0x8038D96C

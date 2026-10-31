@@ -109,7 +109,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Fuzzy (both demos), as the percent chance each status takes hold: resists 10
+ * Status vulnerability of the Fuzzy (both early demos), as the percent chance each status takes hold: resists 10
  * statuses (down to 75% of the normal chance).
  */
 static StatusVulnerability regist = {100, 100, 90, 100, 90, 100, 100, 75, 100, 80, 100, 80, 100, 75, 75, 95, 95, 100, 75, 100, 100, 100};

@@ -118,7 +118,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Pale Piranha (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Pale Piranha (both early demos), as the percent chance each status takes hold:
  * resists 10 statuses (down to 40% of the normal chance).
  */
 static StatusVulnerability regist = {100, 100, 80, 100, 95, 100, 100, 100, 100, 90, 100, 90, 100, 90, 90, 40, 60, 100, 90, 100, 100, 95};

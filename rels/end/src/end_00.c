@@ -1888,7 +1888,8 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
             for (i = 0; i < 3; i++) {
                 if (end_staff_roll_msg_tbl[idx].msg2[i] != NULL) {
                     msg2 = msgSearch(end_staff_roll_msg_tbl[idx].msg2[i]);
-                    // Both demos place the second line 8 pixels further right (integer centring) and add a <wait 0> tag
+                    // Both early demos place the second line 8 pixels further right (integer centring) and add a
+                    // <wait 0> tag
 #if VERSION <= VERSION_DEMO_JP
                     wx2 = x + 8;
                     wy2 = y - i * 24 - 50;
@@ -1939,7 +1940,7 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
             break;
         case 2:
             n = idx + 1;
-            // The releases also continue the windows after the last entry; both demos keep the last entry up with BGM_EVT_PEACH1 instead
+            // The releases also continue the windows after the last entry; both early demos keep the last entry up with BGM_EVT_PEACH1 instead
 #if VERSION <= VERSION_DEMO_JP
             if (n < ARRAY_SIZE(end_staff_roll_msg_tbl)) {
                 for (i = 0; i < 3; i++) {

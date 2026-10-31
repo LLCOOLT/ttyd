@@ -115,7 +115,7 @@ static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Bristle (both demos), as the percent chance each status takes hold: immune
+ * Status vulnerability of the Bristle (both early demos), as the percent chance each status takes hold: immune
  * to burn; resists 13 statuses (down to 50% of the normal chance).
  */
 static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 70, 70, 50, 75, 100, 70, 100, 100, 95};

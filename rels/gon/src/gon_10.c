@@ -3,13 +3,17 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "evt/evt_bero.h"
+#include "evt/evt_cam.h"
 #include "evt/evt_map.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_npc.h"
+#include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "gon.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
+#include "driver/seqdrv.h"
+#include "version.h"
 
 static BeroEntry bero_entry_data[3];
 
@@ -30,12 +34,19 @@ EVT_END()
  * Door animation callback, opening for the w_bero exit to gon_11:
  * rotates map objects "door03" and "door04" about Y by 0.389 and -0.389 times the value in LW(0),
  * so the two leaves swing opposite ways.
+ * In the 2004-09 demos this door, the way into Hooktail's lair, ends the demo instead: it re-enables the letterbox
+ * and goes to the game-over sequence.
  */
 static EVT_BEGIN(door02_open)
+#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+    CALL(evt_cam_letter_box_disable, 0)
+    CALL(evt_seq_set_seq, SEQ_GAME_OVER, 0, 0)
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_rotate, 1, STRING("door04"), 0, LW(0), 0)
+#endif
     RETURN
 EVT_END()
 

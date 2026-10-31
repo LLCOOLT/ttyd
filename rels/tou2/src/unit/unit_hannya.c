@@ -107,7 +107,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Spania (both demos), as the percent chance each status takes hold: immune to
+ * Status vulnerability of the Spania (both early demos), as the percent chance each status takes hold: immune to
  * Dodgy and Invisible; resists 9 statuses (down to 90% of the normal chance); extra vulnerable to stop,
  * poison, shock, burn, Huge, Attack Up, Defense Up, Fright, Gale Force, Fast and instant KO.
  */

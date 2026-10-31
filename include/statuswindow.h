@@ -29,7 +29,7 @@ enum StatusWindowFlags {
     STATUSWIN_FLAG_FORCE_CLOSE = 0x20,     // statusWinForceClose: kept closed until statusWinForceOff
     STATUSWIN_FLAG_FORCE_OPEN_REQ = 0x40,  // start sliding in for a forced open
     STATUSWIN_FLAG_FORCE_CLOSE_REQ = 0x80, // start sliding out for a forced close
-    STATUSWIN_FLAG_MENU_HINTS = 0x100,     // JP and later: the menu button hints are drawn (opened by Z or idling); cleared once closed
+    STATUSWIN_FLAG_MENU_HINTS = 0x100,     // the releases draw the menu button hints (opened by Z or idling); cleared once closed
     STATUSWIN_FLAG_DISP_OFF = 0x1000,      // statusWinDispOff: not drawn
 };
 

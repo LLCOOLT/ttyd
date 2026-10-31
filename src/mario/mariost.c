@@ -80,167 +80,81 @@ BOOL R_bReset; // before DvdCheckTreadOn: .sbss is emitted in reverse
 BOOL DvdCheckTreadOn;
 
 //.data
-#if VERSION >= VERSION_DEMO_EU
-// PAL: the plain modes are 50Hz PAL interlaced, the _prog / Prog ones EURGB60 interlaced
+#if VERSION == VERSION_DEMO_US2
+// Unreferenced; the early demos carry the same table at the start of winmgr.c's and win_log.c's .data.
+static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
+#endif
+
+// A full-width (0x260) video mode with no field rendering or anti-aliasing, the default sample pattern and the
+// usual vertical filter; only the TV mode, heights, origin, display size and XFB mode differ.
+// clang-format off
+#define MARIOST_RENDER_MODE(tvMode, efbHeight, xfbHeight, xOrigin, yOrigin, viWidth, viHeight, xfbMode) \
+    {tvMode, 0x260, efbHeight, xfbHeight, xOrigin, yOrigin, viWidth, viHeight, xfbMode, 0, 0,          \
+     {{6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}},  \
+     {8, 8, 10, 12, 10, 8, 8}}
+// clang-format on
+
+// PAL and the EU demo have only the 50Hz PAL / EURGB60 modes, the others only the NTSC ones. The 2004-09 US
+// demo has both: each NTSC mode is followed by its PAL twin, which marioStInit copies over it on a PAL console.
+// The plain modes are interlaced; the _prog / Prog ones progressive scan on NTSC, EURGB60 interlaced on PAL.
+#if VERSION < VERSION_DEMO_EU
+/** Video mode of the boot logo screens (448 lines): seq_logo sets it on a cold start or restart. */
+GXRenderModeObj sRMObjHReso =
+    MARIOST_RENDER_MODE(VI_TVMODE_NTSC_INT, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_DF);
+#endif
+#if VERSION == VERSION_DEMO_US2
+/** sRMObjHReso's PAL twin (50Hz). */
+GXRenderModeObj sRMObjHResoPal =
+    MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1C0, 0x212, 0x1B, 0x16, 0x29A, 0x212, VI_XFBMODE_DF);
+#elif VERSION >= VERSION_DEMO_EU
 /** Video mode of the boot logo screens (448 lines, 50Hz): seq_logo sets it on a cold start or restart. */
-GXRenderModeObj sRMObjHReso = {
-    VI_TVMODE_PAL_INT, //viTVmode
-    0x260, //fbWidth
-    0x1C0, //efbHeight
-    0x212, //xfbHeight
-    0x1B, //viXOrigin
-    0x16, //viYOrigin
-    0x29A, //viWidth
-    0x212, //viHeight
-    VI_XFBMODE_DF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
+GXRenderModeObj sRMObjHReso =
+    MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1C0, 0x212, 0x1B, 0x16, 0x29A, 0x212, VI_XFBMODE_DF);
+#endif
 
-/** Video mode of the boot logo screens in 60Hz mode (EURGB60), set by seq_logo after a hot reset. */
-GXRenderModeObj sRMObjHReso_prog = {
-    VI_TVMODE_EURGB60_INT, //viTVmode
-    0x260, //fbWidth
-    0x1C0, //efbHeight
-    0x1C0, //xfbHeight
-    0x1B, //viXOrigin
-    0x10, //viYOrigin
-    0x29A, //viWidth
-    0x1C0, //viHeight
-    VI_XFBMODE_DF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
-
-/** The game's main video mode (50Hz PAL, interlaced): marioStInit starts the game with it. */
-GXRenderModeObj GXNtsc480IntDfMarioSt = {
-    VI_TVMODE_PAL_INT, //viTVmode
-    0x260, //fbWidth
-    0x1E0, //efbHeight
-    0x238, //xfbHeight
-    0x1E, //viXOrigin
-    0x6, //viYOrigin
-    0x294, //viWidth
-    0x238, //viHeight
-    VI_XFBMODE_DF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
-
-/** The game's main video mode in 60Hz (EURGB60), used by marioStInit after a hot reset. */
-GXRenderModeObj GXNtsc480ProgMarioSt = {
-    VI_TVMODE_EURGB60_INT, //viTVmode
-    0x260, //fbWidth
-    0x1E0, //efbHeight
-    0x1E0, //xfbHeight
-    0x1E, //viXOrigin
-    0x0, //viYOrigin
-    0x294, //viWidth
-    0x1E0, //viHeight
-    VI_XFBMODE_DF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
-#else
-/** Video mode of the boot logo screens (448 lines, interlaced): seq_logo sets it on a cold start or restart. */
-GXRenderModeObj sRMObjHReso = {
-    VI_TVMODE_NTSC_INT, //viTVmode
-    0x260, //fbWidth
-    0x1C0, //efbHeight
-    0x1C0, //xfbHeight
-    0x1B, //viXOrigin
-    0x10, //viYOrigin
-    0x29A, //viWidth
-    0x1C0, //viHeight
-    VI_XFBMODE_DF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
-
+#if VERSION < VERSION_DEMO_EU
 /** Video mode of the boot logo screens in progressive scan, set by seq_logo after a hot reset. */
-GXRenderModeObj sRMObjHReso_prog = {
-    VI_TVMODE_NTSC_PROG, //viTVmode
-    0x260, //fbWidth
-    0x1C0, //efbHeight
-    0x1C0, //xfbHeight
-    0x1B, //viXOrigin
-    0x10, //viYOrigin
-    0x29A, //viWidth
-    0x1C0, //viHeight
-    VI_XFBMODE_SF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
+GXRenderModeObj sRMObjHReso_prog =
+    MARIOST_RENDER_MODE(VI_TVMODE_NTSC_PROG, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_SF);
+#endif
+#if VERSION == VERSION_DEMO_US2
+/** sRMObjHReso_prog's PAL twin (EURGB60). */
+GXRenderModeObj sRMObjHReso_progPal =
+    MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_DF);
+#elif VERSION >= VERSION_DEMO_EU
+/** Video mode of the boot logo screens in 60Hz mode (EURGB60), set by seq_logo after a hot reset. */
+GXRenderModeObj sRMObjHReso_prog =
+    MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1C0, 0x1C0, 0x1B, 0x10, 0x29A, 0x1C0, VI_XFBMODE_DF);
+#endif
 
+#if VERSION < VERSION_DEMO_EU
 /** The game's main video mode (480 lines, interlaced): marioStInit starts the game with it. */
-GXRenderModeObj GXNtsc480IntDfMarioSt = {
-    VI_TVMODE_NTSC_INT, //viTVmode
-    0x260, //fbWidth
-    0x1E0, //efbHeight
-    0x1E0, //xfbHeight
-    0x1E, //viXOrigin
-    0x0, //viYOrigin
-    0x294, //viWidth
-    0x1E0, //viHeight
-    VI_XFBMODE_DF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
+GXRenderModeObj GXNtsc480IntDfMarioSt =
+    MARIOST_RENDER_MODE(VI_TVMODE_NTSC_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
+#endif
+#if VERSION == VERSION_DEMO_US2
+/** GXNtsc480IntDfMarioSt's PAL twin (50Hz). */
+GXRenderModeObj GXNtsc480IntDfMarioStPal =
+    MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1E0, 0x238, 0x1E, 0x6, 0x294, 0x238, VI_XFBMODE_DF);
+#elif VERSION >= VERSION_DEMO_EU
+/** The game's main video mode (50Hz PAL, interlaced): marioStInit starts the game with it. */
+GXRenderModeObj GXNtsc480IntDfMarioSt =
+    MARIOST_RENDER_MODE(VI_TVMODE_PAL_INT, 0x1E0, 0x238, 0x1E, 0x6, 0x294, 0x238, VI_XFBMODE_DF);
+#endif
 
+#if VERSION < VERSION_DEMO_EU
 /** The game's main video mode in progressive scan, used by marioStInit after a hot reset. */
-GXRenderModeObj GXNtsc480ProgMarioSt = {
-    VI_TVMODE_NTSC_PROG, //viTVmode
-    0x260, //fbWidth
-    0x1E0, //efbHeight
-    0x1E0, //xfbHeight
-    0x1E, //viXOrigin
-    0x0, //viYOrigin
-    0x294, //viWidth
-    0x1E0, //viHeight
-    VI_XFBMODE_SF, //xFBmode
-    0, //field_rendering
-    0, //aa
-    6, 6, 6, 6, 6, 6, //pix 0
-    6, 6, 6, 6, 6, 6, //pix 1
-    6, 6, 6, 6, 6, 6, //pix 2
-    6, 6, 6, 6, 6, 6, //pix 3
-    8, 8, 10, 12, 10, 8, 8, //vfilter
-};
+GXRenderModeObj GXNtsc480ProgMarioSt =
+    MARIOST_RENDER_MODE(VI_TVMODE_NTSC_PROG, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_SF);
+#endif
+#if VERSION == VERSION_DEMO_US2
+/** GXNtsc480ProgMarioSt's PAL twin (EURGB60). */
+GXRenderModeObj GXNtsc480ProgMarioStPal =
+    MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
+#elif VERSION >= VERSION_DEMO_EU
+/** The game's main video mode in 60Hz (EURGB60), used by marioStInit after a hot reset. */
+GXRenderModeObj GXNtsc480ProgMarioSt =
+    MARIOST_RENDER_MODE(VI_TVMODE_EURGB60_INT, 0x1E0, 0x1E0, 0x1E, 0x0, 0x294, 0x1E0, VI_XFBMODE_DF);
 #endif
 
 // local prototypes
@@ -255,13 +169,24 @@ void L_gcResetCheck(void);
 
 /**
  * Start-up.
- * The demos have no error handler (they turn on the SDK's DVD fatal message instead),
- * show English (US demo) or Japanese (JP demo) text whatever the console font,
- * set flag 4 on a restart and always set flag 0x1000.
+ * The early demos have no error handler (they turn on the SDK's DVD fatal message instead),
+ * show English (US demo) or Japanese (JP demo) text whatever the console font and set flag 4 on a restart.
+ * Every demo sets GLOBAL_FLAG_KIOSK and starts the idle timer; the 2004-09 US demo also switches to its PAL
+ * video modes on a PAL console.
  */
 void marioStInit(void) {
     static u8 stack[0x1000];
-    // the releases also start cold after a shutdown reset
+#if VERSION == VERSION_DEMO_US2
+    // the 2004-09 US demo runs on PAL consoles too: there it switches every video mode to its PAL twin
+    VIInit();
+    if (VIGetTvFormat() != VI_NTSC) {
+        memcpy(&sRMObjHReso, &sRMObjHResoPal, sizeof(GXRenderModeObj));
+        memcpy(&sRMObjHReso_prog, &sRMObjHReso_progPal, sizeof(GXRenderModeObj));
+        memcpy(&GXNtsc480IntDfMarioSt, &GXNtsc480IntDfMarioStPal, sizeof(GXRenderModeObj));
+        memcpy(&GXNtsc480ProgMarioSt, &GXNtsc480ProgMarioStPal, sizeof(GXRenderModeObj));
+    }
+#endif
+    // the releases and the later demos also start cold after a shutdown reset
     if (!OSIsRestart()
 #if VERSION >= VERSION_JP
         || (OSGetResetCode() & OS_RESET_SHUTDOWN)
@@ -295,6 +220,9 @@ void marioStInit(void) {
     if (OSIsRestart()) {
         gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
     }
+#endif
+    // every demo runs in kiosk mode
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
     gp->flags |= GLOBAL_FLAG_KIOSK;
 #endif
     gp->rumbleEnabled = 1;
@@ -433,8 +361,8 @@ void marioStInit(void) {
     } else {
         SoundSetOutputMode(1);
     }
-#if VERSION <= VERSION_DEMO_JP
-    none_key = OSGetTime();
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+    none_key = OSGetTime(); // every demo: start the idle timer
 #endif
 }
 
@@ -442,8 +370,8 @@ void marioStInit(void) {
  * One frame of game logic, called from the main loop in main.c:
  * waits out a disc error, reads the pads, then runs every system's per-frame update in a fixed order
  * and checks for a reset.
- * In kiosk builds it also watches for idle pads
- * and raises GLOBAL_FLAG_KIOSK_TIMEOUT (the demos reset outside the field and battle instead).
+ * In kiosk mode it also watches for idle pads and raises GLOBAL_FLAG_KIOSK_TIMEOUT
+ * (the demos after one minute, resetting the game outside the field and battle; the releases after two).
  */
 void marioStMain(void) {
     int i;
@@ -504,10 +432,11 @@ void marioStMain(void) {
                 break;
         }
         if (i >= 4) {
-#if VERSION <= VERSION_DEMO_JP
+            // every demo has the June demo's one-minute timeout and reset
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
             // After a minute without input: in the field or in battle, raise the kiosk timeout flag
             // (seq_game and seq_battle then end the session through SEQ_GAME_OVER in kiosk mode);
-            // anywhere else, reset the game. The US demo restarts the idle timer after raising the flag.
+            // anywhere else, reset the game. The June US demo restarts the idle timer after raising the flag.
             if (OSTicksToSeconds(OSGetTime() - none_key) > 60) {
                 if (seqGetSeq() == SEQ_GAME || seqGetSeq() == SEQ_BATTLE) {
                     gp->flags |= GLOBAL_FLAG_KIOSK_TIMEOUT;

@@ -314,7 +314,7 @@ static BattleUnitDefenseAttr defence_attr_turn = {0};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Red Spike Top (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Red Spike Top (both early demos), as the percent chance each status takes hold:
  * immune to burn; resists 13 statuses (down to 60% of the normal chance).
  */
 static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 65, 100, 75, 100, 100, 95};

@@ -139,7 +139,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Dull Bones (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Dull Bones (both early demos), as the percent chance each status takes hold:
  * immune to sleep and poison; resists 12 statuses (down to 10% of the normal chance).
  */
 static StatusVulnerability regist = {0, 60, 50, 0, 50, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 10, 90, 100, 90, 100, 100, 50};

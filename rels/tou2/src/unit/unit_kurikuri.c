@@ -156,7 +156,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Goomba Bros. (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Goomba Bros. (both early demos), as the percent chance each status takes hold:
  * extra vulnerable to stop, Fright, Gale Force and instant KO.
  */
 static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};

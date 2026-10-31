@@ -122,7 +122,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Spiny (both demos), as the percent chance each status takes hold: resists 11
+ * Status vulnerability of the Spiny (both early demos), as the percent chance each status takes hold: resists 11
  * statuses (down to 80% of the normal chance).
  */
 static StatusVulnerability regist = {90, 90, 80, 100, 90, 100, 100, 80, 100, 90, 100, 90, 100, 90, 90, 100, 80, 100, 90, 100, 100, 100};

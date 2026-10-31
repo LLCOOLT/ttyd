@@ -114,7 +114,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Hyper Bald Cleft (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Hyper Bald Cleft (both early demos), as the percent chance each status takes hold:
  * immune to burn; resists 13 statuses (down to 20% of the normal chance).
  */
 static StatusVulnerability regist = {40, 80, 40, 100, 40, 100, 0, 60, 100, 60, 100, 60, 100, 70, 70, 40, 20, 100, 70, 100, 100, 95};

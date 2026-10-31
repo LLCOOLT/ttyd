@@ -121,7 +121,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Dark Puff (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Dark Puff (both early demos), as the percent chance each status takes hold:
  * resists 9 statuses (down to 90% of the normal chance); extra vulnerable to dizziness and Gale Force.
  */
 static StatusVulnerability regist = {100, 100, 110, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 90, 110, 100, 90, 100, 100, 95};

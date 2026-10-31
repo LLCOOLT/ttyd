@@ -76,7 +76,7 @@ EVT_END()
 
 /**
  * Drops the letters of GAME OVER one after another, waits for the last one to land,
- * then pauses (1 s in later versions; frame waits in the demos and JP).
+ * then pauses (1 s in the releases from US on, 2 s in the 2004-09 demos; frame waits in the early demos and JP).
  */
 EVT_BEGIN(fall_gameover)
     SET_VALUE(LW(0), STRING("g"))
@@ -137,7 +137,9 @@ EVT_BEGIN(fall_gameover)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-#if VERSION >= VERSION_US
+#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+    WAIT_MS(2000) // the 2004-09 demos hold the full word twice as long
+#elif VERSION >= VERSION_US
     WAIT_MS(1000)
 #elif VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(120)
@@ -189,7 +191,11 @@ EVT_BEGIN(fall_gameover_es)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
+#if VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+    WAIT_MS(2000)
+#else
     WAIT_MS(1000)
+#endif
     RETURN
     END
 EVT_END()
@@ -444,7 +450,8 @@ void seq_gameOverMain(SequenceWork* work) {
             if (!fadeIsFinish()) {
                 break;
             }
-#if VERSION <= VERSION_DEMO_JP
+            // every demo resets the game here instead of returning to the title
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
             gp->resetType = 1;
 #else
             _relUnLoad();

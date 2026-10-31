@@ -355,7 +355,8 @@ EVT_BEGIN(luigi_gor_first_talk)
         CALL(evt_msg_print, 0, STRING("gor_luigi_00"), 0, STRING("me"))
         CALL(evt_mario_set_pose, STRING("M_I_2"))
         WAIT_MS(500)
-        // Both demos print the greeting in each branch; the releases pick the message into LW(2) and print it once
+        // Both early demos print the greeting in each branch; the releases pick the message into LW(2) and print it
+        // once
 #if VERSION <= VERSION_DEMO_JP
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_16_SHADOW_QUEEN)
             CALL(evt_msg_print, 0, STRING("gor_luigi_01"), 0, STRING("me"))
@@ -374,7 +375,7 @@ EVT_BEGIN(luigi_gor_first_talk)
         WAIT_MS(500)
         SET_VALUE(GSWF(GSWF_GOR_LUIGI_FIRST_TALK), 1)
     END_IF
-    // Both demos print each Luigi line in its case; the releases pick the message into LW(2) and print it once
+    // Both early demos print each Luigi line in its case; the releases pick the message into LW(2) and print it once
 #if VERSION <= VERSION_DEMO_JP
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG1_17_FATHER_AND_SON_REUNITED, STORY_STG2_24_BOSS_BATTLE)

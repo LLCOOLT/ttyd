@@ -319,7 +319,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                 break;
             case 3:
             case 2:
-                // Both demos draw the labels with FontDrawMessage; the releases fit them to their box (yuuranking_draw_msg_fit)
+                // Both early demos draw the labels with FontDrawMessage; the releases fit them to their box (yuuranking_draw_msg_fit)
 #if VERSION <= VERSION_DEMO_JP
                 FontDrawStart();
                 FontDrawScale(1.0f);

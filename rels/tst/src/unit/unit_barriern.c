@@ -203,7 +203,7 @@ static BattleUnitKindPart parts[] = {
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Yux (both demos), as the percent chance each status takes hold: immune to
+ * Status vulnerability of the Yux (both early demos), as the percent chance each status takes hold: immune to
  * poison, burn, freeze and Fright; resists 11 statuses (down to 20% of the normal chance).
  */
 static StatusVulnerability regist = {20, 90, 80, 0, 80, 100, 0, 0, 100, 80, 100, 80, 100, 80, 80, 0, 80, 100, 80, 100, 100, 95};

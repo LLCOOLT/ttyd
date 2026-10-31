@@ -40,7 +40,7 @@ static f32 angleABTBL[] = { 1.0f,       1.273187f,  1.27303f,   1.272768f,  1.27
 const char* build_date_ptr = R_build_date;
 const char* build_time_ptr = R_build_time;
 
-// FAKE: stand-in for the assertion helper JP, US and both demos strip (PAL keeps it, below); it only
+// FAKE: stand-in for the assertion helper JP, US and the US demos strip (PAL and the EU demo keep it, below); it only
 // keeps the original's message string in its place in .rodata.
 #if VERSION < VERSION_DEMO_EU
 const char* systemStrippedPool0(void) {
@@ -550,14 +550,14 @@ static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
  * Reads the controllers once per frame (DEMOPadRead) into the global input state:
  * held, newly pressed, released and auto-repeat (24 frames first, then every 6) for buttons
  * and stick directions, the analogue sticks and triggers,
- * and applies rumble changes to the motors when rumble is enabled.
+ * and, in the releases, applies rumble changes to the motors when rumble is enabled.
  */
 void makeKey(void) {
     s32 delay;
-#if VERSION <= VERSION_DEMO_JP
-    // The demo keeps button/dirs in 32-bit locals: with no u16 masks to fold, the global optimiser's constant
-    // propagation changes nothing in makeKey, so its dead-li deletion never runs and loop 2's count register
-    // is colour-coalesced with i's zero (the demo's loop-2 register assignment).
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+    // All four demos keep button/dirs in 32-bit locals: with no u16 masks to fold, the global optimiser's
+    // constant propagation changes nothing in makeKey, so its dead-li deletion never runs and loop 2's count
+    // register is colour-coalesced with i's zero (the demos' loop-2 register assignment).
     u32 button;
     u32 dirs;
 #else
@@ -629,7 +629,8 @@ void makeKey(void) {
     }
 #endif
 
-#if VERSION >= VERSION_JP
+#if VERSION == VERSION_JP || VERSION == VERSION_US || VERSION == VERSION_EU
+    // Only the releases drive the rumble motors; none of the four demos does.
     if (gp->rumbleEnabled) {
         for (i = 0; i < 4; i++) {
             if (gp->rumbleHardStop[i]) {
@@ -838,8 +839,8 @@ f32 sysFrame2SecFloat(f32 frame) {
 }
 
 /**
- * Converts milliseconds to whole frames at the current frame rate (50 or 60 in US and PAL;
- * always 60 in JP and the demos).
+ * Converts milliseconds to whole frames at the current frame rate (50 or 60 in US, PAL and the 2004-09 demos;
+ * always 60 in JP and the early demos).
  */
 s32 sysMsec2Frame(s32 msec) {
 #if VERSION >= VERSION_US
@@ -849,7 +850,7 @@ s32 sysMsec2Frame(s32 msec) {
 #endif
 }
 
-/** Converts milliseconds to frames as a float, at the current frame rate (60 in JP and the demos). */
+/** Converts milliseconds to frames as a float, at the current frame rate (60 in JP and the early demos). */
 f32 sysMsec2FrameFloat(f32 msec) {
 #if VERSION >= VERSION_US
     return (msec * (f32)gp->framerate) / 1000.0f;
@@ -1107,11 +1108,11 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     str[10] = "[%8s:% 4d] %s";
 }
 #else
-/** FAKE stand-in, JP and demo form of systemStrippedPool1 above (the demo keeps the full mode name table). */
+/** FAKE stand-in, JP and early-demo form of systemStrippedPool1 above (the early demos keep all the mode names). */
 void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     f[0] = 1.0f;
 #if VERSION <= VERSION_DEMO_JP
-    // the demo's small-data limit leaves the 6-byte names in .rodata, so the whole name table stays
+    // the early demos' small-data limit leaves the 6-byte names in .rodata, so the whole name table stays
     str[0] = "LINEAR";
     str[1] = "ACCEL";
     str[2] = "DOUBLE_ACCEL";

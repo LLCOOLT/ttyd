@@ -75,8 +75,8 @@ static s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj);
 static s32 mobj_timerswitch(MapObjectEntry* mobj);
 static s32 mobj_switch_red(MapObjectEntry* mobj);
 static s32 mobj_switch_blue(MapObjectEntry* mobj);
-// PAL and both demos build the breaking-rock, trap-floor, arrow, orange/green ride-switch and red tornado-switch
-// objects that JP and US strip (their strings and literals stay behind there)
+// PAL, the EU demo and both early demos build the breaking-rock, trap-floor, arrow, orange/green ride-switch and
+// red tornado-switch objects that JP, US and the 2004-09 US demo strip (their strings and literals stay behind there)
 #if VERSION <= VERSION_DEMO_JP || VERSION >= VERSION_DEMO_EU
 #define MOBJ_EXTRA_OBJS 1
 #else

@@ -184,7 +184,7 @@ static void alarm_handler(OSAlarm* alarm, OSContext* context) {
 
 /**
  * Enters the kiosk menu: loads its textures (monthry.tpl; the US demo's e3.tpl plus its four title characters),
- * starts the play-time alarm (5 min in US, 10 min otherwise; the US demo arms it when a scenario starts),
+ * starts the play-time alarm (5 min in the US release, 10 min otherwise; the US demo arms it when a scenario starts),
  * sets the kiosk and save-blocks-off flags and plays the file menu BGM.
  */
 void seq_e3Init(SequenceWork* seq) {
@@ -213,7 +213,7 @@ void seq_e3Init(SequenceWork* seq) {
     wp->initTime = 0;
 #else
     OSCreateAlarm(&wp->alarm);
-#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
+#if VERSION == VERSION_US
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 300, alarm_handler);
 #else
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 600, alarm_handler);
@@ -469,8 +469,8 @@ void seq_e3Main(SequenceWork* seq) {
                 pouchGetPtr()->partyData[i].HPLevel = 1;
             }
 
-#if VERSION >= VERSION_DEMO_EU
-            // PAL: the first scenario starts without items or badges
+#if VERSION >= VERSION_DEMO_US2
+            // the 2004-09 demos and PAL: the first scenario starts without items or badges
             if (wp->scenario != 0) {
 #endif
                 for (i = 0; i < 2; i++) {
@@ -479,20 +479,20 @@ void seq_e3Main(SequenceWork* seq) {
                     pouchGetItem(ITEM_FIRE_FLOWER);
                     pouchGetItem(ITEM_POW_BLOCK);
                 }
-#if VERSION >= VERSION_DEMO_EU
+#if VERSION >= VERSION_DEMO_US2
             }
 #endif
 
             pouchGetPtr()->availableBP = 20;
             pouchGetPtr()->maximumBP = 20;
-#if VERSION >= VERSION_DEMO_EU
+#if VERSION >= VERSION_DEMO_US2
             if (wp->scenario != 0) {
 #endif
                 pouchGetItem(ITEM_POWER_BOUNCE);
                 pouchGetItem(ITEM_POWER_SMASH);
                 pouchEquipBadgeID(ITEM_POWER_BOUNCE);
                 pouchEquipBadgeID(ITEM_POWER_SMASH);
-#if VERSION >= VERSION_DEMO_EU
+#if VERSION >= VERSION_DEMO_US2
             }
 #endif
             pouchReviseMarioParam();

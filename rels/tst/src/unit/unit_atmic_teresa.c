@@ -221,7 +221,7 @@ static BattleUnitKindPart parts[] = {
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Atomic Boo (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Atomic Boo (both early demos), as the percent chance each status takes hold:
  * immune to Huge, Tiny, Attack Down and Fright; resists 12 statuses (down to 5% of the normal chance).
  */
 static StatusVulnerability regist = {40, 40, 40, 40, 40, 40, 100, 30, 0, 0, 100, 0, 100, 40, 40, 0, 10, 100, 40, 100, 100, 5};

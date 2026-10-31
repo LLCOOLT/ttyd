@@ -174,7 +174,7 @@ static BattleUnitDefenseAttr defence_patapata_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Shady Paratroopa in its winged form (both demos), as the percent chance each
+ * Status vulnerability of the Shady Paratroopa in its winged form (both early demos), as the percent chance each
  * status takes hold: resists 11 statuses (down to 85% of the normal chance); extra vulnerable to dizziness
  * and Gale Force.
  */
@@ -554,7 +554,7 @@ static BattleUnitDefense defence_turn = {0};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Shady Paratroopa (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Shady Paratroopa (both early demos), as the percent chance each status takes hold:
  * resists 13 statuses (down to 80% of the normal chance).
  */
 static StatusVulnerability regist = {90, 90, 80, 100, 85, 100, 100, 85, 100, 85, 100, 85, 100, 85, 85, 90, 80, 100, 85, 100, 100, 95};

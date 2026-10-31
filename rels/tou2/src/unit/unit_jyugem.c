@@ -141,7 +141,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Lakitu (both demos), as the percent chance each status takes hold: resists
+ * Status vulnerability of the Lakitu (both early demos), as the percent chance each status takes hold: resists
  * 11 statuses (down to 70% of the normal chance).
  */
 static StatusVulnerability regist = {80, 90, 100, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 90, 100, 100, 80, 100, 100, 95};

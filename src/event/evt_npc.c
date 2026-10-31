@@ -2080,7 +2080,7 @@ USER_FUNC(evt_npc_get_drop_fixitem) {
 
 /**
  * Writes the item the defeated enemy NPC args[0] drops to args[1] (0 if its battle flags forbid drops).
- * The demo releases always write 0.
+ * All four demos always write 0.
  */
 USER_FUNC(evt_npc_get_drop_item) {
     EvtWord* args = event->args;
@@ -2091,13 +2091,13 @@ USER_FUNC(evt_npc_get_drop_item) {
     if (npc->battleInfo.battleFlags & NPC_BATTLE_NO_ITEM) {
         evtSetValue(event, index, 0);
     } else {
-#if VERSION <= VERSION_DEMO_JP
-        evtSetValue(event, index, 0); // the demo never reports a dropped item
+#if VERSION <= VERSION_DEMO_JP || VERSION == VERSION_DEMO_US2 || VERSION == VERSION_DEMO_EU
+        evtSetValue(event, index, 0); // all four demos: no item drops
 #else
         evtSetValue(event, index, npc->battleInfo.itemDropped);
 #endif
     }
-    return 2;
+    return EVT_RETURN_DONE;
 }
 
 /**

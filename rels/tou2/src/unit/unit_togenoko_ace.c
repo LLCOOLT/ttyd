@@ -131,7 +131,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the Dark Koopatrol (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the Dark Koopatrol (both early demos), as the percent chance each status takes hold:
  * resists 13 statuses (down to 50% of the normal chance).
  */
 static StatusVulnerability regist = {60, 60, 50, 100, 50, 100, 100, 50, 100, 60, 100, 60, 100, 60, 60, 50, 50, 100, 50, 100, 100, 95};

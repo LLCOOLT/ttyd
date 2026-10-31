@@ -1522,7 +1522,8 @@ static EVT_BEGIN(kurihakase_talk)
             WAIT_MS(1000)
             SPAWN_EVENT(kurihakase_after3minutes)
         END_IF
-        // Both demos switch on STG7_03/STG7_04; the releases switch on STG7_02 and whether Fahr Outpost was reached
+        // Both early demos switch on STG7_03/STG7_04; the releases switch on STG7_02 and whether Fahr Outpost was
+        // reached
 #if VERSION <= VERSION_DEMO_JP
         CASE_LESS(STORY_STG7_03_WHERES_WHITE)
         CALL(evt_pouch_check_item, ITEM_ULTRA_HAMMER, LW(0))

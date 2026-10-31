@@ -250,7 +250,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 #if VERSION <= VERSION_DEMO_JP
 /**
- * Status vulnerability of the White Magikoopa (both demos), as the percent chance each status takes hold:
+ * Status vulnerability of the White Magikoopa (both early demos), as the percent chance each status takes hold:
  * resists 13 statuses (down to 40% of the normal chance).
  */
 static StatusVulnerability regist = {70, 70, 60, 100, 60, 100, 100, 60, 100, 50, 100, 50, 100, 50, 50, 40, 70, 100, 60, 100, 100, 95};

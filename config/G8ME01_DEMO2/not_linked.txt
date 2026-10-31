@@ -1,13 +1,1 @@
 # September 2004 US demo units not linked from C yet (see configure.py). Remove a line once the unit links and the hashes hold.
-R_build.c
-battle/battle.c
-battle/battle_seq_end.c
-event/evt_npc.c
-gon/gon_01.c
-gon/gon_10.c
-mario/mariost.c
-sequence/seq_e3.c
-sequence/seq_gameover.c
-sequence/seq_logo.c
-statuswindow.c
-system.c
